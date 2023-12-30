@@ -22,7 +22,8 @@ export type UserUsernameProps = {
     fontSize?: number,
     fontFamily?: String,
     margin?: number,
-    onClickAction?: () => void
+    onClickAction?: () => void,
+    scale?: number
 }
 
 export type UserProfilePictureProps = {

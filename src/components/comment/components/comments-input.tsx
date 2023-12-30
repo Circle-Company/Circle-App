@@ -16,6 +16,8 @@ export default function input ({
     const { comment } = useCommentsContext()
     const {momentSizes} = useMomentContext()
 
+    const [commentText, setCommentText] = React.useState<string>('')
+
     var animatedScale = React.useRef(new Animated.Value(0)).current
 
 
@@ -75,7 +77,6 @@ export default function input ({
         alignSelf: 'center',
         alignItems: 'center',
         justifyContent: 'center',
-        backgroundColor: colors.transparent.white_10
     }
     return (
          <View style={blur_container}>
@@ -90,12 +91,22 @@ export default function input ({
                             placeholder={placeholder}
                             placeholderTextColor={String(colors.transparent.white_80)}
                             numberOfLines={1}
+                            onChangeText={(text) => setCommentText(text)}
                             
                         />
                     </View>
-                    <Pressable onPress={(n) => { handleButtonPress() }} style={pressable_style}>
-                        <Animated.View style={[iconContainer, { transform: [{ scale: animatedScale }] }]}>
-                            <Arrowbottom fill={String(colors.transparent.white_60)} width={16} height={16}/>
+                    <Pressable
+                        onPress={(n) => { handleButtonPress() }}
+                        style={pressable_style}
+                    >
+                        <Animated.View
+                            style={[iconContainer, { transform: [{ scale: animatedScale }] }, {backgroundColor: commentText == ''? String(colors.transparent.white_10) : String(colors.transparent.white_20)}]}
+                        >
+                            <Arrowbottom
+                                fill={commentText == ''? String(colors.transparent.white_60): String(colors.gray.white)}
+                                width={16}
+                                height={16}
+                            />
                         </Animated.View>                                
                     </Pressable>
 

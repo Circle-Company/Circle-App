@@ -31,7 +31,7 @@ export default function like ({ isLiked }: MomentLikeProps) {
         animatedScaleIconPressed.setValue(0.4)
         animatedScaleIcon.setValue(0.4)
         Animated.spring(animatedScaleIconPressed, {
-            toValue: 1.4,
+            toValue: 1,
             bounciness: 12,
             speed: 8,
             useNativeDriver: true
@@ -109,24 +109,20 @@ export default function like ({ isLiked }: MomentLikeProps) {
     }
 
     const like_fill = String(colors.gray.white)
-    const like_number = NumberConversor(String(moment.likes_count))
+    const like_number = NumberConversor(Number(moment.likes_count))
     
     if(likedPressed) {
         return (
             <Animated.View style={animated_container}>
                 <Pressable  onPress={() => onDislikeAction()} style={pressable_container}>
-                    <BlurView
-                        overlayColor={String(colors.transparent.black_00)}
-                        blurAmount={sizes.blur.blurAmount}
-                        style={blur_container_likePressed}
-                    >
+                    <View style={blur_container_likePressed}>
                         <View style={container}>
                             <Animated.View style={icon_container_pressed}>
-                                <LikeIcon fill={like_fill} width={14} height={14}/>
+                                <LikeIcon fill={like_fill} width={20} height={20}/>
                             </Animated.View>
                             <Text style={likedPressed?like_text_pressed: like_text}>{like_number}</Text>                                              
                         </View>                        
-                    </BlurView>
+                    </View>
                 </Pressable>
             </Animated.View>
         )   
@@ -144,8 +140,7 @@ export default function like ({ isLiked }: MomentLikeProps) {
                             <Animated.View style={icon_container}>
                                 <LikeIcon fill={like_fill} width={14} height={14}/>
                             </Animated.View>
-                            <Text style={likedPressed?like_text_pressed: like_text}>{like_number}</Text>   
-                                                                              
+                            <Text style={likedPressed?like_text_pressed: like_text}>{like_number}</Text>                                       
                         </View>                        
                     </BlurView>
                 </Pressable>

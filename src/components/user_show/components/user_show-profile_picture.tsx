@@ -1,7 +1,6 @@
 import React from "react"
 import { View, useColorScheme, Image} from "react-native"
 import FastImage from "react-native-fast-image"
-import { BlurView } from "@react-native-community/blur"
 import ColorTheme, { colors } from "../../../layout/constants/colors"
 import sizes from "../../../layout/constants/sizes"
 import { UserProfilePictureProps } from "../user_show-types"
@@ -16,24 +15,18 @@ export default function profile_picture ({
 
     const isDarkMode = useColorScheme() === "dark"
     const outlineSize: Number = Number(Number(pictureDimensions.width)/8)// /6
-    const out_container:any = {
-        overflow: "hidden",
+    const container: any = {
         marginHorizontal: sizes.paddings["1sm"]/2,
+        alignItems: "center",
+        justifyContent: "center",
         borderRadius: + Number([Number(pictureDimensions.width) + Number(outlineSize)]) /2,
-    }
-    const blur_container: any = {
         backgroundColor: displayOnMoment? ColorTheme().blur_display_color: isDarkMode? colors.gray.grey_06: colors.gray.grey_02,
         width: Number(pictureDimensions.width) + Number(outlineSize),
         height: Number(pictureDimensions.height) + Number(outlineSize),
     }
 
     return (
-        <View style={out_container}>
-            <BlurView
-                overlayColor={String(colors.transparent.black_00)}
-                blurAmount={sizes.blur.blurAmount}
-                style={blur_container}
-            />
+        <View style={container}>
             <FastImage
                 source={{ uri: String(user.profile_picture.small_resolution) || '' }}
                 style={{
@@ -44,10 +37,7 @@ export default function profile_picture ({
                     top: Number(outlineSize)/2,
                     left: Number(outlineSize)/2
                 }}
-            />  
-
+            />
         </View>
-
-    
     )
 }

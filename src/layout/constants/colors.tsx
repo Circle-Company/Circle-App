@@ -75,8 +75,8 @@ export const colors:colorsType = {
         blue_08: '#0042A5',
         blue_07: '#0056C3',
         blue_06: '#006BE1',
-        blue_05: '#0082ff',
-        blue_04: '#2492FC',
+        blue_05: '#007AFF',
+        blue_04: '#0A84FF',
         blue_03: '#47A2F9',
         blue_02: '#69B2F8',
         blue_01: '#8AC2F8',
@@ -146,7 +146,7 @@ export const dark = {
     backgroundDisabled: colors.gray.grey_07,
 
     primaryBackground: colors.blue.blue_09,
-    primary: colors.blue.blue_05,
+    primary: colors.blue.blue_04,
     primaryAccent: colors.blue.blue_00,
     primaryMaxAccent: colors.blue.blue_02,
 
@@ -180,7 +180,7 @@ export const light = {
     backgroundAccent: colors.gray.black,
     backgroundDisabled: colors.gray.grey_02,
 
-    primaryBackground: colors.blue.blue_09,
+    primaryBackground: colors.blue.blue_00,
     primary: colors.blue.blue_05,
     primaryAccent: colors.blue.blue_00,
     primaryMaxAccent: colors.blue.blue_02,
@@ -204,8 +204,8 @@ export const light = {
     icon: colors.gray.grey_04,
 
     blur_overlay_color: colors.transparent.black_00,
-    blur_button_color:colors.transparent.white_10,
-    blur_display_color:colors.transparent.black_10,
+    blur_button_color:colors.transparent.black_30,
+    blur_display_color:colors.transparent.black_00,
 
     verifyed: colors.yellow.yellow_04
 }

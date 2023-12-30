@@ -2,7 +2,7 @@ import React from 'react';
 import { SafeAreaView, StatusBar, StyleSheet, TouchableOpacity, Dimensions, useColorScheme} from 'react-native'
 import {useNavigation} from '@react-navigation/native'
 
-import ColorScheme from '../../layout/constants/colors'
+import ColorScheme, { colors } from '../../layout/constants/colors'
 import Sizes from '../../layout/constants/sizes'
 import Fonts from '../../layout/constants/fonts'
 
@@ -27,6 +27,7 @@ export default function ButtonStandart({navigateTo, title}:buttonStandart) {
     }
 
     const text = {
+        color: colors.gray.white,
         fontFamily: Fonts.family['BoldI-talic'],
         fontSize: 14,
     }

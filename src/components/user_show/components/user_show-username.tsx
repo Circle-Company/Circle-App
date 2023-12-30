@@ -16,17 +16,18 @@ export default function user_username ({
     color = ColorTheme().text,
     fontSize = fonts.size.footnote,
     fontFamily = fonts.family.Bold,
-    margin = Sizes.margins["1sm"]
+    margin = Sizes.margins["1sm"],
+    scale = 1
 }: UserUsernameProps) {
 
     const {user} = useUserShowContext()
     const container:any = {
-        margin,
+        margin: margin * scale,
         flexDirection: 'row',
         alignItems: 'center',
     }
     const username_style_moment:any = {
-        fontSize,
+        fontSize: fontSize * scale,
         fontFamily,
         color: colors.gray.white,
         textShadowColor: '#00000070',
@@ -35,7 +36,7 @@ export default function user_username ({
     }
 
     const username_style:any = {
-        fontSize,
+        fontSize: fontSize * scale,
         fontFamily,
         color,
     }
@@ -45,8 +46,8 @@ export default function user_username ({
         <View style={container}>
             <Text style={displayOnMoment? username_style_moment: username_style}>@{truncated({text: user.username, size: Number(truncatedSize)})}</Text>
             {user.verifyed && 
-            <View style={{alignItems: 'center', justifyContent: "center", marginTop: 1, marginLeft: 2}}>
-                <Verifyed fill={String(displayOnMoment? colors.gray.white: ColorTheme().verifyed)} width={12} height={12}/>
+            <View style={{alignItems: 'center', justifyContent: "center", marginTop: 1 * scale*2, marginLeft: 2 * scale}}>
+                <Verifyed fill={String(displayOnMoment? colors.gray.white: ColorTheme().verifyed)} width={12 * scale} height={12 * scale}/>
             </View>
                                
             }
