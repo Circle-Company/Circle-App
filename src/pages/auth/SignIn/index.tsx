@@ -3,14 +3,17 @@ import { SafeAreaView, StatusBar, StyleSheet, useColorScheme, ScrollView, Toucha
 import ColorTheme from '../../../layout/constants/colors'
 import { Text, View } from '../../../components/Themed'
 import {useNavigation} from '@react-navigation/native'
-import * as authActions from '../../../store/actions/auth'
-import { useDispatch } from 'react-redux'
 
 import ButtonClose from '../../../components/buttons/close'
 import AuthTitle from '../../../components/auth/title'
 import AuthSocialLogin from '../../../components/auth/social'
-import Loading from '../../../components/loading'
+import Loading from '../../../components/loading/components/loading-activity_indicator'
 import AuthTermsText from '../../../components/auth/terms'
+
+import Lock from '../../../assets/icons/svgs/lock.svg'
+import User from '../../../assets/icons/svgs/user.svg'
+import Eye from '../../../assets/icons/svgs/eye.svg'
+import EyeSlash from '../../../assets/icons/svgs/eye_slash.svg'
 
 const WindowWidth = Dimensions.get('screen').width
 const WindowHeight = Dimensions.get('screen').height
@@ -175,12 +178,7 @@ export default function SignInScreen() {
       <StatusBar style={'light-content'} translucent={true}/>
 
       <View style={{marginBottom: 30}}>
-        <ButtonClose
-          style={{
-            backgroundColor: ColorTheme().backgroundDisabled,
-            iconColor: ColorTheme().icon
-          }}
-        />
+        <ButtonClose/>
       </View>
 
       <View style={{marginBottom: 18}}>
@@ -201,10 +199,7 @@ export default function SignInScreen() {
 
       <View style={container}>
         <View style={inputContainer}>
-          <Image 
-            source={require('../../../assets/icons/pngs/24/user.png')}
-            style={icon}
-          />
+        <User color={String(ColorTheme().icon)} width={24} height={24} style={{marginRight: 16}}/>
           <TextInput
             style={userError? inputError: input}
             placeholder={'@username'}
@@ -228,10 +223,7 @@ export default function SignInScreen() {
         }
         
         <View style={inputContainer}>
-          <Image 
-            source={require('../../../assets/icons/pngs/24/lock.png')}
-            style={icon}
-          />
+          <Lock color={String(ColorTheme().icon)} width={24} height={24} style={{marginRight: 16}}/>
           <TextInput
             style={passError? inputError: input}
             placeholder={'Password'}
@@ -248,10 +240,11 @@ export default function SignInScreen() {
             onChangeText={(text) => {setPassword(text)}}
           />
           <TouchableOpacity onPress={() => {ViewPassword()}}>
-            <Image 
-              source={viewPass?require('../../../assets/icons/pngs/24/eye.png') : require('../../../assets/icons/pngs/24/eye-off.png')}
-              style={icon2}
-            />                                    
+            {viewPass? 
+              <Eye color={String(ColorTheme().icon)} width={18} height={18} style={{padding: 10, marginLeft: 16, marginRight: 8}}/>
+            :
+              <EyeSlash color={String(ColorTheme().icon)} width={18} height={18} style={{padding: 10, marginLeft: 16, marginRight: 8}}/>
+            }                  
           </TouchableOpacity>
         </View>
         {passError?

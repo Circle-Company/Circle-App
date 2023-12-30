@@ -4,17 +4,17 @@ import { MidiaReciveDataProps } from "../midia_render/midia_render-types"
 import { CommentsReciveDataProps } from "../comment/comments-types"
 export type momentReciveDataProps = {
     id: Number,
-    user: userReciveDataProps
+    user?: userReciveDataProps
     description?: String,
-    content_type: String,
+    content_type?: String,
     midia: {
-        fullhd_resolution: String,
-        nhd_resolution: String
+        fullhd_resolution?: String,
+        nhd_resolution?: String
     },
-    comments: CommentsReciveDataProps,
+    comments?: CommentsReciveDataProps,
     likes_count?: Number,
     deleted?: Boolean,
-    created_at: String
+    created_at?: String
 }
 
 export type MomentMainRootProps = {

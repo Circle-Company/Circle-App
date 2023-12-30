@@ -7,10 +7,14 @@ import { useMomentContext } from "../../moment/moment-context";
 import { MidiaRender } from "..";
 
 type RenderImageProps = {
-  blur?: boolean
+  blur?: boolean,
+  blurRadius?: number
 }
 
-export default function render_image ({blur = false}: RenderImageProps) {
+export default function render_image ({
+  blur = false,
+  blurRadius = 35
+}: RenderImageProps) {
   const {content_sizes, midia} = useMidiaRenderContext()
 
   const image: any = {
@@ -29,7 +33,7 @@ export default function render_image ({blur = false}: RenderImageProps) {
           source={{uri: String(midia.nhd_resolution)}}
           style={image}
           resizeMode="cover"
-          blurRadius={35}
+          blurRadius={blurRadius}
         />        
       </View>
 
@@ -37,7 +41,7 @@ export default function render_image ({blur = false}: RenderImageProps) {
   }else {
     return (
       <FastImage
-        source={{uri: String(midia.fullhd_resolution)}}
+        source={{uri: String(midia.fullhd_resolution? midia.fullhd_resolution: midia.nhd_resolution)}}
         style={image}
         resizeMode="cover"
       />

@@ -19,6 +19,4 @@ export default function container ({children, focused}: CommentsContainerProps) 
         )           
     }
     else return null
-    
-
 }

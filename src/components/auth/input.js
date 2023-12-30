@@ -1,15 +1,17 @@
 import React, {useState, useEffect} from 'react';
-import { Pressable, StyleSheet, TouchableOpacity, Dimensions, Image, useColorScheme, TextInput} from 'react-native'
-import {useNavigation} from '@react-navigation/native'
+import { Pressable, StyleSheet, TouchableOpacity, Dimensions, useColorScheme, TextInput} from 'react-native'
 import { Text, View } from '../Themed'
 import Colors from '../../constants/Colors'
 
+import Lock from '../../assets/icons/svgs/lock.svg'
+import User from '../../assets/icons/svgs/user.svg'
+import Eye from '../../assets/icons/svgs/eye.svg'
+import EyeSlash from '../../assets/icons/svgs/eye_slash.svg'
+import ColorTheme from '../../layout/constants/colors';
+
 const WindowWidth = Dimensions.get('screen').width
-const WindowHeight = Dimensions.get('screen').height
 
 export default function AuthInput(props) {
-
-    const navigation = useNavigation()
     const isDarkMode = useColorScheme() === 'dark'
 
     const container = {
@@ -20,20 +22,6 @@ export default function AuthInput(props) {
         width: WindowWidth - 60,
         alignItems: 'center',
         flexDirection: 'row',
-    }
-    const icon = {
-        width: 24,
-        height: 24,
-        tintColor: isDarkMode ? Colors.dark.icon : Colors.light.icon,
-        marginRight: 16
-    }
-    const icon2 = {
-        width: 18,
-        height: 18,
-        tintColor: isDarkMode ? Colors.dark.placeholder : Colors.light.placeholder,
-        padding: 10,
-        marginLeft: 16,
-        marginRight: 8
     }
     const input = {
         flex: 1,
@@ -80,10 +68,7 @@ export default function AuthInput(props) {
 
                 <View style={container}>
                     <View style={inputContainer}>
-                        <Image 
-                            source={require('../../assets/icons/pngs/24/lock.png')}
-                            style={icon}
-                        />
+                        <Lock color={ColorTheme().icon} width={24} height={24} style={{marginRight: 16}}/>
                         <TextInput
                             style={error? inputError: input}
                             placeholder={props.placeholder}
@@ -98,10 +83,11 @@ export default function AuthInput(props) {
                             secureTextEntry={!viewPass}
                         />
                         <TouchableOpacity onPress={() => {ViewPassword()}}>
-                            <Image 
-                                source={viewPass?require('../../assets/icons/pngs/24/eye.png') : require('../../assets/icons/pngs/24/eye-off.png')}
-                                style={icon2}
-                            />                                    
+                            {viewPass? 
+                                <Eye color={ColorTheme().icon} width={18} height={18} style={{padding: 10, marginLeft: 16, marginRight: 8}}/>
+                            :
+                                <EyeSlash color={ColorTheme().icon} width={18} height={18} style={{padding: 10, marginLeft: 16, marginRight: 8}}/>
+                            }                                 
                         </TouchableOpacity>
              
                     </View>
@@ -122,10 +108,7 @@ export default function AuthInput(props) {
 
                 <View style={container}>
                     <View style={inputContainer}>
-                        <Image 
-                            source={require('../../assets/icons/pngs/24/user.png')}
-                            style={icon}
-                            />
+                    <User color={ColorTheme().icon} width={24} height={24} style={{marginRight: 16}}/>
                         <TextInput
                             style={input}
                             placeholder={props.placeholder}

@@ -9,9 +9,7 @@ export default function main_root ({children, data, sizes}: MomentMainRootProps)
     }
     return (
         <MomentContext.Provider value={{moment: data, momentSizes: sizes}}>
-            <View style={container}>
-                {children}
-            </View>            
+            {children}  
         </MomentContext.Provider>
 
     )

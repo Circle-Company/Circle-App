@@ -5,16 +5,11 @@ import ColorTheme from '../../layout/constants/colors'
 import Sizes from '../../layout/constants/sizes'
 import Fonts from '../../layout/constants/fonts'
 
-const Right = require('../../assets/icons/pngs/24/arrow-right.png')
-const Left = require('../../assets/icons/pngs/24/arrow-up.png')
-const Up = require('../../assets/icons/pngs/24/arrow-up.png')
-const Down = require('../../assets/icons/pngs/24/arrow-down.png')
+import ArrowRight from '../../assets/icons/svgs/arrow_right.svg'
 
 export default function Buttonlarge(props:any) {
 
     const navigation = useNavigation()
-    const isDarkMode = useColorScheme() === 'dark'
-
     var animatedScale = useRef(new Animated.Value(0)).current
 
 
@@ -45,11 +40,6 @@ export default function Buttonlarge(props:any) {
         justifyContent: 'center',
         flex: 1
     }
-    const icon:any = {
-        width: 24,
-        height: 24,
-        tintColor: ColorTheme().textAccent
-    }
     const iconContainer:any = {
         marginLeft: 38,
         width: 28,
@@ -63,7 +53,7 @@ export default function Buttonlarge(props:any) {
 
     return (
         <View style={container}>
-            <Pressable onPress={(n) => { handleButtonPress(), navigation.navigate(props.navigateTo) }}>
+            <Pressable onPress={() => { handleButtonPress(), navigation.navigate(props.navigateTo) }}>
                 <Animated.View
                     style={[buttonContainer, { transform: [{ scale: animatedScale }] }]}
                 >
@@ -72,7 +62,7 @@ export default function Buttonlarge(props:any) {
                     </View>
 
                     <View style={iconContainer}>
-                        <Image source={Right} style={icon} resizeMode='contain' />
+                        <ArrowRight fill={String(ColorTheme().backgroundAccent)} width={16} height={16}/>
                     </View>
                 </Animated.View>
 

@@ -115,7 +115,7 @@ const moment = {
     height: 252,
     paddingTop: 2,
     padding: 5,
-    borderRadius: 28
+    borderRadius: 30
   },
   standart: {
     width: 355,

@@ -9,13 +9,13 @@ import ChevronRight from '../../../assets/icons/svgs/chevron_right.svg'
 import sizes from '../../../layout/constants/sizes'
 
 type ViewMorePuttonProps = {
-    navigateTo: string
+    action(): Promise<void>,
     icon?: React.ReactNode,
     text?: string
 }
 
 export default function ViewMorebutton({
-    navigateTo,
+    action,
     text = 'View More',
     icon = <ChevronRight fill={String(ColorTheme().primary)} width={11} height={11}/>
 }: ViewMorePuttonProps) {
@@ -48,7 +48,7 @@ export default function ViewMorebutton({
     }
     async function onPressAction() {
         HandleButtonAnimation()
-        navigation.navigate(navigateTo)
+        action()
         console.log('View More Pressed')
     }
 

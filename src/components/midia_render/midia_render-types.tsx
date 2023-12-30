@@ -1,8 +1,8 @@
 import { momentSizes } from "../moment/moment-types"
 
 export type MidiaReciveDataProps = {
-    fullhd_resolution: String,
-    nhd_resolution: String,
+    fullhd_resolution?: string,
+    nhd_resolution?: string,
 }
 
 export type MidiaRenderMainRootProps = {
