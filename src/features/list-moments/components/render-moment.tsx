@@ -6,12 +6,17 @@ import { Comments } from '../../../components/comment'
 import { momentReciveDataProps } from '../../../components/moment/moment-types'
 import RenderComment from './render-comment'
 import { truncated } from '../../../algorithms/processText'
+import { MomentActions } from '../../../components/moment/moment-actions'
+
 type renderMomentProps = {
     moment: momentReciveDataProps,
     focused: boolean,
+    viewed: boolean
 }
 
-export default function render_moment ({moment, focused}: renderMomentProps) {
+export default function render_moment ({moment, focused, viewed}: renderMomentProps) {
+    
+    if(viewed) MomentActions.View({moment_id: Number(moment.id)})
     return (
         <Moment.MainRoot data={moment} sizes={sizes.moment.standart}>
             <Moment.Container contentRender={moment.midia} focused={focused}>
@@ -19,7 +24,7 @@ export default function render_moment ({moment, focused}: renderMomentProps) {
                 <Moment.TopLeftRoot>
                 <UserShow.Root data={moment.user}>
                     <UserShow.ProfilePicture pictureDimensions={{width: 30, height: 30}}/>
-                    <UserShow.Username truncatedSize={8}/>
+                    <UserShow.Username truncatedSize={8}/>                        
                     <UserShow.FollowButton isFollowing={false}/>
                 </UserShow.Root>          
                 </Moment.TopLeftRoot>  
@@ -29,7 +34,7 @@ export default function render_moment ({moment, focused}: renderMomentProps) {
             </Moment.TopRoot>  
 
             <Moment.CenterRoot>
-            <Moment.Description/>
+                <Moment.Description/>
             </Moment.CenterRoot>
                
             <Moment.BottomRoot>

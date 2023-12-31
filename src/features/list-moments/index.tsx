@@ -7,6 +7,7 @@ import moments_data from '../../data/moment.json'
 import { FlatList } from 'react-native-gesture-handler'
 import { momentReciveDataProps } from '../../components/moment/moment-types'
 import { Loading } from '../../components/loading'
+import { analytics } from '../../services/Analytics'
 
 export default function ListMoments () {
     const margin = 2
@@ -37,7 +38,7 @@ export default function ListMoments () {
         minimumViewTime: 3000,
         viewAreaCoveragePercentThreshold: 100,
         waitForInteraction: true,
-      };
+    };
 
     return (
         <FlatList
@@ -52,18 +53,14 @@ export default function ListMoments () {
             maxToRenderPerBatch={3}
             keyExtractor={(moment: any) => moment.id}
             disableIntervalMomentum={ true }
-
-            ref={(ref) => {
-                flatListRef.current = ref;
-              }}
+            ref={(ref) => { flatListRef.current = ref }}
             renderItem={({item, index}) => {
 
-                console.log(`moment: ${index} - focused: ${index === centerIndex}`)
-
                 const focusedItem = index === 0? true: index === centerIndex || index -1 === centerIndex || index +1 === centerIndex
+                const viewedItem =  index === centerIndex
                 return (
                     <View style={index == 0? container_0: container && index +1 == moments_data.length? container_1: container}>
-                        <RenderMoment moment={item} focused={focusedItem}/>
+                        <RenderMoment moment={item} focused={focusedItem} viewed={viewedItem}/>
                     </View>
                 )                              
             }}
