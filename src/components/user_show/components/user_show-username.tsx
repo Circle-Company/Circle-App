@@ -1,5 +1,5 @@
 import React from "react"
-import { View, Text } from "react-native"
+import { View, Text, Pressable } from "react-native"
 
 import Sizes from "../../../layout/constants/sizes"
 import fonts from "../../../layout/constants/fonts"
@@ -7,11 +7,13 @@ import ColorTheme, { colors } from "../../../layout/constants/colors"
 import { UserUsernameProps } from "../user_show-types"
 import { useUserShowContext } from "../user_show-context"
 import { truncated } from "../../../algorithms/processText"
+import { UserShowActions } from "../user_show-actions"
 
 import Verifyed from '../../../assets/icons/svgs/check_circle.svg'
 
 export default function user_username ({
     displayOnMoment = true,
+    disableAnalytics = false,
     truncatedSize,
     color = ColorTheme().text,
     fontSize = fonts.size.footnote,
@@ -40,10 +42,16 @@ export default function user_username ({
         fontFamily,
         color,
     }
-    
+
+    async function onUsernameActions() {
+        if(disableAnalytics == false){
+            UserShowActions.UsernamePressed({user_id: Number(user.id)})
+        }
+        
+    }
     
     return (
-        <View style={container}>
+        <Pressable onPress={onUsernameActions} style={container}>
             <Text style={displayOnMoment? username_style_moment: username_style}>@{truncated({text: user.username, size: Number(truncatedSize)})}</Text>
             {user.verifyed && 
             <View style={{alignItems: 'center', justifyContent: "center", marginTop: 1 * scale*2, marginLeft: 2 * scale}}>
@@ -51,7 +59,6 @@ export default function user_username ({
             </View>
                                
             }
-
-        </View>
+        </Pressable>
     )
 }

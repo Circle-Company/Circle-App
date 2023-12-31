@@ -10,6 +10,8 @@ import { BlurView } from "@react-native-community/blur"
 import LikeIcon from '../../../assets/icons/svgs/heart.svg'
 import { MomentLikeProps } from "../moment-types"
 import { useMomentContext } from "../moment-context"
+import { analytics } from "../../../services/Analytics"
+import { MomentActions } from "../moment-actions"
 
 export default function like ({ isLiked }: MomentLikeProps) {
     const {moment} = useMomentContext()
@@ -98,13 +100,13 @@ export default function like ({ isLiked }: MomentLikeProps) {
     const [likedPressed, setLikedPressed] = React.useState(isLiked)
 
     async function onLikeAction() {
+        MomentActions.LikePressed({moment_id: Number(moment.id)})
         HandleButtonAnimation()
-        console.log('LikePressed')
         setLikedPressed(true)
     }
-    async function onDislikeAction() {
+    async function onUnlikeAction() {
+        MomentActions.UnlikePressed({moment_id: Number(moment.id)})
         HandleButtonAnimation()
-        console.log('disLikePressed')
         setLikedPressed(false)
     }
 
@@ -114,7 +116,7 @@ export default function like ({ isLiked }: MomentLikeProps) {
     if(likedPressed) {
         return (
             <Animated.View style={animated_container}>
-                <Pressable  onPress={() => onDislikeAction()} style={pressable_container}>
+                <Pressable  onPress={() => onUnlikeAction()} style={pressable_container}>
                     <View style={blur_container_likePressed}>
                         <View style={container}>
                             <Animated.View style={icon_container_pressed}>

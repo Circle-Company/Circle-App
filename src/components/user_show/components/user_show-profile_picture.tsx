@@ -1,13 +1,15 @@
 import React from "react"
-import { View, useColorScheme, Image} from "react-native"
+import { View, useColorScheme, Image, Pressable} from "react-native"
 import FastImage from "react-native-fast-image"
 import ColorTheme, { colors } from "../../../layout/constants/colors"
 import sizes from "../../../layout/constants/sizes"
 import { UserProfilePictureProps } from "../user_show-types"
 import { useUserShowContext } from "../user_show-context"
+import { UserShowActions } from "../user_show-actions"
 
 export default function profile_picture ({
     displayOnMoment = true,
+    disableAnalytics = false,
     pictureDimensions
 }: UserProfilePictureProps) {
 
@@ -25,8 +27,14 @@ export default function profile_picture ({
         height: Number(pictureDimensions.height) + Number(outlineSize),
     }
 
+    async function onProfilePictureAction() {
+        if(disableAnalytics == false){
+            UserShowActions.ProfilePicturePressed({user_id: Number(user.id)})
+        }
+    }
+
     return (
-        <View style={container}>
+        <Pressable onPress={onProfilePictureAction} style={container}>
             <FastImage
                 source={{ uri: String(user.profile_picture.small_resolution) || '' }}
                 style={{
@@ -38,6 +46,6 @@ export default function profile_picture ({
                     left: Number(outlineSize)/2
                 }}
             />
-        </View>
+        </Pressable>
     )
 }

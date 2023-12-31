@@ -6,6 +6,7 @@ import ColorTheme, { colors } from "../../../layout/constants/colors"
 import fonts from "../../../layout/constants/fonts"
 import { UserFollowButtonProps } from "../user_show-types"
 import { useUserShowContext } from "../user_show-context"
+import { UserShowActions } from "../user_show-actions"
 
 export default function follow_button ({
     isFollowing = false
@@ -61,12 +62,12 @@ export default function follow_button ({
     async function onFollowAction() {
         HandleButtonAnimation()
         setFollowPressed(true)
-        console.log('FollowPressed')
+        UserShowActions.FollowPressed({user_id: Number(user.id)})
     }
     async function onUnfollowAction() {
         HandleButtonAnimation()
         setFollowPressed(false)
-        console.log('unfollowPressed')
+        UserShowActions.UnfollowPressed({user_id: Number(user.id)})
     }
 
     if(isFollowing) return null
