@@ -7,20 +7,19 @@ import { ScrollView } from 'react-native'
 
 export default function ListMemoriesAllSeparatedbyDate() {
     const data_to_render = groupObjectsByDate(memory_all_data, TimeInterval.DAY)
-        return (
-            <ScrollView showsVerticalScrollIndicator>
-                {data_to_render.map((item, index) => {
-
-                    return (
-                            <ListMemoriesAll key={index} data={item} date_text={item.date} count={item.count}/>
+    return (
+        <ScrollView showsVerticalScrollIndicator>
+            {data_to_render.map((item, index) => {
+                return (
+                    <ListMemoriesAll
+                        key={index}
+                        data={item}
+                        date_text={item.date}
+                        count={item.count}
+                    />
                         
-                    )
-                })
-
-                }
-                
-            </ScrollView>
-            
-        )
-
+                )})
+            }
+        </ScrollView>
+    )
 }
