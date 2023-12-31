@@ -5,9 +5,7 @@ import RenderMoment from './components/render-moment'
 import sizes from '../../layout/constants/sizes'
 import moments_data from '../../data/moment.json'
 import { FlatList } from 'react-native-gesture-handler'
-import { momentReciveDataProps } from '../../components/moment/moment-types'
 import { Loading } from '../../components/loading'
-import { analytics } from '../../services/Analytics'
 
 export default function ListMoments () {
     const margin = 2
@@ -57,7 +55,7 @@ export default function ListMoments () {
             renderItem={({item, index}) => {
 
                 const focusedItem = index === 0? true: index === centerIndex || index -1 === centerIndex || index +1 === centerIndex
-                const viewedItem =  index === centerIndex
+                const viewedItem =  index === centerIndex 
                 return (
                     <View style={index == 0? container_0: container && index +1 == moments_data.length? container_1: container}>
                         <RenderMoment moment={item} focused={focusedItem} viewed={viewedItem}/>
