@@ -20,6 +20,17 @@ export type ProfileMainRootProps = {
     children: React.ReactNode,
     data: ProfileReciveDataProps
 }
+export type ProfileShareProps = {
+    color?: string,
+    backgroundColor?: string
+}
+export type ProfileNameProps = {
+    color?: string,
+}
+export type ProfilePictureProps = {
+}
+export type ProfileDescriptionProps = {
+}
 export type ProfileStatisticsContainerProps = {
     children: React.ReactNode
 }
