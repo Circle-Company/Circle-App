@@ -1,5 +1,5 @@
 import React from 'react'
-import { StyleSheet, Dimensions,Pressable} from 'react-native'
+import {ScrollView, StatusBar} from 'react-native'
 import { View, Text } from '../../../components/Themed'
 import AuthContext from '../../../contexts/auth'
 import ListMemories from '../../../features/list-memories/list-memories-preview'
@@ -14,7 +14,7 @@ export default function AccountScreen() {
   return (    
     <View style={container}>
       <RenderProfile/>
-      <ListMemories/>
+      <ListMemories/>        
     </View>  
   )
 }
