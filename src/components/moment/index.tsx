@@ -7,15 +7,24 @@ import main_root from "./components/roots/moment-main_root"
 import container from "./components/moment-container"
 import like from "./components/moment-like"
 import description from "./components/moment-description"
-
+import date from "./components/moment-date"
+import share from "./components/moment-share"
+import more from "./components/moment-more"
 export const Moment = {
-    TopRoot: top_root,
-    MainRoot: main_root,
-    TopLeftRoot: top_left_root,
-    TopRightRoot: top_right_root,
-    CenterRoot: center_root,
-    BottomRoot: bottom_root,
-    Container: container,
+
+    Root: {
+        Main: main_root,
+        Top: top_root,
+        TopLeft: top_left_root,
+        TopRight: top_right_root,
+        Center: center_root,
+        Bottom: bottom_root,        
+    },
+    ShareButton: share,
+    MoreButton: more,
     LikeButton: like,
-    Description: description
+    Container: container,
+    Description: description,
+    Date: date,
+
 }
