@@ -3,7 +3,10 @@ import statistics_container from "./components/statistics/profile-statistics-con
 import statistics_followers from "./components/statistics/profile-statistics-followers";
 import statistics_likes from "./components/statistics/profile-statistics-likes";
 import statistics_views from "./components/statistics/profile-statistics-views";
-
+import share from "./components/profile-share";
+import picture from "./components/profile-picture";
+import name from "./components/profile-name";
+import description from "./components/profile-description";
 export const Profile = {
     MainRoot: main_root,
     Statistics: {
