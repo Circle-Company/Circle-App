@@ -14,7 +14,7 @@ export default function description ({
 
     const container:any = {
         margin: sizes.margins["1sm"],
-        paddingHorizontal: sizes.paddings["1sm"]
+        paddingHorizontal: sizes.paddings["2sm"]
     }
     const description_style:any = {
         lineHeight: 18,
