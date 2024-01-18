@@ -7,7 +7,8 @@ import ColorTheme, { colors } from '../../../../layout/constants/colors'
 import fonts from '../../../../layout/constants/fonts'
 import { Text } from '../../../../components/Themed'
 import MemoryIcon from '../../../../assets/icons/svgs/memory_outline.svg'
-
+import RenderDate from '../../../../components/general/render-date'
+import RenderMemoriesCount from '../../components/render-memories_count'
 type RenderMemoriesAllProps = {
     data: any,
     date_text: string,
@@ -25,10 +26,7 @@ export function ListMemoriesAll ({
     
     const container: any = {
         width: sizes.screens.width,
-        borderBottomWidth: 1,
-        borderColor: isDarkMode? colors.gray.grey_08: colors.gray.grey_02,
     }
-
     const header_container: any = {
         flexDirection: 'row',
         height: sizes.sizes["3md"],
@@ -37,17 +35,6 @@ export function ListMemoriesAll ({
         alignItems: 'center',
         justifyContent: 'center',
     }
-    const header_icon: any = {
-        marginRight: sizes.margins['2sm']
-    }
-    const header_text_date: any = {
-        fontSize: fonts.size.body,
-        fontFamily: fonts.family.Bold,
-    }
-    const header_number: any = {
-        fontSize: fonts.size.caption1*1.1,
-        fontFamily: fonts.family.Bold,
-    }
     const content_container: any = {
         flexDirection: 'row',
         width: sizes.screens.width,
@@ -55,35 +42,17 @@ export function ListMemoriesAll ({
         borderBottomWidth: 0.5,
         borderColor: isDarkMode? colors.gray.grey_08: colors.gray.grey_02
     }
-    const header_number_container:any = {
-        justifyContent: 'center',
-        alignItems: 'center',
-        flexDirection: 'row',
-        backgroundColor: ColorTheme().backgroundDisabled,
-        paddingHorizontal: sizes.paddings['1sm'],
-        paddingVertical: 2,
-        marginLeft: sizes.margins['1sm'],
-        borderRadius: 40,
-        height: sizes.sizes['1md'],
-        minWidth: sizes.sizes['1md']
-    }
 
     return (
         <View style={container}>
             <View style={header_container}>
                 <Memory.HeaderLeft>
-                    <Text style={header_text_date}>{date_text}</Text>
+                    <RenderDate date={date_text}/>
                 </Memory.HeaderLeft>
-                    <Memory.HeaderRight>
-                        <View style={header_number_container}>
-                            <MemoryIcon style={header_icon} width={18} height={18}/>
-                            <Text style={header_number}>{count}</Text>
-                        </View>
-                        
-                    </Memory.HeaderRight>                    
-
+                <Memory.HeaderRight>
+                    <RenderMemoriesCount count={count}/>
+                </Memory.HeaderRight>                    
             </View>
-                
             <FlatList
                 style={content_container}
                 data={memories.content}
