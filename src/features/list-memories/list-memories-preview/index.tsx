@@ -6,6 +6,7 @@ import RenderMemory from '../components/render-memory'
 import RenderMemoryFooter from '../components/render-memory_footer'
 import ViewMorebutton from '../../../components/buttons/view_more'
 import { useNavigation } from '@react-navigation/native'
+import RenderMemoriesCount from '../components/render-memories_count'
 
 type RenderMemoriesPreviewProps = {
     enableScroll?: boolean
@@ -23,9 +24,11 @@ export default function ListMemoriesPreview ({}: RenderMemoriesPreviewProps) {
     return (
         <View style={container}>
             <Memory.Header>
-                <Memory.HeaderLeft text='Memories' number={memories.memories_count}/>
+                <Memory.HeaderLeft>
+                    <RenderMemoriesCount count={memories.memories_count}/>
+                </Memory.HeaderLeft>
                 <Memory.HeaderRight>
-                    <ViewMorebutton action={() => navigation.navigate('MemoriesNavigator')} text='View All'/>
+                    <ViewMorebutton action={() => navigation.navigate('MemoriesNavigator', {screen: 'Memories'})} text='View All'/>
                 </Memory.HeaderRight>
             </Memory.Header>
             <FlatList
