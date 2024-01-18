@@ -47,15 +47,6 @@ export default function button_standart({
         borderRadius: (width)/2
     }
 
-    const badge_style = {
-        zIndex: 10,
-        position: 'absolute',
-        top: -10,
-        right: -10,
-        width: 10,
-        height: 10,
-        backgroundColor: ColorTheme().error
-    }
 
     async function onPress() {
         HandleButtonAnimation()
