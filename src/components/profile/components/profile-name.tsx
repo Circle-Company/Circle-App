@@ -11,21 +11,28 @@ import fonts from "../../../layout/constants/fonts"
 
 export default function name ({
     color = String(ColorTheme().text),
+    fontSize = fonts.size.title3,
+    fontFamily = fonts.family.Bold,
+    margin = sizes.margins["1sm"],
+    scale = 1
 }: ProfileNameProps) {
 
     const { user } = useProfileContext()
 
     const container: any = {
-        marginHorizontal: sizes.margins["1sm"],
+        marginHorizontal: margin * scale,
         flexDirection: 'row',
         alignitems: 'center',
         justifyContent: 'center'
     }
 
     const text_style: any = {
-        fontSize: fonts.size.title3,
-        fontFamily: fonts.family.Bold,
-        color
+        fontSize: fontSize * scale,
+        fontFamily: fontFamily,
+        color: color
+    }
+    if(!user.name){
+        return null
     }
     return (
         <View style={container}>
