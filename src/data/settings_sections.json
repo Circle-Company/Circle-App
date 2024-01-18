@@ -3,19 +3,15 @@
         "name": "my account",
         "content":[
             {
-                "name": "Push Notifications",
+                "name": "Push notifications",
                 "navigateTo": "settings-privacy_policy"
             },
             {
-                "name": "Privacy",
+                "name": "Viewed moments",
                 "navigateTo": "settings-privacy_policy"
             },
             {
-                "name": "Blocked Users",
-                "navigateTo": "settings-privacy_policy"
-            },
-            {
-                "name": "Liked Moments",
+                "name": "Liked moments",
                 "navigateTo": "settings-privacy_policy"
             }
         ]
@@ -23,10 +19,6 @@
     {
         "name": "app",
         "content":[
-            {
-                "name": "Theme",
-                "navigateTo": "settings-privacy_policy"
-            },
             {
                 "name": "Version",
                 "navigateTo": "settings-terms_of_service"
@@ -56,10 +48,6 @@
             {
                 "name": "Log Out",
                 "navigateTo": "settings-privacy_policy"
-            },
-            {
-                "name": "Delete Account",
-                "navigateTo": "settings-terms_of_service"
             }
         ]
     }
