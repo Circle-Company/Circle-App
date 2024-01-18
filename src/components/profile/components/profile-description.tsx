@@ -23,6 +23,9 @@ export default function description ({
         flexDirection: 'row',
         justifyContent: 'space-between'
     }
+    if(!user.description){
+        return null
+    }
     
     return (
         <View style={container}>
