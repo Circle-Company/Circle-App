@@ -195,6 +195,7 @@ export default {
     screens,
     buttons,
     inputs,
+    card,
     moment,
     blur,
     icons,
