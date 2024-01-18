@@ -13,7 +13,10 @@ import { useMomentContext } from "../moment-context"
 import { analytics } from "../../../services/Analytics"
 import { MomentActions } from "../moment-actions"
 
-export default function like ({ isLiked }: MomentLikeProps) {
+export default function like ({
+    isLiked,
+    backgroundColor = String(ColorTheme().blur_button_color)
+}: MomentLikeProps) {
     const {moment} = useMomentContext()
     
     var animatedScale = React.useRef(new Animated.Value(1)).current
@@ -75,6 +78,9 @@ export default function like ({ isLiked }: MomentLikeProps) {
     const blur_container: any = {
         backgroundColor: ColorTheme().blur_button_color
     }
+    const blur_container_background_color: any = {
+        backgroundColor: backgroundColor
+    }
     const blur_container_likePressed: any = {
         backgroundColor: ColorTheme().like
     }
@@ -129,7 +135,22 @@ export default function like ({ isLiked }: MomentLikeProps) {
             </Animated.View>
         )   
     }
-    else{
+    if(backgroundColor) {
+        return (
+            <Animated.View style={animated_container}>
+                <Pressable  onPress={() => onLikeAction()} style={pressable_container}>
+                    <View style={blur_container_background_color}>
+                        <View style={container}>
+                            <Animated.View style={icon_container}>
+                                <LikeIcon fill={like_fill} width={14} height={14}/>
+                            </Animated.View>
+                            <Text style={likedPressed?like_text_pressed: like_text}>{like_number}</Text>                                       
+                        </View>         
+                    </View>
+                </Pressable>
+            </Animated.View>
+        )        
+    } else{
         return (
             <Animated.View style={animated_container}>
                 <Pressable  onPress={() => onLikeAction()} style={pressable_container}>
