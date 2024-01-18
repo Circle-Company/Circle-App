@@ -15,7 +15,7 @@ export default function HomeScreen() {
   }
   return (
     <View style={container}>
-      <StatusBar backgroundColor={String(ColorTheme().background)} barStyle={isDarkMode? 'light-content': 'dark-content'}/>
+      <StatusBar translucent={false} backgroundColor={String(ColorTheme().background)} barStyle={isDarkMode? 'light-content': 'dark-content'}/>
       <ListMoments/>
     </View>
   )
