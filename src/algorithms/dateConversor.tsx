@@ -1,14 +1,14 @@
-interface TimeDifference {
-    weeks: number;
-    days: number;
-    hours: number;
-    minutes: number;
-    seconds: number;
+interface TimeDifferenceConverterProps {
+  date: string, 
+  small?: boolean
 }
   
-export function timeDifferenceConverter(inputDate: string): string {
+export function timeDifferenceConverter({
+  date,
+  small = true
+}: TimeDifferenceConverterProps): string {
     const currentDate = new Date();
-    const inputDateObj = new Date(inputDate);
+    const inputDateObj = new Date(date);
   
     const timeDiff = Math.abs(currentDate.getTime() - inputDateObj.getTime());
   
@@ -19,14 +19,19 @@ export function timeDifferenceConverter(inputDate: string): string {
     const weeks = Math.floor(days / 7);
   
     if (weeks > 0) {
-      return `${weeks} ${weeks === 1 ? 'sem' : 'sem'}`;
+      if(small) return `${weeks} ${weeks === 1 ? 'w' : 'w'}`;
+      return `${weeks} ${weeks === 1 ? 'week' : 'weeks'} ago`;
     } else if (days > 0) {
-      return `${days} ${days === 1 ? 'd' : 'd'}`;
+      if(small) return `${weeks} ${weeks === 1 ? 'd' : 'd'}`;
+      return `${days} ${days === 1 ? 'day' : 'days'} ago`;
     } else if (hours > 0) {
-      return `${hours} ${hours === 1 ? 'h' : 'h'}`;
+      if(small) return `${weeks} ${weeks === 1 ? 'h' : 'h'}`;
+      return `${hours} ${hours === 1 ? 'hour' : 'hours'} ago`;
     } else if (minutes > 0) {
-      return `${minutes} ${minutes === 1 ? 'min' : 'min'}`;
+      if(small) return `${weeks} ${weeks === 1 ? 'min' : 'min'}`;
+      return `${minutes} ${minutes === 1 ? 'min' : 'minutes'} ago`;
     } else {
-      return `${seconds} ${seconds === 1 ? 's' : 's'}`;
+      if(small) return `${weeks} ${weeks === 1 ? 's' : 's'}`;
+      return `${seconds} ${seconds === 1 ? 'second' : 'seconds'} ago`;
     }
 }
