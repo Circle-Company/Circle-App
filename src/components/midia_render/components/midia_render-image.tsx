@@ -8,12 +8,14 @@ import { MidiaRender } from "..";
 
 type RenderImageProps = {
   blur?: boolean,
-  blurRadius?: number
+  blurRadius?: number,
+  blurColor?: string
 }
 
 export default function render_image ({
   blur = false,
-  blurRadius = 35
+  blurRadius = 35,
+  blurColor = String(ColorTheme().background)
 }: RenderImageProps) {
   const {content_sizes, midia} = useMidiaRenderContext()
 
@@ -22,7 +24,7 @@ export default function render_image ({
     width: content_sizes.width,
   }
   const opacity_view: any = {
-    backgroundColor: ColorTheme().background,
+    backgroundColor: blurColor,
     opacity: 0.6
   }
 
