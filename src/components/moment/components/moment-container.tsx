@@ -6,7 +6,12 @@ import ColorTheme from "../../../layout/constants/colors"
 import { MidiaRender } from "../../midia_render"
 import { analytics } from "../../../services/Analytics"
 
-export default function scontainer ({children, contentRender, focused}: MomentContainerProps) {
+export default function container ({
+    children,
+    contentRender,
+    focused,
+    blur_color = String(ColorTheme().background)
+}: MomentContainerProps) {
     const { momentSizes, moment} = useMomentContext()
 
     const container:any = {
@@ -46,7 +51,7 @@ export default function scontainer ({children, contentRender, focused}: MomentCo
             <View style={container}>
                 <View style={content_container}>
                 <MidiaRender.Root data={contentRender} content_sizes={momentSizes}>
-                <MidiaRender.RenderImage blur={focused? false: true}/>  
+                <MidiaRender.RenderImage blur={focused? false: true} blurColor={String(blur_color)}/>  
                 </MidiaRender.Root>
                 </View>
             </View>
