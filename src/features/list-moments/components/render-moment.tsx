@@ -7,6 +7,7 @@ import { momentReciveDataProps } from '../../../components/moment/moment-types'
 import RenderComment from './render-comment'
 import { truncated } from '../../../algorithms/processText'
 import { MomentActions } from '../../../components/moment/moment-actions'
+import ColorTheme, { colors } from '../../../layout/constants/colors'
 
 type renderMomentProps = {
     moment: momentReciveDataProps,
@@ -18,33 +19,33 @@ export default function render_moment ({moment, focused, viewed}: renderMomentPr
     
     if(viewed) MomentActions.View({moment_id: Number(moment.id)})
     return (
-        <Moment.MainRoot data={moment} sizes={sizes.moment.standart}>
+        <Moment.Root.Main data={moment} sizes={sizes.moment.standart}>
             <Moment.Container contentRender={moment.midia} focused={focused}>
-            <Moment.TopRoot>
-                <Moment.TopLeftRoot>
+            <Moment.Root.Top>
+                <Moment.Root.TopLeft>
                 <UserShow.Root data={moment.user}>
                     <UserShow.ProfilePicture pictureDimensions={{width: 30, height: 30}}/>
                     <UserShow.Username truncatedSize={8}/>                        
-                    <UserShow.FollowButton isFollowing={false}/>
+                    <UserShow.FollowButton isFollowing={false} displayOnMoment={true}/>
                 </UserShow.Root>          
-                </Moment.TopLeftRoot>  
-                <Moment.TopRightRoot>
+                </Moment.Root.TopLeft>  
+                <Moment.Root.TopRight>
                 <Moment.LikeButton isLiked={false}/>
-                </Moment.TopRightRoot> 
-            </Moment.TopRoot>  
+                </Moment.Root.TopRight> 
+            </Moment.Root.Top>  
 
-            <Moment.CenterRoot>
+            <Moment.Root.Center>
                 <Moment.Description/>
-            </Moment.CenterRoot>
+            </Moment.Root.Center>
                
-            <Moment.BottomRoot>
+            <Moment.Root.Bottom>
                 <Comments.MainRoot data={moment.comments}>
                     <Comments.Input placeholder={`react to @${truncated({text:moment.user.username, size: 20})}`}/>
                 </Comments.MainRoot>
-            </Moment.BottomRoot>
+            </Moment.Root.Bottom>
             </Moment.Container>
 
             <RenderComment moment={moment} focused={focused}/>
-        </Moment.MainRoot>
+        </Moment.Root.Main>
     )
 }
