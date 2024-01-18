@@ -170,7 +170,7 @@ export const dark = {
 
     blur_overlay_color: colors.transparent.black_00,
     blur_button_color:colors.transparent.black_60,
-    blur_display_color:colors.transparent.black_20,
+    blur_display_color:colors.transparent.black_40,
 
     verifyed: colors.yellow.yellow_04
 }
@@ -203,9 +203,9 @@ export const light = {
     iconFocused: colors.blue.blue_05,
     icon: colors.gray.grey_04,
 
-    blur_overlay_color: colors.transparent.black_00,
-    blur_button_color:colors.transparent.black_30,
-    blur_display_color:colors.transparent.black_00,
+    blur_overlay_color: colors.transparent.white_00,
+    blur_button_color:colors.transparent.black_40,
+    blur_display_color:colors.transparent.white_40,
 
     verifyed: colors.yellow.yellow_04
 }
