@@ -42,7 +42,8 @@ export type CommentsRenderCommentProps = {
 export type CommentsHeaderLeftProps = {
 }
 export type CommentsInputProps = {
-    placeholder?: string
+    placeholder?: string,
+    backgroundColor?: string
 }
 export type CommentsListCommentsProps = {
 }
