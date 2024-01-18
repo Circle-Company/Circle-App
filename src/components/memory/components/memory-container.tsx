@@ -25,7 +25,7 @@ export default function container ({children, contentRender, focused}: MemoryCon
     }
 
     function pressed() {
-        navigation.navigate('MemoriesNavigator',{ screen: 'Memories-List_Moments'})
+        navigation.navigate('MemoriesNavigator',{ screen: 'Memory'})
     }
 
     return (
