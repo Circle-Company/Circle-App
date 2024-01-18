@@ -11,7 +11,8 @@ import { BlurView } from "@react-native-community/blur"
 import Arrowbottom from "../../../assets/icons/svgs/paper_plane.svg"
 
 export default function input ({
-    placeholder = "Send Comment..."
+    placeholder = "Send Comment...",
+    backgroundColor = String(ColorTheme().blur_button_color)
 }: CommentsInputProps) {
     const { comment } = useCommentsContext()
     const {momentSizes} = useMomentContext()
@@ -35,6 +36,7 @@ export default function input ({
     const blur_container: any = {
         borderRadius: sizes.inputs.height/2,
         overflow: 'hidden',
+        backgroundColor: backgroundColor
     }
 
     const input_container: any = {
@@ -80,10 +82,6 @@ export default function input ({
     }
     return (
          <View style={blur_container}>
-            <BlurView
-                overlayColor={String(colors.transparent.black_00)}
-                blurAmount={sizes.blur.blurAmount*1.5}
-            >
                 <View style={input_container}>
                     <View style={textContainer}>
                         <TextInput
@@ -110,8 +108,7 @@ export default function input ({
                         </Animated.View>                                
                     </Pressable>
 
-                </View>
-            </BlurView>            
+                </View>       
         </View>            
 
 
