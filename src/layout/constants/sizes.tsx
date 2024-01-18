@@ -139,6 +139,14 @@ const moment = {
     blurAmount: 20
   }
 
+  const card = {
+    width: 150,
+    height: 225,
+    borderRadius: 30,
+    paddingVertical: 10,
+    paddingHorizontal: 10
+  }
+
 
   const icons = {
     '1sm': {
