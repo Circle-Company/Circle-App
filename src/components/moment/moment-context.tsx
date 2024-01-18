@@ -1,7 +1,7 @@
 import React, { createContext, useContext } from "react"
-import { momentReciveDataProps, momentSizes } from "./moment-types"
+import {momentReciveDataProps, momentSizes } from "./moment-types"
 
-const MomentContext = createContext<{ moment: momentReciveDataProps, momentSizes: momentSizes} | null>(null)
+const MomentContext = createContext<{ moment: momentReciveDataProps, momentSizes: momentSizes } | null>(null)
 
 export function useMomentContext() {
     const context = useContext(MomentContext)
