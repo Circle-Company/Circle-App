@@ -11,7 +11,8 @@ type ButtonStandartProps = {
     height?: number,
     backgroundColor?: string,
     children: React.ReactNode,
-    action(): void
+    margins?: boolean,
+    action(): void,
 }
 
 export default function button_standart({
@@ -19,7 +20,8 @@ export default function button_standart({
     height = sizes.buttons.height*0.5,
     backgroundColor = String(ColorTheme().backgroundDisabled),
     children,
-    action
+    margins = true,
+    action,
 }: ButtonStandartProps) {
 
     var animatedScale = React.useRef(new Animated.Value(1)).current
@@ -39,10 +41,20 @@ export default function button_standart({
         alignItems: 'center',
         justifyContent: 'center',
         backgroundColor: backgroundColor,
-        marginRight: sizes.margins['3sm'],
+        marginRight: margins? sizes.margins['3sm']: 0,
         width: width,
         height: height,
         borderRadius: (width)/2
+    }
+
+    const badge_style = {
+        zIndex: 10,
+        position: 'absolute',
+        top: -10,
+        right: -10,
+        width: 10,
+        height: 10,
+        backgroundColor: ColorTheme().error
     }
 
     async function onPress() {
@@ -55,6 +67,7 @@ export default function button_standart({
             <Pressable style={container} onPress={onPress}>
                 {children}
             </Pressable>
-        </Animated.View>  
+        </Animated.View>          
+
     )
 }
