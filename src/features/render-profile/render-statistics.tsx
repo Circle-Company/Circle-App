@@ -1,21 +1,27 @@
+import { View } from "../../components/Themed";
 import { Profile } from "../../components/profile";
 import { ProfileReciveDataProps } from "../../components/profile/profile-types";
+import ColorTheme from "../../layout/constants/colors";
+import sizes from "../../layout/constants/sizes";
 
 type RenderStatisticsProps = {
-    data: ProfileReciveDataProps
 }
 
 export default function RenderStatistics({
-    data
 } : RenderStatisticsProps) {
 
+    const container: any = {
+        paddingVertical: sizes.paddings["1sm"],
+    }
+
     return(
-        <Profile.MainRoot data={data}>
+        <View style={container}>
             <Profile.Statistics.Container>
                 <Profile.Statistics.Followers/>
                 <Profile.Statistics.Likes/>
                 <Profile.Statistics.Views/>
-            </Profile.Statistics.Container>
-        </Profile.MainRoot>
+            </Profile.Statistics.Container>            
+        </View>
+
     )
 }
