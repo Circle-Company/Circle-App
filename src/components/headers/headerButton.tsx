@@ -9,9 +9,9 @@ import fonts from '../../layout/constants/fonts'
 type HeaderButtonProps = {
     width?: number,
     height?: number,
-    marginRight: boolean,
-    marginLeft: boolean,
-    color: string,
+    marginRight?: boolean,
+    marginLeft?: boolean,
+    color?: string,
     children: React.ReactNode,
     action(): void
 }
@@ -51,9 +51,9 @@ export default function HeaderButton({
     }
 
     async function onPress() {
-        HandleButtonAnimation()
-        console.log('HeaderButton Pressed')
         action()
+        HandleButtonAnimation()
+        
     }
     return(
         <Animated.View style={{transform: [{ scale: animatedScale }] }}>

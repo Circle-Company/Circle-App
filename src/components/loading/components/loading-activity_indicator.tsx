@@ -9,7 +9,9 @@ import Loading from '../../../assets/icons/svgs/loading.svg'
 
 export default function activity_indicator({
     size = 30,
-    interval = 20
+    interval = 20,
+    from_color = String(ColorTheme().backgroundDisabled),
+    to_color = String(ColorTheme().placeholder)
 }: LoadingProps) {
 
     const isDarkMode = useColorScheme() === 'dark'
@@ -21,14 +23,14 @@ export default function activity_indicator({
             height: size,
             borderRadius: size/2,
             borderWidth: size/17,
-            borderColor: isDarkMode? String(colors.gray.grey_08) : String(colors.gray.grey_02)
+            borderColor: from_color
         }}
         animate={{
             width: size + interval,
             height: size + interval,
             borderRadius: (size + interval)/2,
             borderWidth: size/15,
-            borderColor: isDarkMode? String(colors.gray.grey_07) : String(colors.gray.grey_03)
+            borderColor: to_color
         }}
         transition={{
             type: 'timing',
