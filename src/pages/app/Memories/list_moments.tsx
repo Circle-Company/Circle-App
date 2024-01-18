@@ -2,6 +2,7 @@ import React from 'react'
 import { StatusBar,  useColorScheme } from 'react-native'
 import { Text, View } from '../../../components/Themed'
 import ColorTheme, { colors } from '../../../layout/constants/colors'
+import ListMemoryMoments from '../../../features/list-memories/list-memory-moments'
 
 export default function MemoriesListMomentsScreen() {
   const isDarkMode = useColorScheme() === 'dark'
@@ -14,7 +15,7 @@ export default function MemoriesListMomentsScreen() {
   return (
     <View style={container}>
       <StatusBar backgroundColor={String(colors.gray.black)} barStyle={'light-content'}/>
-      <Text> list moments screen</Text>
+      <ListMemoryMoments/>
     </View>
   )
 }
