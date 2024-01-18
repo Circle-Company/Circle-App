@@ -1,5 +1,5 @@
 import React, {useRef, useState, useEffect, useCallback} from 'react'
-import {View, ScrollView, Dimensions, NativeScrollEvent} from 'react-native'
+import {View, ScrollView, Dimensions, Animated} from 'react-native'
 
 import RenderMoment from './components/render-moment'
 import sizes from '../../layout/constants/sizes'
@@ -37,7 +37,6 @@ export default function ListMoments () {
         viewAreaCoveragePercentThreshold: 100,
         waitForInteraction: true,
     };
-
     return (
         <FlatList
             data={moments_data}
@@ -54,12 +53,13 @@ export default function ListMoments () {
             ref={(ref) => { flatListRef.current = ref }}
             renderItem={({item, index}) => {
 
-                const focusedItem = index === 0? true: index === centerIndex || index -1 === centerIndex || index +1 === centerIndex
+                const focusedItem = true
                 const viewedItem =  index === centerIndex 
+                const container_style = index == 0? container_0: container && index +1 == moments_data.length? container_1: container
                 return (
-                    <View style={index == 0? container_0: container && index +1 == moments_data.length? container_1: container}>
+                    <Animated.View style={[container_style]}>
                         <RenderMoment moment={item} focused={focusedItem} viewed={viewedItem}/>
-                    </View>
+                    </Animated.View>
                 )                              
             }}
             onScroll={handleScroll}
