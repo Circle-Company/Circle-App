@@ -1,15 +1,18 @@
 import * as React from 'react'
 import { NavigationContainer } from '@react-navigation/native'
 import Routes from './src/routes'
-import AuthContext from './src/contexts/auth'
 import { AuthProvider } from './src/contexts/auth'
+import { ViewProfileProvider } from './src/contexts/viewProfile'
 
 const App = () => {
   
   return (
     <NavigationContainer>
       <AuthProvider>
-        <Routes/>
+        <ViewProfileProvider>
+          <Routes/>
+        </ViewProfileProvider>
+        
       </AuthProvider>
         
     </NavigationContainer>        
