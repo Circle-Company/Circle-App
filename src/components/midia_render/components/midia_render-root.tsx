@@ -27,7 +27,7 @@ export default function root ({children, data, content_sizes}: MidiaRenderMainRo
         bottom: 0
     }
     return (
-        <MidiaRenderContext.Provider value={{midia: data, content_sizes: content_sizes}}>
+        <MidiaRenderContext.Provider value={{midia: data, content_sizes: content_sizes }}>
             <LinearGradient
                 colors={['#00000030', '#00000000']}
                 style={superior_gradient}
