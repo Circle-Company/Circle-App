@@ -1,7 +1,6 @@
 import React from "react"
 import {SignIn} from '../services/Auth'
 import AsyncStorage from "@react-native-async-storage/async-storage"
-
 type AuthProviderProps = {
     children: React.ReactNode
 }
@@ -30,7 +29,7 @@ export function AuthProvider({children}: AuthProviderProps) {
     }, [])
 
     async function useSignIn() {
-        const response  = await SignIn()
+        const response = await SignIn()
         setUser(response.user)
 
         await  AsyncStorage.setItem('@CircleAuth:user', JSON.stringify(response.user))
