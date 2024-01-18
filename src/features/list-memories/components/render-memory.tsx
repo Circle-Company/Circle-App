@@ -17,7 +17,6 @@ export default function render_memory ({memory, index, numOfMemories}: RenderMem
     const container = {
         marginRight: 36
     } 
-    
     const c0 = {
         zIndex: 3,
     }
@@ -51,7 +50,7 @@ export default function render_memory ({memory, index, numOfMemories}: RenderMem
                 {memory.moments.map((moment, index) => {
                     const container = index == 0 && c0 || index == 1 && c1 || index == 2 && c2
                     return (
-                        <Moment.MainRoot key={moment.id} data={moment} sizes={sizes.moment.tiny}>
+                        <Moment.Root.Main key={moment.id} data={moment} sizes={sizes.moment.tiny}>
                             <View style={container}>
                                 <Memory.Container contentRender={moment.midia} focused={Boolean(index !==0)}>
                                     {index == 0 && 
@@ -61,7 +60,7 @@ export default function render_memory ({memory, index, numOfMemories}: RenderMem
                                     }
                                 </Memory.Container>                            
                             </View>                            
-                        </Moment.MainRoot>
+                        </Moment.Root.Main>
                     )
                 })}
                 <View style={text_container}>
