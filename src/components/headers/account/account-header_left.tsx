@@ -1,6 +1,6 @@
 import React from 'react'
 import { Pressable, View, Text, Animated} from 'react-native'
-import ColorTheme from '../../../layout/constants/colors'
+import ColorTheme, { colors } from '../../../layout/constants/colors'
 import {useNavigation} from '@react-navigation/native'
 import AuthContext from '../../../contexts/auth'
 
