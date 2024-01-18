@@ -11,5 +11,9 @@ export const Profile = {
         Followers: statistics_followers,
         Likes: statistics_likes,
         Views: statistics_views
-    }
+    },
+    Picture: picture,
+    ShareButton: share,
+    Name: name,
+    Description: description
 }
