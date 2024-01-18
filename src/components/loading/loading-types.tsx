@@ -1,6 +1,6 @@
 export type LoadingProps = {
-    color?: string
-    borderColor?: string
+    from_color?: string,
+    to_color?: string,
     size?: number,
     interval?: number
 }
