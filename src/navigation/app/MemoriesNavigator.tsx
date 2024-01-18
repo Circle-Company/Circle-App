@@ -8,7 +8,7 @@ import MemoriesHeaderLeft from '../../components/headers/memories/memories-heade
 import MemoriesListMomentsHeaderLeft from '../../components/headers/memories/memories-list_moments-header_left'
 import MemoriesScreen from '../../pages/app/Memories'
 import MemoriesListMomentsScreen from '../../pages/app/Memories/list_moments'
-  
+
 const MemoriesStack = createStackNavigator()
  
 export function MemoriesNavigator() {
@@ -20,9 +20,7 @@ export function MemoriesNavigator() {
     }
    
     return (
-        <MemoriesStack.Navigator 
-            screenOptions={{cardStyleInterpolator: CardStyleInterpolators.forHorizontalIOS}}
-        >
+        <MemoriesStack.Navigator >
             <MemoriesStack.Screen
                 name="Memories"
                 component={MemoriesScreen}
@@ -31,11 +29,12 @@ export function MemoriesNavigator() {
                     cardStyle: {backgroundColor: String(ColorTheme().background)},
                     headerTintColor: String(ColorTheme().text),
                     cardOverlayEnabled: true,
+                    cardStyleInterpolator: CardStyleInterpolators.forModalPresentationIOS,
                     headerLeft: () => <MemoriesHeaderLeft/>
                 }}
             />
             <MemoriesStack.Screen
-                name="Memories-List_Moments"
+                name="Memory"
                 component={MemoriesListMomentsScreen}
                 options={{
                     headerStyle: [HeaderStyle, {backgroundColor: colors.gray.black}],
