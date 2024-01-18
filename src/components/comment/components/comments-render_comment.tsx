@@ -70,7 +70,7 @@ export default function render_comment ({comment, index}: CommentsRenderCommentP
                             margin={0}
                         />
                     </UserShow.Root>     
-                    <Text style={date_style}>{timeDifferenceConverter(String(comment.created_at))}</Text>                
+                    <Text style={date_style}>{timeDifferenceConverter({date: String(comment.created_at)})}</Text>                
                 </View>
                 <View style={container_right_center}>
                     <Text style={content_style}>{comment.content}</Text>                    
