@@ -4,7 +4,7 @@ import {View} from 'react-native'
 import ColorTheme, { colors } from '../../../layout/constants/colors'
 import {useNavigation} from '@react-navigation/native'
 import HeaderButton from '../headerButton'
-import ArrowLeft from '../../../assets/icons/svgs/arrow_left.svg'
+import ArrowLeft from '../../../assets/icons/svgs/close.svg'
 
 export default function MemoriesListMomentsHeaderLeft() {
 
@@ -21,7 +21,7 @@ export default function MemoriesListMomentsHeaderLeft() {
                 marginLeft
                 color={String(colors.gray.grey_07)}
             >
-                <ArrowLeft fill={String(colors.gray.white)} width={18} height={18}/>
+                <ArrowLeft fill={String(colors.gray.white)} width={16} height={16}/>
             </HeaderButton>
         </View>
     )
