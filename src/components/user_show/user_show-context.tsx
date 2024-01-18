@@ -1,7 +1,14 @@
 import React, { createContext, useContext } from "react"
-import { userReciveDataProps } from "./user_show-types"
+import { userReciveDataProps, actionsProps} from "./user_show-types"
 
-const UserShowContext = createContext<{ user: userReciveDataProps} | null>(null)
+
+type contextValue = {
+    user: userReciveDataProps,
+    follow: () => void,
+    unfollow: () => void,
+    view_profile: () => void
+}
+const UserShowContext = createContext<contextValue | null>(null)
 
 export function useUserShowContext() {
     const context = useContext(UserShowContext)

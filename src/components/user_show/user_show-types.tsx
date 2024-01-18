@@ -38,6 +38,14 @@ export type UserProfilePictureProps = {
     onClickAction?: () => void
 }
 
+export type actionsProps = {
+    follow: () => void,
+    unfollow: () => void,
+    view_profile: () => void
+}
+
 export type UserFollowButtonProps = {
-    isFollowing: Boolean
+    isFollowing: Boolean,
+    displayOnMoment?: boolean,
+    hideOnFollowing?: boolean
 }

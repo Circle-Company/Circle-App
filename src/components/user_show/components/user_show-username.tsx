@@ -10,11 +10,13 @@ import { truncated } from "../../../algorithms/processText"
 import { UserShowActions } from "../user_show-actions"
 
 import Verifyed from '../../../assets/icons/svgs/check_circle.svg'
+import { useNavigation } from "@react-navigation/native"
+import ViewProfileContext from "../../../contexts/viewProfile"
 
 export default function user_username ({
     displayOnMoment = true,
     disableAnalytics = false,
-    truncatedSize,
+    truncatedSize = 30,
     color = ColorTheme().text,
     fontSize = fonts.size.footnote,
     fontFamily = fonts.family.Bold,
@@ -22,7 +24,9 @@ export default function user_username ({
     scale = 1
 }: UserUsernameProps) {
 
-    const {user} = useUserShowContext()
+    const {user, view_profile} = useUserShowContext()
+    const {setProfile} = React.useContext(ViewProfileContext)
+    const navigation = useNavigation()
     const container:any = {
         margin: margin * scale,
         flexDirection: 'row',
@@ -45,7 +49,9 @@ export default function user_username ({
 
     async function onUsernameActions() {
         if(disableAnalytics == false){
-            UserShowActions.UsernamePressed({user_id: Number(user.id)})
+            UserShowActions.UsernamePressed({user_id: Number(user.id), action: view_profile, user})
+            await setProfile(user.username)
+            navigation.navigate('ProfileNavigator')
         }
         
     }
