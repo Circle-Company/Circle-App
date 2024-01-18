@@ -42,12 +42,18 @@ export type MomentContainerProps = {
     children: React.ReactNode,
     contentRender: MidiaReciveDataProps,
     focused?: boolean,
+    blur_color?: string
 }
 
 export type MomentLikeProps = {
     isLiked: boolean,
+    backgroundColor?: string
 }
 export type MomentUsernameProps = {
+}
+export type MomentDateProps = {
+    color?: string,
+    backgroundColor?: string
 }
 
 export type momentSizes = {
