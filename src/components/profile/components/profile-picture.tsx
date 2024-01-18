@@ -12,9 +12,10 @@ export default function picture ({
 
     const { user } = useProfileContext()
     const isDarkMode = useColorScheme() === "dark"
+    const [profilePicture, setProfilePicture] = React.useState<string>('')
     const pictureDimensions = {
-        width: 100,
-        height: 100,
+        width: 133,
+        height: 133,
         padding: 10,
         borderRadius: 133/2,
     }
@@ -32,10 +33,19 @@ export default function picture ({
     async function onProfilePictureAction() {
     }
 
+    React.useEffect(() => {
+        if(user.profile_picture.tiny_resolution == undefined){
+            setProfilePicture(String(user.profile_picture.tiny_resolution))
+        } else {
+            setProfilePicture(String(user.profile_picture.tiny_resolution))
+        }                
+
+    }, [])
+
     return (
         <Pressable onPress={onProfilePictureAction} style={container}>
             <FastImage
-                source={{ uri: String(user.profile_picture.fullhd_resolution) || '' }}
+                source={{ uri: String(profilePicture) || '' }}
                 style={{
                     width: Number(pictureDimensions.width),
                     height: Number(pictureDimensions.height),
