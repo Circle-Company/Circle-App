@@ -9,12 +9,14 @@ import { useUserShowContext } from "../user_show-context"
 import { UserShowActions } from "../user_show-actions"
 
 export default function follow_button ({
-    isFollowing = false
+    isFollowing = false,
+    hideOnFollowing = true,
+    displayOnMoment = false
 }: UserFollowButtonProps) {
     
-    const { user } = useUserShowContext()
+    const { user , follow, unfollow} = useUserShowContext()
 
-    const [followPressed, setFollowPressed] = React.useState(false)
+    const [followPressed, setFollowPressed] = React.useState(isFollowing)
 
     var animatedScale = React.useRef(new Animated.Value(1)).current
     React.useEffect(() => { animatedScale.setValue(1) }, [])
@@ -41,7 +43,7 @@ export default function follow_button ({
         width: sizes.buttons.width/4,
         height: sizes.buttons.height/2,
         borderRadius: Number([sizes.buttons.width/4])/2,
-        backgroundColor: colors.gray.white,
+        backgroundColor:displayOnMoment? colors.gray.white : ColorTheme().backgroundDisabled,
         margin: sizes.margins["1sm"],
         alignItems: 'center',
         justifyContent: 'center'
@@ -49,34 +51,32 @@ export default function follow_button ({
     const username_pressed: any = {
         fontSize: fonts.size.body*0.9,
         fontFamily: fonts.family.Bold,
-        color: colors.gray.black
+        color: displayOnMoment? colors.gray.black : ColorTheme().text
     }
     const username_unpressed: any = {
         fontSize: fonts.size.body,
         fontFamily: fonts.family.Bold,
         color: colors.gray.white
     }
-    
-    
-
-    async function onFollowAction() {
-        HandleButtonAnimation()
-        setFollowPressed(true)
-        UserShowActions.FollowPressed({user_id: Number(user.id)})
+    async function ButtonAction() {
+        if(followPressed){
+            HandleButtonAnimation()
+            setFollowPressed(false)
+            UserShowActions.UnfollowPressed({user_id: Number(user.id), action: unfollow})
+        }else {
+            HandleButtonAnimation()
+            setFollowPressed(true)
+            UserShowActions.FollowPressed({user_id: Number(user.id), action: follow})
+        }
     }
-    async function onUnfollowAction() {
-        HandleButtonAnimation()
-        setFollowPressed(false)
-        UserShowActions.UnfollowPressed({user_id: Number(user.id)})
-    }
+    
 
-    if(isFollowing) return null
-    else {
-
+    if(isFollowing && hideOnFollowing) return null
+    if(isFollowing && hideOnFollowing == false){
         if(followPressed) {
             return (
                 <Animated.View style={{transform: [{ scale: animatedScale }] }}>
-                    <Pressable style={container_pressed} onPress={() => onUnfollowAction()}>
+                    <Pressable style={container_pressed} onPress={() => ButtonAction()}>
                         <Text style={username_pressed}>Following</Text>
                     </Pressable>                
                 </Animated.View>
@@ -84,7 +84,27 @@ export default function follow_button ({
         }else {
             return (
                 <Animated.View style={{transform: [{ scale: animatedScale }] }}>
-                    <Pressable style={container_unpressed} onPress={() => onFollowAction()}>
+                    <Pressable style={container_unpressed} onPress={() => ButtonAction()}>
+                        <Text style={username_unpressed}>Follow</Text>
+                    </Pressable>                
+                </Animated.View>
+            )
+        }
+    }
+    else {
+
+        if(followPressed) {
+            return (
+                <Animated.View style={{transform: [{ scale: animatedScale }] }}>
+                    <Pressable style={container_pressed} onPress={() => ButtonAction()}>
+                        <Text style={username_pressed}>Following</Text>
+                    </Pressable>                
+                </Animated.View>
+            )           
+        }else {
+            return (
+                <Animated.View style={{transform: [{ scale: animatedScale }] }}>
+                    <Pressable style={container_unpressed} onPress={() => ButtonAction()}>
                         <Text style={username_unpressed}>Follow</Text>
                     </Pressable>                
                 </Animated.View>
