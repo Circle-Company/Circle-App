@@ -1,6 +1,6 @@
 import { MidiaReciveDataProps } from "../midia_render/midia_render-types"
 
-type MemoryMomentObjectProps = {
+export type MemoryMomentObjectProps = {
     id: number,
     content_type: "image" | "video",
     midia: {
@@ -25,9 +25,10 @@ export type MemoryMainRootProps = {
 }
 
 export type MemoryContainerProps = {
+    contentSizes?: any,
     contentRender: MidiaReciveDataProps,
     focused?: boolean,
-    children: React.ReactNode
+    children?: React.ReactNode,
 }
 export type MemoryCenterRootProps = {
     children?: React.ReactNode

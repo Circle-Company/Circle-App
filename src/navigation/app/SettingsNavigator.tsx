@@ -4,11 +4,18 @@ import ColorTheme, { colors } from '../../layout/constants/colors'
 import Sizes from '../../layout/constants/sizes'
 import Fonts from '../../layout/constants/fonts'
 import SettingsScreen from '../../pages/app/Settings'
-import {useNavigation} from '@react-navigation/native'
-import AuthContext from '../../contexts/auth'
+import SettingsPrivacyPolicy from '../../pages/app/Settings/PrivacyPolicy'
+import SettingsTermsOfService from '../../pages/app/Settings/TermsOfService'
+import SettingsPasswordScreen from '../../pages/app/Settings/Password'
+import SettingsNameScreen from '../../pages/app/Settings/Name'
+import SettingsDescriptionScreen from '../../pages/app/Settings/Description'
 import SettingsHeaderRight from '../../components/headers/account/account-header_right'
 import SettingsHeaderLeft from '../../components/headers/settings/settings-header_left'
 import { useColorScheme } from 'react-native'
+import OpenSourceScreen from '../../pages/app/Settings/OpenSource'
+import VersionScreen from '../../pages/app/Settings/Version'
+import LogOutScreen from '../../pages/app/Settings/LogOut'
+import AllMomentsScreen from '../../pages/app/Settings/AllMoments'
 
 const SettingsStack = createStackNavigator()
  
@@ -18,6 +25,8 @@ export function SettingsNavigator() {
     const HeaderStyle: any= {
         ...Sizes.headers,
         backgroundColor:  ColorTheme().background,
+        borderBottomWidth: 1,
+        borderColor: isDarkMode? colors.gray.grey_08: colors.gray.grey_02
     }
    
   return (
@@ -29,7 +38,7 @@ export function SettingsNavigator() {
             component={SettingsScreen}
             options={{
                 headerTitle: 'Settings',
-                headerStyle: [HeaderStyle, {borderBottomWidth: 1, borderColor: isDarkMode? colors.gray.grey_08: colors.gray.grey_02}],
+                headerStyle: HeaderStyle,
                 headerTintColor: String(ColorTheme().text),
                 cardStyle: {backgroundColor: String(ColorTheme().background)},
                 cardOverlayEnabled: true,
@@ -37,11 +46,11 @@ export function SettingsNavigator() {
             }}
             
         />
-         <SettingsStack.Screen
-            name="Settings-Privacy"
-            component={SettingsScreen}
+        <SettingsStack.Screen
+            name="Settings-Description"
+            component={SettingsDescriptionScreen}
             options={{
-                headerTitle: 'Privacy',
+                headerTitle: 'Add Description',
                 headerStyle: HeaderStyle,
                 headerTintColor: String(ColorTheme().text),
                 cardStyle: {backgroundColor: String(ColorTheme().background)},
@@ -49,31 +58,100 @@ export function SettingsNavigator() {
             }}
         />
         <SettingsStack.Screen
-            name="Settings-Notification"
-            component={SettingsScreen}
+            name="Settings-Name"
+            component={SettingsNameScreen}
             options={{
-                headerTitle: 'Notification',
+                headerTitle: 'Add Name',
                 headerStyle: HeaderStyle,
+                headerTintColor: String(ColorTheme().text),
                 cardStyle: {backgroundColor: String(ColorTheme().background)},
                 cardOverlayEnabled: true,
             }}
         />
         <SettingsStack.Screen
-            name="Settings-Theme"
-            component={SettingsScreen}
+            name="Settings-Password"
+            component={SettingsPasswordScreen}
             options={{
-                headerTitle: 'Theme',
+                headerTitle: 'Change Password',
                 headerStyle: HeaderStyle,
+                headerTintColor: String(ColorTheme().text),
                 cardStyle: {backgroundColor: String(ColorTheme().background)},
                 cardOverlayEnabled: true,
             }}
         />
         <SettingsStack.Screen
-            name="Settings-Community_Guidelines"
+            name="Settings-Privacy-Policy"
+            component={SettingsPrivacyPolicy}
+            options={{
+                headerTitle: 'Privacy Policy',
+                headerStyle: HeaderStyle,
+                headerTintColor: String(ColorTheme().text),
+                cardStyle: {backgroundColor: String(ColorTheme().background)},
+                cardOverlayEnabled: true,
+            }}
+        />
+        <SettingsStack.Screen
+            name="Settings-Terms-Of-Service"
+            component={SettingsTermsOfService}
+            options={{
+                headerTitle: 'Terms of Service',
+                headerStyle: HeaderStyle,
+                headerTintColor: String(ColorTheme().text),
+                cardStyle: {backgroundColor: String(ColorTheme().background)},
+                cardOverlayEnabled: true,
+            }}
+        />
+        <SettingsStack.Screen
+            name="Settings-Push-Notifications"
             component={SettingsScreen}
             options={{
-                headerTitle: 'Community Guidelines',
+                headerTitle: 'Push Notifications',
                 headerStyle: HeaderStyle,
+                headerTintColor: String(ColorTheme().text),
+                cardStyle: {backgroundColor: String(ColorTheme().background)},
+                cardOverlayEnabled: true,
+            }}
+        />
+        <SettingsStack.Screen
+            name="Settings-All-Moments"
+            component={AllMomentsScreen}
+            options={{
+                headerTitle: 'All Moments',
+                headerStyle: HeaderStyle,
+                headerTintColor: String(ColorTheme().text),
+                cardStyle: {backgroundColor: String(ColorTheme().background)},
+                cardOverlayEnabled: true,
+            }}
+        />
+        <SettingsStack.Screen
+            name="Settings-Open-Source"
+            component={OpenSourceScreen}
+            options={{
+                headerTitle: 'Open Source',
+                headerStyle: HeaderStyle,
+                headerTintColor: String(ColorTheme().text),
+                cardStyle: {backgroundColor: String(ColorTheme().background)},
+                cardOverlayEnabled: true,
+            }}
+        />
+        <SettingsStack.Screen
+            name="Settings-Version"
+            component={VersionScreen}
+            options={{
+                headerTitle: 'Version',
+                headerStyle: HeaderStyle,
+                headerTintColor: String(ColorTheme().text),
+                cardStyle: {backgroundColor: String(ColorTheme().background)},
+                cardOverlayEnabled: true,
+            }}
+        />
+        <SettingsStack.Screen
+            name="Settings-Log-Out"
+            component={LogOutScreen}
+            options={{
+                headerTitle: 'Log Out',
+                headerStyle: HeaderStyle,
+                headerTintColor: String(ColorTheme().text), 
                 cardStyle: {backgroundColor: String(ColorTheme().background)},
                 cardOverlayEnabled: true,
             }}

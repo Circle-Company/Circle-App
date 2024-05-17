@@ -3,5 +3,5 @@ import container from "./components/loading-container"
 
 export const Loading = {
     Container: container,
-    ActivityIndicator: activity_indicator
+    ActivityIndicator: activity_indicator,
 }

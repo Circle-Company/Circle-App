@@ -1,7 +1,7 @@
 import React, { createContext, useContext } from "react"
 import { CommentsReciveDataProps} from "./comments-types"
 
-const CommentsContext = createContext<{ comment: CommentsReciveDataProps} | null>(null)
+const CommentsContext = createContext<{ comment: CommentsReciveDataProps } | null>(null)
 
 export function useCommentsContext() {
     const context = useContext(CommentsContext)

@@ -1,44 +1,14 @@
 [
     {
-        "name": "my account",
-        "content":[
-            {
-                "name": "Push notifications",
-                "navigateTo": "settings-privacy_policy"
-            },
-            {
-                "name": "Viewed moments",
-                "navigateTo": "settings-privacy_policy"
-            },
-            {
-                "name": "Liked moments",
-                "navigateTo": "settings-privacy_policy"
-            }
-        ]
-    },
-    {
-        "name": "app",
-        "content":[
-            {
-                "name": "Version",
-                "navigateTo": "settings-terms_of_service"
-            }
-        ]
-    },
-    {
         "name": "legal",
         "content":[
             {
                 "name": "Privacy Policy",
-                "navigateTo": "settings-privacy_policy"
+                "navigateTo": "Settings-Privacy-Policy"
             },
             {
                 "name": "Terms of Service",
-                "navigateTo": "settings-terms_of_service"
-            },
-            {
-                "name": "Community Policy",
-                "navigateTo": "settings-terms_of_service"
+                "navigateTo": "Settings-Terms-Of-Service"
             }
         ]
     },
@@ -46,8 +16,16 @@
         "name": "more",
         "content":[
             {
+                "name": "Open Source",
+                "navigateTo": "Settings-Open-Source"
+            },
+            {
+                "name": "App Version",
+                "navigateTo": "Settings-Version"
+            },
+            {
                 "name": "Log Out",
-                "navigateTo": "settings-privacy_policy"
+                "navigateTo": "Settings-Log-Out"
             }
         ]
     }

@@ -1,17 +1,14 @@
 import React from "react"
 import { View, Text } from "react-native"
-import { MemoryHeaderLeftProps } from "../memory-types"
-import sizes from "../../../layout/constants/sizes"
-import { useMomentContext } from "../../moment/moment-context"
+import MomentContext from "../../moment/context"
 import { truncated } from "../../../algorithms/processText"
 import { colors } from "../../../layout/constants/colors"
 import fonts from "../../../layout/constants/fonts"
 
-type MemoryDescriptionProps = {
-}
+type MemoryDescriptionProps = {}
 
 export default function title ({}: MemoryDescriptionProps) {
-    const {moment} = useMomentContext()
+    const {momentData} = React.useContext(MomentContext)
 
     const container:any = {
         zIndex: 4,
@@ -32,7 +29,7 @@ export default function title ({}: MemoryDescriptionProps) {
     
     return (
         <View style={container}>
-            <Text style={text_style}>{truncated({text: String(moment.description), size: 41})}</Text>
+            <Text style={text_style}>{truncated({text: String(momentData.description), size: 42})}</Text>
         </View>
     )
 }

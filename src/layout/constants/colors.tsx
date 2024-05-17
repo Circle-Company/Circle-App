@@ -15,10 +15,15 @@ type colorsType = {
     },
     green: {
         green_09: String,
+        green_08: String,
         green_07: String,
+        green_06: String,
         green_05: String,
+        green_04: String,
         green_03: String,
+        green_02: String,
         green_01: String,
+        green_00: String,
     },
     yellow: {
         yellow_09: String,
@@ -50,6 +55,9 @@ type colorsType = {
     },
     transparent: {
         black_00: String,
+        black_90: String,
+        black_80: String,
+        black_70: String,
         black_60: String,
         black_50: String,
         black_40: String,
@@ -83,11 +91,16 @@ export const colors:colorsType = {
         blue_00: '#AAD2F8',
     },
     green: {
-        green_09: '#056A40',
-        green_07: '#0B9653',
+        green_09: '#032C23', 
+        green_08: '#06523B',
+        green_07: '#0B774E',
+        green_06: '#0F9B5A',
         green_05: '#15BF62',
-        green_03: '#64CF95',
-        green_01: '#AFE3C7',
+        green_04: '#3CCC79',
+        green_03: '#63D992',
+        green_02: '#8BE4AD',
+        green_01: '#B5EFC9',
+        green_00: '#DFF8E7',
     },
     yellow: {
         yellow_09: '#85590E',
@@ -106,7 +119,7 @@ export const colors:colorsType = {
     },
 
     gray: {
-        black: '#030303',
+        black: '#000000',
         grey_09: '#151414',
         grey_08: '#1F1E1E',
         grey_07: '#282828',
@@ -121,6 +134,9 @@ export const colors:colorsType = {
 
     transparent: {
         black_00: '#00000000',
+        black_90: '#00000090',
+        black_80: '#00000080',
+        black_70: '#00000070',
         black_60: '#00000060',
         black_50: '#00000050',
         black_40: '#00000040',
@@ -150,6 +166,11 @@ export const dark = {
     primaryAccent: colors.blue.blue_00,
     primaryMaxAccent: colors.blue.blue_02,
 
+    secundaryBackground: colors.green.green_09,
+    secundary: colors.green.green_04,
+    secundaryAccent: colors.green.green_00,
+    secundaryMaxAccent: colors.green.green_02,
+
     headline: colors.gray.black,
     title: colors.gray.grey_09,
     titleAccent: colors.gray.white,
@@ -164,6 +185,9 @@ export const dark = {
     error: colors.red.red_05,
 
     like: colors.red.red_05,
+    comment: colors.yellow.yellow_05,
+    view: colors.green.green_05,
+    user: colors.blue.blue_05,
 
     iconFocused: colors.blue.blue_05,
     icon: colors.gray.grey_04,
@@ -184,6 +208,11 @@ export const light = {
     primary: colors.blue.blue_05,
     primaryAccent: colors.blue.blue_00,
     primaryMaxAccent: colors.blue.blue_02,
+
+    secundaryBackground: colors.green.green_00,
+    secundary: colors.green.green_05,
+    secundaryAccent: colors.green.green_00,
+    secundaryMaxAccent: colors.green.green_02,
     
     headline: colors.gray.black,
     title: colors.gray.grey_09,
@@ -199,6 +228,9 @@ export const light = {
     error: colors.red.red_05,
 
     like: colors.red.red_05,
+    comment: colors.yellow.yellow_05,
+    view: colors.green.green_05,
+    user: colors.blue.blue_05,
 
     iconFocused: colors.blue.blue_05,
     icon: colors.gray.grey_04,

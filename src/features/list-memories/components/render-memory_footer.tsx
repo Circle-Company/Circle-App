@@ -1,14 +1,9 @@
 import React from 'react'
 import { View, useColorScheme} from 'react-native'
 import sizes from '../../../layout/constants/sizes'
-import ButtonStandart from '../../../components/buttons/button-standart'
-import { Text } from '../../../components/Themed'
-import fonts from '../../../layout/constants/fonts'
-import ColorTheme, { colors } from '../../../layout/constants/colors'
-import NumberConversor from '../../../algorithms/numberConversor'
 import { Loading } from '../../../components/loading'
-type RenderMemoryFooterProps = {
-}
+
+type RenderMemoryFooterProps = {}
 
 export default function render_memory_footer ({}: RenderMemoryFooterProps) {
     const isDarkMode = useColorScheme() === 'dark'

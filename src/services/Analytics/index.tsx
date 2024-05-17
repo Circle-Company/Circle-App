@@ -1,7 +1,7 @@
 // analyticsManager.ts
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-const STORAGE_KEY = 'analyticsData';
+const STORAGE_KEY = 'circle.api.analytics.storage_key';
 
 interface EventData {
   [key: string]: any;

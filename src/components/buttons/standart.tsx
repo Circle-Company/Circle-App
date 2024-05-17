@@ -1,12 +1,11 @@
 import React from 'react';
 import { SafeAreaView, StatusBar, StyleSheet, TouchableOpacity, Dimensions, useColorScheme} from 'react-native'
 import {useNavigation} from '@react-navigation/native'
-
 import ColorScheme, { colors } from '../../layout/constants/colors'
 import Sizes from '../../layout/constants/sizes'
 import Fonts from '../../layout/constants/fonts'
-
 import { Text, View } from '../Themed'
+import ColorTheme from '../../layout/constants/colors';
 
 type buttonStandart = {
   navigateTo: any,
@@ -27,8 +26,8 @@ export default function ButtonStandart({navigateTo, title}:buttonStandart) {
     }
 
     const text = {
-        color: colors.gray.white,
-        fontFamily: Fonts.family['BoldI-talic'],
+        color: ColorTheme().text,
+        fontFamily: Fonts.family['Semibold-Italic'],
         fontSize: 14,
     }
 

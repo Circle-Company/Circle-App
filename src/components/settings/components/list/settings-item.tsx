@@ -45,7 +45,7 @@ export default function item ({
     }
 
     return (
-        <Pressable style={container} onPress={() => {navigation.navigate(navigateTo)}}>
+        <Pressable style={container} onPress={() => {navigation.navigate('SettingsNavigator', {screen: navigateTo })}}>
             <View style={container_left}>
                 <Text style={text_style}>{name}</Text>
             </View>

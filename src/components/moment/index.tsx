@@ -10,8 +10,12 @@ import description from "./components/moment-description"
 import date from "./components/moment-date"
 import share from "./components/moment-share"
 import more from "./components/moment-more"
-export const Moment = {
+import views from "./components/moment-full-views"
+import options from "./components/moment-options"
+import comments from "./components/moment-full-comments"
+import shares from "./components/moment-full-shares"
 
+export const Moment = {
     Root: {
         Main: main_root,
         Top: top_root,
@@ -26,5 +30,12 @@ export const Moment = {
     Container: container,
     Description: description,
     Date: date,
+    Options: options,
+
+    Full: {
+        Views: views,
+        Comments: comments,
+        Shares: shares
+    }
 
 }

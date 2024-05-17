@@ -5,8 +5,8 @@ import search_list from "../../data/search_list.json"
 import { Search } from "../../components/search"
 import { UserShow } from "../../components/user_show"
 import { useSearchContext } from "../../components/search/search-context"
-import ListMostFamousUsers from "../list-most_famous_users"
-import FamousUsersContext, { FamousUsersContextProvider } from "../../components/ranking/ranking-context"
+import NearToYouUsers from "../list-near_to_you"
+import NearToYouContext, { NearToYouContextProvider } from "../../components/near_to_you/near_to_you-context"
 interface SearchResult {
 
 }
@@ -34,10 +34,9 @@ export default function ListSearch() {
     
     if(isConnected == false) return <Search.Offline/>
     else if(searchTerm.length == 0) return (
-        <FamousUsersContextProvider>
-            <ListMostFamousUsers/>
-        </FamousUsersContextProvider>
-        
+        <NearToYouContextProvider>
+            <NearToYouUsers/>
+        </NearToYouContextProvider>
     )
     else {
         return (

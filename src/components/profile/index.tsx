@@ -7,6 +7,7 @@ import share from "./components/profile-share";
 import picture from "./components/profile-picture";
 import name from "./components/profile-name";
 import description from "./components/profile-description";
+import last_active_at from "./components/profile-last_active_at";
 export const Profile = {
     MainRoot: main_root,
     Statistics: {
@@ -18,5 +19,6 @@ export const Profile = {
     Picture: picture,
     ShareButton: share,
     Name: name,
-    Description: description
+    Description: description,
+    LastActiveAt: last_active_at
 }

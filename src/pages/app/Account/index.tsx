@@ -1,20 +1,70 @@
 import React from 'react'
-import {ScrollView, StatusBar} from 'react-native'
+import {PermissionsAndroid, RefreshControl, ScrollView, StatusBar, useColorScheme} from 'react-native'
 import { View, Text } from '../../../components/Themed'
 import AuthContext from '../../../contexts/auth'
 import ListMemories from '../../../features/list-memories/list-memories-preview'
 import RenderProfile from '../../../features/render-profile'
+import { Loading } from '../../../components/loading'
+import sizes from '../../../layout/constants/sizes'
+import { colors } from '../../../layout/constants/colors'
+
 export default function AccountScreen() {
 
-  const {useSignOut} = React.useContext(AuthContext)
+  const {useSignOut, user, findUserProfileData} = React.useContext(AuthContext)
+  const [refreshing, setRefreshing] = React.useState(false)
+  const [ loading, setLoading] = React.useState(false)
+  const isDarkMode = useColorScheme() === 'dark'
 
   const container = {
-    flex: 1,
+    top: 0,
   } 
+
+  const handleRefresh = () => {
+    setLoading(true)
+    findUserProfileData()
+    .finally(() => {
+        setTimeout(() => {
+        setLoading(false)
+        setRefreshing(false)         
+        }, 200)
+    })
+};
+
+  React.useEffect(() => {
+    if(!user) setLoading(true)
+      else setLoading(false)
+  }, [])
+
   return (    
     <View style={container}>
-      <RenderProfile/>
-      <ListMemories/>        
+    <ScrollView
+      style={container}
+      showsVerticalScrollIndicator={false}
+      horizontal={false}
+      refreshControl={
+        <RefreshControl
+        progressBackgroundColor={String(isDarkMode? colors.gray.grey_08 : colors.gray.grey_02)}
+        colors={[String(isDarkMode? colors.gray.grey_04: colors.gray.grey_04), '#00000000']}
+        refreshing={refreshing}
+        onRefresh={handleRefresh}
+    />
+      }
+    >
+    <View style={{marginBottom: sizes.margins['1md']}}>
+      {loading?
+        <Loading.Container width={sizes.screens.width} height={sizes.screens.height/3}>
+            <Loading.ActivityIndicator/>
+        </Loading.Container>
+        :
+        <RenderProfile user={user}/>
+      }
+      
+    </View>      
+    <ListMemories
+    isAccountScreen={true}
+    user={user}/>   
+    </ScrollView>
+           
     </View>  
   )
 }

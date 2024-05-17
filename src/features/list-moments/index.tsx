@@ -1,77 +1,92 @@
-import React, {useRef, useState, useEffect, useCallback} from 'react'
-import {View, ScrollView, Dimensions, Animated} from 'react-native'
-
-import RenderMoment from './components/render-moment'
+import React, { useRef, useState, useEffect, useCallback } from 'react'
+import { Animated } from 'react-native'
+import FastImage from 'react-native-fast-image'
 import sizes from '../../layout/constants/sizes'
-import moments_data from '../../data/moment.json'
 import { FlatList } from 'react-native-gesture-handler'
 import { Loading } from '../../components/loading'
+import RenderMoment from './components/render-moment'
+import FeedContext from '../../contexts/Feed'
+import {MomentProvider} from '../../components/moment/context'
 
-export default function ListMoments () {
+const ListMoments = () => {
     const margin = 2
-    const [centerIndex, setCenterIndex] = useState<number | null>(null);
+
+    const {enableScrollFeed, feedData} = React.useContext(FeedContext)
+    const [centerIndex, setCenterIndex] = useState<number | null>(0);
     const flatListRef = useRef<FlatList | null>(null);
-  
+
     const handleScroll = useCallback(
-      (event: any) => {
-        const screenWidth = Dimensions.get('window').width *0.9;
-        const contentOffsetX = event.nativeEvent.contentOffset.x;
-        const centerIndex = Math.floor(contentOffsetX / screenWidth);
-        setCenterIndex(centerIndex);
-      },
-      [setCenterIndex]
-    )
+        (event: any) => {
+            const contentOffsetX = event.nativeEvent.contentOffset.x + 140
+            const centerIndex = Math.floor((contentOffsetX + sizes.screens.width / 2) / (sizes.moment.standart.width + margin));
+            setCenterIndex(centerIndex >= 0 ? centerIndex : 0);
+        },
+        [setCenterIndex]
+    );
+
     const container_0 = {
-        marginLeft: ((sizes.screens.width - sizes.moment.standart.width)/2) - margin ,
-        marginRight: margin,
-    }
+        marginLeft: ((sizes.screens.width - sizes.moment.standart.width) / 2) - margin,
+        marginRight: margin
+    };
     const container = {
-        marginRight: margin,
-    }
+        marginRight: margin
+    };
     const container_1 = {
-        marginRight: margin + (sizes.screens.width - sizes.moment.standart.width)/2,
-    }
+        marginRight: margin + (sizes.screens.width - sizes.moment.standart.width) / 2,
+    };
 
     const viewabilityConfig = {
         minimumViewTime: 3000,
         viewAreaCoveragePercentThreshold: 100,
-        waitForInteraction: true,
+        waitForInteraction: true
     };
+
+    const prefetchNextImage = (index: number) => {
+        const nextItem = feedData[index];
+        if (nextItem && nextItem.midia.fullhd_resolution) {
+            FastImage.preload([{ uri: nextItem.midia.fullhd_resolution.toString() }]);
+        }
+    };
+
+    useEffect(() => {
+        if (centerIndex !== null) {
+            prefetchNextImage(centerIndex + 1);
+        }
+    }, [centerIndex]);
+
     return (
         <FlatList
-            data={moments_data}
+            data={feedData}
             horizontal
+            scrollEnabled={enableScrollFeed}
             showsHorizontalScrollIndicator={false}
             bounces={false}
             viewabilityConfig={viewabilityConfig}
             scrollEventThrottle={16}
-            snapToInterval={sizes.moment.standart.width+ margin}
+            snapToInterval={sizes.moment.standart.width + margin}
             decelerationRate='fast'
             maxToRenderPerBatch={3}
-            keyExtractor={(moment: any) => moment.id}
-            disableIntervalMomentum={ true }
-            ref={(ref) => { flatListRef.current = ref }}
-            renderItem={({item, index}) => {
-
-                const focusedItem = true
-                const viewedItem =  index === centerIndex 
-                const container_style = index == 0? container_0: container && index +1 == moments_data.length? container_1: container
-                return (
-                    <Animated.View style={[container_style]}>
-                        <RenderMoment moment={item} focused={focusedItem} viewed={viewedItem}/>
-                    </Animated.View>
-                )                              
-            }}
+            keyExtractor={(moment: any) => moment.id.toString()}
+            disableIntervalMomentum={true}
             onScroll={handleScroll}
-            directionalLockEnabled={true}
-            ListFooterComponent={() => {
+            directionalLockEnabled={true}            
+            ref={(ref) => { flatListRef.current = ref }}
+            renderItem={({ item, index }) => {
+                const focusedItem = index === centerIndex
+                const container_style = index === 0 ? container_0 : index + 1 === feedData.length ? container_1 : container;
                 return (
-                        <Loading.Container height={sizes.moment.standart.height} width={sizes.moment.standart.width/3}>
-                            <Loading.ActivityIndicator interval={10} size={40}/>
-                        </Loading.Container>               
+                    <Animated.View style={[container_style]} key={index}>
+                    <RenderMoment isFeed={true} momentData={item} isFocused={focusedItem}/>
+                    </Animated.View>
                 )
             }}
+            ListFooterComponent={() => (
+                <Loading.Container height={sizes.moment.standart.height} width={sizes.moment.standart.width / 3.5}>
+                    <Loading.ActivityIndicator size={40} />
+                </Loading.Container>
+            )}
         />
-    )
-    
-}
+    );
+};
+
+export default ListMoments;

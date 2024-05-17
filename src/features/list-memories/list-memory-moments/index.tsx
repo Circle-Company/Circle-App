@@ -1,25 +1,89 @@
 import React from 'react'
-import { FlatList, View, Dimensions} from 'react-native'
+import { FlatList, View, RefreshControl, useColorScheme} from 'react-native'
 import sizes from '../../../layout/constants/sizes'
 import { RenderMemoryMoment } from './components/render-memory_moment'
 import { Loading } from '../../../components/loading'
-import memory_moments_data from '../../../data/memory-moments.json'
 import { colors } from '../../../layout/constants/colors'
+import MemoryContext from '../../../contexts/memory'
+import api from '../../../services/api'
+import NetworkContext from '../../../contexts/network'
+import EndReached from '../list-memories-preview/components/end-reached'
+import OfflineCard from '../../../components/general/offline'
 
 export default function ListMemoryMoments() {
     const margin = 20
-    const [centerIndex, setCenterIndex] = React.useState<number | null>(null);
-    const flatListRef = React.useRef<FlatList | null>(null);
+    const {
+        memory,
+        memoryMoments,
+        setMemoryMoments
+    } = React.useContext(MemoryContext)
+    const [centerIndex, setCenterIndex] = React.useState<number | null>(null)
+    const flatListRef = React.useRef<FlatList | null>(null)
+    const [ loading, setLoading ] = React.useState<boolean>(false)
+    const [ page, setPage ] = React.useState<number>(1)
+    const [ pageSize, setPageSize] = React.useState<number>(100000)
+    const [ endReached, setEndReached ] = React.useState(false)
+    const [refreshing, setRefreshing] = React.useState(false)
+    const { networkStats } = React.useContext(NetworkContext)
+    const isDarkMode = useColorScheme() === 'dark'
 
     const handleScroll = React.useCallback(
-      (event: any) => {
-        const screenWidth = Dimensions.get('window').width * 0.9;
-        const contentOffsetX = event.nativeEvent.contentOffset.x;
-        const centerIndex = Math.floor(contentOffsetX / screenWidth);
-        setCenterIndex(centerIndex);
-      },
-      [setCenterIndex]
-    )
+        (event: any) => {
+            const contentOffsetX = event.nativeEvent.contentOffset.x + 60
+            const screenWidth = sizes.screens.width
+            const centerIndex = Math.floor((contentOffsetX + screenWidth / 2) / (sizes.moment.small.width + margin));
+            setCenterIndex(centerIndex >= 0 ? centerIndex : 0);
+        },
+        [setCenterIndex]
+    );
+
+    React.useEffect(() => {setCenterIndex(0)}, [])
+
+    async function fetchData() {
+        await api.post(`/memory/get-moments?page=${page}&pageSize=${pageSize}`, { memory_id: memory?.id })
+        .then(function (response) {
+            if(page == 1) setMemoryMoments(response.data.data)
+            else {
+                setMemoryMoments([...memoryMoments, ...response.data.data])
+                if(pageSize > response.data.data.length) setEndReached(true)
+                else setEndReached(false)
+            } setPage(page + 1)
+        })
+        .catch(function (error) {setLoading(false); console.log(error)})                
+    }
+
+    React.useEffect(() => {
+        setLoading(true)
+        fetchData()
+        .finally(() => {
+        setLoading(false)
+        setRefreshing(false)            
+        })
+    }, [])
+
+    React.useEffect(() => {
+        if(networkStats !== 'OFFLINE'){
+            setLoading(true)
+            fetchData()
+            .finally(() => {
+                setLoading(false)
+                setRefreshing(false)         
+            })            
+        }
+    }, [networkStats])
+
+    const handleRefresh = async () => {
+        setPage(1)
+        setLoading(true)
+        await fetchData()
+        .finally(() => {
+            setTimeout(() => {
+            setLoading(false)
+            setRefreshing(false)         
+            }, 200)
+        })
+    };
+
     const container_0 = {
         marginLeft: ((sizes.screens.width - sizes.moment.small.width + margin*2)/2) - margin ,
         marginRight: margin,
@@ -29,47 +93,68 @@ export default function ListMemoryMoments() {
     }
     const container_1 = {
         
-     }
+    }
 
     const viewabilityConfig = {
         minimumViewTime: 3000,
         viewAreaCoveragePercentThreshold: 100,
         waitForInteraction: true,
-    };
+    }
+
+    if(networkStats == 'OFFLINE' && memoryMoments.length == 0) return <OfflineCard height={(sizes.screens.height - sizes.headers.height) / 2}/>
+
+    if (loading) return (
+        <Loading.Container width={sizes.screens.width} height={(sizes.screens.height - sizes.headers.height) * 0.8}>
+            <Loading.ActivityIndicator/>
+        </Loading.Container>
+    );
     return (
         <FlatList
-        data={memory_moments_data.moments}
+        data={memoryMoments}
         horizontal
         showsHorizontalScrollIndicator={false}
         bounces={false}
         viewabilityConfig={viewabilityConfig}
         scrollEventThrottle={16}
-        snapToInterval={sizes.moment.small.width+ margin}
+        snapToInterval={sizes.moment.small.width + margin}
         decelerationRate='fast'
         maxToRenderPerBatch={3}
-        keyExtractor={(moment: any) => moment.id}
-        disableIntervalMomentum={ true }
+        keyExtractor={(moment: any) => moment.id.toString()}
+        disableIntervalMomentum={true}
+        onScroll={handleScroll}
+        directionalLockEnabled={true}            
         ref={(ref) => { flatListRef.current = ref }}
+        onEndReachedThreshold={0.3}
+        onEndReached={async () => {fetchData()}}
+        refreshControl={
+            <RefreshControl
+                progressBackgroundColor={String(isDarkMode? colors.gray.grey_08 : colors.gray.grey_02)}
+                colors={[String(isDarkMode? colors.gray.grey_04: colors.gray.grey_04), '#00000000']}
+                refreshing={refreshing}
+                onRefresh={async() => await handleRefresh()}
+            />
+        }
         renderItem={({item, index}) => {
-            const viewedItem =  index === centerIndex 
+            const focused = index === centerIndex 
             return (
-                <View style={index == 0? container_0: container && index +1 == memory_moments_data.moments.length? container_1: container}>
-                    <RenderMemoryMoment moment={item} viewed={viewedItem}/>
+                <View style={index == 0? container_0: container && index +1 == memoryMoments.length? container_1: container}>
+                    <RenderMemoryMoment focused={focused} moment={item}/>
                 </View>
             )                              
         }}
-        onScroll={handleScroll}
-        directionalLockEnabled={true}
         ListFooterComponent={() => {
-            return (
-                    <Loading.Container height={sizes.moment.standart.height} width={sizes.moment.standart.width/3}>
-                        <Loading.ActivityIndicator
-                            interval={10}
-                            size={40}
-                            from_color={String(colors.gray.grey_09)}
-                            to_color={String(colors.gray.grey_07)}
-                        />
-                    </Loading.Container>               
+            if(endReached) return (
+                <EndReached
+                    width={sizes.moment.small.width * 0.6}
+                    height={(sizes.screens.height - sizes.headers.height) * 0.78}
+                    style={{marginLeft: sizes.margins['1lg'], marginRight: sizes.margins['1md']}}
+                    text='No more Moments'
+                />                    
+            )
+            else return (
+                <Loading.Container width={sizes.moment.small.width/1.8} height={(sizes.screens.height - sizes.headers.height) * 0.8}>
+                    <Loading.ActivityIndicator/>
+                </Loading.Container>
             )
         }}
     />

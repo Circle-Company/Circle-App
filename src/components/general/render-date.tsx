@@ -9,32 +9,34 @@ import ClockIcon from '../../assets/icons/svgs/clock.svg'
 type DateProps = {
     date: string,
     color?: string,
-    backgroundColor?: string
+    backgroundColor?: string,
+    scale?: number
 }
 export default function RenderDate ({
     date,
     color = String(ColorTheme().text),
-    backgroundColor= String(ColorTheme().backgroundDisabled)
+    backgroundColor,
+    scale = 1
 }: DateProps) {
 
     const container:any = {
-        height: sizes.sizes["2md"]*0.9,
-        borderRadius: (sizes.sizes["2md"]*0.9)/2,
+        height: (sizes.sizes["2md"]*0.7) * scale,
+        borderRadius: ((sizes.sizes["2md"]*0.7)/2) * scale,
         alignItems: 'center',
         justifyContent: 'center',
-        paddingHorizontal: sizes.paddings["2sm"],
+        paddingHorizontal: sizes.paddings["1sm"] * scale,
         backgroundColor,
         flexDirection: 'row'
     }
     const description_style:any = {
-        fontSize: fonts.size.body*0.8,
+        fontSize: (fonts.size.body*0.75) * scale,
         fontFamily: fonts.family.Semibold,
         color
     }
     
     return (
         <View style={container}>
-            <ClockIcon fill={color} width={16} height={16} style={{marginRight: sizes.margins["1sm"]*1.4}}/>
+            <ClockIcon fill={color} width={12 * scale} height={12 * scale} style={{marginRight: (sizes.margins["1sm"]*1.4) * scale}}/>
             <Text style={description_style}>{date}</Text>  
         </View>
     )
