@@ -1,7 +1,8 @@
 import React from "react"
-import { View, Text } from "react-native"
+import { View } from "react-native"
 import { MemoryHeaderProps } from "../../memory-types"
 import sizes from "../../../../layout/constants/sizes"
+import ColorTheme from "../../../../layout/constants/colors"
 
 export default function header ({children}: MemoryHeaderProps) {
     const container:any = {
@@ -10,11 +11,9 @@ export default function header ({children}: MemoryHeaderProps) {
         width: sizes.screens.width,
         paddingHorizontal: sizes.margins['3sm'],
         paddingVertical: sizes.paddings["1sm"]*0.8,
+        borderTopWidth: 1,
+        borderColor: ColorTheme().backgroundDisabled
     }
     
-    return (
-        <View style={container}>
-            {children}
-        </View>
-    )
+    return <View style={container}>{children}</View>
 }

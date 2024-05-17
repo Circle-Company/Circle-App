@@ -1,6 +1,8 @@
 import { FlatList, View, useColorScheme} from "react-native"
 import { SettignsSectionProps } from "../../settings-types"
 import SettingsItem from "./settings-item"
+import SettingsItemAccount from './settings-item-account'
+import { SettingsiItemAccountObjectProps } from "../../settings-types"
 import { Text } from "../../../Themed"
 import ColorTheme, { colors } from "../../../../layout/constants/colors"
 import sizes from "../../../../layout/constants/sizes"
@@ -8,6 +10,7 @@ import fonts from "../../../../layout/constants/fonts"
 
 export default function section ({
     name,
+    type,
     content
 }: SettignsSectionProps) {
 
@@ -42,7 +45,24 @@ export default function section ({
                 <Text style={header_text}>{name.toUpperCase()}</Text>
             </View>
             <View style={content_container}>
-                <FlatList
+                {type == 'ACCOUNT'?
+                    <FlatList
+                        data={content}
+                        renderItem={({item}: {item: SettingsiItemAccountObjectProps}) => {
+                            return (
+                                <SettingsItemAccount
+                                    type={item.type}
+                                    value={item.value}
+                                    navigator=""
+                                    name={item.name}
+                                    navigateTo={item.navigateTo}
+                                    secure={item.secure}
+                                />
+                            )                        
+                        }}
+                    />
+                    :
+                    <FlatList
                     data={content}
                     renderItem={({item}) => {
                         return (
@@ -53,6 +73,8 @@ export default function section ({
                         )                        
                     }}
                 />
+                }
+
 
             </View>
         </View>

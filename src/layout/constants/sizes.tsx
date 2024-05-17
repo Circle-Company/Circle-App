@@ -66,7 +66,7 @@ const window = {
 
 const headers = {
     elevation: 0,
-    height: 60,
+    height: 56,
 }
 
 
@@ -109,47 +109,68 @@ const inputs = {
     marginRight: 10
 }
 
+const momentAspectRatio = 1.566
+
 const moment = {
+  micro: {
+    width: 36,
+    height: momentAspectRatio * 36,
+    paddingTop: 1,
+    padding: 1,
+    borderRadius: 7,
+    fontScale: 0.6
+  },
   tiny: {
     width: 161,
-    height: 252,
+    height: momentAspectRatio * 161,
     paddingTop: 2,
     padding: 5,
     borderRadius: 30
   },
   small: {
     width: 283,
-    height: 437,
+    height: momentAspectRatio * 283,
     paddingTop: 2,
     padding: 5,
     borderRadius: 30
   },
-  standart: {
+  standart: { 
     width: 355,
-    height: 556,
+    height: momentAspectRatio * 355,
     padding: 5,
+    paddingTop: 0,
     borderRadius: 40
   },
   full: {
-    width: 390,
-    height: 552,
-    paddingTop: 2,
-    padding: 5,
-    borderTopLeftRadius: 0,
-    borderTopRightRadius: 0,
-    borderBottomLeftRadius: 40,
-    borderBottomRightRadius: 40,
+    width: screens.width,
+    height: momentAspectRatio * screens.width,
+    paddingBottom: 5,
+    padding: 10,
+    borderTopLeftRadius: 15,
+    borderTopRightRadius: 15,
+    borderBottomLeftRadius: 15,
+    borderBottomRightRadius: 15
   }
 }
+  const toasts = {
+    small: {
+      width: screens.width,
+      height: headers.height *0.7
+    },
+    standart: {
+      width: screens.width,
+      height: headers.height * 1.2
+    }
+  }
 
   const blur = {
     blurAmount: 20
   }
 
   const card = {
-    width: 150,
-    height: 225,
-    borderRadius: 30,
+    width: 160,
+    height: 220,
+    borderRadius: 20,
     paddingVertical: 10,
     paddingHorizontal: 10
   }
@@ -194,6 +215,7 @@ export default {
     bottomTab,
     screens,
     buttons,
+    toasts,
     inputs,
     card,
     moment,

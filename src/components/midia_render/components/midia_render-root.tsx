@@ -2,7 +2,6 @@ import React from "react"
 import { View } from "react-native"
 import { MidiaRenderMainRootProps } from "../midia_render-types"
 import MidiaRenderContext from "../midia_render-context"
-import sizes from "../../../layout/constants/sizes"
 import LinearGradient from "react-native-linear-gradient"
 
 export default function root ({children, data, content_sizes}: MidiaRenderMainRootProps) {

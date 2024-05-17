@@ -12,9 +12,10 @@ export default function MemoriesScreen() {
     flex: 1,
   }
   return (
+
     <View style={container}>
-      <StatusBar backgroundColor={String(colors.gray.black)} barStyle={'light-content'}/>
-      <ListMemoriesAll/>
-    </View>
+    <StatusBar translucent={false} backgroundColor={String(ColorTheme().background)} barStyle={isDarkMode? 'light-content': 'dark-content'}/>
+    <ListMemoriesAll/>
+  </View>
   )
 }

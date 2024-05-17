@@ -11,7 +11,7 @@ export default function statistics_container ({
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'space-between',
-        paddingHorizontal: sizes.paddings["1xl"]*0.9
+        paddingHorizontal: sizes.paddings["1xl"]*1.2
     }
 
     return (

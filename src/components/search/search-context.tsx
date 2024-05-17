@@ -23,24 +23,21 @@ export function SearchContextProvider({children}: SearchContextProvider) {
           setIsConnected(state.isConnected)
         })
         return () => unsubscribe()
-      }, []);
+    }, []);
+
     const fetchData = async (searchTerm: string) => {
-
         if(searchTerm == '') return []
-            try{
-                const response = api.post('/user/search', {
-                    username_to_search: searchTerm,
-                    user_id: 1
-                })
-                .then(function (response) { return response.data })
-                .catch(function (error) { console.log(error)})
-
-                return await response          
-            } catch(err) {
-                console.error('Erro ao buscar dados da API:', err)
-            }            
-
-
+        try{
+            const response = api.post('/user/search', {
+                username_to_search: searchTerm,
+                user_id: 1
+            })
+            .then(function (response) { return response.data })
+            .catch(function (error) { console.log(error)})
+            return await response          
+        } catch(err) {
+            console.error('Erro ao buscar dados da API:', err)
+        }            
     }
   
     const contextValue: SearchContextProps = {

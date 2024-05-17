@@ -1,14 +1,8 @@
 
 import { createStackNavigator, CardStyleInterpolators } from '@react-navigation/stack'
-import React from 'react'
 import ColorTheme from '../../layout/constants/colors'
 import Sizes from '../../layout/constants/sizes'
-import { SearchContextProvider } from '../../components/search/search-context'
-
-import HeaderRigthHome from '../../components/headers/home/Right'
-
 import ExploreScreen from '../../pages/app/Explore'
-import { Search } from '../../components/search'
   
 const ExploreStack = createStackNavigator()
  

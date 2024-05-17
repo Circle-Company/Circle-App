@@ -38,21 +38,14 @@ export default function header_left ({
         fontSize: fonts.size.caption1,
         fontFamily: fonts.family.Semibold,
     }
-    if(children) {
-        return (
-            <View style={container}>
-                {children}
+    
+    if(children) return <View style={container}>{children}</View>
+    else return(
+        <View style={container}>
+            <Text style={header_text}>{text}</Text>
+            <View style={header_number_container}>
+                <Text style={header_number}>{number}</Text>
             </View>
-        )
-    }else {
-        return(
-            <View style={container}>
-                <Text style={header_text}>{text}</Text>
-                <View style={header_number_container}>
-                    <Text style={header_number}>{number}</Text>
-                </View>
-            </View>             
-        )
-
-    }
+        </View>             
+    )
 }

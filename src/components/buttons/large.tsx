@@ -7,7 +7,7 @@ import Fonts from '../../layout/constants/fonts'
 
 import ArrowRight from '../../assets/icons/svgs/arrow_right.svg'
 
-export default function Buttonlarge(props:any) {
+export default function Buttonlarge(props: any) {
 
     const navigation = useNavigation()
     var animatedScale = useRef(new Animated.Value(0)).current
@@ -50,7 +50,6 @@ export default function Buttonlarge(props:any) {
         justifyContent: 'center',
         backgroundColor: ColorTheme().textAccent
     }
-
     return (
         <View style={container}>
             <Pressable onPress={() => { handleButtonPress(), navigation.navigate(props.navigateTo) }}>
