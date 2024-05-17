@@ -1,11 +1,9 @@
 import React from "react"
-import { View, Text } from "react-native"
+import { View } from "react-native"
 import { MomentTopRootProps } from "../../../moment-types"
-import { useMomentContext } from "../../../moment-context"
 import sizes from "../../../../../layout/constants/sizes"
 
 export default function top_root ({children}: MomentTopRootProps) {
-    const { moment } = useMomentContext()
 
     const container:any = {
         width: '100%',
@@ -14,9 +12,5 @@ export default function top_root ({children}: MomentTopRootProps) {
         padding: sizes.paddings["1sm"]/2
     }
     
-    return (
-        <View style={container}>
-            {children}
-        </View>
-    )
+    return <View style={container}>{children}</View>
 }

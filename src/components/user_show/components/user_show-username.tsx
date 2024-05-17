@@ -1,5 +1,5 @@
 import React from "react"
-import { View, Text, Pressable } from "react-native"
+import { View, Text, Pressable, useColorScheme} from "react-native"
 
 import Sizes from "../../../layout/constants/sizes"
 import fonts from "../../../layout/constants/fonts"
@@ -9,7 +9,7 @@ import { useUserShowContext } from "../user_show-context"
 import { truncated } from "../../../algorithms/processText"
 import { UserShowActions } from "../user_show-actions"
 
-import Verifyed from '../../../assets/icons/svgs/check_circle.svg'
+import Verifyed from '../../../assets/icons/svgs/check_circle_verify.svg'
 import { useNavigation } from "@react-navigation/native"
 import ViewProfileContext from "../../../contexts/viewProfile"
 
@@ -26,6 +26,7 @@ export default function user_username ({
 
     const {user, view_profile} = useUserShowContext()
     const {setProfile} = React.useContext(ViewProfileContext)
+    const isDarkMode = useColorScheme() === 'dark'
     const navigation = useNavigation()
     const container:any = {
         margin: margin * scale,
@@ -50,7 +51,7 @@ export default function user_username ({
     async function onUsernameActions() {
         if(disableAnalytics == false){
             UserShowActions.UsernamePressed({user_id: Number(user.id), action: view_profile, user})
-            await setProfile(user.username)
+            await setProfile(user.id)
             navigation.navigate('ProfileNavigator')
         }
         
@@ -61,7 +62,7 @@ export default function user_username ({
             <Text style={displayOnMoment? username_style_moment: username_style}>@{truncated({text: user.username, size: Number(truncatedSize)})}</Text>
             {user.verifyed && 
             <View style={{alignItems: 'center', justifyContent: "center", marginTop: 1 * scale*2, marginLeft: 2 * scale}}>
-                <Verifyed fill={String(displayOnMoment? colors.gray.white: ColorTheme().verifyed)} width={12 * scale} height={12 * scale}/>
+                <Verifyed fill={String(displayOnMoment? colors.gray.white: isDarkMode? colors.yellow.yellow_04: colors.yellow.yellow_05)} width={12 * scale} height={12 * scale}/>
             </View>
                                
             }

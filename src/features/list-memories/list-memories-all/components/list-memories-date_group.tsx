@@ -3,12 +3,10 @@ import { View, FlatList, useColorScheme} from 'react-native'
 import { Memory } from '../../../../components/memory'
 import RenderMemory from '../../components/render-memory'
 import sizes from '../../../../layout/constants/sizes'
-import ColorTheme, { colors } from '../../../../layout/constants/colors'
-import fonts from '../../../../layout/constants/fonts'
-import { Text } from '../../../../components/Themed'
-import MemoryIcon from '../../../../assets/icons/svgs/memory_outline.svg'
+import { colors } from '../../../../layout/constants/colors'
 import RenderDate from '../../../../components/general/render-date'
 import RenderMemoriesCount from '../../components/render-memories_count'
+import Animated, { FadeInDown } from 'react-native-reanimated'
 type RenderMemoriesAllProps = {
     data: any,
     date_text: string,
@@ -29,7 +27,7 @@ export function ListMemoriesAll ({
     }
     const header_container: any = {
         flexDirection: 'row',
-        height: sizes.sizes["3md"],
+        height: sizes.sizes["2md"],
         width: sizes.screens.width,
         paddingHorizontal: sizes.paddings["1sm"],
         alignItems: 'center',
@@ -38,16 +36,23 @@ export function ListMemoriesAll ({
     const content_container: any = {
         flexDirection: 'row',
         width: sizes.screens.width,
-        paddingBottom: sizes.paddings['1md'],
-        borderBottomWidth: 0.5,
+        paddingBottom: sizes.paddings['1lg'],
+        borderBottomWidth: 1,
         borderColor: isDarkMode? colors.gray.grey_08: colors.gray.grey_02
+    }
+    const memories_container: any = {
+        transform: [{scale: 0.82}],
+        marginRight: -12,
+        marginLeft: -20,
+        marginTop: -20,
+        marginBottom: -25,
     }
 
     return (
         <View style={container}>
             <View style={header_container}>
                 <Memory.HeaderLeft>
-                    <RenderDate date={date_text}/>
+                    <RenderDate date={date_text} scale={1.1}/>
                 </Memory.HeaderLeft>
                 <Memory.HeaderRight>
                     <RenderMemoriesCount count={count}/>
@@ -59,7 +64,14 @@ export function ListMemoriesAll ({
                 horizontal
                 showsHorizontalScrollIndicator={false}
                 renderItem={({item, index}) => {
-                    return ( <RenderMemory memory={item} index={index} numOfMemories={memories.content.length}/>)
+                    return (
+                    <Animated.View entering={FadeInDown.duration(100* index * 2)}>
+                        <View style={memories_container}>
+                            <RenderMemory memory={item} index={index} numOfMemories={memories.content.length}/>
+                        </View>
+                        
+                    </Animated.View>
+                    )
                 }}
                 ListHeaderComponent={() => { return <View style={{width: 15}}></View>}}
                 ListFooterComponent={() => { return <View style={{width: 15}}></View>}}

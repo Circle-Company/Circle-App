@@ -1,4 +1,4 @@
-const dotenv = require('dotenv')
+import dotenv from 'dotenv'
 import emails from './emails'
 import metadata from './metadata'
 
@@ -33,8 +33,6 @@ const log = {
 }
 
 const required = {
-    JWT_SECRET: env.JWT_SECRET,
-    PRIVATE_KEY_PASSPHRASE: env.PRIVATE_KEY_PASSPHRASE,
 }
 
 const options = {

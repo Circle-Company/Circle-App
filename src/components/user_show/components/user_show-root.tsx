@@ -18,7 +18,7 @@ export default function root ({children, data}: UserRootProps) {
 
     const follow = async(followed_user_id: number) => {
         try{
-            const response = api.post('/user/follow', {
+            const response = await api.post('/user/follow', {
                 user_id: 1,
                 followed_user_id
             })
@@ -32,7 +32,7 @@ export default function root ({children, data}: UserRootProps) {
     }
     const unfollow = async(followed_user_id: number) => {
         try{
-            const response = api.post('/user/unfollow', {
+            const response = await api.post('/user/unfollow', {
                 user_id: 1,
                 followed_user_id
             })
@@ -47,7 +47,7 @@ export default function root ({children, data}: UserRootProps) {
 
     const view_profile = async(username: string) => {
         try{
-            const response = api.post(`/user/profile/${username}`, {
+            const response = await api.post(`/user/profile/${username}`, {
                 user_id: 1,
             })
             .then(function (response) { console.log(response.data) })

@@ -1,50 +1,80 @@
 import React from "react"
-import { View } from "react-native"
+import { Pressable, View } from "react-native"
 import { CommentsRenderCommentProps } from "../comments-types"
 import { UserShow } from "../../user_show"
-import { useMomentContext } from "../../moment/moment-context"
 import { Text } from "../../Themed"
 import ColorTheme from "../../../layout/constants/colors"
 import fonts from "../../../layout/constants/fonts"
 import sizes from "../../../layout/constants/sizes"
+import HeartIcon from '../../../assets/icons/svgs/heart_2.svg'
+import HeartIconOutline from '../../../assets/icons/svgs/heart_2-outline.svg'
 import { timeDifferenceConverter } from "../../../algorithms/dateConversor"
+import MomentContext from "../../moment/context"
 
-export default function render_comment ({comment, index}: CommentsRenderCommentProps) {
-    const {momentSizes} = useMomentContext()
+export default function render_comment ({comment, index, preview}: CommentsRenderCommentProps) {
+    const { momentUserActions } = React.useContext(MomentContext)
+
+
+    const [like, setLike] = React.useState(false)
     
     const container:any = {
         flexDirection: 'row',
-        marginTop: sizes.margins["1sm"]/2,
-        marginBottom: sizes.margins["1sm"]
+        marginTop: preview? sizes.margins["1sm"]*0.8 : sizes.margins["3sm"],
+        marginBottom:  preview? sizes.margins["1sm"]*0.5 : sizes.margins["2sm"],
     }
     const container_left:any = {
         left: -2,
         alignItems: 'center',
         justifyContent: 'flex-start',
-        marginRight: sizes.margins["1sm"]/2
+        marginRight: sizes.margins["1sm"]/2,
     }
-    const container_right:any = {
+    const container_center:any = {
+        top: preview? 0 : -4,
         left: -2,
         flex: 1,
         alignItems: 'flex-start',
-        justifyContent: 'center'
+        justifyContent: 'center',
     }
-    const container_right_top:any = {
-        flexDirection: 'row'
+    const container_right: any = {
+        alignItems: 'center',
+        justifyContent: 'flex-start',
+        paddingLeft: sizes.margins["3sm"],
+        paddingTop: sizes.margins["2sm"] * 0.7,
     }
-    const container_right_center:any = {
+    const like_container: any = {
+        width: '100%',
+        alignItems: 'center',
+        justifyContent: 'center',
+        padding: sizes.paddings["1sm"]/5
+    }
+    const container_center_top:any = {
+        flexDirection: 'row',
+        marginBottom: sizes.margins["1sm"]*0.5
     }
     const content_style = {
-        marginTop: -2,
-        fontSize: fonts.size.body*0.9,
+        marginTop: preview? -2 : 0,
+        fontSize: preview? fonts.size.body*0.9 : fonts.size.body,
         fontFamily: 'RedHatDisplay-Medium',
 
     }
     const date_style = {
         marginLeft: 5,
-        fontSize: fonts.size.caption1,
+        fontSize: preview? fonts.size.caption1 : fonts.size.caption1*1.1,
         fontFamily: fonts.family.Medium,
         color: ColorTheme().textDisabled
+    }
+
+    const likesNum = like? comment.statistics.total_likes_num + 1 : comment.statistics.total_likes_num 
+    const likeLabel = likesNum == 1? 'like' : 'likes'
+    
+    function handleLikePress() {
+        if(like){
+            momentUserActions.setLikeComment(false)
+            setLike(false)
+        } else {
+            momentUserActions.setLikeComment(true)
+            setLike(true)
+        }
     }
 
     return (
@@ -52,32 +82,39 @@ export default function render_comment ({comment, index}: CommentsRenderCommentP
             <View style={container_left}>
                 <UserShow.Root data={comment.user}>
                 <UserShow.ProfilePicture
-                    pictureDimensions={{width: 28, height:28}}
+                    pictureDimensions={{width: preview? 28: 32, height:preview? 28: 32}}
                     displayOnMoment={false}
                 />
                 </UserShow.Root>
-
             </View>
-            <View style={container_right}>
-                <View style={container_right_top}>
+            <View style={container_center}>
+                <View style={container_center_top}>
                     <UserShow.Root data={comment.user}>
                         <UserShow.Username
                             displayOnMoment={false}
                             truncatedSize={20}
                             color={ColorTheme().textDisabled}
                             fontFamily={fonts.family.Medium}
-                            fontSize={fonts.size.caption1}
+                            fontSize={preview? fonts.size.caption1 : fonts.size.caption1*1.1}
                             margin={0}
                         />
-                    </UserShow.Root>     
-                    <Text style={date_style}>{timeDifferenceConverter({date: String(comment.created_at)})}</Text>                
+                    </UserShow.Root>    
+                    <Text style={date_style}>•</Text>
+                    <Text style={date_style}>{timeDifferenceConverter({date: String(comment.created_at)})}</Text>
+                    <Text style={date_style}>{likesNum>0? '•': null}</Text>
+                    <Text style={date_style}>{likesNum>0? likesNum +' ' + likeLabel : null}</Text>           
                 </View>
-                <View style={container_right_center}>
-                    <Text style={content_style}>{comment.content}</Text>                    
-                </View>
-
-
+                <Text style={content_style}>{comment.content}</Text>                    
             </View>
+            <Pressable onPress={handleLikePress} style={container_right}>
+                <View style={like_container}>
+                    {like?
+                        <HeartIcon fill={ColorTheme().like.toString()} width={15} height={15}/> :
+                        <HeartIconOutline fill={`${ColorTheme().textDisabled}60`} width={15} height={15}/>
+                    }                    
+                </View>
+
+            </Pressable>
 
         </View>
     )

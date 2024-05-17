@@ -38,6 +38,11 @@ export type UserProfilePictureProps = {
     onClickAction?: () => void
 }
 
+export type UserPressableContainer = {
+    children: React.ReactNode,
+    containerProps?: object
+}
+
 export type actionsProps = {
     follow: () => void,
     unfollow: () => void,

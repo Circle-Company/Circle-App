@@ -1,16 +1,18 @@
 import React from 'react'
-import { Pressable, View, Text, Animated} from 'react-native'
+import { View, Text } from 'react-native'
 import ColorTheme from '../../../layout/constants/colors'
 import {useNavigation} from '@react-navigation/native'
 import sizes from '../../../layout/constants/sizes'
 import fonts from '../../../layout/constants/fonts'
 import HeaderButton from '../headerButton'
-
+import SelectMomentsContext from '../../../contexts/selectMoments'
 import Cog from '../../../assets/icons/svgs/cog.svg'
-import Edit from '../../../assets/icons/svgs/edit.svg'
+import NewMoment from '../../../assets/icons/svgs/memory.svg'
 
 export default function AccountHeaderRight() {
-const navigation = useNavigation()
+    const {setFrom} = React.useContext(SelectMomentsContext)
+    const navigation = useNavigation()
+
 
     const container: any = {
         flexDirection: 'row'
@@ -25,17 +27,22 @@ const navigation = useNavigation()
         marginRight: sizes.margins['2sm']
     }
 
+    function handlePress() {
+        setFrom('NEW_MEMORY')
+        navigation.navigate('MemoriesNavigator', { screen: 'NewMemorySelectMoments' })
+    }
+
     return(
         <View style={container}>
             <HeaderButton
-                action={() => navigation.navigate('SettingsNavigator')}
-                width={85}
+                action={handlePress}
+                width={140}
                 marginRight
             >
                 <View style={textContainer}>
-                    <Text style={text}>Edit</Text>
+                    <Text style={text}>New Memory</Text>
                 </View>
-                <Edit fill={String(ColorTheme().text)} width={16} height={16}/>
+                <NewMoment fill={String(ColorTheme().text)} width={16} height={16}/>
             </HeaderButton>
 
 

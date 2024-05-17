@@ -1,50 +1,36 @@
 import React from 'react'
-import { ActivityIndicator, View} from 'react-native'
-import ColorTheme, { colors } from '../../../layout/constants/colors'
+import ColorTheme from '../../../layout/constants/colors'
 import { LoadingProps } from '../loading-types'
 import { MotiView } from '@motify/components'
-import { useColorScheme } from 'react-native'
-
 import Loading from '../../../assets/icons/svgs/loading.svg'
 
 export default function activity_indicator({
     size = 30,
-    interval = 20,
-    from_color = String(ColorTheme().backgroundDisabled),
-    to_color = String(ColorTheme().placeholder)
+    color = ColorTheme().textDisabled.toString() + '50'
 }: LoadingProps) {
 
-    const isDarkMode = useColorScheme() === 'dark'
-
-    return(
+    return (
         <MotiView
-        from={{
-            width: size,
-            height: size,
-            borderRadius: size/2,
-            borderWidth: size/17,
-            borderColor: from_color
-        }}
-        animate={{
-            width: size + interval,
-            height: size + interval,
-            borderRadius: (size + interval)/2,
-            borderWidth: size/15,
-            borderColor: to_color
-        }}
-        transition={{
-            type: 'timing',
-            duration: 2000,
-            loop: true
-        }}
+            from={{
+                rotate: '0deg',
+            }}
+            animate={{
+                rotate: '360deg', // Rotação completa em 360 graus
+            }}
+            transition={{
+                type: 'timing',
+                duration: 1000,
+                repeatReverse: false,
+                loop: true,
+            }}
             style={{
                 width: size,
                 height: size,
-                borderRadius: size/2,
-                borderWidth: size/10,
+                alignItems: 'center',
+                justifyContent: 'center',
             }}
-        />
-        
-    )        
-
+        >
+            <Loading width={size} height={size} fill={color}/>
+        </MotiView>
+    )
 }

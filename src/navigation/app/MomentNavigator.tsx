@@ -1,31 +1,101 @@
-import React from 'react';
-import { createStackNavigator } from '@react-navigation/stack'
-import ProfileScreen from '../Screens/ViewProfile/ProfileScreen'
-import MomentScreen from '../Screens/Moment'
-import {HeaderPhoto, HeaderMoments, HeaderBack} from '../components/Headers/index' 
-import ColorTheme from '../layout/constants/colors'
+import { createStackNavigator, CardStyleInterpolators } from '@react-navigation/stack'
+import React from 'react'
+import ColorTheme, { colors } from '../../layout/constants/colors'
+import Sizes from '../../layout/constants/sizes'
+import { useColorScheme } from 'react-native'
+import NewMomentDescription from '../../pages/app/Moment/new_moment-description'
+import NewMomentGalleryScreen from '../../pages/app/Moment/new_moment-gallery'
+import NewMomentSelectMemory from '../../pages/app/Moment/new_moment-select_memory'
+import NewMemoryTitleScreen from '../../pages/app/Memories/new_memory_title'
+import MemoryHeaderLeft from '../../components/headers/memory/memory-header_left'
+import MemoryTitleHeaderRight from '../../components/headers/memory/memory_title-header_right'
+import NewMomentImageScreen from '../../pages/app/Moment/new_moment-image'
+import NewMomentImageRight from '../../components/headers/moment/new_moment_image-header_right'
+import NewMomentInputDescriptionRight from '../../components/headers/moment/new_moment_input_description-header_right'
+import NewMomentSelectMemoryRight from '../../components/headers/moment/new_moment_select_memory-header_right'
+import MomentFullScreen from '../../pages/app/Moment/moment-full'
+import MomentFullHeaderLeft from '../../components/headers/moment/moment_full-header_left'
+import MomentFullHeaderRight from '../../components/headers/moment/moment_full-header_right'
+const MomentStack = createStackNavigator()
 
-const MomentStack = createStackNavigator();
+export function MomentNavigator() {
+    const isDarkMode = useColorScheme() === 'dark'
+    const HeaderStyle: any= {
+        ...Sizes.headers,
+        backgroundColor:  ColorTheme().background,
+    }
 
-export function MomentScreenNavigator() {
-  return (
+    return (
     <MomentStack.Navigator>
-      <MomentStack.Screen
-        name="MomentScreen"
-        component={MomentScreen}
-        options={{
-          headerTitle: 'Moments (Beta)',
-          headerTitleAlign: 'left',
-          headerTransparent: true,
-          headerTintColor: ColorTheme().background,
-          headerTitleStyle: {fontFamily: 'RedHatDisplay-Bold', fontSize: 23},
-          
-          headerStyle: {backgroundColor: ColorTheme().background, elevation: 0},
-          headerRight: () => (
-            <HeaderMoments/>
-          )
-        }}
-      />
-    </MomentStack.Navigator>
-  );
+        <MomentStack.Screen
+            name="MomentFullScreen"
+            component={MomentFullScreen}
+            options={{
+                cardShadowEnabled: true,
+                headerStyle: [HeaderStyle],
+                headerTitleStyle: {display: 'none'},
+                headerTransparent: true,
+                headerLeft: () => <MomentFullHeaderLeft/>,
+                cardStyle: {backgroundColor: colors.gray.black.toString(), overflow: 'hidden'}
+            }}
+        />
+        <MomentStack.Screen
+            name="NewMomentGalleryScreen"
+            component={NewMomentGalleryScreen}
+            options={{
+                headerTitle:'New Moment',
+                headerStyle: [HeaderStyle],
+                headerTitleStyle: {color: String(ColorTheme().text)},
+                cardStyle: {backgroundColor: String(ColorTheme().background)},
+                cardOverlayEnabled: true,
+                cardStyleInterpolator: CardStyleInterpolators.forHorizontalIOS,
+                headerLeft: () => <MemoryHeaderLeft/>,
+                headerRight: () => <NewMomentImageRight/>
+            }}
+        />
+
+        <MomentStack.Screen
+            name="NewMomentImageScreen"
+            component={NewMomentImageScreen}
+            options={{
+                headerTitle:'Select Image',
+                headerStyle: [HeaderStyle],
+                headerTitleStyle: {color: String(ColorTheme().text)},
+                cardStyle: {backgroundColor: String(ColorTheme().background)},
+                cardOverlayEnabled: true,
+                cardStyleInterpolator: CardStyleInterpolators.forHorizontalIOS,
+                headerLeft: () => <MemoryHeaderLeft/>,
+                headerRight: () => <NewMomentImageRight/>
+            }}
+        />
+        <MomentStack.Screen
+            name="NewMomentDescription"
+            component={NewMomentDescription}
+            options={{
+                headerTitle:'New Moment',
+                headerStyle: [HeaderStyle],
+                headerTitleStyle: {color: String(ColorTheme().text)},
+                cardStyle: {backgroundColor: String(ColorTheme().background)},
+                cardOverlayEnabled: true,
+                cardStyleInterpolator: CardStyleInterpolators.forHorizontalIOS,
+                headerLeft: () => <MemoryHeaderLeft/>,
+                headerRight: () => <NewMomentInputDescriptionRight/>
+            }}
+        />
+        <MomentStack.Screen
+            name="NewMomentSelectMemory"
+            component={NewMomentSelectMemory}
+            options={{
+                headerTitle:'Add to Memory',
+                headerStyle: [HeaderStyle],
+                headerTitleStyle: {color: String(ColorTheme().text)},
+                cardStyle: {backgroundColor: String(ColorTheme().background)},
+                cardOverlayEnabled: true,
+                cardStyleInterpolator: CardStyleInterpolators.forHorizontalIOS,
+                headerLeft: () => <MemoryHeaderLeft/>,
+                headerRight: () => <NewMomentSelectMemoryRight/>
+            }}
+        />
+        </MomentStack.Navigator>
+    );
 }

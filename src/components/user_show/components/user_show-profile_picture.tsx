@@ -8,6 +8,7 @@ import { useUserShowContext } from "../user_show-context"
 import { UserShowActions } from "../user_show-actions"
 import { useNavigation } from "@react-navigation/native"
 import ViewProfileContext from "../../../contexts/viewProfile"
+import Animated, { FadeIn } from "react-native-reanimated"
 
 export default function profile_picture ({
     displayOnMoment = true,
@@ -36,21 +37,22 @@ export default function profile_picture ({
     async function onProfilePictureAction() {
         if(disableAnalytics == false){
             UserShowActions.ProfilePicturePressed({user_id: Number(user.id), action: view_profile, user})
-            await setProfile(user.username)
+            await setProfile(user.id)
             navigation.navigate('ProfileNavigator')
         }
     }
 
     React.useEffect(() => {
-            if(user.profile_picture.small_resolution == undefined){
-                setProfilePicture(String(user.profile_picture.tiny_resolution))
+            if(user.profile_picture?.small_resolution == undefined){
+                setProfilePicture(String(user.profile_picture?.tiny_resolution))
             } else {
-                setProfilePicture(String(user.profile_picture.small_resolution))
+                setProfilePicture(String(user.profile_picture?.small_resolution))
             }                
     
     }, [])
 
         return (
+            <Animated.View entering={FadeIn.duration(200)}>
             <Pressable onPress={onProfilePictureAction} style={container}>
                 <FastImage
                     source={{ uri: String(profilePicture) || '' }}
@@ -63,7 +65,9 @@ export default function profile_picture ({
                         left: Number(outlineSize)/2
                     }}
                 />
-            </Pressable>
+            </Pressable>                
+            </Animated.View>
+
         )        
 
 

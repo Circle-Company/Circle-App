@@ -6,6 +6,7 @@ import { useProfileContext } from "../profile-context"
 import sizes from "../../../layout/constants/sizes"
 import { Pressable } from "react-native"
 import FastImage from "react-native-fast-image"
+import Animated, { FadeInDown, SlideInUp } from 'react-native-reanimated';
 
 export default function picture ({
 }: ProfilePictureProps) {
@@ -13,9 +14,10 @@ export default function picture ({
     const { user } = useProfileContext()
     const isDarkMode = useColorScheme() === "dark"
     const [profilePicture, setProfilePicture] = React.useState<string>('')
+
     const pictureDimensions = {
-        width: 133,
-        height: 133,
+        width: 100,
+        height: 100,
         padding: 10,
         borderRadius: 133/2,
     }
@@ -30,6 +32,7 @@ export default function picture ({
         width: Number(pictureDimensions.width) + Number(outlineSize),
         height: Number(pictureDimensions.height) + Number(outlineSize),
     }
+
     async function onProfilePictureAction() {
     }
 
@@ -43,18 +46,21 @@ export default function picture ({
     }, [])
 
     return (
-        <Pressable onPress={onProfilePictureAction} style={container}>
-            <FastImage
-                source={{ uri: String(profilePicture) || '' }}
-                style={{
-                    width: Number(pictureDimensions.width),
-                    height: Number(pictureDimensions.height),
-                    borderRadius: Number(pictureDimensions.width)/2,
-                    position: 'absolute',
-                    top: Number(outlineSize)/2,
-                    left: Number(outlineSize)/2
-                }}
-            />
-        </Pressable>
+        <Animated.View entering={FadeInDown.duration(400)}>
+            <Pressable onPress={onProfilePictureAction} style={[container]}>
+                <FastImage
+                    source={{ uri: String(profilePicture) || '' }}
+                    style={{
+                        width: Number(pictureDimensions.width),
+                        height: Number(pictureDimensions.height),
+                        borderRadius: Number(pictureDimensions.width)/2,
+                        position: 'absolute',
+                        top: Number(outlineSize)/2,
+                        left: Number(outlineSize)/2
+                    }}
+                />
+            </Pressable>            
+        </Animated.View>
+
     )
 }

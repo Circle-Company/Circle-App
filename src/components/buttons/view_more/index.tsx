@@ -10,14 +10,20 @@ import sizes from '../../../layout/constants/sizes'
 
 type ViewMorePuttonProps = {
     action(): Promise<void>,
-    icon?: React.ReactNode,
-    text?: string
+    icon?: React.ReactNode | null,
+    text?: string,
+    scale?: number,
+    fontSize?: number,
+    fontFamily?: string,
 }
 
 export default function ViewMorebutton({
     action,
     text = 'View More',
-    icon = <ChevronRight fill={String(ColorTheme().primary)} width={11} height={11}/>
+    scale = 1,
+    fontSize = fonts.size.caption1* 1.05,
+    fontFamily = fonts.family.Semibold,
+    icon = <ChevronRight fill={String(ColorTheme().primary)} width={11 * scale} height={11 * scale}/>
 }: ViewMorePuttonProps) {
 
     const navigation = useNavigation()
@@ -38,12 +44,12 @@ export default function ViewMorebutton({
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'center',
-        paddingVertical: 4,
+        paddingVertical: 4 * scale,
     }
     const text_style: any = {
-        marginRight: sizes.margins['1sm'],
-        fontSize: fonts.size.caption1*1.05,
-        fontFamily: fonts.family.Semibold,
+        marginRight: sizes.margins['1sm'] * scale,
+        fontSize: fontSize * scale,
+        fontFamily: fontFamily,
         color: ColorTheme().primary
     }
     async function onPressAction() {
