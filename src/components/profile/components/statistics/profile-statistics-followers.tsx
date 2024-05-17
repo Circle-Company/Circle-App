@@ -15,18 +15,14 @@ export default function statistics_followers ({}: ProfileStatisticsFollowersProp
 
     const container: any = {
         width: sizes.screens.width/4,
-        backgroundColor: isDarkMode? colors.gray.grey_08: colors.gray.grey_02,
-        paddingHorizontal: sizes.paddings["1sm"],
         marginTop: sizes.margins["1sm"],
-        paddingVertical: sizes.paddings['1sm']*0.8,
-        borderRadius: sizes.borderRadius["1md"],
         alignItems: 'center',
         justifyContent: 'center',
     }
 
     const num_style: any = {
         fontFamily: fonts.family.Bold,
-        fontSize: fonts.size.headline * 0.9,
+        fontSize: fonts.size.headline,
         color: ColorTheme().text
     }
     const text_style: any = {

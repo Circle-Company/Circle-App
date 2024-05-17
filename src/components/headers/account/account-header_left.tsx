@@ -1,11 +1,7 @@
 import React from 'react'
-import { Pressable, View, Text, Animated} from 'react-native'
-import ColorTheme, { colors } from '../../../layout/constants/colors'
-import {useNavigation} from '@react-navigation/native'
+import { View } from 'react-native'
 import AuthContext from '../../../contexts/auth'
-
 import { UserShow } from '../../user_show'
-import fonts from '../../../layout/constants/fonts'
 
 export default function AccountHeaderLeft() {
     const { user} = React.useContext(AuthContext)
@@ -18,7 +14,7 @@ export default function AccountHeaderLeft() {
     return(
         <View style={container}>
             <UserShow.Root data={user}>
-                <UserShow.Username displayOnMoment={false} scale={1.3} fontFamily={fonts.family.Semibold} disableAnalytics={true}/>
+                <UserShow.Username displayOnMoment={false} scale={1.3} disableAnalytics={true}/>
             </UserShow.Root>
         </View>
     )

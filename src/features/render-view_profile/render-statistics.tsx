@@ -11,7 +11,7 @@ export default function RenderStatistics({
 } : RenderStatisticsProps) {
 
     const container: any = {
-        paddingVertical: sizes.paddings["1sm"],
+        paddingVertical: sizes.paddings["1sm"]*0.8,
     }
 
     return(

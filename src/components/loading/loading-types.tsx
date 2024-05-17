@@ -1,8 +1,6 @@
 export type LoadingProps = {
-    from_color?: string,
-    to_color?: string,
+    color?: string,
     size?: number,
-    interval?: number
 }
 export type LoadingContainerProps = {
     width?: number,

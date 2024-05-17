@@ -5,9 +5,7 @@ const MemoryContext = createContext<{ memory: MemoryReciveDataProps} | null>(nul
 
 export function useMemoryContext() {
     const context = useContext(MemoryContext)
-    if(!context) {
-        throw new Error("Memory.* component must be rendered as child of Memory component")
-    }
+    if(!context) throw new Error("Memory.* component must be rendered as child of Memory component")
     return context
 }
 

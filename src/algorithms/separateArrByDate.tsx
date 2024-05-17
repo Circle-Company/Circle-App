@@ -19,11 +19,14 @@ export enum TimeInterval {
   WEEK = 7 * 24 * 60 * 60 * 1000,
   BIMONTH = 2 * 30 * 24 * 60 * 60 * 1000,
   MONTH = 30 * 24 * 60 * 60 * 1000, // Um mês em milissegundos (aproximadamente)
+  TRIMESTER = 3 * 30 * 24 * 60 * 60 * 1000,
   SEMESTER = 6 * 30 * 24 * 60 * 60 * 1000,
   YEAR = 365 * 24 * 60 * 60 * 1000,
 }
 
 export function groupObjectsByDate(objects: MyObject[], timeInterval: number = DEFAULT_TIME_INTERVAL): GroupedObject[] {
+
+  console.log('time: ', objects )
   const groupedObjects = new Map<string, GroupedObject>();
   // Agrupar objetos pela data de criação ou atualização
   objects.forEach((obj) => {
@@ -60,52 +63,52 @@ function getDateStringRelative(date: Date, timeInterval: TimeInterval): string {
 
   if (timeInterval === TimeInterval.SECOND) {
     const secondsAgo = Math.floor(diff / timeInterval);
-    return secondsAgo === 0 ? 'agora' : `${secondsAgo} segundo${secondsAgo === 1 ? '' : 's'} atrás`;
+    return secondsAgo === 0 ? 'now' : `${secondsAgo} second${secondsAgo === 1 ? '' : 's'} ago`;
   } else if (timeInterval === TimeInterval.MINUTE) {
     const minutesAgo = Math.floor(diff / timeInterval);
-    return minutesAgo === 0 ? 'agora' : `${minutesAgo} minuto${minutesAgo === 1 ? '' : 's'} atrás`;
+    return minutesAgo === 0 ? 'now' : `${minutesAgo} minute${minutesAgo === 1 ? '' : 's'} ago`;
   } else if (timeInterval === TimeInterval.HOUR) {
     const hoursAgo = Math.floor(diff / timeInterval);
-    return hoursAgo === 0 ? 'agora' : `${hoursAgo} hora${hoursAgo === 1 ? '' : 's'} atrás`;
+    return hoursAgo === 0 ? 'now' : `${hoursAgo} hour${hoursAgo === 1 ? '' : 's'} ago`;
   } else if (timeInterval === TimeInterval.DAY) {
     const daysAgo = Math.floor(diff / timeInterval);
     return getDayString(daysAgo);
   } else if (timeInterval === TimeInterval.WEEK) {
     const weeksAgo = Math.floor(diff / timeInterval);
-    return weeksAgo === 0 ? 'esta semana' : (weeksAgo === 1 ? 'semana passada' : `${weeksAgo} semanas atrás`);
+    return weeksAgo === 0 ? 'this week' : (weeksAgo === 1 ? 'last week' : `${weeksAgo} weeks ago`);
   } else if (timeInterval === TimeInterval.BIMONTH) {
     const bimonthsAgo = Math.floor(diff / timeInterval);
-    return bimonthsAgo === 0 ? 'este bimestre' : (bimonthsAgo === 1 ? 'bimestre passado' : `${bimonthsAgo} bimestres atrás`);
+    return bimonthsAgo === 0 ? 'this two months' : (bimonthsAgo === 1 ? 'last two months' : `${bimonthsAgo} two months ago`);
   } else if (timeInterval === TimeInterval.MONTH) {
     const monthsAgo = Math.floor(diff / timeInterval);
-    return monthsAgo === 0 ? 'este mês' : (monthsAgo === 1 ? 'mês passado' : `${monthsAgo} meses atrás`);
+    return monthsAgo === 0 ? 'this month' : (monthsAgo === 1 ? 'last month' : `${monthsAgo} months ago`);
   } else if (timeInterval === TimeInterval.TRIMESTER) {
     const trimestersAgo = Math.floor(diff / timeInterval);
-    return trimestersAgo === 0 ? 'este trimestre' : (trimestersAgo === 1 ? 'trimestre passado' : `${trimestersAgo} trimestres atrás`);
+    return trimestersAgo === 0 ? 'this quarter' : (trimestersAgo === 1 ? 'last quarter' : `${trimestersAgo} quarters ago`);
   } else if (timeInterval === TimeInterval.SEMESTER) {
     const semestersAgo = Math.floor(diff / timeInterval);
-    return semestersAgo === 0 ? 'este semestre' : (semestersAgo === 1 ? 'semestre passado' : `${semestersAgo} semestres atrás`);
+    return semestersAgo === 0 ? 'this semester' : (semestersAgo === 1 ? 'last semester' : `${semestersAgo} semesters ago`);
   } else if (timeInterval === TimeInterval.YEAR) {
     const currentYear = now.getFullYear();
     const objYear = date.getFullYear();
 
     if (currentYear === objYear) {
-      return 'este ano';
+      return 'this year';
     } else {
       const yearsAgo = Math.floor(diff / timeInterval);
-      return yearsAgo === 1 ? 'ano passado' : `${yearsAgo} anos atrás`;
+      return yearsAgo === 1 ? 'last year' : `${yearsAgo} years ago`;
     }
   } else {
-    return 'mais de um ano atrás';
+    return 'more than a year ago';
   }
 }
 
 function getDayString(daysAgo: number): string {
   if (daysAgo === 0) {
-    return 'hoje';
+    return 'today';
   } else if (daysAgo === 1) {
-    return 'ontem';
+    return 'yesterday';
   } else {
-    return `${daysAgo} dias atrás`;
+    return `${daysAgo} days ago`;
   }
 }

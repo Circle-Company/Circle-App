@@ -1,15 +1,17 @@
 import React from "react"
-import { View, Pressable} from "react-native"
+import { View } from "react-native"
 import { MemoryContainerProps } from "../memory-types"
 import sizes from "../../../layout/constants/sizes"
 import { MidiaRender } from "../../midia_render"
-import { useMemoryContext } from "../memory-context"
 import ColorTheme from "../../../layout/constants/colors"
-import { useNavigation } from "@react-navigation/native"
 
-export default function container ({children, contentRender, focused}: MemoryContainerProps) {
+export default function container ({
+    children,
+    contentRender,
+    focused,
+    contentSizes = sizes.moment.tiny
+}: MemoryContainerProps) {
 
-    const navigation = useNavigation()
     const container:any = {
         ...sizes.moment.tiny,
         overflow: 'hidden',
@@ -24,18 +26,14 @@ export default function container ({children, contentRender, focused}: MemoryCon
         zIndex: 0
     }
 
-    function pressed() {
-        navigation.navigate('MemoriesNavigator',{ screen: 'Memory'})
-    }
-
     return (
-        <Pressable style={container} onPress={pressed}>
+        <View style={container}>
             <View style={content_container}>
-                <MidiaRender.Root data={contentRender} content_sizes={sizes.moment.tiny}>
-                    <MidiaRender.RenderImage blur={Boolean(focused)} blurRadius={20}/>  
+                <MidiaRender.Root data={contentRender} content_sizes={contentSizes}>
+                <MidiaRender.RenderImage blur={focused} blurRadius={12}/>  
                 </MidiaRender.Root>                
             </View>
             {children}
-        </Pressable>
+        </View>
     )           
 }

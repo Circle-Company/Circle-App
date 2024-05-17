@@ -7,5 +7,5 @@ export const UserShow = {
     Root: root,
     Username: user_username,
     FollowButton: follow_button,
-    ProfilePicture: profile_picture
+    ProfilePicture: profile_picture,
 }

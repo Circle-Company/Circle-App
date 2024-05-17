@@ -1,5 +1,6 @@
 import React from "react"
 import api from "../services/api"
+import AuthContext from "./auth"
 
 type ViewProfileProviderProps = {
     children: React.ReactNode
@@ -27,33 +28,35 @@ export type ProfileDataProps = {
 	},
     you_follow: boolean
 }
-type ViewProfileContextsData = {
-    user: ProfileDataProps,
-    setProfile: () => void,
+export type ViewProfileContextsData = {
+    userProfile: ProfileDataProps,
+    setProfile: () => Promise<void>,
 }
 
 const ViewProfileContext = React.createContext<ViewProfileContextsData>({} as ViewProfileContextsData)
 
 export function ViewProfileProvider({children}: ViewProfileProviderProps) {
-    const [user, setUser] = React.useState()
+    const {user} = React.useContext(AuthContext)
+    const [userProfile, setUserProfile] = React.useState()
 
-    async function setProfile (username: string){
-            try{
-                const response = api.post(`/user/profile/${username}`, {
-                    user_id: 1,
-                })
-                .then(function (response) { setUser(response.data) })
-                .catch(function (error) { console.log(error)})
-    
-                return await response          
-            } catch(err) {
-                console.error(err)
-            } 
+    async function setProfile (Id: number){
+        try{
+            const response = api.post(`/user/profile/data/pk/${Id}`, {
+                user_id: user.id,
+            })
+            .then(function (response) { setUserProfile(response.data) })
+            .catch(function (error) { console.log(error)})
+
+            console.log(response)
+            return await response          
+        } catch(err) {
+            console.error(err)
+        } 
     }
 
-    const contextValue = {
+    const contextValue: any = {
         setProfile,
-        user,        
+        userProfile: userProfile,        
     }
     return (
         <ViewProfileContext.Provider value={contextValue}>

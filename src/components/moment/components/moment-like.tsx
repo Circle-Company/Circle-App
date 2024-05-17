@@ -1,7 +1,6 @@
 import React from "react"
 import { View, Pressable, Animated } from "react-native"
 import { Text } from "../../Themed"
-
 import NumberConversor from "../../../algorithms/numberConversor"
 import sizes from "../../../layout/constants/sizes"
 import fonts from "../../../layout/constants/fonts"
@@ -9,15 +8,15 @@ import ColorTheme, {colors} from "../../../layout/constants/colors"
 import { BlurView } from "@react-native-community/blur"
 import LikeIcon from '../../../assets/icons/svgs/heart.svg'
 import { MomentLikeProps } from "../moment-types"
-import { useMomentContext } from "../moment-context"
-import { analytics } from "../../../services/Analytics"
-import { MomentActions } from "../moment-actions"
+import MomentContext from "../context"
 
 export default function like ({
     isLiked,
-    backgroundColor = String(ColorTheme().blur_button_color)
+    backgroundColor = String(ColorTheme().blur_button_color),
+    paddingHorizontal = sizes.paddings["2sm"],
+    margin = sizes.margins["1sm"]
 }: MomentLikeProps) {
-    const {moment} = useMomentContext()
+    const {momentData, momentUserActions} = React.useContext(MomentContext)
     
     var animatedScale = React.useRef(new Animated.Value(1)).current
     var animatedScaleIconPressed = React.useRef(new Animated.Value(1)).current
@@ -58,11 +57,10 @@ export default function like ({
         alignItems: 'center',
         justifyContent: 'center',
         flexDirection: 'row',
-        paddingHorizontal: sizes.paddings["2sm"],
+        paddingHorizontal,
         backgroundColor: 'transparent',
         overflow: 'hidden'
     }
-    
     const like_text_pressed: any = {
         fontSize: fonts.size.body,
         fontFamily: fonts.family.Bold,
@@ -91,7 +89,7 @@ export default function like ({
     const animated_container: any = {
         width: sizes.buttons.width/4,
         height: sizes.buttons.height/2,
-        margin: sizes.margins["1sm"],
+        margin,
         transform: [{ scale: animatedScale }] 
     }
     const icon_container: any = {
@@ -103,21 +101,23 @@ export default function like ({
         paddingRight: 4
     }
 
-    const [likedPressed, setLikedPressed] = React.useState(isLiked)
+    const [likedPressed, setLikedPressed] = React.useState(momentUserActions.liked)
 
     async function onLikeAction() {
-        MomentActions.LikePressed({moment_id: Number(moment.id)})
+        await momentUserActions.setLiked(true)
         HandleButtonAnimation()
         setLikedPressed(true)
+        
     }
     async function onUnlikeAction() {
-        MomentActions.UnlikePressed({moment_id: Number(moment.id)})
+        await momentUserActions.setLiked(false)
         HandleButtonAnimation()
         setLikedPressed(false)
     }
 
-    const like_fill = String(colors.gray.white)
-    const like_number = NumberConversor(Number(moment.likes_count))
+    const like_fill: string = String(colors.gray.white)
+    const like_number: string = NumberConversor(Number(momentData.statistics.total_likes_num))
+    const like_number_pressed: string = NumberConversor(Number(momentData.statistics.total_likes_num ) + 1)
     
     if(likedPressed) {
         return (
@@ -128,12 +128,12 @@ export default function like ({
                             <Animated.View style={icon_container_pressed}>
                                 <LikeIcon fill={like_fill} width={20} height={20}/>
                             </Animated.View>
-                            <Text style={likedPressed?like_text_pressed: like_text}>{like_number}</Text>                                              
-                        </View>                        
+                            <Text style={likedPressed?like_text_pressed: like_text}>{like_number_pressed}</Text>                                              
+                        </View>
                     </View>
                 </Pressable>
             </Animated.View>
-        )   
+        )
     }
     if(backgroundColor) {
         return (

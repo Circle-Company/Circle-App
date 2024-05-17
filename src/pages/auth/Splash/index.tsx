@@ -1,7 +1,6 @@
 import React from 'react';
-import { SafeAreaView, StatusBar, StyleSheet, useColorScheme,TouchableOpacity, Image, Dimensions, View} from 'react-native'
+import { StatusBar, useColorScheme, Image, View } from 'react-native'
 import ColorTheme from '../../../layout/constants/colors'
-import Sizes from '../../../layout/constants/sizes'
 import Fonts from '../../../layout/constants/fonts'
 import { Text } from '../../../components/Themed'
 import ButtonLarge from '../../../components/buttons/large' 
@@ -53,7 +52,7 @@ export default function SplashScreen() {
 
     return (
         <View style={container}>
-            <StatusBar barStyle={isDarkMode?'lght-content': 'dark-content'} translucent={true} backgroundColor={'transparent'}/>
+            <StatusBar barStyle={isDarkMode?'light-content': 'dark-content'} backgroundColor={ColorTheme().background.toString()}/>
                 <View style={header}>
                     <Text style={title}>Circle</Text>
                     <Text style={slogan}>Share momments and create memories</Text>
@@ -65,13 +64,13 @@ export default function SplashScreen() {
                     <ButtonStandart
                         title={'I already have a account'}
                         transparent={true}
-                        navigateTo={'SignInScreen'}
+                        navigateTo={'Auth-SignIn'}
                     />
                     
                     <View style={{marginBottom: 10}}>
                         <ButtonLarge
                             title={"Let's Get Started"}
-                            navigateTo={'Register'}
+                            navigateTo={'Auth-SignUp-Username'}
                         />
                     </View>
                 </View>

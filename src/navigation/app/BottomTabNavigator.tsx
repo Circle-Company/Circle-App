@@ -8,10 +8,10 @@ import { HomeScreenNavigator } from './HomeScreenNavigator'
 import { ExploreScreenNavigator } from './ExploreScreenNavigator'
 import { AccountScreenNavigator } from './AccountNavigator'
 
-import Moment from '../../assets/icons/svgs/moment.svg'
-import MomentOutline from '../../assets/icons/svgs/moment-outline.svg'
-import Explore from '../../assets/icons/svgs/map.svg'
-import ExploreOutline from '../../assets/icons/svgs/map_outline.svg'
+import Moment from '../../assets/icons/svgs/moments.svg'
+import MomentOutline from '../../assets/icons/svgs/moments-outline.svg'
+import Explore from '../../assets/icons/svgs/compass.svg'
+import ExploreOutline from '../../assets/icons/svgs/compass-outline.svg'
 import User from '../../assets/icons/svgs/user_circle.svg'
 import UserOutline from '../../assets/icons/svgs/user_circle-outline.svg'
 
@@ -25,7 +25,7 @@ export default function BottomTabNavigator() {
   }
   return (
     <BottomTab.Navigator
-      initialRouteName="Home"
+      initialRouteName="Moments"
       screenOptions={{
         tabBarHideOnKeyboard: true,
         headerShown: false,

@@ -15,9 +15,5 @@ export default function center_root ({children}: MemoryCenterRootProps) {
         paddingBottom: sizes.paddings["1sm"]*0.8
     }
     
-    return (
-        <View style={container}>
-            {children}
-        </View>
-    )
+    return <View style={container}>{children}</View>
 }

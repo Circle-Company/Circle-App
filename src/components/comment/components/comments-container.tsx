@@ -1,22 +1,15 @@
 import React from "react"
-import { View, Text } from "react-native"
+import { View } from "react-native"
 import { CommentsContainerProps } from "../comments-types"
-import sizes from "../../../layout/constants/sizes"
-import { useMomentContext } from "../../moment/moment-context"
+import MomentContext from "../../moment/context"
 
 export default function container ({children, focused}: CommentsContainerProps) {
-    const {momentSizes} = useMomentContext()
+    const { momentSize } = React.useContext(MomentContext)
     
     const container:any = {
-        width: momentSizes.width,
+        width: momentSize.width,
     }
 
-    if(focused) {
-        return (
-            <View style={container}>
-                {children}
-            </View>
-        )           
-    }
+    if(focused) return <View style={container}>{children}</View>
     else return null
 }

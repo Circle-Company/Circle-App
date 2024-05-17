@@ -55,9 +55,7 @@ export default function button_standart({
     }
     return(
         <Animated.View style={{transform: [{ scale: animatedScale }] }}>
-            <Pressable style={container} onPress={onPress}>
-                {children}
-            </Pressable>
+            <Pressable style={container} onPress={onPress}>{children}</Pressable>
         </Animated.View>          
 
     )

@@ -1,62 +1,97 @@
 import React from "react"
-import { View, Text, Pressable } from "react-native"
-import { MomentContainerProps } from "../moment-types"
-import { useMomentContext } from "../moment-context"
+import { View, Pressable,} from "react-native"
 import ColorTheme from "../../../layout/constants/colors"
 import { MidiaRender } from "../../midia_render"
-import { analytics } from "../../../services/Analytics"
+import { useNavigation } from "@react-navigation/native"
+import MomentContext from "../context"
+import FeedContext from "../../../contexts/Feed"
+import { UserShow } from "../../user_show"
+import { MomentContainerProps } from "../moment-types"
 
-export default function container ({
+export default function Container({
     children,
     contentRender,
-    focused,
-    blur_color = String(ColorTheme().background)
-}: MomentContainerProps) {
-    const { momentSizes, moment} = useMomentContext()
+    blur_color = String(ColorTheme().background),
+    blurRadius = 35,
+    isFocused = true
 
-    const container:any = {
-        ...momentSizes,
+}: MomentContainerProps) {
+    const { momentData, momentFunctions, momentSize, momentOptions } = React.useContext(MomentContext)
+    const { commentEnabled } = React.useContext(FeedContext)
+
+    const navigation = useNavigation()
+    
+    const container: any = {
+        ...momentSize,
         overflow: 'hidden',
-        borderRadius: momentSizes.borderRadius,
+        borderRadius: momentSize.borderRadius,
         backgroundColor: ColorTheme().backgroundDisabled,
-        zIndex: 1
     }
-    const content_container:any = {
+    const content_container: any = {
         position: 'absolute',
-        width: momentSizes.width,
-        height: momentSizes.height,
+        width: momentSize.width,
+        height: momentSize.height,
         zIndex: 0,
     }
 
-    async function onPressed() {
-        analytics.setEventPrefix('moment')
-        analytics.setUserId('19397179319')
-        analytics.trackEvent('click_into_moment', {moment_id: moment.id} )
-        console.log(analytics.data)
+    const tiny_container: any = {
+        width: momentSize.width * 0.31,
+        height: momentSize.height * 0.31,
+        position: 'absolute',
+        alignItems: 'flex-start',
+        flexDirection: 'row',
+        top: 190,
+        left: 120,
+        flex: 1,
+        zIndex: 0,
+        transform: [{scale: 3}]
     }
 
-    if(focused) {
-        return (
-            <View style={container}>
-                <Pressable onPress={onPressed} style={content_container}>
-                    <MidiaRender.Root data={contentRender} content_sizes={momentSizes}>
-                        <MidiaRender.RenderImage/>  
-                    </MidiaRender.Root>
-                </Pressable>
-                {children}
-            </View>
-        )
-    }else {
-        return (
-            <View style={container}>
-                <View style={content_container}>
-                <MidiaRender.Root data={contentRender} content_sizes={momentSizes}>
-                <MidiaRender.RenderImage blur={focused? false: true} blurColor={String(blur_color)}/>  
-                </MidiaRender.Root>
-                </View>
-            </View>
-        )
+    async function handlePress() {
+        if(!commentEnabled && momentOptions.isFeed) navigation.navigate('MomentNavigator', { screen: 'DetailScreen' })
     }
+
+    console.log('momentOptions.isFocused: ', momentOptions.isFocused)
     
 
+    return (
+        <View style={container}>
+            {isFocused?
+                <>
+                    <View style={content_container}>
+                        <Pressable onPress={handlePress}>
+                            <MidiaRender.Root data={contentRender} content_sizes={momentSize}>
+                            <MidiaRender.RenderImage enableBlur={false} blur={false}/>
+                            </MidiaRender.Root>                    
+                        </Pressable>
+                    </View>
+                    {!commentEnabled? children :
+                        <View style={tiny_container}>
+                            <UserShow.Root data={momentData.user}>
+                                <View style={{top: 1}}>
+                                <UserShow.ProfilePicture
+                                disableAnalytics={true}
+                                pictureDimensions={{width: 15, height: 15}}
+                                />  
+                                </View>
+                                <UserShow.Username scale={0.8} disableAnalytics={true} margin={0} truncatedSize={8}/>
+                            </UserShow.Root>
+                        </View>
+                    }       
+                </>
+             :
+                <View style={[content_container]}>
+                    <MidiaRender.Root data={contentRender} content_sizes={momentSize}>
+                    <MidiaRender.RenderImage
+                    blur={true}
+                    enableBlur={true}
+                    blurColor={String(blur_color)}
+                    blurRadius={blurRadius}
+                    />
+                    </MidiaRender.Root>
+                </View>
+            }                
+        </View>
+
+    )
 }

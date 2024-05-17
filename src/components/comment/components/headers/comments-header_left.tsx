@@ -14,7 +14,6 @@ export default function header_left ({}: CommentsHeaderLeftProps) {
         width: 120,
         borderRadius: 20,
         paddingVertical: 4,
-        backgroundColor: ColorTheme().backgroundDisabled
     }
     const text: any ={
         marginLeft: sizes.margins["1sm"]*1.4,
