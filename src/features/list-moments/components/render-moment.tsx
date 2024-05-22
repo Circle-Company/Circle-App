@@ -4,9 +4,9 @@ import { Moment } from '../../../components/moment'
 import { UserShow } from '../../../components/user_show'
 import RenderComment from './render-comment'
 import FeedContext from '../../../contexts/Feed'
-import { View, Animated } from 'react-native'
+import { View, Animated, useColorScheme } from 'react-native'
 import { MomentDataProps } from '../../../components/moment/context/types'
-
+import { useKeyboardAnimation } from 'react-native-keyboard-controller'
 type renderMomentProps = {
     momentData: MomentDataProps,
     isFocused: boolean,
@@ -18,22 +18,16 @@ export default function render_moment ({
     isFocused,
     isFeed
 }: renderMomentProps) {
+    const { height, progress } = useKeyboardAnimation()
     const { commentEnabled } = React.useContext(FeedContext)
     const [animatedValue] = React.useState(new Animated.Value(0))
     const [commentValue] = React.useState(new Animated.Value(0))
     const [opacityValue] = React.useState(new Animated.Value(1))
+    const isDarkMode = useColorScheme() === 'dark'
 
     React.useEffect(() => {
         if(isFocused){
             if(commentEnabled) {
-                Animated.timing(
-                    animatedValue,
-                    {
-                        toValue: 1,
-                        duration: 200, // Adjust duration as needed
-                        useNativeDriver: true
-                    }
-                ).start();
                 Animated.timing(
                     commentValue,
                     {
@@ -117,7 +111,7 @@ export default function render_moment ({
             Animated.timing(
                 animatedValue,
                 {
-                    toValue: 0.03,
+                    toValue: 0.043,
                     duration: 200, // Adjust duration as needed
                     useNativeDriver: true
                 }
@@ -125,8 +119,8 @@ export default function render_moment ({
             Animated.timing(
                 opacityValue,
                 {
-                    toValue: 0.8,
-                    duration: 200, // Adjust duration as needed
+                    toValue: isDarkMode? 0.4 : 0.55,
+                    duration: 400, // Adjust duration as needed
                     useNativeDriver: true
                 }
             ).start();
@@ -134,25 +128,31 @@ export default function render_moment ({
 
     }, [ isFocused ])
 
-    const translateY = animatedValue.interpolate({
+    const translateY = progress.interpolate({
         inputRange: [0, 1],
         outputRange: [0, -175], // Adjust the value as needed
     });
-    const scale = animatedValue.interpolate({
-        inputRange: [0, 0.4],
-        outputRange: [1, 0.31], // Adjust the value as needed
+    const scale = progress.interpolate({
+        inputRange: [0, 1],
+        outputRange: [1, 0.34], // Adjust the value as needed
     })
 
-    const translateCommentsY = commentValue.interpolate({
+    const scale2 = animatedValue.interpolate({
         inputRange: [0, 1],
-        outputRange: [0, -sizes.screens.height/1.9], // Adjust the value as needed
+        outputRange: [1, 0.005], // Adjust the value as needed
+    })
+
+    const translateCommentsY = height.interpolate({
+        inputRange: [0, 1],
+        outputRange: [0,1.08], // Adjust the value as needed
     });
 
     const animated_container: any = {
         opacity: opacityValue,
         transform: [
             { translateY: isFocused ? translateY : 0 },
-            { scale: scale },
+            { scale: commentEnabled? scale: 1},
+            { scale: scale2}
         ]
     }
 
