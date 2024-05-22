@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from "react";
 import { AppState } from 'react-native';
-import AsyncStorage from "@react-native-async-storage/async-storage";
 import io, { Socket } from 'socket.io-client';
 import getDeviceInfoFunc, { getDeviceInfoProps } from "../services/deviceInfo";
 import api from "../services/api";
+import { storage } from "../store"
 
 
 type UserProps = {
@@ -80,11 +80,13 @@ export function AuthProvider({ children }: AuthProviderProps) {
   useEffect(() => {
 
     async function loadStorageData() {
-      const storagedUser = await AsyncStorage.getItem('@CircleAuth:user')
-      const storagedAccessToken = await AsyncStorage.getItem('@CircleAuth:accessToken')
+      const storagedUser = storage.getString('@CircleAuth:user')
+      
+      const storagedAccessToken = storage.getString('@CircleAuth:accessToken')
       if (storagedUser && storagedAccessToken) {
         setUser(JSON.parse(storagedUser))
-        const storedDeviceInfo = await AsyncStorage.getItem('@CircleAuth:deviceInfo')
+        if(user) storage.set(`@circle:sessionId`, user.id)
+        const storedDeviceInfo = storage.getString('@CircleAuth:deviceInfo')
         if (storedDeviceInfo) { setDeviceInfo(JSON.parse(storedDeviceInfo)) }
         else { await getDeviceInfo() }
       }
@@ -95,10 +97,10 @@ export function AuthProvider({ children }: AuthProviderProps) {
     await getDeviceInfoFunc()
     .then(async (info: getDeviceInfoProps) => {
       setDeviceInfo(info)
-      await AsyncStorage.setItem('@CircleAuth:deviceInfo', JSON.stringify(info));
+      storage.set('@CircleAuth:deviceInfo', JSON.stringify(info));
     })
     .catch(async () => {
-      const data: any = await AsyncStorage.getItem('@CircleAuth:deviceInfo')
+      const data: any = storage.getString('@CircleAuth:deviceInfo')
       setDeviceInfo(data)
     })
   }
@@ -109,9 +111,9 @@ export function AuthProvider({ children }: AuthProviderProps) {
         username: usernameInput,
         password: passwordInput
       });
-      await setUser(response.data.user);
-      await AsyncStorage.setItem('@CircleAuth:user', JSON.stringify(response.data.user))
-      await AsyncStorage.setItem('@CircleAuth:accessToken', response.data.access_token)
+      setUser(response.data.user)
+      storage.set('@CircleAuth:user', JSON.stringify(response.data.user))
+      storage.set('@CircleAuth:accessToken', response.data.access_token)
     } catch (error: any) { throw new Error(error.message)}
   }
 
@@ -121,9 +123,9 @@ export function AuthProvider({ children }: AuthProviderProps) {
         username: usernameInput,
         password: passwordInput
       })
-      await setUser(response.data.user);
-      await AsyncStorage.setItem('@CircleAuth:user', JSON.stringify(response.data.user))
-      await AsyncStorage.setItem('@CircleAuth:accessToken', response.data.access_token)
+      setUser(response.data.user);
+      storage.set('@CircleAuth:user', JSON.stringify(response.data.user))
+      storage.set('@CircleAuth:accessToken', response.data.access_token)
     } catch (error: any) { throw new Error(error.message)}
   }
 
@@ -131,7 +133,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
     try {
       const response = await api.post(`/user/profile/data/pk/${user?.id}`, {user_id: user?.id})
       setUser(response.data)
-      await AsyncStorage.setItem('@CircleAuth:user', JSON.stringify(response.data))
+      storage.set('@CircleAuth:user', JSON.stringify(response.data))
     }catch(error: any){throw new Error(error.message)}
   }
 
@@ -141,15 +143,15 @@ export function AuthProvider({ children }: AuthProviderProps) {
 
   function useSignOut() {
     setUser(null);
-    AsyncStorage.removeItem('@CircleAuth:user');
-    AsyncStorage.removeItem('@CircleAuth:accessToken');
-    AsyncStorage.removeItem('@CircleAuth:deviceInfo'); // Remover o deviceInfo ao fazer logout
+    storage.delete('@CircleAuth:user');
+    storage.delete('@CircleAuth:accessToken');
+    storage.delete('@CircleAuth:deviceInfo'); // Remover o deviceInfo ao fazer logout
   }
 
   async function checkAuthenticated(): Promise<boolean> {
     // Lógica de verificação de autenticação
-    // Exemplo: verificar se o usuário está autenticado no AsyncStorage
-    const userToken = await AsyncStorage.getItem('@CircleAuth:accessToken')
+    // Exemplo: verificar se o usuário está autenticado no MMKV
+    const userToken = storage.getString('@CircleAuth:accessToken')
 
     return !!userToken; // Converte para booleano
   }
