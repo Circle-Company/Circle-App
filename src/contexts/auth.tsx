@@ -20,8 +20,8 @@ type UserProps = {
   last_password_updated_at: string,
   send_notification_emails: boolean,
   profile_picture: {
-    fullhd_resolution: string | null,
-    tiny_resolution: string | null,
+    small_resolution: string,
+    tiny_resolution: string,
   },
   statistics: {
     total_followers_num: number,
