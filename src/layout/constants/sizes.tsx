@@ -138,7 +138,7 @@ const moment = {
     width: 355,
     height: momentAspectRatio * 355,
     padding: 5,
-    paddingTop: 0,
+    paddingTop: 5,
     borderRadius: 40
   },
   full: {
