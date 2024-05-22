@@ -101,7 +101,7 @@ export default function like ({
         paddingRight: 4
     }
 
-    const [likedPressed, setLikedPressed] = React.useState(momentUserActions.liked)
+    const [likedPressed, setLikedPressed] = React.useState(isLiked? isLiked : momentUserActions.liked)
 
     async function onLikeAction() {
         await momentUserActions.setLiked(true)
