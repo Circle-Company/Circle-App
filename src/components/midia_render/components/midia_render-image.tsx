@@ -4,13 +4,13 @@ import FastImage from "react-native-fast-image";
 import ColorTheme, { colors } from "../../../layout/constants/colors";
 import { useMidiaRenderContext } from "../midia_render-context";
 import { Loading } from "../../loading";
+import MomentContext from "../../moment/context";
 
 type RenderImageProps = {
   blur?: boolean,
   blurRadius?: number,
   blurColor?: string
   enableBlur?: boolean
-  loading?: boolean,
 }
 
 export default function render_image ({
@@ -18,11 +18,10 @@ export default function render_image ({
   blurRadius = 35,
   blurColor = String(ColorTheme().background),
   enableBlur = true,
-  loading = false
 }: RenderImageProps) {
   const { content_sizes, midia } = useMidiaRenderContext();
   const [fadeAnim] = useState(new Animated.Value( enableBlur? 1 : 0));
-
+  const { momentOptions } = React.useContext(MomentContext)
   const image: any = {
     ...content_sizes
   };
@@ -33,15 +32,6 @@ export default function render_image ({
     backgroundColor: blurColor,
   };
 
-  const loading_container: any = {
-    position: 'absolute',
-    zIndex: 4,
-    alignItems: 'center',
-    justifyContent: 'center',
-    width: content_sizes.width,
-    height: content_sizes.height
-  }
-
   function removeBlur() {
     if(!blur){
       Animated.timing(fadeAnim, {
@@ -49,7 +39,24 @@ export default function render_image ({
         duration: 600, // Tempo da transição (em milissegundos)
         useNativeDriver: true, // Usa o driver nativo para melhor performance
       }).start();      
+    } else {
+      Animated.timing(fadeAnim, {
+        toValue: 1,
+        duration: 600, // Tempo da transição (em milissegundos)
+        useNativeDriver: true, // Usa o driver nativo para melhor performance
+      }).start();
     }
+  }
+
+  if(momentOptions.isFeed) {
+    return (
+      <Image
+      source={{ uri: midia.nhd_resolution?.toString() }}
+      style={image}
+      resizeMode="cover"
+      blurRadius={blur? blurRadius: 0}
+    />
+    )
   }
 
   return (
@@ -68,8 +75,8 @@ export default function render_image ({
               priority: FastImage.priority.high,
             }}
             style={image}
-            resizeMode="cover"
             onLoadEnd={() => {removeBlur()}}
+            resizeMode="cover"
           />
     </View>
   );
