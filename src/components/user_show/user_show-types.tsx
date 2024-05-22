@@ -1,12 +1,12 @@
 import React from "react"
 
 export type userReciveDataProps = {
-    id: Number,
-    username: String,
-    verifyed: Boolean,
+    id: number,
+    username: string,
+    verifyed: boolean,
     profile_picture: {
-        small_resolution: String,
-        tiny_resolution: String
+        small_resolution: string,
+        tiny_resolution: string
     }
 }
 
