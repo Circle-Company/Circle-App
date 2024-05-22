@@ -31,8 +31,6 @@ export default function ListSettings(){
                     "navigateTo": "Settings-Name",
                     "secure": false
                 },
-
-
                 {
                     "name": "Description",
                     "value": description_text,
@@ -54,6 +52,25 @@ export default function ListSettings(){
                 },
                 {
                     "name": "Password",
+                    "value": null,
+                    "type": "TEXT",
+                    "navigateTo": "Settings-Password",
+                    "secure": true
+                }
+            ]
+        },
+        {
+            name: "preferences",
+            content:[
+                {
+                    "name": "Language",
+                    "value": null,
+                    "type": "TEXT",
+                    "navigateTo": "Settings-All-Moments",
+                    "secure": false
+                },
+                {
+                    "name": "Content",
                     "value": null,
                     "type": "TEXT",
                     "navigateTo": "Settings-Password",
