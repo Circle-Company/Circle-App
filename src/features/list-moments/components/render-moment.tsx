@@ -164,33 +164,33 @@ export default function render_moment ({
     return (
         <Moment.Root.Main momentData={momentData} isFeed={isFeed} isFocused={isFocused} momentSize={sizes.moment.standart}>
             <Animated.View style={animated_container}>
-                    <Moment.Container contentRender={momentData.midia} isFocused={isFocused} blurRadius={30}>
-                        <Moment.Root.Top>
-                            <Moment.Root.TopLeft>
-                                <UserShow.Root data={momentData.user}>
-                                    <UserShow.ProfilePicture pictureDimensions={{ width: 30, height: 30 }} />
+                <Moment.Container contentRender={momentData.midia} isFocused={isFocused} blurRadius={30}>
+
+                    <Moment.Root.Top>
+                        <Moment.Root.TopLeft>
+                            <UserShow.Root data={momentData.user}>
+                                <UserShow.ProfilePicture pictureDimensions={{ width: 30, height: 30 }} />
                                     <UserShow.Username truncatedSize={8} />
-                                    <UserShow.FollowButton isFollowing={false} displayOnMoment={true} />
-                                </UserShow.Root>
-                            </Moment.Root.TopLeft>
-                            <Moment.Root.TopRight>
-                                <Moment.LikeButton isLiked={false}/>
-                            </Moment.Root.TopRight>
-                        </Moment.Root.Top>
+                                <UserShow.FollowButton isFollowing={false} displayOnMoment={true} />
+                            </UserShow.Root>
+                        </Moment.Root.TopLeft>
+                        <Moment.Root.TopRight>
+                            <Moment.LikeButton isLiked={false}/>
+                        </Moment.Root.TopRight>
+                    </Moment.Root.Top>
 
-                        <Moment.Root.Center>
-                            <View style={{ marginBottom: sizes.margins['2sm'] }}>
-                                <Moment.Description />
-                            </View>
-                        </Moment.Root.Center>
-                    </Moment.Container>                    
-
+                    <Moment.Root.Center>
+                        <View style={{ marginBottom: sizes.margins['2sm'] }}>
+                            <Moment.Description />
+                        </View>
+                    </Moment.Root.Center>
+                </Moment.Container>                                      
             </Animated.View>
-
 
             <Animated.View style={animated_comment_container}>
                 <RenderComment moment={momentData} focused={isFocused} />
             </Animated.View>
-        </Moment.Root.Main>
+            
+        </Moment.Root.Main>            
     )
 }
