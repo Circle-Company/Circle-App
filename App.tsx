@@ -54,10 +54,14 @@ const App = () => {
             <PreferencesProvider>
               <TrackingProvider>
                   <InnerApp/>
-          </TrackingProvider>   
+              </TrackingProvider>                 
+            </PreferencesProvider>
+            
+          </PersistedProvider>
+           
         </AuthProvider>        
       </NetworkProvider>
-    </NavigationContainer>        
+    </SafeAreaProvider>
   )
 }
 
