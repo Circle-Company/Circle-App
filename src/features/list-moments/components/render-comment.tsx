@@ -6,6 +6,7 @@ import FeedContext from '../../../contexts/Feed'
 import ViewMorebutton from '../../../components/buttons/view_more'
 import ColorTheme from '../../../layout/constants/colors'
 import { MomentDataProps } from '../../../components/moment/context/types'
+import { useKeyboardAnimation } from 'react-native-keyboard-controller'
 
 type renderCommentProps = {
     moment: MomentDataProps,
@@ -13,7 +14,7 @@ type renderCommentProps = {
 }
 
 export default function render_comment ({moment, focused}: renderCommentProps) {
-
+    const { height, progress } = useKeyboardAnimation()
     const { commentEnabled, setCommentEnabled, setShowKeyboard} = React.useContext(FeedContext)
     const [animatedOpacityValue] = React.useState(new Animated.Value(1))
 
@@ -31,7 +32,7 @@ export default function render_comment ({moment, focused}: renderCommentProps) {
                 Animated.timing(
                     animatedOpacityValue,
                     {
-                        delay: 200,
+                        delay: 0,
                         toValue: 1,
                         duration: 200, // Adjust duration as needed
                         useNativeDriver: true
@@ -51,35 +52,36 @@ export default function render_comment ({moment, focused}: renderCommentProps) {
     }
 
     return (
-        <Comments.MainRoot data={moment.comments}>
-            <Comments.Container focused={focused}>
-                <Animated.View style={animated_header_container}>
-                    <Comments.TopRoot>
-                        <Comments.TopLeftRoot>
-                            <Comments.HeaderLeft/>
-                        </Comments.TopLeftRoot>
-                        <Comments.TopRightRoot>
-                            <ViewMorebutton
-                            navigateTo=''
-                            action={() => {handlePress()}}
-                            text='Add Comment'
-                            icon={
-                                <AddIcon
-                                    style={{top: 0.6}}
-                                    fill={ColorTheme().primary.toString()}
-                                    width={12}
-                                    height={12}
-                                />
-                            }/>
-                        </Comments.TopRightRoot>
-                        
-                    </Comments.TopRoot>                    
-                </Animated.View>
+            <Comments.MainRoot data={moment.comments}>
+                <Comments.Container focused={focused}>
+                    <Animated.View style={animated_header_container}>
+                        <Comments.TopRoot>
+                            <Comments.TopLeftRoot>
+                                <Comments.HeaderLeft/>
+                            </Comments.TopLeftRoot>
+                            <Comments.TopRightRoot>
+                                <ViewMorebutton
+                                navigateTo=''
+                                action={() => {handlePress()}}
+                                text='Add Comment'
+                                icon={
+                                    <AddIcon
+                                        style={{top: 0.6}}
+                                        fill={ColorTheme().primary.toString()}
+                                        width={12}
+                                        height={12}
+                                    />
+                                }/>
+                            </Comments.TopRightRoot>
+                            
+                        </Comments.TopRoot>                    
+                    </Animated.View>
 
-                <Comments.CenterRoot>
-                    <Comments.ListComments preview={true}/>                    
-                </Comments.CenterRoot>
-            </Comments.Container>
-        </Comments.MainRoot>      
+                    <Comments.CenterRoot>
+                        <Comments.ListComments preview={true}/>                    
+                    </Comments.CenterRoot>
+                </Comments.Container>
+            </Comments.MainRoot>                
+  
     )
 }
