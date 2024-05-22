@@ -1,7 +1,7 @@
 import { MomentUserActionsProps } from "./types"
 
 export default class MomentUserActionsClass {
-    public liked : boolean
+    public liked: boolean
     public shared: boolean
     public viewed: boolean
     public clickIntoMoment: boolean
