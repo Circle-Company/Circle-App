@@ -42,8 +42,6 @@ export function ListNotificationsAll ({
         borderBottomWidth: 1,
         borderColor: isDarkMode? colors.gray.grey_08: colors.gray.grey_02
     }
-
-    console.log('notifications.content: ',notifications.content)
     return (
         <View style={container}>
             <View style={header_container}>
