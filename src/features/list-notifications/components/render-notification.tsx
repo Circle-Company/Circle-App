@@ -27,7 +27,7 @@ export default function render_notification ({notification}: renderNotificationP
                 <Notification.Container.Right>
                     { notification.midia?
                         <MidiaRender.Root data={notification.midia} content_sizes={sizes.moment.micro}>
-                            <MidiaRender.RenderImage/>
+                            <MidiaRender.RenderImage isFeed={false}/>
                         </MidiaRender.Root>
                         :
                         <UserShow.Root data={notification.sender_user}>
