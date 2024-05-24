@@ -7,10 +7,12 @@ import RenderProfile from '../../../features/render-profile'
 import { Loading } from '../../../components/loading'
 import sizes from '../../../layout/constants/sizes'
 import { colors } from '../../../layout/constants/colors'
+import PersistedContext from '../../../contexts/Persisted'
 
 export default function AccountScreen() {
 
   const {useSignOut, user, findUserProfileData} = React.useContext(AuthContext)
+  const { session } = React.useContext(PersistedContext)
   const [refreshing, setRefreshing] = React.useState(false)
   const [ loading, setLoading] = React.useState(false)
   const isDarkMode = useColorScheme() === 'dark'
@@ -65,7 +67,7 @@ export default function AccountScreen() {
             <Loading.ActivityIndicator/>
         </Loading.Container>
         :
-        <RenderProfile user={user}/>
+        <RenderProfile user={renderUser}/>
       }
       
     </View>      
