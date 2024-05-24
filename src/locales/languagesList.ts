@@ -5,9 +5,9 @@ export const languagesList =
         "nativeName": "English"
     },
     {
-        "code": "pt-br",
+        "code": "pt",
         "nativeName": "Português (Brasil)"
     }
 ]
 
-export const languagesCodesList = ["en", "pt-br"]
+export const languagesCodesList = ["en", "pt"]
