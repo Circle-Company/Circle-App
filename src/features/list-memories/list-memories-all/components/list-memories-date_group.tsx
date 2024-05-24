@@ -6,7 +6,7 @@ import sizes from '../../../../layout/constants/sizes'
 import { colors } from '../../../../layout/constants/colors'
 import RenderDate from '../../../../components/general/render-date'
 import RenderMemoriesCount from '../../components/render-memories_count'
-import Animated, { FadeInDown } from 'react-native-reanimated'
+import Animated, { FadeInLeft } from 'react-native-reanimated'
 type RenderMemoriesAllProps = {
     data: any,
     date_text: string,
@@ -65,7 +65,7 @@ export function ListMemoriesAll ({
                 showsHorizontalScrollIndicator={false}
                 renderItem={({item, index}) => {
                     return (
-                    <Animated.View entering={FadeInDown.duration(100* index * 2)}>
+                    <Animated.View entering={FadeInLeft.duration(200)}>
                         <View style={memories_container}>
                             <RenderMemory memory={item} index={index} numOfMemories={memories.content.length}/>
                         </View>
