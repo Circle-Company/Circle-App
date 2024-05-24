@@ -107,7 +107,7 @@ export function RenderMemoryMoment ({ moment, focused = true }: RenderMemoryMome
 
     return (
         <Animated.View style={container}>
-            <Moment.Root.Main momentData={moment} isFeed={false} isFocused={focused} momentSize={sizes.moment.small}>
+            <Moment.Root.Main momentData={moment} isFeed={true} isFocused={focused} momentSize={sizes.moment.small}>
                 <Animated.View style={top_container}>
                     <Moment.Date color={String(colors.gray.white)}/>
                 </Animated.View>            
