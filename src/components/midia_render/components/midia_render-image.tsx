@@ -3,8 +3,6 @@ import { View, Image, Animated } from "react-native";
 import FastImage from "react-native-fast-image";
 import ColorTheme, { colors } from "../../../layout/constants/colors";
 import { useMidiaRenderContext } from "../midia_render-context";
-import { Loading } from "../../loading";
-import MomentContext from "../../moment/context";
 
 type RenderImageProps = {
   blur?: boolean,
