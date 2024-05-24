@@ -11,7 +11,6 @@ export default function RenderTagsList() {
     React.useEffect(() => {
         async function fetch() {
             await momentData.findTags()
-            console.log(momentData.tags)
         }; fetch()
 
     }, [])
