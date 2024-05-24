@@ -9,6 +9,7 @@ type RenderImageProps = {
   blurRadius?: number,
   blurColor?: string
   enableBlur?: boolean
+  isFeed?: boolean
 }
 
 export default function render_image ({
@@ -16,6 +17,7 @@ export default function render_image ({
   blurRadius = 35,
   blurColor = String(ColorTheme().background),
   enableBlur = true,
+  isFeed = false
 }: RenderImageProps) {
   const { content_sizes, midia } = useMidiaRenderContext();
   const [fadeAnim] = useState(new Animated.Value( enableBlur? 1 : 0));
