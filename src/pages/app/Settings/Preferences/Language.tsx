@@ -7,12 +7,15 @@ import LanguageContext from '../../../../contexts/Preferences/language';
 import { LanguagesCodesType } from '../../../../locales/LanguageTypes';
 import PersistedContext from '../../../../contexts/Persisted';
 import sizes from '../../../../layout/constants/sizes';
+import { useTranslation } from 'react-i18next';
 export default function LanguageScreen() {
     const {useSignOut}= React.useContext(AuthContext)
     const { changeAppLanguage, languagesList} = React.useContext(LanguageContext)
     const { session } = React.useContext(PersistedContext)
 
     const isDarkMode = useColorScheme() === 'dark'
+    const { t } = useTranslation()
+
 
     const container  = {
       alignItems:'center',
@@ -20,9 +23,8 @@ export default function LanguageScreen() {
     }
 
     function handlePress(value: LanguagesCodesType){
-        console.warn('lingua mudada para: ' + value)
         changeAppLanguage(value)
-        console.log(JSON.stringify(session.preferences.language.appLanguage))
+        console.log('language changed to: 'JSON.stringify(session.preferences.language.appLanguage))
     }
 
     return (
@@ -30,16 +32,15 @@ export default function LanguageScreen() {
             <StatusBar backgroundColor={String(ColorTheme().background)} barStyle={isDarkMode? 'light-content': 'dark-content'}/>
             <Text>{session.preferences.language.appLanguage}</Text>
             <FlatList
-            data={languagesList}
-            renderItem={({item}) => {
-                return (
-                    <Pressable onPress={() => {handlePress(item.code)}} style={{width: sizes.screens.width, height: sizes.headers.height}}>
-                        <Text>{item.nativeName}</Text> 
-                        {session.preferences?.language.appLanguage == item.code && <Text>Selected</Text>}
-                    </Pressable>
-                   
-                )
-            }}
+                data={languagesList}
+                renderItem={({item}) => {
+                    return (
+                        <Pressable onPress={() => {handlePress(item.code)}} style={{width: sizes.screens.width, height: sizes.headers.height}}>
+                            <Text>{item.nativeName}</Text> 
+                            {session.preferences?.language.appLanguage == item.code && <Text>Selected</Text>}
+                        </Pressable>
+                    )
+                }}
             />
 
         </View>
