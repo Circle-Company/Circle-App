@@ -63,7 +63,6 @@ export function AuthProvider({ children }: AuthProviderProps) {
 
   useEffect(() => {
     const handleAppStateChange = (nextAppState: string) => {
-      console.log(`AppState mudou para: ${nextAppState}`)
       if(user) socket.emit('sign', { user_id: user.id })
     }
     AppState.addEventListener('change', handleAppStateChange)
@@ -71,7 +70,6 @@ export function AuthProvider({ children }: AuthProviderProps) {
 
   useEffect(() => {
     const handleAppStateChange = (nextAppState: string) => {
-      console.log(`AppState mudou para: ${nextAppState}`)
       if(user) socket.emit('sign', { user_id: user.id })
     }
     AppState.addEventListener('change', handleAppStateChange)
@@ -136,10 +134,6 @@ export function AuthProvider({ children }: AuthProviderProps) {
       storage.set('@CircleAuth:user', JSON.stringify(response.data))
     }catch(error: any){throw new Error(error.message)}
   }
-
-  useEffect(() => {
-    console.log('user dentro do useEffect: ', user);
-  }, [user]);
 
   function useSignOut() {
     setUser(null);
