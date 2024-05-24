@@ -6,6 +6,3 @@ O compartilhamento de momentos foi pensado para estimular a exposição da reali
 
 ## Funcionamento básico
 O Circle App será uma rede social para compartilhar momentos reais, funcionará com publicação de um "moment" e que os outros usuários possam ver e interagir com comentários e curtidas, junto ao "moment" serão exibidos os comentários mais relevantes de cada post para estimular o engajamento.
-
-## Estrutura de Operação
-![Section 1](https://github.com/TiagoXavierSavioli/Circle-App/assets/71526510/9c27a8c0-441c-4865-8aad-b629b6efe82d)
