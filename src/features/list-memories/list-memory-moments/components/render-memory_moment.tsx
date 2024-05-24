@@ -53,7 +53,7 @@ export function RenderMemoryMoment ({ moment, focused = true }: RenderMemoryMome
             Animated.timing(
                 opacityValue,
                 {
-                    toValue: 0.8,
+                    toValue: 0.4,
                     duration: 300, // Adjust duration as needed
                     useNativeDriver: true
                 }
