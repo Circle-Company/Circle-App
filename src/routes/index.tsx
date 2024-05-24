@@ -2,7 +2,7 @@ import React from "react"
 import AppRoute from "./app.routes"
 import AuthRoute from "./auth.routes"
 import AuthContext from "../contexts/auth"
-import LoadingScreen from "../pages/auth/Loading";
+import LoadingScreen from "../pages/auth/Loading"
 
 export default function Routes() {
     const {signed, checkAuthenticated } = React.useContext(AuthContext);
