@@ -12,7 +12,6 @@ type renderNotificationProps = {
 }
 
 export default function render_notification ({notification}: renderNotificationProps) {
-    console.log(notification)
     return (
         <View style={{paddingVertical: sizes.paddings['2sm']}}>
             <Notification.Container.Main notification={notification}>
