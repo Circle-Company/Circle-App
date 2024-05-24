@@ -1,7 +1,7 @@
 {
-    "Moments": "Moments",
-    "Explore": "Explore",
-    "You": "You",
-    "New Moment": "New Moment",
-    "New Memory": "New Memory"
+    "moments": "Moments",
+    "explore": "Explore",
+    "you": "You",
+    "new-moment": "New Moment",
+    "new-memory": "New Memory"
 }
