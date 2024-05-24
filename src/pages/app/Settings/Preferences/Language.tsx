@@ -24,7 +24,7 @@ export default function LanguageScreen() {
 
     function handlePress(value: LanguagesCodesType){
         changeAppLanguage(value)
-        console.log('language changed to: 'JSON.stringify(session.preferences.language.appLanguage))
+        console.log('language changed to: ', JSON.stringify(session.preferences.language.appLanguage))
     }
 
     return (
