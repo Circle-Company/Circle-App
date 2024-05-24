@@ -140,7 +140,7 @@ export default function ListMemoriesPreview({isAccountScreen = false, user}: Ren
                 }}
                 renderItem={({ item, index }) => {
                     return(
-                    <Animated.View entering={FadeInLeft.duration(200 * index)}>
+                    <Animated.View entering={FadeInLeft.duration(200)}>
                         <RenderMemory memory={item} />
                     </Animated.View>
                     
