@@ -9,8 +9,10 @@ import fonts from '../../../layout/constants/fonts';
 import ButtonStandart from '../../buttons/button-standart';
 import NotificationContext from '../../../contexts/notification';
 import { BadgeIcon } from '../../general/badge-icon';
+import LanguageContext from '../../../contexts/Preferences/language';
 
 export default function HeaderRightHome() {
+    const {t} = React.useContext(LanguageContext)
 
     const {newNotificationsNum} = React.useContext(NotificationContext)
     const navigation = useNavigation()
@@ -41,7 +43,7 @@ export default function HeaderRightHome() {
         <View style={container}>
         <ButtonStandart action={onPressNewMoment} width={140} backgroundColor={String(ColorTheme().backgroundDisabled)}>
             <View style={textContainer}>
-                <Text style={text}>New Moment</Text>
+                <Text style={text}>{t('new-moment')}</Text>
             </View>
             <Camera fill={String(ColorTheme().text)} width={16} height={16}/>
         </ButtonStandart>  
