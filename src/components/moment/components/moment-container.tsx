@@ -65,7 +65,7 @@ export default function Container({
             {!commentEnabled? 
                             momentOptions.isFocused? children : null               
                     :
-                        <View style={tiny_container}>
+                        <Animated.View style={tiny_container} entering={FadeIn.delay(300).duration(200)} exiting={FadeOut.duration(200)}>
                             <UserShow.Root data={momentData.user}>
                                 <View style={{top: 1}}>
                                     <UserShow.ProfilePicture
@@ -75,7 +75,7 @@ export default function Container({
                                 </View>
                                 <UserShow.Username scale={0.8} disableAnalytics={true} margin={0} truncatedSize={8}/>
                             </UserShow.Root>
-                        </View>
+                        </Animated.View>
                     }
         </View>
 
