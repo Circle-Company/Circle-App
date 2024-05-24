@@ -6,7 +6,7 @@ import { useProfileContext } from "../profile-context"
 import sizes from "../../../layout/constants/sizes"
 import { Pressable } from "react-native"
 import FastImage from "react-native-fast-image"
-import Animated, { FadeInDown, SlideInUp } from 'react-native-reanimated';
+import Animated, { FadeIn } from 'react-native-reanimated'
 
 export default function picture ({
 }: ProfilePictureProps) {
@@ -46,7 +46,7 @@ export default function picture ({
     }, [])
 
     return (
-        <Animated.View entering={FadeInDown.duration(400)}>
+        <Animated.View entering={FadeIn.duration(300)}>
             <Pressable onPress={onProfilePictureAction} style={[container]}>
                 <FastImage
                     source={{ uri: String(profilePicture) || '' }}
