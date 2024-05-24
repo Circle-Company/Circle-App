@@ -22,6 +22,7 @@ export function storageKeys () {
         user: {
             id: baseKey + 'user:id',
             username: baseKey + 'user:username',
+            description: baseKey + 'user:description',
             verifyed: baseKey + 'user:verifyed',
             profile_picture: {
                 small: baseKey + 'user:profile_picture:small',
