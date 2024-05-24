@@ -1,23 +1,36 @@
 import { userReciveDataProps } from "../../components/user_show/user_show-types"
 import { LanguagesCodesType } from "../../locales/LanguageTypes"
+import { AccountState } from "./persistedAccount"
+import { PreferencesState } from "./persistedPreferences"
 
-export type UserDataReturnsType = {
-    id: number,
-    username: string,
+export type UserDataType = {
+    id: number
+    username: string
+    description: string
     verifyed: boolean,
     profile_picture: {
-        small_resolution: string,
+        small_resolution: string
+        tiny_resolution: string
+    }
+}
+export type UserDataReturnsType = {
+    id: number
+    username: string
+    verifyed: boolean
+    profile_picture: {
+        small_resolution: string
         tiny_resolution: string
     }
     setId: (value: number) => void
     setUsername: (value: string) => void
+    setDescription: (value: string) => void
     setVerifyed: (value: boolean) => void
     setProfilePicture: (value: {
         small_resolution: String
         tiny_resolution: String
     }) => void
-    storeUser: (value: userReciveDataProps) => void
-    loadUserFromStorage: () => void
+    storeUser: (value: userReciveDataProps) => userReciveDataProps
+    loadUserFromStorage: () => userReciveDataProps
     removeUserFromStorage: () => void
 }
 
@@ -36,8 +49,8 @@ export type AccountDataReturnsType = {
     setMuted: (value: boolean) => void
     setLastActiveAt: (value: string) => void
     setLastLoginAt: (value: string) => void
-    storeAccount: (value: AccountDataType) => void
-    loadAccountFromStorage: () => void
+    storeAccount: (value: AccountDataType) => AccountDataType
+    loadAccountFromStorage: () => AccountDataType
     removeAccountFromStorage: () => void
 }
 
@@ -93,16 +106,17 @@ export type PreferencesDataStorageType = {
 export type PreferencesDataReturnsType = {
     language: LanguageDataReturnsType
     content: ContentDataReturnsType
-    storePreferences: (value: PreferencesDataType) => void
-    loadPreferencesFromStorage: () => void
+    
+    storePreferences: (value: PreferencesDataType) => PreferencesDataStorageType
+    loadPreferencesFromStorage: () => PreferencesDataStorageType
     removePreferencesFromStorage: () => void
 }
 
 
 export type SessionDataType = {
-    user: UserDataReturnsType | null
-    account: AccountDataReturnsType | null
-    preferences: PreferencesDataReturnsType | null
+    user: UserDataReturnsType
+    account: AccountState
+    preferences: PreferencesState
     jwtToken: string | null
     setJwtToken: React.Dispatch<React.SetStateAction<string | null>>
 }
