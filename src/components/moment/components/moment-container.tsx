@@ -58,7 +58,7 @@ export default function Container({
             <View style={content_container}>
                 <Pressable onPress={handlePress}>
                         <MidiaRender.Root data={contentRender} content_sizes={momentSize}>
-                        <MidiaRender.RenderImage enableBlur={true} blur={!isFocused}/>
+                        <MidiaRender.RenderImage isFeed={momentOptions.isFeed} enableBlur={true} blur={!isFocused}/>
                         </MidiaRender.Root>                  
                 </Pressable>                
             </View>
