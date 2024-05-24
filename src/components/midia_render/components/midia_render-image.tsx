@@ -49,7 +49,7 @@ export default function render_image ({
   if(momentOptions.isFeed) {
     return (
       <Image
-      source={{ uri: midia.nhd_resolution?.toString() }}
+      source={{ uri: midia.fullhd_resolution?.toString() }}
       style={image}
       resizeMode="cover"
       blurRadius={blur? blurRadius: 0}
