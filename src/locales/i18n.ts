@@ -2,11 +2,11 @@ import i18next from 'i18next'
 import { initReactI18next } from 'react-i18next'
 
 import en from './languages/en.json'
-import pt_br from './languages/pt-br.json'
+import pt from './languages/pt.json'
 
 export const languageResources = {
     en: { translation: en},
-    pt_br: {translation: pt_br}
+    pt: {translation: pt}
 }
 
 i18next.use(initReactI18next).init({
