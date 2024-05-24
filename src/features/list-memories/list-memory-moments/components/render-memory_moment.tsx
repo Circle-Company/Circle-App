@@ -110,8 +110,8 @@ export function RenderMemoryMoment ({ moment, focused = true }: RenderMemoryMome
             <Moment.Root.Main momentData={moment} isFeed={true} isFocused={focused} momentSize={sizes.moment.small}>
                 <Animated.View style={top_container}>
                     <Moment.Date color={String(colors.gray.white)}/>
-                </Animated.View>            
-                <Moment.Container contentRender={moment.midia} blurRadius={40}>
+                </Animated.View>
+                <Moment.Container contentRender={moment.midia} isFocused={focused} blurRadius={40}>
                 <Moment.Root.Center>
                     <Moment.Description/>
                 </Moment.Root.Center>
