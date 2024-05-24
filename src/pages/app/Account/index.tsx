@@ -35,6 +35,15 @@ export default function AccountScreen() {
       else setLoading(false)
   }, [])
 
+  const renderUser = {
+    ...session.user,
+    statistics: {
+      total_followers_num: 1,
+      total_likes_num: 1,
+      total_views_num: 1
+    }
+  }
+
   return (    
     <View style={container}>
     <ScrollView
