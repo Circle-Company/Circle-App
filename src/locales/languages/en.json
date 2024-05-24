@@ -3,5 +3,12 @@
     "explore": "Explore",
     "you": "You",
     "new-moment": "New Moment",
-    "new-memory": "New Memory"
+    "new-memory": "New Memory",
+    "following": "following",
+    "followers": "followers",
+    "follower": "follower",
+    "likes": "likes",
+    "like": "like",
+    "views": "views",
+    "view": "view"
 }
