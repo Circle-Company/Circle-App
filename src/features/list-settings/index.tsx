@@ -13,7 +13,7 @@ export default function ListSettings(){
     const description_text = user.description? truncated({text: user.description, size: 18}) : 'add new description'
 
 
-    const accountData = [
+    const ListData = [
         {
             name: "public profile",
             content:[
@@ -60,27 +60,15 @@ export default function ListSettings(){
             ]
         },
         {
-            name: "preferences",
+            name: "app",
             content:[
                 {
                     "name": "Language",
                     "value": null,
                     "type": "TEXT",
-                    "navigateTo": "Settings-All-Moments",
+                    "navigateTo": "Settings-Preferences-Language",
                     "secure": false
                 },
-                {
-                    "name": "Content",
-                    "value": null,
-                    "type": "TEXT",
-                    "navigateTo": "Settings-Password",
-                    "secure": true
-                }
-            ]
-        },
-        {
-            name: "app",
-            content:[
                 {
                     "name": "Open Source",
                     "value": null,
@@ -130,9 +118,9 @@ export default function ListSettings(){
         }
     ]
     return (
-        <ScrollView>
+        <ScrollView showsVerticalScrollIndicator={false} horizontal={false}>
             <FlatList
-                data={accountData}
+                data={ListData}
                 scrollEnabled={false}
                 keyExtractor={(item) => item.name}
                 renderItem={({item}) => {
