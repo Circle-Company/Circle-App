@@ -3,6 +3,7 @@ import React from 'react'
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs'
 import sizes from '../../layout/constants/sizes'
 import ColorTheme from '../../layout/constants/colors'
+import LanguageContext from '../../contexts/Preferences/language'
 
 import { HomeScreenNavigator } from './HomeScreenNavigator'
 import { ExploreScreenNavigator } from './ExploreScreenNavigator'
@@ -18,6 +19,7 @@ import UserOutline from '../../assets/icons/svgs/user_circle-outline.svg'
 const BottomTab = createBottomTabNavigator();
 
 export default function BottomTabNavigator() {
+  const {t} = React.useContext(LanguageContext)
   const iconWidth = 21
   const iconHeight = 21
   const tabBarStyle: any = {
@@ -36,6 +38,7 @@ export default function BottomTabNavigator() {
         name="Moments"
         component={HomeScreenNavigator}
         options={{
+          title: t('moments'),
           tabBarIcon: ({focused}: any) => 
           focused?
             <Moment fill={String(ColorTheme().iconFocused)} width={iconWidth} height={iconHeight}/>
@@ -47,6 +50,7 @@ export default function BottomTabNavigator() {
           name="Explore"
           component={ExploreScreenNavigator}
           options={{
+            title: t('explore'),
             tabBarIcon: ({focused}: any) =>
               focused?
               <Explore fill={String(ColorTheme().iconFocused)} width={iconWidth} height={iconHeight}/>
@@ -58,6 +62,7 @@ export default function BottomTabNavigator() {
           name="You"
           component={AccountScreenNavigator}
           options={{
+            title: t('you'),
             tabBarIcon: ({focused}: any) =>
               focused?
               <User fill={String(ColorTheme().iconFocused)} width={iconWidth} height={iconHeight}/>
