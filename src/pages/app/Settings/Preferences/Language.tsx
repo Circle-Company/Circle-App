@@ -8,41 +8,20 @@ import { LanguagesCodesType } from '../../../../locales/LanguageTypes';
 import PersistedContext from '../../../../contexts/Persisted';
 import sizes from '../../../../layout/constants/sizes';
 import { useTranslation } from 'react-i18next';
+import ListLanguagesSelector from '../../../../features/list-languages-selector';
 export default function LanguageScreen() {
-    const {useSignOut}= React.useContext(AuthContext)
-    const { changeAppLanguage, languagesList} = React.useContext(LanguageContext)
-    const { session } = React.useContext(PersistedContext)
 
     const isDarkMode = useColorScheme() === 'dark'
-    const { t } = useTranslation()
-
 
     const container  = {
       alignItems:'center',
       flex: 1
     }
 
-    function handlePress(value: LanguagesCodesType){
-        changeAppLanguage(value)
-        console.log('language changed to: ', JSON.stringify(session.preferences.language.appLanguage))
-    }
-
     return (
         <View style={container}>
             <StatusBar backgroundColor={String(ColorTheme().background)} barStyle={isDarkMode? 'light-content': 'dark-content'}/>
-            <Text>{session.preferences.language.appLanguage}</Text>
-            <FlatList
-                data={languagesList}
-                renderItem={({item}) => {
-                    return (
-                        <Pressable onPress={() => {handlePress(item.code)}} style={{width: sizes.screens.width, height: sizes.headers.height}}>
-                            <Text>{item.nativeName}</Text> 
-                            {session.preferences?.language.appLanguage == item.code && <Text>Selected</Text>}
-                        </Pressable>
-                    )
-                }}
-            />
-
+            <ListLanguagesSelector/>
         </View>
     )
 }
