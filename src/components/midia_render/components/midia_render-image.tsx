@@ -21,7 +21,6 @@ export default function render_image ({
 }: RenderImageProps) {
   const { content_sizes, midia } = useMidiaRenderContext();
   const [fadeAnim] = useState(new Animated.Value( enableBlur? 1 : 0));
-  const { momentOptions } = React.useContext(MomentContext)
   const image: any = {
     ...content_sizes
   };
@@ -48,7 +47,7 @@ export default function render_image ({
     }
   }
 
-  if(momentOptions.isFeed) {
+  if(isFeed) {
     return (
       <Image
       source={{ uri: midia.fullhd_resolution?.toString() }}
