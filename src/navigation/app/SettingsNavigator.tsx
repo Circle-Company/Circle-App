@@ -16,6 +16,9 @@ import OpenSourceScreen from '../../pages/app/Settings/OpenSource'
 import VersionScreen from '../../pages/app/Settings/Version'
 import LogOutScreen from '../../pages/app/Settings/LogOut'
 import AllMomentsScreen from '../../pages/app/Settings/AllMoments'
+import PreferencesScreen from '../../pages/app/Settings/Preferences'
+import LanguageScreen from '../../pages/app/Settings/Preferences/Language'
+import ContentScreen from '../../pages/app/Settings/Preferences/Content'
 
 const SettingsStack = createStackNavigator()
  
@@ -117,6 +120,39 @@ export function SettingsNavigator() {
             component={AllMomentsScreen}
             options={{
                 headerTitle: 'All Moments',
+                headerStyle: HeaderStyle,
+                headerTintColor: String(ColorTheme().text),
+                cardStyle: {backgroundColor: String(ColorTheme().background)},
+                cardOverlayEnabled: true,
+            }}
+        />
+        <SettingsStack.Screen
+            name="Settings-Preferences"
+            component={PreferencesScreen}
+            options={{
+                headerTitle: 'Preferences',
+                headerStyle: HeaderStyle,
+                headerTintColor: String(ColorTheme().text),
+                cardStyle: {backgroundColor: String(ColorTheme().background)},
+                cardOverlayEnabled: true,
+            }}
+        />
+        <SettingsStack.Screen
+            name="Settings-Preferences-Language"
+            component={LanguageScreen}
+            options={{
+                headerTitle: 'Language',
+                headerStyle: HeaderStyle,
+                headerTintColor: String(ColorTheme().text),
+                cardStyle: {backgroundColor: String(ColorTheme().background)},
+                cardOverlayEnabled: true,
+            }}
+        />
+        <SettingsStack.Screen
+            name="Settings-Preferences-Content"
+            component={ContentScreen}
+            options={{
+                headerTitle: 'Content',
                 headerStyle: HeaderStyle,
                 headerTintColor: String(ColorTheme().text),
                 cardStyle: {backgroundColor: String(ColorTheme().background)},
