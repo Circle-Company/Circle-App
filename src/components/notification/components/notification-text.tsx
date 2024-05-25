@@ -1,22 +1,32 @@
 import { View } from "react-native"
-
 import ColorTheme, { colors } from "../../../layout/constants/colors"
 import { useIndividualNotificationContext } from "../notification-individual_context"
 import React from "react"
 import { Text } from "../../Themed"
 import { UserShow } from "../../user_show"
-import { NotificationProps } from "../notification-types"
-import { NotificationTextData } from "../data/text"
 import { timeDifferenceConverter } from "../../../algorithms/dateConversor"
 import sizes from "../../../layout/constants/sizes"
 import fonts from "../../../layout/constants/fonts"
+import LanguageContext from "../../../contexts/Preferences/language"
 
 export default function notification_text() {
     const { notification } = useIndividualNotificationContext()
+    const {t} = React.useContext(LanguageContext)
     const [text, setText] = React.useState<string>('')
 
+    const notificactionsText = {
+        "LIKE-MOMENT": t("liked your moment"),
+        "LIKE-MOMENT-2": t("liked 2 of your moments"),
+        "LIKE-MOMENT-3": t("liked 3 of your moments"),
+        "LIKE-MEMORY": t("liked your memory"),
+        "LIKE-COMMENT": t("liked your comment"),
+        "COMMENT-MOMENT": t("commented on your moment"),
+        "FOLLOW-USER": t("is following you"),
+        "VIEW-USER": t("viewed your profile"),
+    }
+
     React.useEffect(() => {
-        if (notification.type in NotificationTextData) setText(NotificationTextData[notification.type]);
+        if (notification.type) setText(notificactionsText[notification.type]);
     }, [notification]);
 
 

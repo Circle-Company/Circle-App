@@ -6,9 +6,11 @@ import ColorTheme, { colors } from "../../../../layout/constants/colors"
 import fonts from "../../../../layout/constants/fonts"
 import SearchIcon from '../../../../assets/icons/svgs/search.svg'
 import CloseIcon from '../../../../assets/icons/svgs/close.svg'
+import LanguageContext from "../../../../contexts/Preferences/language"
 
 export default function input() {
     const { searchTerm, setSearchTerm, fetchData } = useSearchContext()
+    const {t} = React.useContext(LanguageContext)
     const isDarkMode = useColorScheme() === 'dark'
 
     const handleInputChange = (text: string) => {
@@ -102,7 +104,7 @@ export default function input() {
                     <View style={textContainer}>
                         <TextInput
                             style={text}
-                            placeholder={'Type @username'}
+                            placeholder={t('Type @username')}
                             maxLength={35}
                             placeholderTextColor={String(colors.gray.grey_04)}
                             numberOfLines={1}

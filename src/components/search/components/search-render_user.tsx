@@ -6,8 +6,10 @@ import { useColorScheme, View, Text} from "react-native"
 import { UserShow } from "../../user_show"
 import { SearchRenderItemReciveDataObjectProps } from "../search-types"
 import { formatNumberWithDots } from "../../../algorithms/numberConversor"
+import LanguageContext from "../../../contexts/Preferences/language"
+import React from "react"
 export default function render_user({user}: SearchRenderItemReciveDataObjectProps) {
-
+    const {t} = React.useContext(LanguageContext)
     const isDarkMode = useColorScheme() === 'dark'
 
     const container: any = {
@@ -73,27 +75,16 @@ export default function render_user({user}: SearchRenderItemReciveDataObjectProp
                             {user.name && user.statistic.total_followers_num > 0?
                                 <Text style={dot_style}>•</Text> : null
                             }
-
                             {user.statistic.total_followers_num > 0 &&
                                 <Text style={total_followers_num_style}>
                                     {formatNumberWithDots(user.statistic.total_followers_num)}
-                                    {user.statistic.total_followers_num> 1? ' followers': ' follower'}
-                                </Text>                            
-
+                                    {user.statistic.total_followers_num> 1? ' ' + t('followers'): ' ' + t('follower')}
+                                </Text>
                             }
-                            
                         </Profile.MainRoot>                        
                     </View>
-
                 </View>
-                <View style={container_right}>
-                    <UserShow.FollowButton isFollowing={user.you_follow}/>
-                </View>
-                
-                
-                
             </UserShow.Root>            
         </View>
-
     )
 }

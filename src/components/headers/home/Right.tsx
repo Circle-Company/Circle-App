@@ -43,7 +43,7 @@ export default function HeaderRightHome() {
         <View style={container}>
         <ButtonStandart action={onPressNewMoment} width={140} backgroundColor={String(ColorTheme().backgroundDisabled)}>
             <View style={textContainer}>
-                <Text style={text}>{t('new-moment')}</Text>
+                <Text style={text}>{t('New Moment')}</Text>
             </View>
             <Camera fill={String(ColorTheme().text)} width={16} height={16}/>
         </ButtonStandart>  

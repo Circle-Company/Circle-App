@@ -7,10 +7,11 @@ import fonts from '../../../layout/constants/fonts'
 import SelectMomentsContext from '../../../contexts/selectMoments'
 import ButtonStandart from '../../buttons/button-standart';
 import AddIcon from '../../../assets/icons/svgs/memory.svg'
+import LanguageContext from '../../../contexts/Preferences/language'
 
 export default function MemoryTitleHeaderRight() {
     const { selectedMoments, title, storeMemory, endSession} = React.useContext(SelectMomentsContext)
-
+    const {t} = React.useContext(LanguageContext)
     const [ active, setActive ] = React.useState(false)
     const isDarkMode = useColorScheme() === 'dark'
 
@@ -34,11 +35,9 @@ export default function MemoryTitleHeaderRight() {
     }
 
     async function onPressCreate() {
-        console.log('New Moment Pressed')
         if(title && selectedMoments) {
             await storeMemory()
             await endSession()
-
         }
     }
 
@@ -50,7 +49,7 @@ export default function MemoryTitleHeaderRight() {
                 backgroundColor={String( active? colors.blue.blue_05 : isDarkMode? colors.gray.grey_07 : colors.gray.grey_02)}
                 >
                 <View style={textContainer}>
-                    <Text style={text}>Create</Text>
+                    <Text style={text}>{t('Create')}</Text>
                 </View>
                 <AddIcon fill={String(active? colors.gray.white: colors.gray.grey_04)} width={14} height={14}/>
             </ButtonStandart>  

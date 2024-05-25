@@ -1,3 +1,6 @@
+import React from "react";
+import LanguageContext from "../contexts/Preferences/language";
+
 interface MyObject {
   created_at?: Date;
   updated_at?: Date;
@@ -25,8 +28,6 @@ export enum TimeInterval {
 }
 
 export function groupObjectsByDate(objects: MyObject[], timeInterval: number = DEFAULT_TIME_INTERVAL): GroupedObject[] {
-
-  console.log('time: ', objects )
   const groupedObjects = new Map<string, GroupedObject>();
   // Agrupar objetos pela data de criação ou atualização
   objects.forEach((obj) => {
@@ -58,57 +59,52 @@ export function groupObjectsByDate(objects: MyObject[], timeInterval: number = D
 }
 
 function getDateStringRelative(date: Date, timeInterval: TimeInterval): string {
+  const {t} = React.useContext(LanguageContext)
   const now = new Date();
   const diff = now.getTime() - date.getTime();
 
   if (timeInterval === TimeInterval.SECOND) {
     const secondsAgo = Math.floor(diff / timeInterval);
-    return secondsAgo === 0 ? 'now' : `${secondsAgo} second${secondsAgo === 1 ? '' : 's'} ago`;
+    return secondsAgo === 0 ? t('now') : `${secondsAgo} ${secondsAgo === 1 ? t('second') : t('seconds')} ${t('ago')}`;
   } else if (timeInterval === TimeInterval.MINUTE) {
     const minutesAgo = Math.floor(diff / timeInterval);
-    return minutesAgo === 0 ? 'now' : `${minutesAgo} minute${minutesAgo === 1 ? '' : 's'} ago`;
+    return minutesAgo === 0 ? t('now') : `${minutesAgo} ${minutesAgo === 1 ? t('minute') : t('minutes')} ${t('ago')}`;
   } else if (timeInterval === TimeInterval.HOUR) {
     const hoursAgo = Math.floor(diff / timeInterval);
-    return hoursAgo === 0 ? 'now' : `${hoursAgo} hour${hoursAgo === 1 ? '' : 's'} ago`;
+    return hoursAgo === 0 ? t('now') : `${hoursAgo} ${hoursAgo === 1 ? t('hour') : t('hours')} ${t('ago')}`;
   } else if (timeInterval === TimeInterval.DAY) {
     const daysAgo = Math.floor(diff / timeInterval);
     return getDayString(daysAgo);
   } else if (timeInterval === TimeInterval.WEEK) {
     const weeksAgo = Math.floor(diff / timeInterval);
-    return weeksAgo === 0 ? 'this week' : (weeksAgo === 1 ? 'last week' : `${weeksAgo} weeks ago`);
+    return weeksAgo === 0 ? t('this week') : (weeksAgo === 1 ? t('last week') : `${weeksAgo} ${t('weeks ago')}`);
   } else if (timeInterval === TimeInterval.BIMONTH) {
     const bimonthsAgo = Math.floor(diff / timeInterval);
-    return bimonthsAgo === 0 ? 'this two months' : (bimonthsAgo === 1 ? 'last two months' : `${bimonthsAgo} two months ago`);
+    return bimonthsAgo === 0 ? t('this two months') : (bimonthsAgo === 1 ? t('last two months') : `${bimonthsAgo} ${t('two months ago')}`);
   } else if (timeInterval === TimeInterval.MONTH) {
     const monthsAgo = Math.floor(diff / timeInterval);
-    return monthsAgo === 0 ? 'this month' : (monthsAgo === 1 ? 'last month' : `${monthsAgo} months ago`);
+    return monthsAgo === 0 ? t('this month') : (monthsAgo === 1 ? t('last month') : `${monthsAgo} ${t('months ago')}`);
   } else if (timeInterval === TimeInterval.TRIMESTER) {
     const trimestersAgo = Math.floor(diff / timeInterval);
-    return trimestersAgo === 0 ? 'this quarter' : (trimestersAgo === 1 ? 'last quarter' : `${trimestersAgo} quarters ago`);
+    return trimestersAgo === 0 ? t('this quarter') : (trimestersAgo === 1 ? t('last quarter') : `${trimestersAgo} ${t('quarters ago')}`);
   } else if (timeInterval === TimeInterval.SEMESTER) {
     const semestersAgo = Math.floor(diff / timeInterval);
-    return semestersAgo === 0 ? 'this semester' : (semestersAgo === 1 ? 'last semester' : `${semestersAgo} semesters ago`);
+    return semestersAgo === 0 ? t('this semester') : (semestersAgo === 1 ? t('last semester') : `${semestersAgo} ${t('semesters ago')}`);
   } else if (timeInterval === TimeInterval.YEAR) {
     const currentYear = now.getFullYear();
     const objYear = date.getFullYear();
 
-    if (currentYear === objYear) {
-      return 'this year';
-    } else {
+    if (currentYear === objYear) return t('this year')
+    else {
       const yearsAgo = Math.floor(diff / timeInterval);
-      return yearsAgo === 1 ? 'last year' : `${yearsAgo} years ago`;
+      return yearsAgo === 1 ? t('last year') : `${yearsAgo} ${t('years ago')}`;
     }
-  } else {
-    return 'more than a year ago';
-  }
+  } else return t('more than a year ago')
 }
 
 function getDayString(daysAgo: number): string {
-  if (daysAgo === 0) {
-    return 'today';
-  } else if (daysAgo === 1) {
-    return 'yesterday';
-  } else {
-    return `${daysAgo} days ago`;
-  }
+  const {t} = React.useContext(LanguageContext)
+  if (daysAgo === 0) return t('today');
+  else if (daysAgo === 1) return t('yesterday');
+  else return `${daysAgo} ${t('days ago')}`;
 }

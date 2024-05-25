@@ -1,14 +1,85 @@
 {
-    "moments": "Moments",
-    "explore": "Explore",
-    "you": "You",
-    "new-moment": "New Moment",
-    "new-memory": "New Memory",
-    "following": "following",
+    "Moments": "Moments",
+    "Explore": "Explore",
+    "You": "You",
+
+    "New Moment": "New Moment",
+    "New Memory": "New Memory",
+
+    "Follow": "Follow",
+    "Following": "Following",
+    "Followers": "Followers",
     "followers": "followers",
     "follower": "follower",
-    "likes": "likes",
-    "like": "like",
-    "views": "views",
-    "view": "view"
+
+    "Views": "Views",
+    "viewed your profile": "viewed your profile",
+
+    "Likes": "Likes",
+    "liked your moment": "liked your moment",
+    "liked 2 of your moments": "liked 2 of your moments",
+    "liked 3 of your moments": "liked 3 of your moments",
+    "liked your memory": "liked your memory",
+    "liked your comment": "liked your comment",
+
+    "is following you": "is following you",
+
+    "commented on your moment": "commented on your moment",
+
+    "Type @username": "Type @username",
+
+    "w": "w",
+    "week": "week",
+    "weeks": "weeks",
+    
+
+    "d": "d",
+    "day": "day",
+    "days": "days",
+
+    "h": "h",
+    "hour": "hour",
+    "hours": "hours",
+
+    "min": "min",
+    "minute": "minute",
+    "minutes": "minutes",
+
+    "s": "s",
+    "second": "second",
+    "seconds": "seconds",
+
+    "ago": "ago",
+    "today": "toady",
+    "yesterday": "yesterday",
+    "now": "now",
+
+    "last week": "last week",
+    "last two months": "last two months",
+    "last month": "last month",
+    "last quarter": "last quarter",
+    "last semester": "last semester",
+    "last year": "last year",
+
+    "this week": "this week",
+    "this two months": "this two months",
+    "this month": "this month",
+    "this quarter": "this quarter",
+    "this semester": "this semester",
+    "this year": "this year",
+    
+    "days ago": "days ago",
+    "weeks ago": "weeks ago",
+    "months ago": "months ago",
+    "two months ago": "two months ago",
+    "quarters ago": "quarters ago",
+    "semesters ago": "semesters ago",
+    "years ago": "years ago",
+
+    "more than a year ago": "more than a year ago",
+
+    "You are offline": "You are offline",
+
+    "Create": "Create",
+    "Next": "Next"
 }

@@ -4,6 +4,7 @@ import ColorTheme from "../../layout/constants/colors"
 import fonts from "../../layout/constants/fonts"
 import WifiIcon from '../../assets/icons/svgs/wifi_slash.svg'
 import { Text, View} from "../Themed"
+import LanguageContext from "../../contexts/Preferences/language"
 
 type OfflineCardProps = {
     width?: number
@@ -13,6 +14,7 @@ export default function offlineCard({
     width = sizes.screens.width,
     height = sizes.screens.height - sizes.bottomTab.height
 }: OfflineCardProps) {
+    const {t} = React.useContext(LanguageContext)
 
     const container: any = {
         width,
@@ -32,7 +34,7 @@ export default function offlineCard({
                 width={60}
                 height={60}
             />         
-            <Text style={text_style}>You are offline</Text>     
+            <Text style={text_style}>{t('You are offline')}</Text>     
         </View>
     )
 }
