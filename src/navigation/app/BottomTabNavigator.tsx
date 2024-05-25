@@ -38,7 +38,7 @@ export default function BottomTabNavigator() {
         name="Moments"
         component={HomeScreenNavigator}
         options={{
-          title: t('moments'),
+          title: t('Moments'),
           tabBarIcon: ({focused}: any) => 
           focused?
             <Moment fill={String(ColorTheme().iconFocused)} width={iconWidth} height={iconHeight}/>
@@ -50,7 +50,7 @@ export default function BottomTabNavigator() {
           name="Explore"
           component={ExploreScreenNavigator}
           options={{
-            title: t('explore'),
+            title: t('Explore'),
             tabBarIcon: ({focused}: any) =>
               focused?
               <Explore fill={String(ColorTheme().iconFocused)} width={iconWidth} height={iconHeight}/>
@@ -62,7 +62,7 @@ export default function BottomTabNavigator() {
           name="You"
           component={AccountScreenNavigator}
           options={{
-            title: t('you'),
+            title: t('You'),
             tabBarIcon: ({focused}: any) =>
               focused?
               <User fill={String(ColorTheme().iconFocused)} width={iconWidth} height={iconHeight}/>
