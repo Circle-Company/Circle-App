@@ -8,8 +8,10 @@ import HeaderButton from '../headerButton'
 import SelectMomentsContext from '../../../contexts/selectMoments'
 import Cog from '../../../assets/icons/svgs/cog.svg'
 import NewMoment from '../../../assets/icons/svgs/memory.svg'
+import LanguageContext from '../../../contexts/Preferences/language'
 
 export default function AccountHeaderRight() {
+    const {t} = React.useContext(LanguageContext)
     const {setFrom} = React.useContext(SelectMomentsContext)
     const navigation = useNavigation()
 
@@ -40,7 +42,7 @@ export default function AccountHeaderRight() {
                 marginRight
             >
                 <View style={textContainer}>
-                    <Text style={text}>New Memory</Text>
+                    <Text style={text}>{t('New Memory')}</Text>
                 </View>
                 <NewMoment fill={String(ColorTheme().text)} width={16} height={16}/>
             </HeaderButton>

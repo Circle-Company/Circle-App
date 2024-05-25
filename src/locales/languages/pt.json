@@ -1,14 +1,87 @@
 {
-    "moments": "Moments",
-    "explore": "Explorar",
-    "you": "Você",
-    "new-moment": "Criar Moment",
-    "new-memory": "Criar Memória",
-    "following": "seguindo",
+    "Moments": "Moments",
+    "Explore": "Explorar",
+    "You": "Você",
+
+    "New Moment": "Criar Moment",
+    "New Memory": "Criar Memória",
+
+    "Follow": "Seguir",
+    "Following": "Seguindo",
+    "Followers": "Seguidores",
     "followers": "seguidores",
+    "Follower": "Seguidor",
     "follower": "seguidor",
-    "likes": "likes",
-    "like": "like",
-    "views": "visualizações",
-    "view": "visualização"
+
+    "Views": "Visualizações",
+    "View": "Visualização",
+    "viewed your profile": "visualizou o seu perfil",
+
+    "Likes": "Likes",
+    "Like": "Like",
+    "liked your moment": "gostou do seu moment",
+    "liked 2 of your moments": "gostou de 2 dos seus moments",
+    "liked 3 of your moments": "gostou de 3 dos seus moments",
+    "liked your memory": "gostou da sua memória",
+    "liked your comment": "gostou do seu comentário",
+
+    "is following you": "está seguindo você",
+
+    "commented on your moment": "comentou no seu moment",
+
+    "Type @username": "Digite @usuário",
+
+    "w": "sem",
+    "week": "semana",
+    "weeks": "semanas",
+
+    "d": "d",
+    "day": "dia",
+    "days": "dias",
+
+    "h": "h",
+    "hour": "hora",
+    "hours": "horas",
+
+    "min": "min",
+    "minute": "minuto",
+    "minutes": "minutos",
+
+    "s": "s",
+    "second": "segundo",
+    "seconds": "segundos",
+
+    "ago": "atrás",
+    "today": "hoje",
+    "yesterday": "ontem",
+    "now": "agora",
+
+    "last week": "semana passada",
+    "last two months": "bimestre passado",
+    "last month": "mês passado",
+    "last quarter": "trimestre passado",
+    "last semester": "semestre passado",
+    "last year": "ano passado",
+
+    "this week": "esta semana",
+    "this two months": "este bimestre",
+    "this month": "este mês",
+    "this quarter": "este trimestre",
+    "this semester": "este semetre",
+    "this year": "esse ano",
+    
+    "days ago": "dias atrás",
+    "weeks ago": "semanas atrás",
+    "months ago": "meses atrás",
+    "two months ago": "bimestres atrás",
+    "quarters ago": "trimestres atrás",
+    "semesters ago": "semestres atrás",
+    "years ago": "anos atrás",
+
+    "more than a year ago": "mais de um ano atrás",
+
+    "You are offline": "Você está offline",
+
+    "Create": "Criar",
+    "Next": "Próximo"
 }

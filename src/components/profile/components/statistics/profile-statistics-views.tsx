@@ -8,10 +8,13 @@ import sizes from "../../../../layout/constants/sizes";
 import fonts from "../../../../layout/constants/fonts";
 import { useColorScheme } from "react-native";
 import ColorTheme, {colors} from "../../../../layout/constants/colors";
+import React from "react";
+import LanguageContext from "../../../../contexts/Preferences/language";
 
 export default function statistics_views ({}: ProfileStatisticsViewsProps) {
     const {user} = useProfileContext()
     const isDarkMode = useColorScheme() === 'dark'
+    const {t} = React.useContext(LanguageContext)
 
     const container: any = {
         width: sizes.screens.width/4,
@@ -34,7 +37,7 @@ export default function statistics_views ({}: ProfileStatisticsViewsProps) {
     return (
         <View style={container}>
             <Text style={num_style}>{ NumberConversor(user.statistics.total_views_num)}</Text>
-            <Text style={text_style}>Views</Text>
+            <Text style={text_style}>{t('Views')}</Text>
         </View>
     )
 } 

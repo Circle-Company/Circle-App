@@ -7,6 +7,7 @@ import fonts from "../../../layout/constants/fonts"
 import { UserFollowButtonProps } from "../user_show-types"
 import { useUserShowContext } from "../user_show-context"
 import { UserShowActions } from "../user_show-actions"
+import LanguageContext from "../../../contexts/Preferences/language"
 
 export default function follow_button ({
     isFollowing = false,
@@ -15,6 +16,7 @@ export default function follow_button ({
 }: UserFollowButtonProps) {
     
     const { user , follow, unfollow} = useUserShowContext()
+    const { t } = React.useContext(LanguageContext)
 
     const [followPressed, setFollowPressed] = React.useState(isFollowing)
 
@@ -77,7 +79,7 @@ export default function follow_button ({
             return (
                 <Animated.View style={{transform: [{ scale: animatedScale }] }}>
                     <Pressable style={container_pressed} onPress={() => ButtonAction()}>
-                        <Text style={username_pressed}>Following</Text>
+                        <Text style={username_pressed}>{t('Following')}</Text>
                     </Pressable>                
                 </Animated.View>
             )           
@@ -85,7 +87,7 @@ export default function follow_button ({
             return (
                 <Animated.View style={{transform: [{ scale: animatedScale }] }}>
                     <Pressable style={container_unpressed} onPress={() => ButtonAction()}>
-                        <Text style={username_unpressed}>Follow</Text>
+                        <Text style={username_unpressed}>{t('Follow')}</Text>
                     </Pressable>                
                 </Animated.View>
             )
@@ -97,7 +99,7 @@ export default function follow_button ({
             return (
                 <Animated.View style={{transform: [{ scale: animatedScale }] }}>
                     <Pressable style={container_pressed} onPress={() => ButtonAction()}>
-                        <Text style={username_pressed}>Following</Text>
+                        <Text style={username_pressed}>{t('Following')}</Text>
                     </Pressable>                
                 </Animated.View>
             )           
@@ -105,7 +107,7 @@ export default function follow_button ({
             return (
                 <Animated.View style={{transform: [{ scale: animatedScale }] }}>
                     <Pressable style={container_unpressed} onPress={() => ButtonAction()}>
-                        <Text style={username_unpressed}>Follow</Text>
+                        <Text style={username_unpressed}>{t('Follow')}</Text>
                     </Pressable>                
                 </Animated.View>
             )
