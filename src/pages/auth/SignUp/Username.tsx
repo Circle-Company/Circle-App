@@ -12,7 +12,7 @@ import { useNavigation } from '@react-navigation/native'
 
 export default function UsernameScreen() {
     const isDarkMode = useColorScheme() === 'dark'
-    const {usernameInput} = React.useContext(AuthContext)
+    const { signInputUsername } = React.useContext(AuthContext)
     const navigation = useNavigation()
 
     const container  = {
@@ -36,7 +36,7 @@ export default function UsernameScreen() {
     const button_text: any = {
         fontSize: fonts.size.body * 0.9,
         fontFamily: fonts.family.Semibold,
-        color: usernameInput? colors.gray.white: isDarkMode? colors.gray.grey_04 + '90' : colors.gray.grey_04 + '90',
+        color: signInputUsername? colors.gray.white: isDarkMode? colors.gray.grey_04 + '90' : colors.gray.grey_04 + '90',
     }
 
     const icon: any = {
@@ -45,7 +45,7 @@ export default function UsernameScreen() {
     }
 
     function handlePress() {
-        if(usernameInput) {
+        if(signInputUsername) {
             navigation.navigate('Auth-SignUp-Password')
         }
     }
@@ -62,12 +62,12 @@ export default function UsernameScreen() {
                     width={sizes.buttons.width/2.8}
                     height={40} 
                     action={handlePress}
-                    backgroundColor={ usernameInput? ColorTheme().primary.toString() : ColorTheme().backgroundDisabled.toString()}
+                    backgroundColor={ signInputUsername? ColorTheme().primary.toString() : ColorTheme().backgroundDisabled.toString()}
                 >
                     <Text style={button_text}>Next Step</Text>
                     <NextIcon
                         style={icon}
-                        fill={String(usernameInput? colors.gray.white: isDarkMode? colors.gray.grey_04 + '90' : colors.gray.grey_04 + '90')}
+                        fill={String(signInputUsername? colors.gray.white: isDarkMode? colors.gray.grey_04 + '90' : colors.gray.grey_04 + '90')}
                         width={17}
                         height={17}
                     />

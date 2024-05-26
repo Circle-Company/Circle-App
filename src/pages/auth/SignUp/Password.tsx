@@ -7,14 +7,12 @@ import fonts from '../../../layout/constants/fonts'
 import PasswordInput from '../../../components/auth/password_input'
 import ButtonStandart from '../../../components/buttons/button-standart'
 import Icon from '../../../assets/icons/svgs/plus_circle.svg'
-import { useNavigation } from '@react-navigation/native'
 import AuthContext from '../../../contexts/auth'
 import AuthTermsText from '../../../components/auth/terms';
 
 export default function PasswordScreen() {
     const isDarkMode = useColorScheme() === 'dark'
-    const {passwordInput, signUp} = React.useContext(AuthContext)
-    const navigation = useNavigation()
+    const {signUp, signInputPassword} = React.useContext(AuthContext)
 
     const container = {
       flex: 1,
@@ -37,7 +35,7 @@ export default function PasswordScreen() {
     const button_text: any = {
         fontSize: fonts.size.body * 0.9,
         fontFamily: fonts.family.Semibold,
-        color: passwordInput? colors.gray.white: isDarkMode? colors.gray.grey_04 + '90' : colors.gray.grey_04 + '90',
+        color: signInputPassword? colors.gray.white: isDarkMode? colors.gray.grey_04 + '90' : colors.gray.grey_04 + '90',
     }
 
     const icon: any = {
@@ -46,7 +44,7 @@ export default function PasswordScreen() {
     }
 
     function handlePress() {
-        if(passwordInput) {
+        if(signInputPassword) {
             signUp()
         }
     }
@@ -63,12 +61,12 @@ export default function PasswordScreen() {
                     width={sizes.buttons.width/2.05}
                     height={40} 
                     action={handlePress}
-                    backgroundColor={ passwordInput? ColorTheme().primary.toString() : ColorTheme().backgroundDisabled.toString()}
+                    backgroundColor={ signInputPassword? ColorTheme().primary.toString() : ColorTheme().backgroundDisabled.toString()}
                 >
                     <Text style={button_text}>Create Account</Text>
                     <Icon
                         style={icon}
-                        fill={String(passwordInput? colors.gray.white: isDarkMode? colors.gray.grey_04 + '90' : colors.gray.grey_04 + '90')}
+                        fill={String(signInputPassword? colors.gray.white: isDarkMode? colors.gray.grey_04 + '90' : colors.gray.grey_04 + '90')}
                         width={17}
                         height={17}
                     />

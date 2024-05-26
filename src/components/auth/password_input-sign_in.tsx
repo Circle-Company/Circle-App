@@ -12,7 +12,7 @@ import AuthContext from "../../contexts/auth"
 
 export default function PasswordInputSignIn() {
     const isDarkMode = useColorScheme() === 'dark'
-    const { setPasswordInput } = React.useContext(AuthContext)
+    const { setSignInputPassword } = React.useContext(AuthContext)
     const [password, setPassword] = useState("")
     const inputRef = React.useRef<TextInput>(null)
 
@@ -53,7 +53,7 @@ export default function PasswordInputSignIn() {
 
     const handleClearPressed = () => {
         setPassword('')
-        setPasswordInput('')
+        setSignInputPassword ('')
     }
 
     const handleInputChange = (text: string) => {
@@ -62,9 +62,9 @@ export default function PasswordInputSignIn() {
 
     React.useEffect(() => {
         if (password.length <= 0) {
-            setPasswordInput('')
+            setSignInputPassword ('')
         } else {
-            setPasswordInput(password)  
+            setSignInputPassword (password)  
         }
 
     }, [password, inputRef])

@@ -36,7 +36,7 @@ export default function ButtonStandart({navigateTo, title}:buttonStandart) {
           style={container}
           onPress={() => { navigation.navigate(navigateTo)}}
         >
-          <Text style={text}>{title.toUpperCase()}</Text>
+          <Text style={text}>{title}</Text>
         </TouchableOpacity>
     )        
 

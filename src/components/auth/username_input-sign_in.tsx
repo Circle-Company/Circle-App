@@ -12,7 +12,7 @@ import AuthContext from "../../contexts/auth"
 
 export default function UsernameInputSignIn() {
     const isDarkMode = useColorScheme() === 'dark'
-    const { setUsernameInput } = React.useContext(AuthContext)
+    const { setSignInputUsername } = React.useContext(AuthContext)
     const [username, setUsername] = useState("");
     const inputRef = React.useRef<TextInput>(null)
 
@@ -53,7 +53,7 @@ export default function UsernameInputSignIn() {
 
     const handleClearPressed = () => {
         setUsername('')
-        setUsernameInput('')
+        setSignInputUsername('')
     }
 
     const handleInputChange = (text: string) => {
@@ -63,10 +63,10 @@ export default function UsernameInputSignIn() {
 
     React.useEffect(() => {
         if (username.length <= 0) {
-            setUsernameInput('')
+            setSignInputUsername('')
             return;
         } else {
-            setUsernameInput(username)  
+            setSignInputUsername(username)  
         }
 
     }, [username, inputRef])
