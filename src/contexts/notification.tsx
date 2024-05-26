@@ -22,9 +22,9 @@ export function NotificationProvider({children}: NotificationProviderProps) {
     const [ notifications, setNotifications ] = React.useState([])
     const [ allNotifications, setAllNotifications ] = React.useState<any[]>([])
     const [ showNotification, setShowNotification ] = React.useState<boolean>(false)
-    const { socket, user } = React.useContext(AuthContext)
 
-    React.useEffect(() => {
+    /**
+     *     React.useEffect(() => {
         socket.on("new-notification", (notification: any) => {
             setSocketNotifications((prev: any):any => [...prev, notification]);
             setLastNotification(notification)
@@ -32,6 +32,7 @@ export function NotificationProvider({children}: NotificationProviderProps) {
             setShowNotification(true)
         })
     }, [socket])
+     */
 
     React.useEffect(() => {
         setNewNotificationsNum(socketNotifications.length)
