@@ -2,9 +2,11 @@ import { userReciveDataProps } from "../../components/user_show/user_show-types"
 import { LanguagesCodesType } from "../../locales/LanguageTypes"
 import { AccountState } from "./persistedAccount"
 import { PreferencesState } from "./persistedPreferences"
+import { StatisticsState } from "./persistedStatistics"
 
 export type UserDataType = {
     id: number
+    name: string
     username: string
     description: string
     verifyed: boolean,
@@ -15,7 +17,9 @@ export type UserDataType = {
 }
 export type UserDataReturnsType = {
     id: number
+    name: string
     username: string
+    description: string
     verifyed: boolean
     profile_picture: {
         small_resolution: string
@@ -32,6 +36,12 @@ export type UserDataReturnsType = {
     storeUser: (value: userReciveDataProps) => userReciveDataProps
     loadUserFromStorage: () => userReciveDataProps
     removeUserFromStorage: () => void
+}
+
+export type StatisticsDataType = {
+    total_followers_num: number
+    total_likes_num: number
+    total_views_num: number
 }
 
 export type AccountDataType = {
@@ -117,6 +127,5 @@ export type SessionDataType = {
     user: UserDataReturnsType
     account: AccountState
     preferences: PreferencesState
-    jwtToken: string | null
-    setJwtToken: React.Dispatch<React.SetStateAction<string | null>>
+    statistics: StatisticsState
 }
