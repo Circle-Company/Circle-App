@@ -11,6 +11,11 @@ export function storageKeys () {
             last_active_at: baseKey + 'account:lastactive',
             last_login_at: baseKey + 'account:lastlogin'
         },
+        statistics: {
+            total_followers: baseKey + 'statistics:totalfollowers',
+            total_likes: baseKey + 'statistics:totallikes',
+            total_views: baseKey + 'statistics:totalviews',
+        },
         preferences: {
             primaryLanguage: baseKey + 'preferences:language:primary',
             appLanguage: baseKey + 'preferences:language:app',
@@ -21,6 +26,7 @@ export function storageKeys () {
         },
         user: {
             id: baseKey + 'user:id',
+            name: baseKey + 'user:name',
             username: baseKey + 'user:username',
             description: baseKey + 'user:description',
             verifyed: baseKey + 'user:verifyed',
