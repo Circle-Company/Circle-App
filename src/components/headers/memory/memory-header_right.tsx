@@ -6,11 +6,11 @@ import ViewMorebutton from '../../buttons/view_more'
 import sizes from '../../../layout/constants/sizes'
 import fonts from '../../../layout/constants/fonts'
 import SelectMomentsContext from '../../../contexts/selectMoments'
+import LanguageContext from '../../../contexts/Preferences/language'
 
 export default function MemoryHeaderRight() {
-
+    const {t} = React.useContext(LanguageContext)
     const { selectedMoments } = React.useContext(SelectMomentsContext)
-
     const navigation = useNavigation()
 
     const container: any = {
@@ -23,7 +23,8 @@ export default function MemoryHeaderRight() {
         <View style={container}>
             <ViewMorebutton
                 action={() => {selectedMoments.length> 0? navigation.navigate('MemoriesNavigator', { screen: 'NewMemoryTitle'}): null}}
-                text='Next' scale={1.2}
+                text={t('Next')}
+                scale={1.2}
                 fontFamily={selectedMoments.length> 0? fonts.family.Bold: fonts.family.Semibold }
             />
         </View>
