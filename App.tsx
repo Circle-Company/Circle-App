@@ -56,9 +56,7 @@ const App = () => {
                   <InnerApp/>
               </TrackingProvider>                 
             </PreferencesProvider>
-            
           </PersistedProvider>
-           
         </AuthProvider>        
       </NetworkProvider>
     </SafeAreaProvider>
