@@ -16,7 +16,7 @@ export default function PasswordInput({
     sign = true
 }: {sign?: boolean }) {
     const isDarkMode = useColorScheme() === 'dark'
-    const { setPasswordInput, usernameInput} = React.useContext(AuthContext)
+    const { setSignInputPassword, signInputUsername } = React.useContext(AuthContext)
     const [password, setPassword] = useState("");
     const [showStatusMessage, setShowStatusMessage] = useState(false);
     const [statusMessage, setStatusMessage] = useState("");
@@ -120,8 +120,7 @@ export default function PasswordInput({
         setIsValidPassword(false)
         setStatusMessage("The Password needs least 6 characters.")
         setShowStatusMessage(true)
-        
-        setPasswordInput('')
+        setSignInputPassword ('')
     }
 
     const handleInputChange = (text: string) => {
@@ -133,23 +132,20 @@ export default function PasswordInput({
             setIsValidPassword(false)
             setStatusMessage("The Password needs least 6 characters.")
             setShowStatusMessage(true)
-            
-            setPasswordInput('')
+            setSignInputPassword ('')
         }
-        if(password == usernameInput && sign){
+        if(password == signInputUsername && sign){
                 setIsValidPassword(false)
                 setStatusMessage("Your password cannot be the same as the username.")
                 setShowStatusMessage(true)
-
-                setPasswordInput('')
+                setSignInputPassword ('')
         } else {
             if(sign || password.length >= 6){
                 setIsValidPassword(true)
                 setShowStatusMessage(true)
                 setStatusMessage("This password can be used.")  
-                setPasswordInput(password)                 
+                setSignInputPassword (password)                 
             }
- 
         }
 
     }, [password, inputRef])

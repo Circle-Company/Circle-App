@@ -1,13 +1,19 @@
 import React from 'react';
-import { StatusBar, useColorScheme, Image, View } from 'react-native'
-import ColorTheme from '../../../layout/constants/colors'
+import { StatusBar, useColorScheme, Image, View, Pressable } from 'react-native'
+import ColorTheme, { colors } from '../../../layout/constants/colors'
 import Fonts from '../../../layout/constants/fonts'
 import { Text } from '../../../components/Themed'
-import ButtonLarge from '../../../components/buttons/large' 
 import ButtonStandart from '../../../components/buttons/standart'
+import Button from '../../../components/buttons/button-standart';
+import config from '../../../config';
+import fonts from '../../../layout/constants/fonts';
+import sizes from '../../../layout/constants/sizes';
+import { useNavigation } from '@react-navigation/native';
+import Icon from '../../../assets/icons/svgs/arrow_circle_right.svg'
 
 export default function SplashScreen() {
     const isDarkMode = useColorScheme() === 'dark'
+    const navigation = useNavigation()
 
     const container:any  = {
         flex: 1,
@@ -18,7 +24,7 @@ export default function SplashScreen() {
         alignSelf: 'center',
         justifyContent: 'center',
         position: 'absolute',
-        top: 100,
+        top: 70,
         color: ColorTheme().text,
     }
     const center:any  = {
@@ -33,14 +39,13 @@ export default function SplashScreen() {
         fontFamily: Fonts.family['Black-Italic'],
         fontSize: 44,
         color: ColorTheme().text,
-        marginBottom: 44
+        marginBottom: 30
     }
     const slogan:any  = {
-        fontFamily: Fonts.family['Black-Italic'],
+        fontFamily: Fonts.family['Semibold-Italic'],
         alignSelf: 'center',
-        width: 230,
         textAlign: 'center',
-        fontSize: 18,
+        fontSize: fonts.size.subheadline,
         color: ColorTheme().text
     }
     const buttons:any = {
@@ -50,29 +55,48 @@ export default function SplashScreen() {
         bottom: 0
     }
 
+    const primaryActionContainer: any = {
+        width: sizes.screens.width,
+        height: sizes.headers.height,
+        marginTop: sizes.margins['1md'],
+        marginBottom: sizes.margins['1xl'] * 0.95,
+        alignItems: 'center',
+        justifyContent: 'center',
+    }
+    const primaryActionText: any = {
+        fontSize: fonts.size.body,
+        fontFamily: fonts.family.Semibold,
+        color: colors.gray.white,
+        marginRight: sizes.margins['1md'] * 0.8
+    }
+
+    const secundaryActionText: any = {
+        fontSize: fonts.size.body,
+        fontFamily: fonts.family.Semibold,
+        color: ColorTheme().primary,
+    }
+
     return (
         <View style={container}>
             <StatusBar barStyle={isDarkMode?'light-content': 'dark-content'} backgroundColor={ColorTheme().background.toString()}/>
                 <View style={header}>
-                    <Text style={title}>Circle</Text>
-                    <Text style={slogan}>Share momments and create memories</Text>
+                    <Text style={title}>{config.APPLICATION_SHORT_NAME}</Text>
+                    <Text style={slogan}>{config.APPLICATION_DESCRIPTION}</Text>
                 </View>
                 <View style={center}>
                     <Image style={{width: 454, height: 430}} resizeMode='contain' source={require('../../../assets/images/bg/bg.png')}/>
                 </View>
                 <View style={buttons}>
-                    <ButtonStandart
-                        title={'I already have a account'}
-                        transparent={true}
-                        navigateTo={'Auth-SignIn'}
-                    />
-                    
-                    <View style={{marginBottom: 10}}>
-                        <ButtonLarge
-                            title={"Let's Get Started"}
-                            navigateTo={'Auth-SignUp-Username'}
-                        />
+                    <Button action={() => {navigation.navigate('Auth-SignIn')}} backgroundColor={'#00000000'} width={200} height={20}>
+                        <Text style={secundaryActionText}>Already have a account</Text>
+                    </Button> 
+                    <View style={primaryActionContainer}>
+                        <Button action={() => {navigation.navigate('Auth-SignUp-Username')}} backgroundColor={ColorTheme().primary.toString()} width={200} height={50}>
+                            <Text style={primaryActionText}>Create Account</Text>
+                            <Icon width={24} height={24} fill={colors.gray.white.toString()}/>
+                        </Button>                        
                     </View>
+
                 </View>
         </View>
     )

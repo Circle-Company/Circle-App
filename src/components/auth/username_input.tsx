@@ -12,7 +12,7 @@ import AuthContext from "../../contexts/auth"
 
 export default function UsernameInput() {
     const isDarkMode = useColorScheme() === 'dark'
-    const { setUsernameInput } = React.useContext(AuthContext)
+    const { setSignInputUsername } = React.useContext(AuthContext)
     const [username, setUsername] = useState("");
     const [isUsernameAvailable, setIsUsernameAvailable] = useState(false);
     const [showStatusMessage, setShowStatusMessage] = useState(false);
@@ -111,7 +111,7 @@ export default function UsernameInput() {
                 setIsValidUsername(false);
                 setIsUsernameAvailable(false);
                 setShowStatusMessage(true)
-                setUsernameInput('')
+                setSignInputUsername('')
                 return;
             }
             if (isUsernameAvailable) {
@@ -120,7 +120,7 @@ export default function UsernameInput() {
                 setStatusMessage("Checking availability...");
             }
             setShowStatusMessage(isUsernameAvailable);   
-            setUsernameInput(username)         
+            setSignInputUsername(username)         
         }
 
     }, [isUsernameAvailable]);
@@ -146,7 +146,7 @@ export default function UsernameInput() {
         setStatusMessage("The username needs least 4 characters.");
         setIsUsernameAvailable(false);
         setShowStatusMessage(true);
-        setUsernameInput('')
+        setSignInputUsername('')
     }
 
     const handleInputChange = (text: string) => {
@@ -160,7 +160,7 @@ export default function UsernameInput() {
             setStatusMessage("The username needs least 4 characters.");
             setIsUsernameAvailable(false);
             setShowStatusMessage(true);
-            setUsernameInput('')
+            setSignInputUsername('')
             return;
         } else {
             setIsValidUsername(true);
