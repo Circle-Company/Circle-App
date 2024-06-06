@@ -9,6 +9,7 @@ import FastImage from "react-native-fast-image"
 import Animated, { FadeIn } from 'react-native-reanimated'
 
 export default function picture ({
+    fromProfile = false
 }: ProfilePictureProps) {
 
     const { user } = useProfileContext()
@@ -37,12 +38,16 @@ export default function picture ({
     }
 
     React.useEffect(() => {
-        if(user.profile_picture.tiny_resolution == undefined){
-            setProfilePicture(String(user.profile_picture.tiny_resolution))
-        } else {
-            setProfilePicture(String(user.profile_picture.tiny_resolution))
-        }                
-
+        if(fromProfile){
+            if(user.profile_picture.small_resolution == undefined){
+                setProfilePicture(String(user.profile_picture.tiny_resolution))
+            } else setProfilePicture(String(user.profile_picture.small_resolution))
+        }
+        else {
+            if(user.profile_picture.tiny_resolution == undefined){
+                setProfilePicture(String(user.profile_picture.small_resolution))
+            } else setProfilePicture(String(user.profile_picture.tiny_resolution))       
+        }
     }, [])
 
     return (
