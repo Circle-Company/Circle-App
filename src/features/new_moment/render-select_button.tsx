@@ -44,12 +44,12 @@ export default function RenderSelectButton () {
         <View style={container}>
             <ButtonStandart
                 action={onHandlePress}
-                width={sizes.buttons.width*0.6}
+                width={sizes.buttons.width*0.46}
                 margins={false}
                 backgroundColor={String( active? colors.blue.blue_05 : isDarkMode? colors.gray.grey_07 : colors.gray.grey_02)}
                 >
                 <View style={textContainer}>
-                    <Text style={text}>Select From Gallery</Text>
+                    <Text style={text}>Take a Photo</Text>
                 </View>
                 <AddIcon fill={String(active? colors.gray.white: isDarkMode?  colors.gray.white : colors.gray.black)} width={14} height={14}/>
             </ButtonStandart>  

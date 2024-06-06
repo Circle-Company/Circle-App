@@ -1,6 +1,5 @@
 import React from "react"
 import api from "../../services/api"
-import AuthContext from "../../contexts/auth"
 import {useNavigation} from '@react-navigation/native'
 import TouchID from 'react-native-simple-biometrics'
 
@@ -24,7 +23,6 @@ export type AllMomentsContextsData = {
 const AllMomentsContext = React.createContext<AllMomentsContextsData>({} as AllMomentsContextsData)
 
 export function AllMomentsProvider({children}: AllMomentsProviderProps) {
-    const { user } = React.useContext(AuthContext)
     const [selectedMoments, setSelectedMoments] = React.useState<Moment[]>([])
 
     async function deleteMoments (memory_id: number) {

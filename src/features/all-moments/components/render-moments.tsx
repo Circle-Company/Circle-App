@@ -35,8 +35,8 @@ export default function RenderMoment({
     borderRadius = 13,
     preview = false
 }: RenderMomentProps) {
-    const isDarkMode = useColorScheme() === 'dark'
     const {put_moment_on_list, delete_moment_from_list, selectedMoments} = React.useContext(AllMomentsContext)
+    const isDarkMode = useColorScheme() === 'dark'
     React.useEffect(() => {
         setSelected(false)
         if(!preview){
@@ -47,7 +47,7 @@ export default function RenderMoment({
             }            
         }
 
-    }, [ selectedMoments])
+    }, [selectedMoments])
 
     const [selected, setSelected] = React.useState(false)
     const container:any = {
@@ -61,53 +61,52 @@ export default function RenderMoment({
     const selected_container = {
         top: 0,
         left: 0,
-        zIndex: 10,
         position: 'absolute',
-        backgroundColor: '#00000000',
+        backgroundColor: '#00000004',
         width:117 * scale,
         height: 181 * scale,
         alignItems: 'center',
         justifyContent: 'center'
     }
 
-    async function Select() {
+    async function handlePress() {
+        console.log(selectedMoments)
         if(!preview){
-            await put_moment_on_list(moment),
-            await setSelected(true)            
-        }
-
-    }
-
-    async function Unselect() {
-        if(!preview) {
-            await delete_moment_from_list(moment)
-            await setSelected(false)            
+            if(selected){
+                delete_moment_from_list(moment)
+                setSelected(false)   
+            } else {
+                put_moment_on_list(moment),
+                setSelected(true)                 
+            }
+           
         }
 
     }
 
     if(selected) {
         return (
-            <Pressable onPress={() => {Unselect()}}>
+            <Pressable onPress={handlePress}>
                 <View style={container}>
-                    {selected &&
-                        
-                        <View style={selected_container}>
-                            <CheckCircle fill='#ffffff90'/>
-                        </View>
-                    }
-                    <MidiaRender.Root data={moment.midia} content_sizes={{width:117 * scale, height: 181 * scale, padding: 0}}>
-                        <MidiaRender.RenderImage blur={selected? true: false} blurRadius={10} blurColor="#000000"/>
-                    </MidiaRender.Root>
-                </View>            
+                    <View style={selected_container}>
+                        <CheckCircle fill={String(isDarkMode? colors.gray.white: colors.gray.black)}/>
+                    </View>
+                    <View style={{opacity: 0.5}}>
+                        <MidiaRender.Root data={moment.midia} content_sizes={{width:117 * scale, height: 181 * scale, padding: 0}}>
+                            
+                            <MidiaRender.RenderImage isFeed={false} enableBlur={true} blur={true} blurRadius={20} blurColor="#000000"/>
+                        </MidiaRender.Root>
+                    </View>                                    
+                </View>
+
             </Pressable>
         )
     } else {
         return (
-            <Pressable onPress={() => {Select()}}>
+            <Pressable onPress={handlePress}>
                 <View style={container}>
                     <MidiaRender.Root data={moment.midia} content_sizes={{width:117 * scale, height: 181 * scale, padding: 0}}>
-                        <MidiaRender.RenderImage/>
+                        <MidiaRender.RenderImage isFeed={false} blur={false}/>
                     </MidiaRender.Root>
                 </View>            
             </Pressable>

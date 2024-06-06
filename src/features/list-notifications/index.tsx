@@ -11,10 +11,11 @@ import { ListNotificationsAll } from './list-notifications-date_group';
 import OfflineCard from '../../components/general/offline';
 import EndReached from '../list-memories/list-memories-all/components/end-reached';
 import AuthContext from '../../contexts/auth';
+import PersistedContext from '../../contexts/Persisted';
 
 export default function ListNotifcations() {
 
-    const { user } = React.useContext(AuthContext)
+    const { session } = React.useContext(PersistedContext)
     const { allNotifications, setReadSocketNotifications } = React.useContext(NotificationContext)
     const [notificationsData, setNotificationsData] = React.useState(allNotifications)
     const [page, setPage] = React.useState(1)
@@ -31,7 +32,7 @@ export default function ListNotifcations() {
     }, [])
 
     const fetchData = async () => {
-        await api.post(`/notification/find?page=${page}&pageSize=${pageSize}`, { user_id: user.id })
+        await api.post(`/notification/find?page=${page}&pageSize=${pageSize}`, { user_id: session.user.id })
         .then(function (response) {
             if (page === 1) setNotificationsData(response.data.notifications)
             else {

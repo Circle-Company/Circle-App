@@ -33,11 +33,6 @@ export default function ListSearch() {
 
     
     if(isConnected == false) return <Search.Offline/>
-    else if(searchTerm.length == 0) return (
-        <NearToYouContextProvider>
-            <NearToYouUsers/>
-        </NearToYouContextProvider>
-    )
     else {
         return (
             <View>

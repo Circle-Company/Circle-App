@@ -15,28 +15,24 @@ type RenderProfileProps = {
 
 export default function RenderProfile({user}: RenderProfileProps) {
     const top_container: any = {
-        paddingTop: sizes.paddings["1xl"],
+        paddingTop: sizes.paddings["1md"],
         alignItems: 'center',
     }
     const name_container: any = {
         paddingTop: sizes.paddings["1sm"],
         paddingBottom: sizes.paddings["1sm"]*0.6
     }
-    const description_container: any = {
-    }
     return (
         <Profile.MainRoot data={user}>
             <View style={top_container}>
-                <Profile.Picture/>
+                <Profile.Picture fromProfile={true}/>
                 <View style={name_container}>
                     <Profile.Name scale={0.8}/>
                 </View>
             </View>
             
             <RenderStatistics/>    
-            <View style={description_container}>
-              <Profile.Description/>  
-            </View>
+            <Profile.Description/>  
         </Profile.MainRoot>
     )
 }
