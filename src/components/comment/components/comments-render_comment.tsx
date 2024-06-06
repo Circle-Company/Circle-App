@@ -92,7 +92,7 @@ export default function render_comment ({comment, index, preview}: CommentsRende
                     <UserShow.Root data={comment.user}>
                         <UserShow.Username
                             displayOnMoment={false}
-                            truncatedSize={20}
+                            truncatedSize={18}
                             color={ColorTheme().textDisabled}
                             fontFamily={fonts.family.Medium}
                             fontSize={preview? fonts.size.caption1 : fonts.size.caption1*1.1}
