@@ -2,8 +2,8 @@ import React from 'react';
 import { View, Text } from 'react-native';
 import ColorTheme from '../../../layout/constants/colors';
 import {useNavigation} from '@react-navigation/native';
-import Camera from '../../../assets/icons/svgs/moment.svg'
-import InboxIcon from '../../../assets/icons/svgs/tray.svg'
+import Camera from '../../../assets/icons/svgs/camera.svg'
+import SearchIcon from '../../../assets/icons/svgs/search.svg'
 import sizes from '../../../layout/constants/sizes';
 import fonts from '../../../layout/constants/fonts';
 import ButtonStandart from '../../buttons/button-standart';
@@ -34,8 +34,8 @@ export default function HeaderRightHome() {
         navigation.navigate('MomentNavigator', {screen: 'NewMomentImageScreen'})
     }
 
-    async function onPressInbox() {
-        navigation.navigate('InboxNavigator', {screen: 'Inbox'})
+    async function onPressSearch() {
+        navigation.navigate('ExploreNavigator', {screen: 'ExploreScreen'})
     }
 
     const active = newNotificationsNum> 0? true: false
@@ -48,9 +48,9 @@ export default function HeaderRightHome() {
             <Camera fill={String(ColorTheme().text)} width={16} height={16}/>
         </ButtonStandart>  
 
-        <ButtonStandart action={onPressInbox} backgroundColor={String(ColorTheme().backgroundDisabled)}>
+        <ButtonStandart action={onPressSearch} backgroundColor={String(ColorTheme().backgroundDisabled)}>
             <BadgeIcon active={active} number={newNotificationsNum}/>
-            <InboxIcon fill={String(ColorTheme().text)} width={18} height={18}/>
+            <SearchIcon fill={String(ColorTheme().text)} width={18} height={18}/>
         </ButtonStandart>                  
         </View>
 
