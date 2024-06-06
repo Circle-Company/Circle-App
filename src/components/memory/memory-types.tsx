@@ -13,6 +13,7 @@ export type MemoryObjectProps = {
     moments: Array<MemoryMomentObjectProps>
 }
 export type MemoryReciveDataProps = {
+    user_id: number,
     id: number,
     title: string,
     updated_at: string,
