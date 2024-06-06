@@ -4,23 +4,28 @@ import { CommentsInputProps } from "../comments-types"
 import sizes from "../../../layout/constants/sizes"
 import fonts from "../../../layout/constants/fonts"
 import ColorTheme, { colors } from "../../../layout/constants/colors"
-import AuthContext from "../../../contexts/auth"
 import Arrowbottom from "../../../assets/icons/svgs/paper_plane.svg"
 import { UserShow } from "../../user_show"
+import PersistedContext from "../../../contexts/Persisted"
+import FeedContext from "../../../contexts/Feed"
+import api from "../../../services/api"
+import { useNotifications } from "react-native-notificated"
+import CheckIcon from '../../../assets/icons/svgs/check_circle.svg'
 
 export default function input ({
     preview = false,
     placeholder = "Send Comment...",
     color = String(ColorTheme().text),
     backgroundColor = String(ColorTheme().blur_button_color),
-    autoFocus = false
+    autoFocus = false,
 }: CommentsInputProps) {
-    const { user } = React.useContext(AuthContext)
+    const {focusedItemId} = React.useContext(FeedContext)
+    const { session } = React.useContext(PersistedContext)
     const [commentText, setCommentText] = React.useState<string>('')
     const isDarkMode = useColorScheme() === 'dark'
+    const { notify } = useNotifications()
 
     var animatedScale = React.useRef(new Animated.Value(0)).current
-
 
     React.useEffect(() => { animatedScale.setValue(1) }, [])
     const handleButtonPress = () => {
@@ -31,6 +36,9 @@ export default function input ({
             speed: 10,
             useNativeDriver: true
         }).start()
+        async function fetch() {
+            await sendComment()
+        }; fetch()
     }
 
     const input_container: any = {
@@ -77,12 +85,29 @@ export default function input ({
         justifyContent: 'center',
     }
 
+    async function sendComment() {
+        if(commentText) await api.post('/moment/comment', {
+            user_id: session.user.id,
+            moment_id: focusedItemId,
+            content: commentText
+        }).then(() => {
+            notify('toast', {
+                params: {
+                    description: 'Comment Has been sended with success',
+                    title: 'Comment Sended',
+                    icon: <CheckIcon fill={colors.green.green_05.toString()} width={15} height={15}/>
+                }
+            })
+        })
+        
+    }
+
     if(preview) return (
         <View style={input_container}>
             <View style={[textContainer, {justifyContent: 'center'}]}>
                 <Text style={[text, {opacity: 0.4, flex: 0}]}>{placeholder}</Text>
             </View>
-            <Pressable onPress={(n) => { handleButtonPress() }}  style={pressable_style}>
+            <Pressable onPress={handleButtonPress}  style={pressable_style}>
                 <Animated.View
                     style={[iconContainer, { transform: [{ scale: animatedScale }] }, {backgroundColor: commentText == ''? String(colors.transparent.white_10) : String(colors.transparent.white_20)}]}
                 >
@@ -97,7 +122,7 @@ export default function input ({
     )
     return (
         <View style={[input_container, { paddingLeft: sizes.paddings["1sm"]* 0.2}]}>
-            <UserShow.Root data={user}>
+            <UserShow.Root data={session.user}>
                 <UserShow.ProfilePicture
                     disableAnalytics={true}
                     displayOnMoment={false}

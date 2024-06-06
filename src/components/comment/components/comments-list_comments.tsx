@@ -1,5 +1,5 @@
 import React from "react"
-import { View, Text, FlatList, useColorScheme, RefreshControl } from "react-native"
+import { FlatList, useColorScheme, RefreshControl } from "react-native"
 import { CommentsListCommentsProps } from "../comments-types"
 import { useCommentsContext } from "../comments-context"
 import RenderComment from "./comments-render_comment"
@@ -11,7 +11,7 @@ import OfflineCard from "../../general/offline"
 import { colors } from "../../../layout/constants/colors"
 import EndReached from "../../../features/list-memories/list-memories-preview/components/end-reached"
 import NetworkContext from "../../../contexts/network"
-import Reanimated, { FadeIn, FadeInUp } from "react-native-reanimated"
+import Reanimated, { FadeInUp } from "react-native-reanimated"
 
 export default function list_comments ({ preview = true }: CommentsListCommentsProps) {
     const {comment} = useCommentsContext()
@@ -28,13 +28,13 @@ export default function list_comments ({ preview = true }: CommentsListCommentsP
 
 
     async function fetchData() {
+        console.log('id: ',momentData.id)
         await api.post(`/moment/get-comments?page=${page}&pageSize=${pageSize}`, {moment_id: momentData.id})
         .then(function(response) {
-            if (page === 1) {
-                setAllComments(response.data.comments);
-            } else {
+            if (page === 1) setAllComments(response.data.comments);
+            else {
                 setAllComments([...allComments, ...response.data.comments]);
-                if(pageSize > response.data.comments.length) setEndReached(true)
+                if(page > response.data.totalPages) setEndReached(true)
                 else setEndReached(false)
             }setPage(page + 1)
         })
@@ -44,14 +44,13 @@ export default function list_comments ({ preview = true }: CommentsListCommentsP
     React.useEffect(() => {
         if(preview == false){
             setLoading(true)
-            fetchData()
+            if(momentData.id !== 0) fetchData()
             .finally(() => {
                 setLoading(false)
                 setRefreshing(false)            
             })            
         }
-
-    }, [])
+    }, [momentData.id])
 
     React.useEffect(() => {
         if(preview == false) fetchData()
@@ -97,7 +96,7 @@ export default function list_comments ({ preview = true }: CommentsListCommentsP
             }
             renderItem={({item, index}) => {
                 return (
-                    <Reanimated.View entering={preview? FadeInUp.duration(100 * (index + 1)) : FadeInUp.duration(60 * index + 1)}>
+                    <Reanimated.View entering={preview? FadeInUp.duration(100 * (index + 1)) : FadeInUp.duration(250)}>
                         <RenderComment
                             preview={preview}
                             comment={item}
@@ -118,6 +117,7 @@ export default function list_comments ({ preview = true }: CommentsListCommentsP
                 } else return null
 
             }}
-        />
+        />        
+
     )
 }
