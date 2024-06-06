@@ -6,6 +6,7 @@ import { InboxNavigator } from "./InboxNavigator"
 import { ProfileNavigator } from "./ProfileNavigator"
 import { MomentNavigator } from "./MomentNavigator"
 import ColorTheme from "../../layout/constants/colors"
+import { ExploreScreenNavigator } from "./ExploreScreenNavigator"
 
 export default function AppNavigator() {
     const App =  createStackNavigator()
@@ -14,7 +15,6 @@ export default function AppNavigator() {
             initialRouteName="BottomTab"
             screenOptions={{
                 headerShown: false,
-                cardOverlayEnabled: true,
                 cardStyle: {backgroundColor: String(ColorTheme().background)}
             }}
         >
@@ -25,6 +25,13 @@ export default function AppNavigator() {
             <App.Screen
                 name="SettingsNavigator"
                 component={SettingsNavigator}
+                options={{
+                    cardStyleInterpolator: CardStyleInterpolators.forHorizontalIOS
+                }}
+            />
+            <App.Screen
+                name="ExploreNavigator"
+                component={ExploreScreenNavigator}
                 options={{
                     cardStyleInterpolator: CardStyleInterpolators.forHorizontalIOS
                 }}

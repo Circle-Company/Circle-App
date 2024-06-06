@@ -9,11 +9,13 @@ import MemoriesScreen from '../../pages/app/Memories'
 import MemoriesListMomentsScreen from '../../pages/app/Memories/list_moments'
 import NewMemorySelectMomentsScreen from '../../pages/app/Memories/new_memory_select_moments'
 import NewMemoryTitleScreen from '../../pages/app/Memories/new_memory_title'
-import { HeaderBack } from '../../components/headers'
 import MemoryHeaderLeft from '../../components/headers/memory/memory-header_left'
 import MemoryHeaderRight from '../../components/headers/memory/memory-header_right'
 import MemoryTitleHeaderRight from '../../components/headers/memory/memory_title-header_right'
 import MemoryContext from '../../contexts/memory'
+import MemoriesListMomentsHeaderRight from '../../components/headers/memories/memories-list_moments-header_right'
+import EditMemoryScreen from '../../pages/app/Memories/edit_memory'
+import { truncated } from '../../algorithms/processText'
 const MemoriesStack = createStackNavigator()
  
 export function MemoriesNavigator() {
@@ -50,7 +52,21 @@ export function MemoriesNavigator() {
                     cardStyle: {backgroundColor: String(ColorTheme().background)},
                     cardOverlayEnabled: true,
                     cardStyleInterpolator: CardStyleInterpolators.forHorizontalIOS,
-                    headerLeft: () => <MemoriesListMomentsHeaderLeft/>
+                    headerLeft: () => <MemoriesListMomentsHeaderLeft/>,
+                    headerRight: () => <MemoriesListMomentsHeaderRight user_id={memory.user_id}/>
+                }}
+            />
+            <MemoriesStack.Screen
+                name="EditMemory"
+                component={EditMemoryScreen}
+                options={{
+                    headerTitle:memory? `Edit ${ truncated({text: memory.title, size: 18})}` : 'Edit Memory',
+                    headerStyle: [HeaderStyle, {backgroundColor: colors.gray.black}],
+                    headerTitleStyle: {color: String(colors.gray.white)},
+                    cardStyle: {backgroundColor: String(ColorTheme().background)},
+                    cardOverlayEnabled: true,
+                    cardStyleInterpolator: CardStyleInterpolators.forHorizontalIOS,
+                    headerLeft: () => <MemoriesHeaderLeft/>,
                 }}
             />
             <MemoriesStack.Screen

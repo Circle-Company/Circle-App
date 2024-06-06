@@ -45,19 +45,7 @@ export default function BottomTabNavigator() {
             :
             <MomentOutline fill={String(ColorTheme().icon)} width={iconWidth} height={iconHeight}/>
         }}
-      />
-        <BottomTab.Screen
-          name="Explore"
-          component={ExploreScreenNavigator}
-          options={{
-            title: t('Explore'),
-            tabBarIcon: ({focused}: any) =>
-              focused?
-              <Explore fill={String(ColorTheme().iconFocused)} width={iconWidth} height={iconHeight}/>
-              :
-              <ExploreOutline fill={String(ColorTheme().icon)} width={iconWidth} height={iconHeight}/>
-          }}
-        />    
+      />  
         <BottomTab.Screen
           name="You"
           component={AccountScreenNavigator}
