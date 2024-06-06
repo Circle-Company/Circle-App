@@ -39,7 +39,9 @@ export default function follow_button ({
         backgroundColor: ColorTheme().primary,
         margin: sizes.margins["1sm"],
         alignItems: 'center',
-        justifyContent: 'center'
+        justifyContent: 'center',
+        borderWidth: sizes.borders["1md"],
+        borderColor: colors.blue.blue_03 + '50',
     }
     const container_pressed: any = {
         width: sizes.buttons.width/4,

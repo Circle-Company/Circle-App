@@ -59,24 +59,27 @@ export default function render_image ({
   }
 
   return (
-    <View>
-        <Animated.View style={[opacity_view, {opacity: fadeAnim }]}>
-          <Image
-            source={{ uri: midia.nhd_resolution?.toString() }}
-            style={image}
-            resizeMode="cover"
-            blurRadius={blurRadius}
-          />
-        </Animated.View>        
-          <FastImage
-            source={{
-              uri: String(midia.fullhd_resolution ? midia.fullhd_resolution : midia.nhd_resolution),
-              priority: FastImage.priority.high,
-            }}
-            style={image}
-            onLoadEnd={() => {removeBlur()}}
-            resizeMode="cover"
-          />
-    </View>
-  );
-};
+      <>
+          <Animated.View style={[opacity_view, {opacity: fadeAnim }]}>
+            <Image
+              source={{ uri: midia.nhd_resolution?.toString() }}
+              style={image}
+              resizeMode="cover"
+              blurRadius={blurRadius}
+            />
+          </Animated.View>     
+          {!blur &&
+            <FastImage
+              source={{
+                uri: String(midia.fullhd_resolution ? midia.fullhd_resolution : midia.nhd_resolution),
+                priority: FastImage.priority.high,
+              }}
+              style={image}
+              resizeMode="cover"
+              onLoadEnd={() => {removeBlur()}}
+            />
+          }   
+
+      </>
+    );
+  };

@@ -18,7 +18,7 @@ export default function Container({
 
 }: MomentContainerProps) {
     const { momentData, momentFunctions, momentSize, momentOptions } = React.useContext(MomentContext)
-    const { commentEnabled } = React.useContext(FeedContext)
+    const { commentEnabled, setFocusedMoment} = React.useContext(FeedContext)
 
     const navigation = useNavigation()
     
@@ -50,7 +50,9 @@ export default function Container({
     }
 
     async function handlePress() {
-        if(!commentEnabled && momentOptions.isFeed) navigation.navigate('MomentNavigator', { screen: 'DetailScreen' })
+        if(!commentEnabled && momentOptions.isFeed) {
+            navigation.navigate('MomentNavigator', { screen: 'DetailScreen' })
+        }
     }
 
     return (
@@ -65,7 +67,7 @@ export default function Container({
             {!commentEnabled? 
                             momentOptions.isFocused? children : null               
                     :
-                        <Animated.View style={tiny_container} entering={FadeIn.delay(300).duration(200)} exiting={FadeOut.duration(200)}>
+                        <Animated.View style={tiny_container} entering={FadeIn.delay(300).duration(200)} exiting={FadeOut.duration(100)}>
                             <UserShow.Root data={momentData.user}>
                                 <View style={{top: 1}}>
                                     <UserShow.ProfilePicture

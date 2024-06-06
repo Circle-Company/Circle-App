@@ -59,6 +59,8 @@ export default function like ({
         flexDirection: 'row',
         paddingHorizontal,
         backgroundColor: 'transparent',
+        borderWidth: sizes.borders["1md"],
+        borderColor: colors.transparent.white_30,
         overflow: 'hidden'
     }
     const like_text_pressed: any = {

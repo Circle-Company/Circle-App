@@ -10,6 +10,7 @@ import { UserShow } from "../../../user_show"
 import AuthContext from "../../../../contexts/auth"
 import React from "react"
 import TouchID from 'react-native-simple-biometrics'
+import PersistedContext from "../../../../contexts/Persisted"
 
 export default function item ({
     name,
@@ -22,7 +23,7 @@ export default function item ({
 
     const navigation = useNavigation()
     const isDarkMode = useColorScheme() === 'dark'
-    const {user} = React.useContext(AuthContext)
+    const { session } = React.useContext(PersistedContext)
 
     const icon_fill: string = isDarkMode? String(colors.gray.grey_06): String(colors.gray.grey_03)
 
@@ -81,7 +82,7 @@ export default function item ({
             <View style={container_right}>
                 {type == 'IMAGE' ?
                     <View style={[value_container, {marginRight: 6}]}>
-                        <UserShow.Root data={user}>
+                        <UserShow.Root data={session.user}>
                             <UserShow.ProfilePicture displayOnMoment={false} pictureDimensions={{width: 22, height: 22}} disableAnalytics={true}/>
                         </UserShow.Root>                    
                     </View>
