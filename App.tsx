@@ -12,12 +12,10 @@ import { TrackingProvider } from './src/contexts/tracking'
 import { NetworkProvider } from './src/contexts/network'
 import {GestureHandlerRootView} from 'react-native-gesture-handler'
 import {KeyboardProvider} from 'react-native-keyboard-controller'
+import { initialWindowMetrics, SafeAreaProvider } from 'react-native-safe-area-context'
 import { Provider as PreferencesProvider } from './src/contexts/Preferences'
-import {
-  initialWindowMetrics,
-  SafeAreaProvider,
-} from 'react-native-safe-area-context'
 import { Provider as PersistedProvider } from './src/contexts/Persisted'
+import { Provider as ToastProvider } from './src/contexts/Toast'
 import sizes from './src/layout/constants/sizes'
 
 function InnerApp() {
@@ -30,9 +28,7 @@ function InnerApp() {
               <SelectMomentsProvider>
                 <MemoryProvider>
                   <NewMomentProvider>
-                  <GestureHandlerRootView style={{width: sizes.window.width, height: sizes.window.height}}>
                     <Routes/>
-                  </GestureHandlerRootView>
                   </NewMomentProvider>                  
                 </MemoryProvider>
               </SelectMomentsProvider>                
@@ -48,17 +44,21 @@ function InnerApp() {
 const App = () => {
   return (
     <SafeAreaProvider initialMetrics={initialWindowMetrics}>
-      <NetworkProvider>
-        <AuthProvider>
-          <PersistedProvider>
-            <PreferencesProvider>
-              <TrackingProvider>
-                  <InnerApp/>
-              </TrackingProvider>                 
-            </PreferencesProvider>
-          </PersistedProvider>
-        </AuthProvider>        
-      </NetworkProvider>
+      <GestureHandlerRootView style={{width: sizes.window.width, height: sizes.window.height}}>
+        <ToastProvider>
+          <NetworkProvider>
+            <AuthProvider>
+              <PersistedProvider>
+                <PreferencesProvider>
+                  <TrackingProvider>
+                      <InnerApp/>
+                  </TrackingProvider>                 
+                </PreferencesProvider>
+              </PersistedProvider>
+            </AuthProvider>        
+          </NetworkProvider>        
+        </ToastProvider>
+      </GestureHandlerRootView>
     </SafeAreaProvider>
   )
 }
