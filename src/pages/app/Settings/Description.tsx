@@ -9,34 +9,33 @@ import api from '../../../services/api'
 import { useNavigation } from '@react-navigation/native'
 import Icon from '../../../assets/icons/svgs/check_circle.svg'
 import ButtonStandart from '../../../components/buttons/button-standart'
+import PersistedContext from '../../../contexts/Persisted';
 
 export default function DescriptionScreen() {
-    const {user} = React.useContext(AuthContext)
+    const { session } = React.useContext(PersistedContext)
     const isDarkMode = useColorScheme() === 'dark'
     const maxLength = 300
 
     const [keyboardIsVisible, setKeyboardIsVisible] = React.useState(false)
-    const [ description, setDescription ] = React.useState(user.description? user.description : '')
+    const [ description, setDescription ] = React.useState(session.user.description? session.user.description : '')
     const height = keyboardIsVisible? sizes.headers.height : sizes.headers.height
-    const input_width = sizes.screens.width - sizes.paddings["1lg"] * 2
+    const input_width = sizes.screens.width
     const navigation = useNavigation()
 
     const container  = {
       alignItems:'center',
-      paddingTop: sizes.paddings['1md'],
       flex: 1
     }
 
     const input_container = {
         width: input_width,
-        backgroundColor: ColorTheme().backgroundDisabled,
-        borderRadius: sizes.headers.height/2,
-        marginTop: sizes.margins["2sm"],
+        borderBottomWidth: sizes.borders['1md'],
+        borderColor: ColorTheme().backgroundDisabled,
         paddingVertical: sizes.paddings["1sm"],
         paddingHorizontal: sizes.paddings["1md"]* 0.7,
         alignItems: 'flex-start',
         alignSelf: 'center',
-        justifyContent: 'flex-start'
+        justifyContent: 'flex-start',
     }
 
     const input_style : any = {
@@ -45,19 +44,28 @@ export default function DescriptionScreen() {
         fontFamily: fonts.family.Semibold,
         width: input_width - (sizes.paddings["1md"]* 0.7) * 2,
     }
+    const bottom_style: any = {
+        width: sizes.screens.width,
+        height: sizes.headers.height * 0.8,
+        alignItems: 'center',
+        justifyContent: 'center',
+        flexDirection: 'row',
+        borderBottomWidth: sizes.borders['1md'],
+        borderColor: ColorTheme().backgroundDisabled,
+        paddingHorizontal: sizes.paddings["1md"]* 0.7,
+    }
 
     const counter: any = {
         fontSize: fonts.size.caption1,
-        alignSelf: 'flex-end',
         color: maxLength == description.length? ColorTheme().error : ColorTheme().textDisabled,
     }
 
     const legend_style: any = {
-        marginTop: sizes.margins["1lg"],
         alignSelf: 'center',
         fontSize: fonts.size.caption2,
         fontFamily: fonts.family.Medium,
-        color: ColorTheme().textDisabled
+        color: ColorTheme().textDisabled,
+        flex: 1
     }
 
     const button_text: any = {
@@ -86,11 +94,13 @@ export default function DescriptionScreen() {
         if(description) {
             try{
                 await api.put('/account/edit/description', {
-                    user_id: user.id,
+                    user_id: session.user.id,
                     description
-                })      
-                setDescription('')
-                navigation.goBack()
+                }).finally(() => {
+                    session.user.getUser(session.user.id)
+                    setDescription('')
+                    navigation.goBack()
+                })
             }catch(err: any){
                 console.log(err.message)
             }
@@ -109,18 +119,20 @@ export default function DescriptionScreen() {
                         returnKeyType='done'
                         keyboardType='twitter'
                         onChangeText={handleInputChange}
-                        numberOfLines={5}
                         maxLength={300}
+                        numberOfLines={5}
                         style={input_style}
                         placeholder="say something about you..."
                         placeholderTextColor={String(ColorTheme().textDisabled)}
                     />
+                </View>
+                <View style={bottom_style}>
+                    <Text style={legend_style}>*The description will be visible for all users to see</Text>
                     <Text style={counter}>{description.length}/{maxLength}</Text>
                 </View>
-                <Text style={legend_style}>*The description will be visible for all users to see</Text>
             </View>
 
-            <ButtonStandart
+                <ButtonStandart
                     margins={false}
                     width={sizes.buttons.width/3.5}
                     height={40} 
