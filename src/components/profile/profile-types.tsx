@@ -13,7 +13,7 @@ export type ProfileReciveDataProps = {
 	description: string | null,
 	last_active_at: string,
 	profile_picture: {
-		fullhd_resolution: string,
+		small_resolution: string,
 		tiny_resolution: string
 	},
 	statistics: {
@@ -38,6 +38,7 @@ export type ProfileNameProps = {
     scale?: number
 }
 export type ProfilePictureProps = {
+	fromProfile?: boolean
 }
 export type ProfileDescriptionProps = {
 }

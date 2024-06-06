@@ -15,12 +15,14 @@ export default function description ({
     const isDarkMode = useColorScheme() === 'dark'
 
     const container:any = {
-        marginVertical: sizes.margins["1sm"],
-        marginHorizontal: sizes.margins["3sm"],
-        borderRadius: sizes.borderRadius["1md"],
+        width: sizes.screens.width,
+        marginTop: sizes.margins["1sm"],
         paddingHorizontal: sizes.paddings["1md"],
         paddingVertical: sizes.paddings["2sm"],
         minHeight: sizes.sizes["1lg"],
+        borderTopWidth: sizes.borders['1md'],
+        borderBottomWidth: sizes.borders['1md'],
+        borderColor: ColorTheme().backgroundDisabled,
         backgroundColor: isDarkMode? colors.gray.grey_09: colors.gray.grey_01,
     }
     const description_style:any = {
