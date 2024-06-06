@@ -9,6 +9,7 @@ export default function root ({children, data, content_sizes}: MidiaRenderMainRo
     const container: any = {
         width: content_sizes.width,
         height: content_sizes.height,
+        zIndex: 0,
     }
     const superior_gradient: any = {
         width: content_sizes.width,

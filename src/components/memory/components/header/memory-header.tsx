@@ -11,8 +11,6 @@ export default function header ({children}: MemoryHeaderProps) {
         width: sizes.screens.width,
         paddingHorizontal: sizes.margins['3sm'],
         paddingVertical: sizes.paddings["1sm"]*0.8,
-        borderTopWidth: 1,
-        borderColor: ColorTheme().backgroundDisabled
     }
     
     return <View style={container}>{children}</View>
