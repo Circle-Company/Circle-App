@@ -3,24 +3,20 @@ import { StatusBar, useColorScheme, Keyboard, Animated} from 'react-native'
 import { View } from '../../../components/Themed'
 import ColorTheme, { colors } from '../../../layout/constants/colors'
 import ListMoments from '../../../features/list-moments'
-import AuthContext from '../../../contexts/auth'
 import FeedContext from '../../../contexts/Feed'
 import { Comments } from '../../../components/comment'
 import sizes from '../../../layout/constants/sizes'
 import { useKeyboardAnimation } from 'react-native-keyboard-controller'
+import api from '../../../services/api'
+import PersistedContext from '../../../contexts/Persisted'
 
 export default function HomeScreen() {
   const isDarkMode = useColorScheme() === 'dark';
-  const { getDeviceInfo, deviceInfo } = React.useContext(AuthContext);
-  const { commentEnabled, setCommentEnabled, showKeyboard} = React.useContext(FeedContext);
+  const { commentEnabled, setCommentEnabled, showKeyboard, focusedItemId} = React.useContext(FeedContext);
   const { height } = useKeyboardAnimation()
 
   const bottomContainerRef = useRef(null);
   useEffect(() => {
-    async function fetchData() {
-      await getDeviceInfo()
-      console.log(deviceInfo)
-    }; fetchData()
     const keyboardDidHideListener = Keyboard.addListener('keyboardDidHide', () => { setCommentEnabled(false) })
     return () => { keyboardDidHideListener.remove() }      
   }, [])
@@ -39,22 +35,22 @@ export default function HomeScreen() {
     borderColor: isDarkMode ? colors.transparent.white_10 : colors.transparent.black_10,
     backgroundColor: ColorTheme().background,
     transform: [{ translateY: height }],
-  };
+  }
 
   return (
     <View style={container}>
-      <StatusBar backgroundColor={String(ColorTheme().background)} barStyle={isDarkMode ? 'light-content' : 'dark-content'} />
-      <ListMoments />
-      {commentEnabled && (
-        <Animated.View ref={bottomContainerRef} style={bottomContainer}>
-              <Comments.Input
-                preview={false}
-                color={isDarkMode ? colors.gray.white.toString() : colors.gray.black.toString()}
-                backgroundColor={String(isDarkMode ? colors.gray.grey_09 : colors.gray.grey_01)}
-                autoFocus={showKeyboard? true: false}
-              />
-        </Animated.View>
-      )}
+        <StatusBar backgroundColor={String(ColorTheme().background)} barStyle={isDarkMode ? 'light-content' : 'dark-content'} />
+        <ListMoments />
+        {commentEnabled && (
+            <Animated.View ref={bottomContainerRef} style={bottomContainer}>
+                <Comments.Input
+                    preview={false}
+                    color={isDarkMode ? colors.gray.white.toString() : colors.gray.black.toString()}
+                    backgroundColor={String(isDarkMode ? colors.gray.grey_09 : colors.gray.grey_01)}
+                    autoFocus={showKeyboard? true: false}
+                />
+            </Animated.View>
+        )}
     </View>
   );
 }

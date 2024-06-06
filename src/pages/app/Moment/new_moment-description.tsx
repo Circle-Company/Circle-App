@@ -12,7 +12,6 @@ import RenderTagsList from '../../../features/new_moment/render-tags_list';
 
 export default function NewMomentDescriptionScreen() {
     const isDarkMode = useColorScheme() === 'dark'
-
     const { selectedImage, getAllMemories} = React.useContext(NewMomentContext)
     const [keyboardIsVisible, setKeyboardIsVisible] = React.useState(false);
     const [animation] = React.useState(new Animated.Value(0))

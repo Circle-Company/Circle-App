@@ -10,7 +10,7 @@ import RenderSelectButton from '../../../features/new_moment/render-select_butto
 export default function NewMomentImageScreen() {
   const isDarkMode = useColorScheme() === 'dark'
 
-  const { selectedImage} = React.useContext(NewMomentContext)
+  const { selectedImage, handleLaunchImageLibrary} = React.useContext(NewMomentContext)
 
   const [ image, setImage ] = React.useState(selectedImage)
 
@@ -45,21 +45,21 @@ export default function NewMomentImageScreen() {
         borderColor: isDarkMode? colors.gray.grey_09: colors.gray.grey_02
     }
 
+    React.useEffect(() => {
+        handleLaunchImageLibrary()
+    }, [])
+
 
 return (
     <View style={container}>
     <StatusBar translucent={false} backgroundColor={String(ColorTheme().background)} barStyle={isDarkMode? 'light-content': 'dark-content'}/>
     <View style={midia_container}>
-        {image?
+        {image &&
             <View style={image_container}>
                 <MidiaRender.Root data={{"fullhd_resolution": image}} content_sizes={{...sizes.moment.standart, borderRadius: sizes.moment.standart.borderRadius*0.6}}>
                     <MidiaRender.RenderImage />
                 </MidiaRender.Root>            
             </View>
-
-            : <View style={image_cover}>
-                <RenderSelectButton/>
-            </View>     
         }
     </View>
     { image? <RenderSelectButton/>: null }         
