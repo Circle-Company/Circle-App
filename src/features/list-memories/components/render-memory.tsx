@@ -14,6 +14,7 @@ import { colors } from '../../../layout/constants/colors'
 
 type RenderMemoryProps = {
     memory: MemoryObjectProps,
+    user_id: number
     pressable?: boolean
     scale?: number,
     marginRight?: number,
@@ -25,6 +26,7 @@ type RenderMemoryProps = {
 
 export default function render_memory ({
     memory,
+    user_id,
     pressable = true,
     scale = 1,
     marginRight = 36,
@@ -75,7 +77,7 @@ export default function render_memory ({
 
     async function handlePressed(memoryData: any) {
         if(pressable) {
-            await setMemory(memoryData)
+            await setMemory({user_id, ...memoryData})
             navigation.navigate('MemoriesNavigator',{ screen: 'Memory'})
         }
     }
@@ -85,8 +87,9 @@ export default function render_memory ({
             <Memory.MainRoot data={memory}>
                 {memory.moments.map((moment, index) => {
                     const container: any = index == 0 && c0 || index == 1 && c1 || index == 2 && c2
+                    console.log(moment)
                     return (
-                        <Moment.Root.Main key={moment.id} data={moment} sizes={sizes.moment.tiny}>
+                        <Moment.Root.Main key={moment.id} momentData={moment} sizes={sizes.moment.tiny}>
                             <Pressable style={container} onPress={() => {handlePressed(memory)}}>
                                 {icon &&
                                     <View style={icon_container}>

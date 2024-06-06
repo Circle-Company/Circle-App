@@ -14,7 +14,7 @@ type AnyMemoryCardProps = {
 }
 
 export default function AnyMemoryCard({isAccountScreen = false}: AnyMemoryCardProps) {
-    const { user } = React.useContext(ViewProfileContext)
+    const { userProfile } = React.useContext(ViewProfileContext)
     const {setFrom} = React.useContext(SelectMomentsContext)
     const navigation = useNavigation()
 
@@ -41,13 +41,13 @@ export default function AnyMemoryCard({isAccountScreen = false}: AnyMemoryCardPr
         marginRight: sizes.margins['2sm']
     }
 
-    const username = user? `@${user.username}` : 'This user'
+    const username = userProfile? `@${userProfile.username}` : 'This user'
 
     const titleText = isAccountScreen? "You don't have any memory": `${username} don't have any memory`
 
     return(
         <View style={container}>
-            <View style={{top: -sizes.sizes["1md"], alignItems: 'center'}}>
+            <View style={{top: sizes.sizes["1md"], alignItems: 'center'}}>
                 <Text style={title}>{titleText}</Text>
                 {isAccountScreen &&
                     <HeaderButton

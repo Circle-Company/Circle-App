@@ -9,9 +9,10 @@ import sizes from '../../../layout/constants/sizes';
 import EndReached from './components/end-reached';
 import NetworkContext from '../../../contexts/network';
 import OfflineCard from '../../../components/general/offline';
+import PersistedContext from '../../../contexts/Persisted';
 
 export default function ListMemoriesAllSeparatedbyDate() {
-    
+    const { session } = React.useContext(PersistedContext)
     const [allMemories, setAllMemories] = React.useState<Object[]>([]);
     const [page, setPage] = React.useState(1);
     const [pageSize, setPageSize] = React.useState(30);
@@ -22,7 +23,7 @@ export default function ListMemoriesAllSeparatedbyDate() {
     const {networkStats} = React.useContext(NetworkContext)
 
     const fetchData = async () => {
-        await api.post(`/memory/get-user-memories?page=${page}&pageSize=${pageSize}`, { user_id: 1 })
+        await api.post(`/memory/get-user-memories?page=${page}&pageSize=${pageSize}`, { user_id: session.user.id })
             .then(function (response) {
                 if (page === 1) {
                     setAllMemories(response.data.memories);
