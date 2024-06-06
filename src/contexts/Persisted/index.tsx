@@ -20,7 +20,10 @@ export function Provider({ children }: PersistedProviderProps) {
     const sessionStatistics = useStatisticsStore()
 
     React.useEffect(() => {
-
+        if(sessionData.user) sessionUser.setUser(sessionData.user)
+        if(sessionData.account) sessionAccount.setAccount(sessionData.account)
+        if(sessionData.preferences) sessionPreferences.setPreferences(sessionData.preferences)
+        if(sessionData.statistics) sessionStatistics.setStatistics(sessionData.statistics)
     }, [sessionData])
 
     const contextValue: any = {
