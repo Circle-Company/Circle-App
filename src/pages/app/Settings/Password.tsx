@@ -10,9 +10,11 @@ import ButtonStandart from '../../../components/buttons/button-standart'
 import Icon from '../../../assets/icons/svgs/check_circle.svg'
 import api from '../../../services/api'
 import { useNavigation } from '@react-navigation/native'
+import PersistedContext from '../../../contexts/Persisted';
 
 export default function PasswordScreen({}) {
-    const { passwordInput, user, setPasswordInput} = React.useContext(AuthContext)
+    const { signInputPassword, setSignInputPassword} = React.useContext(AuthContext)
+    const { session } = React.useContext(PersistedContext) 
     const isDarkMode = useColorScheme() === 'dark'
     const navigation = useNavigation()
 
@@ -37,7 +39,7 @@ export default function PasswordScreen({}) {
     const button_text: any = {
         fontSize: fonts.size.body * 0.9,
         fontFamily: fonts.family.Semibold,
-        color: passwordInput? colors.gray.white: isDarkMode? colors.gray.grey_04 + '90' : colors.gray.grey_04 + '90',
+        color: signInputPassword? colors.gray.white: isDarkMode? colors.gray.grey_04 + '90' : colors.gray.grey_04 + '90',
     }
 
     const icon: any = {
@@ -46,13 +48,13 @@ export default function PasswordScreen({}) {
     }
 
     async function handlePress() {
-        if(passwordInput) {
+        if(signInputPassword) {
             try{
                 await api.put('/auth/change-password', {
-                    user_id: user.id,
-                    password_input: passwordInput
+                    user_id: session.user.id,
+                    password_input: signInputPassword
                 })      
-                setPasswordInput('')
+                setSignInputPassword('')
                 navigation.goBack()
             }catch(err: any){
                 console.log(err.message)
@@ -73,12 +75,12 @@ export default function PasswordScreen({}) {
                 width={sizes.buttons.width/3.5}
                 height={40} 
                 action={handlePress}
-                backgroundColor={ passwordInput? ColorTheme().primary.toString() : ColorTheme().backgroundDisabled.toString()}
+                backgroundColor={ signInputPassword? ColorTheme().primary.toString() : ColorTheme().backgroundDisabled.toString()}
             >
                 <Text style={button_text}>Done</Text>
                 <Icon
                     style={icon}
-                    fill={String(passwordInput? colors.gray.white: isDarkMode? colors.gray.grey_04 + '90' : colors.gray.grey_04 + '90')}
+                    fill={String(signInputPassword? colors.gray.white: isDarkMode? colors.gray.grey_04 + '90' : colors.gray.grey_04 + '90')}
                     width={17}
                     height={17}
                     />

@@ -5,7 +5,7 @@ import ColorTheme from '../../../layout/constants/colors'
 import AuthContext from '../../../contexts/auth';
 
 export default function LogOutScreen() {
-    const {useSignOut}= React.useContext(AuthContext)
+    const {signOut}= React.useContext(AuthContext)
     const isDarkMode = useColorScheme() === 'dark'
 
     const container  = {
@@ -13,7 +13,7 @@ export default function LogOutScreen() {
       flex: 1
     }
 
-    function handlePress(){useSignOut()}
+    function handlePress(){signOut()}
 
     return (
         <View style={container}>
