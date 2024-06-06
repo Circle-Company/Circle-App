@@ -51,16 +51,13 @@ export default function ProfileScreen() {
         />
       }
     >
-    <View style={{marginBottom: sizes.margins['1md']}}>
       {loading?
         <Loading.Container width={sizes.screens.width} height={sizes.screens.height/3}>
             <Loading.ActivityIndicator/>
         </Loading.Container>
         :
         <RenderProfile user={userProfile}/>
-      }
-      
-    </View>      
+      } 
     </ScrollView>
       <ListMemories isAccountScreen={false} user={userProfile}/>        
     </View>  

@@ -1,5 +1,5 @@
 import React from 'react'
-import { StatusBar,  useColorScheme} from 'react-native'
+import { StatusBar,  useColorScheme, Keyboard, Animated } from 'react-native'
 import { Text, View } from '../../../components/Themed'
 import ColorTheme, { colors } from '../../../layout/constants/colors'
 import sizes from '../../../layout/constants/sizes'
@@ -7,10 +7,14 @@ import MomentContext from '../../../components/moment/context'
 import RenderMomentFull from '../../../features/list-moments/components/render-moment-full'
 import { Comments } from '../../../components/comment'
 import { Moment } from '../../../components/moment'
+import FeedContext from '../../../contexts/Feed'
+import { useKeyboardAnimation } from 'react-native-keyboard-controller'
 
 export default function MomentFullScreen() {
   const isDarkMode = useColorScheme() === 'dark'
-  const { momentData } = React.useContext(MomentContext)
+  const { focusedMoment } = React.useContext(FeedContext)
+  const { height } = useKeyboardAnimation()
+  const bottomContainerRef = React.useRef(null);
 
     const container  = {
         alignItems:'center',
@@ -19,28 +23,29 @@ export default function MomentFullScreen() {
         borderTopLeftRadius: 15,
         borderTopRightRadius: 15
     }
-
-    const bottom_container = {
-        paddingVertical: sizes.paddings['1sm'] *0.4,
+    const bottomContainer = {
+        bottom: 0,
+        paddingVertical: sizes.paddings['1sm'] * 0.4,
         paddingHorizontal: sizes.paddings['2sm'] * 0.8,
         width: sizes.screens.width,
         borderTopWidth: sizes.borders['1md'] * 0.7,
-        borderColor: isDarkMode? colors.transparent.white_10 : colors.transparent.black_10,
-    }
+        borderColor: isDarkMode ? colors.transparent.white_10 : colors.transparent.black_10,
+        backgroundColor: ColorTheme().background,
+        transform: [{ translateY: height }],
+      };
 
     return (
         <View style={container}>
             <StatusBar translucent={false} backgroundColor={String(colors.gray.black)} barStyle={'light-content'}/>
-            <RenderMomentFull moment={momentData} focused={true} viewed={true}/>
-            <View style={bottom_container}>
-                <Moment.Root.Main data={momentData} sizes={sizes.moment.standart}>
-                    <Comments.Input
-                    preview={false}
-                    color={ColorTheme().text.toString()}
-                    backgroundColor={String( isDarkMode? colors.gray.grey_09 : colors.gray.grey_01)}
-                    />             
-                </Moment.Root.Main>                
-            </View>
+            <RenderMomentFull momentData={focusedMoment} isFocused={true} fromFeed={true} fromAccount={false}/>
+                    <Animated.View ref={bottomContainerRef} style={bottomContainer}>
+                        <Comments.Input
+                            preview={false}
+                            color={isDarkMode ? colors.gray.white.toString() : colors.gray.black.toString()}
+                            backgroundColor={String(isDarkMode ? colors.gray.grey_09 : colors.gray.grey_01)}
+                            autoFocus={false}
+                        />
+                    </Animated.View>                      
         </View>
     )
 }
