@@ -2,7 +2,7 @@ export const languagesList =
 [
     {
         "code": "en",
-        "nativeName": "English"
+        "nativeName": "English (US)"
     },
     {
         "code": "pt",
