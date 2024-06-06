@@ -50,7 +50,6 @@ export default function button_standart({
 
     async function onPress() {
         HandleButtonAnimation()
-        console.log('HeaderButton Pressed')
         action()
     }
     return(
