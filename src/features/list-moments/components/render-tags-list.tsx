@@ -6,15 +6,7 @@ import MomentContext from "../../../components/moment/context"
 import Tag from "../../../components/moment/components/moment-tag"
 
 export default function RenderTagsList() {
-    const { momentData, momentFunctions} = React.useContext(MomentContext)
-
-    React.useEffect(() => {
-        async function fetch() {
-            await momentData.findTags()
-        }; fetch()
-
-    }, [])
-
+    const { momentData } = React.useContext(MomentContext)
     const container: any = {
         left: -sizes.paddings['1md'],
         flexDirection: 'row',
@@ -23,6 +15,12 @@ export default function RenderTagsList() {
     }
 
     if(!momentData.tags) return null
+
+    React.useEffect(() => {
+        async function fetch() {
+            await momentData.getTags()
+        }; fetch()
+    }, [])
 
     return (
         <View style={container}>

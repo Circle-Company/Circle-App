@@ -1,18 +1,22 @@
 import React, { useRef, useState, useEffect, useCallback } from 'react'
-import { Animated } from 'react-native'
+import { Animated, RefreshControl, useColorScheme } from 'react-native'
 import FastImage from 'react-native-fast-image'
 import sizes from '../../layout/constants/sizes'
 import { FlatList } from 'react-native-gesture-handler'
 import { Loading } from '../../components/loading'
 import RenderMoment from './components/render-moment'
 import FeedContext from '../../contexts/Feed'
-import {MomentProvider} from '../../components/moment/context'
+import { colors } from '../../layout/constants/colors'
 
 const ListMoments = () => {
     const margin = 2
 
-    const {enableScrollFeed, feedData} = React.useContext(FeedContext)
+    const {enableScrollFeed, feedData, getFeed} = React.useContext(FeedContext)
     const [centerIndex, setCenterIndex] = useState<number | null>(0);
+    const [loading, setLoading] = React.useState(false)
+    const [refreshing, setRefreshing] = React.useState(false)
+    const [endReached, setEndReached] = React.useState(false)
+    const isDarkMode = useColorScheme() === 'dark'
     const flatListRef = useRef<FlatList | null>(null);
 
     const handleScroll = useCallback(
@@ -48,11 +52,27 @@ const ListMoments = () => {
         }
     };
 
+    const handleRefresh = async () => {
+        if (flatListRef.current) flatListRef.current.scrollToOffset({ animated: false, offset: 0 })
+        await getFeed()
+        .finally(() => {
+            setTimeout(() => {
+            setRefreshing(false)         
+            }, 200)
+        })
+    };
+
     useEffect(() => {
         if (centerIndex !== null) {
             prefetchNextImage(centerIndex + 1);
         }
     }, [centerIndex]);
+
+    if (loading) return (
+        <Loading.Container width={sizes.screens.width} height={sizes.screens.height - sizes.headers.height}>
+            <Loading.ActivityIndicator/>
+        </Loading.Container>
+    )
 
     return (
         <FlatList
@@ -69,7 +89,17 @@ const ListMoments = () => {
             keyExtractor={(moment: any) => moment.id.toString()}
             disableIntervalMomentum={true}
             onScroll={handleScroll}
-            directionalLockEnabled={true}            
+            directionalLockEnabled={true}      
+            onEndReached={async() => {await getFeed()}}
+            onEndReachedThreshold={0.1}
+            refreshControl={
+                <RefreshControl
+                    progressBackgroundColor={String(isDarkMode? colors.gray.grey_08 : colors.gray.grey_02)}
+                    colors={[String(isDarkMode? colors.gray.grey_04: colors.gray.grey_04), '#00000000']}
+                    refreshing={refreshing}
+                    onRefresh={async() => await handleRefresh()}
+                />
+            }      
             ref={(ref) => { flatListRef.current = ref }}
             renderItem={({ item, index }) => {
                 const focusedItem = index === centerIndex
@@ -80,11 +110,14 @@ const ListMoments = () => {
                     </Animated.View>
                 )
             }}
-            ListFooterComponent={() => (
-                <Loading.Container height={sizes.moment.standart.height} width={sizes.moment.standart.width / 3.5}>
-                    <Loading.ActivityIndicator size={40} />
-                </Loading.Container>
-            )}
+            ListFooterComponent={(item, index) => {
+                if(index == feedData.length - 1) return (
+                    <Loading.Container height={sizes.moment.standart.height} width={sizes.moment.standart.width / 3.5}>
+                        <Loading.ActivityIndicator size={40} />
+                    </Loading.Container>                    
+                )
+
+            }}
         />
     );
 };

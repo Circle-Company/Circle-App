@@ -7,6 +7,7 @@ import FeedContext from '../../../contexts/Feed'
 import { View, Animated, useColorScheme } from 'react-native'
 import { MomentDataProps } from '../../../components/moment/context/types'
 import { useKeyboardAnimation } from 'react-native-keyboard-controller'
+import Reanimated from 'react-native-reanimated'
 type renderMomentProps = {
     momentData: MomentDataProps,
     isFocused: boolean,
@@ -19,11 +20,13 @@ export default function render_moment ({
     isFeed
 }: renderMomentProps) {
     const { height, progress } = useKeyboardAnimation()
-    const { commentEnabled } = React.useContext(FeedContext)
+    const { commentEnabled, setFocusedMoment} = React.useContext(FeedContext)
     const [animatedValue] = React.useState(new Animated.Value(0))
     const [commentValue] = React.useState(new Animated.Value(0))
     const [opacityValue] = React.useState(new Animated.Value(1))
     const isDarkMode = useColorScheme() === 'dark'
+
+    React.useEffect(() => { if(isFocused) setFocusedMoment(momentData)}, [isFocused])
 
     React.useEffect(() => {
         if(isFocused){
@@ -139,7 +142,7 @@ export default function render_moment ({
 
     const scale2 = animatedValue.interpolate({
         inputRange: [0, 1],
-        outputRange: [1, 0.005], // Adjust the value as needed
+        outputRange: [1, 0.5], // Adjust the value as needed
     })
 
     const translateCommentsY = height.interpolate({
@@ -164,27 +167,28 @@ export default function render_moment ({
     return (
         <Moment.Root.Main momentData={momentData} isFeed={isFeed} isFocused={isFocused} momentSize={sizes.moment.standart}>
             <Animated.View style={animated_container}>
-                <Moment.Container contentRender={momentData.midia} isFocused={isFocused} blurRadius={30}>
+                    <Moment.Container contentRender={momentData.midia} isFocused={isFocused} blurRadius={30}>
 
-                    <Moment.Root.Top>
-                        <Moment.Root.TopLeft>
-                            <UserShow.Root data={momentData.user}>
-                                <UserShow.ProfilePicture pictureDimensions={{ width: 30, height: 30 }} />
-                                    <UserShow.Username truncatedSize={8} />
-                                <UserShow.FollowButton isFollowing={false} displayOnMoment={true} />
-                            </UserShow.Root>
-                        </Moment.Root.TopLeft>
-                        <Moment.Root.TopRight>
-                            <Moment.LikeButton isLiked={false}/>
-                        </Moment.Root.TopRight>
-                    </Moment.Root.Top>
+                        <Moment.Root.Top>
+                            <Moment.Root.TopLeft>
+                                <UserShow.Root data={momentData.user}>
+                                    <UserShow.ProfilePicture pictureDimensions={{ width: 30, height: 30 }} />
+                                        <UserShow.Username truncatedSize={8} />
+                                    <UserShow.FollowButton isFollowing={false} displayOnMoment={true} />
+                                </UserShow.Root>
+                            </Moment.Root.TopLeft>
+                            <Moment.Root.TopRight>
+                                <Moment.LikeButton isLiked={false}/>
+                            </Moment.Root.TopRight>
+                        </Moment.Root.Top>
 
-                    <Moment.Root.Center>
-                        <View style={{ marginBottom: sizes.margins['2sm'] }}>
-                            <Moment.Description />
-                        </View>
-                    </Moment.Root.Center>
-                </Moment.Container>                                      
+                        <Moment.Root.Center>
+                            <View style={{ marginBottom: sizes.margins['2sm'] }}>
+                                <Moment.Description />
+                            </View>
+                        </Moment.Root.Center>
+                    </Moment.Container>                     
+                                     
             </Animated.View>
 
             <Animated.View style={animated_comment_container}>
