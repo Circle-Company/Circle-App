@@ -11,11 +11,12 @@ import api from "../../services/api";
 import { Loading } from "../../components/loading";
 import OfflineCard from "../../components/general/offline";
 import AuthContext from "../../contexts/auth";
+import PersistedContext from "../../contexts/Persisted";
 
 export default function ListAllMoments() {
 
     const isDarkMode = useColorScheme() === 'dark'
-    const { user } = React.useContext(AuthContext)
+    const { session } = React.useContext(PersistedContext)
     const [ allMoments, setAllMoments ] = React.useState([])
     const [loading, setLoading] = React.useState(false)
     const [page, setPage] = React.useState(1)
@@ -28,7 +29,7 @@ export default function ListAllMoments() {
     const fetchData = async () => {
         async function getMoments() {           
             try{
-                await api.post(`/moment/get-user-moments/tiny?page=${page}&pageSize=${pageSize}`, { user_id: user.id })
+                await api.post(`/moment/get-user-moments/tiny?page=${page}&pageSize=${pageSize}`, { user_id: session.user.id })
                     .then(function (response) {
                         if (page === 1) {
                             setAllMoments(response.data.moments);

@@ -5,12 +5,13 @@ import SettingsSections from '../../data/settings_sections.json'
 import { View } from "../../components/Themed"
 import AuthContext from "../../contexts/auth"
 import { truncated } from "../../algorithms/processText"
+import PersistedContext from "../../contexts/Persisted"
 
 export default function ListSettings(){
-    const {user} = React.useContext(AuthContext)
+    const { session } = React.useContext(PersistedContext)
 
-    const name_text = user.name? truncated({text: user.name, size: 18}) : 'add new name'
-    const description_text = user.description? truncated({text: user.description, size: 18}) : 'add new description'
+    const name_text = session.user.name? truncated({text: session.user.name, size: 18}) : 'add new name'
+    const description_text = session.user.description? truncated({text: session.user.description, size: 18}) : 'add new description'
 
 
     const ListData = [
@@ -21,7 +22,7 @@ export default function ListSettings(){
                     "name": "Profile Picture",
                     "value": null,
                     "type": "IMAGE",
-                    "navigateTo": "Settings-Privacy-Policy",
+                    "navigateTo": "Settings-ProfilePicture",
                     "secure": false
                 },
                 {
@@ -62,13 +63,14 @@ export default function ListSettings(){
         {
             name: "app",
             content:[
+                /** 
                 {
                     "name": "Language",
                     "value": null,
                     "type": "TEXT",
                     "navigateTo": "Settings-Preferences-Language",
                     "secure": false
-                },
+                },*/
                 {
                     "name": "Open Source",
                     "value": null,
@@ -100,7 +102,7 @@ export default function ListSettings(){
                     "value": null,
                     "type": "TEXT",
                     "navigateTo": "Settings-Terms-Of-Service",
-                    "secure": true
+                    "secure": false
                 },
             ]
         },
@@ -111,7 +113,7 @@ export default function ListSettings(){
                     "name": "Log Out",
                     "value": null,
                     "type": "TEXT",
-                    "navigateTo": "Settings-Sign-Out",
+                    "navigateTo": "Settings-Log-Out",
                     "secure": false
                 }
             ]
