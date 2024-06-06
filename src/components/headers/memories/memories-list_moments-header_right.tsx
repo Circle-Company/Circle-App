@@ -20,8 +20,6 @@ export default function MemoriesListMomentsHeaderRight({user_id}: {user_id: numb
         marginRight: sizes.margins['3sm']
     }
 
-    console.log('editMemory: ', user_id, session.user.id)
-
     if(user_id == session.user.id) return(
         <View style={container}>
             <ViewMorebutton
