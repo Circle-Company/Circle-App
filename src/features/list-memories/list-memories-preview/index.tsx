@@ -15,6 +15,7 @@ import OfflineCard from '../../../components/general/offline';
 import { colors } from '../../../layout/constants/colors';
 import { userReciveDataProps } from '../../../components/user_show/user_show-types';
 import Animated, { FadeInLeft } from 'react-native-reanimated';
+import MemoryContext from '../../../contexts/memory';
 
 type RenderMemoriesPreviewProps = {
     enableScroll?: boolean
@@ -98,10 +99,6 @@ export default function ListMemoriesPreview({isAccountScreen = false, user}: Ren
             <Memory.Header>
                 <Memory.HeaderLeft>
                     <RenderMemoriesCount count={memories.length} />
-                    <View style={{marginLeft: sizes.margins['2sm']}}>
-                        <ViewMorebutton action={handleRefresh} text="Reload" icon={null}/>
-                    </View>
-                    
                 </Memory.HeaderLeft>
                 <Memory.HeaderRight>
                     <ViewMorebutton action={() => navigation.navigate('MemoriesNavigator', { screen: 'Memories' })} text="View All" />
@@ -141,7 +138,7 @@ export default function ListMemoriesPreview({isAccountScreen = false, user}: Ren
                 renderItem={({ item, index }) => {
                     return(
                     <Animated.View entering={FadeInLeft.duration(200)}>
-                        <RenderMemory memory={item} />
+                        <RenderMemory user_id={user.id} memory={item} />
                     </Animated.View>
                     
                     )

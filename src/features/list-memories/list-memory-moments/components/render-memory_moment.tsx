@@ -4,15 +4,19 @@ import { Moment } from '../../../../components/moment'
 import sizes from '../../../../layout/constants/sizes'
 import { colors } from '../../../../layout/constants/colors'
 import { MomentDataProps } from '../../../../components/moment/context/types'
+import FeedContext from '../../../../contexts/Feed'
 
 type RenderMemoryMomenProps = {
     moment: MomentDataProps,
     focused?: boolean
 }
 export function RenderMemoryMoment ({ moment, focused = true }: RenderMemoryMomenProps) {
+    const { setFocusedMoment } = React.useContext(FeedContext)
     const [animatedValue] = React.useState(new Animated.Value(0))
     const [opacityValue] = React.useState(new Animated.Value(1))
     const [footerOpacityValue] = React.useState(new Animated.Value(1))
+
+    React.useEffect(() => { if(focused) setFocusedMoment(moment)}, [focused])
 
     React.useEffect(() => {
         if(focused){
@@ -95,7 +99,7 @@ export function RenderMemoryMoment ({ moment, focused = true }: RenderMemoryMome
     }
     const footer_left_container: any = {
         alignItems: 'center',
-        justifyContent: 'flex-start',
+        justifyContent: 'center',
         flexDirection: 'row',
         flex: 1
     }
@@ -120,12 +124,20 @@ export function RenderMemoryMoment ({ moment, focused = true }: RenderMemoryMome
                     <View style={footer_left_container}>
                         <Moment.LikeButton isLiked={false} backgroundColor={String(colors.gray.grey_07)}/>
                     </View>
+                    {/**
+                     * 
                     <View style={footer_right_container}>
                         <View style={{marginRight: sizes.margins['2sm']}}>
                             <Moment.ShareButton color={String(colors.gray.white)} backgroundColor={String(colors.gray.grey_07)}/>
                         </View>
                         <Moment.MoreButton color={String(colors.gray.white)} backgroundColor={String(colors.gray.grey_07)}/>
-                    </View>
+                    </View>                     * 
+                     * 
+                     * 
+                     */
+
+                    }
+
                 </Animated.View>
             </Moment.Root.Main>
         </Animated.View>
