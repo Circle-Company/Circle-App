@@ -28,7 +28,10 @@ export function AuthProvider({ children }: AuthProviderProps) {
   const [ sessionData, setSessionData ] = useState<SessionDataType>({} as SessionDataType)
   const [ jwtToken, setJwtToken ] = useState<string | null>(null)
 
-  async function signIn() {
+  React.useEffect(() => {
+    console.log(signInputUsername, signInputPassword)
+  }, [signInputPassword, signInputUsername])
+  async function signIn() { 
     try {
       const response = await api.post('/auth/sign-in', {
         username: signInputUsername,
@@ -58,12 +61,13 @@ export function AuthProvider({ children }: AuthProviderProps) {
 
 
   function signOut() {
-
+    storage.clearAll()
+    setSessionData({} as SessionDataType)
+    setJwtToken(null)
   }
 
   function checkIsSigned() {
     const hasSessionId = storage.getAllKeys().map((key) => { if(key == '@circle:sessionId') return true; else return false})
-    
     if(storage.getNumber(storageKeys().user.id) && hasSessionId) return true
     else return false
   }

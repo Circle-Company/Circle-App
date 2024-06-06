@@ -1,6 +1,7 @@
 import React from "react"
 import api from "../services/api"
 import AuthContext from "./auth"
+import PersistedContext from "./Persisted"
 
 type ViewProfileProviderProps = {
     children: React.ReactNode
@@ -36,13 +37,13 @@ export type ViewProfileContextsData = {
 const ViewProfileContext = React.createContext<ViewProfileContextsData>({} as ViewProfileContextsData)
 
 export function ViewProfileProvider({children}: ViewProfileProviderProps) {
-    const {user} = React.useContext(AuthContext)
+    const { session } = React.useContext(PersistedContext)
     const [userProfile, setUserProfile] = React.useState()
 
     async function setProfile (Id: number){
         try{
             const response = api.post(`/user/profile/data/pk/${Id}`, {
-                user_id: user.id,
+                user_id: session.user.id,
             })
             .then(function (response) { setUserProfile(response.data) })
             .catch(function (error) { console.log(error)})

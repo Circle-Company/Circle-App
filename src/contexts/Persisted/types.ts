@@ -3,6 +3,7 @@ import { LanguagesCodesType } from "../../locales/LanguageTypes"
 import { AccountState } from "./persistedAccount"
 import { PreferencesState } from "./persistedPreferences"
 import { StatisticsState } from "./persistedStatistics"
+import { UserState } from "./persistedUser"
 
 export type UserDataType = {
     id: number
@@ -26,6 +27,7 @@ export type UserDataReturnsType = {
         tiny_resolution: string
     }
     setId: (value: number) => void
+    setName: (value: string) => void;
     setUsername: (value: string) => void
     setDescription: (value: string) => void
     setVerifyed: (value: boolean) => void
@@ -33,6 +35,7 @@ export type UserDataReturnsType = {
         small_resolution: String
         tiny_resolution: String
     }) => void
+    getUser: (id: number) => Promise<UserState>
     storeUser: (value: userReciveDataProps) => userReciveDataProps
     loadUserFromStorage: () => userReciveDataProps
     removeUserFromStorage: () => void

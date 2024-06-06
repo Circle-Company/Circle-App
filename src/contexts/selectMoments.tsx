@@ -3,6 +3,10 @@ import api from "../services/api"
 import AuthContext from "./auth"
 import {useNavigation} from '@react-navigation/native'
 import SelectMomentsData from '../data/select_moments.json'
+import PersistedContext from "./Persisted"
+import { colors } from "../layout/constants/colors"
+import { notify } from "react-native-notificated"
+import CheckIcon from '../assets/icons/svgs/check_circle.svg'
 
 type StoreMomentsProps = {
     memory_id: number
@@ -39,7 +43,7 @@ export type SelectMomentsContextsData = {
 const SelectMomentsContext = React.createContext<SelectMomentsContextsData>({} as SelectMomentsContextsData)
 
 export function SelectMomentsProvider({children}: SelectMomentsProviderProps) {
-    const { user } = React.useContext(AuthContext)
+    const { session } = React.useContext(PersistedContext)
     const [ from, setFrom ] = React.useState<From | ''>('')
     const [allMoments, setAllMoments] = React.useState([])
     const [selectedMoments, setSelectedMoments] = React.useState<Moment[]>([])
@@ -49,7 +53,7 @@ export function SelectMomentsProvider({children}: SelectMomentsProviderProps) {
 
     async function getMoments() {           
         try{
-            const response = await api.post(`/moment/get-user-moments/tiny?page=1&pageSize=10000`, { user_id: 1 })
+            const response = await api.post(`/moment/get-user-moments/tiny?page=1&pageSize=10000`, { user_id: session.user.id })
             .then(function (response) {return response.data})
             .catch(function (error) { console.log(error)})
             console.log(response.moments)
@@ -61,8 +65,17 @@ export function SelectMomentsProvider({children}: SelectMomentsProviderProps) {
 
     async function storeMemory () {
         try{
-            const response = await api.post(`/memory/create`, { user_id: 1, title })
-            .then(function (response) { return response.data })
+            const response = await api.post(`/memory/create`, { user_id: session.user.id, title })
+            .then(function (response) {
+                notify('toast', {
+                    params: {
+                        description: 'Memory Has been created with success',
+                        title: 'Memory Created',
+                        icon: <CheckIcon fill={colors.green.green_05.toString()} width={15} height={15}/>
+                    }
+                })
+                return response.data
+            })
             .catch(function (error) { console.log(error)})
             await storeMoments(response.id)
         } catch(err) { console.error(err) } 

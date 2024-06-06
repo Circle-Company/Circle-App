@@ -24,13 +24,13 @@ export type MomentDataReturnsProps = {
     tags: TagProps[] 
     language: LanguagesCodesType
     created_at: String
-    findComments: ({page, pageSize}: {page: number, pageSize: number}) => Promise<void>
-    findStatistics: () => Promise<void>
-    findTags: () => Promise<void>
+    getComments: ({page, pageSize}: {page: number, pageSize: number}) => Promise<void>
+    getStatistics: () => Promise<void>
+    getTags: () => Promise<void>
 }
 
 export type MomentMidiaProps = {
-    content_type?: 'IMAGE' | 'VIDEO'
+    content_type: 'IMAGE' | 'VIDEO'
     fullhd_resolution?: String
     nhd_resolution?: String
 }

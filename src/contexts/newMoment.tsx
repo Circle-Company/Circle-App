@@ -1,12 +1,15 @@
 import React from "react"
 import { Platform, PermissionsAndroid} from "react-native"
 import api from "../services/api"
-import { launchImageLibrary, ImagePickerResponse, ImageLibraryOptions} from "react-native-image-picker"
-import AuthContext from "./auth"
+import { launchImageLibrary, ImagePickerResponse, launchCamera} from "react-native-image-picker"
 import {useNavigation} from '@react-navigation/native'
 import { MemoryObjectProps } from "../components/memory/memory-types"
 import RNFS from 'react-native-fs'
-import { HEICtoJPEG } from "../algorithms/HEICtoJPEG"
+import PersistedContext from "./Persisted"
+import { useNotifications } from "react-native-notificated"
+import UploadIcon from '../assets/icons/svgs/arrow_up.svg'
+import CheckIcon from '../assets/icons/svgs/check_circle.svg'
+import { colors } from "../layout/constants/colors"
 
 type NewMomentProviderProps = {
     children: React.ReactNode
@@ -43,15 +46,15 @@ export type NewMomentContextsData = {
 const NewMomentContext = React.createContext<NewMomentContextsData>({} as NewMomentContextsData)
 
 export function NewMomentProvider({children}: NewMomentProviderProps) {
-
-    const { user } = React.useContext(AuthContext)
-    const [selectedImage, setSelectedImage] = React.useState<ImagePickerResponse | null>()
+    const { session } = React.useContext(PersistedContext)
+    const [selectedImage, setSelectedImage] = React.useState<any>()
     const [description, setDescription] = React.useState<string>('')
     const [tags, setTags] = React.useState<TagProps[]>([])
     const [allMemories, setAllMemories] = React.useState<MemoryObjectProps[]>([])
     const [selectedMemory, setSelectedMemory] = React.useState<MemoryObjectProps | null>()
     const [createdMoment, setCreatedMoment] = React.useState<any>({})
     const navigation = useNavigation()
+    const { notify } = useNotifications()
 
     async function requestPermission() {
         try {
@@ -84,7 +87,7 @@ export function NewMomentProvider({children}: NewMomentProviderProps) {
             const IMG = selectedImage.assets[0]
             const imageBase64 = await RNFS.readFile(IMG.uri, 'base64')
             await api.post(`/moment/create`, {
-                user_id: 1,
+                user_id: session.user.id,
                 moment: {
                     description: description? description : null,
                     midia: {
@@ -102,24 +105,37 @@ export function NewMomentProvider({children}: NewMomentProviderProps) {
                     tags
                 }
             })
-            .then(function (response) {setCreatedMoment(response.data)})
+            .then(function (response) {
+                setCreatedMoment(response.data)
+                notify('toast', {
+                    params: {
+                        description: 'Moment Has been uploaded with success',
+                        title: 'Moment Created',
+                        icon: <UploadIcon fill={colors.green.green_05.toString()} width={15} height={15}/>
+                    }
+                })
+            })
             .catch(function (error) { console.log(error)})
         }
     }
 
     async function addToMemory () {
-        console.log('createdMoment: ' + createdMoment)
-        console.log('selectedMemory: ' + selectedMemory)
         if(createdMoment){
             await api.post(`/memory/add-moment`, {
                 memory_id: selectedMemory?.id,
                 moments_list: [{id: createdMoment.id}]
             })
             .then(function (response) {
-                setSelectedImage(null)
                 setTags([])
                 setDescription('')
                 setSelectedMemory(null)
+                notify('toast', {
+                    params: {
+                        description: 'Memory Has been created with success',
+                        title: 'Memory Created',
+                        icon: <CheckIcon fill={colors.green.green_05.toString()} width={15} height={15}/>
+                    }
+                })
                 return response.data
             })
             .catch(function (error) { console.log(error)})            
@@ -130,7 +146,7 @@ export function NewMomentProvider({children}: NewMomentProviderProps) {
         requestPermission().then(() => {
             launchImageLibrary({
                 mediaType: 'photo',
-                selectionLimit: 1,
+                selectionLimit: 1
             }, handleImagePickerResponse);
         });
     }
@@ -163,7 +179,7 @@ export function NewMomentProvider({children}: NewMomentProviderProps) {
 
     async function getAllMemories() {
         try{
-            const response = await api.post(`memory/get-user-memories`, { user_id: 1 })
+            const response = await api.post(`memory/get-user-memories`, { user_id: session.user.id })
             .then(function (response) {return response.data})
             .catch(function (error) { console.log(error)})
             console.log(response.memories)

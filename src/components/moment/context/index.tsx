@@ -4,8 +4,9 @@ import AuthContext from "../../../contexts/auth"
 import { MomentContextsData, MomentProviderProps } from './types'
 import sizes from "../../../layout/constants/sizes"
 import UserActions from "./momentUserActions"
-import MomentDataClass from "./momentData"
+import {useMomentData} from "./momentData"
 import MomentOptionsClass from "./momentOptions"
+import PersistedContext from "../../../contexts/Persisted"
 
 const MomentContext = React.createContext<MomentContextsData>({} as MomentContextsData)
 
@@ -17,8 +18,14 @@ export function MomentProvider({
     momentSize = sizes.moment.standart
 }: MomentProviderProps) {
 
-    const { user } = React.useContext(AuthContext)
+    const { session } = React.useContext(PersistedContext)
     const [ comment, setComment ] = React.useState<string>('')
+
+    const momentDataStore = useMomentData()
+
+    React.useEffect(() => {
+        momentDataStore.setMomentData(momentData)
+    }, [momentData])
 
     async function sendComment() {
 
@@ -43,17 +50,7 @@ export function MomentProvider({
             sendUserInteraction
         },
         momentSize: momentSize,
-        momentData: new MomentDataClass({
-            id: momentData?.id,
-            user: momentData?.user,
-            description: momentData?.description,
-            midia: momentData?.midia,
-            comments: [], 
-            statistics: momentData?.statistics,
-            tags: [],
-            language: momentData?.language,
-            created_at: momentData?.created_at
-        }),
+        momentData: momentDataStore,
         momentUserActions: new UserActions({
             liked: false,
             shared: false,
