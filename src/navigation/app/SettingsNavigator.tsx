@@ -19,6 +19,7 @@ import AllMomentsScreen from '../../pages/app/Settings/AllMoments'
 import PreferencesScreen from '../../pages/app/Settings/Preferences'
 import LanguageScreen from '../../pages/app/Settings/Preferences/Language'
 import ContentScreen from '../../pages/app/Settings/Preferences/Content'
+import ProfilePictureScreen from '../../pages/app/Settings/ProfilePicture'
 
 const SettingsStack = createStackNavigator()
  
@@ -48,6 +49,17 @@ export function SettingsNavigator() {
                 headerLeft: () => <SettingsHeaderLeft/>
             }}
             
+        />
+        <SettingsStack.Screen
+            name="Settings-ProfilePicture"
+            component={ProfilePictureScreen}
+            options={{
+                headerTitle: 'Add Profile Picture',
+                headerStyle: HeaderStyle,
+                headerTintColor: String(ColorTheme().text),
+                cardStyle: {backgroundColor: String(ColorTheme().background)},
+                cardOverlayEnabled: true,
+            }}
         />
         <SettingsStack.Screen
             name="Settings-Description"
