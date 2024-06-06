@@ -1,4 +1,5 @@
 import DeviceInfo, {LocationProviderInfo} from 'react-native-device-info'
+import { storage } from '../store'
 
 export type getDeviceInfoProps = {
     brand: string,
@@ -28,7 +29,10 @@ export type getDeviceInfoProps = {
 }
 
 export default async function getDeviceInfo(){
-    const deviceInfo: getDeviceInfoProps = {
+
+    let deviceInfo
+    
+    const newDeviceInfo: getDeviceInfoProps = {
         brand: DeviceInfo.getBrand(),
         buildNumber: DeviceInfo.getBuildNumber(),
         deviceId: DeviceInfo.getDeviceId(),
@@ -55,5 +59,14 @@ export default async function getDeviceInfo(){
         availableLocationProviders: await DeviceInfo.getAvailableLocationProviders()
     }
 
-    return deviceInfo
+    if(newDeviceInfo) {
+        storage.set('circle:device:info', JSON.stringify(newDeviceInfo))
+        deviceInfo = newDeviceInfo
+    } else {
+        const recoveredDeviceInfo = storage.getString('circle:device:info')
+        if(recoveredDeviceInfo) deviceInfo = JSON.parse(recoveredDeviceInfo)
+    }
+
+    const deviceInfoReturns: getDeviceInfoProps = deviceInfo
+    return deviceInfoReturns
 }
