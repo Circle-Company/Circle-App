@@ -2,6 +2,7 @@ import React, { createContext, useContext } from "react"
 import AuthContext from "../../contexts/auth"
 import api from "../../services/api"
 import NetInfo from '@react-native-community/netinfo'
+import PersistedContext from "../../contexts/Persisted"
 
 interface SearchContextProps {
     isConnected: boolean | null
@@ -16,7 +17,7 @@ const SearchContext = createContext<SearchContextProps | undefined>(undefined)
 export function SearchContextProvider({children}: SearchContextProvider) {
     const [searchTerm, setSearchTerm] = React.useState<string>('')
     const [isConnected, setIsConnected] = React.useState<boolean | null>(true)
-    const { user } = React.useContext(AuthContext)
+    const { session } = React.useContext(PersistedContext)
 
     React.useEffect(() => {
         const unsubscribe = NetInfo.addEventListener(state => {
@@ -30,7 +31,7 @@ export function SearchContextProvider({children}: SearchContextProvider) {
         try{
             const response = api.post('/user/search', {
                 username_to_search: searchTerm,
-                user_id: 1
+                user_id: session.user.id
             })
             .then(function (response) { return response.data })
             .catch(function (error) { console.log(error)})

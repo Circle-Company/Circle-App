@@ -111,6 +111,7 @@ export default function input() {
                             value={searchTerm}
                             onChangeText={handleInputChange}
                             autoCapitalize="none"
+                            autoFocus={true}
                                 
                         />
                     </View>

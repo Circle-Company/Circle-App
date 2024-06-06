@@ -8,6 +8,7 @@ import { SearchRenderItemReciveDataObjectProps } from "../search-types"
 import { formatNumberWithDots } from "../../../algorithms/numberConversor"
 import LanguageContext from "../../../contexts/Preferences/language"
 import React from "react"
+import Animated, { FadeInDown } from "react-native-reanimated"
 export default function render_user({user}: SearchRenderItemReciveDataObjectProps) {
     const {t} = React.useContext(LanguageContext)
     const isDarkMode = useColorScheme() === 'dark'
@@ -49,7 +50,7 @@ export default function render_user({user}: SearchRenderItemReciveDataObjectProp
     }
     
     return (
-        <View style={container}>
+        <Animated.View entering={FadeInDown.duration(200)} style={container}>
             <UserShow.Root data={user}>
                 <View style={container_left}>
                     <UserShow.ProfilePicture
@@ -85,6 +86,6 @@ export default function render_user({user}: SearchRenderItemReciveDataObjectProp
                     </View>
                 </View>
             </UserShow.Root>            
-        </View>
+        </Animated.View>
     )
 }
