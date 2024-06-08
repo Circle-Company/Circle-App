@@ -6,6 +6,7 @@ import ColorTheme from "../../../layout/constants/colors"
 import fonts from "../../../layout/constants/fonts"
 import SelectMomentsContext from "../../../contexts/selectMoments"
 import NewMomentContext from "../../../contexts/newMoment"
+import LanguageContext from "../../../contexts/Preferences/language"
 type RenderMomentProps = {
     height?: number,
     keyboardIsVisible: boolean
@@ -16,7 +17,7 @@ export default function DescriptionInput({
     height = keyboardIsVisible? sizes.headers.height : sizes.headers.height,
     
 }: RenderMomentProps) {
-
+    const { t } = React.useContext(LanguageContext)
     const maxLength = 300
     const input_width = sizes.screens.width - sizes.paddings["1lg"] * 2
     const {description, setDescription} = React.useContext(NewMomentContext)
@@ -72,7 +73,7 @@ export default function DescriptionInput({
 
     return (
         <View style = {container}>
-            <Text style={text_style}>Description ✏️</Text>            
+            <Text style={text_style}>{t('Description')} ✏️</Text>            
         
             <View style = {input_container}>
                 <TextInput
@@ -85,12 +86,12 @@ export default function DescriptionInput({
                     numberOfLines={5}
                     maxLength={300}
                     style={input_style}
-                    placeholder="description..."
+                    placeholder={t('description') + '...'}
                     placeholderTextColor={String(ColorTheme().textDisabled)}
                 />
                 <Text style={counter}>{description.length}/{maxLength}</Text>
             </View>
-            <Text style={legend_style}>*The description will be visible for all users to see</Text>
+            <Text style={legend_style}>{t('*The description will be visible for all users to see')}</Text>
         </View>
     )
 }

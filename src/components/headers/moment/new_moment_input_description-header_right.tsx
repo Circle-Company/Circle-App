@@ -9,9 +9,11 @@ import ButtonStandart from '../../buttons/button-standart'
 import AddIcon from '../../../assets/icons/svgs/moment.svg'
 import { colors } from '../../../layout/constants/colors'
 import { Loading } from '../../loading'
+import LanguageContext from '../../../contexts/Preferences/language'
 
 export default function NewMomentInputDescriptionRight() {
     const { uploadMoment } = useContext(NewMomentContext)
+    const { t } = React.useContext(LanguageContext)
     const [ loading, setLoading ] = React.useState(false)
     const isDarkMode = useColorScheme() === 'dark'
 
@@ -64,7 +66,7 @@ export default function NewMomentInputDescriptionRight() {
                 >
                     {loading?
                         <View style={loading_container}>
-                            <Text style={loading_text}>Loading</Text>
+                            <Text style={loading_text}>{t('Loading')}</Text>
                             <Loading.Container width={40} height={30}>
                             <Loading.ActivityIndicator size={10}/>
                             </Loading.Container>                     
@@ -73,7 +75,7 @@ export default function NewMomentInputDescriptionRight() {
                     :
                         <>
                             <View style={textContainer}>
-                                <Text style={text}>Create</Text>
+                                <Text style={text}>{t('Create')}</Text>
                             </View>
                             <AddIcon fill={String(colors.gray.white)} width={15} height={15}/>                    
                         </>

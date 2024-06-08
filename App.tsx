@@ -16,25 +16,31 @@ import { initialWindowMetrics, SafeAreaProvider } from 'react-native-safe-area-c
 import { Provider as PreferencesProvider } from './src/contexts/Preferences'
 import { Provider as PersistedProvider } from './src/contexts/Persisted'
 import { Provider as ToastProvider } from './src/contexts/Toast'
+import { Provider as ProfileProvider } from './src/contexts/profile'
+import { Provider as BottomTabsProvider } from './src/contexts/bottomTabs'
 import sizes from './src/layout/constants/sizes'
 
 function InnerApp() {
   return (
     <KeyboardProvider enabled={true}>
       <NotificationProvider>
-        <ViewProfileProvider>
-          <FeedProvider>
-            <NavigationContainer>
-              <SelectMomentsProvider>
-                <MemoryProvider>
-                  <NewMomentProvider>
-                    <Routes/>
-                  </NewMomentProvider>                  
-                </MemoryProvider>
-              </SelectMomentsProvider>                
-            </NavigationContainer>
-          </FeedProvider>
-        </ViewProfileProvider> 
+        <BottomTabsProvider>
+          <ProfileProvider>
+            <ViewProfileProvider>
+              <FeedProvider>
+                <NavigationContainer>
+                  <SelectMomentsProvider>
+                    <MemoryProvider>
+                      <NewMomentProvider>
+                        <Routes/>
+                      </NewMomentProvider>                  
+                    </MemoryProvider>
+                  </SelectMomentsProvider>                
+                </NavigationContainer>
+              </FeedProvider>
+            </ViewProfileProvider>           
+          </ProfileProvider>          
+        </BottomTabsProvider>
       </NotificationProvider>       
     </KeyboardProvider>   
 

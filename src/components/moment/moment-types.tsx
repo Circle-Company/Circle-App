@@ -33,6 +33,7 @@ export type MomentContainerProps = {
     loading?: boolean
     opacity?: number
     isFocused?: boolean
+    fromFullMomentScreen?: boolean
 }
 
 export type MomentLikeProps = {

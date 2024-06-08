@@ -8,6 +8,7 @@ import SelectMomentsContext from "../../../contexts/selectMoments"
 import NewMomentContext, { TagProps } from "../../../contexts/newMoment"
 import ButtonStandart from "../../../components/buttons/button-standart"
 import title from "../../../components/memory/components/memory-title"
+import LanguageContext from "../../../contexts/Preferences/language"
 type RenderMomentProps = {
     height?: number,
     keyboardIsVisible: boolean
@@ -18,7 +19,7 @@ export default function TagsInput({
     height = keyboardIsVisible? sizes.headers.height : sizes.headers.height,
     
 }: RenderMomentProps) {
-
+    const { t } = React.useContext(LanguageContext)
     const maxLength = 300
     const isDarkMode = useColorScheme() === 'dark'
     const input_width = (sizes.screens.width/1.) - sizes.paddings["1lg"] * 2
@@ -94,7 +95,7 @@ export default function TagsInput({
     }
     return (
         <View style = {container}>
-            <Text style={text_style}>Tags 🚩</Text>    
+            <Text style={text_style}>{t('Tags')} 🚩</Text>    
                    
         
             <View style = {input_container}>
@@ -112,15 +113,15 @@ export default function TagsInput({
                     numberOfLines={5}
                     maxLength={27}
                     style={input_style}
-                    placeholder="tag name"
+                    placeholder={t("tag name")}
                     placeholderTextColor={String(ColorTheme().textDisabled)}
                 />
                 <ButtonStandart action={handelButtonPress} backgroundColor={button_background} width={input_width/6}>
-                    <Text style={button_text_style}>Add</Text>
+                    <Text style={button_text_style}>{t('Add')}</Text>
                 </ButtonStandart>                
             </View>
 
-            <Text style={legend_style}>*Type one tag at a time and press "Add" to add it</Text>
+            <Text style={legend_style}>{t("*Type one tag at a time and press 'Add' to add it")}</Text>
         </View>
     )
 }

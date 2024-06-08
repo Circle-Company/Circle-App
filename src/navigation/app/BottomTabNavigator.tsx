@@ -39,11 +39,9 @@ export default function BottomTabNavigator() {
         component={HomeScreenNavigator}
         options={{
           title: t('Moments'),
-          tabBarIcon: ({focused}: any) => 
-          focused?
-            <Moment fill={String(ColorTheme().iconFocused)} width={iconWidth} height={iconHeight}/>
-            :
-            <MomentOutline fill={String(ColorTheme().icon)} width={iconWidth} height={iconHeight}/>
+          tabBarIcon: ({focused}: any) => focused?
+          <Moment fill={String(ColorTheme().iconFocused)} width={iconWidth} height={iconHeight}/>
+          : <MomentOutline fill={String(ColorTheme().icon)} width={iconWidth} height={iconHeight}/>
         }}
       />  
         <BottomTab.Screen
@@ -51,11 +49,9 @@ export default function BottomTabNavigator() {
           component={AccountScreenNavigator}
           options={{
             title: t('You'),
-            tabBarIcon: ({focused}: any) =>
-              focused?
-              <User fill={String(ColorTheme().iconFocused)} width={iconWidth} height={iconHeight}/>
-              :
-              <UserOutline fill={String(ColorTheme().icon)} width={iconWidth} height={iconHeight}/>
+            tabBarIcon: ({focused}: any) => focused?
+            <User fill={String(ColorTheme().iconFocused)} width={iconWidth} height={iconHeight}/>
+            : <UserOutline fill={String(ColorTheme().icon)} width={iconWidth} height={iconHeight}/>
           }}
         />          
     </BottomTab.Navigator>

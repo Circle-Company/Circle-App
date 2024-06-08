@@ -4,7 +4,7 @@ import { Moment } from '../../../components/moment'
 import { UserShow } from '../../../components/user_show'
 import { Comments } from '../../../components/comment'
 import ColorTheme, { colors } from '../../../layout/constants/colors'
-import { ScrollView, View} from 'react-native'
+import { Animated, ScrollView, View} from 'react-native'
 import { Text } from '../../../components/Themed'
 import fonts from '../../../layout/constants/fonts'
 import MomentContext from '../../../components/moment/context'
@@ -13,6 +13,7 @@ import { Loading } from '../../../components/loading'
 import { MomentDataProps } from '../../../components/moment/context/types'
 import RenderCommentFull from './render-comment-full'
 import PersistedContext from '../../../contexts/Persisted'
+import FeedContext from '../../../contexts/Feed'
 
 type renderMomentProps = {
     momentData: MomentDataProps
@@ -23,7 +24,27 @@ type renderMomentProps = {
 
 export default function render_moment_full ({momentData, fromFeed, fromAccount, isFocused}: renderMomentProps) {
     const { session } = React.useContext(PersistedContext)
+    const { setFocusedMoment, setFocusedItemId} = React.useContext(FeedContext)
     const [ loading, setLoading ] = React.useState(false)
+    const scrollY = React.useRef(new Animated.Value(0)).current
+
+    const imageScale = scrollY.interpolate({
+        inputRange: [0, sizes.moment.full.width], // Faixa de entrada
+        outputRange: [1, 0.75], // Faixa de saída (escala de 1 a 0.5)
+        extrapolate: 'clamp', // Impedir valores fora do range
+    });
+
+    const imageY = scrollY.interpolate({
+        inputRange: [0, 800], // Faixa de entrada
+        outputRange: [0, 160], // Faixa de saída (translada de 0 a -50)
+        extrapolate: 'clamp', // Impedir valores fora do range
+    });
+
+    const imageOpacity = scrollY.interpolate({
+        inputRange: [1, 1], // Faixa de entrada
+        outputRange: [1, 0.9], // Faixa de saída (escala de 1 a 0.5)
+        extrapolate: 'clamp', // Impedir valores fora do range
+    });
 
     let userDataRender: any
 
@@ -83,42 +104,57 @@ export default function render_moment_full ({momentData, fromFeed, fromAccount, 
 
     if(loading) return <Loading.Container><Loading.ActivityIndicator/></Loading.Container>
 
+    React.useEffect(() => {
+        console.log(JSON.stringify(momentData))
+        setFocusedItemId(Number(momentData.id))
+    }, [])
     return (
-        <ScrollView showsVerticalScrollIndicator={false}>
+        <Animated.ScrollView
+        onScroll={Animated.event(
+            [{ nativeEvent: { contentOffset: { y: scrollY } } }],
+            { useNativeDriver: true } // Use o driver nativo para melhor performance
+          )}
+          scrollEventThrottle={16} // Frequência de atualização da animação
+        showsVerticalScrollIndicator={false}
+        >
             <Moment.Root.Main momentData={momentData} isFeed={fromFeed} isFocused={true} momentSize={{...sizes.moment.full, width: sizes.screens.width}}>
-                <Moment.Container contentRender={momentData.midia}>
-                    <Moment.Root.Center/>
-                    <Moment.Root.Bottom>     
-                        <View style={in_moment_bottom_container}>
-                            <View style={in_moment_button_left_container}>
-                                <UserShow.Root data={userDataRender}>
-                                    <UserShow.ProfilePicture pictureDimensions={{width: 30, height: 30}}/>
-                                    <UserShow.Username/>
-                                    {!fromAccount && <UserShow.FollowButton isFollowing={false} displayOnMoment={true}/>}
-                                </UserShow.Root>
+                <Animated.View style={{ transform: [{ scale: imageScale }, {translateY: imageY}] }}>
+                    <Moment.Container contentRender={momentData.midia}>
+                        <Moment.Root.Center/>
+                        <Moment.Root.Bottom>     
+                            <View style={in_moment_bottom_container}>
+                                <View style={in_moment_button_left_container}>
+                                    <UserShow.Root data={userDataRender}>
+                                        <UserShow.ProfilePicture pictureDimensions={{width: 30, height: 30}}/>
+                                        <UserShow.Username/>
+                                        {!fromAccount && <UserShow.FollowButton isFollowing={false} displayOnMoment={true}/>}
+                                    </UserShow.Root>
+                                </View>
+                                {!fromAccount && <Moment.LikeButton isLiked={false} paddingHorizontal={0} margin={0}/>}
                             </View>
-                            {!fromAccount && <Moment.LikeButton isLiked={false} paddingHorizontal={0} margin={0}/>}
-                        </View>
-                    </Moment.Root.Bottom>
-                </Moment.Container>                       
+                        </Moment.Root.Bottom>
+                    </Moment.Container>                      
+                </Animated.View>
+                     
 
                 <View style={bottom_container}>
+                <Animated.View style={{ opacity: imageOpacity}}>
                     <View style={description_container}>
                         <Text style={descriptionStyle}>{momentData.description}</Text>  
                         <View style={informations_container}>
                             <Moment.Date color={ColorTheme().text.toString()} paddingHorizontal={0}/>
-                            {momentData.statistics &&
-                                <>
-          
-                                </> 
-                            }                            
+                            {momentData.statistics.total_comments_num && <Moment.Full.Comments comments={momentData.statistics.total_comments_num}/>} 
+                            {momentData.statistics.total_views_num && <Moment.Full.Views views={momentData.statistics.total_views_num}/>}              
                         </View>
-                    </View>             
+                    </View>                      
+                </Animated.View>
+           
                     <RenderTagsList/>
                 </View>
+                
                 <RenderCommentFull/>
             </Moment.Root.Main>    
-        </ScrollView>
+        </Animated.ScrollView>
 
     )
 }

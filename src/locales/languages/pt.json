@@ -83,5 +83,51 @@
     "You are offline": "Você está offline",
 
     "Create": "Criar",
-    "Next": "Próximo"
+    "Next": "Próximo",
+    "Add": "Adicionar",
+    "View All": "Ver Tudo",
+    "All Memories": "Todas as Memórias",
+    "Add Comment": "Comentar",
+    "Done": "Pronto",
+
+    "Public Profile": "Perfil Público",
+    "Profile Picture": "Foto de Perfil",
+    "Name": "Nome",
+    "Description": "Descrição",
+    "Account": "Conta",
+    "Password": "Senha",
+    "App": "App",
+    "Language": "Língua",
+    "Open Source": "Código Aberto",
+    "Version": "Versão",
+    "Legal": "Legal",
+    "Privacy Policy": "Política de Privacidade",
+    "Terms of Service": "Termos de Serviço",
+    "More": "Mais",
+    "Log Out": "Deslogar",
+
+    "Most Relevants": "Mais Relevantes",
+    "Send Comment": "Enviar Comentário",
+    "No more Moments": "Sem mais Moments",
+    "No more Memories": "Sem mais Memórias",
+    "No more Notifications": "Sem mais notificações",
+
+    "Select Image": "Selecione Imagem",
+    "Select Other": "Selecione Outro",
+    "Add to Memory": "Adicionar",
+    "Create New": "Criar Novo",
+    "Moment Created": "Moment Criado",
+    "Comment Sended": "Comentário Enviado",
+
+    "description": "descrição",
+    "Tags": "Tags",
+    "tag name": "nome da tag",
+
+    "*The description will be visible for all users to see": "*A descrição ficará visível para todos os usuários",
+    "*Type one tag at a time and press 'Add' to add it": "*Digite uma tag de cada vez e pressione 'Adicionar' para adiciona-la",
+    "Moment Has been uploaded with success": "Moment foi carregado com sucesso",
+    "Memory Has been created with success": "Memória foi criada com sucesso",
+    "Comment Has been sended with success": "Comentário foi enviado com sucesso",
+
+    "Made with love in Brazil": "Feito com amor no Brasil"
 }

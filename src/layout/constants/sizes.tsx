@@ -146,7 +146,7 @@ const moment = {
     height: momentAspectRatio * screens.width,
     paddingBottom: 5,
     padding: 10,
-    borderRadius: 0
+    borderRadius: 10
   }
 }
   const toasts = {

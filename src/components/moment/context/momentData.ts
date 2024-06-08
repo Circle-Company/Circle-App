@@ -7,7 +7,7 @@ import { CommentsReciveDataProps } from '../../comment/comments-types'
 import { LanguagesCodesType } from '../../../locales/LanguageTypes'
 export interface MomentDataState extends MomentDataProps{
     getComments: ({page, pageSize}: {page: number, pageSize: number}) => Promise<void>
-    getStatistics: (moment_id: string) => Promise<void>
+    getStatistics: () => Promise<void>
     getTags: (moment_id: string) => Promise<void>
     setMomentData: (momentData: MomentDataProps) => void
 }
@@ -43,7 +43,7 @@ export function useMomentData(): MomentDataState {
         .then((response) => { setTags(response.data) })
         .catch(function (error) { console.log(error)}) 
     }
-    async function setMomentData (momentData: MomentDataProps) {
+    function setMomentData (momentData: MomentDataProps) {
         setId(momentData.id)
         setUser(momentData.user)
         setDescription(momentData.description)

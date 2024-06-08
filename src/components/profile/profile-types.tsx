@@ -3,15 +3,9 @@ import React from 'react'
 export type ProfileReciveDataProps = {
 	id: number,
 	username: string,
-	access_level: number,
 	verifyed: boolean,
-	deleted: boolean,
-	blocked: boolean,
-	muted: boolean,
-	send_notification_emails: boolean,
 	name: string | null,
 	description: string | null,
-	last_active_at: string,
 	profile_picture: {
 		small_resolution: string,
 		tiny_resolution: string

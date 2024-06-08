@@ -1,4 +1,6 @@
-export const languagesList =
+import { LanguagesListType } from "./LanguageTypes"
+
+export const languagesList: LanguagesListType =
 [
     {
         "code": "en",
@@ -6,7 +8,7 @@ export const languagesList =
     },
     {
         "code": "pt",
-        "nativeName": "Português (Brasil)"
+        "nativeName": "Português (BR)"
     }
 ]
 

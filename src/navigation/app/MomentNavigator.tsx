@@ -16,10 +16,12 @@ import NewMomentSelectMemoryRight from '../../components/headers/moment/new_mome
 import MomentFullScreen from '../../pages/app/Moment/moment-full'
 import MomentFullHeaderLeft from '../../components/headers/moment/moment_full-header_left'
 import MomentFullHeaderRight from '../../components/headers/moment/moment_full-header_right'
+import LanguageContext from '../../contexts/Preferences/language'
 const MomentStack = createStackNavigator()
 
 export function MomentNavigator() {
     const isDarkMode = useColorScheme() === 'dark'
+    const { t } = React.useContext(LanguageContext)
     const HeaderStyle: any= {
         ...Sizes.headers,
         backgroundColor:  ColorTheme().background,
@@ -43,7 +45,7 @@ export function MomentNavigator() {
             name="NewMomentGalleryScreen"
             component={NewMomentGalleryScreen}
             options={{
-                headerTitle:'New Moment',
+                headerTitle:t('New Moment'),
                 headerStyle: [HeaderStyle],
                 headerTitleStyle: {color: String(ColorTheme().text)},
                 cardStyle: {backgroundColor: String(ColorTheme().background)},
@@ -58,7 +60,7 @@ export function MomentNavigator() {
             name="NewMomentImageScreen"
             component={NewMomentImageScreen}
             options={{
-                headerTitle:'Select Image',
+                headerTitle: t('Select Image'),
                 headerStyle: [HeaderStyle],
                 headerTitleStyle: {color: String(ColorTheme().text)},
                 cardStyle: {backgroundColor: String(ColorTheme().background)},
@@ -72,7 +74,7 @@ export function MomentNavigator() {
             name="NewMomentDescription"
             component={NewMomentDescription}
             options={{
-                headerTitle:'New Moment',
+                headerTitle:t('New Moment'),
                 headerStyle: [HeaderStyle],
                 headerTitleStyle: {color: String(ColorTheme().text)},
                 cardStyle: {backgroundColor: String(ColorTheme().background)},
@@ -86,7 +88,7 @@ export function MomentNavigator() {
             name="NewMomentSelectMemory"
             component={NewMomentSelectMemory}
             options={{
-                headerTitle:'Add to Memory',
+                headerTitle:t('Add to Memory'),
                 headerStyle: [HeaderStyle],
                 headerTitleStyle: {color: String(ColorTheme().text)},
                 cardStyle: {backgroundColor: String(ColorTheme().background)},

@@ -9,9 +9,10 @@ import AddIcon from '../../../assets/icons/svgs/memory.svg'
 import { colors } from '../../../layout/constants/colors'
 import ButtonStandart from '../../buttons/button-standart'
 import { Loading } from '../../loading'
+import LanguageContext from '../../../contexts/Preferences/language'
 
 export default function NewMomentSelectMemoryRight() {
-
+    const { t } = React.useContext(LanguageContext)
     const { allMemories, addToMemory} = React.useContext(NewMomentContext)
     const [ loading, setLoading ] = React.useState(false)
     const navigation = useNavigation()
@@ -77,7 +78,7 @@ export default function NewMomentSelectMemoryRight() {
 
                 : <>
                     <View style={textContainer}>
-                    <Text style={text}>Create</Text>
+                    <Text style={text}>{t('Create')}</Text>
                     </View>
                     <AddIcon fill={String(colors.gray.white)} width={15} height={15}/>                    
                 </>}

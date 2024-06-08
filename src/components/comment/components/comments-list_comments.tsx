@@ -17,7 +17,6 @@ export default function list_comments ({ preview = true }: CommentsListCommentsP
     const {comment} = useCommentsContext()
     const {networkStats} = React.useContext(NetworkContext)
     const isDarkMode = useColorScheme() === 'dark'
-
     const [page, setPage ] = React.useState<number>(1)
     const [pageSize, setPageSize ] = React.useState<number>(4)
     const [loading, setLoading ] = React.useState<boolean>(false)
@@ -28,7 +27,6 @@ export default function list_comments ({ preview = true }: CommentsListCommentsP
 
 
     async function fetchData() {
-        console.log('id: ',momentData.id)
         await api.post(`/moment/get-comments?page=${page}&pageSize=${pageSize}`, {moment_id: momentData.id})
         .then(function(response) {
             if (page === 1) setAllComments(response.data.comments);

@@ -11,14 +11,16 @@ import FeedContext from "../../../contexts/Feed"
 import api from "../../../services/api"
 import { useNotifications } from "react-native-notificated"
 import CheckIcon from '../../../assets/icons/svgs/check_circle.svg'
+import LanguageContext from "../../../contexts/Preferences/language"
 
 export default function input ({
     preview = false,
-    placeholder = "Send Comment...",
+    placeholder,
     color = String(ColorTheme().text),
     backgroundColor = String(ColorTheme().blur_button_color),
     autoFocus = false,
 }: CommentsInputProps) {
+    const { t } = React.useContext(LanguageContext)
     const {focusedItemId} = React.useContext(FeedContext)
     const { session } = React.useContext(PersistedContext)
     const [commentText, setCommentText] = React.useState<string>('')
@@ -93,8 +95,8 @@ export default function input ({
         }).then(() => {
             notify('toast', {
                 params: {
-                    description: 'Comment Has been sended with success',
-                    title: 'Comment Sended',
+                    description: t('Comment Has been sended with success'),
+                    title: t('Comment Sended'),
                     icon: <CheckIcon fill={colors.green.green_05.toString()} width={15} height={15}/>
                 }
             })
@@ -105,7 +107,7 @@ export default function input ({
     if(preview) return (
         <View style={input_container}>
             <View style={[textContainer, {justifyContent: 'center'}]}>
-                <Text style={[text, {opacity: 0.4, flex: 0}]}>{placeholder}</Text>
+                <Text style={[text, {opacity: 0.4, flex: 0}]}>{placeholder? placeholder: t('Send Comment') + '...'}</Text>
             </View>
             <Pressable onPress={handleButtonPress}  style={pressable_style}>
                 <Animated.View

@@ -60,7 +60,7 @@ export function MemoriesNavigator() {
                 name="EditMemory"
                 component={EditMemoryScreen}
                 options={{
-                    headerTitle:memory? `Edit ${ truncated({text: memory.title, size: 18})}` : 'Edit Memory',
+                    headerTitle:memory? `Edit ${memory.title}` : 'Edit Memory',
                     headerStyle: [HeaderStyle, {backgroundColor: colors.gray.black}],
                     headerTitleStyle: {color: String(colors.gray.white)},
                     cardStyle: {backgroundColor: String(ColorTheme().background)},

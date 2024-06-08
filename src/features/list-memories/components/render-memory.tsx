@@ -87,7 +87,6 @@ export default function render_memory ({
             <Memory.MainRoot data={memory}>
                 {memory.moments.map((moment, index) => {
                     const container: any = index == 0 && c0 || index == 1 && c1 || index == 2 && c2
-                    console.log(moment)
                     return (
                         <Moment.Root.Main key={moment.id} momentData={moment} sizes={sizes.moment.tiny}>
                             <Pressable style={container} onPress={() => {handlePressed(memory)}}>
