@@ -3,10 +3,11 @@ import api from "../../../services/api"
 import AuthContext from "../../../contexts/auth"
 import { MomentContextsData, MomentProviderProps } from './types'
 import sizes from "../../../layout/constants/sizes"
-import UserActions from "./momentUserActions"
-import {useMomentData} from "./momentData"
+import { useMomentUserActions } from "./momentUserActions"
+import { useMomentData } from "./momentData"
 import MomentOptionsClass from "./momentOptions"
 import PersistedContext from "../../../contexts/Persisted"
+import { use } from "i18next"
 
 const MomentContext = React.createContext<MomentContextsData>({} as MomentContextsData)
 
@@ -22,10 +23,24 @@ export function MomentProvider({
     const [ comment, setComment ] = React.useState<string>('')
 
     const momentDataStore = useMomentData()
+    const momentUserActionsStore = useMomentUserActions()
 
+    React.useEffect(() => { momentDataStore.setMomentData(momentData) }, [momentData])
     React.useEffect(() => {
-        momentDataStore.setMomentData(momentData)
-    }, [momentData])
+        momentUserActionsStore.setMomentUserActions({
+            liked: false,
+            shared: false,
+            viewed: false,
+            clickIntoMoment: false,
+            watchTime: 0,
+            clickProfile: false,
+            commented: false,
+            likeComment: false,
+            skipped: false,
+            showLessOften: false,
+            reported: false
+        })
+    }, [])
 
     async function sendComment() {
 
@@ -51,19 +66,7 @@ export function MomentProvider({
         },
         momentSize: momentSize,
         momentData: momentDataStore,
-        momentUserActions: new UserActions({
-            liked: false,
-            shared: false,
-            viewed: false,
-            clickIntoMoment: false,
-            watchTime: 0,
-            clickProfile: false,
-            commented: false,
-            likeComment: false,
-            skipped: false,
-            showLessOften: false,
-            reported: false
-        })
+        momentUserActions: momentUserActionsStore
     }
 
     return <MomentContext.Provider value={contextValue}>{children}</MomentContext.Provider>

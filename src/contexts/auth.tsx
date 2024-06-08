@@ -28,9 +28,6 @@ export function AuthProvider({ children }: AuthProviderProps) {
   const [ sessionData, setSessionData ] = useState<SessionDataType>({} as SessionDataType)
   const [ jwtToken, setJwtToken ] = useState<string | null>(null)
 
-  React.useEffect(() => {
-    console.log(signInputUsername, signInputPassword)
-  }, [signInputPassword, signInputUsername])
   async function signIn() { 
     try {
       const response = await api.post('/auth/sign-in', {
@@ -39,7 +36,8 @@ export function AuthProvider({ children }: AuthProviderProps) {
       })
       setSessionData(response.data.session)
       setJwtToken(response.data.access_token)
-      storage.set('@circle:sessionId', response.data.session.user.id)
+      const userId = response.data.session.id
+      if(userId) storage.set('@circle:sessionId', Number(userId))
     } catch (error: any) { throw new Error(error.message)}
   }
 
@@ -51,7 +49,8 @@ export function AuthProvider({ children }: AuthProviderProps) {
       })
       setSessionData(response.data.session)
       setJwtToken(response.data.access_token)
-      storage.set('@circle:sessionId', response.data.session.user.id)
+      const userId = response.data.session.id
+      if(userId) storage.set('@circle:sessionId', Number(userId))
     } catch (error: any) { throw new Error(error.message)}
   }
 

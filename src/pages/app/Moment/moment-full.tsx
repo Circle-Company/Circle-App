@@ -3,14 +3,14 @@ import { StatusBar,  useColorScheme, Keyboard, Animated } from 'react-native'
 import { Text, View } from '../../../components/Themed'
 import ColorTheme, { colors } from '../../../layout/constants/colors'
 import sizes from '../../../layout/constants/sizes'
-import MomentContext from '../../../components/moment/context'
 import RenderMomentFull from '../../../features/list-moments/components/render-moment-full'
 import { Comments } from '../../../components/comment'
-import { Moment } from '../../../components/moment'
 import FeedContext from '../../../contexts/Feed'
 import { useKeyboardAnimation } from 'react-native-keyboard-controller'
+import LanguageContext from '../../../contexts/Preferences/language'
 
 export default function MomentFullScreen() {
+    const { t } = React.useContext(LanguageContext)
   const isDarkMode = useColorScheme() === 'dark'
   const { focusedMoment } = React.useContext(FeedContext)
   const { height } = useKeyboardAnimation()
@@ -38,14 +38,15 @@ export default function MomentFullScreen() {
         <View style={container}>
             <StatusBar translucent={false} backgroundColor={String(colors.gray.black)} barStyle={'light-content'}/>
             <RenderMomentFull momentData={focusedMoment} isFocused={true} fromFeed={true} fromAccount={false}/>
-                    <Animated.View ref={bottomContainerRef} style={bottomContainer}>
-                        <Comments.Input
-                            preview={false}
-                            color={isDarkMode ? colors.gray.white.toString() : colors.gray.black.toString()}
-                            backgroundColor={String(isDarkMode ? colors.gray.grey_09 : colors.gray.grey_01)}
-                            autoFocus={false}
-                        />
-                    </Animated.View>                      
+            <Animated.View ref={bottomContainerRef} style={bottomContainer}>
+                <Comments.Input
+                preview={false}
+                placeholder={t('Send Comment')}
+                color={isDarkMode ? colors.gray.white.toString() : colors.gray.black.toString()}
+                backgroundColor={String(isDarkMode ? colors.gray.grey_09 : colors.gray.grey_01)}
+                autoFocus={false}
+                />
+            </Animated.View>                      
         </View>
     )
 }

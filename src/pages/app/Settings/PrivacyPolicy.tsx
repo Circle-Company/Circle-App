@@ -70,7 +70,7 @@ const styles = StyleSheet.create({
   },
   text: {
     fontFamily: 'RedHatDisplay-Medium',
-    color: '#00000099',
+    color: '#fff',
     marginHorizontal: 10
   },
   text2: {

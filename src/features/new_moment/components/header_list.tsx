@@ -7,8 +7,10 @@ import ViewMorebutton from "../../../components/buttons/view_more"
 import ColorTheme from "../../../layout/constants/colors"
 import fonts from "../../../layout/constants/fonts"
 import SelectMomentsContext from "../../../contexts/selectMoments"
+import LanguageContext from "../../../contexts/Preferences/language"
 
 export default function HeaderList() {
+    const { t } = React.useContext(LanguageContext)
     const {setFrom} = React.useContext(SelectMomentsContext)
     const navigation = useNavigation()
 
@@ -39,11 +41,11 @@ export default function HeaderList() {
 
     return (
         <View style={container}>
-            <Text style={title}>All Memories</Text>
+            <Text style={title}>{t('All Memories')}</Text>
             <View style={button_container}>
                 <ViewMorebutton
                     action={handlePress}
-                    text="Create New"
+                    text={t("Create New")}
                     scale={1.2}
                     icon={<AddIcon fill={String(ColorTheme().primary)} width={14} height={14} style={{top: 1}}/>}
                 />

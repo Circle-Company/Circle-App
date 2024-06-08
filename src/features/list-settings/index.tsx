@@ -6,9 +6,12 @@ import { View } from "../../components/Themed"
 import AuthContext from "../../contexts/auth"
 import { truncated } from "../../algorithms/processText"
 import PersistedContext from "../../contexts/Persisted"
+import LanguageContext from "../../contexts/Preferences/language"
+import { SettingsFooterComponent } from "./footer"
 
 export default function ListSettings(){
     const { session } = React.useContext(PersistedContext)
+    const { t } = React.useContext(LanguageContext)
 
     const name_text = session.user.name? truncated({text: session.user.name, size: 18}) : 'add new name'
     const description_text = session.user.description? truncated({text: session.user.description, size: 18}) : 'add new description'
@@ -16,24 +19,24 @@ export default function ListSettings(){
 
     const ListData = [
         {
-            name: "public profile",
+            name: t("Public Profile"),
             content:[
                 {
-                    "name": "Profile Picture",
+                    "name": t("Profile Picture"),
                     "value": null,
                     "type": "IMAGE",
                     "navigateTo": "Settings-ProfilePicture",
                     "secure": false
                 },
                 {
-                    "name": "Name",
+                    "name": t("Name"),
                     "value": name_text,
                     "type": "TEXT",
                     "navigateTo": "Settings-Name",
                     "secure": false
                 },
                 {
-                    "name": "Description",
+                    "name": t("Description"),
                     "value": description_text,
                     "type": "TEXT",
                     "navigateTo": "Settings-Description",
@@ -42,17 +45,17 @@ export default function ListSettings(){
             ]
         },
         {
-            name: "account",
+            name: t("Account"),
             content:[
                 {
-                    "name": "Moments",
+                    "name": t("Moments"),
                     "value": null,
                     "type": "TEXT",
                     "navigateTo": "Settings-All-Moments",
                     "secure": false
                 },
                 {
-                    "name": "Password",
+                    "name": t("Password"),
                     "value": null,
                     "type": "TEXT",
                     "navigateTo": "Settings-Password",
@@ -61,25 +64,24 @@ export default function ListSettings(){
             ]
         },
         {
-            name: "app",
+            name: t("App"),
             content:[
-                /** 
                 {
-                    "name": "Language",
+                    "name": t("Language"),
                     "value": null,
                     "type": "TEXT",
                     "navigateTo": "Settings-Preferences-Language",
                     "secure": false
-                },*/
+                },
                 {
-                    "name": "Open Source",
+                    "name": t("Open Source"),
                     "value": null,
                     "type": "TEXT",
                     "navigateTo": "Settings-Open-Source",
                     "secure": false
                 },
                 {
-                    "name": "Version",
+                    "name": t("Version"),
                     "value": null,
                     "type": "TEXT",
                     "navigateTo": "Settings-Version",
@@ -88,17 +90,17 @@ export default function ListSettings(){
             ]
         },
         {
-            name: "legal",
+            name: t("Legal"),
             content:[
                 {
-                    "name": "Privacy Policy",
+                    "name": t("Privacy Policy"),
                     "value": null,
                     "type": "TEXT",
                     "navigateTo": "Settings-Privacy-Policy",
                     "secure": false
                 },
                 {
-                    "name": "Terms of Service",
+                    "name": t("Terms of Service"),
                     "value": null,
                     "type": "TEXT",
                     "navigateTo": "Settings-Terms-Of-Service",
@@ -107,10 +109,10 @@ export default function ListSettings(){
             ]
         },
         {
-            name: "more",
+            name: t("More"),
             content:[
                 {
-                    "name": "Log Out",
+                    "name": t("Log Out"),
                     "value": null,
                     "type": "TEXT",
                     "navigateTo": "Settings-Log-Out",
@@ -127,6 +129,9 @@ export default function ListSettings(){
                 keyExtractor={(item) => item.name}
                 renderItem={({item}) => {
                     return (<Settings.Section name={item.name} content={item.content} type='ACCOUNT'/>)
+                }}
+                ListFooterComponent={() => {
+                    return <SettingsFooterComponent/>
                 }}
             />      
         </ScrollView>

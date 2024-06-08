@@ -1,5 +1,5 @@
 import React from "react"
-import { View, Pressable,} from "react-native"
+import { View, Pressable, Text} from "react-native"
 import ColorTheme from "../../../layout/constants/colors"
 import { MidiaRender } from "../../midia_render"
 import { useNavigation } from "@react-navigation/native"
@@ -14,11 +14,12 @@ export default function Container({
     contentRender,
     blur_color = String(ColorTheme().background),
     blurRadius = 35,
-    isFocused = true
+    isFocused = true,
+    fromFullMomentScreen = false
 
 }: MomentContainerProps) {
-    const { momentData, momentFunctions, momentSize, momentOptions } = React.useContext(MomentContext)
-    const { commentEnabled, setFocusedMoment} = React.useContext(FeedContext)
+    const { momentData, momentUserActions, momentSize, momentOptions } = React.useContext(MomentContext)
+    const { commentEnabled, setFocusedMoment, setFocusedItemId} = React.useContext(FeedContext)
 
     const navigation = useNavigation()
     
@@ -49,23 +50,44 @@ export default function Container({
         transform: [{scale: 3}]
     }
 
+    const likeAnimationContainer: any = {
+        flex: 1,
+        position: 'absolute',
+        width: momentSize.width,
+        height: momentSize.height,
+        zIndex: 1,
+        alignItems: 'center',
+        justifyContent: 'center'
+    }
+
     async function handlePress() {
+        momentUserActions.handleLikeButtonPressed({})
+        /**
+         * 
         if(!commentEnabled && momentOptions.isFeed) {
+            if(!fromFullMomentScreen && isFocused) {
+                setFocusedMoment(momentData)
+                setFocusedItemId(Number(momentData.id))
+            }
             navigation.navigate('MomentNavigator', { screen: 'DetailScreen' })
-        }
+        }         * 
+         * 
+        */
+
     }
 
     return (
         <View style={container}>
             <View style={content_container}>
                 <Pressable onPress={handlePress}>
+                    {momentUserActions.liked && <View style={likeAnimationContainer}><Text>Liked</Text></View>}
                         <MidiaRender.Root data={contentRender} content_sizes={momentSize}>
                         <MidiaRender.RenderImage isFeed={momentOptions.isFeed} enableBlur={true} blur={!isFocused}/>
                         </MidiaRender.Root>                  
                 </Pressable>                
             </View>
             {!commentEnabled? 
-                            momentOptions.isFocused? children : null               
+                    momentOptions.isFocused? children : null               
                     :
                         <Animated.View style={tiny_container} entering={FadeIn.delay(300).duration(200)} exiting={FadeOut.duration(100)}>
                             <UserShow.Root data={momentData.user}>

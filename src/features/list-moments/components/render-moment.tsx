@@ -26,8 +26,6 @@ export default function render_moment ({
     const [opacityValue] = React.useState(new Animated.Value(1))
     const isDarkMode = useColorScheme() === 'dark'
 
-    React.useEffect(() => { if(isFocused) setFocusedMoment(momentData)}, [isFocused])
-
     React.useEffect(() => {
         if(isFocused){
             if(commentEnabled) {

@@ -9,17 +9,27 @@ import sizes from '../../../layout/constants/sizes'
 import { useKeyboardAnimation } from 'react-native-keyboard-controller'
 import api from '../../../services/api'
 import PersistedContext from '../../../contexts/Persisted'
+import BottomTabsContext from '../../../contexts/bottomTabs'
+import { useIsFocused} from '@react-navigation/native'
+import LanguageContext from '../../../contexts/Preferences/language'
 
 export default function HomeScreen() {
   const isDarkMode = useColorScheme() === 'dark';
+  const { t } = React.useContext(LanguageContext)
+  const { setCurrentTab } = React.useContext(BottomTabsContext)
   const { commentEnabled, setCommentEnabled, showKeyboard, focusedItemId} = React.useContext(FeedContext);
   const { height } = useKeyboardAnimation()
+  const isFocused = useIsFocused()
 
   const bottomContainerRef = useRef(null);
   useEffect(() => {
     const keyboardDidHideListener = Keyboard.addListener('keyboardDidHide', () => { setCommentEnabled(false) })
     return () => { keyboardDidHideListener.remove() }      
   }, [])
+
+  React.useEffect(() => {
+    setCurrentTab('Home')
+  }, [isFocused])
 
   const container = {
     alignItems: 'center',
@@ -45,6 +55,7 @@ export default function HomeScreen() {
             <Animated.View ref={bottomContainerRef} style={bottomContainer}>
                 <Comments.Input
                     preview={false}
+                    placeholder={t('Send Comment')}
                     color={isDarkMode ? colors.gray.white.toString() : colors.gray.black.toString()}
                     backgroundColor={String(isDarkMode ? colors.gray.grey_09 : colors.gray.grey_01)}
                     autoFocus={showKeyboard? true: false}

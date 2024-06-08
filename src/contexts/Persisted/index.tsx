@@ -12,7 +12,7 @@ export type PersistedContextData = { session: SessionDataType }
 const PersistedContext = React.createContext<PersistedContextData>({} as PersistedContextData)
 
 export function Provider({ children }: PersistedProviderProps) {
-    const { sessionData } = React.useContext(AuthContext)
+    const { sessionData, signOut, checkIsSigned} = React.useContext(AuthContext)
 
     const sessionUser = useUserStore()
     const sessionAccount = useAccountStore()
@@ -25,6 +25,16 @@ export function Provider({ children }: PersistedProviderProps) {
         if(sessionData.preferences) sessionPreferences.setPreferences(sessionData.preferences)
         if(sessionData.statistics) sessionStatistics.setStatistics(sessionData.statistics)
     }, [sessionData])
+
+    React.useEffect(() => {
+        const isSigned = checkIsSigned()
+        if(!isSigned) {
+            sessionUser.removeUserFromStorage()
+            sessionAccount.removeAccountFromStorage()
+            sessionPreferences.removePreferencesFromStorage()
+            sessionStatistics.removeStatisticsFromStorage()
+        }
+    }, [signOut])
 
     const contextValue: any = {
         session: {

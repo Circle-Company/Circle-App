@@ -8,6 +8,8 @@ import ColorTheme, { colors } from "../../../../layout/constants/colors";
 import sizes from "../../../../layout/constants/sizes";
 import NewMoment from '../../../../assets/icons/svgs/memory.svg'
 import ViewProfileContext from "../../../../contexts/viewProfile";
+import { useColorScheme } from "react-native";
+import LanguageContext from "../../../../contexts/Preferences/language";
 
 type AnyMemoryCardProps = {
     isAccountScreen?: boolean
@@ -15,8 +17,10 @@ type AnyMemoryCardProps = {
 
 export default function AnyMemoryCard({isAccountScreen = false}: AnyMemoryCardProps) {
     const { userProfile } = React.useContext(ViewProfileContext)
+    const { t } = React.useContext(LanguageContext)
     const {setFrom} = React.useContext(SelectMomentsContext)
     const navigation = useNavigation()
+    const isDarkMode = useColorScheme() === 'dark'
 
     function handlePress() {
         setFrom('NEW_MEMORY')
@@ -24,15 +28,22 @@ export default function AnyMemoryCard({isAccountScreen = false}: AnyMemoryCardPr
     }
 
     const container: any = {
-        flex: 1,
+        width: sizes.screens.width,
+        height: sizes.headers.height,
         alignItems: 'center',
-        justifyContent: 'center'
+        justifyContent: 'center',
+        flexDirection: 'row',
+        backgroundColor: isDarkMode? colors.gray.grey_09 : colors.gray.grey_01,
+        borderBottomWidth: 1,
+        borderTopWidth: 1,
+        paddingHorizontal: sizes.paddings['2sm'],
+        borderColor: isDarkMode? colors.gray.grey_08: colors.gray.grey_02
     }
     const title: any = {
         fontSize: fonts.size.footnote,
         fontFamily: fonts.family.Medium,
         color: ColorTheme().textDisabled,
-        marginBottom: sizes.margins['1md']
+        flex: 1,
     }
     const text: any = {
         fontSize: fonts.size.footnote,
@@ -47,7 +58,6 @@ export default function AnyMemoryCard({isAccountScreen = false}: AnyMemoryCardPr
 
     return(
         <View style={container}>
-            <View style={{top: sizes.sizes["1md"], alignItems: 'center'}}>
                 <Text style={title}>{titleText}</Text>
                 {isAccountScreen &&
                     <HeaderButton
@@ -58,12 +68,11 @@ export default function AnyMemoryCard({isAccountScreen = false}: AnyMemoryCardPr
                         width={140}
                         marginRight={false}
                     >
-                        <Text style={text}>New Memory</Text>
+                        <Text style={text}>{t('New Memory')}</Text>
                         <NewMoment fill={colors.gray.white.toString()} width={16} height={16}/>
                     </HeaderButton>
                 }
-
-            </View>                
+            
             </View>
 
     )

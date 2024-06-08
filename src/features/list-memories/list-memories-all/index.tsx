@@ -10,9 +10,11 @@ import EndReached from './components/end-reached';
 import NetworkContext from '../../../contexts/network';
 import OfflineCard from '../../../components/general/offline';
 import PersistedContext from '../../../contexts/Persisted';
+import MemoryContext from '../../../contexts/memory';
 
 export default function ListMemoriesAllSeparatedbyDate() {
     const { session } = React.useContext(PersistedContext)
+    const { allMemoriesUserId } = React.useContext(MemoryContext)
     const [allMemories, setAllMemories] = React.useState<Object[]>([]);
     const [page, setPage] = React.useState(1);
     const [pageSize, setPageSize] = React.useState(30);
@@ -21,9 +23,8 @@ export default function ListMemoriesAllSeparatedbyDate() {
     const [endReached, setEndReached] = React.useState(false);
     const isDarkMode = useColorScheme() === 'dark'
     const {networkStats} = React.useContext(NetworkContext)
-
     const fetchData = async () => {
-        await api.post(`/memory/get-user-memories?page=${page}&pageSize=${pageSize}`, { user_id: session.user.id })
+        await api.post(`/memory/get-user-memories?page=${page}&pageSize=${pageSize}`, { user_id: allMemoriesUserId })
             .then(function (response) {
                 if (page === 1) {
                     setAllMemories(response.data.memories);
@@ -31,6 +32,7 @@ export default function ListMemoriesAllSeparatedbyDate() {
                     setAllMemories([...allMemories, ...response.data.memories]);
                     if(pageSize > response.data.memories.length) setEndReached(true)
                     else setEndReached(false)
+
                 }setPage(page + 1)
             })
             .catch(function (error) { console.log(error) });
@@ -92,6 +94,7 @@ export default function ListMemoriesAllSeparatedbyDate() {
                         data={item}
                         date_text={item.date}
                         count={item.count}
+                        user_id={allMemoriesUserId}
                     />
                 );                
             }}

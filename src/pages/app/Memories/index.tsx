@@ -3,9 +3,12 @@ import { StatusBar,  useColorScheme } from 'react-native'
 import { Text, View } from '../../../components/Themed'
 import ColorTheme, { colors } from '../../../layout/constants/colors'
 import ListMemoriesAll from '../../../features/list-memories/list-memories-all';
+import { NativeStackScreenProps } from '@react-navigation/native-stack';
 
-export default function MemoriesScreen() {
+export default function MemoriesScreen({route}: any) {
   const isDarkMode = useColorScheme() === 'dark'
+
+  console.log(route.params)
 
   const container  = {
     alignItems:'center',

@@ -83,13 +83,13 @@ export const useUserStore = create<UserState>((set) => ({
                     verified: user.verifyed,
                     profile_picture: user.profile_picture
                 })
-                storage.set(storageKey.id, user.id);
-                storage.set(storageKey.name, user.name)
-                storage.set(storageKey.username, user.username);
-                storage.set(storageKey.description, user.description);
-                storage.set(storageKey.verifyed, user.verifyed);
-                storage.set(storageKey.profile_picture.small, user.profile_picture.small_resolution)
-                storage.set(storageKey.profile_picture.tiny, user.profile_picture.tiny_resolution)
+                if(user.id) storage.set(storageKey.id, user.id)
+                if(user.name) storage.set(storageKey.name, user.name)
+                if(user.username) storage.set(storageKey.username, user.username);
+                if(user.description) storage.set(storageKey.description, user.description);
+                if(user.verifyed) storage.set(storageKey.verifyed, user.verifyed);
+                if(user.profile_picture.small_resolution) storage.set(storageKey.profile_picture.small, user.profile_picture.small_resolution)
+                if(user.profile_picture.tiny_resolution) storage.set(storageKey.profile_picture.tiny, user.profile_picture.tiny_resolution)
                 return response.data
              })
             .catch(function (error) { console.log(error)})
@@ -108,13 +108,13 @@ export const useUserStore = create<UserState>((set) => ({
             verified: value.verifyed,
             profile_picture: value.profile_picture
         })
-        storage.set(storageKey.id, value.id);
-        storage.set(storageKey.name, value.name)
-        storage.set(storageKey.username, value.username);
-        storage.set(storageKey.description, value.description);
-        storage.set(storageKey.verifyed, value.verifyed);
-        storage.set(storageKey.profile_picture.small, value.profile_picture.small_resolution)
-        storage.set(storageKey.profile_picture.tiny, value.profile_picture.tiny_resolution)
+        if(value.id) storage.set(storageKey.id, value.id)
+        if(value.name) storage.set(storageKey.name, value.name)
+        if(value.username) storage.set(storageKey.username, value.username);
+        if(value.description) storage.set(storageKey.description, value.description);
+        if(value.verifyed) storage.set(storageKey.verifyed, value.verifyed);
+        if(value.profile_picture.small_resolution) storage.set(storageKey.profile_picture.small, value.profile_picture.small_resolution)
+        if(value.profile_picture.tiny_resolution) storage.set(storageKey.profile_picture.tiny, value.profile_picture.tiny_resolution)
     },
     loadUserFromStorage: () => {
         set({

@@ -10,6 +10,7 @@ import { useNotifications } from "react-native-notificated"
 import UploadIcon from '../assets/icons/svgs/arrow_up.svg'
 import CheckIcon from '../assets/icons/svgs/check_circle.svg'
 import { colors } from "../layout/constants/colors"
+import LanguageContext from "./Preferences/language"
 
 type NewMomentProviderProps = {
     children: React.ReactNode
@@ -47,6 +48,7 @@ const NewMomentContext = React.createContext<NewMomentContextsData>({} as NewMom
 
 export function NewMomentProvider({children}: NewMomentProviderProps) {
     const { session } = React.useContext(PersistedContext)
+    const { t } = React.useContext(LanguageContext)
     const [selectedImage, setSelectedImage] = React.useState<any>()
     const [description, setDescription] = React.useState<string>('')
     const [tags, setTags] = React.useState<TagProps[]>([])
@@ -109,11 +111,14 @@ export function NewMomentProvider({children}: NewMomentProviderProps) {
                 setCreatedMoment(response.data)
                 notify('toast', {
                     params: {
-                        description: 'Moment Has been uploaded with success',
-                        title: 'Moment Created',
+                        description: t('Moment Has been uploaded with success'),
+                        title: t('Moment Created'),
                         icon: <UploadIcon fill={colors.green.green_05.toString()} width={15} height={15}/>
                     }
                 })
+                setTags([])
+                setDescription('')
+                setSelectedMemory(null)
             })
             .catch(function (error) { console.log(error)})
         }
@@ -131,8 +136,8 @@ export function NewMomentProvider({children}: NewMomentProviderProps) {
                 setSelectedMemory(null)
                 notify('toast', {
                     params: {
-                        description: 'Memory Has been created with success',
-                        title: 'Memory Created',
+                        description: t('Memory Has been created with success'),
+                        title: t('Memory Created'),
                         icon: <CheckIcon fill={colors.green.green_05.toString()} width={15} height={15}/>
                     }
                 })

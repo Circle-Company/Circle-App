@@ -9,11 +9,12 @@ import SelectMomentsContext from '../../contexts/selectMoments'
 import NewMomentContext from '../../contexts/newMoment'
 import ButtonStandart from '../../components/buttons/button-standart'
 import AddIcon from '../../assets/icons/svgs/camera.svg'
+import LanguageContext from '../../contexts/Preferences/language'
 
 
 export default function RenderSelectButton () {
     const { selectedImage, handleLaunchImageLibrary } = React.useContext(NewMomentContext)
-
+    const { t } = React.useContext(LanguageContext)
     const [ active, setActive ] = React.useState(true)
     const navigation = useNavigation()
     const isDarkMode = useColorScheme() === 'dark'
@@ -44,12 +45,12 @@ export default function RenderSelectButton () {
         <View style={container}>
             <ButtonStandart
                 action={onHandlePress}
-                width={sizes.buttons.width*0.46}
+                width={sizes.buttons.width*0.50}
                 margins={false}
                 backgroundColor={String( active? colors.blue.blue_05 : isDarkMode? colors.gray.grey_07 : colors.gray.grey_02)}
                 >
                 <View style={textContainer}>
-                    <Text style={text}>Take a Photo</Text>
+                    <Text style={text}>{t('Select Other')}</Text>
                 </View>
                 <AddIcon fill={String(active? colors.gray.white: isDarkMode?  colors.gray.white : colors.gray.black)} width={14} height={14}/>
             </ButtonStandart>  

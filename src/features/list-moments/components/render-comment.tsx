@@ -7,6 +7,7 @@ import ViewMorebutton from '../../../components/buttons/view_more'
 import ColorTheme from '../../../layout/constants/colors'
 import { MomentDataProps } from '../../../components/moment/context/types'
 import { useKeyboardAnimation } from 'react-native-keyboard-controller'
+import LanguageContext from '../../../contexts/Preferences/language'
 
 type renderCommentProps = {
     moment: MomentDataProps,
@@ -15,6 +16,7 @@ type renderCommentProps = {
 
 export default function render_comment ({moment, focused}: renderCommentProps) {
     const { height, progress } = useKeyboardAnimation()
+    const { t } = React.useContext(LanguageContext)
     const { commentEnabled, setCommentEnabled, setShowKeyboard, setFocusedItemId} = React.useContext(FeedContext)
     const [ animatedOpacityValue ] = React.useState(new Animated.Value(1))
     React.useEffect(() => {
@@ -62,7 +64,7 @@ export default function render_comment ({moment, focused}: renderCommentProps) {
                                 <ViewMorebutton
                                 navigateTo=''
                                 action={() => {handlePress()}}
-                                text='Add Comment'
+                                text={t('Add Comment')}
                                 icon={
                                     <AddIcon
                                         style={{top: 0.6}}

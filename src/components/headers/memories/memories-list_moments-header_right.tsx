@@ -7,12 +7,13 @@ import HeaderButton from '../headerButton'
 import ArrowLeft from '../../../assets/icons/svgs/close.svg'
 import ViewMorebutton from '../../buttons/view_more'
 import fonts from '../../../layout/constants/fonts'
-import { t } from 'i18next'
 import sizes from '../../../layout/constants/sizes'
 import PersistedContext from '../../../contexts/Persisted'
+import LanguageContext from '../../../contexts/Preferences/language'
 
 export default function MemoriesListMomentsHeaderRight({user_id}: {user_id: number}) {
     const { session } = React.useContext(PersistedContext)
+    const { t } = React.useContext(LanguageContext)
     const navigation = useNavigation()
 
     const container: any = {
@@ -24,7 +25,7 @@ export default function MemoriesListMomentsHeaderRight({user_id}: {user_id: numb
         <View style={container}>
             <ViewMorebutton
                 action={() => {navigation.navigate('MemoriesNavigator', { screen: 'EditMemory'})}}
-                text={t('Edit')}
+                text={t('Add')}
                 scale={1.2}
                 fontFamily={fonts .family.Semibold}
             />

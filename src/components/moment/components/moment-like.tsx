@@ -17,7 +17,7 @@ export default function like ({
     margin = sizes.margins["1sm"]
 }: MomentLikeProps) {
     const {momentData, momentUserActions} = React.useContext(MomentContext)
-    
+    const [likedPressed, setLikedPressed] = React.useState(isLiked? isLiked : momentUserActions.liked)
     var animatedScale = React.useRef(new Animated.Value(1)).current
     var animatedScaleIconPressed = React.useRef(new Animated.Value(1)).current
     var animatedScaleIcon = React.useRef(new Animated.Value(1)).current
@@ -49,6 +49,16 @@ export default function like ({
             useNativeDriver: true
         }).start()
     }
+    React.useEffect(() => {
+        if(momentUserActions.liked) {
+           setLikedPressed(true)
+           HandleButtonAnimation()
+        }
+        else{
+            setLikedPressed(false)
+            HandleButtonAnimation()
+        }
+    }, [momentUserActions.liked])
 
     const container: any = {
         minWidth: sizes.buttons.width/4,
@@ -103,16 +113,15 @@ export default function like ({
         paddingRight: 4
     }
 
-    const [likedPressed, setLikedPressed] = React.useState(isLiked? isLiked : momentUserActions.liked)
+    
 
     async function onLikeAction() {
-        await momentUserActions.setLiked(true)
+        await momentUserActions.handleLikeButtonPressed({likedValue: true})
         HandleButtonAnimation()
         setLikedPressed(true)
-        
     }
     async function onUnlikeAction() {
-        await momentUserActions.setLiked(false)
+        await momentUserActions.handleLikeButtonPressed({likedValue: false})
         HandleButtonAnimation()
         setLikedPressed(false)
     }

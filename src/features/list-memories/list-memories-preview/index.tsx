@@ -16,6 +16,7 @@ import { colors } from '../../../layout/constants/colors';
 import { userReciveDataProps } from '../../../components/user_show/user_show-types';
 import Animated, { FadeInLeft } from 'react-native-reanimated';
 import MemoryContext from '../../../contexts/memory';
+import PersistedContext from '../../../contexts/Persisted';
 
 type RenderMemoriesPreviewProps = {
     enableScroll?: boolean
@@ -25,11 +26,13 @@ type RenderMemoriesPreviewProps = {
 
 export default function ListMemoriesPreview({isAccountScreen = false, user}: RenderMemoriesPreviewProps) {
     const [memories, setMemories] = React.useState([])
+    const { session } = React.useContext(PersistedContext)
     const [loading, setLoading] = React.useState(false)
     const [page, setPage] = React.useState(1)
     const [pageSize, setPageSize] = React.useState(3)
     const [refreshing, setRefreshing] = React.useState(false)
     const [endReached, setEndReached] = React.useState(false)
+    const { setAllMemoriesUserId } = React.useContext(MemoryContext)
     const { networkStats } = React.useContext(NetworkContext)
     const isDarkMode = useColorScheme() === 'dark'
 
@@ -93,7 +96,6 @@ export default function ListMemoriesPreview({isAccountScreen = false, user}: Ren
         </Loading.Container>
     );
     if (memories.length === 0) return <AnyMemoryCard isAccountScreen={isAccountScreen}/>;
-
     return (
         <View style={container}>
             <Memory.Header>
@@ -101,7 +103,10 @@ export default function ListMemoriesPreview({isAccountScreen = false, user}: Ren
                     <RenderMemoriesCount count={memories.length} />
                 </Memory.HeaderLeft>
                 <Memory.HeaderRight>
-                    <ViewMorebutton action={() => navigation.navigate('MemoriesNavigator', { screen: 'Memories' })} text="View All" />
+                    <ViewMorebutton action={() => {
+                        navigation.navigate('MemoriesNavigator', { screen: 'Memories' })
+                        setAllMemoriesUserId(isAccountScreen? session.user.id : user.id)
+                    }} text="View All" />
                 </Memory.HeaderRight>
             </Memory.Header>
             <FlatList
@@ -138,7 +143,7 @@ export default function ListMemoriesPreview({isAccountScreen = false, user}: Ren
                 renderItem={({ item, index }) => {
                     return(
                     <Animated.View entering={FadeInLeft.duration(200)}>
-                        <RenderMemory user_id={user.id} memory={item} />
+                        <RenderMemory memory={item} user_id={user.id} />
                     </Animated.View>
                     
                     )

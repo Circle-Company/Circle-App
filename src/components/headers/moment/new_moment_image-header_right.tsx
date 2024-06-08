@@ -6,9 +6,10 @@ import ViewMorebutton from '../../buttons/view_more'
 import sizes from '../../../layout/constants/sizes'
 import fonts from '../../../layout/constants/fonts'
 import NewMomentContext from '../../../contexts/newMoment'
+import LanguageContext from '../../../contexts/Preferences/language'
 
 export default function NewMomentImageRight() {
-
+    const { t } = React.useContext(LanguageContext)
     const { selectedImage } = React.useContext(NewMomentContext)
 
     const navigation = useNavigation()
@@ -23,7 +24,7 @@ export default function NewMomentImageRight() {
         <View style={container}>
             <ViewMorebutton
                 action={() => {selectedImage? navigation.navigate('MomentNavigator', { screen: 'NewMomentDescription'}): null}}
-                text='Next' scale={1.2}
+                text={t('Next')} scale={1.2}
                 fontFamily={selectedImage? fonts.family.Bold: fonts.family.Semibold }
             />
         </View>

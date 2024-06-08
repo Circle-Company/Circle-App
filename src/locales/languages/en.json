@@ -81,5 +81,52 @@
     "You are offline": "You are offline",
 
     "Create": "Create",
-    "Next": "Next"
+    "Next": "Next",
+    "Add": "Add",
+    "View All": "View All",
+    "All Memories": "All Memories",
+    "Add Comment": "Add Comment",
+    "Done": "Done",
+
+    "Public Profile": "Public Profile",
+    "Profile Picture": "Profile Picture",
+    "Name": "Name",
+    "Description": "Description",
+    "Account": "Account",
+    "Password": "Password",
+    "App": "App",
+    "Language": "Language",
+    "Open Source": "Open Source",
+    "Version": "Version",
+    "Legal": "Legal",
+    "Privacy Policy": "Privacy Policy",
+    "Terms of Service": "Terms of Service",
+    "More": "More",
+    "Log Out": "Log Out",
+
+    "Most Relevants": "Most Relevants",
+    "Send Comment": "Send Comment",
+    "No more Moments": "No more Moments",
+    "No more Memories": "No more Memories",
+    "No more Notifications": "No more Notifications",
+
+    "Select Image": "Select Image",
+    "Select Other": "Select Other",
+    "Add to Memory": "Add to Memory",
+    "Create New": "Create New",
+    "Moment Created": "Moment Created",
+    "Memory Created": "Memory Created",
+    "Comment Sended": "Comment Sended",
+
+    "description": "description",
+    "Tags": "Tags",
+    "tag name": "tag name",
+
+    "*The description will be visible for all users to see": "*The description will be visible for all users to se",
+    "*Type one tag at a time and press 'Add' to add it": "*Type one tag at a time and press 'Add' to add it",
+    "Moment Has been uploaded with success": "Moment Has been uploaded with success",
+    "Memory Has been created with success": "Memory Has been created with success",
+    "Comment Has been sended with success": "Comment Has been sended with success",
+
+    "Made with love in Brazil": "Made with love in Brazil"
 }

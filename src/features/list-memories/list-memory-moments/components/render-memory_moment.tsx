@@ -99,7 +99,7 @@ export function RenderMemoryMoment ({ moment, focused = true }: RenderMemoryMome
     }
     const footer_left_container: any = {
         alignItems: 'center',
-        justifyContent: 'center',
+        justifyContent: 'flex-start',
         flexDirection: 'row',
         flex: 1
     }
@@ -123,6 +123,9 @@ export function RenderMemoryMoment ({ moment, focused = true }: RenderMemoryMome
                 <Animated.View style={footer_container}>
                     <View style={footer_left_container}>
                         <Moment.LikeButton isLiked={false} backgroundColor={String(colors.gray.grey_07)}/>
+                    </View>
+                    <View style={footer_right_container}>
+                    <Moment.MoreButton color={String(colors.gray.white)} backgroundColor={String(colors.gray.grey_07)}/>
                     </View>
                     {/**
                      * 

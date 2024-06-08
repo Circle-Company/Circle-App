@@ -90,7 +90,6 @@ export type MomentUserActionsReturnsProps = {
     skipped: boolean
     showLessOften: boolean
     reported: boolean
-    setLiked: (value: boolean) => Promise<void>
     setShared: (value: boolean) => Promise<void>
     setViewed: (value: boolean) => Promise<void>
     setClickIntoMoment: (value: boolean) => Promise<void>
@@ -101,6 +100,10 @@ export type MomentUserActionsReturnsProps = {
     setSkipped: (value: boolean) => Promise<void>
     setShowLessOften: (value: boolean) => Promise<void>
     setReported: (value: boolean) => Promise<void>
+
+    setMomentUserActions: (momentUserActions: MomentUserActionsProps) => void
+    injectInteractionsToList: () => void
+    handleLikeButtonPressed: ({likedValue}: {likedValue?: boolean}) => void
 }
 
 export type MomentSizeProps = {
@@ -115,16 +118,9 @@ export type MomentSizeProps = {
     borderBottomRightRadius?: number
 }
 
-export type MomentFunctionsProps = {
-    setComment: React.Dispatch<React.SetStateAction<string>>
-    sendComment: () => Promise<void>
-    sendUserInteraction: () => Promise<void>
-}
-
 export type MomentContextsData = {
     momentData: MomentDataReturnsProps
     momentSize: MomentSizeProps
     momentOptions: MomentOptionsProps
     momentUserActions: MomentUserActionsReturnsProps
-    momentFunctions: MomentFunctionsProps
 }

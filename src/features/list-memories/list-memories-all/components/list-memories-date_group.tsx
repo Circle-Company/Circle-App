@@ -11,12 +11,14 @@ type RenderMemoriesAllProps = {
     data: any,
     date_text: string,
     count: number, 
-    enableScroll?: boolean
+    enableScroll?: boolean,
+    user_id: number
 }
 export function ListMemoriesAll ({
     data,
     date_text,
-    count
+    count,
+    user_id
 }: RenderMemoriesAllProps) {
 
     const isDarkMode = useColorScheme() === 'dark'
@@ -67,7 +69,7 @@ export function ListMemoriesAll ({
                     return (
                     <Animated.View entering={FadeInLeft.duration(200)}>
                         <View style={memories_container}>
-                            <RenderMemory memory={item} index={index} numOfMemories={memories.content.length}/>
+                            <RenderMemory memory={item} user_id={user_id} numOfMemories={memories.content.length}/>
                         </View>
                         
                     </Animated.View>

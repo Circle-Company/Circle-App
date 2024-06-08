@@ -19,7 +19,7 @@ export default function render_comment ({comment, index, preview}: CommentsRende
     
     const container:any = {
         flexDirection: 'row',
-        marginTop: preview? sizes.margins["1sm"]*0.8 : sizes.margins["3sm"],
+        marginTop: preview? sizes.margins["1sm"]*0.8 : sizes.margins["1md"],
         marginBottom:  preview? sizes.margins["1sm"]*0.5 : sizes.margins["2sm"],
     }
     const container_left:any = {

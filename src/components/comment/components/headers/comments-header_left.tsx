@@ -5,9 +5,11 @@ import Trend from '../../../../assets/icons/svgs/trend.svg'
 import ColorTheme from "../../../../layout/constants/colors"
 import fonts from "../../../../layout/constants/fonts"
 import sizes from "../../../../layout/constants/sizes"
+import LanguageContext from "../../../../contexts/Preferences/language"
 
 export default function header_left ({}: CommentsHeaderLeftProps) {
-    
+
+    const { t } = React.useContext(LanguageContext)
     const container:any = {
         paddingLeft: sizes.paddings["1sm"]*0.7,
         flexDirection: 'row',
@@ -30,7 +32,7 @@ export default function header_left ({}: CommentsHeaderLeftProps) {
                 width={15}
                 height={15}
             />
-            <Text style={text}>Most Relevant</Text>
+            <Text style={text}>{t('Most Relevants')}</Text>
         </View>
     )           
     
