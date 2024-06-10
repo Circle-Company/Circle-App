@@ -11,7 +11,7 @@ import fonts from "../../layout/constants/fonts";
 
 
 export default function ListLanguagesSelector() {
-    const { changeAppLanguage, languagesList} = React.useContext(LanguageContext)
+    const { changeAppLanguage, languagesList, t} = React.useContext(LanguageContext)
     const { session } = React.useContext(PersistedContext)
 
     function handlePress(value: LanguagesCodesType){ changeAppLanguage(value) }
@@ -69,7 +69,7 @@ export default function ListLanguagesSelector() {
         ListHeaderComponent={() => {
             return (
                 <View style={header_container}>
-                    <Text style={header_text}>{'Select Language'}</Text>
+                    <Text style={header_text}>{t('Select Language')}</Text>
                 </View>
             )
         }}

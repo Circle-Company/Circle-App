@@ -12,10 +12,8 @@ import { SettingsFooterComponent } from "./footer"
 export default function ListSettings(){
     const { session } = React.useContext(PersistedContext)
     const { t } = React.useContext(LanguageContext)
-
     const name_text = session.user.name? truncated({text: session.user.name, size: 18}) : 'add new name'
-    const description_text = session.user.description? truncated({text: session.user.description, size: 18}) : 'add new description'
-
+    const description_text = session.user.description? truncated({text: session.user.description.replace(/(\r\n|\n|\r)/gm, " "), size: 18}) : 'add new description'
 
     const ListData = [
         {

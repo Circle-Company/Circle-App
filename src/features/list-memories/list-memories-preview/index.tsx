@@ -17,6 +17,7 @@ import { userReciveDataProps } from '../../../components/user_show/user_show-typ
 import Animated, { FadeInLeft } from 'react-native-reanimated';
 import MemoryContext from '../../../contexts/memory';
 import PersistedContext from '../../../contexts/Persisted';
+import LanguageContext from '../../../contexts/Preferences/language';
 
 type RenderMemoriesPreviewProps = {
     enableScroll?: boolean
@@ -25,6 +26,7 @@ type RenderMemoriesPreviewProps = {
 };
 
 export default function ListMemoriesPreview({isAccountScreen = false, user}: RenderMemoriesPreviewProps) {
+    const { t } = React.useContext(LanguageContext)
     const [memories, setMemories] = React.useState([])
     const { session } = React.useContext(PersistedContext)
     const [loading, setLoading] = React.useState(false)
@@ -106,7 +108,7 @@ export default function ListMemoriesPreview({isAccountScreen = false, user}: Ren
                     <ViewMorebutton action={() => {
                         navigation.navigate('MemoriesNavigator', { screen: 'Memories' })
                         setAllMemoriesUserId(isAccountScreen? session.user.id : user.id)
-                    }} text="View All" />
+                    }} text={t("View All")}/>
                 </Memory.HeaderRight>
             </Memory.Header>
             <FlatList

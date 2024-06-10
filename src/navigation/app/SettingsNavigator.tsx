@@ -20,11 +20,12 @@ import PreferencesScreen from '../../pages/app/Settings/Preferences'
 import LanguageScreen from '../../pages/app/Settings/Preferences/Language'
 import ContentScreen from '../../pages/app/Settings/Preferences/Content'
 import ProfilePictureScreen from '../../pages/app/Settings/ProfilePicture'
+import LanguageContext from '../../contexts/Preferences/language'
 
 const SettingsStack = createStackNavigator()
  
 export function SettingsNavigator() {
-
+    const { t } = React.useContext(LanguageContext)
     const isDarkMode = useColorScheme() === 'dark'
     const HeaderStyle: any= {
         ...Sizes.headers,
@@ -41,7 +42,7 @@ export function SettingsNavigator() {
             name="Settings"
             component={SettingsScreen}
             options={{
-                headerTitle: 'Settings',
+                headerTitle: t('Settings'),
                 headerStyle: HeaderStyle,
                 headerTintColor: String(ColorTheme().text),
                 cardStyle: {backgroundColor: String(ColorTheme().background)},
@@ -54,7 +55,7 @@ export function SettingsNavigator() {
             name="Settings-ProfilePicture"
             component={ProfilePictureScreen}
             options={{
-                headerTitle: 'Add Profile Picture',
+                headerTitle: t('Add Profile Picture'),
                 headerStyle: HeaderStyle,
                 headerTintColor: String(ColorTheme().text),
                 cardStyle: {backgroundColor: String(ColorTheme().background)},
@@ -65,7 +66,7 @@ export function SettingsNavigator() {
             name="Settings-Description"
             component={SettingsDescriptionScreen}
             options={{
-                headerTitle: 'Add Description',
+                headerTitle: t('Add Description'),
                 headerStyle: HeaderStyle,
                 headerTintColor: String(ColorTheme().text),
                 cardStyle: {backgroundColor: String(ColorTheme().background)},
@@ -76,7 +77,7 @@ export function SettingsNavigator() {
             name="Settings-Name"
             component={SettingsNameScreen}
             options={{
-                headerTitle: 'Add Name',
+                headerTitle: t('Add Name'),
                 headerStyle: HeaderStyle,
                 headerTintColor: String(ColorTheme().text),
                 cardStyle: {backgroundColor: String(ColorTheme().background)},
@@ -87,7 +88,7 @@ export function SettingsNavigator() {
             name="Settings-Password"
             component={SettingsPasswordScreen}
             options={{
-                headerTitle: 'Change Password',
+                headerTitle: t('Change Password'),
                 headerStyle: HeaderStyle,
                 headerTintColor: String(ColorTheme().text),
                 cardStyle: {backgroundColor: String(ColorTheme().background)},
@@ -98,7 +99,7 @@ export function SettingsNavigator() {
             name="Settings-Privacy-Policy"
             component={SettingsPrivacyPolicy}
             options={{
-                headerTitle: 'Privacy Policy',
+                headerTitle: t('Privacy Policy'),
                 headerStyle: HeaderStyle,
                 headerTintColor: String(ColorTheme().text),
                 cardStyle: {backgroundColor: String(ColorTheme().background)},
@@ -109,7 +110,7 @@ export function SettingsNavigator() {
             name="Settings-Terms-Of-Service"
             component={SettingsTermsOfService}
             options={{
-                headerTitle: 'Terms of Service',
+                headerTitle: t('Terms of Service'),
                 headerStyle: HeaderStyle,
                 headerTintColor: String(ColorTheme().text),
                 cardStyle: {backgroundColor: String(ColorTheme().background)},
@@ -120,7 +121,7 @@ export function SettingsNavigator() {
             name="Settings-Push-Notifications"
             component={SettingsScreen}
             options={{
-                headerTitle: 'Push Notifications',
+                headerTitle: t('Push Notifications'),
                 headerStyle: HeaderStyle,
                 headerTintColor: String(ColorTheme().text),
                 cardStyle: {backgroundColor: String(ColorTheme().background)},
@@ -131,7 +132,7 @@ export function SettingsNavigator() {
             name="Settings-All-Moments"
             component={AllMomentsScreen}
             options={{
-                headerTitle: 'All Moments',
+                headerTitle: t('All Moments'),
                 headerStyle: HeaderStyle,
                 headerTintColor: String(ColorTheme().text),
                 cardStyle: {backgroundColor: String(ColorTheme().background)},
@@ -142,7 +143,7 @@ export function SettingsNavigator() {
             name="Settings-Preferences"
             component={PreferencesScreen}
             options={{
-                headerTitle: 'Preferences',
+                headerTitle: t('Preferences'),
                 headerStyle: HeaderStyle,
                 headerTintColor: String(ColorTheme().text),
                 cardStyle: {backgroundColor: String(ColorTheme().background)},
@@ -153,7 +154,7 @@ export function SettingsNavigator() {
             name="Settings-Preferences-Language"
             component={LanguageScreen}
             options={{
-                headerTitle: 'Language',
+                headerTitle: t('Language'),
                 headerStyle: HeaderStyle,
                 headerTintColor: String(ColorTheme().text),
                 cardStyle: {backgroundColor: String(ColorTheme().background)},
@@ -164,7 +165,7 @@ export function SettingsNavigator() {
             name="Settings-Preferences-Content"
             component={ContentScreen}
             options={{
-                headerTitle: 'Content',
+                headerTitle: t('Content'),
                 headerStyle: HeaderStyle,
                 headerTintColor: String(ColorTheme().text),
                 cardStyle: {backgroundColor: String(ColorTheme().background)},
@@ -175,7 +176,7 @@ export function SettingsNavigator() {
             name="Settings-Open-Source"
             component={OpenSourceScreen}
             options={{
-                headerTitle: 'Open Source',
+                headerTitle: t('Open Source'),
                 headerStyle: HeaderStyle,
                 headerTintColor: String(ColorTheme().text),
                 cardStyle: {backgroundColor: String(ColorTheme().background)},
@@ -186,7 +187,7 @@ export function SettingsNavigator() {
             name="Settings-Version"
             component={VersionScreen}
             options={{
-                headerTitle: 'Version',
+                headerTitle: t('Version'),
                 headerStyle: HeaderStyle,
                 headerTintColor: String(ColorTheme().text),
                 cardStyle: {backgroundColor: String(ColorTheme().background)},
@@ -197,7 +198,7 @@ export function SettingsNavigator() {
             name="Settings-Log-Out"
             component={LogOutScreen}
             options={{
-                headerTitle: 'Log Out',
+                headerTitle: t('Log Out'),
                 headerStyle: HeaderStyle,
                 headerTintColor: String(ColorTheme().text), 
                 cardStyle: {backgroundColor: String(ColorTheme().background)},

@@ -5,9 +5,11 @@ import InboxScreen from '../../pages/app/Inbox'
 import { createStackNavigator, CardStyleInterpolators} from '@react-navigation/stack'
 import MemoriesHeaderLeft from '../../components/headers/memories/#'
 import { useColorScheme } from 'react-native'
+import LanguageContext from '../../contexts/Preferences/language'
 const InboxStack = createStackNavigator()
  
 export function InboxNavigator() {
+    const { t } = React.useContext(LanguageContext) 
     const HeaderStyle: any= {
         ...Sizes.headers,
         backgroundColor:  ColorTheme().background,
@@ -23,7 +25,7 @@ export function InboxNavigator() {
             name="Inbox"
             component={InboxScreen}
             options={{
-                headerTitle: 'Inbox',
+                headerTitle: t('Inbox'),
                 headerStyle: [HeaderStyle, {borderBottomWidth: 1, borderColor: isDarkMode? colors.gray.grey_08: colors.gray.grey_02}],
                 headerTintColor: String(ColorTheme().text),
                 cardStyle: {backgroundColor: String(ColorTheme().background)},

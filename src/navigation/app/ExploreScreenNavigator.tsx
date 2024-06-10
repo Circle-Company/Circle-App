@@ -3,10 +3,13 @@ import { createStackNavigator, CardStyleInterpolators } from '@react-navigation/
 import ColorTheme from '../../layout/constants/colors'
 import Sizes from '../../layout/constants/sizes'
 import ExploreScreen from '../../pages/app/Explore'
+import LanguageContext from '../../contexts/Preferences/language'
+import React from 'react'
   
 const ExploreStack = createStackNavigator()
  
 export function ExploreScreenNavigator() {
+    const { t } = React.useContext(LanguageContext)
     const HeaderStyle: any= {
         ...Sizes.headers,
         backgroundColor:  ColorTheme().background,
@@ -20,7 +23,7 @@ export function ExploreScreenNavigator() {
                 name="ExploreScreen"
                 component={ExploreScreen}
                 options={{
-                    headerTitle: 'Explore',
+                    headerTitle: t('Explore'),
                     headerStyle: HeaderStyle,
                     headerShown: false,
                     headerTintColor: String(ColorTheme().text),

@@ -87,6 +87,8 @@
     "All Memories": "All Memories",
     "Add Comment": "Add Comment",
     "Done": "Done",
+    "Delete": "Delete",
+    "Error": "Error",
 
     "Public Profile": "Public Profile",
     "Profile Picture": "Profile Picture",
@@ -117,16 +119,59 @@
     "Moment Created": "Moment Created",
     "Memory Created": "Memory Created",
     "Comment Sended": "Comment Sended",
+    "Moments Deleted": "Moments Deleted",
 
     "description": "description",
     "Tags": "Tags",
     "tag name": "tag name",
 
-    "*The description will be visible for all users to see": "*The description will be visible for all users to se",
+    "Select Language": "Select Language",
+    "Select Moments to put in the Memory": "Select Moments to put in the Memory",
+
+    "make sure it's you": "make sure it's you",
+    "You're deleting the selected Moments": "You're deleting the selected Moments",
+    "You're changing your password": "You're changing your password",
+
+    "Test Version": "Test Version",
+    "beta": "beta",
+
+    "Edit": "Edit",
+    "Inbox": "Inbox",
+    "Memory": "Memory",
+    "Memories": "Memories",
+    "Edit Memory": "Edit Memory",
+    "Settings": "Settings",
+    "Add Profile Picture": "Add Profile Picture",
+    "Add Description": "Add Description",
+    "Add Name": "Add Name",
+    "Change Password": "Change Password",
+    "Push Notifications": "Push Notifications",
+    "All Moments": "All Moments",
+    "Preferences": "Preferences",
+    "Content": "Content",
+
+    "You can't get it back if you forget it.": "You can't get it back if you forget it.",
+    
     "*Type one tag at a time and press 'Add' to add it": "*Type one tag at a time and press 'Add' to add it",
     "Moment Has been uploaded with success": "Moment Has been uploaded with success",
     "Memory Has been created with success": "Memory Has been created with success",
     "Comment Has been sended with success": "Comment Has been sended with success",
+    "Moments has been deleted with success": "Moments has been deleted with success",
+    "We can't delete your Moments": "We can't delete your Moments",
 
-    "Made with love in Brazil": "Made with love in Brazil"
+    "Made with love in Brazil": "Made with love in Brazil",
+
+    "You can view all the moments created and you can delete them if you want. They will be removed from the memories automatically.": "You can view all the moments created and you can delete them if you want. They will be removed from the memories automatically.",
+    "When contributing to an open source project, it is essential to understand the project's license and adopt its code standards.": "When contributing to an open source project, it is essential to understand the project's license and adopt its code standards.",
+    "Testing and documentation are crucial to ensuring code stability and understandability.": "Testing and documentation are crucial to ensuring code stability and understandability.",
+    "Be open to community feedback and break your contributions into manageable chunks.": "Be open to community feedback and break your contributions into manageable chunks.",
+    "Respect existing code and closely monitor revisions.": "Respect existing code and closely monitor revisions.",
+    "Above all, maintain ethical and collaborative conduct to promote a healthy environment in the open source community.": "Above all, maintain ethical and collaborative conduct to promote a healthy environment in the open source community.",
+
+    "The description will be visible for all users to see": "The description will be visible for all users to see",
+    "Your name will be visible for all users to see": "Your name will be visible for all users to see",
+    "Keeping the API version up to date and carefully managing changes and updates is critical to ensuring the stability, security, and continued functionality of the application over time.": "Keeping the API version up to date and carefully managing changes and updates is critical to ensuring the stability, security, and continued functionality of the application over time.",
+    "Beta test verison, performance and features currently present do not represent the final release version": "Beta test verison, performance and features currently present do not represent the final release version",
+
+    "Are you sure you want to permanently delete your selected moments? You won't be able to recover them later.": "Are you sure you want to permanently delete your selected moments? You won't be able to recover them later."
 }

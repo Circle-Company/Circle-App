@@ -5,6 +5,7 @@ import Sizes from '../../layout/constants/sizes'
 import Fonts from '../../layout/constants/fonts'
 import HeaderRigthHome from '../../components/headers/home/Right'
 import HomeScreen from '../../pages/app/Home'
+import config from '../../config'
 import MomentFullScreen from '../../pages/app/Moment/moment-full'
   
 const HomeScreenStack = createStackNavigator()
@@ -23,7 +24,7 @@ export function HomeScreenNavigator() {
         name="HomeScreen"
         component={HomeScreen}
         options={{
-            headerTitle: 'Circle',
+            headerTitle: config.APPLICATION_SHORT_NAME,
             headerTitleAlign: 'left',
             headerTransparent: false,
             headerTitleStyle: {fontFamily: Fonts.family['Black-Italic'], fontSize: Fonts.size.title2},

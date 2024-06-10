@@ -7,9 +7,11 @@ import { useColorScheme } from "react-native";
 import ButtonStandart from "../../../components/buttons/button-standart";
 import Icon from '../../../assets/icons/svgs/trash.svg'
 import fonts from "../../../layout/constants/fonts";
+import LanguageContext from "../../../contexts/Preferences/language";
 
 export default function deleteMoments() {
     const isDarkMode = useColorScheme() === 'dark'
+    const { t } = React.useContext(LanguageContext)
     const {selectedMoments, deleteMoments} = React.useContext(AllMomentsContext)
     const container = {
         width: sizes.screens.width,
@@ -50,7 +52,7 @@ export default function deleteMoments() {
     return (
             <View style={container}>
                 <View style={description_container}>
-                    <Text style={description_text}>Are you sure you want to permanently delete your selected moments? You won't be able to recover them later.</Text>
+                    <Text style={description_text}>{t("Are you sure you want to permanently delete your selected moments? You won't be able to recover them later.")}</Text>
                 </View>
                 
                 <View>
@@ -61,7 +63,7 @@ export default function deleteMoments() {
                         action={deleteMoments}
                         backgroundColor={colors.red.red_05.toString()}
                     >
-                        <Text style={button_text}>Delete</Text>
+                        <Text style={button_text}>{t('Delete')}</Text>
                         <Icon
                             style={icon}
                             fill={colors.gray.white.toString()}

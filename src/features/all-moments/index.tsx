@@ -12,10 +12,12 @@ import { Loading } from "../../components/loading";
 import OfflineCard from "../../components/general/offline";
 import AuthContext from "../../contexts/auth";
 import PersistedContext from "../../contexts/Persisted";
+import LanguageContext from "../../contexts/Preferences/language";
 
 export default function ListAllMoments() {
 
     const isDarkMode = useColorScheme() === 'dark'
+    const { t } = React.useContext(LanguageContext)
     const { session } = React.useContext(PersistedContext)
     const [ allMoments, setAllMoments ] = React.useState([])
     const [loading, setLoading] = React.useState(false)
@@ -89,7 +91,7 @@ export default function ListAllMoments() {
     const header_text: any = {
         marginTop: sizes.margins["2sm"],
         marginBottom: sizes.margins["1sm"],
-        fontSize: fonts.size.footnote*0.9,
+        fontSize: fonts.size.body*0.8,
         fontFamily: fonts.family.Medium,
         color: ColorTheme().textDisabled,
         textAlign: 'justify',
@@ -107,7 +109,7 @@ export default function ListAllMoments() {
     return (
         <ScrollView showsVerticalScrollIndicator={false}>
             <View style={header_container}>
-                <Text style={header_text}>You can view all the moments created and you can delete them if you want. They will be removed from the memories automatically.</Text>
+                <Text style={header_text}>{t('You can view all the moments created and you can delete them if you want. They will be removed from the memories automatically.')}</Text>
             </View>
             <FlatList
                 scrollEnabled={false}

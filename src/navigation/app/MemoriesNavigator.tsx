@@ -16,10 +16,11 @@ import MemoryContext from '../../contexts/memory'
 import MemoriesListMomentsHeaderRight from '../../components/headers/memories/memories-list_moments-header_right'
 import EditMemoryScreen from '../../pages/app/Memories/edit_memory'
 import { truncated } from '../../algorithms/processText'
+import LanguageContext from '../../contexts/Preferences/language'
 const MemoriesStack = createStackNavigator()
  
 export function MemoriesNavigator() {
-
+    const { t } = React.useContext(LanguageContext) 
     const {memory} = React.useContext(MemoryContext)
 
     const isDarkMode = useColorScheme() === 'dark'
@@ -34,6 +35,7 @@ export function MemoriesNavigator() {
                 name="Memories"
                 component={MemoriesScreen}
                 options={{
+                    headerTitle: t("Memories"),
                     headerStyle: [HeaderStyle, {borderBottomWidth: 1, borderColor: isDarkMode? colors.gray.grey_08: colors.gray.grey_02}],
                     cardStyle: {backgroundColor: String(ColorTheme().background)},
                     headerTintColor: String(ColorTheme().text),
@@ -46,7 +48,7 @@ export function MemoriesNavigator() {
                 name="Memory"
                 component={MemoriesListMomentsScreen}
                 options={{
-                    headerTitle:memory? memory.title : 'Memory',
+                    headerTitle:memory? memory.title : t('Memory'),
                     headerStyle: [HeaderStyle, {backgroundColor: colors.gray.black}],
                     headerTitleStyle: {color: String(colors.gray.white)},
                     cardStyle: {backgroundColor: String(ColorTheme().background)},
@@ -60,7 +62,7 @@ export function MemoriesNavigator() {
                 name="EditMemory"
                 component={EditMemoryScreen}
                 options={{
-                    headerTitle:memory? `Edit ${memory.title}` : 'Edit Memory',
+                    headerTitle:memory? `${t("Edit")} ${memory.title}` : t('Edit Memory'),
                     headerStyle: [HeaderStyle, {backgroundColor: colors.gray.black}],
                     headerTitleStyle: {color: String(colors.gray.white)},
                     cardStyle: {backgroundColor: String(ColorTheme().background)},
@@ -73,7 +75,7 @@ export function MemoriesNavigator() {
                 name="NewMemorySelectMoments"
                 component={NewMemorySelectMomentsScreen}
                 options={{
-                    headerTitle:'New Memory',
+                    headerTitle:t('New Memory'),
                     headerStyle: [HeaderStyle],
                     headerTitleStyle: {color: String(ColorTheme().text)},
                     cardStyle: {backgroundColor: String(ColorTheme().background)},
@@ -87,7 +89,7 @@ export function MemoriesNavigator() {
                 name="NewMemoryTitle"
                 component={NewMemoryTitleScreen}
                 options={{
-                    headerTitle:'New Memory',
+                    headerTitle:t('New Memory'),
                     headerStyle: [HeaderStyle],
                     headerTitleStyle: {color: String(ColorTheme().text)},
                     cardStyle: {backgroundColor: String(ColorTheme().background)},
