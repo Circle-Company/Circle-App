@@ -10,8 +10,10 @@ import { useNavigation } from '@react-navigation/native'
 import Icon from '../../../assets/icons/svgs/check_circle.svg'
 import ButtonStandart from '../../../components/buttons/button-standart'
 import PersistedContext from '../../../contexts/Persisted';
+import LanguageContext from '../../../contexts/Preferences/language';
 
 export default function DescriptionScreen() {
+    const { t } = React.useContext(LanguageContext)
     const { session } = React.useContext(PersistedContext)
     const isDarkMode = useColorScheme() === 'dark'
     const maxLength = 300
@@ -127,7 +129,7 @@ export default function DescriptionScreen() {
                     />
                 </View>
                 <View style={bottom_style}>
-                    <Text style={legend_style}>*The description will be visible for all users to see</Text>
+                    <Text style={legend_style}>*{t('The description will be visible for all users to see')}</Text>
                     <Text style={counter}>{description.length}/{maxLength}</Text>
                 </View>
             </View>
@@ -139,7 +141,7 @@ export default function DescriptionScreen() {
                     action={handlePress}
                     backgroundColor={ description? ColorTheme().primary.toString() : ColorTheme().backgroundDisabled.toString()}
                 >
-                    <Text style={button_text}>Done</Text>
+                    <Text style={button_text}>{t('Done')}</Text>
                     <Icon
                         style={icon}
                         fill={String(description? colors.gray.white: isDarkMode? colors.gray.grey_04 + '90' : colors.gray.grey_04 + '90')}

@@ -4,8 +4,10 @@ import { Text, View } from '../../../components/Themed'
 import ColorTheme from '../../../layout/constants/colors'
 import sizes from '../../../layout/constants/sizes';
 import fonts from '../../../layout/constants/fonts';
+import LanguageContext from '../../../contexts/Preferences/language';
 
 export default function OpenSourceScreen() {
+    const { t } = React.useContext(LanguageContext)
     const isDarkMode = useColorScheme() === 'dark'
 
     const container  = {
@@ -21,7 +23,7 @@ export default function OpenSourceScreen() {
     const description_style: any = {
         lineHeight: 12,
         marginBottom: sizes.margins['2sm'],
-        fontSize: fonts.size.body * 0.9,
+        fontSize: fonts.size.body * 0.8,
         fontFamily: fonts.family.Medium,
         color: ColorTheme().textDisabled,
         textAlign: 'justify'
@@ -34,11 +36,11 @@ export default function OpenSourceScreen() {
     }
 
     const textData = [
-        "When contributing to an open source project, it is essential to understand the project's license and adopt its code standards.",
-        'Testing and documentation are crucial to ensuring code stability and understandability.',
-        'Be open to community feedback and break your contributions into manageable chunks.',
-        'Respect existing code and closely monitor revisions.',
-        'Above all, maintain ethical and collaborative conduct to promote a healthy environment in the open source community.',
+        t("When contributing to an open source project, it is essential to understand the project's license and adopt its code standards."),
+        t('Testing and documentation are crucial to ensuring code stability and understandability.'),
+        t('Be open to community feedback and break your contributions into manageable chunks.'),
+        t('Respect existing code and closely monitor revisions.'),
+        t('Above all, maintain ethical and collaborative conduct to promote a healthy environment in the open source community.'),
     ]
 
     const handlePress = () => {

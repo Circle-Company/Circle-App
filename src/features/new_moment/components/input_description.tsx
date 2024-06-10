@@ -91,7 +91,7 @@ export default function DescriptionInput({
                 />
                 <Text style={counter}>{description.length}/{maxLength}</Text>
             </View>
-            <Text style={legend_style}>{t('*The description will be visible for all users to see')}</Text>
+            <Text style={legend_style}>*{t('The description will be visible for all users to see')}</Text>
         </View>
     )
 }

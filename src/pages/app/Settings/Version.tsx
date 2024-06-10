@@ -3,9 +3,12 @@ import { StatusBar,  useColorScheme, Linking, Pressable} from 'react-native'
 import { Text, View } from '../../../components/Themed'
 import ColorTheme from '../../../layout/constants/colors'
 import sizes from '../../../layout/constants/sizes'
-import fonts from '../../../layout/constants/fonts';
+import fonts from '../../../layout/constants/fonts'
+import config from '../../../config';
+import LanguageContext from '../../../contexts/Preferences/language';
 
 export default function VersionScreen() {
+    const { t } = React.useContext(LanguageContext)
     const isDarkMode = useColorScheme() === 'dark'
 
     const container  = {
@@ -14,14 +17,14 @@ export default function VersionScreen() {
     }
 
     const description_container: any = {
-        paddingHorizontal: sizes.paddings['1md'],
+        paddingHorizontal: sizes.paddings['1md'] * 0.6,
         paddingVertical: sizes.paddings['2sm'],
     }
 
     const description_style: any = {
         lineHeight: 12,
         marginBottom: sizes.margins['2sm'],
-        fontSize: fonts.size.body * 0.9,
+        fontSize: fonts.size.body * 0.8,
         fontFamily: fonts.family.Medium,
         color: ColorTheme().textDisabled,
         textAlign: 'justify'
@@ -47,18 +50,18 @@ export default function VersionScreen() {
     }
 
     const data = [
-        {title: 'CIrcle App (Test Version)', version: 'v1.0.0-beta'},
+        {title: config.APPLICATION_NAME + ` (${t('Test Version')})`, version: config.APP_VERSION + '-' + t('beta')},
     ]
 
     return (
         <View style={container}>
             <StatusBar backgroundColor={String(ColorTheme().background)} barStyle={isDarkMode? 'light-content': 'dark-content'}/>
             <View style={description_container}>
-                        <Text style={description_style}>* Keeping the API version up to date and carefully managing changes and updates is critical to ensuring the stability, security, and continued functionality of the application over time.</Text>
+                <Text style={description_style}>*{t('Keeping the API version up to date and carefully managing changes and updates is critical to ensuring the stability, security, and continued functionality of the application over time.')} </Text>
             </View>
 
             <View style={description_container}>
-                        <Text style={[description_style, {top: -10}]}>*Beta test verison, performance and features currently present do not represent the final release version </Text>
+                <Text style={[description_style, {top: -10}]}>*{t('Beta test verison, performance and features currently present do not represent the final release version')}</Text>
             </View>
             {data.map((item, index) => {
                 return (

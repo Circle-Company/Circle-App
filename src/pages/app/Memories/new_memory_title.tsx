@@ -86,7 +86,7 @@ React.useEffect(() => {
       </Animated.View>
 
       <View style={moment_list_container}>
-        <Text style={sub_title}>* Moments that will be added</Text>
+        <Text style={sub_title}>*Moments that will be added</Text>
       <FlatList
         data={selectedMoments}
         horizontal

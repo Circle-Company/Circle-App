@@ -89,6 +89,8 @@
     "All Memories": "Todas as Memórias",
     "Add Comment": "Comentar",
     "Done": "Pronto",
+    "Delete": "Deletar",
+    "Error": "Erro",
 
     "Public Profile": "Perfil Público",
     "Profile Picture": "Foto de Perfil",
@@ -118,16 +120,61 @@
     "Create New": "Criar Novo",
     "Moment Created": "Moment Criado",
     "Comment Sended": "Comentário Enviado",
+    "Moments Deleted": "Moments Deletados",
 
     "description": "descrição",
     "Tags": "Tags",
     "tag name": "nome da tag",
 
-    "*The description will be visible for all users to see": "*A descrição ficará visível para todos os usuários",
+    "Select Language": "Selecione a Língua",
+    "Select Moments to put in the Memory": "Selecione os Moments para colocar na Memória",
+
+    "Make sure it's you": "Certifique-se de que é você",
+    "You're deleting the selected Moments": "Você está excluindo os Moments selecionados",
+    "You're changing your password": "Você está alterando sua senha",
+
+    "Test Version": "Versão de Teste",
+    "beta": "beta",
+
+    "Edit": "Editar",
+    "Inbox": "Caixa de Entrada",
+    "Memory": "Memória",
+    "Memories": "Memórias",
+    "Edit Memory": "Editar Memória",
+    "Settings": "Configurações",
+    "Add Profile Picture": "Nova Foto de Perfil",
+    "Add Description": "Nova Descrição",
+    "Add Name": "Novo Nome",
+    "Change Password": "Mudar Senha",
+    "Push Notifications": "notificações de Push",
+    "All Moments": "Todos os Moments",
+    "Preferences": "Preferências",
+    "Content": "Conteúdo",
+
+
+    "You can't get it back if you forget it.": "Você não pode recuperá-la se esquecer.",
+
     "*Type one tag at a time and press 'Add' to add it": "*Digite uma tag de cada vez e pressione 'Adicionar' para adiciona-la",
     "Moment Has been uploaded with success": "Moment foi carregado com sucesso",
     "Memory Has been created with success": "Memória foi criada com sucesso",
     "Comment Has been sended with success": "Comentário foi enviado com sucesso",
+    "Moments has been deleted with success": "Seus Moments foram excluídos com sucesso",
+    "We can't delete your Moments": "Não conseguimos excluir seus Moments",
 
-    "Made with love in Brazil": "Feito com amor no Brasil"
+    "Made with love in Brazil": "Feito com amor no Brasil",
+
+    "You can view all the moments created and you can delete them if you want. They will be removed from the memories automatically.": "Você pode ver todos os Moments criados e pode deletá-los se quiser. Eles serão removido das Memórias automaticamente.",
+    "When contributing to an open source project, it is essential to understand the project's license and adopt its code standards.": "Ao contribuir para um projeto de código aberto, é essencial compreender a licença do projeto e adotar seus padrões de código.",
+    "Testing and documentation are crucial to ensuring code stability and understandability.": "O teste e a documentação são cruciais para garantir a estabilidade e a compreensão do código.",
+    "Be open to community feedback and break your contributions into manageable chunks.": "Esteja aberto ao feedback da comunidade e divida suas contribuições em partes gerenciáveis.",
+    "Respect existing code and closely monitor revisions.": "Respeite o código existente e monitore de perto as revisões.",
+    "Above all, maintain ethical and collaborative conduct to promote a healthy environment in the open source community.": "Acima de tudo, mantenha uma conduta ética e colaborativa para promover um ambiente saudável na comunidade de código aberto.",
+
+    "The description will be visible for all users to see": "A descrição ficará visível para todos os usuários",
+    "Your name will be visible for all users to see": "Seu nome ficará visível para todos os usuários",
+
+    "Keeping the API version up to date and carefully managing changes and updates is critical to ensuring the stability, security, and continued functionality of the application over time.": "Manter a versão da API atualizada e gerenciar cuidadosamente as alterações e atualizações é fundamental para garantir a estabilidade, a segurança e a funcionalidade contínua do aplicativo ao longo do tempo.",
+    "Beta test verison, performance and features currently present do not represent the final release version": "Versão de teste beta. O desempenho e os recursos presentes atualmente não representam a versão final",
+
+    "Are you sure you want to permanently delete your selected moments? You won't be able to recover them later.": "Tem certeza de que deseja excluir permanentemente os Moments selecionados? Você não poderá recuperá-los depois."
 }

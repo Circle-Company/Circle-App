@@ -8,10 +8,11 @@ import {useNavigation} from '@react-navigation/native'
 import AuthContext from '../../contexts/auth'
 import AccountHeaderRight from '../../components/headers/account/account-header_right'
 import AccountHeaderLeft from '../../components/headers/account/account-header_left'
+import LanguageContext from '../../contexts/Preferences/language'
 const AccountScreenStack = createStackNavigator()
  
 export function AccountScreenNavigator() {
-    const { user } = React.useContext(AuthContext)
+    const { t } = React.useContext(LanguageContext)
     const navigation = useNavigation()
     const HeaderStyle: any= {
         ...Sizes.headers,
@@ -39,7 +40,7 @@ export function AccountScreenNavigator() {
         name="EditAccountScreen"
         component={AccountScreen}
         options={{
-            headerTitle: 'Edit',
+            headerTitle: t('Edit'),
             headerTitleAlign: 'left',
             headerTransparent: false,
             headerTitleStyle: {fontFamily: Fonts.family['Black-Italic'], fontSize: Fonts.size.title2},

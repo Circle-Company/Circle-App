@@ -6,9 +6,10 @@ import sizes from "../../layout/constants/sizes"
 import { Text } from "../../components/Themed"
 import fonts from "../../layout/constants/fonts"
 import ColorTheme from "../../layout/constants/colors"
+import LanguageContext from "../../contexts/Preferences/language"
 
 export default function ListSelectMoments() {
-
+    const { t } = React.useContext(LanguageContext)
     const { all_moments, get_moments } = React.useContext(SelectMomentsContext)
 
     const item_container = {
@@ -33,7 +34,7 @@ export default function ListSelectMoments() {
     return (
         <ScrollView showsVerticalScrollIndicator={false}>
             <View style={header_container}>
-                <Text style={header_text}>Select Moments to put in the Memory</Text>
+                <Text style={header_text}>{t('Select Moments to put in the Memory')}</Text>
             </View>
             <FlatList
                 numColumns={3}

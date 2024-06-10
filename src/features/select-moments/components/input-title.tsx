@@ -5,12 +5,13 @@ import sizes from "../../../layout/constants/sizes"
 import ColorTheme from "../../../layout/constants/colors"
 import fonts from "../../../layout/constants/fonts"
 import SelectMomentsContext from "../../../contexts/selectMoments"
+import LanguageContext from "../../../contexts/Preferences/language"
 type RenderMomentProps = {
 }
 
 export default function TitleInput({
 }: RenderMomentProps) {
-
+    const { t } = React.useContext(LanguageContext)
     const {setTitle, title} = React.useContext(SelectMomentsContext)
 
     const container = {
@@ -47,7 +48,7 @@ export default function TitleInput({
 
     return (
         <View style = {container}>
-            <Text style={text_style}>Title ✏️</Text>            
+            <Text style={text_style}>{t('Title')} ✏️</Text>            
         
             <View style = {input_container}>
                 <TextInput
@@ -56,7 +57,7 @@ export default function TitleInput({
                     numberOfLines={1}
                     maxLength={30}
                     style={input_style}
-                    placeholder="New Memory"
+                    placeholder={t("New Memory")}
                     placeholderTextColor={String(ColorTheme().textDisabled)}
                 />
             </View>

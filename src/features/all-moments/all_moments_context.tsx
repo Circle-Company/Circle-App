@@ -2,6 +2,11 @@ import React from "react"
 import api from "../../services/api"
 import {useNavigation} from '@react-navigation/native'
 import TouchID from 'react-native-simple-biometrics'
+import LanguageContext from "../../contexts/Preferences/language"
+import { colors } from "../../layout/constants/colors"
+import { notify } from "react-native-notificated"
+import CheckIcon from '../../assets/icons/svgs/check_circle.svg'
+import ErrorIcon from '../../assets/icons/svgs/exclamationmark_circle.svg'
 
 type AllMomentsProviderProps = {
     children: React.ReactNode
@@ -23,19 +28,35 @@ export type AllMomentsContextsData = {
 const AllMomentsContext = React.createContext<AllMomentsContextsData>({} as AllMomentsContextsData)
 
 export function AllMomentsProvider({children}: AllMomentsProviderProps) {
+    const { t } = React.useContext(LanguageContext)
     const [selectedMoments, setSelectedMoments] = React.useState<Moment[]>([])
 
-    async function deleteMoments (memory_id: number) {
+    async function deleteMoments() {
         try{
-            const isAuthenticated = await TouchID.requestBioAuth("make sure it's you", `You're deleting the selected Moments`)
+            const isAuthenticated = await TouchID.requestBioAuth(t("Make sure it's you"), t("You're deleting the selected Moments"))
             if (isAuthenticated) {
-                const filtered_moments = selectedMoments.map((item) => {return {id: item.id}})
-                console.log('store_moments: ', memory_id, filtered_moments)
-                await api.post(`/memory/add-moment`, { memory_id, moments_list: [...filtered_moments] })
-                .then(function (response) { return response.data })
-                .catch(function (error) { console.log(error)})   
-                setSelectedMoments([])
-                useNavigation().goBack()                
+                const filtered_moments = selectedMoments.map((item) => {return item.id})
+                await api.post(`/moment/delete-list`, { moment_ids_list: [...filtered_moments] })
+                .then(() => {
+                    notify('toast', {
+                        params: {
+                            description: t('Moments has been deleted with success'),
+                            title: t('Moments Deleted'),
+                            icon: <CheckIcon fill={colors.green.green_05.toString()} width={15} height={15}/>
+                        }
+                    }),
+                    setSelectedMoments([])
+                    useNavigation().goBack()
+                })
+                .catch(() => {
+                    notify('toast', {
+                        params: {
+                            description: t("We can't delete your Moments"),
+                            title: t('Error'),
+                            icon: <ErrorIcon fill={colors.red.red_05.toString()} width={15} height={15}/>
+                        }
+                    })
+                })                
             } else {
                 setSelectedMoments([])
                 useNavigation().goBack() 

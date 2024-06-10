@@ -11,6 +11,7 @@ import AuthContext from "../../../../contexts/auth"
 import React from "react"
 import TouchID from 'react-native-simple-biometrics'
 import PersistedContext from "../../../../contexts/Persisted"
+import LanguageContext from "../../../../contexts/Preferences/language"
 
 export default function item ({
     name,
@@ -22,6 +23,7 @@ export default function item ({
 }: SettingsiItemAccountObjectProps) {
 
     const navigation = useNavigation()
+    const { t } = React.useContext(LanguageContext)
     const isDarkMode = useColorScheme() === 'dark'
     const { session } = React.useContext(PersistedContext)
 
@@ -69,7 +71,7 @@ export default function item ({
 
     async function handlePress () {
         if(secure) {
-            const isAuthenticated = await TouchID.requestBioAuth("make sure it's you", `You're deleting the selected Moments`)
+            const isAuthenticated = await TouchID.requestBioAuth(t("Make sure it's you"), t("You're changing your password"))
             if (isAuthenticated) navigation.navigate('SettingsNavigator', {screen: navigateTo })
         } else navigation.navigate('SettingsNavigator', {screen: navigateTo })
     }

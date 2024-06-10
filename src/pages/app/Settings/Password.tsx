@@ -11,8 +11,10 @@ import Icon from '../../../assets/icons/svgs/check_circle.svg'
 import api from '../../../services/api'
 import { useNavigation } from '@react-navigation/native'
 import PersistedContext from '../../../contexts/Persisted';
+import LanguageContext from '../../../contexts/Preferences/language';
 
 export default function PasswordScreen({}) {
+    const { t } = React.useContext(LanguageContext)
     const { signInputPassword, setSignInputPassword} = React.useContext(AuthContext)
     const { session } = React.useContext(PersistedContext) 
     const isDarkMode = useColorScheme() === 'dark'
@@ -77,7 +79,7 @@ export default function PasswordScreen({}) {
                 action={handlePress}
                 backgroundColor={ signInputPassword? ColorTheme().primary.toString() : ColorTheme().backgroundDisabled.toString()}
             >
-                <Text style={button_text}>Done</Text>
+                <Text style={button_text}>{t("Done")}</Text>
                 <Icon
                     style={icon}
                     fill={String(signInputPassword? colors.gray.white: isDarkMode? colors.gray.grey_04 + '90' : colors.gray.grey_04 + '90')}

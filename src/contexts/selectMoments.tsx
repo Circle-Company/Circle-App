@@ -53,11 +53,9 @@ export function SelectMomentsProvider({children}: SelectMomentsProviderProps) {
 
     async function getMoments() {           
         try{
-            const response = await api.post(`/moment/get-user-moments/tiny?page=1&pageSize=10000`, { user_id: session.user.id })
-            .then(function (response) {return response.data})
+            await api.post(`/moment/get-user-moments/tiny?page=1&pageSize=10000`, { user_id: session.user.id })
+            .then(function (response) {return setAllMoments(response.data.moments)})
             .catch(function (error) { console.log(error)})
-            console.log(response.moments)
-            setAllMoments(response.moments)
         } catch(err) {
             console.error(err)
         }
