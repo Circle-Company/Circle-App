@@ -50,16 +50,6 @@ export default function Container({
         transform: [{scale: 3}]
     }
 
-    const likeAnimationContainer: any = {
-        flex: 1,
-        position: 'absolute',
-        width: momentSize.width,
-        height: momentSize.height,
-        zIndex: 1,
-        alignItems: 'center',
-        justifyContent: 'center'
-    }
-
     async function handlePress() {
         momentUserActions.handleLikeButtonPressed({})
         /**
@@ -80,10 +70,9 @@ export default function Container({
         <View style={container}>
             <View style={content_container}>
                 <Pressable onPress={handlePress}>
-                    {momentUserActions.liked && <View style={likeAnimationContainer}><Text>Liked</Text></View>}
-                        <MidiaRender.Root data={contentRender} content_sizes={momentSize}>
-                        <MidiaRender.RenderImage isFeed={momentOptions.isFeed} enableBlur={true} blur={!isFocused}/>
-                        </MidiaRender.Root>                  
+                    <MidiaRender.Root data={contentRender} content_sizes={momentSize}>
+                    <MidiaRender.RenderImage isFeed={momentOptions.isFeed} enableBlur={true} blur={!isFocused}/>
+                    </MidiaRender.Root>                  
                 </Pressable>                
             </View>
             {!commentEnabled? 
