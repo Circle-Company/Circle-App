@@ -59,11 +59,6 @@ export function MomentProvider({
             isFeed: isFeed,
             isFocused: isFocused
         }),
-        momentFunctions: {
-            sendComment,
-            setComment,
-            sendUserInteraction
-        },
         momentSize: momentSize,
         momentData: momentDataStore,
         momentUserActions: momentUserActionsStore
