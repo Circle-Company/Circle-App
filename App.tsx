@@ -18,32 +18,34 @@ import { Provider as PersistedProvider } from './src/contexts/Persisted'
 import { Provider as ToastProvider } from './src/contexts/Toast'
 import { Provider as ProfileProvider } from './src/contexts/profile'
 import { Provider as BottomTabsProvider } from './src/contexts/bottomTabs'
+import { Provider as BottomSheetProvider } from './src/contexts/bottomSheet'
 import sizes from './src/layout/constants/sizes'
 
 function InnerApp() {
   return (
     <KeyboardProvider enabled={true}>
       <NotificationProvider>
-        <BottomTabsProvider>
-          <ProfileProvider>
-            <ViewProfileProvider>
-              <FeedProvider>
-                <NavigationContainer>
-                  <SelectMomentsProvider>
-                    <MemoryProvider>
-                      <NewMomentProvider>
-                        <Routes/>
-                      </NewMomentProvider>                  
-                    </MemoryProvider>
-                  </SelectMomentsProvider>                
-                </NavigationContainer>
-              </FeedProvider>
-            </ViewProfileProvider>           
-          </ProfileProvider>          
-        </BottomTabsProvider>
-      </NotificationProvider>       
+        <BottomSheetProvider>
+          <BottomTabsProvider>
+            <ProfileProvider>
+              <ViewProfileProvider>
+                <FeedProvider>
+                  <NavigationContainer>
+                    <SelectMomentsProvider>
+                      <MemoryProvider>
+                        <NewMomentProvider>
+                          <Routes/>
+                        </NewMomentProvider>                  
+                      </MemoryProvider>
+                    </SelectMomentsProvider>                
+                  </NavigationContainer>
+                </FeedProvider>
+              </ViewProfileProvider>           
+            </ProfileProvider>          
+          </BottomTabsProvider>
+        </BottomSheetProvider>
+      </NotificationProvider>          
     </KeyboardProvider>   
-
   )
 }
 
