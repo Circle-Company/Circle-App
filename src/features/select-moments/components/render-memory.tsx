@@ -50,7 +50,7 @@ export default function render_memory ({memory, scale = 1}: RenderMemoryProps) {
                 {memory.moments.map((moment, index) => {
                     const container = index == 0 && c0 || index == 1 && c1 || index == 2 && c2
                     return (
-                        <Moment.Root.Main key={moment.id} data={moment} sizes={sizes.moment.tiny}>
+                        <Moment.Root.Main key={moment.id} momentData={moment} momentSize={sizes.moment.tiny}>
                             <View style={container}>
                                 <Memory.Container contentRender={moment.midia} focused={Boolean(index !==0)} pressable={false}/>                  
                             </View>                            
