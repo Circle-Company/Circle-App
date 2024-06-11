@@ -76,7 +76,7 @@ export default function Container({
                 </Pressable>                
             </View>
             {!commentEnabled? 
-                    momentOptions.isFocused? children : null               
+                    isFocused? children : null               
                     :
                         <Animated.View style={tiny_container} entering={FadeIn.delay(300).duration(200)} exiting={FadeOut.duration(100)}>
                             <UserShow.Root data={momentData.user}>
