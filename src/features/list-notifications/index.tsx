@@ -12,9 +12,10 @@ import OfflineCard from '../../components/general/offline';
 import EndReached from '../list-memories/list-memories-all/components/end-reached';
 import AuthContext from '../../contexts/auth';
 import PersistedContext from '../../contexts/Persisted';
+import LanguageContext from '../../contexts/Preferences/language';
 
 export default function ListNotifcations() {
-
+    const { t } = React.useContext(LanguageContext)
     const { session } = React.useContext(PersistedContext)
     const { allNotifications, setReadSocketNotifications } = React.useContext(NotificationContext)
     const [notificationsData, setNotificationsData] = React.useState(allNotifications)
@@ -104,7 +105,7 @@ export default function ListNotifcations() {
                 )
             }}
             ListFooterComponent={() => {
-                if(endReached) return (<EndReached text='No more Notifications'/>)
+                if(endReached) return (<EndReached text={t('No more Notifications')}/>)
                 else return (
                     <Loading.Container width={sizes.screens.width} height={sizes.headers.height * 2}>
                         <Loading.ActivityIndicator/>

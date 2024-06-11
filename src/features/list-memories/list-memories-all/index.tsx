@@ -11,9 +11,11 @@ import NetworkContext from '../../../contexts/network';
 import OfflineCard from '../../../components/general/offline';
 import PersistedContext from '../../../contexts/Persisted';
 import MemoryContext from '../../../contexts/memory';
+import LanguageContext from '../../../contexts/Preferences/language';
 
 export default function ListMemoriesAllSeparatedbyDate() {
     const { session } = React.useContext(PersistedContext)
+    const { t } = React.useContext(LanguageContext)
     const { allMemoriesUserId } = React.useContext(MemoryContext)
     const [allMemories, setAllMemories] = React.useState<Object[]>([]);
     const [page, setPage] = React.useState(1);
@@ -99,7 +101,7 @@ export default function ListMemoriesAllSeparatedbyDate() {
                 );                
             }}
             ListFooterComponent={() => {
-                if(endReached) return (<EndReached text='No more Memories'/>)
+                if(endReached) return (<EndReached text={t('No more Memories')}/>)
                 else return (
                     <Loading.Container width={sizes.screens.width} height={sizes.headers.height * 2}>
                         <Loading.ActivityIndicator/>

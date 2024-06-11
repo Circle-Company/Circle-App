@@ -85,7 +85,9 @@ export default function ListMemoriesPreview({isAccountScreen = false, user}: Ren
 
     const navigation = useNavigation();
 
-    const container = {};
+    const container = {
+        marginTop: sizes.margins["2sm"],
+    };
     const content_container: any = {
         flexDirection: 'row',
     };
@@ -133,7 +135,7 @@ export default function ListMemoriesPreview({isAccountScreen = false, user}: Ren
                         <EndReached
                             width={sizes.moment.tiny.width * 1.2}
                             height={sizes.moment.tiny.height * 0.9}
-                            text='No more Memories'
+                            text={t('No more Memories')}
                         />
                     )
                     else return (
