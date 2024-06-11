@@ -9,6 +9,7 @@ import api from '../../../services/api'
 import NetworkContext from '../../../contexts/network'
 import EndReached from '../list-memories-preview/components/end-reached'
 import OfflineCard from '../../../components/general/offline'
+import LanguageContext from '../../../contexts/Preferences/language'
 
 export default function ListMemoryMoments() {
     const margin = 20
@@ -17,6 +18,7 @@ export default function ListMemoryMoments() {
         memoryMoments,
         setMemoryMoments
     } = React.useContext(MemoryContext)
+    const { t } = React.useContext(LanguageContext)
     const [centerIndex, setCenterIndex] = React.useState<number | null>(null)
     const flatListRef = React.useRef<FlatList | null>(null)
     const [ loading, setLoading ] = React.useState<boolean>(false)
@@ -148,7 +150,7 @@ export default function ListMemoryMoments() {
                     width={sizes.moment.small.width * 0.6}
                     height={(sizes.screens.height - sizes.headers.height) * 0.78}
                     style={{marginLeft: sizes.margins['1lg'], marginRight: sizes.margins['1md']}}
-                    text='No more Moments'
+                    text={t('No more Moments')}
                 />                    
             )
             else return (

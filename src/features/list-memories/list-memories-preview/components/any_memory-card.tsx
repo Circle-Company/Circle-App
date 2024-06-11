@@ -28,6 +28,7 @@ export default function AnyMemoryCard({isAccountScreen = false}: AnyMemoryCardPr
     }
 
     const container: any = {
+        marginTop: sizes.margins["2sm"],
         width: sizes.screens.width,
         height: sizes.headers.height,
         alignItems: 'center',
@@ -52,9 +53,9 @@ export default function AnyMemoryCard({isAccountScreen = false}: AnyMemoryCardPr
         marginRight: sizes.margins['2sm']
     }
 
-    const username = userProfile? `@${userProfile.username}` : 'This user'
+    const username = userProfile? `@${userProfile.username}` : t('This user')
 
-    const titleText = isAccountScreen? "You don't have any memory": `${username} don't have any memory`
+    const titleText = isAccountScreen? t("You don't have any memory"): `${username} ${t("don't have any memory")}`
 
     return(
         <View style={container}>
