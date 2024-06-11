@@ -1,13 +1,10 @@
 import React from "react"
-import api from "../../../services/api"
-import AuthContext from "../../../contexts/auth"
 import { MomentContextsData, MomentProviderProps } from './types'
 import sizes from "../../../layout/constants/sizes"
 import { useMomentUserActions } from "./momentUserActions"
 import { useMomentData } from "./momentData"
-import MomentOptionsClass from "./momentOptions"
+import { useMomentOptions } from "./momentOptions"
 import PersistedContext from "../../../contexts/Persisted"
-import { use } from "i18next"
 
 const MomentContext = React.createContext<MomentContextsData>({} as MomentContextsData)
 
@@ -20,10 +17,11 @@ export function MomentProvider({
 }: MomentProviderProps) {
 
     const { session } = React.useContext(PersistedContext)
-    const [ comment, setComment ] = React.useState<string>('')
-
     const momentDataStore = useMomentData()
     const momentUserActionsStore = useMomentUserActions()
+    const momentOptionsStore = useMomentOptions()
+
+    const isMe = momentData.user?.id? session.user.id == momentData.user.id? true : false : true
 
     React.useEffect(() => { momentDataStore.setMomentData(momentData) }, [momentData])
     React.useEffect(() => {
@@ -40,25 +38,18 @@ export function MomentProvider({
             showLessOften: false,
             reported: false
         })
+        momentOptionsStore.setMomentOptions({
+            isFeed: isFeed,
+            isFocused: isFocused,
+            enableAnalyticsView: isMe,
+            enableModeration: true,
+            enableStoreActions: isMe,
+            enableTranslation: true
+        })
     }, [])
 
-    async function sendComment() {
-
-    }
-
-    async function sendUserInteraction() {
-
-    }
-
     const contextValue: any = {
-        momentOptions: new MomentOptionsClass({
-            enableAnalyticsView: true,
-            enableStoreActions: true,
-            enableTranslation: true,
-            enableModeration: true,
-            isFeed: isFeed,
-            isFocused: isFocused
-        }),
+        momentOptions: momentOptionsStore,
         momentSize: momentSize,
         momentData: momentDataStore,
         momentUserActions: momentUserActionsStore

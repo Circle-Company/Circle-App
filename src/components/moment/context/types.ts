@@ -1,6 +1,7 @@
 import { LanguagesCodesType } from "../../../locales/LanguageTypes"
 import { CommentsReciveDataProps } from "../../comment/comments-types"
 import { userReciveDataProps } from "../../user_show/user_show-types"
+import { MomentOptionsState } from "./momentOptions"
 
 export type MomentDataProps = {
     id: Number
@@ -121,6 +122,6 @@ export type MomentSizeProps = {
 export type MomentContextsData = {
     momentData: MomentDataReturnsProps
     momentSize: MomentSizeProps
-    momentOptions: MomentOptionsProps
+    momentOptions: MomentOptionsState
     momentUserActions: MomentUserActionsReturnsProps
 }
