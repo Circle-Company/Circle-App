@@ -25,7 +25,7 @@ export default function MemoriesListMomentsHeaderRight({user_id}: {user_id: numb
         <View style={container}>
             <ViewMorebutton
                 action={() => {navigation.navigate('MemoriesNavigator', { screen: 'EditMemory'})}}
-                text={t('Add')}
+                text={t('Edit')}
                 scale={1.2}
                 fontFamily={fonts .family.Semibold}
             />
