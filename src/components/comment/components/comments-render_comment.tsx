@@ -10,9 +10,12 @@ import HeartIcon from '../../../assets/icons/svgs/heart_2.svg'
 import HeartIconOutline from '../../../assets/icons/svgs/heart_2-outline.svg'
 import { timeDifferenceConverter } from "../../../algorithms/dateConversor"
 import MomentContext from "../../moment/context"
+import api from "../../../services/api"
+import PersistedContext from "../../../contexts/Persisted"
 
 export default function render_comment ({comment, index, preview}: CommentsRenderCommentProps) {
-    const { momentUserActions } = React.useContext(MomentContext)
+    const { session } = React.useContext(PersistedContext)
+    const { momentUserActions, momentData} = React.useContext(MomentContext)
 
 
     const [like, setLike] = React.useState(false)
@@ -67,13 +70,21 @@ export default function render_comment ({comment, index, preview}: CommentsRende
     const likesNum = like? comment.statistics.total_likes_num + 1 : comment.statistics.total_likes_num 
     const likeLabel = likesNum == 1? 'like' : 'likes'
     
-    function handleLikePress() {
+    async function handleLikePress() {
         if(like){
             momentUserActions.setLikeComment(false)
             setLike(false)
+            await api.post('/moment/unlike-comment', {
+                user_id: session.user.id,
+                comment_id: comment.id
+            }).catch((error) => console.log(error))
         } else {
             momentUserActions.setLikeComment(true)
             setLike(true)
+            await api.post('/moment/like-comment', {
+                user_id: session.user.id,
+                comment_id: comment.id
+            }).catch((error) => console.log(error))
         }
     }
 
