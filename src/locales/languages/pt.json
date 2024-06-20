@@ -80,7 +80,9 @@
 
     "more than a year ago": "mais de um ano atrás",
 
-    "You are offline": "Você está offline",
+    "You are Offline": "Você está offline",
+    "Connected to Internet": "Connectado à Internet",
+    "Reconnecting...": "Reconectando...",
 
     "Create": "Criar",
     "Next": "Próximo",
@@ -124,10 +126,19 @@
     "Moment Created": "Moment Criado",
     "Comment Sended": "Comentário Enviado",
     "Moments Deleted": "Moments Deletados",
+    "Moment deleted": "Moment deletado",
+    "Moments Added": "Moments Adicionados",
+    "Memory Deleted": "Memória Deletada",
+    "Title Edited": "Título Editado",
+    "Delete Moment from": "Deletar Moment de",
+    "Title": "Título",
+    "Add Moments": "Adicionar Moments",
+    "Confirm": "Confirmar",
 
     "description": "descrição",
     "Tags": "Tags",
     "tag name": "nome da tag",
+    "memory title": "título da memória",
 
     "Select Language": "Selecione a Língua",
     "Select Moments to put in the Memory": "Selecione os Moments para colocar na Memória",
@@ -135,6 +146,7 @@
     "Make sure it's you": "Certifique-se de que é você",
     "You're deleting the selected Moments": "Você está excluindo os Moments selecionados",
     "You're changing your password": "Você está alterando sua senha",
+    "You're deleting this memory": "Você está deletando esta memória",
 
     "Test Version": "Versão de Teste",
     "beta": "beta",
@@ -153,7 +165,7 @@
     "All Moments": "Todos os Moments",
     "Preferences": "Preferências",
     "Content": "Conteúdo",
-
+    "Community Guidelines": "Diretrizes da Comunidade",
 
     "You can't get it back if you forget it.": "Você não pode recuperá-la se esquecer.",
 
@@ -162,7 +174,15 @@
     "Memory Has been created with success": "Memória foi criada com sucesso",
     "Comment Has been sended with success": "Comentário foi enviado com sucesso",
     "Moments has been deleted with success": "Seus Moments foram excluídos com sucesso",
+    "Moment has been deleted with success": "Moment foi excluído com sucesso",
+    "Moments successfully added to memory": "Moments foram adicionados com sucesso na memória",
+    "Memory title edited successfully": "O título da memória foi editado com sucesso",
+    "Memory deleted successfully": "Memória foi deletada com sucesso",
+
     "We can't delete your Moments": "Não conseguimos excluir seus Moments",
+    "We can't add these moments to memory": "não conseguimos adicionar estes moments na memória",
+    "We were unable to edit the memory title": "Não conseguimos editar o título da memória",
+    "We can't delete the memory": "Não conseguimos deletar a memória",
 
     "Made with love in Brazil": "Feito com amor no Brasil",
 
@@ -175,9 +195,13 @@
 
     "The description will be visible for all users to see": "A descrição ficará visível para todos os usuários",
     "Your name will be visible for all users to see": "Seu nome ficará visível para todos os usuários",
-
+"Memory title will be visible for all users to see": "O título da memória ficará visível para todos os usuários",
     "Keeping the API version up to date and carefully managing changes and updates is critical to ensuring the stability, security, and continued functionality of the application over time.": "Manter a versão da API atualizada e gerenciar cuidadosamente as alterações e atualizações é fundamental para garantir a estabilidade, a segurança e a funcionalidade contínua do aplicativo ao longo do tempo.",
     "Beta test verison, performance and features currently present do not represent the final release version": "Versão de teste beta. O desempenho e os recursos presentes atualmente não representam a versão final",
 
-    "Are you sure you want to permanently delete your selected moments? You won't be able to recover them later.": "Tem certeza de que deseja excluir permanentemente os Moments selecionados? Você não poderá recuperá-los depois."
+    "Are you sure you want to permanently delete your selected moments? You won't be able to recover them later.": "Tem certeza de que deseja excluir permanentemente os Moments selecionados? Você não poderá recuperá-los depois.",
+    "Are you sure you want to permanently delete this Memory? You won't be able to recover this later.": "Tem certeza de que deseja excluir permanentemente esta Memória? Você não poderá recuperá-la depois.",
+
+    "The Moment will only be removed from this memory.": "O Moment será removido somente desta memória.",
+    "If the memory only has this moment and you remove it, the memory will be deleted.": "Se a memória só tiver esse Moment e você removê-lo, a memória será apagada."
 }
