@@ -35,14 +35,15 @@ export function NotificationProvider({children}: NotificationProviderProps) {
      */
 
     React.useEffect(() => {
-        setNewNotificationsNum(socketNotifications.length)
+        //setNewNotificationsNum(socketNotifications.length)
         if(!lastNotification) setLastNotification(socketNotifications[socketNotifications.length -1])
-        setAllNotifications([...socketNotifications, ...notifications])    
+        //setAllNotifications([...socketNotifications, ...notifications])    
+        setAllNotifications([...notifications])    
     }, [socketNotifications, notifications]);
 
     const setReadSocketNotifications = () => {
-        setNewNotificationsNum(0)
-        setSocketNotifications([])
+        //setNewNotificationsNum(0)
+        //setSocketNotifications([])
         setLastNotification({})
     }
 
