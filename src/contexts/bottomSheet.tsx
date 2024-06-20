@@ -1,7 +1,6 @@
 import React, { useState, useRef, useMemo, useEffect, useCallback } from "react";
-import { Text, useColorScheme } from "react-native";
+import { Text, useColorScheme, View} from "react-native";
 import BottomSheet, { BottomSheetModalProvider, BottomSheetProps } from '@gorhom/bottom-sheet';
-import { View } from "../components/Themed";
 import sizes from "../layout/constants/sizes";
 import { colors } from "../layout/constants/colors";
 import { Pressable } from "react-native";
@@ -38,14 +37,12 @@ export function Provider({ children }: BottomSheetProviderProps) {
   const modalBackgroundStyle: any = {
     borderRadius: sizes.borderRadius['1xl'] * 0.8,
     backgroundColor: isDarkMode ? colors.gray.grey_09 : colors.gray.grey_01,
+    alignItems: 'center'
   };
 
   const modalStyle: any = {
-    zIndex: 1,
-    paddingHorizontal: sizes.paddings['2sm'],
-    paddingTop: sizes.paddings['1sm'],
-    paddingBottom: sizes.paddings["2md"],
-    marginHorizontal: 10,
+    ...sizes.bottomSheet,
+    alignItems: 'center'
   };
 
   const handleStyle: any = {
@@ -69,13 +66,16 @@ export function Provider({ children }: BottomSheetProviderProps) {
             handleIndicatorStyle={handleIndicatorStyle}
             handleStyle={handleStyle}
             style={modalStyle}
-            bottomInset={50}
+            bottomInset={36}
             detached={true}
             backdropComponent={() => ( <CustomBackdrop/> )}
             backgroundStyle={modalBackgroundStyle}
             onClose={() => bottomSheetRef.current?.collapse()}
           >
-            {options.children}
+            <View style={{marginTop: sizes.margins["2sm"]}}>
+              {options.children}
+            </View>
+            
           </BottomSheet>
         )}
       </BottomSheetContext.Provider>
