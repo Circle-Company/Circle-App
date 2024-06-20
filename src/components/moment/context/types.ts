@@ -15,6 +15,15 @@ export type MomentDataProps = {
     created_at: String
 }
 
+export type ExportMomentDataProps = {
+    id: number
+    userId: number
+    tags: TagProps[]
+    type: "IMAGE" | "VIDEO",
+    language: LanguagesCodesType,
+    duration: number
+}
+
 export type MomentDataReturnsProps = {
     id: Number
     user: userReciveDataProps
