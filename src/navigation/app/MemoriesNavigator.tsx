@@ -62,9 +62,12 @@ export function MemoriesNavigator() {
                 name="EditMemory"
                 component={EditMemoryScreen}
                 options={{
-                    headerTitle:memory? `${t("Edit")} ${memory.title}` : t('Edit Memory'),
-                    headerStyle: [HeaderStyle, {backgroundColor: colors.gray.black}],
-                    headerTitleStyle: {color: String(colors.gray.white)},
+                    headerTitle:memory? `${t("Edit")} "${memory.title}"` : t('Edit Memory'),
+                    headerStyle: [HeaderStyle, {
+                        borderBottomWidth: 1,
+                        borderColor: isDarkMode? colors.gray.grey_08: colors.gray.grey_02
+                    }],
+                    headerTitleStyle: {color: String(ColorTheme().text)},
                     cardStyle: {backgroundColor: String(ColorTheme().background)},
                     cardOverlayEnabled: true,
                     cardStyleInterpolator: CardStyleInterpolators.forHorizontalIOS,
