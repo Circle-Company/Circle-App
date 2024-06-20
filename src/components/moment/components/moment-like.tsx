@@ -9,6 +9,8 @@ import { BlurView } from "@react-native-community/blur"
 import LikeIcon from '../../../assets/icons/svgs/heart.svg'
 import { MomentLikeProps } from "../moment-types"
 import MomentContext from "../context"
+import PersistedContext from "../../../contexts/Persisted"
+import api from "../../../services/api"
 
 export default function like ({
     isLiked,
@@ -16,6 +18,7 @@ export default function like ({
     paddingHorizontal = sizes.paddings["2sm"],
     margin = sizes.margins["1sm"]
 }: MomentLikeProps) {
+    const { session } = React.useContext(PersistedContext)
     const {momentData, momentUserActions} = React.useContext(MomentContext)
     const [likedPressed, setLikedPressed] = React.useState(isLiked? isLiked : momentUserActions.liked)
     var animatedScale = React.useRef(new Animated.Value(1)).current
@@ -116,14 +119,22 @@ export default function like ({
     
 
     async function onLikeAction() {
-        await momentUserActions.handleLikeButtonPressed({likedValue: true})
+        momentUserActions.handleLikeButtonPressed({likedValue: true})
         HandleButtonAnimation()
-        setLikedPressed(true)
+        setLikedPressed(true) 
+        await api.post('/moment/like', {
+            user_id: session.user.id,
+            moment_id: momentData.id
+        }).catch((error) => console.log(error))
     }
     async function onUnlikeAction() {
-        await momentUserActions.handleLikeButtonPressed({likedValue: false})
+        momentUserActions.handleLikeButtonPressed({likedValue: false})
         HandleButtonAnimation()
         setLikedPressed(false)
+        await api.post('/moment/unlike', {
+            user_id: session.user.id,
+            moment_id: momentData.id
+        }).catch((error) => console.log(error))
     }
 
     const like_fill: string = String(colors.gray.white)
