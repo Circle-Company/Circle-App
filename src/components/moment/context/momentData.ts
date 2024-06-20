@@ -1,6 +1,6 @@
 import create from 'zustand'
 import api from "../../../services/api"
-import { MomentDataProps, MomentMidiaProps, MomentStatisticsProps, TagProps } from "./types"
+import { ExportMomentDataProps, MomentDataProps, MomentMidiaProps, MomentStatisticsProps, TagProps } from "./types"
 import React from 'react'
 import { userReciveDataProps } from '../../user_show/user_show-types'
 import { CommentsReciveDataProps } from '../../comment/comments-types'
@@ -10,6 +10,7 @@ export interface MomentDataState extends MomentDataProps{
     getStatistics: () => Promise<void>
     getTags: (moment_id: string) => Promise<void>
     setMomentData: (momentData: MomentDataProps) => void
+    exportMomentData: () => Promise<ExportMomentDataProps>
 }
 
 export function useMomentData(): MomentDataState {
@@ -43,6 +44,24 @@ export function useMomentData(): MomentDataState {
         .then((response) => { setTags(response.data) })
         .catch(function (error) { console.log(error)}) 
     }
+
+    async function exportMomentData(): Promise<ExportMomentDataProps> {
+        let exportTags: TagProps[] = []
+        if(tags) exportTags = tags
+        else {
+            await getTags()
+            .finally(() => { exportTags = tags })
+        }
+        return {
+            id: Number(id),
+            userId: Number(user.id),
+            tags: exportTags,
+            type: midia.content_type,
+            language: language,
+            duration: 0
+        }
+    }
+
     function setMomentData (momentData: MomentDataProps) {
         setId(momentData.id)
         setUser(momentData.user)
@@ -68,6 +87,7 @@ export function useMomentData(): MomentDataState {
         getComments,
         getStatistics,
         getTags,
-        setMomentData
+        setMomentData,
+        exportMomentData
     }
 }
