@@ -1,12 +1,12 @@
 import React from "react"
-import { useColorScheme } from "react-native"
+import { useColorScheme, Animated } from "react-native"
 import { colors } from "../../../layout/constants/colors"
 import { ProfilePictureProps } from "../profile-types"
 import { useProfileContext } from "../profile-context"
 import sizes from "../../../layout/constants/sizes"
 import { Pressable } from "react-native"
 import FastImage from "react-native-fast-image"
-import Animated, { FadeIn } from 'react-native-reanimated'
+import { opacity } from "react-native-reanimated/lib/typescript/reanimated2/Colors"
 
 export default function picture ({
     fromProfile = false
@@ -37,6 +37,29 @@ export default function picture ({
     async function onProfilePictureAction() {
     }
 
+    var animatedScale = React.useRef(new Animated.Value(0)).current
+    var animatedOpacity = React.useRef(new Animated.Value(0.2)).current
+
+    function handleAnimation() {
+        Animated.spring(animatedScale, {
+            toValue: 1,
+            bounciness: 5,
+            speed: 80,
+            useNativeDriver: true
+        }).start()
+        Animated.spring(animatedOpacity, {
+            toValue: 1,
+            bounciness: 0,
+            speed: 1,
+            delay: 50,
+            useNativeDriver: true
+        }).start()
+    }
+
+    React.useEffect(() => {
+        handleAnimation()
+    }, [])
+
     React.useEffect(() => {
         if(fromProfile){
             if(user.profile_picture.small_resolution == undefined){
@@ -50,8 +73,13 @@ export default function picture ({
         }
     }, [])
 
+    const animatedContainer: any = {
+        transform: [{ scale: animatedScale }],
+        opacity: animatedOpacity
+    }
+
     return (
-        <Animated.View entering={FadeIn.duration(300)}>
+        <Animated.View style={animatedContainer}>
             <Pressable onPress={onProfilePictureAction} style={[container]}>
                 <FastImage
                     source={{ uri: String(profilePicture) || '' }}
