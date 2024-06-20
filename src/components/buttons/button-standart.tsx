@@ -7,31 +7,45 @@ import sizes from '../../layout/constants/sizes'
 import fonts from '../../layout/constants/fonts'
 
 type ButtonStandartProps = {
-    width?: number,
+    bounciness?: number
+    animationScale?: number
+    width?: number | string,
     height?: number,
     backgroundColor?: string,
     children: React.ReactNode,
-    margins?: boolean,
+    margins?: boolean
+    borderRadius?: number
     action(): void,
 }
 
 export default function button_standart({
+    bounciness = 12,
+    animationScale = 0.8,
     width = sizes.buttons.height*0.5,
     height = sizes.buttons.height*0.5,
     backgroundColor = String(ColorTheme().backgroundDisabled),
     children,
     margins = true,
+    borderRadius = Number(width)/2,
     action,
 }: ButtonStandartProps) {
 
     var animatedScale = React.useRef(new Animated.Value(1)).current
     React.useEffect(() => { animatedScale.setValue(1) }, [])
     const HandleButtonAnimation = () => {
-        animatedScale.setValue(0.8)
         Animated.spring(animatedScale, {
             toValue: 1,
-            bounciness: 12,
+            bounciness: bounciness,
             speed: 10,
+            useNativeDriver: true
+        }).start()
+    }
+
+    const HandlePressIn = () => {
+        Animated.spring(animatedScale, {
+            toValue: animationScale,
+            bounciness: bounciness,
+            speed: 20,
             useNativeDriver: true
         }).start()
     }
@@ -44,17 +58,17 @@ export default function button_standart({
         marginRight: margins? sizes.margins['3sm']: 0,
         width: width,
         height: height,
-        borderRadius: (width)/2
+        borderRadius: borderRadius
     }
 
 
     async function onPress() {
-        HandleButtonAnimation()
+        HandleButtonAnimation
         action()
     }
     return(
         <Animated.View style={{transform: [{ scale: animatedScale }] }}>
-            <Pressable style={container} onPress={onPress}>{children}</Pressable>
+            <Pressable style={container} onPressIn={HandlePressIn} onPressOut={HandleButtonAnimation} onPress={onPress}>{children}</Pressable>
         </Animated.View>          
 
     )
