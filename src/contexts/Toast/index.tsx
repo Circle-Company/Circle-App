@@ -3,8 +3,8 @@ import { createNotifications, MoveUp, MoveDown} from 'react-native-notificated'
 import { Notify} from "react-native-notificated/lib/typescript/types"
 import { DefaultVariants} from "react-native-notificated/lib/typescript/defaultConfig/types"
 import sizes from "../../layout/constants/sizes"
-import { CustomToast as Toast } from "./CustomToast"
-
+import { Toast as StandartToast  } from "./CustomToast/standart"
+import { Toast as TinyToast } from "./CustomToast/tiny"
 type ToastProviderProps = { children: React.ReactNode }
 export type ToastContextsData = {
     toast: Notify<DefaultVariants>
@@ -19,18 +19,25 @@ export function Provider({children}: ToastProviderProps) {
         animationConfig: MoveDown,
         variants: {
             toast: {
-                component: Toast,
+                component: StandartToast,
                 config: {
                   notificationPosition: 'top',
                   duration: 1500,
                 },
-              },
+            },
+            tiny: {
+                component: TinyToast,
+                config: {
+                  notificationPosition: 'top',
+                  duration: 1000,
+                },
+            },
         },
       })
 
     return (
         <NotificationsProvider>
-                {children}    
+            {children}    
         </NotificationsProvider>
 
     )
