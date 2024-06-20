@@ -7,10 +7,8 @@ import FeedContext from '../../../contexts/Feed'
 import { Comments } from '../../../components/comment'
 import sizes from '../../../layout/constants/sizes'
 import { useKeyboardAnimation } from 'react-native-keyboard-controller'
-import api from '../../../services/api'
-import PersistedContext from '../../../contexts/Persisted'
 import BottomTabsContext from '../../../contexts/bottomTabs'
-import { useIsFocused} from '@react-navigation/native'
+import { useIsFocused } from '@react-navigation/native'
 import LanguageContext from '../../../contexts/Preferences/language'
 
 export default function HomeScreen() {
@@ -36,7 +34,7 @@ export default function HomeScreen() {
     flex: 1,
   };
 
-  const bottomContainer = {
+  const bottomContainer: any = {
     bottom: 0,
     paddingVertical: sizes.paddings['1sm'] * 0.4,
     paddingHorizontal: sizes.paddings['2sm'] * 0.8,

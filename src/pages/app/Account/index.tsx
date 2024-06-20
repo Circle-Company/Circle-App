@@ -8,12 +8,21 @@ import { Loading } from '../../../components/loading'
 import sizes from '../../../layout/constants/sizes'
 import { colors } from '../../../layout/constants/colors'
 import PersistedContext from '../../../contexts/Persisted'
+import { useIsFocused } from '@react-navigation/native'
+import BottomTabsContext from '../../../contexts/bottomTabs'
 
 export default function AccountScreen() {
     const { session } = React.useContext(PersistedContext)
+    const { currentTab, setCurrentTab } = React.useContext(BottomTabsContext)
     const [refreshing, setRefreshing] = React.useState(false)
     const [ loading, setLoading] = React.useState(false)
     const isDarkMode = useColorScheme() === 'dark'
+    const isFocused = useIsFocused()
+
+
+    React.useEffect(() => {
+        setCurrentTab('Account')
+      }, [isFocused])
 
     const container = {
         top: 0,
@@ -22,6 +31,7 @@ export default function AccountScreen() {
     const handleRefresh = () => {
         setLoading(true)
         session.user.getUser(session.user.id)
+        session.statistics.getStatistics(session.user.id)
         .finally(() => {
             setTimeout(() => {
             setLoading(false)
