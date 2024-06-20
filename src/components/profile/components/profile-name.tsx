@@ -1,5 +1,5 @@
 import React from "react"
-import { View } from "react-native"
+import { View, Animated } from "react-native"
 import ColorTheme from "../../../layout/constants/colors"
 import { ProfileNameProps } from "../profile-types"
 import ShareIcon from '../../../assets/icons/svgs/arrow_shape_right.svg'
@@ -19,11 +19,28 @@ export default function name ({
 
     const { user } = useProfileContext()
 
+    var animatedOpacity = React.useRef(new Animated.Value(0.2)).current
+
+    function handleAnimation() {
+        Animated.spring(animatedOpacity, {
+            toValue: 1,
+            bounciness: 0,
+            speed: 0.5,
+            useNativeDriver: true,
+            delay: 60
+        }).start()
+    }
+
+    React.useEffect(() => {
+        handleAnimation()
+    }, [])
+
     const container: any = {
         marginHorizontal: margin * scale,
         flexDirection: 'row',
         alignitems: 'center',
-        justifyContent: 'center'
+        justifyContent: 'center',
+        opacity: animatedOpacity
     }
 
     const text_style: any = {
@@ -35,9 +52,9 @@ export default function name ({
         return null
     }
     return (
-        <View style={container}>
+        <Animated.View style={container}>
             <Text style={text_style}>{user.name}</Text>
-        </View>
+        </Animated.View>
         
     )
 }
