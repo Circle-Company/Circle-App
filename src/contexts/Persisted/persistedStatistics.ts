@@ -2,6 +2,7 @@ import create from 'zustand';
 import { StatisticsDataType } from './types';
 import { storage } from '../../store'
 import { storageKeys } from './storageKeys'
+import api from '../../services/api';
 const storageKey = storageKeys().statistics
 
 export interface StatisticsState extends StatisticsDataType {
@@ -9,6 +10,7 @@ export interface StatisticsState extends StatisticsDataType {
     setTotalLikesNum: (value: number) => void;
     setTotalViewsNum: (value: number) => void;
     setStatistics: (value: StatisticsDataType) => void
+    getStatistics: (user_id: number) => Promise<StatisticsState>
     loadStatisticsFromStorage: () => void;
     removeStatisticsFromStorage: () => void;
 }
@@ -30,7 +32,27 @@ export const useStatisticsStore = create<StatisticsState>((set) => ({
         storage.set(storageKey.total_views, value);
         set({ total_views_num: value });
     },
-
+    getStatistics: async (user_id: number) => {
+        try{
+            const response = await api.post(`/user/session/statistics/pk/${user_id}`, { user_id })
+            .then(function (response) {
+                const statistics = response.data
+                set({
+                    total_followers_num: statistics.total_followers_num,
+                    total_likes_num: statistics.total_likes_num,
+                    total_views_num: statistics.total_views_num
+                })
+                if(statistics.total_followers_num) storage.set(storageKey.total_followers, statistics.total_followers_num)
+                if(statistics.total_likes_num) storage.set(storageKey.total_likes, statistics.total_likes_num)
+                if(statistics.total_views_num) storage.set(storageKey.total_views, statistics.total_views_num);
+                return response.data
+             })
+            .catch(function (error) { console.log(error)})
+            return response
+        } catch(err) {
+            console.error(err)
+        } 
+    },
     setStatistics: (value: StatisticsDataType) => {
         set({
             total_followers_num: value.total_followers_num,
