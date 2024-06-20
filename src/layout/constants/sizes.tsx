@@ -58,6 +58,13 @@ const sizes = {
     "3xxl" : 250,
     "4xxl" : 300,
 }
+
+const bottomSheet = {
+  zIndex: 1,
+  paddingHorizontal: paddings['2sm'],
+  paddingBottom: paddings["2md"],
+  marginHorizontal: 10,
+}
 const window = {
     width: WindowWidth,
     height: WindowHeight,
@@ -202,6 +209,7 @@ const moment = {
 const isSmallDevice = WindowWidth < 375
 
 export default {
+    bottomSheet,
     borderRadius,
     paddings,
     borders,
