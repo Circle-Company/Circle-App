@@ -33,6 +33,14 @@ export default function RenderMemoriesCount ({
         fontFamily: fonts.family.Semibold,
         color
     }
+    /**
+     *return (
+        <View style={container}>
+            {icon}
+            <Text style={description_style}>{count}</Text>  
+        </View>
+        )
+     */
     
     return (
         <View style={container}>
