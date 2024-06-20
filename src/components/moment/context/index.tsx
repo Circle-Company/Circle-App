@@ -1,12 +1,13 @@
-import React from "react"
-import { MomentContextsData, MomentProviderProps } from './types'
-import sizes from "../../../layout/constants/sizes"
-import { useMomentUserActions } from "./momentUserActions"
-import { useMomentData } from "./momentData"
-import { useMomentOptions } from "./momentOptions"
-import PersistedContext from "../../../contexts/Persisted"
+import React, { useEffect, useMemo } from "react";
+import { MomentProviderProps, MomentContextsData } from './types';
+import sizes from "../../../layout/constants/sizes";
+import { useMomentUserActions } from "./momentUserActions";
+import { useMomentData } from "./momentData";
+import { useMomentOptions } from "./momentOptions";
+import PersistedContext from "../../../contexts/Persisted";
+import FeedContext, { InteractionProps } from "../../../contexts/Feed";
 
-const MomentContext = React.createContext<MomentContextsData>({} as MomentContextsData)
+const MomentContext = React.createContext<MomentContextsData>({} as MomentContextsData);
 
 export function MomentProvider({
     children,
@@ -15,16 +16,21 @@ export function MomentProvider({
     momentData,
     momentSize = sizes.moment.standart
 }: MomentProviderProps) {
+    const { getFeed, feedData, reloadFeed, setChunkInteractionsFunc, currentChunkIds } = React.useContext(FeedContext);
+    const { session } = React.useContext(PersistedContext);
+    const momentDataStore = useMomentData();
+    const momentUserActionsStore = useMomentUserActions();
+    const momentOptionsStore = useMomentOptions();
 
-    const { session } = React.useContext(PersistedContext)
-    const momentDataStore = useMomentData()
-    const momentUserActionsStore = useMomentUserActions()
-    const momentOptionsStore = useMomentOptions()
+    const isMe = useMemo(() => {
+        return momentData.user?.id ? session.user.id === momentData.user.id : true;
+    }, [momentData, session.user.id]);
 
-    const isMe = momentData.user?.id? session.user.id == momentData.user.id? true : false : true
+    useEffect(() => {
+        momentDataStore.setMomentData(momentData);
+    }, [momentData]);
 
-    React.useEffect(() => { momentDataStore.setMomentData(momentData) }, [momentData])
-    React.useEffect(() => {
+    useEffect(() => {
         momentUserActionsStore.setMomentUserActions({
             liked: false,
             shared: false,
@@ -37,7 +43,7 @@ export function MomentProvider({
             skipped: false,
             showLessOften: false,
             reported: false
-        })
+        });
         momentOptionsStore.setMomentOptions({
             isFeed: isFeed,
             isFocused: isFocused,
@@ -45,16 +51,37 @@ export function MomentProvider({
             enableModeration: true,
             enableStoreActions: isMe,
             enableTranslation: true
-        })
-    }, [])
+        });
+    }, [isFeed, isFocused, isMe]);
 
-    const contextValue: any = {
+    useEffect(() => {
+        if (currentChunkIds.includes(Number(momentDataStore.id)) && feedData) {
+            const getChunkInteractions = async () => {
+                const momentData = await momentDataStore.exportMomentData();
+                const interaction = momentUserActionsStore.exportMomentUserActions();
+                const chunkData = {
+                    id: momentData.id,
+                    userId: momentData.userId,
+                    tags: momentData.tags,
+                    duration: momentData.duration,
+                    type: momentData.type,
+                    language: momentData.language,
+                    interaction
+                };
+                setChunkInteractionsFunc(chunkData);
+            };
+            getChunkInteractions();
+        }
+    }, [currentChunkIds]);
+
+    const contextValue: any = useMemo(() => ({
         momentOptions: momentOptionsStore,
         momentSize: momentSize,
         momentData: momentDataStore,
-        momentUserActions: momentUserActionsStore
-    }
+        momentUserActions: momentUserActionsStore,
+    }), [momentOptionsStore, momentSize, momentDataStore, momentUserActionsStore]);
 
-    return <MomentContext.Provider value={contextValue}>{children}</MomentContext.Provider>
+    return <MomentContext.Provider value={contextValue}>{children}</MomentContext.Provider>;
 }
-export default MomentContext
+
+export default MomentContext;
