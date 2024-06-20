@@ -1,5 +1,7 @@
 import React from "react"
 import { MomentUserActionsProps } from "./types"
+import api from "../../../services/api"
+import PersistedContext from "../../../contexts/Persisted"
 
 export interface MomentUserActionsState extends MomentUserActionsProps {
     setShared: React.Dispatch<React.SetStateAction<boolean>>
@@ -13,12 +15,12 @@ export interface MomentUserActionsState extends MomentUserActionsProps {
     setShowLessOften: React.Dispatch<React.SetStateAction<boolean>>
     setReported: React.Dispatch<React.SetStateAction<boolean>>
     setMomentUserActions: (momentUserActions: MomentUserActionsProps) => void
-    injectInteractionsToList: () => void
+    exportMomentUserActions: () => MomentUserActionsProps
     handleLikeButtonPressed: ({likedValue}: {likedValue?: boolean}) => void
 }
 
 export function useMomentUserActions(): MomentUserActionsState {
-
+    const { session } = React.useContext(PersistedContext)
     const [ liked, setLiked] = React.useState<boolean>(false)
     const [ shared, setShared] = React.useState<boolean>(false)
     const [ viewed, setViewed ] = React.useState<boolean>(false)
@@ -31,8 +33,19 @@ export function useMomentUserActions(): MomentUserActionsState {
     const [ showLessOften, setShowLessOften ] = React.useState<boolean>(false)
     const [ reported, setReported ] = React.useState<boolean>(false)
 
-    function injectInteractionsToList() {
-
+    function exportMomentUserActions(): MomentUserActionsProps {
+        return {
+            liked,
+            shared,
+            viewed,clickIntoMoment,
+            watchTime,
+            clickProfile,
+            commented,
+            likeComment,
+            skipped,
+            showLessOften,
+            reported
+        }
     }
     function handleLikeButtonPressed({likedValue}: {likedValue?: boolean}) {
         if(likedValue) setLiked(likedValue)
@@ -40,7 +53,6 @@ export function useMomentUserActions(): MomentUserActionsState {
             if(liked) setLiked(false)
             else setLiked(true)            
         }
-        console.log('run handleLikeButtonPressed')
     }
 
     function setMomentUserActions(momentUserActions: MomentUserActionsProps) {
@@ -81,7 +93,7 @@ export function useMomentUserActions(): MomentUserActionsState {
         setReported,
 
         setMomentUserActions,
-        injectInteractionsToList,
+        exportMomentUserActions,
         handleLikeButtonPressed
     }
 }
