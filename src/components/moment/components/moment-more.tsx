@@ -6,14 +6,19 @@ import MoreIcon from '../../../assets/icons/svgs/ellipsis.svg'
 import ButtonStandart from "../../buttons/button-standart"
 import BottomSheetContext from "../../../contexts/bottomSheet"
 import { Text } from "../../Themed"
+import Options from "./moment-options"
+import BottomTabsContext from "../../../contexts/bottomTabs"
+import MemoryContext from "../../../contexts/memory"
 export default function more ({
     color = String(ColorTheme().text),
     backgroundColor= String(ColorTheme().backgroundDisabled)
 }: MomentDateProps) {
+    const { memory } = React.useContext(MemoryContext)
+    const { currentTab } = React.useContext(BottomTabsContext)
     const { expand, collapse} = React.useContext(BottomSheetContext)
-    const { momentOptions } = React.useContext(MomentContext)
+    const { momentOptions, momentData} = React.useContext(MomentContext)
     function handlePress() {
-        expand({children: <Text>oiee</Text>, snapPoints: ["20%"]})
+        expand({children: <Options momentData={momentData} memory={memory} momentOptions={momentOptions} currentTab={currentTab}/>, snapPoints: ["16%"]})
     }
     
     return (
