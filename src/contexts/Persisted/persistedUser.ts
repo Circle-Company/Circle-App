@@ -97,7 +97,6 @@ export const useUserStore = create<UserState>((set) => ({
         } catch(err) {
             console.error(err)
         } 
-
     },
     setUser: (value: UserDataType) => {
         set({
