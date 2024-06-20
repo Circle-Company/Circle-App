@@ -10,7 +10,7 @@ type CustomToastProps = {
     description: string,
     icon: React.ReactNode | null
 }
-export function CustomToast({
+export function Toast({
     title,
     description,
     icon
@@ -36,7 +36,7 @@ export function CustomToast({
 
     const titleStyle: any = {
         fontSize: fonts.size.body,
-        fontFamily: fonts.family.Semibold,
+        fontFamily: fonts.family.Bold,
         marginBottom: sizes.margins["1sm"]
     }
 
