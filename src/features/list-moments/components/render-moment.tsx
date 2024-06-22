@@ -20,7 +20,7 @@ export default function render_moment ({
     isFeed
 }: renderMomentProps) {
     const { height, progress } = useKeyboardAnimation()
-    const { commentEnabled, setFocusedMoment} = React.useContext(FeedContext)
+    const { commentEnabled } = React.useContext(FeedContext)
     const [animatedValue] = React.useState(new Animated.Value(0))
     const [commentValue] = React.useState(new Animated.Value(0))
     const [opacityValue] = React.useState(new Animated.Value(1))
