@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { NavigationContainer } from '@react-navigation/native'
+import { DefaultTheme, NavigationContainer} from '@react-navigation/native'
 import Routes from './src/routes'
 import { AuthProvider } from './src/contexts/auth'
 import { ViewProfileProvider } from './src/contexts/viewProfile'
@@ -20,8 +20,19 @@ import { Provider as ProfileProvider } from './src/contexts/profile'
 import { Provider as BottomTabsProvider } from './src/contexts/bottomTabs'
 import { Provider as BottomSheetProvider } from './src/contexts/bottomSheet'
 import sizes from './src/layout/constants/sizes'
+import ColorTheme from './src/layout/constants/colors'
+
+
 
 function InnerApp() {
+  const myTheme = {
+    ...DefaultTheme,
+    colors: {
+      ...DefaultTheme.colors,
+      background: ColorTheme().background.toString()
+    }
+  }
+
   return (
     <KeyboardProvider enabled={true}>
       <NotificationProvider>
@@ -30,7 +41,7 @@ function InnerApp() {
             <ProfileProvider>
               <ViewProfileProvider>
                 <FeedProvider>
-                  <NavigationContainer>
+                  <NavigationContainer theme={myTheme}>
                     <SelectMomentsProvider>
                       <MemoryProvider>
                         <NewMomentProvider>
@@ -54,17 +65,17 @@ const App = () => {
     <SafeAreaProvider initialMetrics={initialWindowMetrics}>
       <GestureHandlerRootView style={{width: sizes.window.width, height: sizes.window.height}}>
         <ToastProvider>
-          <NetworkProvider>
             <AuthProvider>
               <PersistedProvider>
                 <PreferencesProvider>
+                  <NetworkProvider>
                   <TrackingProvider>
                       <InnerApp/>
-                  </TrackingProvider>                 
+                  </TrackingProvider>
+                  </NetworkProvider>              
                 </PreferencesProvider>
               </PersistedProvider>
             </AuthProvider>        
-          </NetworkProvider>        
         </ToastProvider>
       </GestureHandlerRootView>
     </SafeAreaProvider>
