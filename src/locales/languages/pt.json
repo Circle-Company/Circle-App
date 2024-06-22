@@ -134,6 +134,7 @@
     "Title": "Título",
     "Add Moments": "Adicionar Moments",
     "Confirm": "Confirmar",
+    "Log Out Anyway": "Deslogar Mesmo Assim",
 
     "description": "descrição",
     "Tags": "Tags",
@@ -147,6 +148,7 @@
     "You're deleting the selected Moments": "Você está excluindo os Moments selecionados",
     "You're changing your password": "Você está alterando sua senha",
     "You're deleting this memory": "Você está deletando esta memória",
+    "You're logging out of your account": "Você está se deslogando da sua conta",
 
     "Test Version": "Versão de Teste",
     "beta": "beta",
@@ -166,6 +168,10 @@
     "Preferences": "Preferências",
     "Content": "Conteúdo",
     "Community Guidelines": "Diretrizes da Comunidade",
+
+    "Are you sure you want to log out?": "Você tem certeza que deseja se deslogar?",
+    "You will not be able to recover your account if you forget your password.": "Você não poderá recuperar sua conta se esquecer sua senha.",
+    "You won't be able to see or interact with Moments of those you follow.": "Você não poderá ver ou interagir com Moments de quem você acompanha.",
 
     "You can't get it back if you forget it.": "Você não pode recuperá-la se esquecer.",
 
