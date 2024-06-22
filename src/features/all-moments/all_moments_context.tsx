@@ -1,6 +1,5 @@
 import React from "react"
 import api from "../../services/api"
-import {useNavigation} from '@react-navigation/native'
 import TouchID from 'react-native-simple-biometrics'
 import LanguageContext from "../../contexts/Preferences/language"
 import { colors } from "../../layout/constants/colors"
@@ -46,7 +45,6 @@ export function AllMomentsProvider({children}: AllMomentsProviderProps) {
                         }
                     }),
                     setSelectedMoments([])
-                    useNavigation().goBack()
                 })
                 .catch(() => {
                     notify('toast', {
@@ -57,10 +55,7 @@ export function AllMomentsProvider({children}: AllMomentsProviderProps) {
                         }
                     })
                 })                
-            } else {
-                setSelectedMoments([])
-                useNavigation().goBack() 
-            }
+            } else setSelectedMoments([])
         } catch(err) { console.error(err) } 
     }
 
