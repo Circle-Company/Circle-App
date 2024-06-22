@@ -48,9 +48,10 @@ export default function section ({
                 {type == 'ACCOUNT'?
                     <FlatList
                         data={content}
-                        renderItem={({item}: {item: SettingsiItemAccountObjectProps}) => {
+                        renderItem={({item, index}: {item: SettingsiItemAccountObjectProps, index: number}) => {
                             return (
                                 <SettingsItemAccount
+                                    key={index}
                                     type={item.type}
                                     value={item.value}
                                     navigator=""

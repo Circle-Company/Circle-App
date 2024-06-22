@@ -132,8 +132,8 @@ export default function ListSettings(){
                 data={ListData}
                 scrollEnabled={false}
                 keyExtractor={(item) => item.name}
-                renderItem={({item}) => {
-                    return (<Settings.Section name={item.name} content={item.content} type='ACCOUNT'/>)
+                renderItem={({item, index}) => {
+                    return (<Settings.Section key={index} name={item.name} content={item.content} type='ACCOUNT'/>)
                 }}
                 ListFooterComponent={() => {
                     return <SettingsFooterComponent/>
