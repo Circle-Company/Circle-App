@@ -104,6 +104,13 @@ export default function ListSettings(){
                     "navigateTo": "Settings-Terms-Of-Service",
                     "secure": false
                 },
+                {
+                    "name": t("Community Guidelines"),
+                    "value": null,
+                    "type": "TEXT",
+                    "navigateTo": "Settings-Privacy-Policy",
+                    "secure": false
+                },
             ]
         },
         {
