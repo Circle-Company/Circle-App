@@ -18,6 +18,8 @@ import Animated, { FadeInLeft } from 'react-native-reanimated';
 import MemoryContext from '../../../contexts/memory';
 import PersistedContext from '../../../contexts/Persisted';
 import LanguageContext from '../../../contexts/Preferences/language';
+import { Text } from '../../../components/Themed';
+import fonts from '../../../layout/constants/fonts';
 
 type RenderMemoriesPreviewProps = {
     enableScroll?: boolean
@@ -91,6 +93,10 @@ export default function ListMemoriesPreview({isAccountScreen = false, user}: Ren
     const content_container: any = {
         flexDirection: 'row',
     };
+    const headerTitle: any = {
+        fontSize: fonts.size.body * 0.9,
+        fontFamily: fonts.family.Semibold
+    }
 
     if(networkStats == 'OFFLINE' && memories.length == 0) return <OfflineCard height={(sizes.screens.height - sizes.headers.height) / 2}/>
 
@@ -104,7 +110,7 @@ export default function ListMemoriesPreview({isAccountScreen = false, user}: Ren
         <View style={container}>
             <Memory.Header>
                 <Memory.HeaderLeft>
-                    <RenderMemoriesCount count={memories.length} />
+                    <Text style={headerTitle}>{t('Memories')}</Text>
                 </Memory.HeaderLeft>
                 <Memory.HeaderRight>
                     <ViewMorebutton action={() => {
