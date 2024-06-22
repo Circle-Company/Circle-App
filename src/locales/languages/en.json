@@ -133,6 +133,7 @@
     "Title": "Title",
     "Add Moments": "Add Moments",
     "Confirm": "Confirm",
+    "Log Out Anyway": "Log Out Anyway",
 
     "description": "description",
     "Tags": "Tags",
@@ -146,6 +147,7 @@
     "You're deleting the selected Moments": "You're deleting the selected Moments",
     "You're changing your password": "You're changing your password",
     "You're deleting this memory": "You're deleting this memory",
+    "You're logging out of your account": "You're logging out of your account",
 
     "Test Version": "Test Version",
     "beta": "beta",
@@ -165,6 +167,10 @@
     "Preferences": "Preferences",
     "Content": "Content",
     "Community Guidelines": "Community Guidelines",
+
+    "Are you sure you want to log out?": "Are you sure you want to log out?",
+    "You will not be able to recover your account if you forget your password.": "You will not be able to recover your account if you forget your password.",
+    "You won't be able to see or interact with Moments of those you follow.": "You won't be able to see or interact with Moments of those you follow.",
 
     "You can't get it back if you forget it.": "You can't get it back if you forget it.",
     
