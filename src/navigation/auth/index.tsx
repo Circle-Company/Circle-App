@@ -1,16 +1,21 @@
 import { createStackNavigator, CardStyleInterpolators} from '@react-navigation/stack'
 import React from 'react'
 import InitScreen from '../../pages/auth/Splash'
-import RegisterScreen from '../../pages/auth/SignUp'
 import LoginScreen from '../../pages/auth/SignIn'
 import ColorTheme from '../../layout/constants/colors'
 import sizes from '../../layout/constants/sizes'
 import fonts from '../../layout/constants/fonts'
 import UsernameScreen from '../../pages/auth/SignUp/Username'
 import PasswordScreen from '../../pages/auth/SignUp/Password'
+import LanguageContext from '../../contexts/Preferences/language'
+import SettingsPrivacyPolicy from '../../pages/app/Settings/PrivacyPolicy'
+import SettingsTermsOfService from '../../pages/app/Settings/TermsOfService'
+import SettingsCommunityGuidelines from '../../pages/app/Settings/CommunityGuidelines'
 
 const AuthStack = createStackNavigator();
 export default function AuthNavigator(){
+
+    const { t } = React.useContext(LanguageContext)
 
     const HeaderStyle: any= {
         ...sizes.headers,
@@ -76,6 +81,39 @@ export default function AuthNavigator(){
                     headerRight: () => null,
                     headerLeft: () => null
 
+                }}
+            />
+            <AuthStack.Screen
+                name="Auth-Privacy-Policy"
+                component={SettingsPrivacyPolicy}
+                options={{
+                    headerTitle: t('Privacy Policy'),
+                    headerStyle: HeaderStyle,
+                    headerTintColor: String(ColorTheme().text),
+                    cardStyle: {backgroundColor: String(ColorTheme().background)},
+                    cardOverlayEnabled: true,
+                }}
+            />
+            <AuthStack.Screen
+                name="Auth-Terms-Of-Service"
+                component={SettingsTermsOfService}
+                options={{
+                    headerTitle: t('Terms of Service'),
+                    headerStyle: HeaderStyle,
+                    headerTintColor: String(ColorTheme().text),
+                    cardStyle: {backgroundColor: String(ColorTheme().background)},
+                    cardOverlayEnabled: true,
+                }}
+            />
+            <AuthStack.Screen
+                name="Auth-Community-Guidelines"
+                component={SettingsCommunityGuidelines}
+                options={{
+                    headerTitle: t('Community Guidelines'),
+                    headerStyle: HeaderStyle,
+                    headerTintColor: String(ColorTheme().text),
+                    cardStyle: {backgroundColor: String(ColorTheme().background)},
+                    cardOverlayEnabled: true,
                 }}
             />
         </AuthStack.Navigator>
