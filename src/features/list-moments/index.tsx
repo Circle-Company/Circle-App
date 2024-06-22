@@ -11,7 +11,7 @@ import { colors } from '../../layout/constants/colors'
 const ListMoments = () => {
     const margin = 2
 
-    const {enableScrollFeed, feedData, getFeed} = React.useContext(FeedContext)
+    const {enableScrollFeed, feedData, getFeed, reloadFeed, loadingFeed} = React.useContext(FeedContext)
     const [centerIndex, setCenterIndex] = useState<number | null>(0);
     const [loading, setLoading] = React.useState(false)
     const [refreshing, setRefreshing] = React.useState(false)
@@ -41,8 +41,8 @@ const ListMoments = () => {
 
     const viewabilityConfig = {
         minimumViewTime: 3000,
-        viewAreaCoveragePercentThreshold: 100,
-        waitForInteraction: true
+        viewAreaCoveragePercentThreshold: 10,
+        waitForInteraction: false
     };
 
     const prefetchNextImage = (index: number) => {
@@ -54,7 +54,7 @@ const ListMoments = () => {
 
     const handleRefresh = async () => {
         if (flatListRef.current) flatListRef.current.scrollToOffset({ animated: false, offset: 0 })
-        await getFeed()
+        await reloadFeed()
         .finally(() => {
             setTimeout(() => {
             setRefreshing(false)         
@@ -80,7 +80,6 @@ const ListMoments = () => {
             horizontal
             scrollEnabled={enableScrollFeed}
             showsHorizontalScrollIndicator={false}
-            bounces={false}
             viewabilityConfig={viewabilityConfig}
             scrollEventThrottle={16}
             snapToInterval={sizes.moment.standart.width + margin}
@@ -91,7 +90,7 @@ const ListMoments = () => {
             onScroll={handleScroll}
             directionalLockEnabled={true}      
             onEndReached={async() => {await getFeed()}}
-            onEndReachedThreshold={0.1}
+            onEndReachedThreshold={0.9}
             refreshControl={
                 <RefreshControl
                     progressBackgroundColor={String(isDarkMode? colors.gray.grey_08 : colors.gray.grey_02)}
@@ -104,6 +103,7 @@ const ListMoments = () => {
             renderItem={({ item, index }) => {
                 const focusedItem = index === centerIndex
                 const container_style = index === 0 ? container_0 : index + 1 === feedData.length ? container_1 : container;
+                
                 return (
                     <Animated.View style={[container_style]} key={index}>
                     <RenderMoment isFeed={true} momentData={item} isFocused={focusedItem}/>
@@ -111,7 +111,7 @@ const ListMoments = () => {
                 )
             }}
             ListFooterComponent={(item, index) => {
-                if(index == feedData.length - 1) return (
+                if(loadingFeed) return (
                     <Loading.Container height={sizes.moment.standart.height} width={sizes.moment.standart.width / 3.5}>
                         <Loading.ActivityIndicator size={40} />
                     </Loading.Container>                    
