@@ -187,7 +187,6 @@ export function NewMomentProvider({children}: NewMomentProviderProps) {
             const response = await api.post(`memory/get-user-memories`, { user_id: session.user.id })
             .then(function (response) {return response.data})
             .catch(function (error) { console.log(error)})
-            console.log(response.memories)
             await setAllMemories(response.memories)
             await setSelectedMemory(response.memories[0])
         } catch(err) {
