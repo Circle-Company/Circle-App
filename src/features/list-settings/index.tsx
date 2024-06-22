@@ -108,7 +108,7 @@ export default function ListSettings(){
                     "name": t("Community Guidelines"),
                     "value": null,
                     "type": "TEXT",
-                    "navigateTo": "Settings-Privacy-Policy",
+                    "navigateTo": "Settings-Community-Guidelines",
                     "secure": false
                 },
             ]

@@ -21,6 +21,7 @@ import LanguageScreen from '../../pages/app/Settings/Preferences/Language'
 import ContentScreen from '../../pages/app/Settings/Preferences/Content'
 import ProfilePictureScreen from '../../pages/app/Settings/ProfilePicture'
 import LanguageContext from '../../contexts/Preferences/language'
+import SettingsCommunityGuidelines from '../../pages/app/Settings/CommunityGuidelines'
 
 const SettingsStack = createStackNavigator()
  
@@ -111,6 +112,17 @@ export function SettingsNavigator() {
             component={SettingsTermsOfService}
             options={{
                 headerTitle: t('Terms of Service'),
+                headerStyle: HeaderStyle,
+                headerTintColor: String(ColorTheme().text),
+                cardStyle: {backgroundColor: String(ColorTheme().background)},
+                cardOverlayEnabled: true,
+            }}
+        />
+        <SettingsStack.Screen
+            name="Settings-Community-Guidelines"
+            component={SettingsCommunityGuidelines}
+            options={{
+                headerTitle: t('Community Guidelines'),
                 headerStyle: HeaderStyle,
                 headerTintColor: String(ColorTheme().text),
                 cardStyle: {backgroundColor: String(ColorTheme().background)},
