@@ -40,8 +40,8 @@ export function useMomentData(): MomentDataState {
     }
 
     async function getTags() {
-        await api.post('/moment/get-tags?page=1&pageSize=100', { moment_id: id})
-        .then((response) => { setTags(response.data) })
+        return await api.post('/moment/get-tags?page=1&pageSize=100', { moment_id: id})
+        .then((response) => { setTags(response.data); return response.data })
         .catch(function (error) { console.log(error)}) 
     }
 
