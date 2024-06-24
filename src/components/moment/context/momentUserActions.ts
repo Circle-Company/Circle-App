@@ -37,7 +37,8 @@ export function useMomentUserActions(): MomentUserActionsState {
         return {
             liked,
             shared,
-            viewed,clickIntoMoment,
+            viewed,
+            clickIntoMoment,
             watchTime,
             clickProfile,
             commented,
