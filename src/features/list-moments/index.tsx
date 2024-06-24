@@ -110,7 +110,7 @@ const ListMoments = () => {
                     </Animated.View>
                 )
             }}
-            ListFooterComponent={(item, index) => {
+            ListFooterComponent={() => {
                 if(loadingFeed) return (
                     <Loading.Container height={sizes.moment.standart.height} width={sizes.moment.standart.width / 3.5}>
                     <Loading.ActivityIndicator size={40} />
