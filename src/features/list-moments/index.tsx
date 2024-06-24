@@ -93,10 +93,10 @@ const ListMoments = () => {
             onEndReachedThreshold={0}
             refreshControl={
                 <RefreshControl
-                    progressBackgroundColor={String(isDarkMode? colors.gray.grey_08 : colors.gray.grey_02)}
-                    colors={[String(isDarkMode? colors.gray.grey_04: colors.gray.grey_04), '#00000000']}
-                    refreshing={refreshing}
-                    onRefresh={async() => await handleRefresh()}
+                progressBackgroundColor={String(isDarkMode? colors.gray.grey_08 : colors.gray.grey_02)}
+                colors={[String(isDarkMode? colors.gray.grey_04: colors.gray.grey_04), '#00000000']}
+                refreshing={refreshing}
+                onRefresh={async() => await handleRefresh()}
                 />
             }      
             ref={(ref) => { flatListRef.current = ref }}
