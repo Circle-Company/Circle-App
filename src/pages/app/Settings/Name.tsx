@@ -87,7 +87,7 @@ export default function NameScreen() {
     }, [])
 
     const handleInputChange = (text: string) => {
-        const formattedText = text.replace(/[_@#]/g, "")
+        const formattedText = text.replace(/[^a-zA-Z\s]/g, "")
         setName(formattedText)
     }
 
