@@ -32,6 +32,7 @@ type FeedContextsData = {
     scrollOffset: Animated.Value
     showKeyboard: boolean,
     currentChunkIds: Array<number>
+    chunkInteractions: InteractionProps[]
     getFeed: () => Promise<void>
     reloadFeed: () => Promise<void>
     setChunkInteractionsFunc: (value: InteractionProps) => void,
@@ -142,6 +143,7 @@ export function FeedProvider({children}: FeedProviderProps) {
         focusedMoment,
         sendedComments,
         currentChunkIds,
+        chunkInteractions,
         setFocusedItemIndex,
         setFocusedItemId,
         setCommentEnabled,
