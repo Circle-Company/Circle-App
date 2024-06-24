@@ -1,6 +1,6 @@
 // analyticsManager.ts
 import AsyncStorage from '@react-native-async-storage/async-storage';
-
+import { storage } from '../../store';
 const STORAGE_KEY = 'circle.api.analytics.storage_key';
 
 interface EventData {
@@ -18,22 +18,22 @@ class Analytics {
   serverEndpoint: string;
   contentTimerStart: number | null;
   eventPrefix: string;
-  userId: string | null;
+  sessionId: string | null;
 
   constructor() {
     this.data = [];
     this.serverEndpoint = ''; // Adicione o endpoint do seu servidor, se aplicável
     this.contentTimerStart = null;
     this.eventPrefix = ''; // Prefixo inicial vazio
-    this.userId = null;
+    this.sessionId = null;
   }
 
   setEventPrefix(prefix: string): void {
     this.eventPrefix = prefix;
   }
 
-  setUserId(userId: string): void {
-    this.userId = userId;
+  setUserId(sessionId: string): void {
+    this.sessionId = sessionId;
   }
 
   trackEvent(eventName: string, eventData: EventData = {}): void {
@@ -41,9 +41,10 @@ class Analytics {
     const prefixedEventName = this.eventPrefix ? `${this.eventPrefix}_${eventName}` : eventName;
     const eventObject: EventObject = {
       eventName: prefixedEventName,
-      eventData: { ...eventData, userId: this.userId},
+      eventData: { ...eventData, userId: this.sessionId},
       timestamp: currentTimestamp,
     };
+
 
     this.data.push(eventObject);
     this.saveData();
@@ -71,6 +72,7 @@ class Analytics {
 
   async saveData(): Promise<void> {
     try {
+      storage.set(`@circle:sessionId=${this.sessionId}:analytics:data`, JSON.stringify(this.data))
       await AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(this.data));
     } catch (error) {
       console.error('Erro ao salvar dados de analytics:', error);
