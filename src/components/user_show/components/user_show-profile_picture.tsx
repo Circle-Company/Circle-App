@@ -9,13 +9,13 @@ import { UserShowActions } from "../user_show-actions"
 import { useNavigation } from "@react-navigation/native"
 import ViewProfileContext from "../../../contexts/viewProfile"
 import Animated, { FadeIn } from "react-native-reanimated"
+import MomentContext from "../../moment/context"
 
 export default function profile_picture ({
     displayOnMoment = true,
     disableAnalytics = false,
     pictureDimensions
 }: UserProfilePictureProps) {
-
     const { user, view_profile} = useUserShowContext()
     const {setProfile} = React.useContext(ViewProfileContext)
     const navigation = useNavigation()
