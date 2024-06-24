@@ -9,9 +9,9 @@ export interface AccountState extends AccountDataType {
     setMuted: (value: boolean) => void;
     setLastActiveAt: (value: string) => void;
     setLastLoginAt: (value: string) => void;
-    setAccount: (value: AccountDataType) => void
-    loadAccountFromStorage: () => void;
-    removeAccountFromStorage: () => void;
+    set: (value: AccountDataType) => void
+    load: () => void;
+    remove: () => void;
 }
 
 export const useAccountStore = create<AccountState>((set) => ({
@@ -36,7 +36,7 @@ export const useAccountStore = create<AccountState>((set) => ({
         storage.set(storageKey.last_login_at, value);
         set({ last_login_at: value });
     },
-    setAccount: (value: AccountDataType) => {
+    set: (value: AccountDataType) => {
         set({
             blocked: value.blocked,
             muted: value.muted,
@@ -48,7 +48,7 @@ export const useAccountStore = create<AccountState>((set) => ({
         storage.set(storageKey.last_active_at, value.last_active_at)
         storage.set(storageKey.last_login_at, value.last_login_at)
     },
-    loadAccountFromStorage: () => {
+    load: () => {
         set({
             blocked: storage.getBoolean(storageKey.blocked) || false,
             muted: storage.getBoolean(storageKey.muted) || false,
@@ -56,7 +56,7 @@ export const useAccountStore = create<AccountState>((set) => ({
             last_login_at: storage.getString(storageKey.last_login_at) || new Date().toString(),
         });
     },
-    removeAccountFromStorage: () => {
+    remove: () => {
         storage.delete(storageKey.blocked);
         storage.delete(storageKey.muted);
         storage.delete(storageKey.last_active_at);

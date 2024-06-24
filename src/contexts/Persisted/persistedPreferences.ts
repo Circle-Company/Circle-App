@@ -12,9 +12,9 @@ export interface PreferencesState extends PreferencesDataStorageType {
     setDisableHaptics: (value: boolean) => void;
     setDisableTranslation: (value: boolean) => void;
     setTranslationLanguage: (value: string) => void;
-    setPreferences: (value: PreferencesDataStorageType) => void;
-    loadPreferencesFromStorage: () => void;
-    removePreferencesFromStorage: () => void;
+    set: (value: PreferencesDataStorageType) => void;
+    load: () => void;
+    remove: () => void;
 }
 
 export const usePreferencesStore = create<PreferencesState>((set) => ({
@@ -82,7 +82,7 @@ export const usePreferencesStore = create<PreferencesState>((set) => ({
             },
         }));
     },
-    setPreferences: (value: PreferencesDataStorageType) => {
+    set: (value: PreferencesDataStorageType) => {
         set({
             language: value.language,
             content: value.content
@@ -95,7 +95,7 @@ export const usePreferencesStore = create<PreferencesState>((set) => ({
         storage.set(storageKey.translationLanguage, value.content.translationLanguage)
 
     },
-    loadPreferencesFromStorage: () => {
+    load: () => {
         set({
             language: {
                 appLanguage: storage.getString(storageKey.appLanguage) || 'en',
@@ -109,7 +109,7 @@ export const usePreferencesStore = create<PreferencesState>((set) => ({
             },
         });
     },
-    removePreferencesFromStorage: () => {
+    remove: () => {
         storage.delete(storageKey.appLanguage);
         storage.delete(storageKey.primaryLanguage);
         storage.delete(storageKey.autoplay);
