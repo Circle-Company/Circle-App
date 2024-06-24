@@ -50,7 +50,7 @@ export function useMomentUserActions(): MomentUserActionsState {
     function handleLikeButtonPressed({likedValue}: {likedValue?: boolean}) {
         if(likedValue) setLiked(likedValue)
         else {
-            if(liked) setLiked(false)
+            if(liked == true) setLiked(false)
             else setLiked(true)            
         }
     }
