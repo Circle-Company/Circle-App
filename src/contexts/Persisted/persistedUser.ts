@@ -25,10 +25,10 @@ export interface UserState {
         small_resolution: string;
         tiny_resolution: string;
     }) => void;
-    setUser: (value: UserDataType) => void
-    getUser: (id: number) => Promise<UserState>
-    loadUserFromStorage: () => void;
-    removeUserFromStorage: () => void;
+    set: (value: UserDataType) => void
+    get: (id: number) => Promise<UserState>
+    load: () => void;
+    remove: () => void;
 }
 
 export const useUserStore = create<UserState>((set) => ({
@@ -70,7 +70,7 @@ export const useUserStore = create<UserState>((set) => ({
         storage.set(storageKey.profile_picture.tiny, value.tiny_resolution)
         set({ profile_picture: value });
     },
-    getUser: async (id: number) => {
+    get: async (id: number) => {
         try{
             const response = await api.post(`/user/session/data/pk/${id}`, { user_id: id })
             .then(function (response) {
@@ -98,7 +98,7 @@ export const useUserStore = create<UserState>((set) => ({
             console.error(err)
         } 
     },
-    setUser: (value: UserDataType) => {
+    set: (value: UserDataType) => {
         set({
             id: value.id,
             name: value.name,
@@ -115,7 +115,7 @@ export const useUserStore = create<UserState>((set) => ({
         if(value.profile_picture.small_resolution) storage.set(storageKey.profile_picture.small, value.profile_picture.small_resolution)
         if(value.profile_picture.tiny_resolution) storage.set(storageKey.profile_picture.tiny, value.profile_picture.tiny_resolution)
     },
-    loadUserFromStorage: () => {
+    load: () => {
         set({
             id: storage.getNumber(storageKey.id) || 0,
             name: storage.getString(storageKey.name) || '',
@@ -128,7 +128,7 @@ export const useUserStore = create<UserState>((set) => ({
             },
         });
     },
-    removeUserFromStorage: () => {
+    remove: () => {
         storage.delete(storageKey.id);
         storage.delete(storageKey.name);
         storage.delete(storageKey.username);

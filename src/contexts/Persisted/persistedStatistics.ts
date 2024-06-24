@@ -9,10 +9,10 @@ export interface StatisticsState extends StatisticsDataType {
     setTotalFollowersNum: (value: number) => void;
     setTotalLikesNum: (value: number) => void;
     setTotalViewsNum: (value: number) => void;
-    setStatistics: (value: StatisticsDataType) => void
-    getStatistics: (user_id: number) => Promise<StatisticsState>
-    loadStatisticsFromStorage: () => void;
-    removeStatisticsFromStorage: () => void;
+    set: (value: StatisticsDataType) => void
+    get: (user_id: number) => Promise<StatisticsState>
+    load: () => void;
+    remove: () => void;
 }
 
 export const useStatisticsStore = create<StatisticsState>((set) => ({
@@ -32,7 +32,7 @@ export const useStatisticsStore = create<StatisticsState>((set) => ({
         storage.set(storageKey.total_views, value);
         set({ total_views_num: value });
     },
-    getStatistics: async (user_id: number) => {
+    get: async (user_id: number) => {
         try{
             const response = await api.post(`/user/session/statistics/pk/${user_id}`, { user_id })
             .then(function (response) {
@@ -53,7 +53,7 @@ export const useStatisticsStore = create<StatisticsState>((set) => ({
             console.error(err)
         } 
     },
-    setStatistics: (value: StatisticsDataType) => {
+    set: (value: StatisticsDataType) => {
         set({
             total_followers_num: value.total_followers_num,
             total_likes_num: value.total_likes_num,
@@ -63,14 +63,14 @@ export const useStatisticsStore = create<StatisticsState>((set) => ({
         storage.set(storageKey.total_likes, value.total_likes_num)
         storage.set(storageKey.total_views, value.total_views_num)
     },
-    loadStatisticsFromStorage: () => {
+    load: () => {
         set({
             total_followers_num: storage.getNumber(storageKey.total_followers) || 0,
             total_likes_num: storage.getNumber(storageKey.total_likes) || 0,
             total_views_num: storage.getNumber(storageKey.total_views) || 0
         });
     },
-    removeStatisticsFromStorage: () => {
+    remove: () => {
         storage.delete(storageKey.total_followers);
         storage.delete(storageKey.total_likes);
         storage.delete(storageKey.total_views);
