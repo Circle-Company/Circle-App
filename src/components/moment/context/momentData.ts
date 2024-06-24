@@ -46,16 +46,10 @@ export function useMomentData(): MomentDataState {
     }
 
     async function exportMomentData(): Promise<ExportMomentDataProps> {
-        let exportTags: TagProps[] = []
-        if(tags) exportTags = tags
-        else {
-            await getTags()
-            .finally(() => { exportTags = tags })
-        }
         return {
             id: Number(id),
             userId: Number(user.id),
-            tags: exportTags,
+            tags:  await getTags(),
             type: midia.content_type,
             language: language,
             duration: 0
