@@ -12,9 +12,10 @@ import { Loading } from '../../loading'
 import LanguageContext from '../../../contexts/Preferences/language'
 
 export default function NewMomentInputDescriptionRight() {
-    const { uploadMoment } = useContext(NewMomentContext)
+    const { uploadMoment, tags} = useContext(NewMomentContext)
     const { t } = React.useContext(LanguageContext)
     const [ loading, setLoading ] = React.useState(false)
+    const [enabled, setEnabled] = React.useState(false)
     const isDarkMode = useColorScheme() === 'dark'
 
     const navigation = useNavigation()
@@ -22,6 +23,7 @@ export default function NewMomentInputDescriptionRight() {
     const container: any = {
         flexDirection: 'row',
         marginRight: sizes.margins['3sm'],
+        opacity: enabled? 1 : 0.3
     }
 
     const text: any = {
@@ -48,8 +50,13 @@ export default function NewMomentInputDescriptionRight() {
         flex: 1
     }
 
+    React.useEffect(() => {
+        if(tags.length > 0) setEnabled(true)
+        else setEnabled(false)
+    }, [tags])
+
     async function handlePress() {
-        if(!loading){
+        if(!loading && enabled){
             setLoading(true)
             await uploadMoment()
             .then(function () {setLoading(false)})
