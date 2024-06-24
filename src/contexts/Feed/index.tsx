@@ -76,7 +76,6 @@ export function FeedProvider({children}: FeedProviderProps) {
 
     async function reloadFeed() {
         setEnableScrollFeed(false)
-        console.log('dataaaaaaaaaaaa: ', chunkInteractions)
         await api.post(`/moment/get-feed`, {
             user_id: session.user.id,
             period,
@@ -91,9 +90,9 @@ export function FeedProvider({children}: FeedProviderProps) {
             resetTimer()
         })
     }
+
     async function getFeed() {
         setEnableScrollFeed(false)
-        console.log('dataaaaaaaaaaaa: ', chunkInteractions)
         await api.post(`/moment/get-feed`, {
             user_id: session.user.id,
             period,
