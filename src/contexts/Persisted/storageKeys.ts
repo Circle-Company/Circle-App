@@ -5,6 +5,9 @@ export function storageKeys () {
     const sessionId = storage.getNumber('@circle:sessionId')
     const baseKey = `@circle:sessionId=${sessionId}:`
     return {
+        history: {
+            search: baseKey + 'history:search',
+        },
         account: {
             blocked: baseKey + 'account:block',
             muted: baseKey + 'account:mute',

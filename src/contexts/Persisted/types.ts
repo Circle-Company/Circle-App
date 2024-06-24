@@ -1,3 +1,4 @@
+import { SearchRenderItemReciveDataObjectProps } from "../../components/search/search-types"
 import { userReciveDataProps } from "../../components/user_show/user_show-types"
 import { LanguagesCodesType } from "../../locales/LanguageTypes"
 import { AccountState } from "./persistedAccount"
@@ -16,6 +17,7 @@ export type UserDataType = {
         tiny_resolution: string
     }
 }
+
 export type UserDataReturnsType = {
     id: number
     name: string
@@ -119,14 +121,18 @@ export type PreferencesDataStorageType = {
 export type PreferencesDataReturnsType = {
     language: LanguageDataReturnsType
     content: ContentDataReturnsType
-    
     storePreferences: (value: PreferencesDataType) => PreferencesDataStorageType
     loadPreferencesFromStorage: () => PreferencesDataStorageType
     removePreferencesFromStorage: () => void
 }
 
+export type HistoryDataStorageType = {
+    search: SearchRenderItemReciveDataObjectProps[] | []
+}
+
 
 export type SessionDataType = {
+    history: HistoryDataStorageType
     user: UserDataReturnsType
     account: AccountState
     preferences: PreferencesState
