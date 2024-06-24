@@ -90,7 +90,7 @@ const ListMoments = () => {
             onScroll={handleScroll}
             directionalLockEnabled={true}      
             onEndReached={async() => {await getFeed()}}
-            onEndReachedThreshold={0.9}
+            onEndReachedThreshold={0}
             refreshControl={
                 <RefreshControl
                     progressBackgroundColor={String(isDarkMode? colors.gray.grey_08 : colors.gray.grey_02)}
