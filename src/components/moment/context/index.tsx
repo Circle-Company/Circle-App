@@ -16,7 +16,7 @@ export function MomentProvider({
     momentData,
     momentSize = sizes.moment.standart
 }: MomentProviderProps) {
-    const { getFeed, feedData, reloadFeed, setChunkInteractionsFunc, currentChunkIds } = React.useContext(FeedContext);
+    const { feedData, setChunkInteractionsFunc, currentChunkIds, chunkInteractions} = React.useContext(FeedContext);
     const { session } = React.useContext(PersistedContext);
     const momentDataStore = useMomentData();
     const momentUserActionsStore = useMomentUserActions();
