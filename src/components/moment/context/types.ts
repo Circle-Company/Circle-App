@@ -100,16 +100,18 @@ export type MomentUserActionsReturnsProps = {
     skipped: boolean
     showLessOften: boolean
     reported: boolean
-    setShared: (value: boolean) => Promise<void>
-    setViewed: (value: boolean) => Promise<void>
-    setClickIntoMoment: (value: boolean) => Promise<void>
-    setWatchTime: (value: number) => Promise<void>
-    setClickProfile: (value: boolean) => Promise<void>
-    setCommented: (value: boolean) => Promise<void>
-    setLikeComment: (value: boolean) => Promise<void>
-    setSkipped: (value: boolean) => Promise<void>
-    setShowLessOften: (value: boolean) => Promise<void>
-    setReported: (value: boolean) => Promise<void>
+
+    
+    setShared: React.Dispatch<React.SetStateAction<boolean>>
+    setViewed: React.Dispatch<React.SetStateAction<boolean>>
+    setClickIntoMoment: React.Dispatch<React.SetStateAction<boolean>>
+    setWatchTime: React.Dispatch<React.SetStateAction<number>>
+    setClickProfile: React.Dispatch<React.SetStateAction<boolean>>
+    setCommented: React.Dispatch<React.SetStateAction<boolean>>
+    setLikeComment: React.Dispatch<React.SetStateAction<boolean>>
+    setSkipped: React.Dispatch<React.SetStateAction<boolean>>
+    setShowLessOften: React.Dispatch<React.SetStateAction<boolean>>
+    setReported: React.Dispatch<React.SetStateAction<boolean>>
 
     setMomentUserActions: (momentUserActions: MomentUserActionsProps) => void
     injectInteractionsToList: () => void
