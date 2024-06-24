@@ -70,6 +70,7 @@ export default function Container({
     async function handleSinglePress() {
         if(!commentEnabled && momentOptions.isFeed) {
             if(!fromFullMomentScreen && isFocused) {
+                momentUserActions.setClickIntoMoment(true)
                 setFocusedMoment(momentData)
                 setFocusedItemId(Number(momentData.id))
             }

@@ -12,6 +12,7 @@ import { UserShowActions } from "../user_show-actions"
 import Verifyed from '../../../assets/icons/svgs/check_circle_verify.svg'
 import { useNavigation } from "@react-navigation/native"
 import ViewProfileContext from "../../../contexts/viewProfile"
+import MomentContext from "../../moment/context"
 
 export default function user_username ({
     displayOnMoment = true,
@@ -23,7 +24,6 @@ export default function user_username ({
     margin = Sizes.margins["1sm"],
     scale = 1
 }: UserUsernameProps) {
-
     const {user, view_profile} = useUserShowContext()
     const {setProfile} = React.useContext(ViewProfileContext)
     const isDarkMode = useColorScheme() === 'dark'

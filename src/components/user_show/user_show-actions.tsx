@@ -1,5 +1,7 @@
+import React from "react"
 import { analytics } from "../../services/Analytics"
 import { useNavigation } from "@react-navigation/native"
+import MomentContext from "../moment/context"
 
 type UserShowActionsProps = {
     prefix?: string,
@@ -15,12 +17,16 @@ function setAnalyticsConfig() {
 }
 
 async function username_pressed ({ user_id, prefix, action, user}: UserShowActionsProps) {
+    const { momentUserActions } = React.useContext(MomentContext)
+    momentUserActions.setClickProfile(true)
     await action(user.username)
     setAnalyticsConfig()
     analytics.trackEvent(prefix? prefix : 'username', { user_id: user_id })
     await analytics.saveData()
 }
 async function profile_picture_pressed ({ user_id, prefix, action, user}: UserShowActionsProps) {
+    const { momentUserActions } = React.useContext(MomentContext)
+    momentUserActions.setClickProfile(true)
     await action(user.username)
     setAnalyticsConfig()
     analytics.trackEvent(prefix? prefix : 'profile_picture', { user_id: user_id})
