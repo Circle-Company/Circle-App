@@ -55,23 +55,26 @@ export function MomentProvider({
     }, [isFeed, isFocused, isMe]);
 
     useEffect(() => {
-        if (currentChunkIds.includes(Number(momentDataStore.id)) && feedData) {
-            const getChunkInteractions = async () => {
-                const momentData = await momentDataStore.exportMomentData();
-                const interaction = momentUserActionsStore.exportMomentUserActions();
-                const chunkData = {
-                    id: momentData.id,
-                    userId: momentData.userId,
-                    tags: momentData.tags,
-                    duration: momentData.duration,
-                    type: momentData.type,
-                    language: momentData.language,
-                    interaction
+        async function fetch() {
+            if (currentChunkIds.includes(Number(momentDataStore.id)) && feedData) {
+                const getChunkInteractions = async () => {
+                    const momentData = await momentDataStore.exportMomentData();
+                    const interaction = momentUserActionsStore.exportMomentUserActions();
+                    const chunkData = {
+                        id: momentData.id,
+                        userId: momentData.userId,
+                        tags: momentData.tags,
+                        duration: momentData.duration,
+                        type: momentData.type,
+                        language: momentData.language,
+                        interaction
+                    };
+                    setChunkInteractionsFunc(chunkData);
                 };
-                setChunkInteractionsFunc(chunkData);
-            };
-            getChunkInteractions();
-        }
+                await getChunkInteractions();
+            }            
+        }; fetch()
+
     }, [currentChunkIds]);
 
     const contextValue: any = useMemo(() => ({
