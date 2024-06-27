@@ -37,10 +37,10 @@ export type UserDataReturnsType = {
         small_resolution: String
         tiny_resolution: String
     }) => void
-    getUser: (id: number) => Promise<UserState>
-    storeUser: (value: userReciveDataProps) => userReciveDataProps
-    loadUserFromStorage: () => userReciveDataProps
-    removeUserFromStorage: () => void
+    get: (id: number) => Promise<UserState>
+    store: (value: userReciveDataProps) => userReciveDataProps
+    load: () => userReciveDataProps
+    remove: () => void
 }
 
 export type StatisticsDataType = {
