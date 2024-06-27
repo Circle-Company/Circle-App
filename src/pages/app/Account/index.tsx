@@ -30,8 +30,8 @@ export default function AccountScreen() {
 
     const handleRefresh = () => {
         setLoading(true)
-        session.user.getUser(session.user.id)
-        session.statistics.getStatistics(session.user.id)
+        session.user.get(session.user.id)
+        session.statistics.get(session.user.id)
         .finally(() => {
             setTimeout(() => {
             setLoading(false)
