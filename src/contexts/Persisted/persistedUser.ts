@@ -11,7 +11,7 @@ export interface UserState {
     name: string
     username: string;
     description: string;
-    verified: boolean;
+    verifyed: boolean;
     profile_picture: {
         small_resolution: string;
         tiny_resolution: string;
@@ -20,7 +20,7 @@ export interface UserState {
     setName: (value: string) => void;
     setUsername: (value: string) => void;
     setDescription: (value: string) => void;
-    setVerified: (value: boolean) => void;
+    setVerifyed: (value: boolean) => void;
     setProfilePicture: (value: {
         small_resolution: string;
         tiny_resolution: string;
@@ -36,7 +36,7 @@ export const useUserStore = create<UserState>((set) => ({
     name: storage.getString(storageKey.name) || '',
     username: storage.getString(storageKey.username) || '',
     description: storage.getString(storageKey.description) || '',
-    verified: storage.getBoolean(storageKey.verifyed) || false,
+    verifyed: storage.getBoolean(storageKey.verifyed) || false,
     profile_picture: {
         small_resolution: storage.getString(storageKey.profile_picture.small) || '',
         tiny_resolution: storage.getString(storageKey.profile_picture.tiny) || ''
@@ -58,9 +58,9 @@ export const useUserStore = create<UserState>((set) => ({
         storage.set(storageKey.description, value);
         set({ description: value });
     },
-    setVerified: (value: boolean) => {
+    setVerifyed: (value: boolean) => {
         storage.set(storageKey.verifyed, value);
-        set({ verified: value });
+        set({ verifyed: value });
     },
     setProfilePicture: (value: {
         small_resolution: string;
@@ -80,7 +80,7 @@ export const useUserStore = create<UserState>((set) => ({
                     name: user.name,
                     username: user.username,
                     description: user.description,
-                    verified: user.verifyed,
+                    verifyed: user.verifyed,
                     profile_picture: user.profile_picture
                 })
                 if(user.id) storage.set(storageKey.id, user.id)
@@ -104,7 +104,7 @@ export const useUserStore = create<UserState>((set) => ({
             name: value.name,
             username: value.username,
             description: value.description,
-            verified: value.verifyed,
+            verifyed: value.verifyed,
             profile_picture: value.profile_picture
         })
         if(value.id) storage.set(storageKey.id, value.id)
@@ -121,7 +121,7 @@ export const useUserStore = create<UserState>((set) => ({
             name: storage.getString(storageKey.name) || '',
             username: storage.getString(storageKey.username) || '',
             description: storage.getString(storageKey.description) || '',
-            verified: storage.getBoolean(storageKey.verifyed) || false,
+            verifyed: storage.getBoolean(storageKey.verifyed) || false,
             profile_picture: {
                 small_resolution: storage.getString(storageKey.profile_picture.small) || '',
                 tiny_resolution: storage.getString(storageKey.profile_picture.tiny) || ''
@@ -142,7 +142,7 @@ export const useUserStore = create<UserState>((set) => ({
             name: '',
             username: '',
             description: '',
-            verified: false,
+            verifyed: false,
             profile_picture: { small_resolution: '', tiny_resolution: '' },
         });
     },
