@@ -35,7 +35,7 @@ export function useMomentData(): MomentDataState {
 
     async function getStatistics() {
         await api.post('/moment/get-statistics/view', { moment_id: id})
-        .then((response) => { setStatistics(response.data); console.log(response.data) })
+        .then((response) => { setStatistics(response.data) })
         .catch(function (error) { console.log(error)}) 
     }
 
