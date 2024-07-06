@@ -8,6 +8,7 @@ import { notify } from "react-native-notificated"
 import { colors } from "../layout/constants/colors"
 import CheckIcon from '../assets/icons/svgs/check_circle.svg'
 import ErrorIcon from '../assets/icons/svgs/exclamationmark_circle.svg'
+import TrackingContext from "./tracking"
 
 type AuthProviderProps = { children: React.ReactNode }
 
@@ -30,6 +31,7 @@ const AuthContext = React.createContext<AuthContextsData>({} as AuthContextsData
 
 export function AuthProvider({ children }: AuthProviderProps) {
     const { t } = React.useContext(LanguageContext)
+    const { trackSign, mixpanel} = React.useContext(TrackingContext)
     const [signInputUsername, setSignInputUsername] = React.useState('')
     const [signInputPassword, setSignInputPassword] = React.useState('')
     const [ sessionData, setSessionData ] = useState<SessionDataType>({} as SessionDataType)
