@@ -1,6 +1,16 @@
 import emails from './emails'
 import metadata from './metadata'
-import {APP_VERSION, NODE_ENV, DEBUG, MIXPANEL_KEY, LOG_LEVEL, LOG_DEBUG} from "@env"
+import {
+    APP_VERSION,
+    NODE_ENV,
+    DEBUG,
+    MIXPANEL_KEY,
+    LOG_LEVEL,
+    LOG_DEBUG,
+    API_VERSION,
+    CIRCLE_SYSTEM_API_PRODUCTION,
+    CIRCLE_SYSTEM_API_DEVELOPMENT
+} from "@env"
 
 const environment = {
     APP_VERSION: APP_VERSION,
@@ -8,6 +18,11 @@ const environment = {
     DEBUG: NODE_ENV !== 'production' && DEBUG,
     TEST: NODE_ENV === 'test',
     PRODUCTION: NODE_ENV === 'production',
+}
+
+const api = {
+    API_VERSION: API_VERSION,
+    CIRCLE_SYSTEM_API: NODE_ENV === 'production'? CIRCLE_SYSTEM_API_PRODUCTION : CIRCLE_SYSTEM_API_DEVELOPMENT
 }
 
 const analytics = {
@@ -45,6 +60,7 @@ Object.entries(required).map((entry) => {
 })
 
 export default {
+    ...api,
     ...environment,
     ...log,
     ...options,
