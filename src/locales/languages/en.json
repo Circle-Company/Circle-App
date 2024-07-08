@@ -91,6 +91,7 @@
     "Done": "Done",
     "Delete": "Delete",
     "Error": "Error",
+    "Reload": "Reload",
 
     "Public Profile": "Public Profile",
     "Profile Picture": "Profile Picture",
@@ -173,6 +174,9 @@
     "You won't be able to see or interact with Moments of those you follow.": "You won't be able to see or interact with Moments of those you follow.",
 
     "You can't get it back if you forget it.": "You can't get it back if you forget it.",
+
+    "We don't have any Moment to show": "We don't have any Moment to show",
+    "Share a Moment": "Share a Moment",
     
     "*Type one tag at a time and press 'Add' to add it": "*Type one tag at a time and press 'Add' to add it",
     "Moment Has been uploaded with success": "Moment Has been uploaded with success",
