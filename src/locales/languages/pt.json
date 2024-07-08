@@ -93,6 +93,7 @@
     "Done": "Pronto",
     "Delete": "Deletar",
     "Error": "Erro",
+    "Reload": "Recarregar",
 
     "Public Profile": "Perfil Público",
     "Profile Picture": "Foto de Perfil",
@@ -174,6 +175,9 @@
     "You won't be able to see or interact with Moments of those you follow.": "Você não poderá ver ou interagir com Moments de quem você acompanha.",
 
     "You can't get it back if you forget it.": "Você não pode recuperá-la se esquecer.",
+
+    "We don't have any Moment to show": "Não temos nenhum Moment para mostrar",
+    "Share a Moment": "Crie um Moment",
 
     "*Type one tag at a time and press 'Add' to add it": "*Digite uma tag de cada vez e pressione 'Adicionar' para adiciona-la",
     "Moment Has been uploaded with success": "Moment foi carregado com sucesso",
