@@ -74,7 +74,7 @@ const ListMoments = () => {
         </Loading.Container>
     )
 
-    return (
+    if(feedData.length > 0) return (
         <FlatList
             data={feedData}
             horizontal
@@ -120,6 +120,7 @@ const ListMoments = () => {
             }}
         />
     );
+    else return <EmptyList/>
 };
 
 export default ListMoments;
