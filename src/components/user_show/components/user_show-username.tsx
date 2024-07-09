@@ -13,6 +13,8 @@ import Verifyed from '../../../assets/icons/svgs/check_circle_verify.svg'
 import { useNavigation } from "@react-navigation/native"
 import ViewProfileContext from "../../../contexts/viewProfile"
 import MomentContext from "../../moment/context"
+import PersistedContext from "../../../contexts/Persisted"
+import LanguageContext from "../../../contexts/Preferences/language"
 
 export default function user_username ({
     displayOnMoment = true,
@@ -24,10 +26,15 @@ export default function user_username ({
     margin = Sizes.margins["1sm"],
     scale = 1
 }: UserUsernameProps) {
+    const { session } = React.useContext(PersistedContext)
+    const { t } = React.useContext(LanguageContext)
     const {user, view_profile} = useUserShowContext()
     const {setProfile} = React.useContext(ViewProfileContext)
     const isDarkMode = useColorScheme() === 'dark'
     const navigation = useNavigation()
+
+    const isMe = user.id == session.user.id? true : false
+
     const container:any = {
         margin: margin * scale,
         flexDirection: 'row',
@@ -49,7 +56,7 @@ export default function user_username ({
     }
 
     async function onUsernameActions() {
-        if(disableAnalytics == false){
+        if(disableAnalytics == false || !isMe){
             UserShowActions.UsernamePressed({user_id: Number(user.id), action: view_profile, user})
             await setProfile(user.id)
             navigation.navigate('ProfileNavigator')
