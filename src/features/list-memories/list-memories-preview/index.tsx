@@ -151,6 +151,7 @@ export default function ListMemoriesPreview({isAccountScreen = false, user}: Ren
                     )
                 }}
                 renderItem={({ item, index }) => {
+                    const memory = {...item, isAccountScreen}
                     return(
                     <Animated.View entering={FadeInLeft.duration(200)}>
                         <RenderMemory memory={memory} user_id={user.id} />
