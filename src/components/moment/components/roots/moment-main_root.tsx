@@ -1,7 +1,13 @@
 import { MomentMainRootProps } from "../../moment-types"
 import { MomentProvider } from "../../context"
 
-export default function main_root ({children, isFeed, isFocused, momentData, momentSize}: MomentMainRootProps) {
+export default function main_root ({
+    children,
+    isFeed,
+    isFocused,
+    momentData,
+    momentSize,
+}: MomentMainRootProps) {
 
     return(
         <MomentProvider
