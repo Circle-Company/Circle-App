@@ -8,7 +8,7 @@ type RenderMemoryFooterProps = {}
 export default function render_memory_footer ({}: RenderMemoryFooterProps) {
     const isDarkMode = useColorScheme() === 'dark'
     
-    const container = {
+    const container: any = {
         alignItems: 'center',
         justifyContent: 'center',
         height: sizes.moment.tiny.height,
@@ -17,7 +17,7 @@ export default function render_memory_footer ({}: RenderMemoryFooterProps) {
     return (
         <View style={container}>
             <Loading.Container height={sizes.moment.tiny.height} width={sizes.sizes['1lg']*1.6}>
-                <Loading.ActivityIndicator interval={10}/>
+                <Loading.ActivityIndicator/>
             </Loading.Container>
         </View>
      
