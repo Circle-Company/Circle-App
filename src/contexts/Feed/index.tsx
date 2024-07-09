@@ -76,6 +76,7 @@ export function FeedProvider({children}: FeedProviderProps) {
 
     async function reloadFeed() {
         setEnableScrollFeed(false)
+        setLoadingFeed(true)
         await api.post(`/moment/get-feed`, {
             user_id: session.user.id,
             period,
@@ -86,13 +87,18 @@ export function FeedProvider({children}: FeedProviderProps) {
             const postsIds = response.data.map((moment: any) => moment.id)
             setCurrentChunksIds(postsIds)
             setFeedData(response.data)
+        })
+        .finally(() => {
             setEnableScrollFeed(true)
             resetTimer()
+            setLoadingFeed(false)
+            setChunkInteractions([])
         })
     }
 
     async function getFeed() {
         setEnableScrollFeed(false)
+        setLoadingFeed(true)
         await api.post(`/moment/get-feed`, {
             user_id: session.user.id,
             period,
@@ -104,20 +110,16 @@ export function FeedProvider({children}: FeedProviderProps) {
             else setFeedData(response.data)
             const postsIds = response.data.map((moment: any) => moment.id)
             setCurrentChunksIds(postsIds)
-            setEnableScrollFeed(true)
-            resetTimer()
         })
-        .catch(function (error) { console.log(error)})  
+        .finally(() => {
+            resetTimer()
+            setEnableScrollFeed(true)
+            setLoadingFeed(false)
+            setChunkInteractions([])
+        })
     }
 
-    React.useEffect(() => {
-        setLoadingFeed(true)
-        getFeed()
-        .finally(() => {
-            setLoadingFeed(false)
-        })
-        
-    }, [])
+    React.useEffect(() => { getFeed() }, [])
 
     React.useEffect(() => {
         if(commentEnabled){
