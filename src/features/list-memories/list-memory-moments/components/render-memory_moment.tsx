@@ -7,7 +7,7 @@ import { MomentDataProps } from '../../../../components/moment/context/types'
 import FeedContext from '../../../../contexts/Feed'
 
 type RenderMemoryMomenProps = {
-    moment: MomentDataProps,
+    moment: MomentDataProps
     focused?: boolean
 }
 export function RenderMemoryMoment ({ moment, focused = true }: RenderMemoryMomenProps) {
