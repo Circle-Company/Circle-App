@@ -124,7 +124,7 @@ export default function ListMemoriesPreview({isAccountScreen = false, user}: Ren
                 data={memories}
                 horizontal
                 showsHorizontalScrollIndicator={false}
-                keyExtractor={(item) => item.id}
+                keyExtractor={(item: any) => item.id}
                 onEndReachedThreshold={0.3}
                 onEndReached={async () => {fetchData()}}
                 refreshControl={
