@@ -15,7 +15,7 @@ export default function AccountHeaderLeft() {
     return(
         <View style={container}>
             <UserShow.Root data={session.user}>
-                <UserShow.Username displayOnMoment={false} scale={1.3} disableAnalytics={true}/>
+                <UserShow.Username displayYou={false} displayOnMoment={false} scale={1.3} disableAnalytics={true}/>
             </UserShow.Root>
         </View>
     )
