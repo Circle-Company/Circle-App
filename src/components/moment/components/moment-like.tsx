@@ -11,6 +11,7 @@ import { MomentLikeProps } from "../moment-types"
 import MomentContext from "../context"
 import PersistedContext from "../../../contexts/Persisted"
 import api from "../../../services/api"
+import MemoryContext from "../../../contexts/memory"
 
 export default function like ({
     isLiked,
@@ -19,6 +20,7 @@ export default function like ({
     margin = sizes.margins["1sm"]
 }: MomentLikeProps) {
     const { session } = React.useContext(PersistedContext)
+    const { memory } = React.useContext(MemoryContext)
     const {momentData, momentUserActions} = React.useContext(MomentContext)
     const [likedPressed, setLikedPressed] = React.useState(isLiked? isLiked : momentUserActions.liked)
     var animatedScale = React.useRef(new Animated.Value(1)).current
@@ -140,7 +142,9 @@ export default function like ({
     const like_fill: string = String(colors.gray.white)
     const like_number: string = NumberConversor(Number(momentData.statistics.total_likes_num))
     const like_number_pressed: string = NumberConversor(Number(momentData.statistics.total_likes_num ) + 1)
-    
+
+    if(momentData.user?.id == session.user.id) return null
+    if(memory?.isAccountScreen) return null
     if(likedPressed) {
         return (
             <Animated.View style={animated_container}>
