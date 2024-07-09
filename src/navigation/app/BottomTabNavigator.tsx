@@ -13,8 +13,8 @@ import Moment from '../../assets/icons/svgs/moments.svg'
 import MomentOutline from '../../assets/icons/svgs/moments-outline.svg'
 import Explore from '../../assets/icons/svgs/compass.svg'
 import ExploreOutline from '../../assets/icons/svgs/compass-outline.svg'
-import User from '../../assets/icons/svgs/user_circle.svg'
-import UserOutline from '../../assets/icons/svgs/user_circle-outline.svg'
+import User from '../../assets/icons/svgs/user.svg'
+import UserOutline from '../../assets/icons/svgs/user.svg'
 
 const BottomTab = createBottomTabNavigator();
 
