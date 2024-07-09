@@ -17,7 +17,8 @@ export type MemoryReciveDataProps = {
     id: number,
     title: string,
     updated_at: string,
-    moments: Array<MemoryMomentObjectProps>    
+    moments: Array<MemoryMomentObjectProps>
+    isAccountScreen?: boolean
 }
 
 export type MemoryMainRootProps = {
