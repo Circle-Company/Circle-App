@@ -1,5 +1,5 @@
 import React, { useRef, useState, useEffect, useCallback } from 'react'
-import { Animated, RefreshControl, useColorScheme } from 'react-native'
+import { Animated, Image, RefreshControl, useColorScheme } from 'react-native'
 import FastImage from 'react-native-fast-image'
 import sizes from '../../layout/constants/sizes'
 import { FlatList } from 'react-native-gesture-handler'
@@ -7,6 +7,7 @@ import { Loading } from '../../components/loading'
 import RenderMoment from './components/render-moment'
 import FeedContext from '../../contexts/Feed'
 import { colors } from '../../layout/constants/colors'
+import { EmptyList } from './components/render-empty_list'
 
 const ListMoments = () => {
     const margin = 2
@@ -15,7 +16,6 @@ const ListMoments = () => {
     const [centerIndex, setCenterIndex] = useState<number | null>(0);
     const [loading, setLoading] = React.useState(false)
     const [refreshing, setRefreshing] = React.useState(false)
-    const [endReached, setEndReached] = React.useState(false)
     const isDarkMode = useColorScheme() === 'dark'
     const flatListRef = useRef<FlatList | null>(null);
 
