@@ -20,6 +20,7 @@ export default function user_username ({
     displayOnMoment = true,
     disableAnalytics = false,
     truncatedSize = 30,
+    displayYou = true,
     color = ColorTheme().text,
     fontSize = fonts.size.footnote,
     fontFamily = fonts.family.Bold,
@@ -63,10 +64,12 @@ export default function user_username ({
         }
         
     }
-    
+
+    const username = `@${truncated({text: user.username, size: Number(truncatedSize)})}`
+    const usernameText = displayYou? isMe? t("You") : username : username
     return (
         <Pressable onPress={onUsernameActions} style={container}>
-            <Text style={displayOnMoment? username_style_moment: username_style}>@{truncated({text: user.username, size: Number(truncatedSize)})}</Text>
+            <Text style={displayOnMoment? username_style_moment: username_style}>{usernameText}</Text>
             {user.verifyed && 
             <View style={{alignItems: 'center', justifyContent: "center", marginTop: 1 * scale*2, marginLeft: 2 * scale}}>
                 <Verifyed fill={String(displayOnMoment? colors.gray.white: isDarkMode? colors.yellow.yellow_04: colors.yellow.yellow_05)} width={12 * scale} height={12 * scale}/>

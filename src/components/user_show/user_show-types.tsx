@@ -16,9 +16,10 @@ export type UserRootProps = {
 }
 
 export type UserUsernameProps = {
-    displayOnMoment?: boolean,
-    disableAnalytics?: boolean,
-    truncatedSize?: number,
+    displayOnMoment?: boolean
+    displayYou?: boolean
+    disableAnalytics?: boolean
+    truncatedSize?: number
     color?: String,
     fontSize?: number,
     fontFamily?: String,
