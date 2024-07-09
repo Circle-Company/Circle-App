@@ -31,7 +31,7 @@ export type ProfileDataProps = {
 }
 export type ViewProfileContextsData = {
     userProfile: ProfileDataProps,
-    setProfile: () => Promise<void>,
+    setProfile: (Id: number) => Promise<void>,
 }
 
 const ViewProfileContext = React.createContext<ViewProfileContextsData>({} as ViewProfileContextsData)
