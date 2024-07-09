@@ -8,13 +8,14 @@ import { UserFollowButtonProps } from "../user_show-types"
 import { useUserShowContext } from "../user_show-context"
 import { UserShowActions } from "../user_show-actions"
 import LanguageContext from "../../../contexts/Preferences/language"
+import PersistedContext from "../../../contexts/Persisted"
 
 export default function follow_button ({
     isFollowing = false,
     hideOnFollowing = true,
     displayOnMoment = false
 }: UserFollowButtonProps) {
-    
+    const { session } = React.useContext(PersistedContext)
     const { user , follow, unfollow} = useUserShowContext()
     const { t } = React.useContext(LanguageContext)
 
@@ -74,7 +75,7 @@ export default function follow_button ({
         }
     }
     
-
+    if(user.id == session.user.id) return null
     if(isFollowing && hideOnFollowing) return null
     if(isFollowing && hideOnFollowing == false){
         if(followPressed) {
