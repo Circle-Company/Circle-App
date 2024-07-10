@@ -117,6 +117,13 @@ export default function ListSettings(){
             name: t("More"),
             content:[
                 {
+                    "name": t("Support"),
+                    "value": null,
+                    "type": "TEXT",
+                    "navigateTo": "Settings-Support",
+                    "secure": false
+                },
+                {
                     "name": t("Log Out"),
                     "value": null,
                     "type": "TEXT",
