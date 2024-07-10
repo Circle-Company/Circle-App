@@ -1,10 +1,10 @@
-import React, {useRef} from 'react';
+import React, {useRef} from 'react'
 import { StatusBar,  useColorScheme, Linking, Pressable} from 'react-native'
 import { Text, View } from '../../../components/Themed'
 import ColorTheme from '../../../layout/constants/colors'
-import sizes from '../../../layout/constants/sizes';
-import fonts from '../../../layout/constants/fonts';
-import LanguageContext from '../../../contexts/Preferences/language';
+import sizes from '../../../layout/constants/sizes'
+import fonts from '../../../layout/constants/fonts'
+import LanguageContext from '../../../contexts/Preferences/language'
 import config from '../../../config'
 
 export default function SupportScreen() {
