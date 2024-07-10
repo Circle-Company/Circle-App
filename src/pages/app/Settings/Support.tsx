@@ -5,6 +5,7 @@ import ColorTheme from '../../../layout/constants/colors'
 import sizes from '../../../layout/constants/sizes';
 import fonts from '../../../layout/constants/fonts';
 import LanguageContext from '../../../contexts/Preferences/language';
+import config from '../../../config'
 
 export default function SupportScreen() {
     const { t } = React.useContext(LanguageContext)
@@ -43,9 +44,7 @@ export default function SupportScreen() {
         t('Above all, maintain ethical and collaborative conduct to promote a healthy environment in the open source community.'),
     ]
 
-    const handlePress = () => {
-        Linking.openURL('https://mail.google.com/mail/u/?authuser=suporte@circlecompany.com.br');
-      };
+    const handlePress = () => { Linking.openURL(config.SUPPORT_URL) }
 
     return (
         <View style={container}>
