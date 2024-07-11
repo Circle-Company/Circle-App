@@ -108,6 +108,7 @@
     "Terms of Service": "Terms of Service",
     "More": "More",
     "Log Out": "Log Out",
+    "Support": "Support",
 
     "Most Relevants": "Most Relevants",
     "Send Comment": "Send Comment",
@@ -212,5 +213,8 @@
     "Are you sure you want to permanently delete this Memory? You won't be able to recover this later.": "Are you sure you want to permanently delete this Memory? You won't be able to recover this later.",
 
     "The Moment will only be removed from this memory.": "The Moment will only be removed from this memory.",
-    "If the memory only has this moment and you remove it, the memory will be deleted.": "If the memory only has this moment and you remove it, the memory will be deleted."
+    "If the memory only has this moment and you remove it, the memory will be deleted.": "If the memory only has this moment and you remove it, the memory will be deleted.",
+
+    "If you have any questions or want to report something more serious, send an email to our support.": "If you have any questions or want to report something more serious, send an email to our support.",
+    "If you have found a bug, please help us by reporting it. Thanks!": "If you have found a bug, please help us by reporting it. Thanks!"
 }
