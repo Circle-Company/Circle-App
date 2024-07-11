@@ -26,7 +26,7 @@ ios/.xcode.env.local
 #
 build/
 .idea
-.gradle
+*.gradle
 local.properties
 *.iml
 *.hprof
@@ -40,6 +40,7 @@ node_modules/
 npm-debug.log
 yarn-error.log
 .env
+*.env
 
 # fastlane
 #
@@ -59,6 +60,11 @@ yarn-error.log
 # Ruby / CocoaPods
 /ios/Pods/
 /vendor/bundle/
+
+# local builds
+*.apk
+*.aab
+*.ipa
 
 # Temporary files created by Metro to check the health of the file watcher
 .metro-health-check*
