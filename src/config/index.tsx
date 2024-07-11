@@ -8,8 +8,7 @@ import {
     LOG_LEVEL,
     LOG_DEBUG,
     API_VERSION,
-    CIRCLE_SYSTEM_API_PRODUCTION,
-    CIRCLE_SYSTEM_API_DEVELOPMENT
+    CIRCLE_SYSTEM_API
 } from "@env"
 
 const environment = {
@@ -22,7 +21,7 @@ const environment = {
 
 const api = {
     API_VERSION: API_VERSION,
-    CIRCLE_SYSTEM_API: NODE_ENV === 'production'? CIRCLE_SYSTEM_API_PRODUCTION : CIRCLE_SYSTEM_API_DEVELOPMENT
+    CIRCLE_SYSTEM_API: CIRCLE_SYSTEM_API
 }
 
 const analytics = {
@@ -58,6 +57,7 @@ Object.entries(required).map((entry) => {
     }
     return entry
 })
+
 
 export default {
     ...api,
