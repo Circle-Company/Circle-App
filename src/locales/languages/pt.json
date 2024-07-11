@@ -110,6 +110,7 @@
     "Terms of Service": "Termos de Serviço",
     "More": "Mais",
     "Log Out": "Deslogar",
+    "Support": "Suporte",
 
     "Most Relevants": "Mais Relevantes",
     "Send Comment": "Enviar Comentário",
@@ -213,5 +214,8 @@
     "Are you sure you want to permanently delete this Memory? You won't be able to recover this later.": "Tem certeza de que deseja excluir permanentemente esta Memória? Você não poderá recuperá-la depois.",
 
     "The Moment will only be removed from this memory.": "O Moment será removido somente desta memória.",
-    "If the memory only has this moment and you remove it, the memory will be deleted.": "Se a memória só tiver esse Moment e você removê-lo, a memória será apagada."
+    "If the memory only has this moment and you remove it, the memory will be deleted.": "Se a memória só tiver esse Moment e você removê-lo, a memória será apagada.",
+
+    "If you have any questions or want to report something more serious, send an email to our support.": "Caso haja alguma dúvida ou queira reportar algo mais sério, envie um email para o nosso suporte.",
+    "If you have found a bug, please help us by reporting it. Thanks!": "Se tive encontrado algum bug, nos ajude reportando. Obrigado!"
 }
