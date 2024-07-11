@@ -22,6 +22,7 @@ import ContentScreen from '../../pages/app/Settings/Preferences/Content'
 import ProfilePictureScreen from '../../pages/app/Settings/ProfilePicture'
 import LanguageContext from '../../contexts/Preferences/language'
 import SettingsCommunityGuidelines from '../../pages/app/Settings/CommunityGuidelines'
+import SupportScreen from '../../pages/app/Settings/Support'
 
 const SettingsStack = createStackNavigator()
  
@@ -189,6 +190,17 @@ export function SettingsNavigator() {
             component={OpenSourceScreen}
             options={{
                 headerTitle: t('Open Source'),
+                headerStyle: HeaderStyle,
+                headerTintColor: String(ColorTheme().text),
+                cardStyle: {backgroundColor: String(ColorTheme().background)},
+                cardOverlayEnabled: true,
+            }}
+        />
+        <SettingsStack.Screen
+            name="Settings-Support"
+            component={SupportScreen}
+            options={{
+                headerTitle: t('Support'),
                 headerStyle: HeaderStyle,
                 headerTintColor: String(ColorTheme().text),
                 cardStyle: {backgroundColor: String(ColorTheme().background)},
