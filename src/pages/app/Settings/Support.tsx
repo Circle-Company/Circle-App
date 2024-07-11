@@ -37,11 +37,8 @@ export default function SupportScreen() {
     }
 
     const textData = [
-        t("When contributing to an open source project, it is essential to understand the project's license and adopt its code standards."),
-        t('Testing and documentation are crucial to ensuring code stability and understandability.'),
-        t('Be open to community feedback and break your contributions into manageable chunks.'),
-        t('Respect existing code and closely monitor revisions.'),
-        t('Above all, maintain ethical and collaborative conduct to promote a healthy environment in the open source community.'),
+        t("If you have any questions or want to report something more serious, send an email to our support."),
+        t('If you have found a bug, please help us by reporting it. Thanks!'),
     ]
 
     const handlePress = () => { Linking.openURL(config.SUPPORT_URL) }
