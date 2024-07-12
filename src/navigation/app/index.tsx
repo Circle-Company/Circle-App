@@ -7,6 +7,7 @@ import { ProfileNavigator } from "./ProfileNavigator"
 import { MomentNavigator } from "./MomentNavigator"
 import ColorTheme from "../../layout/constants/colors"
 import { ExploreScreenNavigator } from "./ExploreScreenNavigator"
+import { Interpolation as Horizontal  } from "../transitions/horizontal"
 
 export default function AppNavigator() {
     const App =  createStackNavigator()
@@ -26,14 +27,14 @@ export default function AppNavigator() {
                 name="SettingsNavigator"
                 component={SettingsNavigator}
                 options={{
-                    cardStyleInterpolator: CardStyleInterpolators.forHorizontalIOS
+                    cardStyleInterpolator: Horizontal
                 }}
             />
             <App.Screen
                 name="ExploreNavigator"
                 component={ExploreScreenNavigator}
                 options={{
-                    cardStyleInterpolator: CardStyleInterpolators.forHorizontalIOS
+                    cardStyleInterpolator: Horizontal
                 }}
             />
             <App.Screen
@@ -47,21 +48,21 @@ export default function AppNavigator() {
                 name="MemoriesNavigator"
                 component={MemoriesNavigator}
                 options={{
-                    cardStyleInterpolator: CardStyleInterpolators.forHorizontalIOS
+                    cardStyleInterpolator: Horizontal
                 }}
             />
             <App.Screen
               name="InboxNavigator"
               component={InboxNavigator}
               options={{
-                cardStyleInterpolator: CardStyleInterpolators.forHorizontalIOS
+                cardStyleInterpolator: Horizontal
               }}
             />
             <App.Screen
                 name="ProfileNavigator"
                 component={ProfileNavigator}
                 options={{
-                    cardStyleInterpolator: CardStyleInterpolators.forHorizontalIOS
+                    cardStyleInterpolator: Horizontal
                 }}
             /> 
         </App.Navigator>
