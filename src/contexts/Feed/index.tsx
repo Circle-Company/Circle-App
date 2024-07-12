@@ -46,7 +46,7 @@ type FeedContextsData = {
 
 const FeedContext = React.createContext<FeedContextsData>({} as FeedContextsData)
 
-export function FeedProvider({children}: FeedProviderProps) {
+export function Provider({children}: FeedProviderProps) {
     const { session } = React.useContext(PersistedContext)
     const [ loadingFeed, setLoadingFeed ] = React.useState(false)
     const [ focusedItemIndex, setFocusedItemIndex] = React.useState<null | number>(null)

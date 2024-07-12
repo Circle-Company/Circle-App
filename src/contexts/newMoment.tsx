@@ -46,7 +46,7 @@ export type NewMomentContextsData = {
 
 const NewMomentContext = React.createContext<NewMomentContextsData>({} as NewMomentContextsData)
 
-export function NewMomentProvider({children}: NewMomentProviderProps) {
+export function Provider({children}: NewMomentProviderProps) {
     const { session } = React.useContext(PersistedContext)
     const { t } = React.useContext(LanguageContext)
     const [selectedImage, setSelectedImage] = React.useState<any>()
