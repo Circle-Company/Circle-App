@@ -19,7 +19,7 @@ export type MemoryContextsData = {
 
 const MemoryContext = React.createContext<MemoryContextsData>({} as MemoryContextsData)
 
-export function MemoryProvider({children}: MemoryProviderProps) {
+export function Provider({children}: MemoryProviderProps) {
     const [memory, setMemory] = React.useState<MemoryReciveDataProps>()
     const [memoryMoments, setMemoryMoments] = React.useState<any>()
     const [allMemoriesUserId, setAllMemoriesUserId] = React.useState<number>()

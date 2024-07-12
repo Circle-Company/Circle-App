@@ -36,7 +36,7 @@ export type ViewProfileContextsData = {
 
 const ViewProfileContext = React.createContext<ViewProfileContextsData>({} as ViewProfileContextsData)
 
-export function ViewProfileProvider({children}: ViewProfileProviderProps) {
+export function Provider({children}: ViewProfileProviderProps) {
     const { session } = React.useContext(PersistedContext)
     const [userProfile, setUserProfile] = React.useState()
 

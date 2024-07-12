@@ -20,7 +20,7 @@ export type TrackingContextsData = {
 
 const TrackingContext = React.createContext<TrackingContextsData>({} as TrackingContextsData)
 
-export function TrackingProvider({children}: TrackingProviderProps) {
+export function Provider({children}: TrackingProviderProps) {
     const { sessionData } = React.useContext(AuthContext)
 
     const trackAutomaticEvents = false

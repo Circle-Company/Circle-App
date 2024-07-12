@@ -29,7 +29,7 @@ export type AuthContextsData = {
 
 const AuthContext = React.createContext<AuthContextsData>({} as AuthContextsData);
 
-export function AuthProvider({ children }: AuthProviderProps) {
+export function Provider({ children }: AuthProviderProps) {
     const { t } = React.useContext(LanguageContext)
     const { trackSign, mixpanel} = React.useContext(TrackingContext)
     const [signInputUsername, setSignInputUsername] = React.useState('')

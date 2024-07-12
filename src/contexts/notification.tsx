@@ -15,7 +15,7 @@ export type NotificationContextData = {
 }
 const NotificationContext = React.createContext<NotificationContextData>({} as NotificationContextData)
 
-export function NotificationProvider({children}: NotificationProviderProps) {
+export function Provider({children}: NotificationProviderProps) {
     const [ socketNotifications, setSocketNotifications ] = React.useState<NotificationProps[]>([])
     const [ newNotificationsNum, setNewNotificationsNum ] = React.useState<number>(0)
     const [ lastNotification, setLastNotification ] = React.useState<NotificationProps| any>({})

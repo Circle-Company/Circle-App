@@ -42,7 +42,7 @@ export type SelectMomentsContextsData = {
 
 const SelectMomentsContext = React.createContext<SelectMomentsContextsData>({} as SelectMomentsContextsData)
 
-export function SelectMomentsProvider({children}: SelectMomentsProviderProps) {
+export function Provider({children}: SelectMomentsProviderProps) {
     const { session } = React.useContext(PersistedContext)
     const [ from, setFrom ] = React.useState<From | ''>('')
     const [allMoments, setAllMoments] = React.useState([])

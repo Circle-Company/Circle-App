@@ -14,7 +14,7 @@ export type NetworkContextData = {
 
 const NetworkContext = createContext<NetworkContextData>({} as NetworkContextData);
 
-export function NetworkProvider({ children }: NetworkProviderProps) {
+export function Provider({ children }: NetworkProviderProps) {
     const [ networkStatus, setNetworkStatus ] = React.useState<"ONLINE" | "OFFLINE" | "RECONNECTING">("ONLINE")
     const [isConnected, setIsConnected] = useState<boolean | null>(null);
     const [isInternetReachable, setIsInternetReachable] = useState<boolean | null>(null)

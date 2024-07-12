@@ -1,28 +1,27 @@
 import * as React from 'react'
-import { DefaultTheme, NavigationContainer} from '@react-navigation/native'
 import Routes from './src/routes'
-import { AuthProvider } from './src/contexts/auth'
-import { ViewProfileProvider } from './src/contexts/viewProfile'
-import { NotificationProvider } from './src/contexts/notification'
-import { SelectMomentsProvider } from './src/contexts/selectMoments'
-import { NewMomentProvider } from './src/contexts/newMoment'
-import { FeedProvider } from './src/contexts/Feed'
-import { MemoryProvider } from './src/contexts/memory'
-import { TrackingProvider } from './src/contexts/tracking'
-import { NetworkProvider } from './src/contexts/network'
+import { DefaultTheme, NavigationContainer} from '@react-navigation/native'
+import sizes from './src/layout/constants/sizes'
+import ColorTheme from './src/layout/constants/colors'
 import {GestureHandlerRootView} from 'react-native-gesture-handler'
 import {KeyboardProvider} from 'react-native-keyboard-controller'
 import { initialWindowMetrics, SafeAreaProvider } from 'react-native-safe-area-context'
+
+import { Provider as AuthProvider } from './src/contexts/auth'
+import { Provider as ViewProfileProvider } from './src/contexts/viewProfile'
+import { Provider as NotificationProvider } from './src/contexts/notification'
+import { Provider as SelectMomentsProvider } from './src/contexts/selectMoments'
+import { Provider as NewMomentProvider } from './src/contexts/newMoment'
+import { Provider as MemoryProvider } from './src/contexts/memory'
+import { Provider as TrackingProvider } from './src/contexts/tracking'
+import { Provider as NetworkProvider } from './src/contexts/network'
+import { Provider as FeedProvider } from './src/contexts/Feed'
 import { Provider as PreferencesProvider } from './src/contexts/Preferences'
 import { Provider as PersistedProvider } from './src/contexts/Persisted'
 import { Provider as ToastProvider } from './src/contexts/Toast'
 import { Provider as ProfileProvider } from './src/contexts/profile'
 import { Provider as BottomTabsProvider } from './src/contexts/bottomTabs'
 import { Provider as BottomSheetProvider } from './src/contexts/bottomSheet'
-import sizes from './src/layout/constants/sizes'
-import ColorTheme from './src/layout/constants/colors'
-
-
 
 function InnerApp() {
   const myTheme = {
@@ -65,17 +64,17 @@ const App = () => {
     <SafeAreaProvider initialMetrics={initialWindowMetrics}>
       <GestureHandlerRootView style={{width: sizes.window.width, height: sizes.window.height}}>
         <ToastProvider>
-            <AuthProvider>
-              <PersistedProvider>
-                <PreferencesProvider>
-                  <NetworkProvider>
+          <AuthProvider>
+            <PersistedProvider>
+              <PreferencesProvider>
+                <NetworkProvider>
                   <TrackingProvider>
-                      <InnerApp/>
+                    <InnerApp/>
                   </TrackingProvider>
-                  </NetworkProvider>              
-                </PreferencesProvider>
-              </PersistedProvider>
-            </AuthProvider>        
+                </NetworkProvider>              
+              </PreferencesProvider>
+            </PersistedProvider>
+          </AuthProvider>        
         </ToastProvider>
       </GestureHandlerRootView>
     </SafeAreaProvider>
