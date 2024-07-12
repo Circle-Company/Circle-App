@@ -99,7 +99,7 @@ export default function DescriptionScreen() {
                     user_id: session.user.id,
                     description
                 }).finally(() => {
-                    session.user.getUser(session.user.id)
+                    session.user.get(session.user.id)
                     setDescription('')
                     navigation.goBack()
                 })
@@ -124,7 +124,7 @@ export default function DescriptionScreen() {
                         maxLength={300}
                         numberOfLines={5}
                         style={input_style}
-                        placeholder="say something about you..."
+                        placeholder={t("say something about you") + '...'}
                         placeholderTextColor={String(ColorTheme().textDisabled)}
                     />
                 </View>
