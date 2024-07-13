@@ -1,39 +1,41 @@
-import { createStackNavigator, CardStyleInterpolators} from '@react-navigation/stack'
-import React from 'react'
-import ColorTheme from '../../layout/constants/colors'
-import Sizes from '../../layout/constants/sizes'
-import Fonts from '../../layout/constants/fonts'
-import HeaderRigthHome from '../../components/headers/home/Right'
-import HomeScreen from '../../pages/app/Home'
-import config from '../../config'
-import MomentFullScreen from '../../pages/app/Moment/moment-full'
-  
+import { CardStyleInterpolators, createStackNavigator } from "@react-navigation/stack"
+import React from "react"
+import HeaderRigthHome from "../../components/headers/home/Right"
+import config from "../../config"
+import ColorTheme from "../../layout/constants/colors"
+import Fonts from "../../layout/constants/fonts"
+import Sizes from "../../layout/constants/sizes"
+import HomeScreen from "../../pages/app/Home"
+
 const HomeScreenStack = createStackNavigator()
- 
+
 export function HomeScreenNavigator() {
-    const HeaderStyle: any= {
+    const HeaderStyle = {
         ...Sizes.headers,
-        backgroundColor:  ColorTheme().background,
+        backgroundColor: ColorTheme().background,
     }
-   
-  return (
-    <HomeScreenStack.Navigator 
-        screenOptions={{cardStyleInterpolator: CardStyleInterpolators.forHorizontalIOS}}
-    >
-    <HomeScreenStack.Screen
-        name="HomeScreen"
-        component={HomeScreen}
-        options={{
-            headerTitle: config.APPLICATION_SHORT_NAME,
-            headerTitleAlign: 'left',
-            headerTransparent: false,
-            headerTitleStyle: {fontFamily: Fonts.family['Black-Italic'], fontSize: Fonts.size.title2},
-            headerTintColor: String(ColorTheme().text),
-            headerStyle: HeaderStyle,
-            cardStyle: {backgroundColor: String(ColorTheme().background)},
-            headerRight: () => (<HeaderRigthHome/>),
-        }}
-    />
-    </HomeScreenStack.Navigator>
-  )
+
+    return (
+        <HomeScreenStack.Navigator
+            screenOptions={{ cardStyleInterpolator: CardStyleInterpolators.forHorizontalIOS }}
+        >
+            <HomeScreenStack.Screen
+                name="HomeScreen"
+                component={HomeScreen}
+                options={{
+                    headerTitle: config.APPLICATION_SHORT_NAME,
+                    headerTitleAlign: "left",
+                    headerTransparent: false,
+                    headerTitleStyle: {
+                        fontFamily: Fonts.family["Black-Italic"],
+                        fontSize: Fonts.size.title2,
+                    },
+                    headerTintColor: String(ColorTheme().text),
+                    headerStyle: HeaderStyle,
+                    cardStyle: { backgroundColor: String(ColorTheme().background) },
+                    headerRight: () => <HeaderRigthHome />,
+                }}
+            />
+        </HomeScreenStack.Navigator>
+    )
 }

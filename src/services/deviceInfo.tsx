@@ -1,37 +1,36 @@
-import DeviceInfo, {LocationProviderInfo} from 'react-native-device-info'
-import { storage } from '../store'
+import DeviceInfo, { LocationProviderInfo } from "react-native-device-info"
+import { storage } from "../store"
 
 export type getDeviceInfoProps = {
-    brand: string,
-    buildNumber: string,
-    deviceId: string,
-    deviceType: string,
-    deviceName: string,
-    systemName: string,
-    systemVersion: string,
-    hardware: string,
-    uniqueId: string,
-    userAgent: string,
-    totalMemory: number,
-    maxMemory: number,
-    totalDiskCapacity: number,
-    freeDiskStorage: number,
-    androidId: string,
-    apiLevel: number,
-    carrier: string,
-    hasNotch: boolean,
-    hasDynamicIsland: boolean,
-    ipAddress: string,
-    macAddress: string,
-    phoneNumber: string,
-    serialNumber: string,
+    brand: string
+    buildNumber: string
+    deviceId: string
+    deviceType: string
+    deviceName: string
+    systemName: string
+    systemVersion: string
+    hardware: string
+    uniqueId: string
+    userAgent: string
+    totalMemory: number
+    maxMemory: number
+    totalDiskCapacity: number
+    freeDiskStorage: number
+    androidId: string
+    apiLevel: number
+    carrier: string
+    hasNotch: boolean
+    hasDynamicIsland: boolean
+    ipAddress: string
+    macAddress: string
+    phoneNumber: string
+    serialNumber: string
     availableLocationProviders: LocationProviderInfo
 }
 
-export default async function getDeviceInfo(){
-
+export default async function getDeviceInfo() {
     let deviceInfo
-    
+
     const newDeviceInfo: getDeviceInfoProps = {
         brand: DeviceInfo.getBrand(),
         buildNumber: DeviceInfo.getBuildNumber(),
@@ -56,15 +55,15 @@ export default async function getDeviceInfo(){
         macAddress: await DeviceInfo.getMacAddress(),
         phoneNumber: await DeviceInfo.getPhoneNumber(),
         serialNumber: await DeviceInfo.getSerialNumber(),
-        availableLocationProviders: await DeviceInfo.getAvailableLocationProviders()
+        availableLocationProviders: await DeviceInfo.getAvailableLocationProviders(),
     }
 
-    if(newDeviceInfo) {
-        storage.set('circle:device:info', JSON.stringify(newDeviceInfo))
+    if (newDeviceInfo) {
+        storage.set("circle:device:info", JSON.stringify(newDeviceInfo))
         deviceInfo = newDeviceInfo
     } else {
-        const recoveredDeviceInfo = storage.getString('circle:device:info')
-        if(recoveredDeviceInfo) deviceInfo = JSON.parse(recoveredDeviceInfo)
+        const recoveredDeviceInfo = storage.getString("circle:device:info")
+        if (recoveredDeviceInfo) deviceInfo = JSON.parse(recoveredDeviceInfo)
     }
 
     const deviceInfoReturns: getDeviceInfoProps = deviceInfo

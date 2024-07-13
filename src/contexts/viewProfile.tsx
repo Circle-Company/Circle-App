@@ -1,6 +1,6 @@
 import React from "react"
 import api from "../services/api"
-import AuthContext from "./auth"
+import AuthContext from "./auth"    
 import PersistedContext from "./Persisted"
 
 type ViewProfileProviderProps = {

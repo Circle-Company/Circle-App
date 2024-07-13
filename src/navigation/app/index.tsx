@@ -1,71 +1,68 @@
-import {createStackNavigator, CardStyleInterpolators } from "@react-navigation/stack"
-import BottomTabNavigator from "./BottomTabNavigator"
-import { SettingsNavigator } from "./SettingsNavigator"
-import { MemoriesNavigator } from "./MemoriesNavigator"
-import { InboxNavigator } from "./InboxNavigator"
-import { ProfileNavigator } from "./ProfileNavigator"
-import { MomentNavigator } from "./MomentNavigator"
+import { CardStyleInterpolators, createStackNavigator } from "@react-navigation/stack"
+import React from "react"
 import ColorTheme from "../../layout/constants/colors"
+import { Interpolation as Horizontal } from "../transitions/horizontal"
+import BottomTabNavigator from "./BottomTabNavigator"
 import { ExploreScreenNavigator } from "./ExploreScreenNavigator"
-import { Interpolation as Horizontal  } from "../transitions/horizontal"
+import { InboxNavigator } from "./InboxNavigator"
+import { MemoriesNavigator } from "./MemoriesNavigator"
+import { MomentNavigator } from "./MomentNavigator"
+import { ProfileNavigator } from "./ProfileNavigator"
+import { SettingsNavigator } from "./SettingsNavigator"
 
 export default function AppNavigator() {
-    const App =  createStackNavigator()
-    return(
+    const App = createStackNavigator()
+    return (
         <App.Navigator
             initialRouteName="BottomTab"
             screenOptions={{
                 headerShown: false,
-                cardStyle: {backgroundColor: String(ColorTheme().background)}
+                cardStyle: { backgroundColor: String(ColorTheme().background) },
             }}
         >
-            <App.Screen
-                name="BottomTab"
-                component={BottomTabNavigator}
-            />      
+            <App.Screen name="BottomTab" component={BottomTabNavigator} />
             <App.Screen
                 name="SettingsNavigator"
                 component={SettingsNavigator}
                 options={{
-                    cardStyleInterpolator: Horizontal
+                    cardStyleInterpolator: Horizontal,
                 }}
             />
             <App.Screen
                 name="ExploreNavigator"
                 component={ExploreScreenNavigator}
                 options={{
-                    cardStyleInterpolator: Horizontal
+                    cardStyleInterpolator: Horizontal,
                 }}
             />
             <App.Screen
                 name="MomentNavigator"
                 component={MomentNavigator}
                 options={{
-                    cardStyleInterpolator: CardStyleInterpolators.forNoAnimation
+                    cardStyleInterpolator: CardStyleInterpolators.forNoAnimation,
                 }}
             />
             <App.Screen
                 name="MemoriesNavigator"
                 component={MemoriesNavigator}
                 options={{
-                    cardStyleInterpolator: Horizontal
+                    cardStyleInterpolator: Horizontal,
                 }}
             />
             <App.Screen
-              name="InboxNavigator"
-              component={InboxNavigator}
-              options={{
-                cardStyleInterpolator: Horizontal
-              }}
+                name="InboxNavigator"
+                component={InboxNavigator}
+                options={{
+                    cardStyleInterpolator: Horizontal,
+                }}
             />
             <App.Screen
                 name="ProfileNavigator"
                 component={ProfileNavigator}
                 options={{
-                    cardStyleInterpolator: Horizontal
+                    cardStyleInterpolator: Horizontal,
                 }}
-            /> 
+            />
         </App.Navigator>
     )
-  
 }

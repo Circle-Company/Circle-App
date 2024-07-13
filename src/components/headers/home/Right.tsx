@@ -1,59 +1,66 @@
-import React from 'react';
-import { View, Text } from 'react-native';
-import ColorTheme from '../../../layout/constants/colors';
-import {useNavigation} from '@react-navigation/native';
-import Camera from '../../../assets/icons/svgs/camera.svg'
-import SearchIcon from '../../../assets/icons/svgs/search.svg'
-import sizes from '../../../layout/constants/sizes';
-import fonts from '../../../layout/constants/fonts';
-import ButtonStandart from '../../buttons/button-standart';
-import NotificationContext from '../../../contexts/notification';
-import { BadgeIcon } from '../../general/badge-icon';
-import LanguageContext from '../../../contexts/Preferences/language';
+import React from "react"
+import { View, Text } from "react-native"
+import ColorTheme from "../../../layout/constants/colors"
+import { useNavigation } from "@react-navigation/native"
+import Camera from "../../../assets/icons/svgs/camera.svg"
+import SearchIcon from "../../../assets/icons/svgs/search.svg"
+import sizes from "../../../layout/constants/sizes"
+import fonts from "../../../layout/constants/fonts"
+import ButtonStandart from "../../buttons/button-standart"
+import NotificationContext from "../../../contexts/notification"
+import { BadgeIcon } from "../../general/badge-icon"
+import LanguageContext from "../../../contexts/Preferences/language"
 
 export default function HeaderRightHome() {
-    const {t} = React.useContext(LanguageContext)
+    const { t } = React.useContext(LanguageContext)
 
-    const {newNotificationsNum} = React.useContext(NotificationContext)
+    const { newNotificationsNum } = React.useContext(NotificationContext)
     const navigation = useNavigation()
 
     const container: any = {
-        flexDirection: 'row'
+        flexDirection: "row",
     }
 
     const text: any = {
         fontSize: fonts.size.footnote,
         fontFamily: fonts.family.Bold,
-        color: ColorTheme().text
+        color: ColorTheme().text,
     }
     const textContainer = {
-        marginRight: sizes.margins['2sm']
+        marginRight: sizes.margins["2sm"],
     }
 
     async function onPressNewMoment() {
-        navigation.navigate('MomentNavigator', {screen: 'NewMomentImageScreen'})
+        navigation.navigate("MomentNavigator", {
+            screen: "NewMomentImageScreen",
+        })
     }
 
     async function onPressSearch() {
-        navigation.navigate('ExploreNavigator', {screen: 'ExploreScreen'})
+        navigation.navigate("ExploreNavigator", { screen: "ExploreScreen" })
     }
 
-    const active = newNotificationsNum> 0? true: false
-    return(
+    const active = newNotificationsNum > 0 ? true : false
+    return (
         <View style={container}>
-        <ButtonStandart action={onPressNewMoment} width={140} backgroundColor={String(ColorTheme().backgroundDisabled)}>
-            <View style={textContainer}>
-                <Text style={text}>{t('New Moment')}</Text>
-            </View>
-            <Camera fill={String(ColorTheme().text)} width={16} height={16}/>
-        </ButtonStandart>  
+            <ButtonStandart
+                action={onPressNewMoment}
+                width={140}
+                backgroundColor={String(ColorTheme().backgroundDisabled)}
+            >
+                <View style={textContainer}>
+                    <Text style={text}>{t("New Moment")}</Text>
+                </View>
+                <Camera fill={String(ColorTheme().text)} width={16} height={16} />
+            </ButtonStandart>
 
-        <ButtonStandart action={onPressSearch} backgroundColor={String(ColorTheme().backgroundDisabled)}>
-            <BadgeIcon active={active} number={newNotificationsNum}/>
-            <SearchIcon fill={String(ColorTheme().text)} width={18} height={18}/>
-        </ButtonStandart>                  
+            <ButtonStandart
+                action={onPressSearch}
+                backgroundColor={String(ColorTheme().backgroundDisabled)}
+            >
+                <BadgeIcon active={active} number={newNotificationsNum} />
+                <SearchIcon fill={String(ColorTheme().text)} width={18} height={18} />
+            </ButtonStandart>
         </View>
-
-
     )
 }

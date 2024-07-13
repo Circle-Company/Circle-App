@@ -1,68 +1,70 @@
-import React from 'react';
-import { StatusBar,  useColorScheme} from 'react-native'
-import { Text, View } from '../../../components/Themed'
-import ColorTheme, { colors } from '../../../layout/constants/colors'
-import NewMomentContext from '../../../contexts/newMoment'
-import { MidiaRender } from '../../../components/midia_render';
-import sizes from '../../../layout/constants/sizes';
-import RenderSelectButton from '../../../features/new_moment/render-select_button';
+import React from "react"
+import { StatusBar, useColorScheme } from "react-native"
+import { MidiaRender } from "../../../components/midia_render"
+import { View } from "../../../components/Themed"
+import NewMomentContext from "../../../contexts/newMoment"
+import RenderSelectButton from "../../../features/new_moment/render-select_button"
+import ColorTheme, { colors } from "../../../layout/constants/colors"
+import sizes from "../../../layout/constants/sizes"
 
 export default function NewMomentImageScreen() {
-  const isDarkMode = useColorScheme() === 'dark'
+    const isDarkMode = useColorScheme() === "dark"
 
-  const { selectedImage, handleLaunchImageLibrary} = React.useContext(NewMomentContext)
+    const { selectedImage, handleLaunchImageLibrary } = React.useContext(NewMomentContext)
 
-  const [ image, setImage ] = React.useState(selectedImage)
+    const [image, setImage] = React.useState(selectedImage)
 
-  React.useEffect(() => {
-    if(selectedImage) setImage(selectedImage.assets[0].uri)
+    React.useEffect(() => {
+        if (selectedImage) setImage(selectedImage.assets[0].uri)
 
-    console.log(selectedImage)
-  }, [selectedImage])
+        console.log(selectedImage)
+    }, [selectedImage])
 
-    const container  = {
-        paddingTop: sizes.paddings['1md'],
-        alignItems:'center',
+    const container = {
+        paddingTop: sizes.paddings["1md"],
+        alignItems: "center",
         flex: 1,
     }
 
     const midia_container = {
-        overflow: 'hidden',
-        marginBottom: sizes.margins['1md']
-    }
-    const image_cover = {
-        ...sizes.moment.standart,
-        borderRadius: sizes.moment.standart.borderRadius*0.6,
-        alignItems: 'center',
-        justifyContent: 'center',
-        backgroundColor: ColorTheme().backgroundDisabled
+        overflow: "hidden",
+        marginBottom: sizes.margins["1md"],
     }
 
-    const image_container: any = {
-        overflow: 'hidden',
-        borderRadius: sizes.moment.standart.borderRadius*0.6,
+    const image_container = {
+        overflow: "hidden",
+        borderRadius: sizes.moment.standart.borderRadius * 0.6,
         borderWidth: 1.5,
-        borderColor: isDarkMode? colors.gray.grey_09: colors.gray.grey_02
+        borderColor: isDarkMode ? colors.gray.grey_09 : colors.gray.grey_02,
     }
 
     React.useEffect(() => {
         handleLaunchImageLibrary()
     }, [])
 
-
-return (
-    <View style={container}>
-    <StatusBar translucent={false} backgroundColor={String(ColorTheme().background)} barStyle={isDarkMode? 'light-content': 'dark-content'}/>
-    <View style={midia_container}>
-        {image &&
-            <View style={image_container}>
-                <MidiaRender.Root data={{"fullhd_resolution": image}} content_sizes={{...sizes.moment.standart, borderRadius: sizes.moment.standart.borderRadius*0.6}}>
-                    <MidiaRender.RenderImage />
-                </MidiaRender.Root>            
+    return (
+        <View style={container}>
+            <StatusBar
+                translucent={false}
+                backgroundColor={String(ColorTheme().background)}
+                barStyle={isDarkMode ? "light-content" : "dark-content"}
+            />
+            <View style={midia_container}>
+                {image && (
+                    <View style={image_container}>
+                        <MidiaRender.Root
+                            data={{ fullhd_resolution: image }}
+                            content_sizes={{
+                                ...sizes.moment.standart,
+                                borderRadius: sizes.moment.standart.borderRadius * 0.6,
+                            }}
+                        >
+                            <MidiaRender.RenderImage />
+                        </MidiaRender.Root>
+                    </View>
+                )}
             </View>
-        }
-    </View>
-    { image? <RenderSelectButton/>: null }         
-    </View>
-);
+            {image ? <RenderSelectButton /> : null}
+        </View>
+    )
 }
