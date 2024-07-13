@@ -1,15 +1,15 @@
 import React from 'react'
-import { FlatList, View, RefreshControl, useColorScheme} from 'react-native'
-import sizes from '../../../layout/constants/sizes'
-import { RenderMemoryMoment } from './components/render-memory_moment'
-import { Loading } from '../../../components/loading'
-import { colors } from '../../../layout/constants/colors'
-import MemoryContext from '../../../contexts/memory'
-import api from '../../../services/api'
-import NetworkContext from '../../../contexts/network'
-import EndReached from '../list-memories-preview/components/end-reached'
+import { FlatList, RefreshControl, useColorScheme, View } from 'react-native'
 import OfflineCard from '../../../components/general/offline'
+import { Loading } from '../../../components/loading'
+import MemoryContext from '../../../contexts/memory'
+import NetworkContext from '../../../contexts/network'
 import LanguageContext from '../../../contexts/Preferences/language'
+import { colors } from '../../../layout/constants/colors'
+import sizes from '../../../layout/constants/sizes'
+import api from '../../../services/api'
+import EndReached from '../list-memories-preview/components/end-reached'
+import { RenderMemoryMoment } from './components/render-memory_moment'
 
 export default function ListMemoryMoments() {
     const margin = 20
@@ -23,14 +23,14 @@ export default function ListMemoryMoments() {
     const flatListRef = React.useRef<FlatList | null>(null)
     const [ loading, setLoading ] = React.useState<boolean>(false)
     const [ page, setPage ] = React.useState<number>(1)
-    const [ pageSize, setPageSize] = React.useState<number>(100000)
+    const [ pageSize ] = React.useState<number>(100000)
     const [ endReached, setEndReached ] = React.useState(false)
     const [refreshing, setRefreshing] = React.useState(false)
     const { networkStats } = React.useContext(NetworkContext)
     const isDarkMode = useColorScheme() === 'dark'
 
     const handleScroll = React.useCallback(
-        (event: any) => {
+        (event: ) => {
             const contentOffsetX = event.nativeEvent.contentOffset.x + 60
             const screenWidth = sizes.screens.width
             const centerIndex = Math.floor((contentOffsetX + screenWidth / 2) / (sizes.moment.small.width + margin));
