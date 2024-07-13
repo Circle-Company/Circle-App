@@ -5,7 +5,7 @@ import CheckIcon from "../../assets/icons/svgs/check_circle.svg"
 import ErrorIcon from "../../assets/icons/svgs/exclamationmark_circle.svg"
 import LanguageContext from "../../contexts/Preferences/language"
 import { colors } from "../../layout/constants/colors"
-import api from "../../services/api"
+import api from "../../services/Api"
 
 type AllMomentsProviderProps = {
     children: React.ReactNode

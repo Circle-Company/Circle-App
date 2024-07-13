@@ -1,33 +1,35 @@
-import React from 'react';
-import { View, FlatList, RefreshControl, useColorScheme} from 'react-native';
-import { Memory } from '../../../components/memory';
-import RenderMemory from '../components/render-memory';
-import ViewMorebutton from '../../../components/buttons/view_more';
-import { useNavigation } from '@react-navigation/native';
-import RenderMemoriesCount from '../components/render-memories_count';
-import api from '../../../services/api';
-import AnyMemoryCard from './components/any_memory-card';
-import { Loading } from '../../../components/loading';
-import sizes from '../../../layout/constants/sizes';
-import EndReached from './components/end-reached';
-import NetworkContext from '../../../contexts/network';
-import OfflineCard from '../../../components/general/offline';
-import { colors } from '../../../layout/constants/colors';
-import { userReciveDataProps } from '../../../components/user_show/user_show-types';
-import Animated, { FadeInLeft } from 'react-native-reanimated';
-import MemoryContext from '../../../contexts/memory';
-import PersistedContext from '../../../contexts/Persisted';
-import LanguageContext from '../../../contexts/Preferences/language';
-import { Text } from '../../../components/Themed';
-import fonts from '../../../layout/constants/fonts';
+import { useNavigation } from "@react-navigation/native"
+import React from "react"
+import { FlatList, RefreshControl, useColorScheme, View } from "react-native"
+import Animated, { FadeInLeft } from "react-native-reanimated"
+import ViewMorebutton from "../../../components/buttons/view_more"
+import OfflineCard from "../../../components/general/offline"
+import { Loading } from "../../../components/loading"
+import { Memory } from "../../../components/memory"
+import { Text } from "../../../components/Themed"
+import { userReciveDataProps } from "../../../components/user_show/user_show-types"
+import MemoryContext from "../../../contexts/memory"
+import NetworkContext from "../../../contexts/network"
+import PersistedContext from "../../../contexts/Persisted"
+import LanguageContext from "../../../contexts/Preferences/language"
+import { colors } from "../../../layout/constants/colors"
+import fonts from "../../../layout/constants/fonts"
+import sizes from "../../../layout/constants/sizes"
+import api from "../../../services/Api"
+import RenderMemory from "../components/render-memory"
+import AnyMemoryCard from "./components/any_memory-card"
+import EndReached from "./components/end-reached"
 
 type RenderMemoriesPreviewProps = {
     enableScroll?: boolean
     isAccountScreen?: boolean
     user: userReciveDataProps
-};
+}
 
-export default function ListMemoriesPreview({isAccountScreen = false, user}: RenderMemoriesPreviewProps) {
+export default function ListMemoriesPreview({
+    isAccountScreen = false,
+    user,
+}: RenderMemoriesPreviewProps) {
     const { t } = React.useContext(LanguageContext)
     const [memories, setMemories] = React.useState([])
     const { session } = React.useContext(PersistedContext)
@@ -38,85 +40,93 @@ export default function ListMemoriesPreview({isAccountScreen = false, user}: Ren
     const [endReached, setEndReached] = React.useState(false)
     const { setAllMemoriesUserId } = React.useContext(MemoryContext)
     const { networkStats } = React.useContext(NetworkContext)
-    const isDarkMode = useColorScheme() === 'dark'
+    const isDarkMode = useColorScheme() === "dark"
 
     const fetchData = async () => {
-        await api.post(`/memory/get-user-memories?page=${page}&pageSize=${pageSize}`, { user_id: user.id })
-            .then(function (response) {
-                if (page === 1) setMemories(response.data.memories);
-                else {
-                    setMemories([...memories, ...response.data.memories]);
-                    if(pageSize > response.data.memories.length) setEndReached(true)
-                    else setEndReached(false)
-                }setPage(page + 1)
+        await api
+            .post(`/memory/get-user-memories?page=${page}&pageSize=${pageSize}`, {
+                user_id: user.id,
             })
-            .catch(function (error) { console.log(error) });
-    };
+            .then(function (response) {
+                if (page === 1) setMemories(response.data.memories)
+                else {
+                    setMemories([...memories, ...response.data.memories])
+                    if (pageSize > response.data.memories.length) setEndReached(true)
+                    else setEndReached(false)
+                }
+                setPage(page + 1)
+            })
+            .catch(function (error) {
+                console.log(error)
+            })
+    }
 
     React.useEffect(() => {
         setLoading(true)
-        fetchData()
-        .finally(() => {
-        setLoading(false)
-        setRefreshing(false)            
+        fetchData().finally(() => {
+            setLoading(false)
+            setRefreshing(false)
         })
     }, [])
 
     React.useEffect(() => {
-        if(networkStats !== 'OFFLINE'){
+        if (networkStats !== "OFFLINE") {
             setLoading(true)
-            fetchData()
-            .finally(() => {
+            fetchData().finally(() => {
                 setLoading(false)
-                setRefreshing(false)         
-            })            
+                setRefreshing(false)
+            })
         }
     }, [networkStats])
 
     const handleRefresh = async () => {
         setPage(1)
         setLoading(true)
-        await fetchData()
-        .finally(() => {
+        await fetchData().finally(() => {
             setTimeout(() => {
-            setLoading(false)
-            setRefreshing(false)         
+                setLoading(false)
+                setRefreshing(false)
             }, 200)
         })
-    };
+    }
 
-    const navigation = useNavigation();
+    const navigation = useNavigation()
 
     const container = {
         marginTop: sizes.margins["2sm"],
-    };
+    }
     const content_container: any = {
-        flexDirection: 'row',
-    };
+        flexDirection: "row",
+    }
     const headerTitle: any = {
         fontSize: fonts.size.body * 0.9,
-        fontFamily: fonts.family.Semibold
+        fontFamily: fonts.family.Semibold,
     }
 
-    if(networkStats == 'OFFLINE' && memories.length == 0) return <OfflineCard height={(sizes.screens.height - sizes.headers.height) / 2}/>
+    if (networkStats == "OFFLINE" && memories.length == 0)
+        return <OfflineCard height={(sizes.screens.height - sizes.headers.height) / 2} />
 
-    if (loading) return (
-        <Loading.Container width={sizes.screens.width} height={sizes.screens.height/2.2}>
-            <Loading.ActivityIndicator/>
-        </Loading.Container>
-    );
-    if (memories.length === 0) return <AnyMemoryCard isAccountScreen={isAccountScreen}/>;
+    if (loading)
+        return (
+            <Loading.Container width={sizes.screens.width} height={sizes.screens.height / 2.2}>
+                <Loading.ActivityIndicator />
+            </Loading.Container>
+        )
+    if (memories.length === 0) return <AnyMemoryCard isAccountScreen={isAccountScreen} />
     return (
         <View style={container}>
             <Memory.Header>
                 <Memory.HeaderLeft>
-                    <Text style={headerTitle}>{t('Memories')}</Text>
+                    <Text style={headerTitle}>{t("Memories")}</Text>
                 </Memory.HeaderLeft>
                 <Memory.HeaderRight>
-                    <ViewMorebutton action={() => {
-                        navigation.navigate('MemoriesNavigator', { screen: 'Memories' })
-                        setAllMemoriesUserId(isAccountScreen? session.user.id : user.id)
-                    }} text={t("View All")}/>
+                    <ViewMorebutton
+                        action={() => {
+                            navigation.navigate("MemoriesNavigator", { screen: "Memories" })
+                            setAllMemoriesUserId(isAccountScreen ? session.user.id : user.id)
+                        }}
+                        text={t("View All")}
+                    />
                 </Memory.HeaderRight>
             </Memory.Header>
             <FlatList
@@ -126,43 +136,53 @@ export default function ListMemoriesPreview({isAccountScreen = false, user}: Ren
                 showsHorizontalScrollIndicator={false}
                 keyExtractor={(item: any) => item.id}
                 onEndReachedThreshold={0.3}
-                onEndReached={async () => {fetchData()}}
+                onEndReached={async () => {
+                    fetchData()
+                }}
                 refreshControl={
                     <RefreshControl
-                        progressBackgroundColor={String(isDarkMode? colors.gray.grey_08 : colors.gray.grey_02)}
-                        colors={[String(isDarkMode? colors.gray.grey_04: colors.gray.grey_04), '#00000000']}
+                        progressBackgroundColor={String(
+                            isDarkMode ? colors.gray.grey_08 : colors.gray.grey_02
+                        )}
+                        colors={[
+                            String(isDarkMode ? colors.gray.grey_04 : colors.gray.grey_04),
+                            "#00000000",
+                        ]}
                         refreshing={refreshing}
-                        onRefresh={async() => await handleRefresh()}
+                        onRefresh={async () => await handleRefresh()}
                     />
                 }
-                ListHeaderComponent={() => {return <View style={{ width: 15 }} />}}
+                ListHeaderComponent={() => {
+                    return <View style={{ width: 15 }} />
+                }}
                 ListFooterComponent={() => {
-                    if(endReached) return (
-                        <EndReached
-                            width={sizes.moment.tiny.width * 1.2}
-                            height={sizes.moment.tiny.height * 0.9}
-                            text={t('No more Memories')}
-                        />
-                    )
-                    else return (
-                        <Loading.Container width={sizes.moment.tiny.width} height={sizes.moment.tiny.height}>
-                            <Loading.ActivityIndicator/>
-                        </Loading.Container>
-                    )
+                    if (endReached)
+                        return (
+                            <EndReached
+                                width={sizes.moment.tiny.width * 1.2}
+                                height={sizes.moment.tiny.height * 0.9}
+                                text={t("No more Memories")}
+                            />
+                        )
+                    else
+                        return (
+                            <Loading.Container
+                                width={sizes.moment.tiny.width}
+                                height={sizes.moment.tiny.height}
+                            >
+                                <Loading.ActivityIndicator />
+                            </Loading.Container>
+                        )
                 }}
                 renderItem={({ item, index }) => {
-                    const memory = {...item, isAccountScreen}
-                    return(
-                    <Animated.View entering={FadeInLeft.duration(200)}>
-                        <RenderMemory memory={memory} user_id={user.id} />
-                    </Animated.View>
-                    
+                    const memory = { ...item, isAccountScreen }
+                    return (
+                        <Animated.View entering={FadeInLeft.duration(200)}>
+                            <RenderMemory memory={memory} user_id={user.id} />
+                        </Animated.View>
                     )
                 }}
-
-
-
             />
         </View>
-    );
+    )
 }

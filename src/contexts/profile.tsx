@@ -1,13 +1,13 @@
 import React from "react"
 import PersistedContext from "./Persisted"
 import { StatisticsDataType, UserDataType } from "./Persisted/types"
-import api from "../services/api"
+import api from "../services/Api"
 import BottomTabsContext from "./bottomTabs"
 
 interface ProfileData extends UserDataType {
-    you_follow?: boolean,
+    you_follow?: boolean
     statistics: StatisticsDataType
-} 
+}
 type ProfileProviderProps = { children: React.ReactNode }
 export type ProfileContextsData = {
     showAnalytics: boolean
@@ -16,40 +16,48 @@ export type ProfileContextsData = {
     refreshing: boolean
     loading: boolean
     currentUser: ProfileData
-    getCurrentUser: ({user_id}: {user_id: number}) => Promise<void>
+    getCurrentUser: ({ user_id }: { user_id: number }) => Promise<void>
     setLoading: React.Dispatch<React.SetStateAction<boolean>>
     setRefreshing: React.Dispatch<React.SetStateAction<boolean>>
 }
 
 const ProfileContext = React.createContext<ProfileContextsData>({} as ProfileContextsData)
 
-export function Provider({children}: ProfileProviderProps) {
+export function Provider({ children }: ProfileProviderProps) {
     const { session } = React.useContext(PersistedContext)
     const { currentTab } = React.useContext(BottomTabsContext)
-    const [ loading, setLoading ] = React.useState(false)
-    const [ refreshing, setRefreshing ] = React.useState(false)
-    const [ currentUser, setCurrentUser ] = React.useState({} as ProfileData)
+    const [loading, setLoading] = React.useState(false)
+    const [refreshing, setRefreshing] = React.useState(false)
+    const [currentUser, setCurrentUser] = React.useState({} as ProfileData)
 
-    const isMe: boolean = currentTab == 'Account'
+    const isMe: boolean = currentTab == "Account"
     const showAnalytics: boolean = isMe
     const showStatistics: boolean = isMe
     const showEditTabs: boolean = isMe
 
-    async function getCurrentUser({user_id}: {user_id: number}) {
-        if(!isMe){
-            try{
-                await api.post(`/user/profile/data/pk/${user_id}`, { user_id })
-                .then(function (response) { setCurrentUser(response.data); setLoading(false); console.log(currentUser)})
-                .catch(function (error) { console.log(error)})
-            } catch(err: any) { console.error(err)}           
+    async function getCurrentUser({ user_id }: { user_id: number }) {
+        if (!isMe) {
+            try {
+                await api
+                    .post(`/user/profile/data/pk/${user_id}`, { user_id })
+                    .then(function (response) {
+                        setCurrentUser(response.data)
+                        setLoading(false)
+                        console.log(currentUser)
+                    })
+                    .catch(function (error) {
+                        console.log(error)
+                    })
+            } catch (err: any) {
+                console.error(err)
+            }
         } else {
             const user: ProfileData = {
                 ...session.user,
-                ...session.statistics
+                ...session.statistics,
             }
             setCurrentUser(user)
         }
-
     }
 
     const contextValue: ProfileContextsData = {
@@ -61,13 +69,9 @@ export function Provider({children}: ProfileProviderProps) {
         currentUser,
         getCurrentUser,
         setLoading,
-        setRefreshing
+        setRefreshing,
     }
 
-    return (
-        <ProfileContext.Provider value={contextValue}>
-            {children}
-        </ProfileContext.Provider>
-    )
+    return <ProfileContext.Provider value={contextValue}>{children}</ProfileContext.Provider>
 }
 export default ProfileContext

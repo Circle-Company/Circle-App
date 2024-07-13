@@ -1,14 +1,14 @@
 import React from "react"
-import { Platform, PermissionsAndroid} from "react-native"
-import api from "../services/api"
-import { launchImageLibrary, ImagePickerResponse, launchCamera} from "react-native-image-picker"
-import {useNavigation} from '@react-navigation/native'
+import { Platform, PermissionsAndroid } from "react-native"
+import api from "../services/Api"
+import { launchImageLibrary, ImagePickerResponse, launchCamera } from "react-native-image-picker"
+import { useNavigation } from "@react-navigation/native"
 import { MemoryObjectProps } from "../components/memory/memory-types"
-import RNFS from 'react-native-fs'
+import RNFS from "react-native-fs"
 import PersistedContext from "./Persisted"
 import { useNotifications } from "react-native-notificated"
-import UploadIcon from '../assets/icons/svgs/arrow_up.svg'
-import CheckIcon from '../assets/icons/svgs/check_circle.svg'
+import UploadIcon from "../assets/icons/svgs/arrow_up.svg"
+import CheckIcon from "../assets/icons/svgs/check_circle.svg"
 import { colors } from "../layout/constants/colors"
 import LanguageContext from "./Preferences/language"
 
@@ -18,7 +18,7 @@ type NewMomentProviderProps = {
 
 export type TagProps = {
     title: string
-} 
+}
 
 type Image = {
     uri: string
@@ -27,7 +27,7 @@ export type NewMomentContextsData = {
     uploadMoment: () => Promise<void>
     tags: TagProps[]
     description: string
-    selectedImage: Image,
+    selectedImage: Image
     allMemories: MemoryObjectProps[]
     selectedMemory: MemoryObjectProps
     setSelectedImage: React.Dispatch<React.SetStateAction<ImagePickerResponse>>
@@ -41,16 +41,15 @@ export type NewMomentContextsData = {
     handleImagePickerResponse: () => Promise<void>
     addToMemory: () => Promise<Object>
     endSession: () => void
-
 }
 
 const NewMomentContext = React.createContext<NewMomentContextsData>({} as NewMomentContextsData)
 
-export function Provider({children}: NewMomentProviderProps) {
+export function Provider({ children }: NewMomentProviderProps) {
     const { session } = React.useContext(PersistedContext)
     const { t } = React.useContext(LanguageContext)
     const [selectedImage, setSelectedImage] = React.useState<any>()
-    const [description, setDescription] = React.useState<string>('')
+    const [description, setDescription] = React.useState<string>("")
     const [tags, setTags] = React.useState<TagProps[]>([])
     const [allMemories, setAllMemories] = React.useState<MemoryObjectProps[]>([])
     const [selectedMemory, setSelectedMemory] = React.useState<MemoryObjectProps | null>()
@@ -60,117 +59,138 @@ export function Provider({children}: NewMomentProviderProps) {
 
     async function requestPermission() {
         try {
-            if (Platform.OS === 'android') {
+            if (Platform.OS === "android") {
                 const permissions = [
                     PermissionsAndroid.PERMISSIONS.CAMERA,
                     PermissionsAndroid.PERMISSIONS.WRITE_EXTERNAL_STORAGE,
                     PermissionsAndroid.PERMISSIONS.READ_EXTERNAL_STORAGE,
-                ];
-    
-                const granted = await PermissionsAndroid.requestMultiple(permissions);
-                
+                ]
+
+                const granted = await PermissionsAndroid.requestMultiple(permissions)
+
                 if (
-                    granted['android.permission.CAMERA'] === PermissionsAndroid.RESULTS.GRANTED &&
-                    granted['android.permission.WRITE_EXTERNAL_STORAGE'] === PermissionsAndroid.RESULTS.GRANTED &&
-                    granted['android.permission.READ_EXTERNAL_STORAGE'] === PermissionsAndroid.RESULTS.GRANTED
+                    granted["android.permission.CAMERA"] === PermissionsAndroid.RESULTS.GRANTED &&
+                    granted["android.permission.WRITE_EXTERNAL_STORAGE"] ===
+                        PermissionsAndroid.RESULTS.GRANTED &&
+                    granted["android.permission.READ_EXTERNAL_STORAGE"] ===
+                        PermissionsAndroid.RESULTS.GRANTED
                 ) {
-                    console.log('Permissões concedidas');
+                    console.log("Permissões concedidas")
                 } else {
-                    console.log('Permissões negadas');
+                    console.log("Permissões negadas")
                 }
             }
         } catch (err) {
-            console.warn(err);
+            console.warn(err)
         }
     }
 
-    async function uploadMoment () {
-        if(selectedImage){
+    async function uploadMoment() {
+        if (selectedImage) {
             const IMG = selectedImage.assets[0]
-            const imageBase64 = await RNFS.readFile(IMG.uri, 'base64')
-            await api.post(`/moment/create`, {
-                user_id: session.user.id,
-                moment: {
-                    description: description? description : null,
-                    midia: {
-                        content_type: 'IMAGE',
-                        base64: imageBase64
+            const imageBase64 = await RNFS.readFile(IMG.uri, "base64")
+            await api
+                .post(`/moment/create`, {
+                    user_id: session.user.id,
+                    moment: {
+                        description: description ? description : null,
+                        midia: {
+                            content_type: "IMAGE",
+                            base64: imageBase64,
+                        },
+                        metadata: {
+                            duration: IMG.duration,
+                            file_name: IMG.fileName,
+                            file_size: IMG.fileSize,
+                            file_type: IMG.type,
+                            resolution_width: IMG.width,
+                            resolution_height: IMG.height,
+                        },
+                        tags,
                     },
-                    metadata: {
-                        duration: IMG.duration,
-                        file_name: IMG.fileName,
-                        file_size: IMG.fileSize,
-                        file_type: IMG.type,
-                        resolution_width: IMG.width,
-                        resolution_height: IMG.height,
-                    },
-                    tags
-                }
-            })
-            .then(function (response) {
-                setCreatedMoment(response.data)
-                notify('toast', {
-                    params: {
-                        description: t('Moment Has been uploaded with success'),
-                        title: t('Moment Created'),
-                        icon: <UploadIcon fill={colors.green.green_05.toString()} width={15} height={15}/>
-                    }
                 })
-                setTags([])
-                setDescription('')
-                setSelectedMemory(null)
-            })
-            .catch(function (error) { console.log(error)})
+                .then(function (response) {
+                    setCreatedMoment(response.data)
+                    notify("toast", {
+                        params: {
+                            description: t("Moment Has been uploaded with success"),
+                            title: t("Moment Created"),
+                            icon: (
+                                <UploadIcon
+                                    fill={colors.green.green_05.toString()}
+                                    width={15}
+                                    height={15}
+                                />
+                            ),
+                        },
+                    })
+                    setTags([])
+                    setDescription("")
+                    setSelectedMemory(null)
+                })
+                .catch(function (error) {
+                    console.log(error)
+                })
         }
     }
 
-    async function addToMemory () {
-        if(createdMoment){
-            await api.post(`/memory/add-moment`, {
-                memory_id: selectedMemory?.id,
-                moments_list: [{id: createdMoment.id}]
-            })
-            .then(function (response) {
-                setTags([])
-                setDescription('')
-                setSelectedMemory(null)
-                notify('toast', {
-                    params: {
-                        description: t('Memory Has been created with success'),
-                        title: t('Memory Created'),
-                        icon: <CheckIcon fill={colors.green.green_05.toString()} width={15} height={15}/>
-                    }
+    async function addToMemory() {
+        if (createdMoment) {
+            await api
+                .post(`/memory/add-moment`, {
+                    memory_id: selectedMemory?.id,
+                    moments_list: [{ id: createdMoment.id }],
                 })
-                return response.data
-            })
-            .catch(function (error) { console.log(error)})            
+                .then(function (response) {
+                    setTags([])
+                    setDescription("")
+                    setSelectedMemory(null)
+                    notify("toast", {
+                        params: {
+                            description: t("Memory Has been created with success"),
+                            title: t("Memory Created"),
+                            icon: (
+                                <CheckIcon
+                                    fill={colors.green.green_05.toString()}
+                                    width={15}
+                                    height={15}
+                                />
+                            ),
+                        },
+                    })
+                    return response.data
+                })
+                .catch(function (error) {
+                    console.log(error)
+                })
         }
     }
 
     async function handleLaunchImageLibrary() {
         requestPermission().then(() => {
-            launchImageLibrary({
-                mediaType: 'photo',
-                selectionLimit: 1
-            }, handleImagePickerResponse);
-        });
+            launchImageLibrary(
+                {
+                    mediaType: "photo",
+                    selectionLimit: 1,
+                },
+                handleImagePickerResponse
+            )
+        })
     }
 
     const handleImagePickerResponse = async (response: ImagePickerResponse) => {
         if (response.didCancel) {
-            console.log('User cancelled image picker');
+            console.log("User cancelled image picker")
         } else if (response.errorCode) {
-            console.log('ImagePicker Error: ', response.errorMessage);
+            console.log("ImagePicker Error: ", response.errorMessage)
         } else {
-            try {   
+            try {
                 // const convertedBase64 = await HEICtoJPEG(response.assets[0].base64)
                 setSelectedImage(response)
-                console.log('selectedimage --------------------',selectedImage)
+                console.log("selectedimage --------------------", selectedImage)
             } catch (error) {
-                console.log('Error converting HEIC to JPEG:', error);
+                console.log("Error converting HEIC to JPEG:", error)
             }
-
-            
         }
     }
 
@@ -183,20 +203,25 @@ export function Provider({children}: NewMomentProviderProps) {
     }
 
     async function getAllMemories() {
-        try{
-            const response = await api.post(`memory/get-user-memories`, { user_id: session.user.id })
-            .then(function (response) {return response.data})
-            .catch(function (error) { console.log(error)})
+        try {
+            const response = await api
+                .post(`memory/get-user-memories`, { user_id: session.user.id })
+                .then(function (response) {
+                    return response.data
+                })
+                .catch(function (error) {
+                    console.log(error)
+                })
             await setAllMemories(response.memories)
             await setSelectedMemory(response.memories[0])
-        } catch(err) {
+        } catch (err) {
             console.error(err)
         }
     }
 
     function endSession() {
-        navigation.navigate('BottomTab', {screen: 'Home'})
-        setDescription('')
+        navigation.navigate("BottomTab", { screen: "Home" })
+        setDescription("")
         setSelectedImage(undefined)
         setTags([])
     }
@@ -218,13 +243,9 @@ export function Provider({children}: NewMomentProviderProps) {
         handleLaunchImageLibrary,
         handleImagePickerResponse,
         getAllMemories,
-        endSession
+        endSession,
     }
 
-    return (
-        <NewMomentContext.Provider value={contextValue}>
-            {children}
-        </NewMomentContext.Provider>
-    )
+    return <NewMomentContext.Provider value={contextValue}>{children}</NewMomentContext.Provider>
 }
 export default NewMomentContext

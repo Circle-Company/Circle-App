@@ -11,7 +11,7 @@ import LanguageContext from "../../../contexts/Preferences/language"
 import ColorTheme, { colors } from "../../../layout/constants/colors"
 import fonts from "../../../layout/constants/fonts"
 import sizes from "../../../layout/constants/sizes"
-import api from "../../../services/api"
+import api from "../../../services/Api"
 
 export default function PasswordScreen() {
     const { t } = React.useContext(LanguageContext)
