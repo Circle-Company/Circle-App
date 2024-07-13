@@ -9,7 +9,7 @@ import LanguageContext from "../../../contexts/Preferences/language"
 import { groupObjectsByDate, TimeInterval } from "../../../helpers/separateArrByDate"
 import { colors } from "../../../layout/constants/colors"
 import sizes from "../../../layout/constants/sizes"
-import api from "../../../services/api"
+import api from "../../../services/Api/api"
 import EndReached from "./components/end-reached"
 import { ListMemoriesAll } from "./components/list-memories-date_group"
 

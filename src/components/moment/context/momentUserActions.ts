@@ -1,7 +1,6 @@
 import React from "react"
-import { MomentUserActionsProps } from "./types"
-import api from "../../../services/api"
 import PersistedContext from "../../../contexts/Persisted"
+import { MomentUserActionsProps } from "./types"
 
 export interface MomentUserActionsState extends MomentUserActionsProps {
     setShared: React.Dispatch<React.SetStateAction<boolean>>
@@ -16,22 +15,22 @@ export interface MomentUserActionsState extends MomentUserActionsProps {
     setReported: React.Dispatch<React.SetStateAction<boolean>>
     setMomentUserActions: (momentUserActions: MomentUserActionsProps) => void
     exportMomentUserActions: () => MomentUserActionsProps
-    handleLikeButtonPressed: ({likedValue}: {likedValue?: boolean}) => void
+    handleLikeButtonPressed: ({ likedValue }: { likedValue?: boolean }) => void
 }
 
 export function useMomentUserActions(): MomentUserActionsState {
     const { session } = React.useContext(PersistedContext)
-    const [ liked, setLiked] = React.useState<boolean>(false)
-    const [ shared, setShared] = React.useState<boolean>(false)
-    const [ viewed, setViewed ] = React.useState<boolean>(false)
-    const [ clickIntoMoment, setClickIntoMoment ] = React.useState<boolean>(false)
-    const [ watchTime, setWatchTime ] = React.useState<number>(0)
-    const [ clickProfile, setClickProfile ] = React.useState<boolean>(false)
-    const [ commented, setCommented ] = React.useState<boolean>(false)
-    const [ likeComment, setLikeComment ] = React.useState<boolean>(false)
-    const [ skipped, setSkipped ] = React.useState<boolean>(false)
-    const [ showLessOften, setShowLessOften ] = React.useState<boolean>(false)
-    const [ reported, setReported ] = React.useState<boolean>(false)
+    const [liked, setLiked] = React.useState<boolean>(false)
+    const [shared, setShared] = React.useState<boolean>(false)
+    const [viewed, setViewed] = React.useState<boolean>(false)
+    const [clickIntoMoment, setClickIntoMoment] = React.useState<boolean>(false)
+    const [watchTime, setWatchTime] = React.useState<number>(0)
+    const [clickProfile, setClickProfile] = React.useState<boolean>(false)
+    const [commented, setCommented] = React.useState<boolean>(false)
+    const [likeComment, setLikeComment] = React.useState<boolean>(false)
+    const [skipped, setSkipped] = React.useState<boolean>(false)
+    const [showLessOften, setShowLessOften] = React.useState<boolean>(false)
+    const [reported, setReported] = React.useState<boolean>(false)
 
     function exportMomentUserActions(): MomentUserActionsProps {
         return {
@@ -45,14 +44,14 @@ export function useMomentUserActions(): MomentUserActionsState {
             likeComment,
             skipped,
             showLessOften,
-            reported
+            reported,
         }
     }
-    function handleLikeButtonPressed({likedValue}: {likedValue?: boolean}) {
-        if(likedValue) setLiked(likedValue)
+    function handleLikeButtonPressed({ likedValue }: { likedValue?: boolean }) {
+        if (likedValue) setLiked(likedValue)
         else {
-            if(liked == true) setLiked(false)
-            else setLiked(true)            
+            if (liked == true) setLiked(false)
+            else setLiked(true)
         }
     }
 
@@ -95,6 +94,6 @@ export function useMomentUserActions(): MomentUserActionsState {
 
         setMomentUserActions,
         exportMomentUserActions,
-        handleLikeButtonPressed
+        handleLikeButtonPressed,
     }
 }

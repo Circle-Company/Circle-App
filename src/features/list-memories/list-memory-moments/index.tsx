@@ -7,7 +7,7 @@ import NetworkContext from "../../../contexts/network"
 import LanguageContext from "../../../contexts/Preferences/language"
 import { colors } from "../../../layout/constants/colors"
 import sizes from "../../../layout/constants/sizes"
-import api from "../../../services/api"
+import api from "../../../services/Api"
 import EndReached from "../list-memories-preview/components/end-reached"
 import { RenderMemoryMoment } from "./components/render-memory_moment"
 
