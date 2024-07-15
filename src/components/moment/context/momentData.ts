@@ -19,15 +19,15 @@ export interface MomentDataState extends MomentDataProps {
 }
 
 export function useMomentData(): MomentDataState {
-    const [id, setId] = React.useState<Number>(0)
+    const [id, setId] = React.useState<number>(0)
     const [user, setUser] = React.useState({} as userReciveDataProps)
-    const [description, setDescription] = React.useState<String>("")
+    const [description, setDescription] = React.useState<string>("")
     const [midia, setMidia] = React.useState({} as MomentMidiaProps)
     const [comments, setComments] = React.useState([] as CommentsReciveDataProps)
     const [statistics, setStatistics] = React.useState({} as MomentStatisticsProps)
     const [tags, setTags] = React.useState([] as TagProps[])
     const [language, setLanguage] = React.useState("" as LanguagesCodesType)
-    const [createdAt, setCreatedAt] = React.useState<String>("")
+    const [createdAt, setCreatedAt] = React.useState<string>("")
 
     async function getComments({ page, pageSize }: { page: number; pageSize: number }) {
         await api
