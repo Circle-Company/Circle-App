@@ -13,7 +13,6 @@ import EndReached from "./components/end-reached"
 import { ListMemoriesAll } from "./components/list-memories-date_group"
 
 export default function ListMemoriesAllSeparatedbyDate() {
-    const { session } = React.useContext(PersistedContext)
     const { t } = React.useContext(LanguageContext)
     const { allMemoriesUserId } = React.useContext(MemoryContext)
     const [allMemories, setAllMemories] = React.useState<Object[]>([])
