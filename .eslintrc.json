@@ -17,6 +17,7 @@
     "plugins": ["@typescript-eslint", "react", "rect-native"],
     "rules": {
         "no-var": 0,
+        "@typescript-eslint/ban-ts-comment": "off",
         "react/jsx-uses-react": "off",
         "react/react-in-jsx-scope": "off",
         "react/jsx-filename-extension": [1, { "extensions": [".js", ".sjsx"] }],
