@@ -1,5 +1,4 @@
 import React from "react"
-import PersistedContext from "../../../contexts/Persisted"
 import { MomentUserActionsProps } from "./types"
 
 export interface MomentUserActionsState extends MomentUserActionsProps {
@@ -19,7 +18,6 @@ export interface MomentUserActionsState extends MomentUserActionsProps {
 }
 
 export function useMomentUserActions(): MomentUserActionsState {
-    const { session } = React.useContext(PersistedContext)
     const [liked, setLiked] = React.useState<boolean>(false)
     const [shared, setShared] = React.useState<boolean>(false)
     const [viewed, setViewed] = React.useState<boolean>(false)
