@@ -4,45 +4,45 @@ import { userReciveDataProps } from "../../user_show/user_show-types"
 import { MomentOptionsState } from "./momentOptions"
 
 export type MomentDataProps = {
-    id: Number
+    id: number
     user: userReciveDataProps
-    description: String
-    midia: MomentMidiaProps,
+    description: string
+    midia: MomentMidiaProps
     comments: CommentsReciveDataProps
     statistics: MomentStatisticsProps
-    tags: TagProps[] 
+    tags: TagProps[]
     language: LanguagesCodesType
-    created_at: String
+    created_at: string
 }
 
 export type ExportMomentDataProps = {
     id: number
     userId: number
     tags: TagProps[]
-    type: "IMAGE" | "VIDEO",
-    language: LanguagesCodesType,
+    type: "IMAGE" | "VIDEO"
+    language: LanguagesCodesType
     duration: number
 }
 
 export type MomentDataReturnsProps = {
-    id: Number
+    id: number
     user: userReciveDataProps
-    description: String
-    midia: MomentMidiaProps,
+    description: string
+    midia: MomentMidiaProps
     comments: CommentsReciveDataProps
     statistics: MomentStatisticsProps
-    tags: TagProps[] 
+    tags: TagProps[]
     language: LanguagesCodesType
-    created_at: String
-    getComments: ({page, pageSize}: {page: number, pageSize: number}) => Promise<void>
+    created_at: string
+    getComments: ({ page, pageSize }: { page: number; pageSize: number }) => Promise<void>
     getStatistics: () => Promise<void>
     getTags: () => Promise<void>
 }
 
 export type MomentMidiaProps = {
-    content_type: 'IMAGE' | 'VIDEO'
-    fullhd_resolution?: String
-    nhd_resolution?: String
+    content_type: "IMAGE" | "VIDEO"
+    fullhd_resolution?: string
+    nhd_resolution?: string
 }
 
 export type MomentStatisticsProps = {
@@ -61,9 +61,9 @@ export type MomentProviderProps = {
 }
 
 export type TagProps = {
-    id: number,
+    id: number
     title: string
-} 
+}
 
 export type MomentOptionsProps = {
     enableAnalyticsView: boolean
@@ -101,7 +101,6 @@ export type MomentUserActionsReturnsProps = {
     showLessOften: boolean
     reported: boolean
 
-    
     setShared: React.Dispatch<React.SetStateAction<boolean>>
     setViewed: React.Dispatch<React.SetStateAction<boolean>>
     setClickIntoMoment: React.Dispatch<React.SetStateAction<boolean>>
@@ -115,7 +114,7 @@ export type MomentUserActionsReturnsProps = {
 
     setMomentUserActions: (momentUserActions: MomentUserActionsProps) => void
     injectInteractionsToList: () => void
-    handleLikeButtonPressed: ({likedValue}: {likedValue?: boolean}) => void
+    handleLikeButtonPressed: ({ likedValue }: { likedValue?: boolean }) => void
 }
 
 export type MomentSizeProps = {
