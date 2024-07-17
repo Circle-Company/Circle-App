@@ -8,7 +8,7 @@ async function like({ userId, momentId }: PostLikeProps): Promise<void> {
     })
 }
 
-async function deleteLike({ userId, momentId }: PostUnlikeProps): Promise<void> {
+async function unlike({ userId, momentId }: PostUnlikeProps): Promise<void> {
     await api.post("/moment/unlike", {
         user_id: userId,
         moment_id: momentId,
@@ -17,5 +17,5 @@ async function deleteLike({ userId, momentId }: PostUnlikeProps): Promise<void> 
 
 export const routes = {
     like,
-    deleteLike,
+    unlike,
 }
