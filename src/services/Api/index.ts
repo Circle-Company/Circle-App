@@ -1,6 +1,7 @@
 import axios from "axios"
 import config from "../../config"
 import { routes as momentRoutes } from "./routes/moment"
+import { routes as userRoutes } from "./routes/user"
 
 const PATH = config.PRODUCTION
     ? `http://${config.CIRCLE_SYSTEM_API}/v${config.API_VERSION}`
@@ -14,4 +15,5 @@ export const API = api
 
 export const apiRoutes = {
     moment: momentRoutes,
+    user: userRoutes,
 }
