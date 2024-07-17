@@ -21,8 +21,7 @@ export default function like({
     margin = sizes.margins["1sm"],
 }: MomentLikeProps) {
     const { session } = React.useContext(PersistedContext)
-    const { memory } = React.useContext(MemoryContext)
-    const { momentData, momentUserActions } = React.useContext(MomentContext)
+    const { momentData, momentUserActions, momentOptions } = React.useContext(MomentContext)
     const [likedPressed, setLikedPressed] = React.useState(
         isLiked ? isLiked : momentUserActions.liked
     )

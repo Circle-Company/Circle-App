@@ -16,14 +16,14 @@ import { Text } from "../../Themed"
 import { MomentOptionsState } from "../context/momentOptions"
 import { MomentDataProps } from "../context/types"
 type OptionsProps = {
+    momentData: MomentDataReturnsProps
     memory: MemoryReciveDataProps
     currentTab: BottomTabsProps
     momentOptions: MomentOptionsState
     momentData: MomentDataProps
 }
 
-export default function options({ memory, currentTab, momentOptions, momentData }: OptionsProps) {
-    const isDarkMode = useColorScheme() === "dark"
+export default function options({ memory, momentData }: OptionsProps) {
     const { collapse } = React.useContext(BottomSheetContext)
     const { t } = React.useContext(LanguageContext)
     const { notify } = useNotifications()

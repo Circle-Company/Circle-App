@@ -21,10 +21,7 @@ export function MomentProvider({
     const momentDataStore = useMomentData()
     const momentUserActionsStore = useMomentUserActions()
     const momentOptionsStore = useMomentOptions()
-
-    const isMe = useMemo(() => {
-        return momentData.user?.id ? session.user.id === momentData.user.id : true
-    }, [momentData, session.user.id])
+    const isMe = momentData.user?.id ? session.user.id === momentData.user.id : true
 
     useEffect(() => {
         momentDataStore.setMomentData(momentData)
@@ -32,7 +29,7 @@ export function MomentProvider({
 
     useEffect(() => {
         momentUserActionsStore.setMomentUserActions({
-            liked: false,
+            liked: momentData.isLiked,
             shared: false,
             viewed: false,
             clickIntoMoment: false,
@@ -47,8 +44,9 @@ export function MomentProvider({
         momentOptionsStore.setMomentOptions({
             isFeed: isFeed,
             isFocused: isFocused,
+            enableLikeButton: !isMe,
             enableAnalyticsView: isMe,
-            enableModeration: true,
+            enableModeration: !isMe,
             enableStoreActions: isMe,
             enableTranslation: true,
         })
