@@ -8,10 +8,12 @@ import { Loading } from "../../../components/loading"
 import { Memory } from "../../../components/memory"
 import { Text } from "../../../components/Themed"
 import { userReciveDataProps } from "../../../components/user_show/user_show-types"
+import AccountContext from "../../../contexts/account"
 import MemoryContext from "../../../contexts/memory"
 import NetworkContext from "../../../contexts/network"
 import PersistedContext from "../../../contexts/Persisted"
 import LanguageContext from "../../../contexts/Preferences/language"
+import ViewProfileContext from "../../../contexts/viewProfile"
 import { colors } from "../../../layout/constants/colors"
 import fonts from "../../../layout/constants/fonts"
 import sizes from "../../../layout/constants/sizes"
@@ -30,6 +32,8 @@ export default function ListMemoriesPreview({
     isAccountScreen = false,
     user,
 }: RenderMemoriesPreviewProps) {
+    const { setProfile } = React.useContext(ViewProfileContext)
+    const accountContext = React.useContext(AccountContext)
     const { t } = React.useContext(LanguageContext)
     const [memories, setMemories] = React.useState([])
     const { session } = React.useContext(PersistedContext)
@@ -68,6 +72,13 @@ export default function ListMemoriesPreview({
             setRefreshing(false)
         })
     }, [])
+
+    React.useEffect(() => {
+        async function fetch() {
+            await handleRefresh()
+        }
+        fetch()
+    }, [setProfile, accountContext.setRefreshing])
 
     React.useEffect(() => {
         if (networkStats !== "OFFLINE") {
