@@ -141,9 +141,8 @@ export default function like({
         Number(momentData.statistics.total_likes_num) + 1
     )
 
-    if (momentData.user?.id == session.user.id) return null
-    if (memory?.isAccountScreen) return null
-    if (likedPressed) {
+    if (!momentOptions.enableLikeButton) return null
+    else if (likedPressed) {
         return (
             <Animated.View style={animated_container}>
                 <Pressable onPress={onUnlikeAction} style={pressable_container}>
@@ -160,8 +159,7 @@ export default function like({
                 </Pressable>
             </Animated.View>
         )
-    }
-    if (backgroundColor) {
+    } else if (backgroundColor) {
         return (
             <Animated.View style={animated_container}>
                 <Pressable onPress={onLikeAction} style={pressable_container}>
