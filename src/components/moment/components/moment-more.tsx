@@ -15,14 +15,13 @@ export default function more ({
     backgroundColor= String(ColorTheme().backgroundDisabled)
 }: MomentDateProps) {
     const { memory } = React.useContext(MemoryContext)
-    const { currentTab } = React.useContext(BottomTabsContext)
-    const { expand, collapse} = React.useContext(BottomSheetContext)
-    const { momentOptions, momentData} = React.useContext(MomentContext)
+    const { expand } = React.useContext(BottomSheetContext)
+    const { momentOptions, momentData } = React.useContext(MomentContext)
     function handlePress() {
         expand({children: <Options momentData={momentData} memory={memory} momentOptions={momentOptions} currentTab={currentTab}/>, snapPoints: ["16%"]})
     }
-
-    if(memory.isAccountScreen) {
+    console.log(momentOptions)
+    if (momentOptions.enableAnalyticsView) {
         return (
             <ButtonStandart action={handlePress} backgroundColor={backgroundColor} margins={false}>
                 <MoreIcon fill={color} width={20} height={20}/> 

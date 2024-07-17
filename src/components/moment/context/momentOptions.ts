@@ -25,9 +25,11 @@ export function useMomentOptions(): MomentOptionsState {
 
     function setMomentOptions(momentOptionsProps: MomentOptionsProps) {
         setShowOptionsModal(false)
+        setEnableLikeButton(momentOptionsProps.enableLikeButton)
         setEnableAnalyticsView(momentOptionsProps.enableAnalyticsView)
         setEnableStoreActions(momentOptionsProps.enableStoreActions)
         setEnableTranslation(momentOptionsProps.enableTranslation)
+        setEnableModeration(momentOptionsProps.enableModeration)
         setIsFeed(momentOptionsProps.isFeed)
         setIsFocused(momentOptionsProps.isFocused)
     }
@@ -38,6 +40,7 @@ export function useMomentOptions(): MomentOptionsState {
     
     return {
         showOptionsModal,
+        enableLikeButton,
         enableAnalyticsView,
         enableStoreActions,
         enableTranslation,
@@ -51,7 +54,7 @@ export function useMomentOptions(): MomentOptionsState {
         setEnableModeration,
         setIsFeed,
         setIsFocused,
-        setMomentOptions
+        setMomentOptions,
     }
 }
 

@@ -10,7 +10,7 @@ import {
     MomentStatisticsProps,
     TagProps,
 } from "./types"
-export interface MomentDataState extends MomentDataProps {
+export interface MomentDataState extends Omit<MomentDataProps, "isLiked"> {
     getComments: ({ page, pageSize }: { page: number; pageSize: number }) => Promise<void>
     getStatistics: () => Promise<void>
     getTags: (moment_id: string) => Promise<void>
