@@ -25,7 +25,7 @@ export function useLikeMutation({ momentId, userId }: useLikeMutationProps) {
 export function useUnlikeMutation({ momentId, userId }: useLikeMutationProps) {
     const mutation = useMutation({
         mutationFn: async () => {
-            await apiRoutes.moment.deleteLike({
+            await apiRoutes.moment.unlike({
                 userId,
                 momentId,
             })
