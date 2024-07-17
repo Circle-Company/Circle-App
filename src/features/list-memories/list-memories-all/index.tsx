@@ -4,17 +4,15 @@ import OfflineCard from "../../../components/general/offline"
 import { Loading } from "../../../components/loading"
 import MemoryContext from "../../../contexts/memory"
 import NetworkContext from "../../../contexts/network"
-import PersistedContext from "../../../contexts/Persisted"
 import LanguageContext from "../../../contexts/Preferences/language"
 import { groupObjectsByDate, TimeInterval } from "../../../helpers/separateArrByDate"
 import { colors } from "../../../layout/constants/colors"
 import sizes from "../../../layout/constants/sizes"
-import api from "../../../services/Api/api"
+import api from "../../../services/Api"
 import EndReached from "./components/end-reached"
 import { ListMemoriesAll } from "./components/list-memories-date_group"
 
 export default function ListMemoriesAllSeparatedbyDate() {
-    const { session } = React.useContext(PersistedContext)
     const { t } = React.useContext(LanguageContext)
     const { allMemoriesUserId } = React.useContext(MemoryContext)
     const [allMemories, setAllMemories] = React.useState<Object[]>([])
