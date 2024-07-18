@@ -1,5 +1,6 @@
 import React from "react"
 import { FlatList, View } from "react-native"
+import LanguageContext from "../../../contexts/Preferences/language"
 import ColorTheme from "../../../layout/constants/colors"
 import fonts from "../../../layout/constants/fonts"
 import sizes from "../../../layout/constants/sizes"
@@ -13,6 +14,7 @@ type StatisticsPreviewProps = {
 }
 
 export function statisticsPreview({ momentOptions, momentData }: StatisticsPreviewProps) {
+    const { t } = React.useContext(LanguageContext)
     const [likes, setLikes] = React.useState("--")
     const [views, setViews] = React.useState("--")
     const [comments, setComments] = React.useState("--")
@@ -58,9 +60,9 @@ export function statisticsPreview({ momentOptions, momentData }: StatisticsPrevi
     }
 
     const itemsToRender = [
-        { title: "Likes", value: likes },
-        { title: "Views", value: views },
-        { title: "Comments", value: comments },
+        { title: t("Likes"), value: likes },
+        { title: t("Views"), value: views },
+        { title: t("Comments"), value: comments },
     ]
 
     if (!momentOptions.enableAnalyticsView) return null
