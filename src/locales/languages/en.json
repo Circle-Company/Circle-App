@@ -15,6 +15,10 @@
     "Views": "Views",
     "viewed your profile": "viewed your profile",
 
+    "Comments": "Comments",
+
+    "Statistics": "Statistics",
+
     "Likes": "Likes",
     "liked your moment": "liked your moment",
     "liked 2 of your moments": "liked 2 of your moments",
@@ -31,7 +35,6 @@
     "w": "w",
     "week": "week",
     "weeks": "weeks",
-    
 
     "d": "d",
     "day": "day",
@@ -67,7 +70,7 @@
     "this quarter": "this quarter",
     "this semester": "this semester",
     "this year": "this year",
-    
+
     "days ago": "days ago",
     "weeks ago": "weeks ago",
     "months ago": "months ago",
@@ -182,7 +185,7 @@
 
     "We don't have any Moment to show": "We don't have any Moment to show",
     "Share a Moment": "Share a Moment",
-    
+
     "*Type one tag at a time and press 'Add' to add it": "*Type one tag at a time and press 'Add' to add it",
     "Moment Has been uploaded with success": "Moment Has been uploaded with success",
     "Memory Has been created with success": "Memory Has been created with success",

@@ -17,6 +17,10 @@
     "View": "Visualização",
     "viewed your profile": "visualizou o seu perfil",
 
+    "Comments": "Comentários",
+
+    "Statistics": "Statísticas",
+
     "Likes": "Likes",
     "Like": "Like",
     "liked your moment": "gostou do seu moment",
@@ -69,7 +73,7 @@
     "this quarter": "este trimestre",
     "this semester": "este semetre",
     "this year": "esse ano",
-    
+
     "days ago": "dias atrás",
     "weeks ago": "semanas atrás",
     "months ago": "meses atrás",
@@ -210,7 +214,7 @@
 
     "The description will be visible for all users to see": "A descrição ficará visível para todos os usuários",
     "Your name will be visible for all users to see": "Seu nome ficará visível para todos os usuários",
-"Memory title will be visible for all users to see": "O título da memória ficará visível para todos os usuários",
+    "Memory title will be visible for all users to see": "O título da memória ficará visível para todos os usuários",
     "Keeping the API version up to date and carefully managing changes and updates is critical to ensuring the stability, security, and continued functionality of the application over time.": "Manter a versão da API atualizada e gerenciar cuidadosamente as alterações e atualizações é fundamental para garantir a estabilidade, a segurança e a funcionalidade contínua do aplicativo ao longo do tempo.",
     "Beta test verison, performance and features currently present do not represent the final release version": "Versão de teste beta. O desempenho e os recursos presentes atualmente não representam a versão final",
 
