@@ -56,16 +56,16 @@ export default function SplashScreen() {
     const primaryActionContainer = {
         width: sizes.screens.width,
         height: sizes.headers.height,
-        marginTop: sizes.margins["1md"],
+        marginTop: sizes.margins["1lg"],
         marginBottom: sizes.margins["1xl"] * 0.95,
         alignItems: "center",
         justifyContent: "center",
     }
     const primaryActionText = {
-        fontSize: fonts.size.body,
-        fontFamily: fonts.family.Semibold,
+        fontSize: fonts.size.body * 1.2,
+        fontFamily: fonts.family["Bold-Italic"],
         color: colors.gray.white,
-        marginRight: sizes.margins["1md"] * 0.8,
+        marginRight: sizes.margins["2md"],
     }
 
     const secundaryActionText = {
@@ -108,11 +108,12 @@ export default function SplashScreen() {
                             navigation.navigate("Auth-SignUp-Username")
                         }}
                         backgroundColor={ColorTheme().primary.toString()}
-                        width={200}
-                        height={50}
+                        bounciness={10}
+                        width={300}
+                        height={70}
                     >
                         <Text style={primaryActionText}>Create Account</Text>
-                        <Icon width={24} height={24} fill={colors.gray.white.toString()} />
+                        <Icon width={26} height={26} fill={colors.gray.white.toString()} />
                     </Button>
                 </View>
             </View>
