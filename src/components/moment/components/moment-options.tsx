@@ -72,9 +72,24 @@ export default function options({ memory, momentData, momentOptions }: OptionsPr
         marginBottom: sizes.margins["1md"],
     }
 
+    const statisticsText = {
+        fontSize: fonts.size.body,
+        fontFamily: fonts.family.Semibold,
+        marginBottom: sizes.margins["2sm"],
+        marginLeft: sizes.margins["2sm"],
+    }
+
     return (
         <View>
-            <View style={{ marginBottom: sizes.margins["1lg"] * 0.8 }}>
+            <View
+                style={{
+                    paddingBottom: sizes.paddings["1md"],
+                    marginBottom: sizes.margins["1md"],
+                    borderBottomWidth: 1.5,
+                    borderColor: ColorTheme().backgroundDisabled + "99",
+                }}
+            >
+                <Text style={statisticsText}>{t("Statistics")}</Text>
                 <StatisticsPreview momentData={momentData} momentOptions={momentOptions} />
             </View>
 
