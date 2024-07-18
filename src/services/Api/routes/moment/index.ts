@@ -1,5 +1,5 @@
 import api from "../.."
-import { PostLikeProps, PostUnlikeProps } from "./types"
+import { PostLikeProps, PostStatisticsPreviewProps, PostUnlikeProps } from "./types"
 
 async function like({ userId, momentId }: PostLikeProps): Promise<void> {
     await api.post("/moment/like", {
@@ -15,7 +15,14 @@ async function unlike({ userId, momentId }: PostUnlikeProps): Promise<void> {
     })
 }
 
+async function statisticsPreview({ momentId }: PostStatisticsPreviewProps) {
+    return await api.post("/moment/get-statistics/view", {
+        moment_id: momentId,
+    })
+}
+
 export const routes = {
     like,
     unlike,
+    statisticsPreview,
 }
