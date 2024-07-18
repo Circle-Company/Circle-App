@@ -28,6 +28,7 @@ export default function AccountScreen() {
     }
 
     const handleRefresh = () => {
+        setRefreshing(true)
         setLoading(true)
         session.user.get(session.user.id)
         session.statistics.get(session.user.id).finally(() => {

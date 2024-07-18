@@ -18,6 +18,7 @@ export default function ProfileScreen() {
     }
 
     const handleRefresh = () => {
+        setRefreshing(true)
         setLoading(true)
         setProfile(userProfile.id).finally(() => {
             setTimeout(() => {
