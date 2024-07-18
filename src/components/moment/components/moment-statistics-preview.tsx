@@ -4,7 +4,6 @@ import ColorTheme from "../../../layout/constants/colors"
 import fonts from "../../../layout/constants/fonts"
 import sizes from "../../../layout/constants/sizes"
 import { apiRoutes } from "../../../services/Api"
-import { Loading } from "../../loading"
 import { Text } from "../../Themed"
 import { MomentDataReturnsProps, MomentOptionsProps } from "../context/types"
 
@@ -14,23 +13,16 @@ type StatisticsPreviewProps = {
 }
 
 export function statisticsPreview({ momentOptions, momentData }: StatisticsPreviewProps) {
-    const [isLoading, setIsLoading] = React.useState(true)
     const [likes, setLikes] = React.useState("--")
     const [views, setViews] = React.useState("--")
     const [comments, setComments] = React.useState("--")
 
-    function fetch() {
-        setIsLoading(true)
-        apiRoutes.moment
-            .statisticsPreview({ momentId: momentData.id })
-            .then((response) => {
-                setLikes(response.data.total_likes_num)
-                setViews(response.data.total_views_num)
-                setComments(response.data.total_comments_num)
-            })
-            .finally(() => {
-                setIsLoading(false)
-            })
+    async function fetch() {
+        await apiRoutes.moment.statisticsPreview({ momentId: momentData.id }).then((response) => {
+            setLikes(response.data.total_likes_num)
+            setViews(response.data.total_views_num)
+            setComments(response.data.total_comments_num)
+        })
     }
 
     React.useEffect(() => {
@@ -62,7 +54,7 @@ export function statisticsPreview({ momentOptions, momentData }: StatisticsPrevi
     const value = {
         fontSize: fonts.size.body * 0.9,
         fontFamily: fonts.family.Semibold,
-        color: ColorTheme().primary,
+        color: ColorTheme().text,
     }
 
     const itemsToRender = [
@@ -72,15 +64,6 @@ export function statisticsPreview({ momentOptions, momentData }: StatisticsPrevi
     ]
 
     if (!momentOptions.enableAnalyticsView) return null
-    if (isLoading) {
-        return (
-            <View style={container}>
-                <Loading.Container width={"100%"} height={sizes.sizes["3md"]}>
-                    <Loading.ActivityIndicator size={22} />
-                </Loading.Container>
-            </View>
-        )
-    }
     return (
         <View style={container}>
             <FlatList
