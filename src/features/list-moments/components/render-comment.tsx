@@ -1,88 +1,84 @@
-import React from 'react'
-import { Animated } from 'react-native'
-import { Comments } from '../../../components/comment'
-import AddIcon from '../../../assets/icons/svgs/plus_circle-outline.svg'
-import FeedContext from '../../../contexts/Feed'
-import ViewMorebutton from '../../../components/buttons/view_more'
-import ColorTheme from '../../../layout/constants/colors'
-import { MomentDataProps } from '../../../components/moment/context/types'
-import { useKeyboardAnimation } from 'react-native-keyboard-controller'
-import LanguageContext from '../../../contexts/Preferences/language'
+import React from "react"
+import { Animated } from "react-native"
+import AddIcon from "../../../assets/icons/svgs/plus_circle-outline.svg"
+import ViewMorebutton from "../../../components/buttons/view_more"
+import { Comments } from "../../../components/comment"
+import { MomentDataProps } from "../../../components/moment/context/types"
+import FeedContext from "../../../contexts/Feed"
+import LanguageContext from "../../../contexts/Preferences/language"
+import ColorTheme from "../../../layout/constants/colors"
 
 type renderCommentProps = {
-    moment: MomentDataProps,
-    focused: boolean,
+    moment: MomentDataProps
+    focused: boolean
 }
 
-export default function render_comment ({moment, focused}: renderCommentProps) {
-    const { height, progress } = useKeyboardAnimation()
+export default function render_comment({ moment, focused }: renderCommentProps) {
     const { t } = React.useContext(LanguageContext)
-    const { commentEnabled, setCommentEnabled, setShowKeyboard, setFocusedItemId} = React.useContext(FeedContext)
-    const [ animatedOpacityValue ] = React.useState(new Animated.Value(1))
+    const { commentEnabled, setCommentEnabled, setShowKeyboard, setFocusedItemId } =
+        React.useContext(FeedContext)
+    const [animatedOpacityValue] = React.useState(new Animated.Value(1))
     React.useEffect(() => {
-        if(focused){
-            Animated.timing(
-                animatedOpacityValue,
-                {
-                    toValue: commentEnabled ? 0 : 1,
-                    duration: 200, // Adjust duration as needed
-                    useNativeDriver: true
-                }
-            ).start();
+        if (focused) {
+            Animated.timing(animatedOpacityValue, {
+                toValue: commentEnabled ? 0 : 1,
+                duration: 200, // Adjust duration as needed
+                useNativeDriver: true,
+            }).start()
             if (!commentEnabled) {
-                Animated.timing(
-                    animatedOpacityValue,
-                    {
-                        delay: 0,
-                        toValue: 1,
-                        duration: 200, // Adjust duration as needed
-                        useNativeDriver: true
-                    }
-                ).start();
-            } 
+                Animated.timing(animatedOpacityValue, {
+                    delay: 0,
+                    toValue: 1,
+                    duration: 200, // Adjust duration as needed
+                    useNativeDriver: true,
+                }).start()
+            }
         }
     }, [commentEnabled])
 
     const animated_header_container: any = {
-        opacity: animatedOpacityValue
+        opacity: animatedOpacityValue,
     }
 
     function handlePress() {
-        if(commentEnabled) setCommentEnabled(false)
-        else setCommentEnabled(true); setShowKeyboard(true); setFocusedItemId(Number(moment.id))
+        if (commentEnabled) setCommentEnabled(false)
+        else setCommentEnabled(true)
+        setShowKeyboard(true)
+        setFocusedItemId(Number(moment.id))
     }
 
     return (
-            <Comments.MainRoot data={moment.comments}>
-                <Comments.Container focused={focused}>
-                    <Animated.View style={animated_header_container}>
-                        <Comments.TopRoot>
-                            <Comments.TopLeftRoot>
-                                <Comments.HeaderLeft/>
-                            </Comments.TopLeftRoot>
-                            <Comments.TopRightRoot>
-                                <ViewMorebutton
-                                navigateTo=''
-                                action={() => {handlePress()}}
-                                text={t('Add Comment')}
+        <Comments.MainRoot data={moment.comments}>
+            <Comments.Container focused={focused}>
+                <Animated.View style={animated_header_container}>
+                    <Comments.TopRoot>
+                        <Comments.TopLeftRoot>
+                            <Comments.HeaderLeft />
+                        </Comments.TopLeftRoot>
+                        <Comments.TopRightRoot>
+                            <ViewMorebutton
+                                navigateTo=""
+                                action={() => {
+                                    handlePress()
+                                }}
+                                text={t("Add Comment")}
                                 icon={
                                     <AddIcon
-                                        style={{top: 0.6}}
+                                        style={{ top: 0.6 }}
                                         fill={ColorTheme().primary.toString()}
                                         width={12}
                                         height={12}
                                     />
-                                }/>
-                            </Comments.TopRightRoot>
-                            
-                        </Comments.TopRoot>                    
-                    </Animated.View>
+                                }
+                            />
+                        </Comments.TopRightRoot>
+                    </Comments.TopRoot>
+                </Animated.View>
 
-                    <Comments.CenterRoot>
-                        <Comments.ListComments preview={true}/>                    
-                    </Comments.CenterRoot>
-                </Comments.Container>
-            </Comments.MainRoot>                
-  
+                <Comments.CenterRoot>
+                    <Comments.ListComments preview={true} />
+                </Comments.CenterRoot>
+            </Comments.Container>
+        </Comments.MainRoot>
     )
 }
