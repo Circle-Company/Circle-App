@@ -1,12 +1,12 @@
 import React from "react"
 import { View } from "react-native"
-import AuthContext from "../../../contexts/auth"
+import PersistedContext from "../../../contexts/Persisted"
 import api from "../../../services/Api"
 import UserShowContext from "../user_show-context"
 import { UserRootProps } from "../user_show-types"
 
 export default function root({ children, data }: UserRootProps) {
-    const { user } = React.useContext(AuthContext)
+    const { session } = React.useContext(PersistedContext)
 
     const container: any = {
         flexDirection: "row",
@@ -18,7 +18,7 @@ export default function root({ children, data }: UserRootProps) {
         try {
             const response = await api
                 .post("/user/follow", {
-                    user_id: 1,
+                    user_id: session.user.id,
                     followed_user_id,
                 })
                 .then(function (response) {
@@ -37,7 +37,7 @@ export default function root({ children, data }: UserRootProps) {
         try {
             const response = await api
                 .post("/user/unfollow", {
-                    user_id: 1,
+                    user_id: session.user.id,
                     followed_user_id,
                 })
                 .then(function (response) {
@@ -57,7 +57,7 @@ export default function root({ children, data }: UserRootProps) {
         try {
             const response = await api
                 .post(`/user/profile/${username}`, {
-                    user_id: 1,
+                    user_id: session.user.id,
                 })
                 .then(function (response) {
                     console.log(response.data)
