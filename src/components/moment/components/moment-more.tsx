@@ -20,7 +20,7 @@ export default function more({
             children: (
                 <Options momentOptions={momentOptions} momentData={momentData} memory={memory} />
             ),
-            snapPoints: ["32%"],
+            snapPoints: ["39%"],
         })
     }
     if (momentOptions.enableAnalyticsView) {
