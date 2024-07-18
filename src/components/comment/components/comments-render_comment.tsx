@@ -13,9 +13,9 @@ import { Text } from "../../Themed"
 import { UserShow } from "../../user_show"
 import { CommentsRenderCommentProps } from "../comments-types"
 
-export default function render_comment({ comment, index, preview }: CommentsRenderCommentProps) {
+export default function render_comment({ comment, preview }: CommentsRenderCommentProps) {
     const { session } = React.useContext(PersistedContext)
-    const { momentUserActions, momentData } = React.useContext(MomentContext)
+    const { momentUserActions } = React.useContext(MomentContext)
 
     const [like, setLike] = React.useState(false)
 
