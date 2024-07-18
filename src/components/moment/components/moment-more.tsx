@@ -17,8 +17,10 @@ export default function more({
     const { momentOptions, momentData } = React.useContext(MomentContext)
     function handlePress() {
         expand({
-            children: <Options momentData={momentData} memory={memory} />,
-            snapPoints: ["16%"],
+            children: (
+                <Options momentOptions={momentOptions} momentData={momentData} memory={memory} />
+            ),
+            snapPoints: ["32%"],
         })
     }
     if (momentOptions.enableAnalyticsView) {

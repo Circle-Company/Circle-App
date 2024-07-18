@@ -12,14 +12,16 @@ import api from "../../../services/Api"
 import ButtonStandart from "../../buttons/button-standart"
 import { MemoryReciveDataProps } from "../../Memory/Memory-types"
 import { Text } from "../../Themed"
-import { MomentDataReturnsProps } from "../context/types"
+import { MomentDataReturnsProps, MomentOptionsProps } from "../context/types"
+import { statisticsPreview as StatisticsPreview } from "./moment-statistics-preview"
 
 type OptionsProps = {
     momentData: MomentDataReturnsProps
+    momentOptions: MomentOptionsProps
     memory: MemoryReciveDataProps
 }
 
-export default function options({ memory, momentData }: OptionsProps) {
+export default function options({ memory, momentData, momentOptions }: OptionsProps) {
     const { collapse } = React.useContext(BottomSheetContext)
     const { t } = React.useContext(LanguageContext)
     const { notify } = useNotifications()
@@ -72,6 +74,10 @@ export default function options({ memory, momentData }: OptionsProps) {
 
     return (
         <View>
+            <View style={{ marginBottom: sizes.margins["1lg"] * 0.8 }}>
+                <StatisticsPreview momentData={momentData} momentOptions={momentOptions} />
+            </View>
+
             <View style={textsContainer}>
                 <Text style={[descriptionStyle]}>
                     {t("The Moment will only be removed from this memory.")}

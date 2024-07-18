@@ -7,3 +7,7 @@ export type PostUnlikeProps = {
     userId: number
     momentId: number
 }
+
+export type PostStatisticsPreviewProps = {
+    momentId: number
+}
