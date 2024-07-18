@@ -1,6 +1,6 @@
 import React from "react"
 import { MidiaReciveDataProps } from "../midia_render/midia_render-types"
-import { MomentDataProps, MomentSizeProps} from "./context/types"
+import { MomentDataProps, MomentSizeProps } from "./context/types"
 
 export type MomentMainRootProps = {
     momentData: MomentDataProps
@@ -37,13 +37,12 @@ export type MomentContainerProps = {
 }
 
 export type MomentLikeProps = {
-    isLiked: boolean,
-    backgroundColor?: string,
-    paddingHorizontal?: number,
+    isLiked: boolean
+    backgroundColor?: string
+    paddingHorizontal?: number
     margin?: number
 }
-export type MomentUsernameProps = {
-}
+export type MomentUsernameProps = {}
 
 export type MomentDescriptionProps = {
     displayOnMoment?: boolean

@@ -1,14 +1,14 @@
-import React, { useState, useEffect } from "react"
+import React, { useEffect, useState } from "react"
 import { Pressable, TextInput, useColorScheme } from "react-native"
-import ColorTheme, { colors } from "../../layout/constants/colors"
-import fonts from "../../layout/constants/fonts"
 import Icon from "../../assets/icons/svgs/@.svg"
-import { Text, View } from "../Themed"
 import CheckIcon from "../../assets/icons/svgs/check_circle.svg"
 import XIcon from "../../assets/icons/svgs/close.svg"
+import AuthContext from "../../contexts/auth"
+import ColorTheme, { colors } from "../../layout/constants/colors"
+import fonts from "../../layout/constants/fonts"
 import sizes from "../../layout/constants/sizes"
 import api from "../../services/Api"
-import AuthContext from "../../contexts/auth"
+import { Text, View } from "../Themed"
 
 export default function UsernameInput() {
     const isDarkMode = useColorScheme() === "dark"
@@ -150,6 +150,7 @@ export default function UsernameInput() {
             /(?!^[_\.])[^a-zA-Z0-9_\.]|[^a-zA-Z0-9_\.](?![_\.])|\s/g,
             ""
         )
+
         setUsername(formattedText)
     }
 

@@ -7,7 +7,6 @@ import { storage } from "../store"
 import { storageKeys } from "./Persisted/storageKeys"
 import { SessionDataType } from "./Persisted/types"
 import LanguageContext from "./Preferences/language"
-import TrackingContext from "./tracking"
 
 type AuthProviderProps = { children: React.ReactNode }
 
@@ -30,7 +29,6 @@ const AuthContext = React.createContext<AuthContextsData>({} as AuthContextsData
 
 export function Provider({ children }: AuthProviderProps) {
     const { t } = React.useContext(LanguageContext)
-    const { trackSign, mixpanel } = React.useContext(TrackingContext)
     const [signInputUsername, setSignInputUsername] = React.useState("")
     const [signInputPassword, setSignInputPassword] = React.useState("")
     const [sessionData, setSessionData] = useState<SessionDataType>({} as SessionDataType)
