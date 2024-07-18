@@ -154,6 +154,15 @@ export default function ListMemoryMoments() {
             }
             renderItem={({ item, index }) => {
                 const focused = index === centerIndex
+
+                const renderData = {
+                    ...item,
+                    user: {
+                        id: memory.user_id,
+                    },
+                }
+
+                console.log("render-memory-moment: ", item)
                 return (
                     <View
                         style={
@@ -164,7 +173,7 @@ export default function ListMemoryMoments() {
                                   : container
                         }
                     >
-                        <RenderMemoryMoment focused={focused} moment={item} />
+                        <RenderMemoryMoment focused={focused} moment={renderData} />
                     </View>
                 )
             }}

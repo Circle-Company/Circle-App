@@ -13,6 +13,7 @@ export type MomentDataProps = {
     tags: TagProps[]
     language: LanguagesCodesType
     created_at: string
+    isLiked: boolean
 }
 
 export type ExportMomentDataProps = {
@@ -66,6 +67,7 @@ export type TagProps = {
 }
 
 export type MomentOptionsProps = {
+    enableLikeButton: boolean
     enableAnalyticsView: boolean
     enableStoreActions: boolean
     enableTranslation: boolean

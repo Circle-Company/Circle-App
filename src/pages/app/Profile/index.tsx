@@ -2,7 +2,6 @@ import React from "react"
 import { RefreshControl, ScrollView, StatusBar, useColorScheme, View } from "react-native"
 import ProfileHeader from "../../../components/headers/profile/profile-header"
 import { Loading } from "../../../components/loading"
-import PersistedContext from "../../../contexts/Persisted"
 import ViewProfileContext from "../../../contexts/viewProfile"
 import ListMemories from "../../../features/list-memories/list-memories-preview"
 import RenderProfile from "../../../features/render-profile"
@@ -10,7 +9,6 @@ import ColorTheme, { colors } from "../../../layout/constants/colors"
 import sizes from "../../../layout/constants/sizes"
 export default function ProfileScreen() {
     const { userProfile, setProfile } = React.useContext(ViewProfileContext)
-    const { session } = React.useContext(PersistedContext)
     const [refreshing, setRefreshing] = React.useState(false)
     const [loading, setLoading] = React.useState(false)
     const isDarkMode = useColorScheme() === "dark"
@@ -20,8 +18,9 @@ export default function ProfileScreen() {
     }
 
     const handleRefresh = () => {
+        setRefreshing(true)
         setLoading(true)
-        setProfile(session.user.id).finally(() => {
+        setProfile(userProfile.id).finally(() => {
             setTimeout(() => {
                 setLoading(false)
                 setRefreshing(false)

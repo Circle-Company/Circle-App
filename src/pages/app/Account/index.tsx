@@ -3,6 +3,7 @@ import React from "react"
 import { RefreshControl, ScrollView, useColorScheme } from "react-native"
 import { Loading } from "../../../components/loading"
 import { View } from "../../../components/Themed"
+import AccountContext from "../../../contexts/account"
 import BottomTabsContext from "../../../contexts/bottomTabs"
 import PersistedContext from "../../../contexts/Persisted"
 import ListMemories from "../../../features/list-memories/list-memories-preview"
@@ -11,9 +12,9 @@ import { colors } from "../../../layout/constants/colors"
 import sizes from "../../../layout/constants/sizes"
 
 export default function AccountScreen() {
+    const { setRefreshing, refreshing } = React.useContext(AccountContext)
     const { session } = React.useContext(PersistedContext)
     const { setCurrentTab } = React.useContext(BottomTabsContext)
-    const [refreshing, setRefreshing] = React.useState(false)
     const [loading, setLoading] = React.useState(false)
     const isDarkMode = useColorScheme() === "dark"
     const isFocused = useIsFocused()
@@ -27,6 +28,7 @@ export default function AccountScreen() {
     }
 
     const handleRefresh = () => {
+        setRefreshing(true)
         setLoading(true)
         session.user.get(session.user.id)
         session.statistics.get(session.user.id).finally(() => {
@@ -79,7 +81,11 @@ export default function AccountScreen() {
                 ) : (
                     <RenderProfile user={renderUser} />
                 )}
-                <ListMemories isAccountScreen={true} user={session.user} />
+                <ListMemories
+                    userRefreshing={refreshing}
+                    isAccountScreen={true}
+                    user={session.user}
+                />
             </ScrollView>
         </View>
     )

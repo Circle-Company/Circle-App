@@ -11,6 +11,7 @@ import { Provider as FeedProvider } from "./src/contexts/Feed"
 import { Provider as PersistedProvider } from "./src/contexts/Persisted"
 import { Provider as PreferencesProvider } from "./src/contexts/Preferences"
 import { Provider as ToastProvider } from "./src/contexts/Toast"
+import { Provider as AccountProvider } from "./src/contexts/account"
 import { Provider as AuthProvider } from "./src/contexts/auth"
 import { Provider as BottomSheetProvider } from "./src/contexts/bottomSheet"
 import { Provider as BottomTabsProvider } from "./src/contexts/bottomTabs"
@@ -38,21 +39,23 @@ function InnerApp() {
                 <NotificationProvider>
                     <BottomSheetProvider>
                         <BottomTabsProvider>
-                            <ProfileProvider>
-                                <ViewProfileProvider>
-                                    <FeedProvider>
-                                        <NavigationContainer theme={myTheme}>
-                                            <SelectMomentsProvider>
-                                                <MemoryProvider>
-                                                    <NewMomentProvider>
-                                                        <Routes />
-                                                    </NewMomentProvider>
-                                                </MemoryProvider>
-                                            </SelectMomentsProvider>
-                                        </NavigationContainer>
-                                    </FeedProvider>
-                                </ViewProfileProvider>
-                            </ProfileProvider>
+                            <AccountProvider>
+                                <ProfileProvider>
+                                    <ViewProfileProvider>
+                                        <FeedProvider>
+                                            <NavigationContainer theme={myTheme}>
+                                                <SelectMomentsProvider>
+                                                    <MemoryProvider>
+                                                        <NewMomentProvider>
+                                                            <Routes />
+                                                        </NewMomentProvider>
+                                                    </MemoryProvider>
+                                                </SelectMomentsProvider>
+                                            </NavigationContainer>
+                                        </FeedProvider>
+                                    </ViewProfileProvider>
+                                </ProfileProvider>
+                            </AccountProvider>
                         </BottomTabsProvider>
                     </BottomSheetProvider>
                 </NotificationProvider>

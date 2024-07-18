@@ -1,13 +1,14 @@
 import React from "react"
 
 export type userReciveDataProps = {
-    id: number,
-    username: string,
-    verifyed: boolean,
+    id: number
+    username: string
+    verifyed: boolean
     profile_picture: {
-        small_resolution: string,
+        small_resolution: string
         tiny_resolution: string
     }
+    isFollowing: boolean
 }
 
 export type UserRootProps = {
@@ -20,38 +21,38 @@ export type UserUsernameProps = {
     displayYou?: boolean
     disableAnalytics?: boolean
     truncatedSize?: number
-    color?: String,
-    fontSize?: number,
-    fontFamily?: String,
-    margin?: number,
-    onClickAction?: () => void,
+    color?: string
+    fontSize?: number
+    fontFamily?: string
+    margin?: number
+    onClickAction?: () => void
     scale?: number
 }
 
 export type UserProfilePictureProps = {
     pictureDimensions: {
-        width: Number,
-        height: Number
+        width: number
+        height: number
     }
-    displayOnMoment?: boolean,
-    disableAnalytics?: boolean,
-    isLoading?: Boolean
+    displayOnMoment?: boolean
+    disableAnalytics?: boolean
+    isLoading?: boolean
     onClickAction?: () => void
 }
 
 export type UserPressableContainer = {
-    children: React.ReactNode,
+    children: React.ReactNode
     containerProps?: object
 }
 
 export type actionsProps = {
-    follow: () => void,
-    unfollow: () => void,
+    follow: () => void
+    unfollow: () => void
     view_profile: () => void
 }
 
 export type UserFollowButtonProps = {
-    isFollowing: Boolean,
-    displayOnMoment?: boolean,
+    isFollowing: boolean
+    displayOnMoment?: boolean
     hideOnFollowing?: boolean
 }
