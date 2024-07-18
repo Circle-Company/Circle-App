@@ -45,12 +45,10 @@ export function useMomentUserActions(): MomentUserActionsState {
             reported,
         }
     }
-    function handleLikeButtonPressed({ likedValue }: { likedValue?: boolean }) {
-        if (likedValue) setLiked(likedValue)
-        else {
-            if (liked == true) setLiked(false)
-            else setLiked(true)
-        }
+
+    function handleLikeButtonPressed() {
+        if (liked == true) setLiked(false)
+        else setLiked(true)
     }
 
     function setMomentUserActions(momentUserActions: MomentUserActionsProps) {
