@@ -152,29 +152,6 @@ export default function ProfilePictureScreen() {
                 backgroundColor={String(ColorTheme().background)}
                 barStyle={isDarkMode ? "light-content" : "dark-content"}
             />
-            <View
-                style={[
-                    image,
-                    {
-                        position: "absolute",
-                        alignItems: "center",
-                        justifyContent: "center",
-                        zIndex: 10,
-                    },
-                ]}
-            >
-                {!selectedImage && (
-                    <ButtonStandart
-                        margins={false}
-                        width={80}
-                        height={80}
-                        action={handlePressImagePicker}
-                        backgroundColor={colors.gray.white.toString()}
-                    >
-                        <EditIcon fill={String(colors.gray.black)} width={24} height={24} />
-                    </ButtonStandart>
-                )}
-            </View>
             <Image
                 source={{
                     uri: selectedImage
@@ -183,6 +160,17 @@ export default function ProfilePictureScreen() {
                 }}
                 style={image}
             />
+            {!selectedImage && (
+                <ButtonStandart
+                    margins={false}
+                    width={sizes.buttons.width * 0.5}
+                    height={sizes.buttons.height * 0.8}
+                    action={handlePressImagePicker}
+                    backgroundColor={colors.gray.white.toString()}
+                >
+                    <EditIcon fill={String(colors.gray.black)} width={24} height={24} />
+                </ButtonStandart>
+            )}
 
             {selectedImage && (
                 <View style={bottomContainer}>
