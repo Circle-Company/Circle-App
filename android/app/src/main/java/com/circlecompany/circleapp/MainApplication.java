@@ -1,4 +1,4 @@
-package com.circle;
+package com.circlecompany.circleapp;
 
 import android.app.Application;
 import com.facebook.react.PackageList;

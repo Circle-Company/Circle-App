@@ -73,9 +73,9 @@ android {
 
     compileSdkVersion rootProject.ext.compileSdkVersion
 
-    namespace "com.circle"
+    namespace "com.circlecompany.circleapp"
     defaultConfig {
-        applicationId "com.circle"
+        applicationId "com.circlecompany.circleapp"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode 1
