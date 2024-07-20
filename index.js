@@ -1,17 +1,21 @@
-import React from 'react'
-import {AppRegistry, LogBox} from 'react-native'
+import React from "react"
+import { AppRegistry, LogBox } from "react-native"
 
 LogBox.ignoreLogs([
-  "[react-native-gesture-handler] Seems like you\'re using an old API with gesture components, check out new Gestures system!",
-  "[DEPRECATED] Default export is deprecated. Instead use `import { create } from 'zustand'`."
+    "[react-native-gesture-handler] Seems like you're using an old API with gesture components, check out new Gestures system!",
+    "[DEPRECATED] Default export is deprecated. Instead use `import { create } from 'zustand'`.",
 ])
-LogBox.ignoreLogs(["new NativeEventEmitter()"]);
+LogBox.ignoreLogs(["new NativeEventEmitter()"])
 
-import App from './App';
-import {name as appName} from './app.json';
+import App from "./App"
+import { name as appName } from "./app.json"
 
-const Aplication = () => {
-  return <App/>  
+if (__DEV__) {
+    import("react-refresh/runtime")
 }
 
-AppRegistry.registerComponent(appName, () => Aplication);
+const Aplication = () => {
+    return <App />
+}
+
+AppRegistry.registerComponent(appName, () => Aplication)
