@@ -2,10 +2,10 @@ import React from "react"
 import { FlatList, RefreshControl, useColorScheme } from "react-native"
 import OfflineCard from "../../../components/general/offline"
 import { Loading } from "../../../components/loading"
+import LanguageContext from "../../../contexts/Preferences/language"
 import MemoryContext from "../../../contexts/memory"
 import NetworkContext from "../../../contexts/network"
-import LanguageContext from "../../../contexts/Preferences/language"
-import { groupObjectsByDate, TimeInterval } from "../../../helpers/separateArrByDate"
+import { TimeInterval, groupObjectsByDate } from "../../../helpers/separateArrByDate"
 import { colors } from "../../../layout/constants/colors"
 import sizes from "../../../layout/constants/sizes"
 import api from "../../../services/Api"
@@ -14,7 +14,7 @@ import { ListMemoriesAll } from "./components/list-memories-date_group"
 
 export default function ListMemoriesAllSeparatedbyDate() {
     const { t } = React.useContext(LanguageContext)
-    const { allMemoriesUserId } = React.useContext(MemoryContext)
+    const { allMemoriesUserId, memory } = React.useContext(MemoryContext)
     const [allMemories, setAllMemories] = React.useState<Object[]>([])
     const [page, setPage] = React.useState(1)
     const [pageSize, setPageSize] = React.useState(30)
@@ -108,7 +108,7 @@ export default function ListMemoriesAllSeparatedbyDate() {
                         data={item}
                         date_text={item.date}
                         count={item.count}
-                        user_id={allMemoriesUserId}
+                        user={memory.user}
                     />
                 )
             }}

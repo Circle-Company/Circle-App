@@ -80,6 +80,8 @@ export default function ListMemoriesPreview({
         fetch()
     }, [setProfile, accountContext.setRefreshing])
 
+    console.log("user list-memories-preview: ", user)
+
     React.useEffect(() => {
         if (networkStats !== "OFFLINE") {
             setLoading(true)
