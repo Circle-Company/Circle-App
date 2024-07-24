@@ -2,10 +2,11 @@ import { useNavigation } from "@react-navigation/native"
 import React from "react"
 import { Pressable, View } from "react-native"
 import MemoryIcon from "../../../assets/icons/svgs/memory.svg"
+import { Text } from "../../../components/Themed"
 import { Memory } from "../../../components/memory"
 import { MemoryObjectProps } from "../../../components/memory/memory-types"
 import { Moment } from "../../../components/moment"
-import { Text } from "../../../components/Themed"
+import { userReciveDataProps } from "../../../components/user_show/user_show-types"
 import MemoryContext from "../../../contexts/memory"
 import { truncated } from "../../../helpers/processText"
 import { colors } from "../../../layout/constants/colors"
@@ -14,7 +15,7 @@ import sizes from "../../../layout/constants/sizes"
 
 type RenderMemoryProps = {
     memory: MemoryObjectProps
-    user_id: number
+    user: userReciveDataProps
     pressable?: boolean
     scale?: number
     marginRight?: number
@@ -26,7 +27,7 @@ type RenderMemoryProps = {
 
 export default function render_memory({
     memory,
-    user_id,
+    user,
     pressable = true,
     scale = 1,
     marginRight = 36,
@@ -78,7 +79,7 @@ export default function render_memory({
 
     async function handlePressed(memoryData: any) {
         if (pressable) {
-            setMemory({ user_id, ...memoryData })
+            setMemory({ user, ...memoryData })
             navigation.navigate("MemoriesNavigator", { screen: "Memory" })
         }
     }
