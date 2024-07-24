@@ -23,7 +23,7 @@ export default function statistics_likes({}: ProfileStatisticsLikesProps) {
 
     const num_style: any = {
         fontFamily: fonts.family.Bold,
-        fontSize: fonts.size.headline,
+        fontSize: fonts.size.title2,
         color: ColorTheme().text,
     }
     const text_style: any = {
