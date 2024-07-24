@@ -6,6 +6,7 @@ import ColorTheme from "../../../layout/constants/colors"
 
 export default function MemoriesScreen() {
     const isDarkMode = useColorScheme() === "dark"
+    const {}
 
     const container = {
         alignItems: "center",
@@ -18,7 +19,7 @@ export default function MemoriesScreen() {
                 backgroundColor={String(ColorTheme().background)}
                 barStyle={isDarkMode ? "light-content" : "dark-content"}
             />
-            <ListMemoriesAll />
+            <ListMemoriesAll user={} />
         </View>
     )
 }
