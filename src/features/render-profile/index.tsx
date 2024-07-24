@@ -19,7 +19,6 @@ export default function RenderProfile({ user }: RenderProfileProps) {
         paddingBottom: sizes.paddings["1sm"] * 0.6,
     }
 
-    console.log("render-profile: ", user)
     return (
         <Profile.MainRoot data={user}>
             <View style={top_container}>
