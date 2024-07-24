@@ -189,7 +189,7 @@ export default function ListMemoriesPreview({
                     const memory = { ...item, isAccountScreen }
                     return (
                         <Animated.View entering={FadeInLeft.duration(200)}>
-                            <RenderMemory memory={memory} user_id={user.id} />
+                            <RenderMemory memory={memory} user={user} />
                         </Animated.View>
                     )
                 }}
