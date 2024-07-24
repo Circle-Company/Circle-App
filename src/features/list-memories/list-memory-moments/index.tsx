@@ -4,6 +4,7 @@ import OfflineCard from "../../../components/general/offline"
 import { Loading } from "../../../components/loading"
 import MemoryContext from "../../../contexts/memory"
 import NetworkContext from "../../../contexts/network"
+import PersistedContext from "../../../contexts/Persisted"
 import LanguageContext from "../../../contexts/Preferences/language"
 import { colors } from "../../../layout/constants/colors"
 import sizes from "../../../layout/constants/sizes"
@@ -13,7 +14,9 @@ import { RenderMemoryMoment } from "./components/render-memory_moment"
 
 export default function ListMemoryMoments() {
     const margin = 20
-    const { memory, memoryMoments, setMemoryMoments } = React.useContext(MemoryContext)
+    const { session } = React.useContext(PersistedContext)
+    const { memory, memoryMoments, setMemoryMoments, allMemoriesUserId } =
+        React.useContext(MemoryContext)
     const { t } = React.useContext(LanguageContext)
     const [centerIndex, setCenterIndex] = React.useState<number | null>(null)
     const flatListRef = React.useRef<FlatList | null>(null)
@@ -154,12 +157,13 @@ export default function ListMemoryMoments() {
             }
             renderItem={({ item, index }) => {
                 const focused = index === centerIndex
-
+                console.log("ListMemoryMoments: ", memory.user)
+                //const isMe = allMemoriesUserId == session.user.id
                 const renderData = {
                     ...item,
                     user: {
                         ...memory.user,
-                        you_follow: memory.user.you_follow ? memory.user.you_follow : false,
+                        you_follow: memory?.user?.you_follow,
                     },
                 }
 

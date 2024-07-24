@@ -79,6 +79,7 @@ export default function render_memory({
 
     async function handlePressed(memoryData: any) {
         if (pressable) {
+            console.log("handlePressed: ", user)
             setMemory({ user, ...memoryData })
             navigation.navigate("MemoriesNavigator", { screen: "Memory" })
         }
