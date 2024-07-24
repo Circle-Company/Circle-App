@@ -159,7 +159,7 @@ export default function ListMemoryMoments() {
                     ...item,
                     user: {
                         ...memory.user,
-                        you_follow: memory.user.you_follow,
+                        you_follow: memory.user.you_follow ? memory.user.you_follow : false,
                     },
                 }
 
