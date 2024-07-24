@@ -42,7 +42,7 @@ export default function ListMemoriesPreview({
     const [pageSize, setPageSize] = React.useState(3)
     const [refreshing, setRefreshing] = React.useState(false)
     const [endReached, setEndReached] = React.useState(false)
-    const { setAllMemoriesUserId } = React.useContext(MemoryContext)
+    const { setAllMemoriesUser } = React.useContext(MemoryContext)
     const { networkStats } = React.useContext(NetworkContext)
     const isDarkMode = useColorScheme() === "dark"
 
@@ -54,6 +54,7 @@ export default function ListMemoriesPreview({
             .then(function (response) {
                 if (page === 1) setMemories(response.data.memories)
                 else {
+                    setAllMemoriesUser(user)
                     setMemories([...memories, ...response.data.memories])
                     if (pageSize > response.data.memories.length) setEndReached(true)
                     else setEndReached(false)
@@ -79,8 +80,6 @@ export default function ListMemoriesPreview({
         }
         fetch()
     }, [setProfile, accountContext.setRefreshing])
-
-    console.log("user list-memories-preview: ", user)
 
     React.useEffect(() => {
         if (networkStats !== "OFFLINE") {

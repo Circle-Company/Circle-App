@@ -1,42 +1,41 @@
 import React from "react"
 import { MemoryReciveDataProps } from "../components/Memory/Memory-types"
+import { userReciveDataProps } from "../components/user_show/user_show-types"
 type MemoryProviderProps = {
     children: React.ReactNode
 }
 
 export type TagProps = {
     title: string
-} 
+}
 
 export type MemoryContextsData = {
     memory: MemoryReciveDataProps
-    memoryMoments: any 
-    allMemoriesUserId: number
+    memoryMoments: any
+    allMemoriesUser: userReciveDataProps
     setMemory: React.Dispatch<React.SetStateAction<MemoryReciveDataProps | undefined>>
     setMemoryMoments: React.Dispatch<React.SetStateAction<any>>
-    setAllMemoriesUserId: React.Dispatch<React.SetStateAction<number>>
+    setAllMemoriesUser: React.Dispatch<React.SetStateAction<userReciveDataProps>>
 }
 
 const MemoryContext = React.createContext<MemoryContextsData>({} as MemoryContextsData)
 
-export function Provider({children}: MemoryProviderProps) {
+export function Provider({ children }: MemoryProviderProps) {
     const [memory, setMemory] = React.useState<MemoryReciveDataProps>()
-    const [memoryMoments, setMemoryMoments] = React.useState<any>()
-    const [allMemoriesUserId, setAllMemoriesUserId] = React.useState<number>()
+    const [memoryMoments, setMemoryMoments] = React.useState<any>({} as userReciveDataProps)
+    const [allMemoriesUser, setAllMemoriesUser] = React.useState<userReciveDataProps>(
+        {} as userReciveDataProps
+    )
 
     const contextValue: any = {
         memory,
         memoryMoments,
-        allMemoriesUserId,
-        setAllMemoriesUserId,
+        allMemoriesUser,
+        setAllMemoriesUser,
         setMemory,
-        setMemoryMoments
+        setMemoryMoments,
     }
 
-    return (
-        <MemoryContext.Provider value={contextValue}>
-            {children}
-        </MemoryContext.Provider>
-    )
+    return <MemoryContext.Provider value={contextValue}>{children}</MemoryContext.Provider>
 }
 export default MemoryContext
