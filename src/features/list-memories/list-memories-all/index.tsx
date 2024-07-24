@@ -2,7 +2,6 @@ import React from "react"
 import { FlatList, RefreshControl, useColorScheme } from "react-native"
 import OfflineCard from "../../../components/general/offline"
 import { Loading } from "../../../components/loading"
-import { userReciveDataProps } from "../../../components/user_show/user_show-types"
 import LanguageContext from "../../../contexts/Preferences/language"
 import MemoryContext from "../../../contexts/memory"
 import NetworkContext from "../../../contexts/network"
@@ -13,11 +12,7 @@ import api from "../../../services/Api"
 import EndReached from "./components/end-reached"
 import { ListMemoriesAll } from "./components/list-memories-date_group"
 
-interface ListMemoriesAllProps {
-    user: userReciveDataProps
-}
-
-export default function ListMemoriesAllSeparatedbyDate({ user }: ListMemoriesAllProps) {
+export default function ListMemoriesAllSeparatedbyDate() {
     const { t } = React.useContext(LanguageContext)
     const { allMemoriesUser } = React.useContext(MemoryContext)
     const [allMemories, setAllMemories] = React.useState<Object[]>([])
@@ -107,14 +102,13 @@ export default function ListMemoriesAllSeparatedbyDate({ user }: ListMemoriesAll
                 />
             }
             renderItem={({ item, index }) => {
-                console.log("memory.user: ", user)
                 return (
                     <ListMemoriesAll
                         key={index}
                         data={item}
                         date_text={item.date}
                         count={item.count}
-                        user={user}
+                        user={allMemoriesUser}
                     />
                 )
             }}
