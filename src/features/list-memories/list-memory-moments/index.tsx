@@ -158,11 +158,11 @@ export default function ListMemoryMoments() {
                 const renderData = {
                     ...item,
                     user: {
-                        id: memory.user_id,
+                        ...memory.user,
+                        you_follow: memory.user.you_follow,
                     },
                 }
 
-                console.log("render-memory-moment: ", item)
                 return (
                     <View
                         style={
