@@ -39,7 +39,7 @@ const ViewProfileContext = React.createContext<ViewProfileContextsData>(
 
 export function Provider({ children }: ViewProfileProviderProps) {
     const { session } = React.useContext(PersistedContext)
-    const [userProfile, setUserProfile] = React.useState()
+    const [userProfile, setUserProfile] = React.useState<ProfileDataProps>({} as ProfileDataProps)
 
     async function setProfile(Id: number) {
         try {
@@ -60,6 +60,10 @@ export function Provider({ children }: ViewProfileProviderProps) {
             console.error(err)
         }
     }
+
+    React.useEffect(() => {
+        setProfile(userProfile.id)
+    }, [setUserProfile])
 
     const contextValue: any = {
         setProfile,
