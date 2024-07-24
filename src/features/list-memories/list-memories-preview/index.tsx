@@ -135,7 +135,9 @@ export default function ListMemoriesPreview({
                     <ViewMorebutton
                         action={() => {
                             navigation.navigate("MemoriesNavigator", { screen: "Memories" })
-                            setAllMemoriesUserId(isAccountScreen ? session.user.id : user.id)
+                            setAllMemoriesUser(
+                                isAccountScreen ? { ...session.user, isFollowing: false } : user
+                            )
                         }}
                         text={t("View All")}
                     />
