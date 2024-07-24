@@ -36,10 +36,10 @@ export default function follow_button({
     }
 
     const container_unpressed: any = {
-        width: sizes.buttons.width / 4,
-        height: sizes.buttons.height / 2,
-        borderRadius: Number([sizes.buttons.width / 4]) / 2,
-        backgroundColor: ColorTheme().primary,
+        width: sizes.buttons.width / 4.4,
+        height: sizes.buttons.height / 2.8,
+        borderRadius: Number([sizes.buttons.width / 4.4]) / 2,
+        backgroundColor: ColorTheme().text,
         margin: sizes.margins["1sm"],
         alignItems: "center",
         justifyContent: "center",
@@ -47,23 +47,25 @@ export default function follow_button({
         borderColor: colors.blue.blue_03 + "50",
     }
     const container_pressed: any = {
-        width: sizes.buttons.width / 4,
-        height: sizes.buttons.height / 2,
-        borderRadius: Number([sizes.buttons.width / 4]) / 2,
-        backgroundColor: displayOnMoment ? colors.gray.white : ColorTheme().backgroundDisabled,
+        width: sizes.buttons.width / 4.4,
+        height: sizes.buttons.height / 2.8,
+        borderRadius: Number([sizes.buttons.width / 4.4]) / 2,
+        backgroundColor: displayOnMoment
+            ? ColorTheme().backgroundDisabled + "99"
+            : ColorTheme().backgroundDisabled,
         margin: sizes.margins["1sm"],
         alignItems: "center",
         justifyContent: "center",
     }
     const username_pressed: any = {
-        fontSize: fonts.size.body * 0.9,
+        fontSize: fonts.size.body * 0.76,
         fontFamily: fonts.family.Bold,
-        color: displayOnMoment ? colors.gray.black : ColorTheme().text,
+        color: ColorTheme().text + "90",
     }
     const username_unpressed: any = {
-        fontSize: fonts.size.body,
+        fontSize: fonts.size.body * 0.85,
         fontFamily: fonts.family.Bold,
-        color: colors.gray.white,
+        color: ColorTheme().background,
     }
     async function ButtonAction() {
         if (followPressed) {
