@@ -1,4 +1,4 @@
-import { CardStyleInterpolators, createStackNavigator } from "@react-navigation/stack"
+import { createStackNavigator } from "@react-navigation/stack"
 import React from "react"
 import AccountHeaderLeft from "../../components/headers/account/account-header_left"
 import AccountHeaderRight from "../../components/headers/account/account-header_right"
@@ -7,6 +7,7 @@ import ColorTheme from "../../layout/constants/colors"
 import Fonts from "../../layout/constants/fonts"
 import Sizes from "../../layout/constants/sizes"
 import AccountScreen from "../../pages/app/Account"
+import { Interpolation as Horizontal } from "../transitions/horizontal"
 
 const AccountScreenStack = createStackNavigator()
 
@@ -20,7 +21,7 @@ export function AccountScreenNavigator() {
     return (
         <AccountScreenStack.Navigator
             screenOptions={{
-                cardStyleInterpolator: CardStyleInterpolators.forHorizontalIOS,
+                cardStyleInterpolator: Horizontal,
             }}
         >
             <AccountScreenStack.Screen

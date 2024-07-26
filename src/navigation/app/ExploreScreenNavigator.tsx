@@ -1,9 +1,10 @@
-import { CardStyleInterpolators, createStackNavigator } from "@react-navigation/stack"
+import { createStackNavigator } from "@react-navigation/stack"
 import React from "react"
 import LanguageContext from "../../contexts/Preferences/language"
 import ColorTheme from "../../layout/constants/colors"
 import Sizes from "../../layout/constants/sizes"
 import ExploreScreen from "../../pages/app/Explore"
+import { Interpolation as Horizontal } from "../transitions/horizontal"
 
 const ExploreStack = createStackNavigator()
 
@@ -15,9 +16,7 @@ export function ExploreScreenNavigator() {
     }
 
     return (
-        <ExploreStack.Navigator
-            screenOptions={{ cardStyleInterpolator: CardStyleInterpolators.forHorizontalIOS }}
-        >
+        <ExploreStack.Navigator screenOptions={{ cardStyleInterpolator: Horizontal }}>
             <ExploreStack.Screen
                 name="ExploreScreen"
                 component={ExploreScreen}

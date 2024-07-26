@@ -1,4 +1,4 @@
-import { CardStyleInterpolators, createStackNavigator } from "@react-navigation/stack"
+import { createStackNavigator } from "@react-navigation/stack"
 import React from "react"
 import { useColorScheme } from "react-native"
 import MemoriesHeaderLeft from "../../components/headers/memories/#"
@@ -7,8 +7,8 @@ import MemoriesListMomentsHeaderRight from "../../components/headers/memories/me
 import MemoryHeaderLeft from "../../components/headers/memory/memory-header_left"
 import MemoryHeaderRight from "../../components/headers/memory/memory-header_right"
 import MemoryTitleHeaderRight from "../../components/headers/memory/memory_title-header_right"
-import MemoryContext from "../../contexts/memory"
 import LanguageContext from "../../contexts/Preferences/language"
+import MemoryContext from "../../contexts/memory"
 import ColorTheme, { colors } from "../../layout/constants/colors"
 import Sizes from "../../layout/constants/sizes"
 import MemoriesScreen from "../../pages/app/Memories"
@@ -16,6 +16,8 @@ import EditMemoryScreen from "../../pages/app/Memories/edit_memory"
 import MemoriesListMomentsScreen from "../../pages/app/Memories/list_moments"
 import NewMemorySelectMomentsScreen from "../../pages/app/Memories/new_memory_select_moments"
 import NewMemoryTitleScreen from "../../pages/app/Memories/new_memory_title"
+import { Interpolation as Horizontal } from "../transitions/horizontal"
+
 const MemoriesStack = createStackNavigator()
 
 export function MemoriesNavigator() {
@@ -45,7 +47,7 @@ export function MemoriesNavigator() {
                     cardStyle: { backgroundColor: String(ColorTheme().background) },
                     headerTintColor: String(ColorTheme().text),
                     cardOverlayEnabled: true,
-                    cardStyleInterpolator: CardStyleInterpolators.forModalPresentationIOS,
+                    cardStyleInterpolator: Horizontal,
                     headerLeft: () => <MemoriesHeaderLeft />,
                 }}
             />
@@ -58,7 +60,7 @@ export function MemoriesNavigator() {
                     headerTitleStyle: { color: String(colors.gray.white) },
                     cardStyle: { backgroundColor: String(ColorTheme().background) },
                     cardOverlayEnabled: true,
-                    cardStyleInterpolator: CardStyleInterpolators.forHorizontalIOS,
+                    cardStyleInterpolator: Horizontal,
                     headerLeft: () => <MemoriesListMomentsHeaderLeft />,
                     headerRight: () => <MemoriesListMomentsHeaderRight user_id={memory.user_id} />,
                 }}
@@ -78,7 +80,7 @@ export function MemoriesNavigator() {
                     headerTitleStyle: { color: String(ColorTheme().text) },
                     cardStyle: { backgroundColor: String(ColorTheme().background) },
                     cardOverlayEnabled: true,
-                    cardStyleInterpolator: CardStyleInterpolators.forHorizontalIOS,
+                    cardStyleInterpolator: Horizontal,
                     headerLeft: () => <MemoriesHeaderLeft />,
                 }}
             />
@@ -91,7 +93,7 @@ export function MemoriesNavigator() {
                     headerTitleStyle: { color: String(ColorTheme().text) },
                     cardStyle: { backgroundColor: String(ColorTheme().background) },
                     cardOverlayEnabled: true,
-                    cardStyleInterpolator: CardStyleInterpolators.forHorizontalIOS,
+                    cardStyleInterpolator: Horizontal,
                     headerLeft: () => <MemoryHeaderLeft />,
                     headerRight: () => <MemoryHeaderRight />,
                 }}
@@ -105,7 +107,7 @@ export function MemoriesNavigator() {
                     headerTitleStyle: { color: String(ColorTheme().text) },
                     cardStyle: { backgroundColor: String(ColorTheme().background) },
                     cardOverlayEnabled: true,
-                    cardStyleInterpolator: CardStyleInterpolators.forHorizontalIOS,
+                    cardStyleInterpolator: Horizontal,
                     headerLeft: () => <MemoryHeaderLeft />,
                     headerRight: () => <MemoryTitleHeaderRight />,
                 }}

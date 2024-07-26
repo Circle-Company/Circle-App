@@ -1,4 +1,4 @@
-import { CardStyleInterpolators, createStackNavigator } from "@react-navigation/stack"
+import { createStackNavigator } from "@react-navigation/stack"
 import React from "react"
 import LanguageContext from "../../contexts/Preferences/language"
 import ColorTheme from "../../layout/constants/colors"
@@ -11,6 +11,7 @@ import LoginScreen from "../../pages/auth/SignIn"
 import PasswordScreen from "../../pages/auth/SignUp/Password"
 import UsernameScreen from "../../pages/auth/SignUp/Username"
 import InitScreen from "../../pages/auth/Splash"
+import { Interpolation as Horizontal } from "../transitions/horizontal"
 
 const AuthStack = createStackNavigator()
 export default function AuthNavigator() {
@@ -28,7 +29,7 @@ export default function AuthNavigator() {
     return (
         <AuthStack.Navigator
             initialRouteName={"Init"}
-            screenOptions={{ cardStyleInterpolator: CardStyleInterpolators.forHorizontalIOS }}
+            screenOptions={{ cardStyleInterpolator: Horizontal }}
         >
             <AuthStack.Screen name="Init" component={InitScreen} options={{ headerShown: false }} />
             <AuthStack.Screen

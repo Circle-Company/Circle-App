@@ -1,7 +1,8 @@
-import { CardStyleInterpolators, createStackNavigator } from "@react-navigation/stack"
+import { createStackNavigator } from "@react-navigation/stack"
 import React from "react"
 import ColorTheme from "../../layout/constants/colors"
 import ProfileScreen from "../../pages/app/Profile"
+import { Interpolation as Horizontal } from "../transitions/horizontal"
 
 const ProfileStack = createStackNavigator()
 
@@ -9,7 +10,7 @@ export function ProfileNavigator() {
     return (
         <ProfileStack.Navigator
             screenOptions={{
-                cardStyleInterpolator: CardStyleInterpolators.forModalPresentationIOS,
+                cardStyleInterpolator: Horizontal,
             }}
         >
             <ProfileStack.Screen

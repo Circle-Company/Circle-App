@@ -1,15 +1,13 @@
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs"
 import React from "react"
-import LanguageContext from "../../contexts/Preferences/language"
-import ColorTheme from "../../layout/constants/colors"
-import sizes from "../../layout/constants/sizes"
-
-import { AccountScreenNavigator } from "./AccountNavigator"
-import { HomeScreenNavigator } from "./HomeScreenNavigator"
-
 import MomentOutline from "../../assets/icons/svgs/moments-outline.svg"
 import Moment from "../../assets/icons/svgs/moments.svg"
 import { default as User, default as UserOutline } from "../../assets/icons/svgs/user.svg"
+import LanguageContext from "../../contexts/Preferences/language"
+import ColorTheme from "../../layout/constants/colors"
+import sizes from "../../layout/constants/sizes"
+import { AccountScreenNavigator } from "./AccountNavigator"
+import { HomeScreenNavigator } from "./HomeScreenNavigator"
 
 const BottomTab = createBottomTabNavigator()
 
