@@ -1,4 +1,4 @@
-import { CardStyleInterpolators, createStackNavigator } from "@react-navigation/stack"
+import { createStackNavigator } from "@react-navigation/stack"
 import React from "react"
 import MemoryHeaderLeft from "../../components/headers/memory/memory-header_left"
 import MomentFullHeaderLeft from "../../components/headers/moment/moment_full-header_left"
@@ -13,6 +13,8 @@ import NewMomentDescription from "../../pages/app/Moment/new_moment-description"
 import NewMomentGalleryScreen from "../../pages/app/Moment/new_moment-gallery"
 import NewMomentImageScreen from "../../pages/app/Moment/new_moment-image"
 import NewMomentSelectMemory from "../../pages/app/Moment/new_moment-select_memory"
+import { Interpolation as Horizontal } from "../transitions/horizontal"
+
 const MomentStack = createStackNavigator()
 
 export function MomentNavigator() {
@@ -48,7 +50,7 @@ export function MomentNavigator() {
                     headerTitleStyle: { color: String(ColorTheme().text) },
                     cardStyle: { backgroundColor: String(ColorTheme().background) },
                     cardOverlayEnabled: true,
-                    cardStyleInterpolator: CardStyleInterpolators.forHorizontalIOS,
+                    cardStyleInterpolator: Horizontal,
                     headerLeft: () => <MemoryHeaderLeft />,
                     headerRight: () => <NewMomentImageRight />,
                 }}
@@ -63,7 +65,7 @@ export function MomentNavigator() {
                     headerTitleStyle: { color: String(ColorTheme().text) },
                     cardStyle: { backgroundColor: String(ColorTheme().background) },
                     cardOverlayEnabled: true,
-                    cardStyleInterpolator: CardStyleInterpolators.forHorizontalIOS,
+                    cardStyleInterpolator: Horizontal,
                     headerLeft: () => <MemoryHeaderLeft />,
                     headerRight: () => <NewMomentImageRight />,
                 }}
@@ -77,7 +79,7 @@ export function MomentNavigator() {
                     headerTitleStyle: { color: String(ColorTheme().text) },
                     cardStyle: { backgroundColor: String(ColorTheme().background) },
                     cardOverlayEnabled: true,
-                    cardStyleInterpolator: CardStyleInterpolators.forHorizontalIOS,
+                    cardStyleInterpolator: Horizontal,
                     headerLeft: () => <MemoryHeaderLeft />,
                     headerRight: () => <NewMomentInputDescriptionRight />,
                 }}
@@ -91,7 +93,7 @@ export function MomentNavigator() {
                     headerTitleStyle: { color: String(ColorTheme().text) },
                     cardStyle: { backgroundColor: String(ColorTheme().background) },
                     cardOverlayEnabled: true,
-                    cardStyleInterpolator: CardStyleInterpolators.forHorizontalIOS,
+                    cardStyleInterpolator: Horizontal,
                     headerLeft: () => <MemoryHeaderLeft />,
                     headerRight: () => <NewMomentSelectMemoryRight />,
                 }}

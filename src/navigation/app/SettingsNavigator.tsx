@@ -1,4 +1,4 @@
-import { CardStyleInterpolators, createStackNavigator } from "@react-navigation/stack"
+import { createStackNavigator } from "@react-navigation/stack"
 import React from "react"
 import { useColorScheme } from "react-native"
 import SettingsHeaderLeft from "../../components/headers/settings/settings-header_left"
@@ -21,6 +21,7 @@ import ProfilePictureScreen from "../../pages/app/Settings/ProfilePicture"
 import SupportScreen from "../../pages/app/Settings/Support"
 import SettingsTermsOfService from "../../pages/app/Settings/TermsOfService"
 import VersionScreen from "../../pages/app/Settings/Version"
+import { Interpolation as Horizontal } from "../transitions/horizontal"
 
 const SettingsStack = createStackNavigator()
 
@@ -35,9 +36,7 @@ export function SettingsNavigator() {
     }
 
     return (
-        <SettingsStack.Navigator
-            screenOptions={{ cardStyleInterpolator: CardStyleInterpolators.forHorizontalIOS }}
-        >
+        <SettingsStack.Navigator screenOptions={{ cardStyleInterpolator: Horizontal }}>
             <SettingsStack.Screen
                 name="Settings"
                 component={SettingsScreen}

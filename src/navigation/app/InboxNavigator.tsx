@@ -1,4 +1,4 @@
-import { CardStyleInterpolators, createStackNavigator } from "@react-navigation/stack"
+import { createStackNavigator } from "@react-navigation/stack"
 import React from "react"
 import { useColorScheme } from "react-native"
 import MemoriesHeaderLeft from "../../components/headers/memories/#"
@@ -6,6 +6,7 @@ import LanguageContext from "../../contexts/Preferences/language"
 import ColorTheme, { colors } from "../../layout/constants/colors"
 import Sizes from "../../layout/constants/sizes"
 import InboxScreen from "../../pages/app/Inbox"
+import { Interpolation as Horizontal } from "../transitions/horizontal"
 
 const InboxStack = createStackNavigator()
 
@@ -21,7 +22,7 @@ export function InboxNavigator() {
     return (
         <InboxStack.Navigator
             screenOptions={{
-                cardStyleInterpolator: CardStyleInterpolators.forModalPresentationIOS,
+                cardStyleInterpolator: Horizontal,
             }}
         >
             <InboxStack.Screen
