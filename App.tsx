@@ -2,11 +2,7 @@ import { DefaultTheme, NavigationContainer } from "@react-navigation/native"
 import * as React from "react"
 import { GestureHandlerRootView } from "react-native-gesture-handler"
 import { KeyboardProvider } from "react-native-keyboard-controller"
-import { initialWindowMetrics, SafeAreaProvider } from "react-native-safe-area-context"
-import ColorTheme from "./src/layout/constants/colors"
-import sizes from "./src/layout/constants/sizes"
-import Routes from "./src/routes"
-
+import { SafeAreaProvider, initialWindowMetrics } from "react-native-safe-area-context"
 import { Provider as FeedProvider } from "./src/contexts/Feed"
 import { Provider as PersistedProvider } from "./src/contexts/Persisted"
 import { Provider as PreferencesProvider } from "./src/contexts/Preferences"
@@ -23,7 +19,11 @@ import { Provider as ProfileProvider } from "./src/contexts/profile"
 import { Provider as SelectMomentsProvider } from "./src/contexts/selectMoments"
 import { Provider as TrackingProvider } from "./src/contexts/tracking"
 import { Provider as ViewProfileProvider } from "./src/contexts/viewProfile"
+import ColorTheme from "./src/layout/constants/colors"
+import sizes from "./src/layout/constants/sizes"
+import { requestPermission } from "./src/lib/hooks/userRequestPermissions"
 import { QueryProvider } from "./src/lib/react-query"
+import Routes from "./src/routes"
 function InnerApp() {
     const myTheme = {
         ...DefaultTheme,
@@ -65,6 +65,14 @@ function InnerApp() {
 }
 
 function App() {
+    React.useEffect(() => {
+        async function requestPermissions() {
+            await requestPermission.firebaseMessaging()
+            await requestPermission.postNotifications()
+        }
+        requestPermissions()
+    }, [])
+
     return (
         <SafeAreaProvider initialMetrics={initialWindowMetrics}>
             <GestureHandlerRootView
