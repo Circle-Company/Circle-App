@@ -68,7 +68,7 @@ function App() {
     React.useEffect(() => {
         async function requestPermissions() {
             await requestPermission.firebaseMessaging()
-            await requestPermission.postNotifications()
+            requestPermission.postNotifications()
         }
         requestPermissions()
     }, [])
