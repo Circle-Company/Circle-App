@@ -3,14 +3,8 @@ import React from "react"
 import { PermissionsAndroid } from "react-native"
 import PersistedContext from "../../contexts/Persisted"
 
-async function postNotifications(): Promise<boolean> {
-    const { device } = React.useContext(PersistedContext)
-    const permissionStatus = await PermissionsAndroid.request(
-        PermissionsAndroid.PERMISSIONS.POST_NOTIFICATIONS
-    )
-    const enabled = permissionStatus === "granted"
-    device.permissions.setPostNotifications(enabled)
-    return enabled
+function postNotifications(): void {
+    PermissionsAndroid.request(PermissionsAndroid.PERMISSIONS.POST_NOTIFICATIONS)
 }
 async function firebaseMessaging(): Promise<boolean> {
     const { device } = React.useContext(PersistedContext)
