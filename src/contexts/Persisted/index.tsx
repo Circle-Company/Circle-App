@@ -37,6 +37,7 @@ export function Provider({ children }: PersistedProviderProps) {
     React.useEffect(() => {
         devicePermissions.set({
             postNotifications: false,
+            firebaseMessaging: false,
         })
     }, [])
 
