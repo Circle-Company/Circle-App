@@ -21,9 +21,9 @@ import { Provider as TrackingProvider } from "./src/contexts/tracking"
 import { Provider as ViewProfileProvider } from "./src/contexts/viewProfile"
 import ColorTheme from "./src/layout/constants/colors"
 import sizes from "./src/layout/constants/sizes"
-import { requestPermission } from "./src/lib/hooks/userRequestPermissions"
 import { QueryProvider } from "./src/lib/react-query"
 import Routes from "./src/routes"
+
 function InnerApp() {
     const myTheme = {
         ...DefaultTheme,
@@ -65,14 +65,6 @@ function InnerApp() {
 }
 
 function App() {
-    React.useEffect(() => {
-        async function requestPermissions() {
-            await requestPermission.firebaseMessaging()
-            requestPermission.postNotifications()
-        }
-        requestPermissions()
-    }, [])
-
     return (
         <SafeAreaProvider initialMetrics={initialWindowMetrics}>
             <GestureHandlerRootView
