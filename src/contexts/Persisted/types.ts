@@ -49,6 +49,7 @@ export type StatisticsDataType = {
 
 export type PermissionsData = {
     postNotifications: boolean
+    firebaseMessaging: boolean
 }
 
 export type AccountDataType = {
@@ -56,6 +57,7 @@ export type AccountDataType = {
     muted: boolean
     last_active_at: string
     last_login_at: string
+    firebasePushToken: string
 }
 export type AccountDataReturnsType = {
     blocked: boolean

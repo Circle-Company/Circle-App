@@ -8,6 +8,7 @@ export function storageKeys() {
             search: baseKey + "history:search",
         },
         account: {
+            firebasePushToken: baseKey + "account:firebasepushtoken",
             blocked: baseKey + "account:block",
             muted: baseKey + "account:mute",
             last_active_at: baseKey + "account:lastactive",
@@ -39,6 +40,7 @@ export function storageKeys() {
         },
         permissions: {
             postNotifications: baseKey + "permissions:postnotifications",
+            firebaseMessaging: baseKey + "permissions:firebasemessaging",
         },
     }
 }
