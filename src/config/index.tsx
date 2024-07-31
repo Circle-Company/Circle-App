@@ -1,12 +1,13 @@
 import {
     API_VERSION,
     APP_VERSION,
-    CIRCLE_SYSTEM_API,
     DEBUG,
+    DEVELOPMENT_API_ENDPOINT,
     LOG_DEBUG,
     LOG_LEVEL,
     MIXPANEL_KEY,
     NODE_ENV,
+    PRODUCTION_API_ENDPOINT,
 } from "@env"
 import emails from "./emails"
 import metadata from "./metadata"
@@ -21,7 +22,7 @@ const environment = {
 
 const api = {
     API_VERSION: API_VERSION,
-    CIRCLE_SYSTEM_API: CIRCLE_SYSTEM_API,
+    ENDPOINT: NODE_ENV == "production" ? PRODUCTION_API_ENDPOINT : DEVELOPMENT_API_ENDPOINT,
 }
 
 const analytics = {
