@@ -2,12 +2,12 @@ import {
     API_VERSION,
     APP_VERSION,
     DEBUG,
-    DEVELOPMENT_ENDPOINT,
+    DEVELOPMENT_API_ENDPOINT,
     LOG_DEBUG,
     LOG_LEVEL,
     MIXPANEL_KEY,
     NODE_ENV,
-    PRODUCTION_ENDPOINT,
+    PRODUCTION_API_ENDPOINT,
 } from "@env"
 import emails from "./emails"
 import metadata from "./metadata"
@@ -22,7 +22,7 @@ const environment = {
 
 const api = {
     API_VERSION: API_VERSION,
-    ENDPOINT: NODE_ENV == "production" ? PRODUCTION_ENDPOINT : DEVELOPMENT_ENDPOINT,
+    ENDPOINT: NODE_ENV == "production" ? PRODUCTION_API_ENDPOINT : DEVELOPMENT_API_ENDPOINT,
 }
 
 const analytics = {
