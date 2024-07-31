@@ -16,17 +16,17 @@ export default {
     },
 
     family: {
-        "Light-Italic": "SFPRODISPLAYULTRALIGHTITALIC",
+        "Light-Italic": "RaptorV3Premium-LightSlanted",
         Light: "RaptorV3Premium-Light",
         "Regular-Italic": "RaptorV3Premium-RegularSlanted",
-        Regular: "SFPRODISPLAYREGULAR",
+        Regular: "RaptorV3Premium-Regular",
         "Medium-Italic": "RedHatDisplay-MediumItalic",
-        Medium: "SFPRODISPLAYMEDIUM",
-        "Semibold-Italic": "SFPRODISPLAYSEMIBOLDITALIC",
+        Medium: "RedHatDisplay-Medium",
+        "Semibold-Italic": "RaptorV3Premium-SemiboldSlanted",
         Semibold: "RaptorV3Premium-Semibold",
         "Bold-Italic": "RedHatDisplay-BoldItalic",
-        Bold: "SFPRODISPLAYBOLD",
-        "Black-Italic": "SFPRODISPLAYHEAVYITALIC",
+        Bold: "RedHatDisplay-Bold",
+        "Black-Italic": "RaptorV3Premium-BlackSlanted",
         Black: "RaptorV3Premium-Black",
     },
 }
