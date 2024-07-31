@@ -2,6 +2,7 @@ import { SearchRenderItemReciveDataObjectProps } from "../../components/search/s
 import { userReciveDataProps } from "../../components/user_show/user_show-types"
 import { LanguagesCodesType } from "../../locales/LanguageTypes"
 import { AccountState } from "./persistedAccount"
+import { PermissionsState } from "./persistedPermissions"
 import { PreferencesState } from "./persistedPreferences"
 import { StatisticsState } from "./persistedStatistics"
 import { UserState } from "./persistedUser"
@@ -11,7 +12,7 @@ export type UserDataType = {
     name: string
     username: string
     description: string
-    verifyed: boolean,
+    verifyed: boolean
     profile_picture: {
         small_resolution: string
         tiny_resolution: string
@@ -29,14 +30,11 @@ export type UserDataReturnsType = {
         tiny_resolution: string
     }
     setId: (value: number) => void
-    setName: (value: string) => void;
+    setName: (value: string) => void
     setUsername: (value: string) => void
     setDescription: (value: string) => void
     setVerifyed: (value: boolean) => void
-    setProfilePicture: (value: {
-        small_resolution: String
-        tiny_resolution: String
-    }) => void
+    setProfilePicture: (value: { small_resolution: String; tiny_resolution: String }) => void
     get: (id: number) => Promise<UserState>
     store: (value: userReciveDataProps) => userReciveDataProps
     load: () => userReciveDataProps
@@ -49,11 +47,17 @@ export type StatisticsDataType = {
     total_views_num: number
 }
 
+export type PermissionsData = {
+    postNotifications: boolean
+    firebaseMessaging: boolean
+}
+
 export type AccountDataType = {
     blocked: boolean
     muted: boolean
     last_active_at: string
     last_login_at: string
+    firebasePushToken: string
 }
 export type AccountDataReturnsType = {
     blocked: boolean
@@ -130,11 +134,14 @@ export type HistoryDataStorageType = {
     search: SearchRenderItemReciveDataObjectProps[] | []
 }
 
-
 export type SessionDataType = {
     history: HistoryDataStorageType
     user: UserDataReturnsType
     account: AccountState
     preferences: PreferencesState
     statistics: StatisticsState
+}
+
+export type DeviceDataType = {
+    permissions: PermissionsState
 }
