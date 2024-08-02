@@ -1,15 +1,14 @@
 import { useIsFocused } from "@react-navigation/native"
 import React from "react"
-import { RefreshControl, ScrollView, useColorScheme } from "react-native"
+import { useColorScheme } from "react-native"
 import { Loading } from "../../../components/loading"
-import { View } from "../../../components/Themed"
+import PersistedContext from "../../../contexts/Persisted"
 import AccountContext from "../../../contexts/account"
 import BottomTabsContext from "../../../contexts/bottomTabs"
-import PersistedContext from "../../../contexts/Persisted"
 import ListMemories from "../../../features/list-memories/list-memories-preview"
 import RenderProfile from "../../../features/render-profile"
-import { colors } from "../../../layout/constants/colors"
 import sizes from "../../../layout/constants/sizes"
+import { AnimatedVerticalScrollView } from "../../../lib/hooks/useAnimatedScrollView"
 
 export default function AccountScreen() {
     const { setRefreshing, refreshing } = React.useContext(AccountContext)
@@ -27,16 +26,20 @@ export default function AccountScreen() {
         top: 0,
     }
 
-    const handleRefresh = () => {
-        setRefreshing(true)
+    async function fetchData() {
         setLoading(true)
-        session.user.get(session.user.id)
-        session.statistics.get(session.user.id).finally(() => {
+        await session.user.get(session.user.id)
+        await session.statistics.get(session.user.id).finally(() => {
             setTimeout(() => {
                 setLoading(false)
                 setRefreshing(false)
             }, 200)
         })
+    }
+
+    const handleRefresh = async () => {
+        setRefreshing(true)
+        await fetchData()
     }
 
     React.useEffect(() => {
@@ -52,41 +55,19 @@ export default function AccountScreen() {
     }
 
     return (
-        <View style={container}>
-            <ScrollView
-                style={container}
-                showsVerticalScrollIndicator={false}
-                horizontal={false}
-                refreshControl={
-                    <RefreshControl
-                        progressBackgroundColor={String(
-                            isDarkMode ? colors.gray.grey_08 : colors.gray.grey_02
-                        )}
-                        colors={[
-                            String(isDarkMode ? colors.gray.grey_04 : colors.gray.grey_04),
-                            "#00000000",
-                        ]}
-                        refreshing={refreshing}
-                        onRefresh={handleRefresh}
-                    />
-                }
-            >
-                {loading ? (
-                    <Loading.Container
-                        width={sizes.screens.width}
-                        height={sizes.screens.height / 3}
-                    >
-                        <Loading.ActivityIndicator />
-                    </Loading.Container>
-                ) : (
-                    <RenderProfile user={renderUser} />
-                )}
-                <ListMemories
-                    userRefreshing={refreshing}
-                    isAccountScreen={true}
-                    user={session.user}
-                />
-            </ScrollView>
-        </View>
+        <AnimatedVerticalScrollView
+            onEndReachedThreshold={0.1}
+            handleRefresh={handleRefresh}
+            onEndReached={fetchData}
+        >
+            {loading ? (
+                <Loading.Container width={sizes.screens.width} height={sizes.screens.height / 3}>
+                    <Loading.ActivityIndicator />
+                </Loading.Container>
+            ) : (
+                <RenderProfile user={renderUser} />
+            )}
+            <ListMemories userRefreshing={refreshing} isAccountScreen={true} user={session.user} />
+        </AnimatedVerticalScrollView>
     )
 }
