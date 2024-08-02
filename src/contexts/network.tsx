@@ -1,102 +1,128 @@
-import React, { createContext, useState, useEffect, useContext, ReactNode } from "react";
-import NetInfo, { useNetInfo } from "@react-native-community/netinfo";
-import { notify } from "react-native-notificated";
-import LanguageContext from "./Preferences/language";
-import { colors } from "../layout/constants/colors";
-import WifiIcon from '../assets/icons/svgs/wifi.svg';
-import WifiSlashIcon from '../assets/icons/svgs/wifi_slash.svg';
+import NetInfo from "@react-native-community/netinfo"
+import React, { ReactNode, createContext, useContext, useEffect, useState } from "react"
+import { notify } from "react-native-notificated"
+import WifiIcon from "../assets/icons/svgs/wifi.svg"
+import WifiSlashIcon from "../assets/icons/svgs/wifi_slash.svg"
+import config from "../config"
+import { colors } from "../layout/constants/colors"
+import LanguageContext from "./Preferences/language"
 
-type NetworkProviderProps = { children: ReactNode };
+type NetworkProviderProps = { children: ReactNode }
 
 export type NetworkContextData = {
-  networkStats: "ONLINE" | "OFFLINE" | "RECONNECTING";
-};
+    networkStats: "ONLINE" | "OFFLINE" | "RECONNECTING"
+}
 
-const NetworkContext = createContext<NetworkContextData>({} as NetworkContextData);
+const NetworkContext = createContext<NetworkContextData>({} as NetworkContextData)
 
 export function Provider({ children }: NetworkProviderProps) {
-    const [ networkStatus, setNetworkStatus ] = React.useState<"ONLINE" | "OFFLINE" | "RECONNECTING">("ONLINE")
-    const [isConnected, setIsConnected] = useState<boolean | null>(null);
+    const [networkStatus, setNetworkStatus] = React.useState<"ONLINE" | "OFFLINE" | "RECONNECTING">(
+        "ONLINE"
+    )
+    const [isConnected, setIsConnected] = useState<boolean | null>(null)
     const [isInternetReachable, setIsInternetReachable] = useState<boolean | null>(null)
     const [appStarted, setAppStarted] = useState<boolean>(true)
-    const { t } = useContext(LanguageContext);
+    const { t } = useContext(LanguageContext)
+
+    console.log(`http://${config.ENDPOINT}/v${config.API_VERSION}`)
 
     useEffect(() => {
-        let previousState = isConnected;
-        let previousIsInternetReachable = isInternetReachable;
+        let previousState = isConnected
+        let previousIsInternetReachable = isInternetReachable
 
-        const unsubscribe = NetInfo.addEventListener(state => {
-        const currentState = state.isConnected;
-        const currentIsInternetReachable = state.isInternetReachable
+        const unsubscribe = NetInfo.addEventListener((state) => {
+            const currentState = state.isConnected
+            const currentIsInternetReachable = state.isInternetReachable
 
-        if (previousState !== currentState) {
-            if (appStarted && currentState === false) {
-                notify('tiny', {
-                    params: {
-                    title: t('You are Offline'),
-                    backgroundColor: colors.red.red_05,
-                    titleColor: colors.gray.white,
-                    icon: <WifiSlashIcon fill={colors.gray.white.toString()} width={12} height={12}/>
-                    }
-                });
-                setNetworkStatus('OFFLINE')
-                
-            } else if (!appStarted) {
-                if (currentState === true && previousState === false) {
-                    notify('tiny', {
+            if (previousState !== currentState) {
+                if (appStarted && currentState === false) {
+                    notify("tiny", {
                         params: {
-                          title: t('Connected to Internet'),
-                          backgroundColor: colors.green.green_05,
-                          titleColor: colors.gray.white,
-                          icon: <WifiIcon fill={colors.gray.white.toString()} width={12} height={12}/>
-                        }
-                    });
-                    setNetworkStatus('ONLINE')
-                } else if (currentState === false) {
-                    notify('tiny', {
-                        params: {
-                        title: t('You are Offline'),
-                        backgroundColor: colors.red.red_05,
-                        titleColor: colors.gray.white,
-                        icon: <WifiSlashIcon fill={colors.gray.white.toString()} width={12} height={12}/>
-                        }
-                    });
-                    setNetworkStatus('OFFLINE')
-                }                
-            }
-        }
-
-        if (previousIsInternetReachable !== currentIsInternetReachable) {
-            if (currentIsInternetReachable === true && previousIsInternetReachable === false) {
-                notify('tiny', {
-                    params: {
-                    title: t('Reconnecting...'),
-                    backgroundColor: colors.yellow.yellow_05,
-                    titleColor: colors.gray.white,
-                    icon: <WifiSlashIcon fill={colors.gray.white.toString()} width={12} height={12}/>
+                            title: t("You are Offline"),
+                            backgroundColor: colors.red.red_05,
+                            titleColor: colors.gray.white,
+                            icon: (
+                                <WifiSlashIcon
+                                    fill={colors.gray.white.toString()}
+                                    width={12}
+                                    height={12}
+                                />
+                            ),
+                        },
+                    })
+                    setNetworkStatus("OFFLINE")
+                } else if (!appStarted) {
+                    if (currentState === true && previousState === false) {
+                        notify("tiny", {
+                            params: {
+                                title: t("Connected to Internet"),
+                                backgroundColor: colors.green.green_05,
+                                titleColor: colors.gray.white,
+                                icon: (
+                                    <WifiIcon
+                                        fill={colors.gray.white.toString()}
+                                        width={12}
+                                        height={12}
+                                    />
+                                ),
+                            },
+                        })
+                        setNetworkStatus("ONLINE")
+                    } else if (currentState === false) {
+                        notify("tiny", {
+                            params: {
+                                title: t("You are Offline"),
+                                backgroundColor: colors.red.red_05,
+                                titleColor: colors.gray.white,
+                                icon: (
+                                    <WifiSlashIcon
+                                        fill={colors.gray.white.toString()}
+                                        width={12}
+                                        height={12}
+                                    />
+                                ),
+                            },
+                        })
+                        setNetworkStatus("OFFLINE")
                     }
-                });
-                setNetworkStatus('RECONNECTING')
+                }
             }
-        }
 
-        previousState = currentState;
-        setIsConnected(currentState);
-        if (appStarted) setAppStarted(false);    
-        });
+            if (previousIsInternetReachable !== currentIsInternetReachable) {
+                if (currentIsInternetReachable === true && previousIsInternetReachable === false) {
+                    notify("tiny", {
+                        params: {
+                            title: t("Reconnecting..."),
+                            backgroundColor: colors.yellow.yellow_05,
+                            titleColor: colors.gray.white,
+                            icon: (
+                                <WifiSlashIcon
+                                    fill={colors.gray.white.toString()}
+                                    width={12}
+                                    height={12}
+                                />
+                            ),
+                        },
+                    })
+                    setNetworkStatus("RECONNECTING")
+                }
+            }
 
-
+            previousState = currentState
+            setIsConnected(currentState)
+            if (appStarted) setAppStarted(false)
+        })
 
         return () => {
-        unsubscribe();
-        };
-    }, [isConnected]);
+            unsubscribe()
+        }
+    }, [isConnected])
 
     return (
         <NetworkContext.Provider value={{ networkStats: networkStatus }}>
-        {children}
+            {children}
         </NetworkContext.Provider>
-    );
+    )
 }
 
-export default NetworkContext;
+export default NetworkContext

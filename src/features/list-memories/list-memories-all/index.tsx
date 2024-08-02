@@ -1,13 +1,13 @@
 import React from "react"
-import { FlatList, RefreshControl, useColorScheme } from "react-native"
+import { useColorScheme } from "react-native"
 import OfflineCard from "../../../components/general/offline"
 import { Loading } from "../../../components/loading"
 import LanguageContext from "../../../contexts/Preferences/language"
 import MemoryContext from "../../../contexts/memory"
 import NetworkContext from "../../../contexts/network"
 import { TimeInterval, groupObjectsByDate } from "../../../helpers/separateArrByDate"
-import { colors } from "../../../layout/constants/colors"
 import sizes from "../../../layout/constants/sizes"
+import { AnimatedVerticalFlatlist } from "../../../lib/hooks/useAnimatedFlatList"
 import api from "../../../services/Api"
 import EndReached from "./components/end-reached"
 import { ListMemoriesAll } from "./components/list-memories-date_group"
@@ -57,10 +57,8 @@ export default function ListMemoriesAllSeparatedbyDate() {
 
     const handleRefresh = async () => {
         setPage(1)
-        setLoading(true)
         await fetchData().finally(() => {
             setTimeout(() => {
-                setLoading(false)
                 setRefreshing(false)
             }, 200)
         })
@@ -70,37 +68,12 @@ export default function ListMemoriesAllSeparatedbyDate() {
 
     if (networkStats == "OFFLINE" && allMemories.length == 0)
         return <OfflineCard height={sizes.screens.height - sizes.headers.height} />
-    if (loading)
-        return (
-            <Loading.Container
-                width={sizes.screens.width}
-                height={sizes.screens.height - sizes.headers.height}
-            >
-                <Loading.ActivityIndicator />
-            </Loading.Container>
-        )
-
     return (
-        <FlatList
+        <AnimatedVerticalFlatlist
             data={data_to_render}
-            showsVerticalScrollIndicator={false}
-            onEndReached={async () => {
-                await fetchData()
-            }}
+            onEndReached={fetchData}
             onEndReachedThreshold={0.1}
-            refreshControl={
-                <RefreshControl
-                    progressBackgroundColor={String(
-                        isDarkMode ? colors.gray.grey_08 : colors.gray.grey_02
-                    )}
-                    colors={[
-                        String(isDarkMode ? colors.gray.grey_04 : colors.gray.grey_04),
-                        "#00000000",
-                    ]}
-                    refreshing={refreshing}
-                    onRefresh={async () => await handleRefresh()}
-                />
-            }
+            handleRefresh={handleRefresh}
             renderItem={({ item, index }) => {
                 return (
                     <ListMemoriesAll
