@@ -21,7 +21,7 @@ const environment = {
 
 const api = {
     API_VERSION: API_VERSION,
-    ENDPOINT: NODE_ENV == "production" ? PRODUCTION_API_ENDPOINT : "192.168.15.8:3000",
+    ENDPOINT: NODE_ENV == "production" ? PRODUCTION_API_ENDPOINT : "192.168.15.9:3000",
 }
 
 const analytics = {
