@@ -20,6 +20,8 @@ type AnimatedFlatlistProps<T> = {
     renderItem: ({ item, index }: { item: T; index: number }) => React.ReactElement
     ListFooterComponent: () => React.ReactElement
     onEndReachedThreshold: number
+    showRefreshSpinner?: boolean
+    endRefreshAnimationDelay?: number
     onEndReached: () => Promise<void>
     handleRefresh: () => void
     CustomRefreshIcon?: React.ComponentType // Adiciona a propriedade para customização do ícone de refresh
@@ -31,6 +33,8 @@ export function AnimatedVerticalFlatlist<T>({
     ListFooterComponent,
     onEndReached,
     handleRefresh,
+    showRefreshSpinner = true,
+    endRefreshAnimationDelay = 200,
     onEndReachedThreshold,
     CustomRefreshIcon,
 }: AnimatedFlatlistProps<T>) {
@@ -61,7 +65,7 @@ export function AnimatedVerticalFlatlist<T>({
         setTimeout(() => {
             setRefreshing(false)
             pullDownPosition.value = withTiming(0, { duration: 300 })
-        }, 2000)
+        }, endRefreshAnimationDelay)
     }
 
     const pullDownStyles = useAnimatedStyle(() => ({
@@ -170,7 +174,7 @@ export function AnimatedVerticalFlatlist<T>({
                 />
             </Animated.View>
 
-            {refreshing && (
+            {refreshing && showRefreshSpinner && (
                 <Animated.View
                     style={[
                         {

@@ -2,6 +2,7 @@ import {
     API_VERSION,
     APP_VERSION,
     DEBUG,
+    DEVELOPMENT_API_ENDPOINT,
     LOG_DEBUG,
     LOG_LEVEL,
     MIXPANEL_KEY,
@@ -21,7 +22,7 @@ const environment = {
 
 const api = {
     API_VERSION: API_VERSION,
-    ENDPOINT: NODE_ENV == "production" ? PRODUCTION_API_ENDPOINT : "192.168.15.9:3000",
+    ENDPOINT: environment.PRODUCTION ? PRODUCTION_API_ENDPOINT : DEVELOPMENT_API_ENDPOINT,
 }
 
 const analytics = {
