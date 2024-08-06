@@ -1,7 +1,6 @@
 import React from "react"
 import { useColorScheme } from "react-native"
 import OfflineCard from "../../../components/general/offline"
-import { Loading } from "../../../components/loading"
 import LanguageContext from "../../../contexts/Preferences/language"
 import MemoryContext from "../../../contexts/memory"
 import NetworkContext from "../../../contexts/network"
@@ -11,6 +10,7 @@ import { AnimatedVerticalFlatlist } from "../../../lib/hooks/useAnimatedFlatList
 import api from "../../../services/Api"
 import EndReached from "./components/end-reached"
 import { ListMemoriesAll } from "./components/list-memories-date_group"
+import { ListMemoriesAllSkeleton } from "./skeleton"
 
 export default function ListMemoriesAllSeparatedbyDate() {
     const { t } = React.useContext(LanguageContext)
@@ -57,7 +57,9 @@ export default function ListMemoriesAllSeparatedbyDate() {
 
     const handleRefresh = async () => {
         setPage(1)
+        setLoading(true)
         await fetchData().finally(() => {
+            setLoading(false)
             setTimeout(() => {
                 setRefreshing(false)
             }, 200)
@@ -65,7 +67,6 @@ export default function ListMemoriesAllSeparatedbyDate() {
     }
 
     const data_to_render = groupObjectsByDate(allMemories, TimeInterval.DAY)
-
     if (networkStats == "OFFLINE" && allMemories.length == 0)
         return <OfflineCard height={sizes.screens.height - sizes.headers.height} />
     return (
@@ -74,28 +75,31 @@ export default function ListMemoriesAllSeparatedbyDate() {
             onEndReached={fetchData}
             onEndReachedThreshold={0.1}
             handleRefresh={handleRefresh}
+            showRefreshSpinner={false}
             renderItem={({ item, index }) => {
-                return (
-                    <ListMemoriesAll
-                        key={index}
-                        data={item}
-                        date_text={item.date}
-                        count={item.count}
-                        user={allMemoriesUser}
-                    />
-                )
+                if (refreshing || loading) return <ListMemoriesAllSkeleton />
+                else
+                    return (
+                        <ListMemoriesAll
+                            key={index}
+                            data={item}
+                            date_text={item.date}
+                            count={item.count}
+                            user={allMemoriesUser}
+                        />
+                    )
             }}
             ListFooterComponent={() => {
                 if (endReached) return <EndReached text={t("No more Memories")} />
-                else
+                else if (data_to_render.length <= 0)
                     return (
-                        <Loading.Container
-                            width={sizes.screens.width}
-                            height={sizes.headers.height * 2}
-                        >
-                            <Loading.ActivityIndicator />
-                        </Loading.Container>
+                        <>
+                            <ListMemoriesAllSkeleton />
+                            <ListMemoriesAllSkeleton />
+                            <ListMemoriesAllSkeleton />
+                        </>
                     )
+                else return <ListMemoriesAllSkeleton />
             }}
         />
     )

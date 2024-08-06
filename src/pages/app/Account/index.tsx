@@ -1,13 +1,13 @@
 import { useIsFocused } from "@react-navigation/native"
 import React from "react"
 import { useColorScheme } from "react-native"
-import { Loading } from "../../../components/loading"
+import { View } from "../../../components/Themed"
 import PersistedContext from "../../../contexts/Persisted"
 import AccountContext from "../../../contexts/account"
 import BottomTabsContext from "../../../contexts/bottomTabs"
 import ListMemories from "../../../features/list-memories/list-memories-preview"
 import RenderProfile from "../../../features/render-profile"
-import sizes from "../../../layout/constants/sizes"
+import { RenderProfileSkeleton } from "../../../features/render-profile/skeleton"
 import { AnimatedVerticalScrollView } from "../../../lib/hooks/useAnimatedScrollView"
 
 export default function AccountScreen() {
@@ -55,19 +55,21 @@ export default function AccountScreen() {
     }
 
     return (
-        <AnimatedVerticalScrollView
-            onEndReachedThreshold={0.1}
-            handleRefresh={handleRefresh}
-            onEndReached={fetchData}
-        >
-            {loading ? (
-                <Loading.Container width={sizes.screens.width} height={sizes.screens.height / 3}>
-                    <Loading.ActivityIndicator />
-                </Loading.Container>
-            ) : (
-                <RenderProfile user={renderUser} />
-            )}
-            <ListMemories userRefreshing={refreshing} isAccountScreen={true} user={session.user} />
-        </AnimatedVerticalScrollView>
+        <View>
+            <AnimatedVerticalScrollView
+                onEndReachedThreshold={0.1}
+                handleRefresh={handleRefresh}
+                onEndReached={fetchData}
+                endRefreshAnimationDelay={400}
+                showRefreshSpinner={false}
+            >
+                {loading ? <RenderProfileSkeleton /> : <RenderProfile user={renderUser} />}
+                <ListMemories
+                    userRefreshing={refreshing}
+                    isAccountScreen={true}
+                    user={session.user}
+                />
+            </AnimatedVerticalScrollView>
+        </View>
     )
 }
