@@ -21,6 +21,8 @@ type AnimatedScrollViewProps = {
     onEndReachedThreshold: number
     onEndReached: () => Promise<void>
     handleRefresh: () => void
+    endRefreshAnimationDelay?: number
+    showRefreshSpinner?: boolean
     CustomRefreshIcon?: React.ComponentType // Propriedade para customização do ícone de refresh
 }
 
@@ -29,7 +31,9 @@ export function AnimatedVerticalScrollView({
     ListFooterComponent,
     onEndReached,
     handleRefresh,
+    endRefreshAnimationDelay = 200,
     onEndReachedThreshold,
+    showRefreshSpinner = true,
     CustomRefreshIcon,
 }: AnimatedScrollViewProps) {
     const isDarkMode = useColorScheme() === "dark"
@@ -59,7 +63,7 @@ export function AnimatedVerticalScrollView({
         setTimeout(() => {
             setRefreshing(false)
             pullDownPosition.value = withTiming(0, { duration: 300 })
-        }, 2000)
+        }, endRefreshAnimationDelay)
     }
 
     const pullDownStyles = useAnimatedStyle(() => ({
@@ -170,7 +174,7 @@ export function AnimatedVerticalScrollView({
                 </Animated.ScrollView>
             </Animated.View>
 
-            {refreshing && (
+            {refreshing && showRefreshSpinner && (
                 <Animated.View
                     style={[
                         {
