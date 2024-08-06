@@ -1,6 +1,6 @@
 import { useNavigation } from "@react-navigation/native"
 import React from "react"
-import { FlatList, RefreshControl, useColorScheme, View } from "react-native"
+import { FlatList, useColorScheme, View } from "react-native"
 import Animated, { FadeInLeft } from "react-native-reanimated"
 import ViewMorebutton from "../../../components/buttons/view_more"
 import OfflineCard from "../../../components/general/offline"
@@ -14,13 +14,13 @@ import NetworkContext from "../../../contexts/network"
 import PersistedContext from "../../../contexts/Persisted"
 import LanguageContext from "../../../contexts/Preferences/language"
 import ViewProfileContext from "../../../contexts/viewProfile"
-import { colors } from "../../../layout/constants/colors"
 import fonts from "../../../layout/constants/fonts"
 import sizes from "../../../layout/constants/sizes"
 import api from "../../../services/Api"
 import RenderMemory from "../components/render-memory"
 import AnyMemoryCard from "./components/any_memory-card"
 import EndReached from "./components/end-reached"
+import { ListMemoriesPreviewSkeleton } from "./skeleton"
 
 type RenderMemoriesPreviewProps = {
     enableScroll?: boolean
@@ -118,12 +118,7 @@ export default function ListMemoriesPreview({
     if (networkStats == "OFFLINE" && memories.length == 0)
         return <OfflineCard height={(sizes.screens.height - sizes.headers.height) / 2} />
 
-    if (loading)
-        return (
-            <Loading.Container width={sizes.screens.width} height={sizes.screens.height / 2.2}>
-                <Loading.ActivityIndicator />
-            </Loading.Container>
-        )
+    if (loading) return <ListMemoriesPreviewSkeleton />
     if (memories.length === 0) return <AnyMemoryCard isAccountScreen={isAccountScreen} />
     return (
         <View style={container}>
@@ -153,19 +148,6 @@ export default function ListMemoriesPreview({
                 onEndReached={async () => {
                     fetchData()
                 }}
-                refreshControl={
-                    <RefreshControl
-                        progressBackgroundColor={String(
-                            isDarkMode ? colors.gray.grey_08 : colors.gray.grey_02
-                        )}
-                        colors={[
-                            String(isDarkMode ? colors.gray.grey_04 : colors.gray.grey_04),
-                            "#00000000",
-                        ]}
-                        refreshing={refreshing}
-                        onRefresh={async () => await handleRefresh()}
-                    />
-                }
                 ListHeaderComponent={() => {
                     return <View style={{ width: 15 }} />
                 }}
