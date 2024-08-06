@@ -20,8 +20,8 @@ export default function statistics_followers({}: ProfileStatisticsFollowersProps
 
     function handlePress() {
         expand({
-            children: <FollowersRenderModal />,
-            snapPoints: ["20%"],
+            children: <FollowersRenderModal user={user} />,
+            snapPoints: ["15%"],
         })
     }
 
@@ -52,7 +52,7 @@ export default function statistics_followers({}: ProfileStatisticsFollowersProps
         >
             <View style={container}>
                 <Text style={num_style}>
-                    {NumberConversor(user.statistics.total_followers_num)}
+                    {NumberConversor(user?.statistics?.total_followers_num)}
                 </Text>
                 <Text style={text_style}>{t("Followers")}</Text>
             </View>
