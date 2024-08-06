@@ -1,11 +1,9 @@
-import { View, Animated} from "react-native";
-import sizes from "../../../../layout/constants/sizes";
-import { ProfileStatisticsContainerProps } from "../../profile-types";
-import React from "react";
+import React from "react"
+import { Animated } from "react-native"
+import sizes from "../../../../layout/constants/sizes"
+import { ProfileStatisticsContainerProps } from "../../profile-types"
 
-export default function statistics_container ({
-    children
-}: ProfileStatisticsContainerProps) {
+export default function statistics_container({ children }: ProfileStatisticsContainerProps) {
     var animatedOpacity = React.useRef(new Animated.Value(0.2)).current
 
     function handleAnimation() {
@@ -14,7 +12,7 @@ export default function statistics_container ({
             bounciness: 0,
             speed: 0.5,
             useNativeDriver: true,
-            delay: 80
+            delay: 80,
         }).start()
     }
 
@@ -24,16 +22,13 @@ export default function statistics_container ({
 
     const container: any = {
         width: sizes.screens.width,
-        flexDirection: 'row',
-        alignItems: 'center',
-        justifyContent: 'space-between',
-        paddingHorizontal: sizes.paddings["1xl"]*1.2,
-        opacity: animatedOpacity
+        flexDirection: "row",
+        alignItems: "center",
+        justifyContent: "space-between",
+        paddingVertical: sizes.paddings["2sm"],
+        paddingHorizontal: sizes.paddings["1xl"] * 1.2,
+        opacity: animatedOpacity,
     }
 
-    return (
-        <Animated.View style={container}>
-            {children}
-        </Animated.View>
-    )
-} 
+    return <Animated.View style={container}>{children}</Animated.View>
+}
