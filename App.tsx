@@ -11,6 +11,7 @@ import { Provider as AccountProvider } from "./src/contexts/account"
 import { Provider as AuthProvider } from "./src/contexts/auth"
 import { Provider as BottomSheetProvider } from "./src/contexts/bottomSheet"
 import { Provider as BottomTabsProvider } from "./src/contexts/bottomTabs"
+import { Provider as GeolocationProvider } from "./src/contexts/geolocation"
 import { Provider as MemoryProvider } from "./src/contexts/memory"
 import { Provider as NetworkProvider } from "./src/contexts/network"
 import { Provider as NewMomentProvider } from "./src/contexts/newMoment"
@@ -76,7 +77,9 @@ function App() {
                             <PreferencesProvider>
                                 <NetworkProvider>
                                     <TrackingProvider>
-                                        <InnerApp />
+                                        <GeolocationProvider>
+                                            <InnerApp />
+                                        </GeolocationProvider>
                                     </TrackingProvider>
                                 </NetworkProvider>
                             </PreferencesProvider>

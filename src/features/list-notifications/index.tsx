@@ -2,11 +2,10 @@ import React from "react"
 import { FlatList, RefreshControl, useColorScheme } from "react-native"
 import OfflineCard from "../../components/general/offline"
 import { Loading } from "../../components/loading"
-import NetworkContext from "../../contexts/network"
-import NotificationContext from "../../contexts/notification"
 import PersistedContext from "../../contexts/Persisted"
 import LanguageContext from "../../contexts/Preferences/language"
-import { groupObjectsByDate, TimeInterval } from "../../helpers/separateArrByDate"
+import NetworkContext from "../../contexts/network"
+import { TimeInterval, groupObjectsByDate } from "../../helpers/separateArrByDate"
 import { colors } from "../../layout/constants/colors"
 import sizes from "../../layout/constants/sizes"
 import api from "../../services/Api"
@@ -16,8 +15,7 @@ import { ListNotificationsAll } from "./list-notifications-date_group"
 export default function ListNotifcations() {
     const { t } = React.useContext(LanguageContext)
     const { session } = React.useContext(PersistedContext)
-    const { allNotifications, setReadSocketNotifications } = React.useContext(NotificationContext)
-    const [notificationsData, setNotificationsData] = React.useState(allNotifications)
+    const [notificationsData, setNotificationsData] = React.useState([])
     const [page, setPage] = React.useState(1)
     const [pageSize, setPageSize] = React.useState(10)
     const [loading, setLoading] = React.useState(false)
@@ -28,7 +26,6 @@ export default function ListNotifcations() {
 
     React.useEffect(() => {
         fetchData()
-        setReadSocketNotifications()
     }, [])
 
     const fetchData = async () => {
@@ -75,7 +72,7 @@ export default function ListNotifcations() {
 
     const data_to_render = groupObjectsByDate(notificationsData, TimeInterval.DAY)
 
-    if (networkStats == "OFFLINE" && allNotifications.length == 0)
+    if (networkStats == "OFFLINE")
         return <OfflineCard height={sizes.screens.height - sizes.headers.height} />
     if (loading)
         return (
