@@ -18,6 +18,7 @@ import ContentScreen from "../../pages/app/Settings/Preferences/Content"
 import LanguageScreen from "../../pages/app/Settings/Preferences/Language"
 import SettingsPrivacyPolicy from "../../pages/app/Settings/PrivacyPolicy"
 import ProfilePictureScreen from "../../pages/app/Settings/ProfilePicture"
+import SettingsPushNotifications from "../../pages/app/Settings/PushNotifications"
 import SupportScreen from "../../pages/app/Settings/Support"
 import SettingsTermsOfService from "../../pages/app/Settings/TermsOfService"
 import VersionScreen from "../../pages/app/Settings/Version"
@@ -58,6 +59,7 @@ export function SettingsNavigator() {
                     headerTintColor: String(ColorTheme().text),
                     cardStyle: { backgroundColor: String(ColorTheme().background) },
                     cardOverlayEnabled: true,
+                    headerLeft: () => <SettingsHeaderLeft />,
                 }}
             />
             <SettingsStack.Screen
@@ -69,6 +71,7 @@ export function SettingsNavigator() {
                     headerTintColor: String(ColorTheme().text),
                     cardStyle: { backgroundColor: String(ColorTheme().background) },
                     cardOverlayEnabled: true,
+                    headerLeft: () => <SettingsHeaderLeft />,
                 }}
             />
             <SettingsStack.Screen
@@ -80,6 +83,7 @@ export function SettingsNavigator() {
                     headerTintColor: String(ColorTheme().text),
                     cardStyle: { backgroundColor: String(ColorTheme().background) },
                     cardOverlayEnabled: true,
+                    headerLeft: () => <SettingsHeaderLeft />,
                 }}
             />
             <SettingsStack.Screen
@@ -91,6 +95,7 @@ export function SettingsNavigator() {
                     headerTintColor: String(ColorTheme().text),
                     cardStyle: { backgroundColor: String(ColorTheme().background) },
                     cardOverlayEnabled: true,
+                    headerLeft: () => <SettingsHeaderLeft />,
                 }}
             />
             <SettingsStack.Screen
@@ -102,6 +107,7 @@ export function SettingsNavigator() {
                     headerTintColor: String(ColorTheme().text),
                     cardStyle: { backgroundColor: String(ColorTheme().background) },
                     cardOverlayEnabled: true,
+                    headerLeft: () => <SettingsHeaderLeft />,
                 }}
             />
             <SettingsStack.Screen
@@ -113,6 +119,7 @@ export function SettingsNavigator() {
                     headerTintColor: String(ColorTheme().text),
                     cardStyle: { backgroundColor: String(ColorTheme().background) },
                     cardOverlayEnabled: true,
+                    headerLeft: () => <SettingsHeaderLeft />,
                 }}
             />
             <SettingsStack.Screen
@@ -124,17 +131,19 @@ export function SettingsNavigator() {
                     headerTintColor: String(ColorTheme().text),
                     cardStyle: { backgroundColor: String(ColorTheme().background) },
                     cardOverlayEnabled: true,
+                    headerLeft: () => <SettingsHeaderLeft />,
                 }}
             />
             <SettingsStack.Screen
-                name="Settings-Push-Notifications"
-                component={SettingsScreen}
+                name="Settings-Preferences-PushNotifications"
+                component={SettingsPushNotifications}
                 options={{
-                    headerTitle: t("Push Notifications"),
+                    headerTitle: t("Notifications"),
                     headerStyle: HeaderStyle,
                     headerTintColor: String(ColorTheme().text),
                     cardStyle: { backgroundColor: String(ColorTheme().background) },
                     cardOverlayEnabled: true,
+                    headerLeft: () => <SettingsHeaderLeft />,
                 }}
             />
             <SettingsStack.Screen
@@ -146,6 +155,7 @@ export function SettingsNavigator() {
                     headerTintColor: String(ColorTheme().text),
                     cardStyle: { backgroundColor: String(ColorTheme().background) },
                     cardOverlayEnabled: true,
+                    headerLeft: () => <SettingsHeaderLeft />,
                 }}
             />
             <SettingsStack.Screen
@@ -157,6 +167,7 @@ export function SettingsNavigator() {
                     headerTintColor: String(ColorTheme().text),
                     cardStyle: { backgroundColor: String(ColorTheme().background) },
                     cardOverlayEnabled: true,
+                    headerLeft: () => <SettingsHeaderLeft />,
                 }}
             />
             <SettingsStack.Screen
@@ -168,6 +179,7 @@ export function SettingsNavigator() {
                     headerTintColor: String(ColorTheme().text),
                     cardStyle: { backgroundColor: String(ColorTheme().background) },
                     cardOverlayEnabled: true,
+                    headerLeft: () => <SettingsHeaderLeft />,
                 }}
             />
             <SettingsStack.Screen
@@ -179,6 +191,7 @@ export function SettingsNavigator() {
                     headerTintColor: String(ColorTheme().text),
                     cardStyle: { backgroundColor: String(ColorTheme().background) },
                     cardOverlayEnabled: true,
+                    headerLeft: () => <SettingsHeaderLeft />,
                 }}
             />
             <SettingsStack.Screen
@@ -190,6 +203,7 @@ export function SettingsNavigator() {
                     headerTintColor: String(ColorTheme().text),
                     cardStyle: { backgroundColor: String(ColorTheme().background) },
                     cardOverlayEnabled: true,
+                    headerLeft: () => <SettingsHeaderLeft />,
                 }}
             />
             <SettingsStack.Screen
@@ -201,6 +215,7 @@ export function SettingsNavigator() {
                     headerTintColor: String(ColorTheme().text),
                     cardStyle: { backgroundColor: String(ColorTheme().background) },
                     cardOverlayEnabled: true,
+                    headerLeft: () => <SettingsHeaderLeft />,
                 }}
             />
             <SettingsStack.Screen
@@ -212,6 +227,7 @@ export function SettingsNavigator() {
                     headerTintColor: String(ColorTheme().text),
                     cardStyle: { backgroundColor: String(ColorTheme().background) },
                     cardOverlayEnabled: true,
+                    headerLeft: () => <SettingsHeaderLeft />,
                 }}
             />
             <SettingsStack.Screen
@@ -223,6 +239,7 @@ export function SettingsNavigator() {
                     headerTintColor: String(ColorTheme().text),
                     cardStyle: { backgroundColor: String(ColorTheme().background) },
                     cardOverlayEnabled: true,
+                    headerLeft: () => <SettingsHeaderLeft />,
                 }}
             />
         </SettingsStack.Navigator>
