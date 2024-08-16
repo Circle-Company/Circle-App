@@ -26,6 +26,11 @@ export function storageKeys() {
             haptics: baseKey + "preferences:content:haptics",
             translation: baseKey + "preferences:content:translation",
             translationLanguage: baseKey + "preferences:content:translation:language",
+            likeMoment: baseKey + "preferences:pushnotification:likemoment",
+            newMemory: baseKey + "preferences:pushnotification:newmemory",
+            addToMemory: baseKey + "preferences:pushnotification:addtomemory",
+            followUser: baseKey + "preferences:pushnotification:followuser",
+            viewUser: baseKey + "preferences:pushnotification:viewuser",
         },
         user: {
             id: baseKey + "user:id",
