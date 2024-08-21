@@ -172,6 +172,7 @@
     "Add Name": "Add Name",
     "Change Password": "Change Password",
     "Push Notifications": "Push Notifications",
+    "Notifications": "Notifications",
     "All Moments": "All Moments",
     "Preferences": "Preferences",
     "Content": "Content",
@@ -185,6 +186,18 @@
 
     "We don't have any Moment to show": "We don't have any Moment to show",
     "Share a Moment": "Share a Moment",
+
+    "Like on Moment": "Like on Moment",
+    "Memory Creation": "Memory Creation",
+    "Added to Memory": "Added to Memory",
+    "New Follower": "New Follower",
+    "Profile Visit": "Profile Visit",
+
+    "When your moment gets a like.": "When your moment gets a like.",
+    "When someone you follow posts a new Memory.": "When someone you follow posts a new Memory.",
+    "When someone you follow adds a moment to an existing memory.": "When someone you follow adds a moment to an existing memory.",
+    "When some user follows you.": "When some user follows you.",
+    "When any user views your profile.": "When any user views your profile.",
 
     "*Type one tag at a time and press 'Add' to add it": "*Type one tag at a time and press 'Add' to add it",
     "Moment Has been uploaded with success": "Moment Has been uploaded with success",

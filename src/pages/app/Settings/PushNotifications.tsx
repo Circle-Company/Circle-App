@@ -1,20 +1,43 @@
+import { View } from "@/components/Themed"
+import { SwitchButton } from "@/components/general/switch-button"
+import PersistedContext from "@/contexts/Persisted"
+import LanguageContext from "@/contexts/Preferences/language"
+import { ListPushNotificationsSettings } from "@/features/list-push-notifications-settings"
+import { DisabledNotificationsCard } from "@/features/list-push-notifications-settings/disabled-notifications-card"
+import { colors } from "@/layout/constants/colors"
 import messaging from "@react-native-firebase/messaging"
 import React, { useEffect, useState } from "react"
-import { Dimensions, StatusBar, useColorScheme } from "react-native"
-import { View } from "../../../components/Themed"
-import { SwitchButton } from "../../../components/general/switch-button"
-import PersistedContext from "../../../contexts/Persisted"
-import { ListPushNotificationsSettings } from "../../../features/list-push-notifications-settings"
-import { DisabledNotificationsCard } from "../../../features/list-push-notifications-settings/disabled-notifications-card"
-import { colors } from "../../../layout/constants/colors"
-
-const WindowWidth = Dimensions.get("window").width
+import { StatusBar, useColorScheme } from "react-native"
+import {
+    useDisableAddToMemoryMutation,
+    useDisableFollowUserMutation,
+    useDisableLikeMomentMutation,
+    useDisableNewMemoryMutation,
+    useDisableViewUserMutation,
+    useEnableAddToMemoryMutation,
+    useEnableFollowUserMutation,
+    useEnableLikeMomentMutation,
+    useEnableNewMemoryMutation,
+    useEnableViewUserMutation,
+} from "../../../state/queries/preferences-push-notifications"
 
 export default function SettingsPushNotifications() {
     const { session } = React.useContext(PersistedContext)
+    const { t } = React.useContext(LanguageContext)
     const isDarkMode = useColorScheme() === "dark"
     const preferencesState = session.preferences.pushNotifications
     const [notificationsEnabled, setNotificationsEnabled] = useState(true)
+
+    const disableLikeMomentMutation = useDisableLikeMomentMutation()
+    const enableLikeMomentMutation = useEnableLikeMomentMutation()
+    const disableNewMemoryMutation = useDisableNewMemoryMutation()
+    const enableNewMemoryMutation = useEnableNewMemoryMutation()
+    const disableAddToMemoryMutation = useDisableAddToMemoryMutation()
+    const enableAddToMemoryMutation = useEnableAddToMemoryMutation()
+    const disableFollowUserMutation = useDisableFollowUserMutation()
+    const enableFollowUserMutation = useEnableFollowUserMutation()
+    const disableViewUserMutation = useDisableViewUserMutation()
+    const enableViewUserMutation = useEnableViewUserMutation()
 
     useEffect(() => {
         // Verificar se as notificações estão habilitadas
@@ -28,16 +51,7 @@ export default function SettingsPushNotifications() {
 
     const container = {
         flex: 1,
-        width: WindowWidth,
         alignItems: "center",
-    }
-
-    const handleEnable = () => {
-        console.log("Switch enabled")
-    }
-
-    const handleDisable = () => {
-        console.log("Switch disabled")
     }
 
     if (!notificationsEnabled)
@@ -56,57 +70,57 @@ export default function SettingsPushNotifications() {
                 }
             />
             <ListPushNotificationsSettings
-                title="Like"
-                description="When your moment gets a like."
+                title={t("Like on Moment")}
+                description={t("When your moment gets a like.")}
                 leftComponent={
                     <SwitchButton
                         initialState={!preferencesState.disableLikeMoment}
-                        onPressEnable={handleEnable}
-                        onPressDisable={handleDisable}
+                        onPressEnable={enableLikeMomentMutation.mutate}
+                        onPressDisable={disableLikeMomentMutation.mutate}
                     />
                 }
             />
             <ListPushNotificationsSettings
-                title="New Memory"
-                description="When someone you follow posts a new Memory."
+                title={t("Memory Creation")}
+                description={t("When someone you follow posts a new Memory.")}
                 leftComponent={
                     <SwitchButton
                         initialState={!preferencesState.disableNewMemory}
-                        onPressEnable={handleEnable}
-                        onPressDisable={handleDisable}
+                        onPressEnable={enableNewMemoryMutation.mutate}
+                        onPressDisable={disableNewMemoryMutation.mutate}
                     />
                 }
             />
             <ListPushNotificationsSettings
-                title="Add to Memory"
-                description="When someone you follow adds a moment to an existing memory."
+                title={t("Added to Memory")}
+                description={t("When someone you follow adds a moment to an existing memory.")}
                 leftComponent={
                     <SwitchButton
                         initialState={!preferencesState.disableAddToMemory}
-                        onPressEnable={handleEnable}
-                        onPressDisable={handleDisable}
+                        onPressEnable={enableAddToMemoryMutation.mutate}
+                        onPressDisable={disableAddToMemoryMutation.mutate}
                     />
                 }
             />
             <ListPushNotificationsSettings
-                title="Follow"
-                description="When some user follows you."
+                title={t("New Follower")}
+                description={t("When some user follows you.")}
                 leftComponent={
                     <SwitchButton
                         initialState={!preferencesState.disableFollowUser}
-                        onPressEnable={handleEnable}
-                        onPressDisable={handleDisable}
+                        onPressEnable={enableFollowUserMutation.mutate}
+                        onPressDisable={disableFollowUserMutation.mutate}
                     />
                 }
             />
             <ListPushNotificationsSettings
-                title="Profile View"
-                description="When any user views your profile."
+                title={t("Profile Visit")}
+                description={t("When any user views your profile.")}
                 leftComponent={
                     <SwitchButton
                         initialState={!preferencesState.disableViewUser}
-                        onPressEnable={handleEnable}
-                        onPressDisable={handleDisable}
+                        onPressEnable={enableViewUserMutation.mutate}
+                        onPressDisable={disableViewUserMutation.mutate}
                     />
                 }
             />
