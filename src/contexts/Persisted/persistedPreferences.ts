@@ -1,4 +1,6 @@
+import { useQuery } from "@tanstack/react-query"
 import create from "zustand"
+import { apiRoutes } from "../../services/Api"
 import { storage } from "../../store"
 import { storageKeys } from "./storageKeys"
 import { PreferencesDataStorageType } from "./types"
@@ -18,6 +20,7 @@ export interface PreferencesState extends PreferencesDataStorageType {
     setDisableFollowUser: (value: boolean) => void
     setDisableViewUser: (value: boolean) => void
 
+    get: (id: number) => Promise<void>
     set: (value: PreferencesDataStorageType) => void
     load: () => void
     remove: () => void
@@ -26,13 +29,12 @@ export interface PreferencesState extends PreferencesDataStorageType {
 export const usePreferencesStore = create<PreferencesState>((set) => ({
     language: {
         appLanguage: storage.getString(storageKey.appLanguage) || "en",
-        primaryLanguage: storage.getString(storageKey.primaryLanguage) || "en",
+        translationLanguage: storage.getString(storageKey.translationLanguage) || "en",
     },
     content: {
         disableAutoplay: storage.getBoolean(storageKey.autoplay) || false,
         disableHaptics: storage.getBoolean(storageKey.haptics) || false,
         disableTranslation: storage.getBoolean(storageKey.translation) || false,
-        translationLanguage: storage.getString(storageKey.translationLanguage) || "en",
     },
     pushNotifications: {
         disableLikeMoment: storage.getBoolean(storageKey.likeMoment) || false,
@@ -146,6 +148,33 @@ export const usePreferencesStore = create<PreferencesState>((set) => ({
         }))
     },
 
+    get: async (id: number) => {
+        const { data } = useQuery({
+            queryKey: ["get-user-preferences"],
+            queryFn: async () => {
+                return await apiRoutes.preferences.pushNotification.getUserPreferences({
+                    userId: id,
+                })
+            },
+        })
+
+        set({
+            language: data.language,
+            content: data.content,
+            pushNotifications: data.pushNotifications,
+        })
+        storage.set(storageKey.appLanguage, data.language.appLanguage)
+        storage.set(storageKey.translationLanguage, data.language.translationLanguage)
+        storage.set(storageKey.haptics, data.content.disableHaptics)
+        storage.set(storageKey.autoplay, data.content.disableAutoplay)
+        storage.set(storageKey.translation, data.content.disableTranslation)
+        storage.set(storageKey.likeMoment, data.pushNotifications.disableLikeMoment)
+        storage.set(storageKey.newMemory, data.pushNotifications.disableNewMemory)
+        storage.set(storageKey.addToMemory, data.pushNotifications.disableAddToMemory)
+        storage.set(storageKey.followUser, data.pushNotifications.disableFollowUser)
+        storage.set(storageKey.viewUser, data.pushNotifications.disableViewUser)
+    },
+
     set: (value: PreferencesDataStorageType) => {
         set({
             language: value.language,
@@ -153,11 +182,10 @@ export const usePreferencesStore = create<PreferencesState>((set) => ({
             pushNotifications: value.pushNotifications,
         })
         storage.set(storageKey.appLanguage, value.language.appLanguage)
-        storage.set(storageKey.primaryLanguage, value.language.primaryLanguage)
+        storage.set(storageKey.translationLanguage, value.language.translationLanguage)
         storage.set(storageKey.haptics, value.content.disableHaptics)
         storage.set(storageKey.autoplay, value.content.disableAutoplay)
         storage.set(storageKey.translation, value.content.disableTranslation)
-        storage.set(storageKey.translationLanguage, value.content.translationLanguage)
         storage.set(storageKey.likeMoment, value.pushNotifications.disableLikeMoment)
         storage.set(storageKey.newMemory, value.pushNotifications.disableNewMemory)
         storage.set(storageKey.addToMemory, value.pushNotifications.disableAddToMemory)
@@ -168,13 +196,12 @@ export const usePreferencesStore = create<PreferencesState>((set) => ({
         set({
             language: {
                 appLanguage: storage.getString(storageKey.appLanguage) || "en",
-                primaryLanguage: storage.getString(storageKey.primaryLanguage) || "en",
+                translationLanguage: storage.getString(storageKey.translationLanguage) || "en",
             },
             content: {
                 disableAutoplay: storage.getBoolean(storageKey.autoplay) || false,
                 disableHaptics: storage.getBoolean(storageKey.haptics) || false,
                 disableTranslation: storage.getBoolean(storageKey.translation) || false,
-                translationLanguage: storage.getString(storageKey.translationLanguage) || "en",
             },
             pushNotifications: {
                 disableLikeMoment: storage.getBoolean(storageKey.likeMoment) || false,
@@ -201,13 +228,12 @@ export const usePreferencesStore = create<PreferencesState>((set) => ({
         set({
             language: {
                 appLanguage: "en",
-                primaryLanguage: "en",
+                translationLanguage: "en",
             },
             content: {
                 disableAutoplay: false,
                 disableHaptics: false,
                 disableTranslation: false,
-                translationLanguage: "en",
             },
             pushNotifications: {
                 disableLikeMoment: false,
