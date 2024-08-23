@@ -36,31 +36,29 @@ function InnerApp() {
 
     return (
         <KeyboardProvider enabled={true}>
-            <QueryProvider>
-                <NotificationProvider>
-                    <BottomSheetProvider>
-                        <BottomTabsProvider>
-                            <AccountProvider>
-                                <ProfileProvider>
-                                    <ViewProfileProvider>
-                                        <FeedProvider>
-                                            <NavigationContainer theme={myTheme}>
-                                                <SelectMomentsProvider>
-                                                    <MemoryProvider>
-                                                        <NewMomentProvider>
-                                                            <Routes />
-                                                        </NewMomentProvider>
-                                                    </MemoryProvider>
-                                                </SelectMomentsProvider>
-                                            </NavigationContainer>
-                                        </FeedProvider>
-                                    </ViewProfileProvider>
-                                </ProfileProvider>
-                            </AccountProvider>
-                        </BottomTabsProvider>
-                    </BottomSheetProvider>
-                </NotificationProvider>
-            </QueryProvider>
+            <NotificationProvider>
+                <BottomSheetProvider>
+                    <BottomTabsProvider>
+                        <AccountProvider>
+                            <ProfileProvider>
+                                <ViewProfileProvider>
+                                    <FeedProvider>
+                                        <NavigationContainer theme={myTheme}>
+                                            <SelectMomentsProvider>
+                                                <MemoryProvider>
+                                                    <NewMomentProvider>
+                                                        <Routes />
+                                                    </NewMomentProvider>
+                                                </MemoryProvider>
+                                            </SelectMomentsProvider>
+                                        </NavigationContainer>
+                                    </FeedProvider>
+                                </ViewProfileProvider>
+                            </ProfileProvider>
+                        </AccountProvider>
+                    </BottomTabsProvider>
+                </BottomSheetProvider>
+            </NotificationProvider>
         </KeyboardProvider>
     )
 }
@@ -74,15 +72,17 @@ function App() {
                 <ToastProvider>
                     <AuthProvider>
                         <PersistedProvider>
-                            <PreferencesProvider>
-                                <NetworkProvider>
-                                    <TrackingProvider>
-                                        <GeolocationProvider>
-                                            <InnerApp />
-                                        </GeolocationProvider>
-                                    </TrackingProvider>
-                                </NetworkProvider>
-                            </PreferencesProvider>
+                            <QueryProvider>
+                                <PreferencesProvider>
+                                    <NetworkProvider>
+                                        <TrackingProvider>
+                                            <GeolocationProvider>
+                                                <InnerApp />
+                                            </GeolocationProvider>
+                                        </TrackingProvider>
+                                    </NetworkProvider>
+                                </PreferencesProvider>
+                            </QueryProvider>
                         </PersistedProvider>
                     </AuthProvider>
                 </ToastProvider>
