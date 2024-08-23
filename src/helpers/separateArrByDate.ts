@@ -33,7 +33,7 @@ export function groupObjectsByDate(
 ): GroupedObject[] {
     const groupedObjects = new Map<string, GroupedObject>()
     // Agrupar objetos pela data de criação ou atualização
-    objects.forEach((obj) => {
+    objects?.forEach((obj) => {
         let dateProperty: Date | undefined
 
         if (obj.created_at) {
