@@ -1,15 +1,15 @@
-import React from "react"
-import { View, Text } from "react-native"
-import ColorTheme from "../../../layout/constants/colors"
 import { useNavigation } from "@react-navigation/native"
+import React from "react"
+import { Text, View } from "react-native"
 import Camera from "../../../assets/icons/svgs/camera.svg"
 import SearchIcon from "../../../assets/icons/svgs/search.svg"
-import sizes from "../../../layout/constants/sizes"
-import fonts from "../../../layout/constants/fonts"
-import ButtonStandart from "../../buttons/button-standart"
-import NotificationContext from "../../../contexts/notification"
-import { BadgeIcon } from "../../general/badge-icon"
 import LanguageContext from "../../../contexts/Preferences/language"
+import NotificationContext from "../../../contexts/notification"
+import ColorTheme from "../../../layout/constants/colors"
+import fonts from "../../../layout/constants/fonts"
+import sizes from "../../../layout/constants/sizes"
+import ButtonStandart from "../../buttons/button-standart"
+import { BadgeIcon } from "../../general/badge-icon"
 
 export default function HeaderRightHome() {
     const { t } = React.useContext(LanguageContext)

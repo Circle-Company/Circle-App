@@ -1,22 +1,31 @@
-import React from 'react'
-import { View } from 'react-native'
-import AuthContext from '../../../contexts/auth'
-import { UserShow } from '../../user_show'
-import PersistedContext from '../../../contexts/Persisted'
+import { useNavigation } from "@react-navigation/native"
+import React from "react"
+import { View } from "react-native"
+import Icon from "../../../assets/icons/svgs/tray.svg"
+import ColorTheme from "../../../layout/constants/colors"
+import sizes from "../../../layout/constants/sizes"
+import ButtonStandart from "../../buttons/button-standart"
 
 export default function AccountHeaderLeft() {
-    const { session } = React.useContext(PersistedContext)
+    const navigation = useNavigation()
 
     const container: any = {
-        marginLeft: 8,
-        flexDirection: 'row'
+        flexDirection: "row",
+        marginLeft: sizes.margins["3sm"],
+    }
+    function handlePress() {
+        navigation.navigate("InboxNavigator", { screen: "Inbox" })
     }
 
-    return(
+    return (
         <View style={container}>
-            <UserShow.Root data={session.user}>
-                <UserShow.Username displayYou={false} displayOnMoment={false} scale={1.3} disableAnalytics={true}/>
-            </UserShow.Root>
+            <ButtonStandart
+                action={handlePress}
+                margins={false}
+                backgroundColor={String(ColorTheme().backgroundDisabled)}
+            >
+                <Icon fill={String(ColorTheme().text)} width={18} height={18} />
+            </ButtonStandart>
         </View>
     )
 }
