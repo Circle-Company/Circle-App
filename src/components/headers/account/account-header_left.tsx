@@ -1,22 +1,36 @@
-import React from 'react'
-import { View } from 'react-native'
-import AuthContext from '../../../contexts/auth'
-import { UserShow } from '../../user_show'
-import PersistedContext from '../../../contexts/Persisted'
+import { useNavigation } from "@react-navigation/native"
+import React from "react"
+import { View } from "react-native"
+import SearchIcon from "../../../assets/icons/svgs/search.svg"
+import LanguageContext from "../../../contexts/Preferences/language"
+import SelectMomentsContext from "../../../contexts/selectMoments"
+import ColorTheme from "../../../layout/constants/colors"
+import sizes from "../../../layout/constants/sizes"
+import ButtonStandart from "../../buttons/button-standart"
 
 export default function AccountHeaderLeft() {
-    const { session } = React.useContext(PersistedContext)
+    const { t } = React.useContext(LanguageContext)
+    const { setFrom } = React.useContext(SelectMomentsContext)
+    const navigation = useNavigation()
 
     const container: any = {
-        marginLeft: 8,
-        flexDirection: 'row'
+        flexDirection: "row",
+        marginLeft: sizes.margins["3sm"],
+    }
+    function handlePress() {
+        setFrom("NEW_MEMORY")
+        navigation.navigate("InboxNavigator", { screen: "Inbox" })
     }
 
-    return(
+    return (
         <View style={container}>
-            <UserShow.Root data={session.user}>
-                <UserShow.Username displayYou={false} displayOnMoment={false} scale={1.3} disableAnalytics={true}/>
-            </UserShow.Root>
+            <ButtonStandart
+                action={handlePress}
+                margins={false}
+                backgroundColor={String(ColorTheme().backgroundDisabled)}
+            >
+                <SearchIcon fill={String(ColorTheme().text)} width={18} height={18} />
+            </ButtonStandart>
         </View>
     )
 }
