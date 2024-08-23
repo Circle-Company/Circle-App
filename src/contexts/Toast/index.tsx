@@ -1,14 +1,29 @@
 import React from "react"
 import { MoveDown, createNotifications } from "react-native-notificated"
-import { DefaultVariants } from "react-native-notificated/lib/typescript/defaultConfig/types"
-import { Notify } from "react-native-notificated/lib/typescript/types"
+import { Notify, Variant } from "react-native-notificated/lib/typescript/types"
 import sizes from "../../layout/constants/sizes"
+
+import { Toast as AlertToast } from "./CustomToast/alert"
 import { Toast as NotificationToast } from "./CustomToast/notification"
 import { Toast as StandartToast } from "./CustomToast/standart"
 import { Toast as TinyToast } from "./CustomToast/tiny"
+
 type ToastProviderProps = { children: React.ReactNode }
 export type ToastContextsData = {
-    toast: Notify<DefaultVariants>
+    toast: Notify
+}
+
+type Variants = {
+    toast: Variant<typeof StandartToast>
+    tiny: Variant<typeof TinyToast>
+    notification: Variant<typeof NotificationToast>
+    alert: Variant<typeof AlertToast>
+}
+
+declare global {
+    namespace Notificated {
+        interface CustomVariants extends Variants {}
+    }
 }
 
 const ToastContext = React.createContext<ToastContextsData>({} as ToastContextsData)
@@ -38,6 +53,13 @@ export function Provider({ children }: ToastProviderProps) {
                 config: {
                     notificationPosition: "top",
                     duration: 1000,
+                },
+            },
+            alert: {
+                component: AlertToast,
+                config: {
+                    notificationPosition: "top",
+                    duration: 3000,
                 },
             },
         },

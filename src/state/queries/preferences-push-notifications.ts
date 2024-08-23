@@ -1,6 +1,7 @@
 import PersistedContext from "@/contexts/Persisted"
 import { useMutation } from "@tanstack/react-query"
 import React from "react"
+import { notify } from "react-native-notificated"
 import { apiRoutes } from "../../services/Api"
 
 export function useDisableLikeMomentMutation() {
@@ -15,10 +16,15 @@ export function useDisableLikeMomentMutation() {
         onSuccess: () => {
             session.preferences.setDisableLikeMoment(true)
         },
-        onError: (err: any) => {
-            console.log(err)
-        },
     })
+
+    if (mutation.isError) {
+        notify("alert", {
+            params: {
+                message: mutation.error.name,
+            },
+        })
+    }
 
     return mutation
 }
@@ -35,10 +41,15 @@ export function useEnableLikeMomentMutation() {
         onSuccess: () => {
             session.preferences.setDisableLikeMoment(false)
         },
-        onError: (err: any) => {
-            console.log(err)
-        },
     })
+
+    if (mutation.isError) {
+        notify("alert", {
+            params: {
+                message: mutation.error.name,
+            },
+        })
+    }
 
     return mutation
 }
@@ -55,10 +66,14 @@ export function useDisableNewMemoryMutation() {
         onSuccess: () => {
             session.preferences.setDisableNewMemory(true)
         },
-        onError: (err: any) => {
-            console.log(err)
-        },
     })
+    if (mutation.isError) {
+        notify("alert", {
+            params: {
+                message: mutation.error.name,
+            },
+        })
+    }
 
     return mutation
 }
@@ -75,10 +90,15 @@ export function useEnableNewMemoryMutation() {
         onSuccess: () => {
             session.preferences.setDisableNewMemory(false)
         },
-        onError: (err: any) => {
-            console.log(err)
-        },
     })
+
+    if (mutation.isError) {
+        notify("alert", {
+            params: {
+                message: mutation.error.name,
+            },
+        })
+    }
 
     return mutation
 }
@@ -95,10 +115,15 @@ export function useDisableAddToMemoryMutation() {
         onSuccess: () => {
             session.preferences.setDisableAddToMemory(true)
         },
-        onError: (err: any) => {
-            console.log(err)
-        },
     })
+
+    if (mutation.isError) {
+        notify("alert", {
+            params: {
+                message: mutation.error.name,
+            },
+        })
+    }
 
     return mutation
 }
@@ -115,10 +140,15 @@ export function useEnableAddToMemoryMutation() {
         onSuccess: () => {
             session.preferences.setDisableAddToMemory(false)
         },
-        onError: (err: any) => {
-            console.log(err)
-        },
     })
+
+    if (mutation.isError) {
+        notify("alert", {
+            params: {
+                message: mutation.error.name,
+            },
+        })
+    }
 
     return mutation
 }
@@ -135,10 +165,15 @@ export function useDisableFollowUserMutation() {
         onSuccess: () => {
             session.preferences.setDisableFollowUser(true)
         },
-        onError: (err: any) => {
-            console.log(err)
-        },
     })
+
+    if (mutation.isError) {
+        notify("alert", {
+            params: {
+                message: mutation.error.name,
+            },
+        })
+    }
 
     return mutation
 }
@@ -155,10 +190,14 @@ export function useEnableFollowUserMutation() {
         onSuccess: () => {
             session.preferences.setDisableFollowUser(false)
         },
-        onError: (err: any) => {
-            console.log(err)
-        },
     })
+    if (mutation.isError) {
+        notify("alert", {
+            params: {
+                message: mutation.error.name,
+            },
+        })
+    }
 
     return mutation
 }
@@ -175,10 +214,14 @@ export function useDisableViewUserMutation() {
         onSuccess: () => {
             session.preferences.setDisableViewUser(true)
         },
-        onError: (err: any) => {
-            console.log(err)
-        },
     })
+    if (mutation.isError) {
+        notify("alert", {
+            params: {
+                message: mutation.error.message,
+            },
+        })
+    }
 
     return mutation
 }
@@ -195,10 +238,14 @@ export function useEnableViewUserMutation() {
         onSuccess: () => {
             session.preferences.setDisableViewUser(false)
         },
-        onError: (err: any) => {
-            console.log(err)
-        },
     })
+    if (mutation.isError) {
+        notify("alert", {
+            params: {
+                message: mutation.error.name,
+            },
+        })
+    }
 
     return mutation
 }
