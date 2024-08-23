@@ -74,19 +74,18 @@ export type AccountDataReturnsType = {
 }
 
 export type LanguageDataType = {
-    primaryLanguage: LanguagesCodesType
+    translationLanguage: string
     appLanguage: LanguagesCodesType
 }
 export type LanguageDataStorageType = {
-    primaryLanguage: string
-    appLanguage: string
+    translationLanguage: string
+    appLanguage: LanguagesCodesType
 }
 export type LanguageDataReturnsType = {
-    primaryLanguage: LanguagesCodesType
+    translationLanguage: string
     appLanguage: LanguagesCodesType
-    setPrimaryLanguage: (value: LanguagesCodesType) => void
+    setTranslationLanguage: (value: LanguagesCodesType) => void
     setAppLanguage: (value: LanguagesCodesType) => void
-    setLanguage: (value: LanguageDataType) => void
 }
 
 export type ContentDataType = {
@@ -99,7 +98,27 @@ export type ContentDataStorageType = {
     disableAutoplay: boolean
     disableHaptics: boolean
     disableTranslation: boolean
-    translationLanguage: string
+}
+
+export type PushNotificationsStorageType = {
+    disableLikeMoment: boolean
+    disableNewMemory: boolean
+    disableAddToMemory: boolean
+    disableFollowUser: boolean
+    disableViewUser: boolean
+}
+
+export type PushNotificationsReturnsType = {
+    disableLikeMoment: boolean
+    disableNewMemory: boolean
+    disableAddToMemory: boolean
+    disableFollowUser: boolean
+    disableViewUser: boolean
+    setDisableLikeMoment: (value: boolean) => void
+    setDisableNewMemory: (value: boolean) => void
+    setDisableAddToMemory: (value: boolean) => void
+    setDisableFollowUser: (value: boolean) => void
+    setDisableViewUser: (value: boolean) => void
 }
 export type ContentDataReturnsType = {
     disableAutoplay: boolean
@@ -116,18 +135,21 @@ export type ContentDataReturnsType = {
 export type PreferencesDataType = {
     language: LanguageDataType
     content: ContentDataType
+    pushNotifications: PushNotificationsStorageType
 }
 export type PreferencesDataStorageType = {
     language: LanguageDataStorageType
     content: ContentDataStorageType
+    pushNotifications: PushNotificationsStorageType
 }
 
 export type PreferencesDataReturnsType = {
     language: LanguageDataReturnsType
     content: ContentDataReturnsType
-    storePreferences: (value: PreferencesDataType) => PreferencesDataStorageType
-    loadPreferencesFromStorage: () => PreferencesDataStorageType
-    removePreferencesFromStorage: () => void
+    pushNotifications: PushNotificationsReturnsType
+    store: (value: PreferencesDataType) => PreferencesDataStorageType
+    load: () => PreferencesDataStorageType
+    remove: () => void
 }
 
 export type HistoryDataStorageType = {
