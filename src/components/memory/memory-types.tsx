@@ -3,7 +3,7 @@ import { userReciveDataProps } from "../user_show/user_show-types"
 
 export type MemoryMomentObjectProps = {
     id: number
-    content_type: "image" | "video"
+    content_type: "IMAGE" | "VIDEO"
     midia: {
         nhd_resolution: string
     }

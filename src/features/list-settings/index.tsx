@@ -47,6 +47,20 @@ export default function ListSettings() {
             name: t("Account"),
             content: [
                 {
+                    name: t("Notifications"),
+                    value: null,
+                    type: "TEXT",
+                    navigateTo: "Settings-Preferences-PushNotifications",
+                    secure: false,
+                },
+                {
+                    name: t("Language"),
+                    value: null,
+                    type: "TEXT",
+                    navigateTo: "Settings-Preferences-Language",
+                    secure: false,
+                },
+                {
                     name: t("Moments"),
                     value: null,
                     type: "TEXT",
@@ -59,32 +73,6 @@ export default function ListSettings() {
                     type: "TEXT",
                     navigateTo: "Settings-Password",
                     secure: true,
-                },
-            ],
-        },
-        {
-            name: t("App"),
-            content: [
-                {
-                    name: t("Language"),
-                    value: null,
-                    type: "TEXT",
-                    navigateTo: "Settings-Preferences-Language",
-                    secure: false,
-                },
-                {
-                    name: t("Open Source"),
-                    value: null,
-                    type: "TEXT",
-                    navigateTo: "Settings-Open-Source",
-                    secure: false,
-                },
-                {
-                    name: t("Version"),
-                    value: null,
-                    type: "TEXT",
-                    navigateTo: "Settings-Version",
-                    secure: false,
                 },
             ],
         },
@@ -117,6 +105,20 @@ export default function ListSettings() {
         {
             name: t("More"),
             content: [
+                {
+                    name: t("Open Source"),
+                    value: null,
+                    type: "TEXT",
+                    navigateTo: "Settings-Open-Source",
+                    secure: false,
+                },
+                {
+                    name: t("Version"),
+                    value: null,
+                    type: "TEXT",
+                    navigateTo: "Settings-Version",
+                    secure: false,
+                },
                 {
                     name: t("Support"),
                     value: null,
