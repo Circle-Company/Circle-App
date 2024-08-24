@@ -4,17 +4,14 @@ import { Text, View } from "react-native"
 import Camera from "../../../assets/icons/svgs/camera.svg"
 import SearchIcon from "../../../assets/icons/svgs/search.svg"
 import LanguageContext from "../../../contexts/Preferences/language"
-import NotificationContext from "../../../contexts/notification"
 import ColorTheme from "../../../layout/constants/colors"
 import fonts from "../../../layout/constants/fonts"
 import sizes from "../../../layout/constants/sizes"
 import ButtonStandart from "../../buttons/button-standart"
-import { BadgeIcon } from "../../general/badge-icon"
 
 export default function HeaderRightHome() {
     const { t } = React.useContext(LanguageContext)
 
-    const { newNotificationsNum } = React.useContext(NotificationContext)
     const navigation = useNavigation()
 
     const container: any = {
@@ -40,7 +37,6 @@ export default function HeaderRightHome() {
         navigation.navigate("ExploreNavigator", { screen: "ExploreScreen" })
     }
 
-    const active = newNotificationsNum > 0 ? true : false
     return (
         <View style={container}>
             <ButtonStandart
@@ -58,7 +54,6 @@ export default function HeaderRightHome() {
                 action={onPressSearch}
                 backgroundColor={String(ColorTheme().backgroundDisabled)}
             >
-                <BadgeIcon active={active} number={newNotificationsNum} />
                 <SearchIcon fill={String(ColorTheme().text)} width={18} height={18} />
             </ButtonStandart>
         </View>
