@@ -51,7 +51,7 @@ export default function statistics_likes({}: ProfileStatisticsLikesProps) {
             action={handlePress}
         >
             <View style={container}>
-                <Text style={num_style}>{NumberConversor(user.statistics.total_likes_num)}</Text>
+                <Text style={num_style}>{NumberConversor(user?.statistics?.total_likes_num)}</Text>
                 <Text style={text_style}>{t("Likes")}</Text>
             </View>
         </Button>

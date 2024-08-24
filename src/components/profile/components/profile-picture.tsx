@@ -17,7 +17,7 @@ export default function picture({ fromProfile = false }: ProfilePictureProps) {
         padding: 10,
         borderRadius: 133 / 2,
     }
-    const outlineSize: Number = Number(Number(pictureDimensions.width) / 20) // /6
+    const outlineSize: Number = Number(Number(pictureDimensions.width) / 20)
 
     const container: any = {
         alignItems: "center",
@@ -55,16 +55,14 @@ export default function picture({ fromProfile = false }: ProfilePictureProps) {
     }, [])
 
     React.useEffect(() => {
+        const { tiny_resolution, small_resolution } = user.profile_picture || {}
+
         if (fromProfile) {
-            if (user.profile_picture.small_resolution == undefined) {
-                setProfilePicture(String(user.profile_picture.tiny_resolution))
-            } else setProfilePicture(String(user.profile_picture.small_resolution))
+            setProfilePicture(small_resolution || tiny_resolution || "")
         } else {
-            if (user.profile_picture.tiny_resolution == undefined) {
-                setProfilePicture(String(user.profile_picture.small_resolution))
-            } else setProfilePicture(String(user.profile_picture.tiny_resolution))
+            setProfilePicture(tiny_resolution || small_resolution || "")
         }
-    }, [])
+    }, [fromProfile, user])
 
     const animatedContainer: any = {
         transform: [{ scale: animatedScale }],
@@ -75,7 +73,7 @@ export default function picture({ fromProfile = false }: ProfilePictureProps) {
         <Animated.View style={animatedContainer}>
             <Pressable onPress={onProfilePictureAction} style={[container]}>
                 <FastImage
-                    source={{ uri: String(profilePicture) || "" }}
+                    source={{ uri: profilePicture }}
                     style={{
                         width: Number(pictureDimensions.width),
                         height: Number(pictureDimensions.height),
