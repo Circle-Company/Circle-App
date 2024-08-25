@@ -11,6 +11,7 @@ import { AnimatedVerticalFlatlist } from "../../lib/hooks/useAnimatedFlatList"
 import api from "../../services/Api"
 import EndReached from "../list-memories/list-memories-all/components/end-reached"
 import { ListNotificationsAll } from "./list-notifications-date_group"
+import { ListNotificationsSkeleton } from "./skeleton"
 export default function ListNotifcations() {
     const { t } = React.useContext(LanguageContext)
     const { session } = React.useContext(PersistedContext)
@@ -81,6 +82,8 @@ export default function ListNotifcations() {
             onEndReached={async () => {
                 await fetchData()
             }}
+            isLoading={loading}
+            skeleton={<ListNotificationsSkeleton />}
             showRefreshSpinner={false}
             onEndReachedThreshold={0.1}
             handleRefresh={async () => await handleRefresh()}
