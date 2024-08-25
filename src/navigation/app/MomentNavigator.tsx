@@ -13,7 +13,7 @@ import NewMomentDescription from "../../pages/app/Moment/new_moment-description"
 import NewMomentGalleryScreen from "../../pages/app/Moment/new_moment-gallery"
 import NewMomentImageScreen from "../../pages/app/Moment/new_moment-image"
 import NewMomentSelectMemory from "../../pages/app/Moment/new_moment-select_memory"
-import { Interpolation as Horizontal } from "../transitions/horizontal"
+import { Interpolation as Horizontal } from "../transitions/horizontal-right"
 
 const MomentStack = createStackNavigator()
 

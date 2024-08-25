@@ -11,7 +11,7 @@ import LoginScreen from "../../pages/auth/SignIn"
 import PasswordScreen from "../../pages/auth/SignUp/Password"
 import UsernameScreen from "../../pages/auth/SignUp/Username"
 import InitScreen from "../../pages/auth/Splash"
-import { Interpolation as Horizontal } from "../transitions/horizontal"
+import { Interpolation as Horizontal } from "../transitions/horizontal-right"
 
 const AuthStack = createStackNavigator()
 export default function AuthNavigator() {

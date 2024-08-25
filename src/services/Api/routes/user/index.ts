@@ -1,5 +1,6 @@
+import { ProfileData } from "@/contexts/profile"
 import api from "../.."
-import { UserFollowProps, UserUnfollowProps } from "./types"
+import { UserDataByPkProps, UserFollowProps, UserUnfollowProps } from "./types"
 
 async function follow({ userId, followedUserId }: UserFollowProps): Promise<void> {
     await api.post("/user/follow", {
@@ -15,7 +16,15 @@ async function unfollow({ userId, followedUserId }: UserUnfollowProps): Promise<
     })
 }
 
+async function getByPk({ userId, findedUserPk }: UserDataByPkProps): Promise<ProfileData> {
+    const response = await api.post(`/user/profile/data/pk/${findedUserPk}`, {
+        user_id: userId,
+    })
+    return response.data
+}
+
 export const routes = {
     follow,
     unfollow,
+    getByPk,
 }

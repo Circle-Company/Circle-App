@@ -6,7 +6,7 @@ import ColorTheme from "../../layout/constants/colors"
 import Fonts from "../../layout/constants/fonts"
 import Sizes from "../../layout/constants/sizes"
 import HomeScreen from "../../pages/app/Home"
-import { Interpolation as Horizontal } from "../transitions/horizontal"
+import { Interpolation as Horizontal } from "../transitions/horizontal-right"
 
 const HomeScreenStack = createStackNavigator()
 

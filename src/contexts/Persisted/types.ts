@@ -53,6 +53,7 @@ export type PermissionsData = {
 }
 
 export type AccountDataType = {
+    unreadNotificationsCount: number
     blocked: boolean
     muted: boolean
     last_active_at: string
@@ -60,17 +61,19 @@ export type AccountDataType = {
     firebasePushToken: string
 }
 export type AccountDataReturnsType = {
+    unreadNotificationsCount: number
     blocked: boolean
     muted: boolean
     last_active_at: string
     last_login_at: string
+    setUnreadNotificationsCount: (value: number) => void
     setBlocked: (value: boolean) => void
     setMuted: (value: boolean) => void
     setLastActiveAt: (value: string) => void
     setLastLoginAt: (value: string) => void
-    storeAccount: (value: AccountDataType) => AccountDataType
-    loadAccountFromStorage: () => AccountDataType
-    removeAccountFromStorage: () => void
+    store: (value: AccountDataType) => AccountDataType
+    load: () => AccountDataType
+    remove: () => void
 }
 
 export type LanguageDataType = {

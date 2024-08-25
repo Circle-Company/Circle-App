@@ -51,7 +51,7 @@ export default function statistics_views({}: ProfileStatisticsViewsProps) {
             action={handlePress}
         >
             <View style={container}>
-                <Text style={num_style}>{NumberConversor(user.statistics.total_views_num)}</Text>
+                <Text style={num_style}>{NumberConversor(user?.statistics?.total_views_num)}</Text>
                 <Text style={text_style}>{t("Views")}</Text>
             </View>
         </Button>

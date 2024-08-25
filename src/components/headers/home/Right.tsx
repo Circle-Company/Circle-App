@@ -36,6 +36,7 @@ export default function HeaderRightHome() {
     async function onPressSearch() {
         navigation.navigate("ExploreNavigator", { screen: "ExploreScreen" })
     }
+
     return (
         <View style={container}>
             <ButtonStandart

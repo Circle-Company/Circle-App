@@ -1,10 +1,10 @@
 import React from "react"
+import api from "../services/Api"
 import PersistedContext from "./Persisted"
 import { StatisticsDataType, UserDataType } from "./Persisted/types"
-import api from "../services/Api"
 import BottomTabsContext from "./bottomTabs"
 
-interface ProfileData extends UserDataType {
+export interface ProfileData extends UserDataType {
     you_follow?: boolean
     statistics: StatisticsDataType
 }
@@ -17,6 +17,7 @@ export type ProfileContextsData = {
     loading: boolean
     currentUser: ProfileData
     getCurrentUser: ({ user_id }: { user_id: number }) => Promise<void>
+    setCurrentUser: React.Dispatch<React.SetStateAction<ProfileData>>
     setLoading: React.Dispatch<React.SetStateAction<boolean>>
     setRefreshing: React.Dispatch<React.SetStateAction<boolean>>
 }

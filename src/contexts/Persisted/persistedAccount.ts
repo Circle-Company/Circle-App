@@ -5,6 +5,7 @@ import { AccountDataType } from "./types"
 const storageKey = storageKeys().account
 
 export interface AccountState extends AccountDataType {
+    setUnreadNotificationsCount: (value: number) => void
     setFirebasePushToken: (value: string) => void
     setBlocked: (value: boolean) => void
     setMuted: (value: boolean) => void
@@ -16,11 +17,17 @@ export interface AccountState extends AccountDataType {
 }
 
 export const useAccountStore = create<AccountState>((set) => ({
+    unreadNotificationsCount: storage.getNumber(storageKey.unreadNotificationsCount) || 0,
     firebasePushToken: storage.getString(storageKey.firebasePushToken) || "",
     blocked: storage.getBoolean(storageKey.blocked) || false,
     muted: storage.getBoolean(storageKey.muted) || false,
     last_active_at: storage.getString(storageKey.last_active_at) || new Date().toString(),
     last_login_at: storage.getString(storageKey.last_login_at) || new Date().toString(),
+
+    setUnreadNotificationsCount: (value: number) => {
+        storage.set(storageKey.unreadNotificationsCount, Number(value))
+        set({ unreadNotificationsCount: value })
+    },
 
     setFirebasePushToken: (value: string) => {
         storage.set(storageKey.firebasePushToken, value.toString())
@@ -45,12 +52,14 @@ export const useAccountStore = create<AccountState>((set) => ({
     },
     set: (value: AccountDataType) => {
         set({
+            unreadNotificationsCount: 0,
             firebasePushToken: value.firebasePushToken,
             blocked: value.blocked,
             muted: value.muted,
             last_active_at: value.last_active_at,
             last_login_at: value.last_login_at,
         })
+        storage.set(storageKey.unreadNotificationsCount, 0)
         storage.set(storageKey.firebasePushToken, value.firebasePushToken.toString())
         storage.set(storageKey.blocked, value.blocked)
         storage.set(storageKey.muted, value.blocked)
@@ -59,6 +68,7 @@ export const useAccountStore = create<AccountState>((set) => ({
     },
     load: () => {
         set({
+            unreadNotificationsCount: storage.getNumber(storageKey.unreadNotificationsCount) || 0,
             firebasePushToken: storage.getString(storageKey.firebasePushToken) || "",
             blocked: storage.getBoolean(storageKey.blocked) || false,
             muted: storage.getBoolean(storageKey.muted) || false,
@@ -67,6 +77,7 @@ export const useAccountStore = create<AccountState>((set) => ({
         })
     },
     remove: () => {
+        storage.delete(storageKey.unreadNotificationsCount)
         storage.delete(storageKey.firebasePushToken)
         storage.delete(storageKey.blocked)
         storage.delete(storageKey.muted)
@@ -74,6 +85,7 @@ export const useAccountStore = create<AccountState>((set) => ({
         storage.delete(storageKey.last_login_at)
 
         set({
+            unreadNotificationsCount: 0,
             firebasePushToken: "",
             blocked: false,
             muted: false,
