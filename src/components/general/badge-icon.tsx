@@ -24,7 +24,6 @@ export function BadgeIcon({ active = true, number, style }: BadgeIconProps) {
 
     const badgeStyleWithNumber = style
         ? {
-              ...style,
               zIndex: 10,
               position: "absolute",
               alignItems: "center",
@@ -36,6 +35,7 @@ export function BadgeIcon({ active = true, number, style }: BadgeIconProps) {
               backgroundColor: ColorTheme().error,
               borderWidth: 3,
               borderColor: ColorTheme().background,
+              ...style,
           }
         : {
               zIndex: 10,
