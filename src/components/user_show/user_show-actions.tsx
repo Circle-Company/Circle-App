@@ -6,7 +6,7 @@ type UserShowActionsProps = {
     prefix?: string
     user_id: number
     user?: any
-    action: () => void
+    action: (value: string | number) => void
 }
 
 function setAnalyticsConfig() {
@@ -18,7 +18,7 @@ function setAnalyticsConfig() {
 async function username_pressed({ user_id, prefix, action, user }: UserShowActionsProps) {
     const { momentUserActions } = React.useContext(MomentContext)
     momentUserActions.setClickProfile(true)
-    await action(user.username)
+    action(user.id)
     setAnalyticsConfig()
     analytics.trackEvent(prefix ? prefix : "username", { user_id: user_id })
     await analytics.saveData()
@@ -26,7 +26,8 @@ async function username_pressed({ user_id, prefix, action, user }: UserShowActio
 async function profile_picture_pressed({ user_id, prefix, action, user }: UserShowActionsProps) {
     const { momentUserActions } = React.useContext(MomentContext)
     momentUserActions.setClickProfile(true)
-    await action(user.username)
+    action(user.id)
+    console.log("profile_picture_pressed", user)
     setAnalyticsConfig()
     analytics.trackEvent(prefix ? prefix : "profile_picture", { user_id: user_id })
     await analytics.saveData()
