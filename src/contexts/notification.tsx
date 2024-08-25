@@ -1,6 +1,7 @@
 import messaging from "@react-native-firebase/messaging"
 import React from "react"
 import { notify } from "react-native-notificated"
+import { Vibrate } from "../lib/hooks/useHapticFeedback"
 import { useRequestPermission } from "../lib/hooks/userRequestPermissions"
 import { notification } from "../lib/notifications"
 import PersistedContext from "./Persisted"
@@ -38,6 +39,10 @@ export function Provider({ children }: NotificationProviderProps) {
     })
 
     messaging().onMessage(async (remoteMessage) => {
+        const previousNotificationsNum = session.account.unreadNotificationsCount
+        session.account.setUnreadNotificationsCount(previousNotificationsNum + 1)
+        Vibrate("effectClick")
+
         notify("notification", {
             params: {
                 title: remoteMessage.notification?.title,
@@ -47,12 +52,16 @@ export function Provider({ children }: NotificationProviderProps) {
     })
 
     messaging().setBackgroundMessageHandler(async (remoteMessage) => {
+        const previousNotificationsNum = session.account.unreadNotificationsCount
+        session.account.setUnreadNotificationsCount(previousNotificationsNum + 1)
+        Vibrate("effectClick")
+        /** 
         notify("notification", {
             params: {
                 title: remoteMessage.notification?.title,
                 description: remoteMessage.notification?.body,
             },
-        })
+        })*/
     })
     return <NotificationContext.Provider value={{}}>{children}</NotificationContext.Provider>
 }
