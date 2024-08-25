@@ -58,7 +58,7 @@ export function Provider({ children }: ToastProviderProps) {
             alert: {
                 component: AlertToast,
                 config: {
-                    notificationPosition: "top",
+                    notificationPosition: "center",
                     duration: 3000,
                 },
             },
