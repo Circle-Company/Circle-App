@@ -7,3 +7,8 @@ export type UserUnfollowProps = {
     userId: number
     followedUserId: number
 }
+
+export type UserDataByPkProps = {
+    userId: number
+    findedUserPk: number
+}

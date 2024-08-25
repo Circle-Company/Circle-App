@@ -1,7 +1,8 @@
 import { CardStyleInterpolators, createStackNavigator } from "@react-navigation/stack"
 import React from "react"
 import ColorTheme from "../../layout/constants/colors"
-import { Interpolation as Horizontal } from "../transitions/horizontal"
+import { Interpolation as HorizontalLeft } from "../transitions/horizontal-left"
+import { Interpolation as HorizontalRight } from "../transitions/horizontal-right"
 import BottomTabNavigator from "./BottomTabNavigator"
 import { ExploreScreenNavigator } from "./ExploreScreenNavigator"
 import { InboxNavigator } from "./InboxNavigator"
@@ -25,14 +26,14 @@ export default function AppNavigator() {
                 name="SettingsNavigator"
                 component={SettingsNavigator}
                 options={{
-                    cardStyleInterpolator: Horizontal,
+                    cardStyleInterpolator: HorizontalRight,
                 }}
             />
             <App.Screen
                 name="ExploreNavigator"
                 component={ExploreScreenNavigator}
                 options={{
-                    cardStyleInterpolator: Horizontal,
+                    cardStyleInterpolator: HorizontalRight,
                 }}
             />
             <App.Screen
@@ -46,21 +47,21 @@ export default function AppNavigator() {
                 name="MemoriesNavigator"
                 component={MemoriesNavigator}
                 options={{
-                    cardStyleInterpolator: Horizontal,
+                    cardStyleInterpolator: HorizontalRight,
                 }}
             />
             <App.Screen
                 name="InboxNavigator"
                 component={InboxNavigator}
                 options={{
-                    cardStyleInterpolator: Horizontal,
+                    cardStyleInterpolator: HorizontalLeft,
                 }}
             />
             <App.Screen
                 name="ProfileNavigator"
                 component={ProfileNavigator}
                 options={{
-                    cardStyleInterpolator: Horizontal,
+                    cardStyleInterpolator: HorizontalRight,
                 }}
             />
         </App.Navigator>

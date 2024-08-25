@@ -8,7 +8,7 @@ export type userReciveDataProps = {
         small_resolution: string
         tiny_resolution: string
     }
-    isFollowing: boolean
+    you_follow: boolean
 }
 
 export type UserRootProps = {

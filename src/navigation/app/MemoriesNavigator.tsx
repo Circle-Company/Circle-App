@@ -16,7 +16,7 @@ import EditMemoryScreen from "../../pages/app/Memories/edit_memory"
 import MemoriesListMomentsScreen from "../../pages/app/Memories/list_moments"
 import NewMemorySelectMomentsScreen from "../../pages/app/Memories/new_memory_select_moments"
 import NewMemoryTitleScreen from "../../pages/app/Memories/new_memory_title"
-import { Interpolation as Horizontal } from "../transitions/horizontal"
+import { Interpolation as Horizontal } from "../transitions/horizontal-right"
 
 const MemoriesStack = createStackNavigator()
 
