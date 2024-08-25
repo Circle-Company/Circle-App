@@ -17,6 +17,8 @@ import sizes from "../../layout/constants/sizes"
 
 type AnimatedFlatlistProps<T> = {
     data: Array<T>
+    isLoading?: boolean
+    skeleton?: React.ReactElement
     renderItem: ({ item, index }: { item: T; index: number }) => React.ReactElement
     ListFooterComponent: () => React.ReactElement
     onEndReachedThreshold: number
@@ -30,7 +32,9 @@ type AnimatedFlatlistProps<T> = {
 export function AnimatedVerticalFlatlist<T>({
     data,
     renderItem,
+    isLoading,
     ListFooterComponent,
+    skeleton,
     onEndReached,
     handleRefresh,
     showRefreshSpinner = true,
@@ -157,21 +161,36 @@ export function AnimatedVerticalFlatlist<T>({
             </Animated.View>
 
             <Animated.View
-                style={[animatedFlatlistStyles, { flex: 1 }]}
+                style={[animatedFlatlistStyles, { flex: 1, overflow: "hidden" }]}
                 {...panResponder.panHandlers}
             >
-                <Animated.FlatList
-                    data={data}
-                    style={{ backgroundColor: ColorTheme().background }}
-                    onScroll={scrollHandler}
-                    scrollEventThrottle={16}
-                    showsVerticalScrollIndicator={false}
-                    renderItem={({ item, index }) => renderItem({ item, index })}
-                    ListFooterComponent={ListFooterComponent}
-                    keyExtractor={(item, index) => index.toString()}
-                    onEndReached={onEndReached}
-                    onEndReachedThreshold={onEndReachedThreshold}
-                />
+                {isLoading ? (
+                    skeleton ? (
+                        <View
+                            style={{
+                                flex: 1,
+                                backgroundColor: isDarkMode ? colors.gray.black : colors.gray.white,
+                            }}
+                        >
+                            {skeleton}
+                        </View>
+                    ) : null
+                ) : (
+                    <Animated.FlatList
+                        data={data}
+                        style={{
+                            backgroundColor: isDarkMode ? colors.gray.black : colors.gray.white,
+                        }}
+                        onScroll={scrollHandler}
+                        scrollEventThrottle={16}
+                        showsVerticalScrollIndicator={false}
+                        renderItem={({ item, index }) => renderItem({ item, index })}
+                        ListFooterComponent={ListFooterComponent}
+                        keyExtractor={(item, index) => index.toString()}
+                        onEndReached={onEndReached}
+                        onEndReachedThreshold={onEndReachedThreshold}
+                    />
+                )}
             </Animated.View>
 
             {refreshing && showRefreshSpinner && (
