@@ -8,7 +8,7 @@ import ColorTheme from "../../layout/constants/colors"
 import Fonts from "../../layout/constants/fonts"
 import Sizes from "../../layout/constants/sizes"
 import AccountScreen from "../../pages/app/Account"
-import { Interpolation as Horizontal } from "../transitions/horizontal"
+import { Interpolation as Horizontal } from "../transitions/horizontal-right"
 
 const AccountScreenStack = createStackNavigator()
 

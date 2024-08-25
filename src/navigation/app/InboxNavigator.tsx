@@ -1,12 +1,12 @@
+import HeaderLeft from "@/components/headers/inbox/inbox-header_left"
 import { createStackNavigator } from "@react-navigation/stack"
 import React from "react"
 import { useColorScheme } from "react-native"
-import MemoriesHeaderLeft from "../../components/headers/memories/#"
 import LanguageContext from "../../contexts/Preferences/language"
 import ColorTheme, { colors } from "../../layout/constants/colors"
 import Sizes from "../../layout/constants/sizes"
 import InboxScreen from "../../pages/app/Inbox"
-import { Interpolation as Horizontal } from "../transitions/horizontal"
+import { Interpolation as HorizontalLeft } from "../transitions/horizontal-left"
 
 const InboxStack = createStackNavigator()
 
@@ -22,7 +22,7 @@ export function InboxNavigator() {
     return (
         <InboxStack.Navigator
             screenOptions={{
-                cardStyleInterpolator: Horizontal,
+                cardStyleInterpolator: HorizontalLeft,
             }}
         >
             <InboxStack.Screen
@@ -40,7 +40,7 @@ export function InboxNavigator() {
                     headerTintColor: String(ColorTheme().text),
                     cardStyle: { backgroundColor: String(ColorTheme().background) },
                     cardOverlayEnabled: true,
-                    headerLeft: () => <MemoriesHeaderLeft />,
+                    headerLeft: () => <HeaderLeft />,
                 }}
             />
         </InboxStack.Navigator>
