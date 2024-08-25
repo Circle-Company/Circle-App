@@ -1,12 +1,11 @@
+import ProfileHeader from "@/components/headers/profile/profile-header"
+import { RenderProfileSkeleton } from "@/features/render-profile/skeleton"
 import React from "react"
-import { RefreshControl, ScrollView, StatusBar, useColorScheme, View } from "react-native"
-import ProfileHeader from "../../../components/headers/profile/profile-header"
-import { Loading } from "../../../components/loading"
+import { useColorScheme, View } from "react-native"
 import ViewProfileContext from "../../../contexts/viewProfile"
 import ListMemories from "../../../features/list-memories/list-memories-preview"
 import RenderProfile from "../../../features/render-profile"
-import ColorTheme, { colors } from "../../../layout/constants/colors"
-import sizes from "../../../layout/constants/sizes"
+import { AnimatedVerticalScrollView } from "../../../lib/hooks/useAnimatedScrollView"
 export default function ProfileScreen() {
     const { userProfile, setProfile } = React.useContext(ViewProfileContext)
     const [refreshing, setRefreshing] = React.useState(false)
@@ -35,41 +34,21 @@ export default function ProfileScreen() {
 
     return (
         <View style={container}>
-            <StatusBar
-                backgroundColor={String(ColorTheme().background)}
-                barStyle={isDarkMode ? "light-content" : "dark-content"}
-            />
             <ProfileHeader />
-            <ScrollView
-                style={container}
-                showsVerticalScrollIndicator={false}
-                horizontal={false}
-                refreshControl={
-                    <RefreshControl
-                        progressBackgroundColor={String(
-                            isDarkMode ? colors.gray.grey_08 : colors.gray.grey_02
-                        )}
-                        colors={[
-                            String(isDarkMode ? colors.gray.grey_04 : colors.gray.grey_04),
-                            "#00000000",
-                        ]}
-                        refreshing={refreshing}
-                        onRefresh={handleRefresh}
-                    />
-                }
+            <AnimatedVerticalScrollView
+                onEndReachedThreshold={0.1}
+                handleRefresh={handleRefresh}
+                endRefreshAnimationDelay={400}
+                showRefreshSpinner={false}
+                onEndReached={async () => await setProfile(userProfile.id)}
             >
-                {loading ? (
-                    <Loading.Container
-                        width={sizes.screens.width}
-                        height={sizes.screens.height / 3}
-                    >
-                        <Loading.ActivityIndicator />
-                    </Loading.Container>
-                ) : (
-                    <RenderProfile user={userProfile} />
-                )}
-            </ScrollView>
-            <ListMemories isAccountScreen={false} user={userProfile} />
+                {loading ? <RenderProfileSkeleton /> : <RenderProfile user={userProfile} />}
+                <ListMemories
+                    userRefreshing={refreshing}
+                    isAccountScreen={false}
+                    user={userProfile}
+                />
+            </AnimatedVerticalScrollView>
         </View>
     )
 }
