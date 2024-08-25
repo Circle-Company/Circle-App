@@ -1,8 +1,11 @@
+import { BadgeIcon } from "@/components/general/badge-icon"
+import PersistedContext from "@/contexts/Persisted"
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs"
 import React from "react"
 import MomentOutline from "../../assets/icons/svgs/moments-outline.svg"
 import Moment from "../../assets/icons/svgs/moments.svg"
-import { default as User, default as UserOutline } from "../../assets/icons/svgs/user.svg"
+import UserOutline from "../../assets/icons/svgs/user_circle-outline.svg"
+import User from "../../assets/icons/svgs/user_circle.svg"
 import LanguageContext from "../../contexts/Preferences/language"
 import ColorTheme from "../../layout/constants/colors"
 import sizes from "../../layout/constants/sizes"
@@ -13,6 +16,7 @@ const BottomTab = createBottomTabNavigator()
 
 export default function BottomTabNavigator() {
     const { t } = React.useContext(LanguageContext)
+    const { session } = React.useContext(PersistedContext)
     const iconWidth = 21
     const iconHeight = 21
     const tabBarStyle = {
@@ -62,11 +66,17 @@ export default function BottomTabNavigator() {
                                 height={iconHeight}
                             />
                         ) : (
-                            <UserOutline
-                                fill={String(ColorTheme().icon)}
-                                width={iconWidth}
-                                height={iconHeight}
-                            />
+                            <>
+                                <UserOutline
+                                    fill={String(ColorTheme().icon)}
+                                    width={iconWidth}
+                                    height={iconHeight}
+                                />
+                                <BadgeIcon
+                                    style={{ left: "51%", top: -5 }}
+                                    number={session.account.unreadNotificationsCount}
+                                />
+                            </>
                         ),
                 }}
             />

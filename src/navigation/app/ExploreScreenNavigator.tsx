@@ -4,7 +4,7 @@ import LanguageContext from "../../contexts/Preferences/language"
 import ColorTheme from "../../layout/constants/colors"
 import Sizes from "../../layout/constants/sizes"
 import ExploreScreen from "../../pages/app/Explore"
-import { Interpolation as Horizontal } from "../transitions/horizontal"
+import { Interpolation as Horizontal } from "../transitions/horizontal-right"
 
 const ExploreStack = createStackNavigator()
 

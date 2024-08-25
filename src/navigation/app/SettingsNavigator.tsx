@@ -22,7 +22,7 @@ import SettingsPushNotifications from "../../pages/app/Settings/PushNotification
 import SupportScreen from "../../pages/app/Settings/Support"
 import SettingsTermsOfService from "../../pages/app/Settings/TermsOfService"
 import VersionScreen from "../../pages/app/Settings/Version"
-import { Interpolation as Horizontal } from "../transitions/horizontal"
+import { Interpolation as Horizontal } from "../transitions/horizontal-right"
 
 const SettingsStack = createStackNavigator()
 
