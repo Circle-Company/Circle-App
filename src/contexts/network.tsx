@@ -3,7 +3,6 @@ import React, { ReactNode, createContext, useContext, useEffect, useState } from
 import { notify } from "react-native-notificated"
 import WifiIcon from "../assets/icons/svgs/wifi.svg"
 import WifiSlashIcon from "../assets/icons/svgs/wifi_slash.svg"
-import config from "../config"
 import { colors } from "../layout/constants/colors"
 import LanguageContext from "./Preferences/language"
 
@@ -16,15 +15,13 @@ export type NetworkContextData = {
 const NetworkContext = createContext<NetworkContextData>({} as NetworkContextData)
 
 export function Provider({ children }: NetworkProviderProps) {
-    const [networkStatus, setNetworkStatus] = React.useState<"ONLINE" | "OFFLINE" | "RECONNECTING">(
+    const [networkStatus, setNetworkStatus] = useState<"ONLINE" | "OFFLINE" | "RECONNECTING">(
         "ONLINE"
     )
     const [isConnected, setIsConnected] = useState<boolean | null>(null)
     const [isInternetReachable, setIsInternetReachable] = useState<boolean | null>(null)
     const [appStarted, setAppStarted] = useState<boolean>(true)
     const { t } = useContext(LanguageContext)
-
-    console.log(`http://${config.ENDPOINT}/v${config.API_VERSION}`)
 
     useEffect(() => {
         let previousState = isConnected
@@ -34,8 +31,10 @@ export function Provider({ children }: NetworkProviderProps) {
             const currentState = state.isConnected
             const currentIsInternetReachable = state.isInternetReachable
 
+            // Exibir apenas o último estado de conexão
             if (previousState !== currentState) {
-                if (appStarted && currentState === false) {
+                if (currentState === false) {
+                    // Se desconectou, exibe "Offline"
                     notify("tiny", {
                         params: {
                             title: t("You are Offline"),
@@ -51,45 +50,29 @@ export function Provider({ children }: NetworkProviderProps) {
                         },
                     })
                     setNetworkStatus("OFFLINE")
-                } else if (!appStarted) {
-                    if (currentState === true && previousState === false) {
-                        notify("tiny", {
-                            params: {
-                                title: t("Connected to Internet"),
-                                backgroundColor: colors.green.green_05,
-                                titleColor: colors.gray.white,
-                                icon: (
-                                    <WifiIcon
-                                        fill={colors.gray.white.toString()}
-                                        width={12}
-                                        height={12}
-                                    />
-                                ),
-                            },
-                        })
-                        setNetworkStatus("ONLINE")
-                    } else if (currentState === false) {
-                        notify("tiny", {
-                            params: {
-                                title: t("You are Offline"),
-                                backgroundColor: colors.red.red_05,
-                                titleColor: colors.gray.white,
-                                icon: (
-                                    <WifiSlashIcon
-                                        fill={colors.gray.white.toString()}
-                                        width={12}
-                                        height={12}
-                                    />
-                                ),
-                            },
-                        })
-                        setNetworkStatus("OFFLINE")
-                    }
+                } else if (currentState === true && previousState === false) {
+                    // Se reconectou, exibe "Online"
+                    notify("tiny", {
+                        params: {
+                            title: t("Connected to Internet"),
+                            backgroundColor: colors.green.green_05,
+                            titleColor: colors.gray.white,
+                            icon: (
+                                <WifiIcon
+                                    fill={colors.gray.white.toString()}
+                                    width={12}
+                                    height={12}
+                                />
+                            ),
+                        },
+                    })
+                    setNetworkStatus("ONLINE")
                 }
             }
 
             if (previousIsInternetReachable !== currentIsInternetReachable) {
                 if (currentIsInternetReachable === true && previousIsInternetReachable === false) {
+                    // Exibe "Reconnecting" apenas se houver mudança no estado de alcançabilidade da Internet
                     notify("tiny", {
                         params: {
                             title: t("Reconnecting..."),
