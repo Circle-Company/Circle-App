@@ -2,7 +2,7 @@ import React from "react"
 import { Animated, Pressable } from "react-native"
 import PersistedContext from "../../../contexts/Persisted"
 import LanguageContext from "../../../contexts/Preferences/language"
-import ColorTheme, { colors } from "../../../layout/constants/colors"
+import ColorTheme from "../../../layout/constants/colors"
 import fonts from "../../../layout/constants/fonts"
 import sizes from "../../../layout/constants/sizes"
 import { Text } from "../../Themed"
@@ -44,7 +44,7 @@ export default function follow_button({
         alignItems: "center",
         justifyContent: "center",
         borderWidth: sizes.borders["1md"],
-        borderColor: colors.blue.blue_03 + "50",
+        borderColor: ColorTheme().text + "50",
     }
     const container_pressed: any = {
         width: sizes.buttons.width / 4.4,
