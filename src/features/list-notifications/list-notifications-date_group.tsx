@@ -1,9 +1,8 @@
-import { BadgeIcon } from "@/components/general/badge-icon"
 import React from "react"
 import { FlatList, View, useColorScheme } from "react-native"
 import RenderDate from "../../components/general/render-date"
 import { Memory } from "../../components/memory"
-import ColorTheme, { colors } from "../../layout/constants/colors"
+import { colors } from "../../layout/constants/colors"
 import sizes from "../../layout/constants/sizes"
 import RenderNotification from "./components/render-notification"
 type RenderNotificationsAllProps = {
@@ -38,12 +37,6 @@ export function ListNotificationsAll({ data, date_text, count }: RenderNotificat
             <View style={header_container}>
                 <Memory.HeaderLeft>
                     <RenderDate date={date_text} showIcon={true} />
-                    <View>
-                        <BadgeIcon
-                            number={count}
-                            style={{ left: 0, backgroundColor: ColorTheme().backgroundDisabled }}
-                        />
-                    </View>
                 </Memory.HeaderLeft>
             </View>
             <FlatList
