@@ -7,7 +7,7 @@ import fonts from "../../layout/constants/fonts"
 import sizes from "../../layout/constants/sizes"
 
 type DateProps = {
-    capitalize: boolean
+    capitalize?: boolean
     date: string
     color?: string
     backgroundColor?: string
