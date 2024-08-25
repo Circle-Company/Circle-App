@@ -29,7 +29,7 @@ export function InboxNavigator() {
                 name="Inbox"
                 component={InboxScreen}
                 options={{
-                    headerTitle: t("Inbox"),
+                    headerTitle: t("Notifications"),
                     headerStyle: [HeaderStyle],
                     headerTintColor: String(ColorTheme().text),
                     cardStyle: { backgroundColor: String(ColorTheme().background) },
