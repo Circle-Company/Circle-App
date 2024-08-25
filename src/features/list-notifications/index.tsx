@@ -41,6 +41,7 @@ export default function ListNotifcations() {
                     if (pageSize > response.data.notifications.length) setEndReached(true)
                     else setEndReached(false)
                 }
+                session.account.setUnreadNotificationsCount(0)
                 setPage(page + 1)
             })
             .catch(function (error) {
