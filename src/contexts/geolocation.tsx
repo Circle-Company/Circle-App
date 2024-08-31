@@ -36,7 +36,6 @@ export function Provider({ children }: GeolocationProviderProps) {
 
     // Função para atualizar a localização do usuário
     const updateUserCoordinates = async (payload: UpdateCoordinatesPayload): Promise<void> => {
-        console.log("updateUserCoordinates foi chamado")
         try {
             await apiRoutes.account.updateCoordinates({
                 userId: session?.user?.id,
