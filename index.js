@@ -10,10 +10,6 @@ LogBox.ignoreLogs(["new NativeEventEmitter()"])
 import App from "./App"
 import { name as appName } from "./app.json"
 
-if (__DEV__) {
-    import("react-refresh/runtime")
-}
-
 const Aplication = () => {
     return <App />
 }
