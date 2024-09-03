@@ -1,3 +1,7 @@
+import { MomentUserActionsProps } from "@/components/moment/context/types"
+import { LanguagesCodesType } from "locales/LanguageTypes"
+import { TagProps } from "../newMoment"
+
 export interface ProfilePicture {
     small_resolution: string
     tiny_resolution: string
@@ -40,6 +44,15 @@ export interface MomentProps {
     isLiked: boolean
     deleted: boolean
     created_at: string
+}
+
+export type InteractionProps = {
+    id: number
+    tags: TagProps[]
+    duration: number
+    type: "IMAGE" | "VIDEO"
+    language: LanguagesCodesType
+    interaction: MomentUserActionsProps
 }
 
 export type FeedProviderProps = {
