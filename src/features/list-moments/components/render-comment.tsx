@@ -15,7 +15,7 @@ type renderCommentProps = {
 
 export default function render_comment({ moment, focused }: renderCommentProps) {
     const { t } = React.useContext(LanguageContext)
-    const { commentEnabled, setCommentEnabled, setShowKeyboard, setFocusedItemId } =
+    const { commentEnabled, setCommentEnabled, setKeyboardVisible, setFocusedMoment, feedData } =
         React.useContext(FeedContext)
     const [animatedOpacityValue] = React.useState(new Animated.Value(1))
     React.useEffect(() => {
@@ -43,8 +43,8 @@ export default function render_comment({ moment, focused }: renderCommentProps) 
     function handlePress() {
         if (commentEnabled) setCommentEnabled(false)
         else setCommentEnabled(true)
-        setShowKeyboard(true)
-        setFocusedItemId(Number(moment.id))
+        setKeyboardVisible(true)
+        setFocusedMoment(moment)
     }
 
     return (
