@@ -1,3 +1,4 @@
+import PersistedContext from "@/contexts/Persisted"
 import { useNavigation } from "@react-navigation/native"
 import React from "react"
 import { View } from "react-native"
@@ -17,7 +18,8 @@ export default function Container({
 }: MomentContainerProps) {
     const { momentData, momentUserActions, momentSize, momentOptions } =
         React.useContext(MomentContext)
-    const { commentEnabled, setFocusedMoment, setFocusedItemId } = React.useContext(FeedContext)
+    const { session } = React.useContext(PersistedContext)
+    const { commentEnabled, setFocusedMoment } = React.useContext(FeedContext)
     const navigation = useNavigation()
 
     const container: any = {
@@ -47,15 +49,25 @@ export default function Container({
     }
 
     async function handleDoublePress() {
-        momentUserActions.handleLikeButtonPressed({})
+        if (momentData.user.id != session.user.id) momentUserActions.handleLikeButtonPressed({})
     }
 
     async function handleSinglePress() {
         if (!commentEnabled && momentOptions.isFeed) {
             if (!fromFullMomentScreen && isFocused) {
                 momentUserActions.setClickIntoMoment(true)
-                setFocusedMoment(momentData)
-                setFocusedItemId(Number(momentData.id))
+                setFocusedMoment({
+                    id: momentData.id,
+                    user: momentData.user,
+                    description: momentData.description,
+                    midia: momentData.midia,
+                    comments: momentData.comments,
+                    statistics: momentData.statistics,
+                    tags: momentData.tags,
+                    language: momentData.language,
+                    created_at: momentData.created_at,
+                    isLiked: momentUserActions.liked,
+                })
             }
             navigation.navigate("MomentNavigator", { screen: "DetailScreen" })
         }

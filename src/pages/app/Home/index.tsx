@@ -15,7 +15,7 @@ export default function HomeScreen() {
     const isDarkMode = useColorScheme() === "dark"
     const { t } = React.useContext(LanguageContext)
     const { setCurrentTab } = React.useContext(BottomTabsContext)
-    const { commentEnabled, setCommentEnabled, showKeyboard } = React.useContext(FeedContext)
+    const { commentEnabled, setCommentEnabled, isKeyboardVisible } = React.useContext(FeedContext)
     const { height } = useKeyboardAnimation()
     const isFocused = useIsFocused()
 
@@ -67,7 +67,7 @@ export default function HomeScreen() {
                         backgroundColor={String(
                             isDarkMode ? colors.gray.grey_09 : colors.gray.grey_01
                         )}
-                        autoFocus={showKeyboard ? true : false}
+                        autoFocus={isKeyboardVisible}
                     />
                 </Animated.View>
             )}

@@ -21,7 +21,7 @@ export default function input({
     autoFocus = false,
 }: CommentsInputProps) {
     const { t } = React.useContext(LanguageContext)
-    const { focusedItemId } = React.useContext(FeedContext)
+    const { focusedMoment } = React.useContext(FeedContext)
     const { session } = React.useContext(PersistedContext)
     const [commentText, setCommentText] = React.useState<string>("")
     const isDarkMode = useColorScheme() === "dark"
@@ -94,7 +94,7 @@ export default function input({
             await api
                 .post("/moment/comment", {
                     user_id: session.user.id,
-                    moment_id: focusedItemId,
+                    moment_id: focusedMoment.id,
                     content: commentText,
                 })
                 .then(() => {
