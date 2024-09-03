@@ -5,10 +5,8 @@ import { Loading } from "../../../components/loading"
 import { Moment } from "../../../components/moment"
 import { MomentDataProps } from "../../../components/moment/context/types"
 import { UserShow } from "../../../components/user_show"
-import { userReciveDataProps } from "../../../components/user_show/user_show-types"
 import FeedContext from "../../../contexts/Feed"
 import PersistedContext from "../../../contexts/Persisted"
-import ProfileContext from "../../../contexts/profile"
 import ColorTheme from "../../../layout/constants/colors"
 import fonts from "../../../layout/constants/fonts"
 import sizes from "../../../layout/constants/sizes"
@@ -45,13 +43,18 @@ export default function render_moment_full({
         extrapolate: "clamp", // Impedir valores fora do range
     })
 
+    const borderRadius = imageY.interpolate({
+        inputRange: [0, 1], // Ajuste os valores conforme necessário
+        outputRange: [0, 0.4], // O valor do borderRadius vai de 50 a 0, por exemplo
+    })
+
     const imageOpacity = scrollY.interpolate({
         inputRange: [1, 1], // Faixa de entrada
         outputRange: [1, 0.9], // Faixa de saída (escala de 1 a 0.5)
         extrapolate: "clamp", // Impedir valores fora do range
     })
 
-    let userDataRender: userReciveDataProps
+    let userDataRender: any
     if (momentData.user) {
         if (momentData.user?.id == session.user.id) {
             userDataRender = session.user
@@ -133,7 +136,11 @@ export default function render_moment_full({
                 momentSize={{ ...sizes.moment.full, width: sizes.screens.width }}
             >
                 <Animated.View
-                    style={{ transform: [{ scale: imageScale }, { translateY: imageY }] }}
+                    style={{
+                        transform: [{ scale: imageScale }, { translateY: imageY }],
+                        borderRadius: borderRadius,
+                        overflow: "hidden",
+                    }}
                 >
                     <Moment.Container contentRender={momentData.midia}>
                         <Moment.Root.Center />
