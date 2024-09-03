@@ -29,8 +29,7 @@ export default function render_moment_full({
     isFocused,
 }: renderMomentProps) {
     const { session } = React.useContext(PersistedContext)
-    const { currentUser } = React.useContext(ProfileContext)
-    const { setFocusedMoment, setFocusedItemId } = React.useContext(FeedContext)
+    const { setFocusedChunkItemFunc } = React.useContext(FeedContext)
     const [loading, setLoading] = React.useState(false)
     const scrollY = React.useRef(new Animated.Value(0)).current
 
@@ -116,7 +115,7 @@ export default function render_moment_full({
 
     React.useEffect(() => {
         console.log(JSON.stringify(momentData))
-        setFocusedItemId(Number(momentData.id))
+        setFocusedChunkItemFunc({ id: momentData.id })
     }, [])
     return (
         <Animated.ScrollView
