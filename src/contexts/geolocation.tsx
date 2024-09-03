@@ -54,7 +54,7 @@ export function Provider({ children }: GeolocationProviderProps) {
     const useUpdateUserLocation = async () => {
         const hasPermission = await requestLocationPermission()
         if (!hasPermission) throw new Error("Location permission is not granted")
-        console.log("hasPermission: ", hasPermission)
+
         return new Promise<void>((resolve, reject) => {
             Geolocation.getCurrentPosition(
                 async (position) => {
