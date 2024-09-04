@@ -1,8 +1,7 @@
 import { useQuery } from "@tanstack/react-query"
 import create from "zustand"
 import { apiRoutes } from "../../services/Api"
-import { storage } from "../../store"
-import { storageKeys } from "./storageKeys"
+import { storage, storageKeys } from "../../store"
 import { PreferencesDataStorageType } from "./types"
 
 const storageKey = storageKeys().preferences
