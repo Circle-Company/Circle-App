@@ -11,8 +11,6 @@ const FeedContext = React.createContext(
 export function Provider({ children }: FeedProviderProps) {
     const { session } = React.useContext(PersistedContext)
     const feed = useFeed(session.user.id)
-
-    console.log(feed)
     const keyboard = useKeyboard()
 
     return <FeedContext.Provider value={{ ...feed, ...keyboard }}>{children}</FeedContext.Provider>
