@@ -2,12 +2,12 @@ import { useNavigation } from "@react-navigation/native"
 import React from "react"
 import { StatusBar, useColorScheme } from "react-native"
 import Icon from "../../../assets/icons/svgs/check_circle.svg"
+import { Text, View } from "../../../components/Themed"
 import PasswordInput from "../../../components/auth/password_input"
 import ButtonStandart from "../../../components/buttons/button-standart"
-import { Text, View } from "../../../components/Themed"
-import AuthContext from "../../../contexts/auth"
 import PersistedContext from "../../../contexts/Persisted"
 import LanguageContext from "../../../contexts/Preferences/language"
+import AuthContext from "../../../contexts/auth"
 import ColorTheme, { colors } from "../../../layout/constants/colors"
 import fonts from "../../../layout/constants/fonts"
 import sizes from "../../../layout/constants/sizes"
@@ -56,10 +56,14 @@ export default function PasswordScreen() {
     async function handlePress() {
         if (signInputPassword) {
             try {
-                await api.put("/auth/change-password", {
-                    user_id: session.user.id,
-                    password_input: signInputPassword,
-                })
+                await api.put(
+                    "/auth/change-password",
+                    {
+                        user_id: session.user.id,
+                        password_input: signInputPassword,
+                    },
+                    { headers: { authorization_token: session.account.jwtToken } }
+                )
                 setSignInputPassword("")
                 navigation.goBack()
             } catch (err: any) {

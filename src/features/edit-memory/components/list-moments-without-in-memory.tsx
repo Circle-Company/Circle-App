@@ -1,32 +1,29 @@
+import React from "react"
 import {
-    FlatList,
-    RefreshControl,
-    ScrollView,
-    useColorScheme,
-    View,
-    Keyboard,
     Animated,
     Easing,
+    FlatList,
+    Keyboard,
+    RefreshControl,
+    ScrollView,
+    View,
+    useColorScheme,
 } from "react-native"
+import AddIcon from "../../../assets/icons/svgs/plus_circle-outline.svg"
 import { Text } from "../../../components/Themed"
-import RenderMoment from "./render-moments"
-import EndReached from "../../list-memories/list-memories-all/components/end-reached"
-import sizes from "../../../layout/constants/sizes"
-import fonts from "../../../layout/constants/fonts"
-import ColorTheme, { colors } from "../../../layout/constants/colors"
-import NetworkContext from "../../../contexts/network"
-import React from "react"
-import api from "../../../services/Api"
-import { Loading } from "../../../components/loading"
+import ViewMorebutton from "../../../components/buttons/view_more"
 import OfflineCard from "../../../components/general/offline"
-import AuthContext from "../../../contexts/auth"
 import PersistedContext from "../../../contexts/Persisted"
 import LanguageContext from "../../../contexts/Preferences/language"
 import MemoryContext from "../../../contexts/memory"
-import ViewMorebutton from "../../../components/buttons/view_more"
-import AddIcon from "../../../assets/icons/svgs/plus_circle-outline.svg"
-import { opacity } from "react-native-reanimated/lib/typescript/reanimated2/Colors"
+import NetworkContext from "../../../contexts/network"
+import ColorTheme, { colors } from "../../../layout/constants/colors"
+import fonts from "../../../layout/constants/fonts"
+import sizes from "../../../layout/constants/sizes"
+import api from "../../../services/Api"
+import EndReached from "../../list-memories/list-memories-all/components/end-reached"
 import EditMemoryContext from "../edit_memory_context"
+import RenderMoment from "./render-moments"
 export default function ListMomentsWithoutInMemory() {
     const isDarkMode = useColorScheme() === "dark"
     const { memory } = React.useContext(MemoryContext)
@@ -52,10 +49,14 @@ export default function ListMomentsWithoutInMemory() {
         async function getMoments() {
             try {
                 await api
-                    .post(`/moment/get-user-moments/tiny/exclude-memory`, {
-                        user_id: session.user.id,
-                        memory_id: memory.id,
-                    })
+                    .post(
+                        `/moment/get-user-moments/tiny/exclude-memory`,
+                        {
+                            user_id: session.user.id,
+                            memory_id: memory.id,
+                        },
+                        { headers: { authorization_token: session.account.jwtToken } }
+                    )
                     .then(function (response) {
                         if (page === 1) setAllMoments(response.data)
                         else setAllMoments([...allMoments, ...response.data])

@@ -31,9 +31,13 @@ export default function ListNotifcations() {
 
     const fetchData = async () => {
         await api
-            .post(`/notification/find?page=${page}&pageSize=${pageSize}`, {
-                user_id: session.user.id,
-            })
+            .post(
+                `/notification/find?page=${page}&pageSize=${pageSize}`,
+                {
+                    user_id: session.user.id,
+                },
+                { headers: { authorization_token: session.account.jwtToken } }
+            )
             .then(function (response) {
                 if (page === 1) setNotificationsData(response.data.notifications)
                 else {

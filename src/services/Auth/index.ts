@@ -1,14 +1,16 @@
-import { userReciveDataProps } from "../../components/user_show/user_show-types"
-import profile_data from '../../data/profile.json'
+import PersistedContext from "@/contexts/Persisted"
+import { UserDataType } from "@/contexts/Persisted/types"
+import React from "react"
 type SignInResponseProps = {
-    accessToken: string,
-    user: userReciveDataProps
+    accessToken: string
+    user: UserDataType
 }
-export function SignIn():Promise<SignInResponseProps> {
-    return new Promise(resolve => {
+export function SignIn(): Promise<SignInResponseProps> {
+    const { session } = React.useContext(PersistedContext)
+    return new Promise((resolve) => {
         resolve({
-            accessToken: '0e2e209e2idowji2eu29jiwdo2ij2',
-            user: profile_data
+            accessToken: session.account.jwtToken,
+            user: session.user,
         })
     })
 }

@@ -1,13 +1,13 @@
 import React from "react"
-import api from "../../services/Api"
-import TouchID from "react-native-simple-biometrics"
-import LanguageContext from "../../contexts/Preferences/language"
-import { colors } from "../../layout/constants/colors"
 import { notify } from "react-native-notificated"
+import TouchID from "react-native-simple-biometrics"
 import CheckIcon from "../../assets/icons/svgs/check_circle.svg"
 import ErrorIcon from "../../assets/icons/svgs/exclamationmark_circle.svg"
 import PersistedContext from "../../contexts/Persisted"
+import LanguageContext from "../../contexts/Preferences/language"
 import MemoryContext from "../../contexts/memory"
+import { colors } from "../../layout/constants/colors"
+import api from "../../services/Api"
 
 type EditMemoryProviderProps = {
     children: React.ReactNode
@@ -62,10 +62,14 @@ export function EditMemoryProvider({ children }: EditMemoryProviderProps) {
         })
         try {
             await api
-                .post(`/memory/add-moment`, {
-                    memory_id: memory.id,
-                    moments_list: moments_ids_list,
-                })
+                .post(
+                    `/memory/add-moment`,
+                    {
+                        memory_id: memory.id,
+                        moments_list: moments_ids_list,
+                    },
+                    { headers: { authorization_token: session.account.jwtToken } }
+                )
                 .then(() => {
                     notify("toast", {
                         params: {
@@ -105,11 +109,15 @@ export function EditMemoryProvider({ children }: EditMemoryProviderProps) {
     async function editTitle() {
         try {
             await api
-                .post(`/memory/edit/title`, {
-                    user_id: session.user.id,
-                    memory_id: memory.id,
-                    title,
-                })
+                .post(
+                    `/memory/edit/title`,
+                    {
+                        user_id: session.user.id,
+                        memory_id: memory.id,
+                        title,
+                    },
+                    { headers: { authorization_token: session.account.jwtToken } }
+                )
                 .then(() => {
                     notify("toast", {
                         params: {
@@ -153,10 +161,14 @@ export function EditMemoryProvider({ children }: EditMemoryProviderProps) {
             )
             if (isAuthenticated) {
                 await api
-                    .post(`/memory/delete`, {
-                        user_id: session.user.id,
-                        memory_id: memory.id,
-                    })
+                    .post(
+                        `/memory/delete`,
+                        {
+                            user_id: session.user.id,
+                            memory_id: memory.id,
+                        },
+                        { headers: { authorization_token: session.account.jwtToken } }
+                    )
                     .then(() => {
                         notify("toast", {
                             params: {

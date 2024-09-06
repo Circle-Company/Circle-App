@@ -85,17 +85,21 @@ export default function ProfilePictureScreen() {
             const IMG = selectedImage.assets[0]
             const imageBase64 = await RNFS.readFile(IMG.uri, "base64")
             await api
-                .put(`/account/edit/profile-picture`, {
-                    user_id: session.user.id,
-                    midia: { base64: imageBase64 },
-                    metadata: {
-                        file_name: IMG.fileName,
-                        file_size: IMG.fileSize,
-                        file_type: IMG.type,
-                        resolution_width: IMG.width,
-                        resolution_height: IMG.width,
+                .put(
+                    `/account/edit/profile-picture`,
+                    {
+                        user_id: session.user.id,
+                        midia: { base64: imageBase64 },
+                        metadata: {
+                            file_name: IMG.fileName,
+                            file_size: IMG.fileSize,
+                            file_type: IMG.type,
+                            resolution_width: IMG.width,
+                            resolution_height: IMG.width,
+                        },
                     },
-                })
+                    { headers: { authorization_token: session.account.jwtToken } }
+                )
                 .finally(() => {
                     setSelectedImage("")
                 })

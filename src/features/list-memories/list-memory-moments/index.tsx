@@ -15,8 +15,7 @@ import { RenderMemoryMoment } from "./components/render-memory_moment"
 export default function ListMemoryMoments() {
     const margin = 20
     const { session } = React.useContext(PersistedContext)
-    const { memory, memoryMoments, setMemoryMoments, allMemoriesUserId } =
-        React.useContext(MemoryContext)
+    const { memory, memoryMoments, setMemoryMoments } = React.useContext(MemoryContext)
     const { t } = React.useContext(LanguageContext)
     const [centerIndex, setCenterIndex] = React.useState<number | null>(null)
     const flatListRef = React.useRef<FlatList | null>(null)
@@ -46,9 +45,13 @@ export default function ListMemoryMoments() {
 
     async function fetchData() {
         await api
-            .post(`/memory/get-moments?page=${page}&pageSize=${pageSize}`, {
-                memory_id: memory?.id,
-            })
+            .post(
+                `/memory/get-moments?page=${page}&pageSize=${pageSize}`,
+                {
+                    memory_id: memory?.id,
+                },
+                { headers: { authorization_token: session.account.jwtToken } }
+            )
             .then(function (response) {
                 if (page == 1) setMemoryMoments(response.data.data)
                 else {
