@@ -59,6 +59,8 @@ export type AccountDataType = {
     last_active_at: string
     last_login_at: string
     firebasePushToken: string
+    jwtToken: string
+    jwtExpiration: string
 }
 export type AccountDataReturnsType = {
     unreadNotificationsCount: number
@@ -66,6 +68,7 @@ export type AccountDataReturnsType = {
     muted: boolean
     last_active_at: string
     last_login_at: string
+    jwtToken: string
     setUnreadNotificationsCount: (value: number) => void
     setBlocked: (value: boolean) => void
     setMuted: (value: boolean) => void
@@ -82,7 +85,7 @@ export type LanguageDataType = {
 }
 export type LanguageDataStorageType = {
     translationLanguage: string
-    appLanguage: LanguagesCodesType
+    appLanguage: string | LanguagesCodesType
 }
 export type LanguageDataReturnsType = {
     translationLanguage: string
