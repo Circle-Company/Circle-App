@@ -53,9 +53,13 @@ export function Provider({ children }: SelectMomentsProviderProps) {
     async function getMoments() {
         try {
             await api
-                .post(`/moment/get-user-moments/tiny?page=1&pageSize=10000`, {
-                    user_id: session.user.id,
-                })
+                .post(
+                    `/moment/get-user-moments/tiny?page=1&pageSize=10000`,
+                    {
+                        user_id: session.user.id,
+                    },
+                    { headers: { authorization_token: session.account.jwtToken } }
+                )
                 .then(function (response) {
                     return setAllMoments(response.data.moments)
                 })
@@ -70,7 +74,11 @@ export function Provider({ children }: SelectMomentsProviderProps) {
     async function storeMemory() {
         try {
             const response = await api
-                .post(`/memory/create`, { user_id: session.user.id, title })
+                .post(
+                    `/memory/create`,
+                    { user_id: session.user.id, title },
+                    { headers: { authorization_token: session.account.jwtToken } }
+                )
                 .then(function (response) {
                     notify("toast", {
                         params: {
@@ -103,7 +111,11 @@ export function Provider({ children }: SelectMomentsProviderProps) {
             })
             console.log("store_moments: ", memory_id, filtered_moments)
             await api
-                .post(`/memory/add-moment`, { memory_id, moments_list: [...filtered_moments] })
+                .post(
+                    `/memory/add-moment`,
+                    { memory_id, moments_list: [...filtered_moments] },
+                    { headers: { authorization_token: session.account.jwtToken } }
+                )
                 .then(function (response) {
                     return response.data
                 })

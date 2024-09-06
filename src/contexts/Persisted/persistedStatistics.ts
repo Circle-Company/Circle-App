@@ -34,7 +34,16 @@ export const useStatisticsStore = create<StatisticsState>((set) => ({
     get: async (user_id: number) => {
         try {
             const response = await api
-                .post(`/user/session/statistics/pk/${user_id}`, { user_id })
+                .post(
+                    `/user/session/statistics/pk/${user_id}`,
+                    { user_id },
+                    {
+                        headers: {
+                            authorization_token:
+                                storage.getString(storageKeys().account.jwt.token) || "",
+                        },
+                    }
+                )
                 .then(function (response) {
                     const statistics = response.data
                     set({

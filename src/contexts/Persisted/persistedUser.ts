@@ -65,7 +65,16 @@ export const useUserStore = create<UserState>((set) => ({
     get: async (id: number) => {
         try {
             const response = await api
-                .post(`/user/session/data/pk/${id}`, { user_id: id })
+                .post(
+                    `/user/session/data/pk/${id}`,
+                    { user_id: id },
+                    {
+                        headers: {
+                            authorization_token:
+                                storage.getString(storageKeys().account.jwt.token) || "",
+                        },
+                    }
+                )
                 .then(function (response) {
                     const user = response.data
                     set({

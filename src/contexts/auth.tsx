@@ -3,8 +3,7 @@ import { notify } from "react-native-notificated"
 import ErrorIcon from "../assets/icons/svgs/exclamationmark_circle.svg"
 import { colors } from "../layout/constants/colors"
 import api from "../services/Api"
-import { storage } from "../store"
-import { storageKeys } from "./Persisted/storageKeys"
+import { storage, storageKeys } from "../store"
 import { SessionDataType } from "./Persisted/types"
 import LanguageContext from "./Preferences/language"
 
@@ -14,9 +13,7 @@ export type AuthContextsData = {
     signInputUsername: string
     signInputPassword: string
     sessionData: SessionDataType
-    jwtToken: string | null
     getSessionData: ({ sessionId }: { sessionId: string }) => Promise<void>
-    refreshJwtToken: ({ username, id }: { username: string; id: number }) => Promise<void>
     signIn: () => Promise<void>
     signUp: () => Promise<void>
     signOut(): void
@@ -39,9 +36,8 @@ export function Provider({ children }: AuthProviderProps) {
             .post("/auth/sign-in", { username: signInputUsername, password: signInputPassword })
             .then((response) => {
                 setSessionData(response.data.session)
-                setJwtToken(response.data.access_token)
-                const userId = response.data.session.id
-                if (userId) storage.set("@circle:sessionId", Number(userId))
+                if (response.data.session.id)
+                    storage.set("@circle:sessionId", Number(response.data.session.id))
             })
             .catch((err) => {
                 notify("toast", {
@@ -61,9 +57,8 @@ export function Provider({ children }: AuthProviderProps) {
             .post("/auth/sign-up", { username: signInputUsername, password: signInputPassword })
             .then((response) => {
                 setSessionData(response.data.session)
-                setJwtToken(response.data.access_token)
-                const userId = response.data.session.id
-                if (userId) storage.set("@circle:sessionId", Number(userId))
+                if (response.data.session.id)
+                    storage.set("@circle:sessionId", Number(response.data.session.id))
             })
             .catch((err) => {
                 notify("toast", {
@@ -94,20 +89,12 @@ export function Provider({ children }: AuthProviderProps) {
         if (storage.getNumber(storageKeys().user.id) && hasSessionId) return true
         else return false
     }
-
-    async function refreshJwtToken({ username, id }: { username: string; id: number }) {
-        const response = await api.post("/auth/refresh-token", { username, id })
-        setJwtToken(response.data.access_token)
-    }
-
     return (
         <AuthContext.Provider
             value={{
-                jwtToken,
                 sessionData,
                 signInputPassword,
                 signInputUsername,
-                refreshJwtToken,
                 setSignInputPassword,
                 setSignInputUsername,
                 getSessionData,

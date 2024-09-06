@@ -1,15 +1,15 @@
-import React from "react"
-import { Platform, PermissionsAndroid } from "react-native"
-import api from "../services/Api"
-import { launchImageLibrary, ImagePickerResponse, launchCamera } from "react-native-image-picker"
 import { useNavigation } from "@react-navigation/native"
-import { MemoryObjectProps } from "../components/memory/memory-types"
+import React from "react"
+import { PermissionsAndroid, Platform } from "react-native"
 import RNFS from "react-native-fs"
-import PersistedContext from "./Persisted"
+import { ImagePickerResponse, launchImageLibrary } from "react-native-image-picker"
 import { useNotifications } from "react-native-notificated"
 import UploadIcon from "../assets/icons/svgs/arrow_up.svg"
 import CheckIcon from "../assets/icons/svgs/check_circle.svg"
+import { MemoryObjectProps } from "../components/memory/memory-types"
 import { colors } from "../layout/constants/colors"
+import api from "../services/Api"
+import PersistedContext from "./Persisted"
 import LanguageContext from "./Preferences/language"
 
 type NewMomentProviderProps = {
@@ -90,25 +90,29 @@ export function Provider({ children }: NewMomentProviderProps) {
             const IMG = selectedImage.assets[0]
             const imageBase64 = await RNFS.readFile(IMG.uri, "base64")
             await api
-                .post(`/moment/create`, {
-                    user_id: session.user.id,
-                    moment: {
-                        description: description ? description : null,
-                        midia: {
-                            content_type: "IMAGE",
-                            base64: imageBase64,
+                .post(
+                    `/moment/create`,
+                    {
+                        user_id: session.user.id,
+                        moment: {
+                            description: description ? description : null,
+                            midia: {
+                                content_type: "IMAGE",
+                                base64: imageBase64,
+                            },
+                            metadata: {
+                                duration: IMG.duration,
+                                file_name: IMG.fileName,
+                                file_size: IMG.fileSize,
+                                file_type: IMG.type,
+                                resolution_width: IMG.width,
+                                resolution_height: IMG.height,
+                            },
+                            tags,
                         },
-                        metadata: {
-                            duration: IMG.duration,
-                            file_name: IMG.fileName,
-                            file_size: IMG.fileSize,
-                            file_type: IMG.type,
-                            resolution_width: IMG.width,
-                            resolution_height: IMG.height,
-                        },
-                        tags,
                     },
-                })
+                    { headers: { authorization_token: session.account.jwtToken } }
+                )
                 .then(function (response) {
                     setCreatedMoment(response.data)
                     notify("toast", {
@@ -137,10 +141,14 @@ export function Provider({ children }: NewMomentProviderProps) {
     async function addToMemory() {
         if (createdMoment) {
             await api
-                .post(`/memory/add-moment`, {
-                    memory_id: selectedMemory?.id,
-                    moments_list: [{ id: createdMoment.id }],
-                })
+                .post(
+                    `/memory/add-moment`,
+                    {
+                        memory_id: selectedMemory?.id,
+                        moments_list: [{ id: createdMoment.id }],
+                    },
+                    { headers: { authorization_token: session.account.jwtToken } }
+                )
                 .then(function (response) {
                     setTags([])
                     setDescription("")
@@ -205,7 +213,11 @@ export function Provider({ children }: NewMomentProviderProps) {
     async function getAllMemories() {
         try {
             const response = await api
-                .post(`memory/get-user-memories`, { user_id: session.user.id })
+                .post(
+                    `memory/get-user-memories`,
+                    { user_id: session.user.id },
+                    { headers: { authorization_token: session.account.jwtToken } }
+                )
                 .then(function (response) {
                     return response.data
                 })
