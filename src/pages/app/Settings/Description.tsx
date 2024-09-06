@@ -2,8 +2,8 @@ import { useNavigation } from "@react-navigation/native"
 import React from "react"
 import { Keyboard, StatusBar, TextInput, useColorScheme } from "react-native"
 import Icon from "../../../assets/icons/svgs/check_circle.svg"
-import ButtonStandart from "../../../components/buttons/button-standart"
 import { Text, View } from "../../../components/Themed"
+import ButtonStandart from "../../../components/buttons/button-standart"
 import PersistedContext from "../../../contexts/Persisted"
 import LanguageContext from "../../../contexts/Preferences/language"
 import ColorTheme, { colors } from "../../../layout/constants/colors"
@@ -108,10 +108,14 @@ export default function DescriptionScreen() {
         if (description) {
             try {
                 await api
-                    .put("/account/edit/description", {
-                        user_id: session.user.id,
-                        description,
-                    })
+                    .put(
+                        "/account/edit/description",
+                        {
+                            user_id: session.user.id,
+                            description,
+                        },
+                        { headers: { authorization_token: session.account.jwtToken } }
+                    )
                     .finally(() => {
                         session.user.get(session.user.id)
                         setDescription("")

@@ -48,9 +48,13 @@ export default function ListMemoriesPreview({
 
     const fetchData = async () => {
         await api
-            .post(`/memory/get-user-memories?page=${page}&pageSize=${pageSize}`, {
-                user_id: user.id,
-            })
+            .post(
+                `/memory/get-user-memories?page=${page}&pageSize=${pageSize}`,
+                {
+                    user_id: user.id,
+                },
+                { headers: { authorization_token: session.account.jwtToken } }
+            )
             .then(function (response) {
                 if (page === 1) setMemories(response.data.memories)
                 else {

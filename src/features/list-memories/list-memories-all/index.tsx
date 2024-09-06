@@ -1,3 +1,4 @@
+import PersistedContext from "@/contexts/Persisted"
 import React from "react"
 import { useColorScheme } from "react-native"
 import OfflineCard from "../../../components/general/offline"
@@ -14,6 +15,7 @@ import { ListMemoriesAllSkeleton } from "./skeleton"
 
 export default function ListMemoriesAllSeparatedbyDate() {
     const { t } = React.useContext(LanguageContext)
+    const { session } = React.useContext(PersistedContext)
     const { allMemoriesUser } = React.useContext(MemoryContext)
     const [allMemories, setAllMemories] = React.useState<Object[]>([])
     const [page, setPage] = React.useState(1)
@@ -25,9 +27,13 @@ export default function ListMemoriesAllSeparatedbyDate() {
     const { networkStats } = React.useContext(NetworkContext)
     const fetchData = async () => {
         await api
-            .post(`/memory/get-user-memories?page=${page}&pageSize=${pageSize}`, {
-                user_id: allMemoriesUser.id,
-            })
+            .post(
+                `/memory/get-user-memories?page=${page}&pageSize=${pageSize}`,
+                {
+                    user_id: allMemoriesUser.id,
+                },
+                { headers: { authorization_token: session.account.jwtToken } }
+            )
             .then(function (response) {
                 if (page === 1) {
                     setAllMemories(response.data.memories)

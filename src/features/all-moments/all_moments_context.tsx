@@ -1,3 +1,4 @@
+import PersistedContext from "@/contexts/Persisted"
 import React from "react"
 import { notify } from "react-native-notificated"
 import TouchID from "react-native-simple-biometrics"
@@ -28,6 +29,7 @@ export type AllMomentsContextsData = {
 const AllMomentsContext = React.createContext<AllMomentsContextsData>({} as AllMomentsContextsData)
 
 export function AllMomentsProvider({ children }: AllMomentsProviderProps) {
+    const { session } = React.useContext(PersistedContext)
     const { t } = React.useContext(LanguageContext)
     const [selectedMoments, setSelectedMoments] = React.useState<Moment[]>([])
 
@@ -42,7 +44,11 @@ export function AllMomentsProvider({ children }: AllMomentsProviderProps) {
                     return item.id
                 })
                 await api
-                    .post(`/moment/delete-list`, { moment_ids_list: [...filtered_moments] })
+                    .post(
+                        `/moment/delete-list`,
+                        { moment_ids_list: [...filtered_moments] },
+                        { headers: { authorization_token: session.account.jwtToken } }
+                    )
                     .then(() => {
                         notify("toast", {
                             params: {
