@@ -1,7 +1,7 @@
 import { useNavigation } from "@react-navigation/native"
 import React from "react"
 import { Text, View } from "react-native"
-import Camera from "../../../assets/icons/svgs/camera.svg"
+import Camera from "../../../assets/icons/svgs/plus_circle.svg"
 import SearchIcon from "../../../assets/icons/svgs/search.svg"
 import LanguageContext from "../../../contexts/Preferences/language"
 import ColorTheme from "../../../layout/constants/colors"
@@ -41,11 +41,11 @@ export default function HeaderRightHome() {
         <View style={container}>
             <ButtonStandart
                 action={onPressNewMoment}
-                width={140}
+                width={90}
                 backgroundColor={String(ColorTheme().backgroundDisabled)}
             >
                 <View style={textContainer}>
-                    <Text style={text}>{t("New Moment")}</Text>
+                    <Text style={text}>{t("Create")}</Text>
                 </View>
                 <Camera fill={String(ColorTheme().text)} width={16} height={16} />
             </ButtonStandart>
