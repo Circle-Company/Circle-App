@@ -1,5 +1,10 @@
 import { MMKV } from "react-native-mmkv"
+import { initializeMMKVFlipper } from "react-native-mmkv-flipper-plugin"
 export const storage = new MMKV()
+
+if (__DEV__) {
+    initializeMMKVFlipper({ default: storage })
+}
 
 export function storageKeys() {
     const sessionId = storage.getNumber("@circle:sessionId")
@@ -15,6 +20,10 @@ export function storageKeys() {
             muted: baseKey + "account:mute",
             last_active_at: baseKey + "account:lastactive",
             last_login_at: baseKey + "account:lastlogin",
+            jwt: {
+                expiration: baseKey + "account:jwt:expiration",
+                token: baseKey + "account:jwt:token",
+            },
         },
         statistics: {
             total_followers: baseKey + "statistics:totalfollowers",
@@ -48,9 +57,6 @@ export function storageKeys() {
         permissions: {
             postNotifications: baseKey + "permissions:postnotifications",
             firebaseMessaging: baseKey + "permissions:firebasemessaging",
-        },
-        jwt: {
-            expiration: baseKey + "jwt:expiration",
         },
     }
 }

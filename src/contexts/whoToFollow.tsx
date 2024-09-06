@@ -1,8 +1,8 @@
-import React, { createContext, useContext } from "react"
-import AuthContext from "./auth"
-import api from "../services/Api"
 import NetInfo from "@react-native-community/netinfo"
+import React, { createContext } from "react"
 import whotofollowdata from "../data/who_to_follow.json"
+import api from "../services/Api"
+import PersistedContext from "./Persisted"
 
 interface WhoToFollowContextProps {
     isConnected: boolean | null
@@ -16,6 +16,7 @@ interface WhoToFollowContextProvider {
 const WhoToFollowContext = createContext<WhoToFollowContextProps | undefined>(undefined)
 
 export function WhoToFollowContextProvider({ children }: WhoToFollowContextProvider) {
+    const { session } = React.useContext(PersistedContext)
     const [isConnected, setIsConnected] = React.useState<boolean | null>(true)
     const [usersRecommendation, setUsersRecommendation] = React.useState(whotofollowdata)
 
@@ -29,7 +30,9 @@ export function WhoToFollowContextProvider({ children }: WhoToFollowContextProvi
     const fetchData = async () => {
         try {
             const response = api
-                .get("/user/most-famous?page=1&pageSize=4")
+                .get("/user/most-famous?page=1&pageSize=4", {
+                    headers: { authorization_token: session.account.jwtToken },
+                })
                 .then(function (response) {
                     setUsersRecommendation(response.data)
                 })

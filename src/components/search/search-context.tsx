@@ -31,10 +31,16 @@ export function SearchContextProvider({ children }: SearchContextProvider) {
         if (searchTerm == "") return []
         try {
             const response = api
-                .post("/user/search", {
-                    username_to_search: searchTerm,
-                    user_id: session.user.id,
-                })
+                .post(
+                    "/user/search",
+                    {
+                        username_to_search: searchTerm,
+                        user_id: session.user.id,
+                    },
+                    {
+                        headers: { authorization_token: session.account.jwtToken },
+                    }
+                )
                 .then(function (response) {
                     return response.data
                 })

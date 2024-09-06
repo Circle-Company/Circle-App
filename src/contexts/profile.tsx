@@ -40,7 +40,11 @@ export function Provider({ children }: ProfileProviderProps) {
         if (!isMe) {
             try {
                 await api
-                    .post(`/user/profile/data/pk/${user_id}`, { user_id })
+                    .post(
+                        `/user/profile/data/pk/${user_id}`,
+                        { user_id },
+                        { headers: { authorization_token: session.account.jwtToken } }
+                    )
                     .then(function (response) {
                         setCurrentUser(response.data)
                         setLoading(false)

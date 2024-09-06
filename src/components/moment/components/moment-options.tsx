@@ -2,16 +2,16 @@ import React from "react"
 import { View } from "react-native"
 import { useNotifications } from "react-native-notificated"
 import CheckIcon from "../../../assets/icons/svgs/check_circle.svg"
-import BottomSheetContext from "../../../contexts/bottomSheet"
 import PersistedContext from "../../../contexts/Persisted"
 import LanguageContext from "../../../contexts/Preferences/language"
+import BottomSheetContext from "../../../contexts/bottomSheet"
 import ColorTheme, { colors } from "../../../layout/constants/colors"
 import fonts from "../../../layout/constants/fonts"
 import sizes from "../../../layout/constants/sizes"
 import api from "../../../services/Api"
-import ButtonStandart from "../../buttons/button-standart"
 import { MemoryReciveDataProps } from "../../Memory/Memory-types"
 import { Text } from "../../Themed"
+import ButtonStandart from "../../buttons/button-standart"
 import { MomentDataReturnsProps, MomentOptionsProps } from "../context/types"
 import { statisticsPreview as StatisticsPreview } from "./moment-statistics-preview"
 
@@ -31,11 +31,15 @@ export default function options({ memory, momentData, momentOptions }: OptionsPr
 
     async function handleDeleteFromMemoryPress() {
         await api
-            .post("/memory/remove-moment", {
-                memory_id: memory.id,
-                moment_id: momentData.id,
-                user_id: session.user.id,
-            })
+            .post(
+                "/memory/remove-moment",
+                {
+                    memory_id: memory.id,
+                    moment_id: momentData.id,
+                    user_id: session.user.id,
+                },
+                { headers: { authorization_token: session.account.jwtToken } }
+            )
             .then(() => {
                 notify("toast", {
                     params: {

@@ -1,3 +1,4 @@
+import PersistedContext from "@/contexts/Persisted"
 import React from "react"
 import { LanguagesCodesType } from "../../../locales/LanguageTypes"
 import api from "../../../services/Api"
@@ -30,8 +31,11 @@ export function useMomentData(): MomentDataState {
     const [createdAt, setCreatedAt] = React.useState<string>("")
 
     async function getComments({ page, pageSize }: { page: number; pageSize: number }) {
+        const { session } = React.useContext(PersistedContext)
         await api
-            .post(`/moment/get-comments?page=${page}&pageSize=${pageSize}`, { moment_id: id })
+            .get(`/moments/${id}/comments?page=${page}&pageSize=${pageSize}`, {
+                headers: { authorization_token: session.account.jwtToken },
+            })
             .then((response) => {
                 if (page === 1) setComments(response.data.comments)
                 else setComments([...comments, ...response.data.comments])
@@ -42,8 +46,11 @@ export function useMomentData(): MomentDataState {
     }
 
     async function getStatistics() {
+        const { session } = React.useContext(PersistedContext)
         await api
-            .post("/moment/get-statistics/view", { moment_id: id })
+            .get(`/moments/${id}/statistics/preview`, {
+                headers: { authorization_token: session.account.jwtToken },
+            })
             .then((response) => {
                 setStatistics(response.data)
             })
@@ -53,8 +60,11 @@ export function useMomentData(): MomentDataState {
     }
 
     async function getTags() {
+        const { session } = React.useContext(PersistedContext)
         return await api
-            .post("/moment/get-tags?page=1&pageSize=100", { moment_id: id })
+            .get(`/moments/${id}/tags?page=1&pageSize=100`, {
+                headers: { authorization_token: session.account.jwtToken },
+            })
             .then((response) => {
                 setTags(response.data)
                 return response.data

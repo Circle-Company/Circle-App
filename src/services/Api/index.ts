@@ -1,6 +1,7 @@
 import axios from "axios"
 import config from "../../config"
 import { routes as accountRoutes } from "./routes/account"
+import { routes as authRoutes } from "./routes/auth"
 import { routes as momentRoutes } from "./routes/moment"
 import { routes as notificationRoutes } from "./routes/notification"
 import { routes as preferencesRoutes } from "./routes/preferences"
@@ -18,4 +19,5 @@ export const apiRoutes = {
     user: userRoutes,
     notification: notificationRoutes,
     preferences: preferencesRoutes,
+    auth: authRoutes,
 }

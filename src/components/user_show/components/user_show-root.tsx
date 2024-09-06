@@ -20,10 +20,16 @@ export default function root({ children, data }: UserRootProps) {
     const follow = async (followed_user_id: number) => {
         try {
             const response = await api
-                .post("/user/follow", {
-                    user_id: session.user.id,
-                    followed_user_id,
-                })
+                .post(
+                    "/user/follow",
+                    {
+                        user_id: session.user.id,
+                        followed_user_id,
+                    },
+                    {
+                        headers: { authorization_token: session.account.jwtToken },
+                    }
+                )
                 .then(function (response) {
                     return response.data
                 })
@@ -39,10 +45,16 @@ export default function root({ children, data }: UserRootProps) {
     const unfollow = async (followed_user_id: number) => {
         try {
             const response = await api
-                .post("/user/unfollow", {
-                    user_id: session.user.id,
-                    followed_user_id,
-                })
+                .post(
+                    "/user/unfollow",
+                    {
+                        user_id: session.user.id,
+                        followed_user_id,
+                    },
+                    {
+                        headers: { authorization_token: session.account.jwtToken },
+                    }
+                )
                 .then(function (response) {
                     return response.data
                 })

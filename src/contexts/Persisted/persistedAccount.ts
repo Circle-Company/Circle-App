@@ -6,6 +6,8 @@ const storageKey = storageKeys().account
 export interface AccountState extends AccountDataType {
     setUnreadNotificationsCount: (value: number) => void
     setFirebasePushToken: (value: string) => void
+    setJwtToken: (value: string) => void
+    setJwtExpiration: (value: string) => void
     setBlocked: (value: boolean) => void
     setMuted: (value: boolean) => void
     setLastActiveAt: (value: string) => void
@@ -18,6 +20,8 @@ export interface AccountState extends AccountDataType {
 export const useAccountStore = create<AccountState>((set) => ({
     unreadNotificationsCount: storage.getNumber(storageKey.unreadNotificationsCount) || 0,
     firebasePushToken: storage.getString(storageKey.firebasePushToken) || "",
+    jwtToken: storage.getString(storageKey.jwt.token) || "",
+    jwtExpiration: storage.getString(storageKey.jwt.expiration) || "",
     blocked: storage.getBoolean(storageKey.blocked) || false,
     muted: storage.getBoolean(storageKey.muted) || false,
     last_active_at: storage.getString(storageKey.last_active_at) || new Date().toString(),
@@ -31,6 +35,16 @@ export const useAccountStore = create<AccountState>((set) => ({
     setFirebasePushToken: (value: string) => {
         storage.set(storageKey.firebasePushToken, value.toString())
         set({ firebasePushToken: value })
+    },
+
+    setJwtToken: (value: string) => {
+        if (value) storage.set(storageKey.jwt.token, value)
+        set({ jwtToken: value })
+    },
+
+    setJwtExpiration: (value: string) => {
+        if (value) storage.set(storageKey.jwt.expiration, value)
+        set({ jwtExpiration: value })
     },
 
     setBlocked: (value: boolean) => {
@@ -57,10 +71,14 @@ export const useAccountStore = create<AccountState>((set) => ({
             muted: value.muted,
             last_active_at: value.last_active_at,
             last_login_at: value.last_login_at,
+            jwtToken: value.jwtToken,
+            jwtExpiration: value.jwtExpiration,
         })
         storage.set(storageKey.unreadNotificationsCount, 0)
         storage.set(storageKey.firebasePushToken, value.firebasePushToken.toString())
         storage.set(storageKey.blocked, value.blocked)
+        storage.set(storageKey.jwt.token, value.jwtToken)
+        storage.set(storageKey.jwt.expiration, value.jwtExpiration)
         storage.set(storageKey.muted, value.blocked)
         storage.set(storageKey.last_active_at, value.last_active_at)
         storage.set(storageKey.last_login_at, value.last_login_at)
@@ -71,6 +89,8 @@ export const useAccountStore = create<AccountState>((set) => ({
             firebasePushToken: storage.getString(storageKey.firebasePushToken) || "",
             blocked: storage.getBoolean(storageKey.blocked) || false,
             muted: storage.getBoolean(storageKey.muted) || false,
+            jwtToken: storage.getString(storageKey.jwt.token) || "",
+            jwtExpiration: storage.getString(storageKey.jwt.expiration) || "",
             last_active_at: storage.getString(storageKey.last_active_at) || new Date().toString(),
             last_login_at: storage.getString(storageKey.last_login_at) || new Date().toString(),
         })
@@ -80,6 +100,8 @@ export const useAccountStore = create<AccountState>((set) => ({
         storage.delete(storageKey.firebasePushToken)
         storage.delete(storageKey.blocked)
         storage.delete(storageKey.muted)
+        storage.delete(storageKey.jwt.token)
+        storage.delete(storageKey.jwt.expiration)
         storage.delete(storageKey.last_active_at)
         storage.delete(storageKey.last_login_at)
 
@@ -88,6 +110,8 @@ export const useAccountStore = create<AccountState>((set) => ({
             firebasePushToken: "",
             blocked: false,
             muted: false,
+            jwtToken: "",
+            jwtExpiration: "",
             last_active_at: new Date().toString(),
             last_login_at: new Date().toString(),
         })

@@ -1,3 +1,4 @@
+import PersistedContext from "@/contexts/Persisted"
 import NetInfo from "@react-native-community/netinfo"
 import React, { createContext, useContext } from "react"
 import api from "../../services/Api"
@@ -13,6 +14,7 @@ interface NearToYouContextProvider {
 const NearToYouContext = createContext<NearToYouContextProps | undefined>(undefined)
 
 export function NearToYouContextProvider({ children }: NearToYouContextProvider) {
+    const { session } = React.useContext(PersistedContext)
     const [isConnected, setIsConnected] = React.useState<boolean | null>(true)
 
     React.useEffect(() => {
@@ -25,7 +27,9 @@ export function NearToYouContextProvider({ children }: NearToYouContextProvider)
     const fetchData = async () => {
         try {
             const response = api
-                .get("/user/most-famous?page=1&pageSize=4")
+                .get("/user/most-famous?page=1&pageSize=4", {
+                    headers: { authorization_token: session.account.jwtToken },
+                })
                 .then(function (response) {
                     console.log(response.data)
                     return response.data

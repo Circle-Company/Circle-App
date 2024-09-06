@@ -1,11 +1,13 @@
 import { MomentDataProps } from "@/components/moment/context/types"
-import { useCallback, useEffect, useState } from "react"
+import PersistedContext from "@/contexts/Persisted"
+import React, { useCallback, useEffect, useState } from "react"
 import { useTimer } from "../../../lib/hooks/useTimer"
 import api from "../../../services/Api"
 import { InteractionProps, MomentProps } from "../types"
 import { ChunksManager } from "./chunks-mananger"
 
 export const useFeed = (userId: number) => {
+    const { session } = React.useContext(PersistedContext)
     const [feedData, setFeedData] = useState<MomentProps[]>([])
     const [loading, setLoading] = useState(false)
     const [scrollEnabled, setScrollEnabled] = useState(true)
@@ -32,14 +34,19 @@ export const useFeed = (userId: number) => {
             setLoading(true)
             resetTimer()
 
+            console.log("fetchfeedauthorization_token:", session.account.jwtToken)
+
             try {
                 const response = await api
-                    .post(`/moment/get-feed`, {
-                        user_id: userId,
-                        period,
-                        length: interactions.length,
-                        data: interactions,
-                    })
+                    .post(
+                        `/moments/feed`,
+                        {
+                            period,
+                            length: interactions.length,
+                            data: interactions,
+                        },
+                        { headers: { authorization_token: session.account.jwtToken } }
+                    )
                     .catch(() => {
                         setLoading(false)
                     })

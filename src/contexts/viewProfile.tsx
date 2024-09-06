@@ -44,9 +44,13 @@ export function Provider({ children }: ViewProfileProviderProps) {
     async function setProfile(Id: number) {
         try {
             const response = api
-                .post(`/user/profile/data/pk/${Id}`, {
-                    user_id: session.user.id,
-                })
+                .post(
+                    `/user/profile/data/pk/${Id}`,
+                    {
+                        user_id: session.user.id,
+                    },
+                    { headers: { authorization_token: session.account.jwtToken } }
+                )
                 .then(function (response) {
                     setUserProfile(response.data)
                 })
