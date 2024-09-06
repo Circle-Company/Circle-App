@@ -1,8 +1,9 @@
 import { useNavigation } from "@react-navigation/native"
 import React from "react"
-import { Pressable, useColorScheme } from "react-native"
+import { Pressable, useColorScheme, View } from "react-native"
 import FastImage from "react-native-fast-image"
 import Animated, { FadeIn } from "react-native-reanimated"
+import Icon from "../../../assets/icons/svgs/@2.svg"
 import ViewProfileContext from "../../../contexts/viewProfile"
 import ColorTheme, { colors } from "../../../layout/constants/colors"
 import sizes from "../../../layout/constants/sizes"
@@ -34,6 +35,11 @@ export default function profile_picture({
         width: Number(pictureDimensions.width) + Number(outlineSize),
         height: Number(pictureDimensions.height) + Number(outlineSize),
         overflow: "hidden",
+    }
+
+    const iconContainer: any = {
+        alignSelf: "center",
+        justifyContent: "center",
     }
 
     const [profilePicture, setProfilePicture] = React.useState<string>("")
@@ -71,6 +77,18 @@ export default function profile_picture({
                         left: Number(outlineSize) / 2,
                     }}
                 />
+                {!user.profile_picture?.tiny_resolution &&
+                    !user.profile_picture?.small_resolution && (
+                        <View style={iconContainer}>
+                            <Icon
+                                width={pictureDimensions.width * 0.5}
+                                height={pictureDimensions.height * 0.5}
+                                fill={
+                                    isDarkMode ? colors.gray.grey_05 + 90 : colors.gray.grey_04 + 50
+                                }
+                            />
+                        </View>
+                    )}
             </Pressable>
         </Animated.View>
     )
