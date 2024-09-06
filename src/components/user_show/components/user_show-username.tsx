@@ -1,6 +1,12 @@
 import React from "react"
 import { Pressable, Text, useColorScheme, View } from "react-native"
 
+import { useNavigation } from "@react-navigation/native"
+import Icon from "../../../assets/icons/svgs/@2.svg"
+import Verifyed from "../../../assets/icons/svgs/check_circle_verify.svg"
+import PersistedContext from "../../../contexts/Persisted"
+import LanguageContext from "../../../contexts/Preferences/language"
+import ViewProfileContext from "../../../contexts/viewProfile"
 import { truncated } from "../../../helpers/processText"
 import ColorTheme, { colors } from "../../../layout/constants/colors"
 import fonts from "../../../layout/constants/fonts"
@@ -8,12 +14,6 @@ import Sizes from "../../../layout/constants/sizes"
 import { UserShowActions } from "../user_show-actions"
 import { useUserShowContext } from "../user_show-context"
 import { UserUsernameProps } from "../user_show-types"
-
-import { useNavigation } from "@react-navigation/native"
-import Verifyed from "../../../assets/icons/svgs/check_circle_verify.svg"
-import PersistedContext from "../../../contexts/Persisted"
-import LanguageContext from "../../../contexts/Preferences/language"
-import ViewProfileContext from "../../../contexts/viewProfile"
 
 export default function user_username({
     displayOnMoment = true,
@@ -55,6 +55,11 @@ export default function user_username({
         color,
     }
 
+    const icon_style = {
+        top: 2,
+        marginRight: 2 * scale,
+    }
+
     async function onUsernameActions() {
         if (disableAnalytics == false || !isMe) {
             UserShowActions.UsernamePressed({
@@ -67,10 +72,11 @@ export default function user_username({
         }
     }
 
-    const username = `@${truncated({ text: user.username, size: Number(truncatedSize) })}`
+    const username = `${truncated({ text: user.username, size: Number(truncatedSize) })}`
     const usernameText = displayYou ? (isMe ? t("You") : username) : username
     return (
         <Pressable onPress={onUsernameActions} style={container}>
+            <Icon style={icon_style} width={12 * scale} height={12 * scale} fill={color} />
             <Text style={displayOnMoment ? username_style_moment : username_style}>
                 {usernameText}
             </Text>
