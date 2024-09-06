@@ -16,7 +16,7 @@ export function MomentProvider({
     momentData,
     momentSize = sizes.moment.standart,
 }: MomentProviderProps) {
-    const { feedData, setChunkInteractionsFunc, currentChunkIds } = React.useContext(FeedContext)
+    const { feedData, setFocusedChunkItemFunc, currentChunkIds } = React.useContext(FeedContext)
     const { session } = React.useContext(PersistedContext)
     const momentDataStore = useMomentData()
     const momentUserActionsStore = useMomentUserActions()
@@ -67,7 +67,7 @@ export function MomentProvider({
                         language: momentData.language,
                         interaction,
                     }
-                    setChunkInteractionsFunc(chunkData)
+                    setFocusedChunkItemFunc(chunkData)
                 }
                 await getChunkInteractions()
             }
