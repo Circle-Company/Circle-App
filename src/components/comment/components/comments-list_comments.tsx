@@ -1,3 +1,4 @@
+import PersistedContext from "@/contexts/Persisted"
 import React from "react"
 import { FlatList, RefreshControl, useColorScheme } from "react-native"
 import Reanimated, { FadeInUp } from "react-native-reanimated"
@@ -15,6 +16,7 @@ import RenderComment from "./comments-render_comment"
 
 export default function list_comments({ preview = true }: CommentsListCommentsProps) {
     const { comment } = useCommentsContext()
+    const { session } = React.useContext(PersistedContext)
     const { networkStats } = React.useContext(NetworkContext)
     const isDarkMode = useColorScheme() === "dark"
     const [page, setPage] = React.useState<number>(1)
@@ -27,8 +29,8 @@ export default function list_comments({ preview = true }: CommentsListCommentsPr
 
     async function fetchData() {
         await api
-            .post(`/moment/get-comments?page=${page}&pageSize=${pageSize}`, {
-                moment_id: momentData.id,
+            .get(`/moments/${momentData.id}/comments?page=${page}&pageSize=${pageSize}`, {
+                headers: { authorization_token: session.account.jwtToken },
             })
             .then(function (response) {
                 if (page === 1) setAllComments(response.data.comments)
