@@ -43,6 +43,7 @@ export function Provider({ children }: ViewProfileProviderProps) {
 
     async function setProfile(Id: number) {
         try {
+            if (!Id) throw new Error("Can´t possible find user without pass Id")
             const response = api
                 .post(
                     `/user/profile/data/pk/${Id}`,
