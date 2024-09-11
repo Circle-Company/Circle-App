@@ -14,6 +14,7 @@ import config from "../../config"
 import ColorTheme, { colors } from "../../layout/constants/colors"
 import fonts from "../../layout/constants/fonts"
 import sizes from "../../layout/constants/sizes"
+import { Vibrate } from "./useHapticFeedback"
 
 type AnimatedFlatlistProps<T> = {
     data: Array<T>
@@ -24,6 +25,7 @@ type AnimatedFlatlistProps<T> = {
     onEndReachedThreshold: number
     showRefreshSpinner?: boolean
     endRefreshAnimationDelay?: number
+    disableVibrate?: boolean
     onEndReached: () => Promise<void>
     handleRefresh: () => void
     CustomRefreshIcon?: React.ComponentType // Adiciona a propriedade para customização do ícone de refresh
@@ -37,6 +39,7 @@ export function AnimatedVerticalFlatlist<T>({
     skeleton,
     onEndReached,
     handleRefresh,
+    disableVibrate = false,
     showRefreshSpinner = true,
     endRefreshAnimationDelay = 200,
     onEndReachedThreshold,
@@ -66,6 +69,7 @@ export function AnimatedVerticalFlatlist<T>({
     const onRefresh = () => {
         setRefreshing(true)
         handleRefresh()
+        if (!disableVibrate) Vibrate("effectTick")
         setTimeout(() => {
             setRefreshing(false)
             pullDownPosition.value = withTiming(0, { duration: 300 })
@@ -78,6 +82,7 @@ export function AnimatedVerticalFlatlist<T>({
 
     const onPanRelease = () => {
         if (isReadyToRefresh.value) {
+            if (!disableVibrate) Vibrate("effectTick")
             pullDownPosition.value = withTiming(75, { duration: 300 })
             isReadyToRefresh.value = false
             runOnJS(onRefresh)()

@@ -14,9 +14,11 @@ import config from "../../config"
 import ColorTheme, { colors } from "../../layout/constants/colors"
 import fonts from "../../layout/constants/fonts"
 import sizes from "../../layout/constants/sizes"
+import { Vibrate } from "./useHapticFeedback"
 
 type AnimatedScrollViewProps = {
     children: React.ReactNode
+    disableVibrate?: boolean
     ListFooterComponent?: () => React.ReactElement
     onEndReachedThreshold: number
     onEndReached: () => Promise<void>
@@ -28,6 +30,7 @@ type AnimatedScrollViewProps = {
 
 export function AnimatedVerticalScrollView({
     children,
+    disableVibrate = false,
     ListFooterComponent,
     onEndReached,
     handleRefresh,
@@ -60,6 +63,7 @@ export function AnimatedVerticalScrollView({
     const onRefresh = () => {
         setRefreshing(true)
         handleRefresh()
+        if (!disableVibrate) Vibrate("effectTick")
         setTimeout(() => {
             setRefreshing(false)
             pullDownPosition.value = withTiming(0, { duration: 300 })
@@ -75,6 +79,7 @@ export function AnimatedVerticalScrollView({
             pullDownPosition.value = withTiming(75, { duration: 300 })
             isReadyToRefresh.value = false
             runOnJS(onRefresh)()
+            if (!disableVibrate) Vibrate("effectTick")
         } else {
             pullDownPosition.value = withTiming(0, { duration: 300 })
         }
@@ -90,11 +95,12 @@ export function AnimatedVerticalScrollView({
                 onPanResponderMove: (_, gestureState) => {
                     const maxDistance = 150
                     pullDownPosition.value = Math.min(maxDistance, Math.max(0, gestureState.dy))
-                    isReadyToRefresh.value = pullDownPosition.value > 75
+                    isReadyToRefresh.value = pullDownPosition.value > 120
                 },
                 onPanResponderRelease: () => onPanRelease(),
                 onPanResponderTerminate: () => {
                     pullDownPosition.value = withTiming(0, { duration: 300 })
+                    if (!disableVibrate) Vibrate("clockTick")
                 },
             }),
         [scrollPosition.value, pullDownPosition.value, isReadyToRefresh.value]
