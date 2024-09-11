@@ -108,7 +108,7 @@ export function RenderMemoryMoment({ moment, focused = true }: RenderMemoryMomen
                 <Animated.View style={footer_container}>
                     <View style={footer_left_container}>
                         <Moment.LikeButton
-                            isLiked={false}
+                            isLiked={moment.is_liked}
                             backgroundColor={String(colors.gray.grey_07)}
                         />
                     </View>
