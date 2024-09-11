@@ -12,7 +12,7 @@ import ButtonStandart from "../../buttons/button-standart"
 export default function HeaderRightHome() {
     const { t } = React.useContext(LanguageContext)
 
-    const navigation = useNavigation()
+    const navigation: any = useNavigation()
 
     const container: any = {
         flexDirection: "row",
@@ -28,9 +28,7 @@ export default function HeaderRightHome() {
     }
 
     async function onPressNewMoment() {
-        navigation.navigate("MomentNavigator", {
-            screen: "NewMomentImageScreen",
-        })
+        navigation.navigate("CreateBottomTab")
     }
 
     async function onPressSearch() {
