@@ -53,13 +53,9 @@ export function Provider({ children }: SelectMomentsProviderProps) {
     async function getMoments() {
         try {
             await api
-                .post(
-                    `/moment/get-user-moments/tiny?page=1&pageSize=10000`,
-                    {
-                        user_id: session.user.id,
-                    },
-                    { headers: { authorization_token: session.account.jwtToken } }
-                )
+                .get(`/moments/tiny/${session.user.id}?page=1&pageSize=10000`, {
+                    headers: { authorization_token: session.account.jwtToken },
+                })
                 .then(function (response) {
                     return setAllMoments(response.data.moments)
                 })
@@ -144,8 +140,7 @@ export function Provider({ children }: SelectMomentsProviderProps) {
     }
 
     function endSession() {
-        if (from == "NEW_MOMENT") navigation.navigate("BottomTab", { screen: "Home" })
-        if (from == "NEW_MEMORY") navigation.navigate("BottomTab", { screen: "You" })
+        navigation.navigate("BottomTab", { screen: "Home" })
         setSelectedMoments([])
         setAllMoments([])
         setTitle("")
