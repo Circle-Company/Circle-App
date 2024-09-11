@@ -1,6 +1,7 @@
 import React from "react"
-import { Animated, Pressable, useColorScheme } from "react-native"
+import { Animated, Pressable, View, useColorScheme } from "react-native"
 import FastImage from "react-native-fast-image"
+import Icon from "../../../assets/icons/svgs/@2.svg"
 import { colors } from "../../../layout/constants/colors"
 import sizes from "../../../layout/constants/sizes"
 import { useProfileContext } from "../profile-context"
@@ -27,6 +28,11 @@ export default function picture({ fromProfile = false }: ProfilePictureProps) {
         backgroundColor: isDarkMode ? colors.gray.grey_06 : colors.gray.grey_02,
         width: Number(pictureDimensions.width) + Number(outlineSize),
         height: Number(pictureDimensions.height) + Number(outlineSize),
+    }
+
+    const iconContainer: any = {
+        alignSelf: "center",
+        justifyContent: "center",
     }
 
     async function onProfilePictureAction() {}
@@ -83,6 +89,18 @@ export default function picture({ fromProfile = false }: ProfilePictureProps) {
                         left: Number(outlineSize) / 2,
                     }}
                 />
+                {!user.profile_picture?.tiny_resolution &&
+                    !user.profile_picture?.small_resolution && (
+                        <View style={iconContainer}>
+                            <Icon
+                                width={pictureDimensions.width * 0.5}
+                                height={pictureDimensions.height * 0.5}
+                                fill={
+                                    isDarkMode ? colors.gray.grey_04 + 90 : colors.gray.grey_04 + 50
+                                }
+                            />
+                        </View>
+                    )}
             </Pressable>
         </Animated.View>
     )
