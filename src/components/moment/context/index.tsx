@@ -29,7 +29,7 @@ export function MomentProvider({
 
     useEffect(() => {
         momentUserActionsStore.setMomentUserActions({
-            liked: momentData.isLiked,
+            liked: momentData.is_liked,
             shared: false,
             viewed: false,
             clickIntoMoment: false,
