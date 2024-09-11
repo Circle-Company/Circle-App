@@ -181,12 +181,12 @@ export default function render_moment_full({
                                     color={ColorTheme().text.toString()}
                                     paddingHorizontal={0}
                                 />
-                                {momentData.statistics.total_comments_num && (
+                                {momentData?.statistics?.total_comments_num && (
                                     <Moment.Full.Comments
                                         comments={momentData.statistics.total_comments_num}
                                     />
                                 )}
-                                {momentData.statistics.total_views_num && (
+                                {momentData?.statistics?.total_views_num && (
                                     <Moment.Full.Views
                                         views={momentData.statistics.total_views_num}
                                     />
