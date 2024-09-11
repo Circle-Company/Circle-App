@@ -11,7 +11,7 @@ import sizes from "../../../layout/constants/sizes"
 type ViewMorePuttonProps = {
     bounciness?: number
     animationScale?: number
-    action(): Promise<void>
+    action(): void | Promise<void>
     icon?: React.ReactNode | null
     text?: string
     scale?: number
