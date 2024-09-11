@@ -4,6 +4,7 @@ import ColorTheme from "../../layout/constants/colors"
 import { Interpolation as HorizontalLeft } from "../transitions/horizontal-left"
 import { Interpolation as HorizontalRight } from "../transitions/horizontal-right"
 import BottomTabNavigator from "./BottomTabNavigator"
+import CreateBottomTabNavigator from "./CreateBottomTabNavigator"
 import { ExploreScreenNavigator } from "./ExploreScreenNavigator"
 import { InboxNavigator } from "./InboxNavigator"
 import { MemoriesNavigator } from "./MemoriesNavigator"
@@ -22,6 +23,7 @@ export default function AppNavigator() {
             }}
         >
             <App.Screen name="BottomTab" component={BottomTabNavigator} />
+            <App.Screen name="CreateBottomTab" component={CreateBottomTabNavigator} />
             <App.Screen
                 name="SettingsNavigator"
                 component={SettingsNavigator}

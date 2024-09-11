@@ -1,7 +1,8 @@
+import RenderSelectFromGalleryButton from "@/features/new_moment/render-select_button copy"
 import React from "react"
 import { StatusBar, useColorScheme } from "react-native"
-import { MidiaRender } from "../../../components/midia_render"
 import { View } from "../../../components/Themed"
+import { MidiaRender } from "../../../components/midia_render"
 import NewMomentContext from "../../../contexts/newMoment"
 import RenderSelectButton from "../../../features/new_moment/render-select_button"
 import ColorTheme, { colors } from "../../../layout/constants/colors"
@@ -38,9 +39,12 @@ export default function NewMomentImageScreen() {
         borderColor: isDarkMode ? colors.gray.grey_09 : colors.gray.grey_02,
     }
 
-    React.useEffect(() => {
-        handleLaunchImageLibrary()
-    }, [])
+    const selectButtonContainer: any = {
+        width: sizes.screens.width,
+        height: "90%",
+        alignItems: "center",
+        justifyContent: "center",
+    }
 
     return (
         <View style={container}>
@@ -64,7 +68,14 @@ export default function NewMomentImageScreen() {
                     </View>
                 )}
             </View>
-            {image ? <RenderSelectButton /> : null}
+
+            {image ? (
+                <RenderSelectButton />
+            ) : (
+                <View style={selectButtonContainer}>
+                    <RenderSelectFromGalleryButton />
+                </View>
+            )}
         </View>
     )
 }
