@@ -62,7 +62,7 @@ export function Provider({ children }: PersistedProviderProps) {
                 return Promise.reject(error)
             }
         )
-    }, [])
+    }, [api])
 
     function monitorJwtExpiration() {
         const expirationTime = Number(sessionAccount.jwtExpiration) * 1000 // Em milissegundos
