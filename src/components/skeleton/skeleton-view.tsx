@@ -18,29 +18,20 @@ const AnimatedLinearGradient = Animated.createAnimatedComponent(LinearGradient)
 interface SkeletonViewProps extends ViewProps {
     children?: React.ReactNode
     delay?: number
+    duration?: number
     backgroundColor?: string
     gradientColor?: string
 }
 
-export const SkeletonView = React.memo(
-    ({
-        children,
-        style,
-        delay = 0,
-        backgroundColor,
-        gradientColor,
-        ...props
-    }: SkeletonViewProps) => {
+export const SkeletonView: React.FC<SkeletonViewProps> = React.memo(
+    ({ children, style, delay = 0, duration = 1000, backgroundColor, gradientColor, ...props }) => {
         const isDarkMode = useColorScheme() === "dark"
         const x = useSharedValue(0)
 
+        // Aumentando a duração para 3000ms (3 segundos)
         React.useEffect(() => {
-            const startAnimation = () => {
-                x.value = withRepeat(withTiming(1, { duration: 1500 }), -1, false)
-            }
-            const timeoutId = setTimeout(startAnimation, delay)
-            return () => clearTimeout(timeoutId)
-        }, [delay])
+            x.value = withRepeat(withTiming(1, { duration }), -1, false)
+        }, [])
 
         const containerStyle = React.useMemo(
             () => ({
@@ -48,10 +39,8 @@ export const SkeletonView = React.memo(
                     backgroundColor || isDarkMode ? colors.gray.grey_08 : colors.gray.grey_02,
                 overflow: "hidden",
             }),
-            [backgroundColor]
+            [backgroundColor, isDarkMode]
         )
-
-        const lineStyle = React.useMemo(() => StyleSheet.absoluteFillObject, [])
 
         const animatedStyle = useAnimatedStyle(() => ({
             transform: [{ translateX: interpolate(x.value, [0, 1], [-width, width]) }],
@@ -65,7 +54,7 @@ export const SkeletonView = React.memo(
                         gradientColor || isDarkMode ? colors.gray.grey_06 : colors.gray.grey_01,
                         backgroundColor || isDarkMode ? colors.gray.grey_08 : colors.gray.grey_02,
                     ]}
-                    style={[animatedStyle, lineStyle]}
+                    style={[animatedStyle, StyleSheet.absoluteFillObject]}
                     start={{ x: 0, y: 0 }}
                     end={{ x: 1, y: 0 }}
                 />
