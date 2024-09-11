@@ -13,7 +13,7 @@ export type MomentDataProps = {
     tags: TagProps[]
     language: LanguagesCodesType
     created_at: string
-    isLiked: boolean
+    is_liked: boolean
 }
 
 export type ExportMomentDataProps = {
