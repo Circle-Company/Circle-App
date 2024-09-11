@@ -18,7 +18,7 @@ export default function ListNotifcations() {
     const [notificationsData, setNotificationsData] = React.useState([])
 
     const [page, setPage] = React.useState(1)
-    const [pageSize, setPageSize] = React.useState(10)
+    const [pageSize, setPageSize] = React.useState(8)
     const [loading, setLoading] = React.useState(false)
     const [refreshing, setRefreshing] = React.useState(false)
     const [endReached, setEndReached] = React.useState(false)
