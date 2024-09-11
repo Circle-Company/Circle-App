@@ -8,6 +8,7 @@ import NumberConversor from "../../../helpers/numberConversor"
 import ColorTheme, { colors } from "../../../layout/constants/colors"
 import fonts from "../../../layout/constants/fonts"
 import sizes from "../../../layout/constants/sizes"
+import { Vibrate } from "../../../lib/hooks/useHapticFeedback"
 import { useLikeMutation, useUnlikeMutation } from "../../../state/queries/like"
 import { Text } from "../../Themed"
 import MomentContext from "../context"
@@ -124,20 +125,24 @@ export default function like({
     }
 
     async function onLikeAction() {
+        Vibrate("effectClick")
         HandleButtonAnimation()
         momentUserActions.handleLikeButtonPressed({ likedValue: true })
         likeMutation.mutate()
     }
     async function onUnlikeAction() {
+        Vibrate("effectTick")
         HandleButtonAnimation()
         momentUserActions.handleLikeButtonPressed({ likedValue: false })
         unlikeMutation.mutate()
     }
 
     const like_fill: string = String(colors.gray.white)
-    const like_number: string = NumberConversor(Number(momentData.statistics.total_likes_num))
+    const like_number: string = NumberConversor(
+        Number(momentData.statistics.total_likes_num - (isLiked ? 1 : 0))
+    )
     const like_number_pressed: string = NumberConversor(
-        Number(momentData.statistics.total_likes_num) + 1
+        Number(momentData.statistics.total_likes_num - (isLiked ? 1 : 0)) + 1
     )
 
     if (!momentOptions.enableLikeButton) return null
