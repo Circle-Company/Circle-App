@@ -7,6 +7,7 @@ export type MemoryMomentObjectProps = {
     midia: {
         nhd_resolution: string
     }
+    is_liked: boolean
 }
 export type MemoryObjectProps = {
     id: number
