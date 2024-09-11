@@ -15,7 +15,7 @@ type renderCommentProps = {
 
 export default function render_comment({ moment, focused }: renderCommentProps) {
     const { t } = React.useContext(LanguageContext)
-    const { commentEnabled, setCommentEnabled, setKeyboardVisible, setFocusedMoment, feedData } =
+    const { commentEnabled, setCommentEnabled, setKeyboardVisible, setFocusedMoment } =
         React.useContext(FeedContext)
     const [animatedOpacityValue] = React.useState(new Animated.Value(1))
     React.useEffect(() => {
@@ -57,10 +57,7 @@ export default function render_comment({ moment, focused }: renderCommentProps) 
                         </Comments.TopLeftRoot>
                         <Comments.TopRightRoot>
                             <ViewMorebutton
-                                navigateTo=""
-                                action={() => {
-                                    handlePress()
-                                }}
+                                action={handlePress}
                                 text={t("Add Comment")}
                                 icon={
                                     <AddIcon
