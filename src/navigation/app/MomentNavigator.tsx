@@ -60,7 +60,7 @@ export function MomentNavigator() {
                 name="NewMomentImageScreen"
                 component={NewMomentImageScreen}
                 options={{
-                    headerTitle: t("Select Image"),
+                    headerTitle: t("New Moment"),
                     headerStyle: [HeaderStyle],
                     headerTitleStyle: { color: String(ColorTheme().text) },
                     cardStyle: { backgroundColor: String(ColorTheme().background) },
