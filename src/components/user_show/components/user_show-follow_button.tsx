@@ -36,9 +36,9 @@ export default function follow_button({
     }
 
     const container_unpressed: any = {
-        width: sizes.buttons.width / 4.4,
-        height: sizes.buttons.height / 2.8,
-        borderRadius: Number([sizes.buttons.width / 4.4]) / 2,
+        width: sizes.buttons.width / 4.8,
+        height: sizes.buttons.height / 3.2,
+        borderRadius: sizes.borderRadius["1sm"] * 0.9,
         backgroundColor: ColorTheme().text,
         margin: sizes.margins["1sm"],
         alignItems: "center",
@@ -47,9 +47,9 @@ export default function follow_button({
         borderColor: ColorTheme().text + "50",
     }
     const container_pressed: any = {
-        width: sizes.buttons.width / 4.4,
-        height: sizes.buttons.height / 2.8,
-        borderRadius: Number([sizes.buttons.width / 4.4]) / 2,
+        width: sizes.buttons.width / 4.8,
+        height: sizes.buttons.height / 3.2,
+        borderRadius: sizes.borderRadius["1sm"] * 0.9,
         backgroundColor: displayOnMoment
             ? ColorTheme().backgroundDisabled + "99"
             : ColorTheme().backgroundDisabled,
