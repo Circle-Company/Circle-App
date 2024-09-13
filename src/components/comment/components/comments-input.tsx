@@ -1,5 +1,5 @@
 import React from "react"
-import { Animated, Pressable, Text, TextInput, useColorScheme, View } from "react-native"
+import { Animated, Keyboard, Pressable, Text, TextInput, View, useColorScheme } from "react-native"
 import { useNotifications } from "react-native-notificated"
 import CheckIcon from "../../../assets/icons/svgs/check_circle.svg"
 import Arrowbottom from "../../../assets/icons/svgs/paper_plane.svg"
@@ -41,7 +41,10 @@ export default function input({
             useNativeDriver: true,
         }).start()
         async function fetch() {
-            await sendComment()
+            await sendComment().then(() => {
+                setCommentText("")
+                Keyboard.dismiss()
+            })
         }
         fetch()
     }
@@ -92,11 +95,13 @@ export default function input({
     async function sendComment() {
         if (commentText)
             await api
-                .post("/moment/comment", {
-                    user_id: session.user.id,
-                    moment_id: focusedMoment.id,
-                    content: commentText,
-                })
+                .post(
+                    `/moments/${focusedMoment.id}/comments/create`,
+                    {
+                        content: commentText,
+                    },
+                    { headers: { authorization_token: session.account.jwtToken } }
+                )
                 .then(() => {
                     notify("toast", {
                         params: {
