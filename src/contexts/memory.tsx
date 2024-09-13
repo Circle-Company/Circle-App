@@ -1,5 +1,5 @@
 import React from "react"
-import { MemoryReciveDataProps } from "../components/Memory/Memory-types"
+import { MemoryMomentObjectProps, MemoryReciveDataProps } from "../components/Memory/Memory-types"
 import { userReciveDataProps } from "../components/user_show/user_show-types"
 type MemoryProviderProps = {
     children: React.ReactNode
@@ -11,7 +11,7 @@ export type TagProps = {
 
 export type MemoryContextsData = {
     memory: MemoryReciveDataProps
-    memoryMoments: any
+    memoryMoments: Array<MemoryMomentObjectProps>
     allMemoriesUser: userReciveDataProps
     setMemory: React.Dispatch<React.SetStateAction<MemoryReciveDataProps | undefined>>
     setMemoryMoments: React.Dispatch<React.SetStateAction<any>>
