@@ -51,7 +51,7 @@ export default function VersionScreen() {
 
     const data = [
         {
-            title: config.APPLICATION_NAME + ` (${t("Test Version")})`,
+            title: config.APPLICATION_NAME + ` (${t("Release")})`,
             version: config.APP_VERSION + "-" + t("beta"),
         },
     ]
@@ -75,7 +75,7 @@ export default function VersionScreen() {
                 <Text style={[description_style, { top: -10 }]}>
                     *
                     {t(
-                        "Beta test verison, performance and features currently present do not represent the final release version"
+                        "Beta version, performance and features currently present do not represent the final release version."
                     )}
                 </Text>
             </View>
