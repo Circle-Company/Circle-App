@@ -1,8 +1,6 @@
 import React from "react"
-import { AppState } from "react-native"
-import api, { apiRoutes } from "../../services/Api"
-import { storage, storageKeys } from "../../store"
 import AuthContext from "../auth"
+import { monitorJwtExpiration, refreshJwtToken } from "./jwtManager"
 import { useAccountStore } from "./persistedAccount"
 import { useHistoryStore } from "./persistedHistory"
 import { usePermissionsStore } from "./persistedPermissions"
@@ -43,107 +41,24 @@ export function Provider({ children }: PersistedProviderProps) {
             firebaseMessaging: false,
         })
     }, [])
-    let timeoutId: NodeJS.Timeout | null = null
 
+    // Inicializa o monitoramento do JWT
     React.useEffect(() => {
-        api.interceptors.response.use(
-            (response) => response,
-            async (error) => {
-                if (error.response?.status === 401) {
-                    // Token expirou, tenta renová-lo
-                    await refreshJwtToken({
-                        username: storage.getString(storageKeys().user.username) || "",
-                        id: storage.getNumber(storageKeys().user.id) || 0,
-                    })
-                    // Reenvia a requisição original após renovar o token
-                    const originalRequest = error.config
-                    return api.request(originalRequest)
+        const cleanup = monitorJwtExpiration(
+            sessionAccount,
+            async ({ username, id }: { username: string; id: number }) => {
+                try {
+                    await refreshJwtToken({ username, id }, sessionAccount)
+                } catch (error) {
+                    signOut()
                 }
-                return Promise.reject(error)
             }
         )
-    }, [api])
 
-    function monitorJwtExpiration() {
-        const expirationTime = Number(sessionAccount.jwtExpiration) * 1000 // Em milissegundos
-        const renewalThreshold = 60000 // 60 segundos
-
-        const timeRemaining = expirationTime - Date.now()
-
-        // Verifica se o tempo restante é maior que o threshold e não existe um timeout ativo
-        if (timeRemaining > renewalThreshold && !timeoutId) {
-            // Armazena o tempo de expiração para persistência
-            storage.set(storageKeys().account.jwt.expiration, expirationTime.toString())
-
-            timeoutId = setTimeout(() => {
-                refreshJwtToken({
-                    username: storage.getString(storageKeys().user.username) || "",
-                    id: storage.getNumber(storageKeys().user.id) || 0,
-                })
-                storage.delete(storageKeys().account.jwt.expiration) // Limpa após a renovação
-            }, timeRemaining - renewalThreshold)
-
-            // Listener para app sendo fechado ou reaberto
-            const handleAppStateChange = (nextAppState: string) => {
-                if (nextAppState === "active") {
-                    // Quando o app reabre, checa o tempo restante
-                    const storedExpirationTime = storage.getString(
-                        storageKeys().account.jwt.expiration
-                    )
-
-                    if (storedExpirationTime) {
-                        const storedTimeRemaining = parseInt(storedExpirationTime) - Date.now()
-                        if (storedTimeRemaining <= renewalThreshold) {
-                            refreshJwtToken({
-                                username: storage.getString(storageKeys().user.username) || "",
-                                id: storage.getNumber(storageKeys().user.id) || 0,
-                            })
-                        } else if (!timeoutId) {
-                            // Reagendar renovação
-                            timeoutId = setTimeout(() => {
-                                refreshJwtToken({
-                                    username: storage.getString(storageKeys().user.username) || "",
-                                    id: storage.getNumber(storageKeys().user.id) || 0,
-                                })
-                            }, storedTimeRemaining - renewalThreshold)
-                        }
-                    }
-                } else if (nextAppState === "inactive" || nextAppState === "background") {
-                    if (timeoutId) {
-                        clearTimeout(timeoutId) // Cancela o timeout ao fechar ou minimizar o app
-                        timeoutId = null
-                    }
-                }
-            }
-
-            const subscription = AppState.addEventListener("change", handleAppStateChange)
-
-            // Cleanup: remove listener e timeout quando o componente desmonta
-            return () => {
-                if (timeoutId) {
-                    clearTimeout(timeoutId)
-                    timeoutId = null
-                }
-                subscription.remove() // Remove o listener
-            }
-        } else if (timeRemaining <= renewalThreshold && !timeoutId) {
-            refreshJwtToken({
-                username: storage.getString(storageKeys().user.username) || "",
-                id: storage.getNumber(storageKeys().user.id) || 0,
-            })
+        return () => {
+            cleanup()
         }
-    }
-
-    async function refreshJwtToken({ username, id }: { username: string; id: number }) {
-        if (username && id !== 0) {
-            const response = await apiRoutes.auth.refreshToken({ username, id })
-            sessionAccount.setJwtToken(response.data.jwtToken)
-            sessionAccount.setJwtExpiration(response.data.jwtExpiration)
-
-            timeoutId = null // Reinicia o controle de timeout
-            monitorJwtExpiration() // Reconfigura o monitoramento
-        }
-    }
+    }, [sessionAccount.jwtToken])
 
     React.useEffect(() => {
         const isSigned = checkIsSigned()
