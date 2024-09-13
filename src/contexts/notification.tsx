@@ -34,8 +34,10 @@ export function Provider({ children }: NotificationProviderProps) {
     }, [])
 
     messaging().onTokenRefresh((token) => {
-        notification.refreshPushToken(token)
-        notification.registerPushToken({ userId: session.user.id, token })
+        setTimeout(() => {
+            notification.refreshPushToken(token)
+            notification.registerPushToken({ userId: session.user.id, token })
+        }, 10000)
     })
 
     messaging().onMessage(async (remoteMessage) => {
