@@ -45,7 +45,7 @@ export function AllMomentsProvider({ children }: AllMomentsProviderProps) {
                 })
                 await api
                     .post(
-                        `/moment/delete-list`,
+                        `/moments/delete-list`,
                         { moment_ids_list: [...filtered_moments] },
                         { headers: { authorization_token: session.account.jwtToken } }
                     )
