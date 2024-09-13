@@ -6,6 +6,9 @@ import api from "../../../services/Api"
 import { InteractionProps, MomentProps } from "../types"
 import { ChunksManager } from "./chunks-mananger"
 
+// Debounce de tempo em ms para evitar requisições excessivas
+const DEBOUNCE_TIME = 5000 // 5 segundos
+
 export const useFeed = (userId: number) => {
     const { session } = React.useContext(PersistedContext)
     const [feedData, setFeedData] = useState<MomentProps[]>([])
@@ -20,9 +23,11 @@ export const useFeed = (userId: number) => {
     const [interactions, setInteractions] = useState<InteractionProps[]>([])
     const [period, setPeriod] = useState(0)
 
+    const [lastRequestTime, setLastRequestTime] = useState<number>(0) // Timestamp da última requisição
+
     function setFocusedChunkItemFunc({ id }: { id: number }) {
         currentChunkIds.map((item, index) => {
-            if (item == id) setFocusedChunkItem({ id, index })
+            if (item === id) setFocusedChunkItem({ id, index })
         })
     }
 
@@ -30,6 +35,13 @@ export const useFeed = (userId: number) => {
 
     const fetchFeed = useCallback(
         async (isReloading = false) => {
+            const currentTime = Date.now()
+            // Verifica se já passou tempo suficiente (debounce) para evitar requisições seguidas
+            if (currentTime - lastRequestTime < DEBOUNCE_TIME) {
+                console.log("Debounce ativo, evitando nova requisição")
+                return
+            }
+
             setScrollEnabled(false)
             setLoading(true)
             resetTimer()
@@ -54,6 +66,11 @@ export const useFeed = (userId: number) => {
                 const newChunkIds = response.data.map((moment: any) => moment.id)
                 const currentPostIds = feedData.map((item) => item.id)
 
+                // Remove itens que já estão em currentChunkIds
+                const filteredNewChunks = response.data.filter(
+                    (moment: any) => !currentChunkIds.includes(moment.id)
+                )
+
                 const { addChunkOnList } = ChunksManager({
                     reloading: isReloading,
                     period,
@@ -62,16 +79,23 @@ export const useFeed = (userId: number) => {
                 })
 
                 if (addChunkOnList) {
-                    setFeedData(response.data)
-                    setCurrentChunkIds(newChunkIds)
+                    // Adiciona apenas os novos chunks que não estão em currentChunkIds
+                    setFeedData((prevFeedData) => [...prevFeedData, ...filteredNewChunks])
+                    setCurrentChunkIds((prevChunkIds) => [
+                        ...prevChunkIds,
+                        ...filteredNewChunks.map((chunk: any) => chunk.id),
+                    ])
                 }
+
+                // Atualiza o timestamp da última requisição
+                setLastRequestTime(currentTime)
             } finally {
                 setScrollEnabled(true)
                 setLoading(false)
-                setInteractions([])
+                setInteractions([]) // Limpa interações após a resposta
             }
         },
-        [userId]
+        [interactions, lastRequestTime]
     )
 
     useEffect(() => {
