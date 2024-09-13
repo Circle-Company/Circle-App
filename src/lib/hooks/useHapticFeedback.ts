@@ -1,5 +1,6 @@
+import PersistedContext from "@/contexts/Persisted"
+import React from "react"
 import ReactNativeHapticFeedback from "react-native-haptic-feedback"
-
 export type HapticFeedbackTypes =
     | "impactLight"
     | "impactMedium"
@@ -31,5 +32,7 @@ const options = {
 }
 
 export function Vibrate(hapticType: HapticFeedbackTypes) {
-    ReactNativeHapticFeedback.trigger(hapticType, options)
+    const { session } = React.useContext(PersistedContext)
+    if (session.preferences.content.disableHaptics == false)
+        ReactNativeHapticFeedback.trigger(hapticType, options)
 }
