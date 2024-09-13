@@ -1,11 +1,11 @@
 import React from "react"
 import { FlatList, RefreshControl, ScrollView, useColorScheme } from "react-native"
+import { Text, View } from "../../components/Themed"
 import OfflineCard from "../../components/general/offline"
 import { Loading } from "../../components/loading"
-import { Text, View } from "../../components/Themed"
-import NetworkContext from "../../contexts/network"
 import PersistedContext from "../../contexts/Persisted"
 import LanguageContext from "../../contexts/Preferences/language"
+import NetworkContext from "../../contexts/network"
 import ColorTheme, { colors } from "../../layout/constants/colors"
 import fonts from "../../layout/constants/fonts"
 import sizes from "../../layout/constants/sizes"
@@ -30,8 +30,8 @@ export default function ListAllMoments() {
         async function getMoments() {
             try {
                 await api
-                    .post(`/moment/get-user-moments/tiny?page=${page}&pageSize=${pageSize}`, {
-                        user_id: session.user.id,
+                    .get(`/moments/tiny/${session.user.id}?page=${page}&pageSize=${pageSize}`, {
+                        headers: { authorization_token: session.account.jwtToken },
                     })
                     .then(function (response) {
                         if (page === 1) {
