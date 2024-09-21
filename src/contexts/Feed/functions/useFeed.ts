@@ -35,6 +35,7 @@ export const useFeed = (userId: number) => {
 
     const fetchFeed = useCallback(
         async (isReloading = false) => {
+            if (!session.user) throw new Error("has not user")
             const currentTime = Date.now()
             // Verifica se já passou tempo suficiente (debounce) para evitar requisições seguidas
             if (currentTime - lastRequestTime < DEBOUNCE_TIME) {
@@ -46,10 +47,8 @@ export const useFeed = (userId: number) => {
             setLoading(true)
             resetTimer()
 
-            console.log("fetchfeedauthorization_token:", session.account.jwtToken)
-
             try {
-                const response = await api
+                await api
                     .post(
                         `/moments/feed`,
                         {
@@ -59,43 +58,49 @@ export const useFeed = (userId: number) => {
                         },
                         { headers: { authorization_token: session.account.jwtToken } }
                     )
+                    .then((response) => {
+                        if (response.data.length >= 1) {
+                            const newChunkIds = response.data?.map((moment: any) => moment.id)
+                            const currentPostIds = feedData.map((item) => item.id)
+
+                            // Remove itens que já estão em currentChunkIds
+                            const filteredNewChunks = response.data?.filter(
+                                (moment: any) => !currentChunkIds.includes(moment.id)
+                            )
+
+                            const { addChunkOnList } = ChunksManager({
+                                reloading: isReloading,
+                                period,
+                                previousList: currentPostIds,
+                                newList: newChunkIds,
+                            })
+
+                            if (addChunkOnList) {
+                                // Adiciona apenas os novos chunks que não estão em currentChunkIds
+                                setFeedData((prevFeedData) => [
+                                    ...prevFeedData,
+                                    ...filteredNewChunks,
+                                ])
+                                setCurrentChunkIds((prevChunkIds) => [
+                                    ...prevChunkIds,
+                                    ...filteredNewChunks.map((chunk: any) => chunk.id),
+                                ])
+                            }
+
+                            // Atualiza o timestamp da última requisição
+                            setLastRequestTime(currentTime)
+                        }
+                    })
                     .catch(() => {
                         setLoading(false)
                     })
-
-                const newChunkIds = response.data.map((moment: any) => moment.id)
-                const currentPostIds = feedData.map((item) => item.id)
-
-                // Remove itens que já estão em currentChunkIds
-                const filteredNewChunks = response.data.filter(
-                    (moment: any) => !currentChunkIds.includes(moment.id)
-                )
-
-                const { addChunkOnList } = ChunksManager({
-                    reloading: isReloading,
-                    period,
-                    previousList: currentPostIds,
-                    newList: newChunkIds,
-                })
-
-                if (addChunkOnList) {
-                    // Adiciona apenas os novos chunks que não estão em currentChunkIds
-                    setFeedData((prevFeedData) => [...prevFeedData, ...filteredNewChunks])
-                    setCurrentChunkIds((prevChunkIds) => [
-                        ...prevChunkIds,
-                        ...filteredNewChunks.map((chunk: any) => chunk.id),
-                    ])
-                }
-
-                // Atualiza o timestamp da última requisição
-                setLastRequestTime(currentTime)
             } finally {
                 setScrollEnabled(true)
                 setLoading(false)
                 setInteractions([]) // Limpa interações após a resposta
             }
         },
-        [interactions, lastRequestTime]
+        [userId]
     )
 
     useEffect(() => {
