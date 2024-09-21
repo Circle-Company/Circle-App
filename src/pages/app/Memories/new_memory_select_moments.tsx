@@ -8,7 +8,6 @@ export default function NewMemorySelectMomentsScreen() {
     const isDarkMode = useColorScheme() === "dark"
 
     const container = {
-        alignItems: "center",
         flex: 1,
     }
     return (
