@@ -1,10 +1,7 @@
-import { useIsFocused } from "@react-navigation/native"
 import React from "react"
-import { useColorScheme } from "react-native"
 import { View } from "../../../components/Themed"
 import PersistedContext from "../../../contexts/Persisted"
 import AccountContext from "../../../contexts/account"
-import BottomTabsContext from "../../../contexts/bottomTabs"
 import ListMemories from "../../../features/list-memories/list-memories-preview"
 import RenderProfile from "../../../features/render-profile"
 import { RenderProfileSkeleton } from "../../../features/render-profile/skeleton"
@@ -13,18 +10,7 @@ import { AnimatedVerticalScrollView } from "../../../lib/hooks/useAnimatedScroll
 export default function AccountScreen() {
     const { setRefreshing, refreshing } = React.useContext(AccountContext)
     const { session } = React.useContext(PersistedContext)
-    const { setCurrentTab } = React.useContext(BottomTabsContext)
     const [loading, setLoading] = React.useState(false)
-    const isDarkMode = useColorScheme() === "dark"
-    const isFocused = useIsFocused()
-
-    React.useEffect(() => {
-        setCurrentTab("Account")
-    }, [isFocused])
-
-    const container = {
-        top: 0,
-    }
 
     async function fetchData() {
         setLoading(true)
