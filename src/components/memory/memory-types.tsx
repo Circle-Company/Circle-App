@@ -59,7 +59,6 @@ export type MemoryHeaderRightProps = {
     children: React.ReactNode
 }
 export type MemoryHeaderLeftProps = {
-    text?: string
     number?: number
     children?: React.ReactNode
 }
