@@ -51,6 +51,7 @@ export default function section({ name, type, content }: SettignsSectionProps) {
                         }) => {
                             return (
                                 <SettingsItemAccount
+                                    icon={item.icon}
                                     key={index}
                                     type={item.type}
                                     value={item.value}

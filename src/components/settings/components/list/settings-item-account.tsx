@@ -16,11 +16,11 @@ export default function item({
     name,
     value,
     type,
-    navigator,
+    icon,
     navigateTo,
     secure,
 }: SettingsiItemAccountObjectProps) {
-    const navigation = useNavigation()
+    const navigation: any = useNavigation()
     const { t } = React.useContext(LanguageContext)
     const isDarkMode = useColorScheme() === "dark"
     const { session } = React.useContext(PersistedContext)
@@ -39,6 +39,7 @@ export default function item({
     const container_left: any = {
         paddingLeft: sizes.paddings["1sm"],
         alignItems: "flex-start",
+        flexDirection: "row",
     }
     const container_right: any = {
         flexDirection: "row",
@@ -78,6 +79,8 @@ export default function item({
     return (
         <Pressable style={container} onPress={handlePress}>
             <View style={container_left}>
+                {icon && <View style={{ marginRight: sizes.margins["3sm"] }}>{icon}</View>}
+
                 <Text style={text_style}>{name}</Text>
             </View>
             <View style={container_right}>
