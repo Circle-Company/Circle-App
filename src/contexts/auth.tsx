@@ -29,8 +29,6 @@ export function Provider({ children }: AuthProviderProps) {
     const [signInputUsername, setSignInputUsername] = React.useState("")
     const [signInputPassword, setSignInputPassword] = React.useState("")
     const [sessionData, setSessionData] = useState<SessionDataType>({} as SessionDataType)
-    const [jwtToken, setJwtToken] = useState<string | null>(null)
-
     async function signIn() {
         await api
             .post("/auth/sign-in", { username: signInputUsername, password: signInputPassword })
@@ -78,7 +76,6 @@ export function Provider({ children }: AuthProviderProps) {
     function signOut() {
         storage.clearAll()
         setSessionData({} as SessionDataType)
-        setJwtToken(null)
     }
 
     function checkIsSigned() {
