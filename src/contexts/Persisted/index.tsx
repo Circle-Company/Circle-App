@@ -33,6 +33,19 @@ export function Provider({ children }: PersistedProviderProps) {
         if (sessionData.preferences) sessionPreferences.set(sessionData.preferences)
         if (sessionData.statistics) sessionStatistics.set(sessionData.statistics)
         if (sessionData.history) sessionHistory.set(sessionData.history)
+
+        if (sessionUser.username && sessionUser.id) {
+            monitorJwtExpiration(
+                sessionAccount,
+                async ({ username, id }: { username: string; id: number }) => {
+                    try {
+                        await refreshJwtToken({ username, id }, sessionAccount)
+                    } catch (error) {
+                        throw new Error("cant possible refresh JWT Token")
+                    }
+                }
+            )
+        }
     }, [sessionData])
 
     React.useEffect(() => {
@@ -44,21 +57,17 @@ export function Provider({ children }: PersistedProviderProps) {
 
     // Inicializa o monitoramento do JWT
     React.useEffect(() => {
-        const cleanup = monitorJwtExpiration(
+        monitorJwtExpiration(
             sessionAccount,
             async ({ username, id }: { username: string; id: number }) => {
                 try {
                     await refreshJwtToken({ username, id }, sessionAccount)
                 } catch (error) {
-                    signOut()
+                    throw new Error("cant possible refresh JWT Token")
                 }
             }
         )
-
-        return () => {
-            cleanup()
-        }
-    }, [sessionAccount.jwtToken])
+    }, [sessionAccount])
 
     React.useEffect(() => {
         const isSigned = checkIsSigned()
