@@ -33,6 +33,18 @@ export function Provider({ children }: NotificationProviderProps) {
         requestUserPermission()
     }, [])
 
+    React.useEffect(() => {
+        async function refreshToken() {
+            let token = await messaging().getToken()
+            session.account.setFirebasePushToken(token.toString())
+            notification.registerPushToken({
+                userId: Number(storage.getNumber(storageKeys().user.id)),
+                token,
+            })
+        }
+        refreshToken()
+    }, [])
+
     messaging().onTokenRefresh((token) => {
         setTimeout(() => {
             notification.refreshPushToken(token)
