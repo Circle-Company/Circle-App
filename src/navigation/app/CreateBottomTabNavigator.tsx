@@ -1,11 +1,9 @@
-import PersistedContext from "@/contexts/Persisted"
 import fonts from "@/layout/constants/fonts"
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs"
-import React, { useContext } from "react"
-import { Text, View } from "react-native"
+import React from "react"
+import { Text, View, useColorScheme } from "react-native"
 import Moment from "../../assets/icons/svgs/bolt.svg" // Import de SVGs
 import Memory from "../../assets/icons/svgs/memory.svg"
-import LanguageContext from "../../contexts/Preferences/language"
 import ColorTheme, { colors } from "../../layout/constants/colors"
 import sizes from "../../layout/constants/sizes"
 import { MemoriesNavigator } from "./MemoriesNavigator"
@@ -14,14 +12,14 @@ import { MomentNavigator } from "./MomentNavigator" // Importação de suas tela
 const BottomTab = createBottomTabNavigator()
 
 export default function CreateBottomTabNavigator() {
-    const { t } = useContext(LanguageContext)
-    const { session } = useContext(PersistedContext)
+    const isDarkMode = useColorScheme()
     const { iconFocused, icon, background, backgroundDisabled, text } = ColorTheme() // Desestruturação de temas
     const iconWidth = 24
     const iconHeight = 24
 
     // Customização da TabBar
     const tabBarStyle: any = {
+        marginHorizontal: (sizes.screens.width - 200) / 2,
         width: 200,
         alignSelf: "center",
         bottom: sizes.margins["1xl"],
@@ -29,7 +27,8 @@ export default function CreateBottomTabNavigator() {
         height: sizes.bottomTab.height * 1,
         borderTopWidth: 0,
         elevation: 0,
-        backgroundColor: backgroundDisabled + 90,
+        position: "absolute",
+        backgroundColor: backgroundDisabled,
     }
 
     const titleStyle: any = {
@@ -47,6 +46,7 @@ export default function CreateBottomTabNavigator() {
                 headerShown: false,
                 tabBarStyle: tabBarStyle,
                 tabBarShowLabel: false, // Remove os labels
+                lazy: true,
             }}
         >
             {/* Tela de Moments */}
@@ -64,7 +64,9 @@ export default function CreateBottomTabNavigator() {
                                     width: 140,
                                     borderRadius: (sizes.bottomTab.height * 1.2) / 2,
                                     flex: 1,
-                                    backgroundColor: colors.gray.white,
+                                    backgroundColor: isDarkMode
+                                        ? colors.gray.white
+                                        : colors.gray.black,
                                     flexDirection: "row",
                                     alignItems: "center",
                                 }}
@@ -98,7 +100,9 @@ export default function CreateBottomTabNavigator() {
                                     width: 140,
                                     borderRadius: (sizes.bottomTab.height * 1.2) / 2,
                                     flex: 1,
-                                    backgroundColor: colors.gray.white,
+                                    backgroundColor: isDarkMode
+                                        ? colors.gray.white
+                                        : colors.gray.black,
                                     flexDirection: "row",
                                     alignItems: "center",
                                 }}
