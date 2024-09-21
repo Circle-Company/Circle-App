@@ -1,6 +1,6 @@
 {
     "name": "Circle",
-    "version": "0.0.1",
+    "version": "1.0.1",
     "private": true,
     "scripts": {
         "android": "react-native run-android",
@@ -42,7 +42,7 @@
         "fs": "^0.0.1-security",
         "i18next": "^23.11.4",
         "jwt-decode": "^4.0.0",
-        "mixpanel-react-native": "^3.0.5",
+        "mixpanel-react-native": "^3.0.6",
         "path": "^0.12.7",
         "pngjs": "^7.0.0",
         "react": "18.2.0",
@@ -61,7 +61,6 @@
         "react-native-linear-gradient": "^2.8.3",
         "react-native-localize": "^3.1.0",
         "react-native-mmkv": "^2.12.2",
-        "react-native-mmkv-flipper-plugin": "^1.0.0",
         "react-native-modalize": "^2.1.1",
         "react-native-notificated": "^0.1.5",
         "react-native-permissions": "^4.1.5",
