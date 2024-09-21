@@ -4,8 +4,8 @@ import { notify } from "react-native-notificated"
 import { Vibrate } from "../lib/hooks/useHapticFeedback"
 import { useRequestPermission } from "../lib/hooks/userRequestPermissions"
 import { notification } from "../lib/notifications"
+import { storage, storageKeys } from "../store"
 import PersistedContext from "./Persisted"
-import LanguageContext from "./Preferences/language"
 
 type NotificationProviderProps = { children: React.ReactNode }
 export type NotificationContextData = {}
@@ -16,7 +16,6 @@ const NotificationContext = React.createContext<NotificationContextData>(
 
 export function Provider({ children }: NotificationProviderProps) {
     const { session } = React.useContext(PersistedContext)
-    const { t } = React.useContext(LanguageContext)
     React.useEffect(() => {
         async function requestUserPermission() {
             useRequestPermission.postNotifications()
