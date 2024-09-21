@@ -6,7 +6,6 @@ import ViewMorebutton from "../../../components/buttons/view_more"
 import OfflineCard from "../../../components/general/offline"
 import { Loading } from "../../../components/loading"
 import { Memory } from "../../../components/memory"
-import { Text } from "../../../components/Themed"
 import { userReciveDataProps } from "../../../components/user_show/user_show-types"
 import AccountContext from "../../../contexts/account"
 import MemoryContext from "../../../contexts/memory"
@@ -36,6 +35,7 @@ export default function ListMemoriesPreview({
     const accountContext = React.useContext(AccountContext)
     const { t } = React.useContext(LanguageContext)
     const [memories, setMemories] = React.useState([])
+    const [memoriesCount, setMemoriesCount] = React.useState(0)
     const { session } = React.useContext(PersistedContext)
     const [loading, setLoading] = React.useState(false)
     const [page, setPage] = React.useState(1)
@@ -56,9 +56,12 @@ export default function ListMemoriesPreview({
                 { headers: { authorization_token: session.account.jwtToken } }
             )
             .then(function (response) {
-                if (page === 1) setMemories(response.data.memories)
-                else {
+                if (page === 1) {
+                    setMemories(response.data.memories)
+                    setMemoriesCount(response.data.count)
+                } else {
                     setAllMemoriesUser(user)
+                    setMemoriesCount(response.data.count)
                     setMemories([...memories, ...response.data.memories])
                     if (pageSize > response.data.memories.length) setEndReached(true)
                     else setEndReached(false)
@@ -127,9 +130,7 @@ export default function ListMemoriesPreview({
     return (
         <View style={container}>
             <Memory.Header>
-                <Memory.HeaderLeft>
-                    <Text style={headerTitle}>{t("Memories")}</Text>
-                </Memory.HeaderLeft>
+                <Memory.HeaderLeft number={memoriesCount} />
                 <Memory.HeaderRight>
                     <ViewMorebutton
                         action={() => {
