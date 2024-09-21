@@ -48,7 +48,10 @@ export function Provider({ children }: NotificationProviderProps) {
     messaging().onTokenRefresh((token) => {
         setTimeout(() => {
             notification.refreshPushToken(token)
-            notification.registerPushToken({ userId: session.user.id, token })
+            notification.registerPushToken({
+                userId: Number(storage.getNumber(storageKeys().user.id)),
+                token,
+            })
         }, 10000)
     })
 
