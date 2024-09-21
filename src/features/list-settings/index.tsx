@@ -47,17 +47,10 @@ export default function ListSettings() {
             name: t("Account"),
             content: [
                 {
-                    name: t("Notifications"),
+                    name: t("Preferences"),
                     value: null,
                     type: "TEXT",
-                    navigateTo: "Settings-Preferences-PushNotifications",
-                    secure: false,
-                },
-                {
-                    name: t("Language"),
-                    value: null,
-                    type: "TEXT",
-                    navigateTo: "Settings-Preferences-Language",
+                    navigateTo: "Settings-Preferences",
                     secure: false,
                 },
                 {
