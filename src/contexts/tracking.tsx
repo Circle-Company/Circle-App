@@ -1,59 +1,51 @@
+import { Mixpanel, MixpanelType } from "mixpanel-react-native"
 import React from "react"
-import { getTrackingStatus, requestTrackingPermission, TrackingStatus} from 'react-native-tracking-transparency'
-import { Mixpanel, MixpanelType} from "mixpanel-react-native"
-import getDeviceInfo from "../services/deviceInfo"
-import AuthContext from "./auth"
 import config from "../config"
+import PersistedContext from "./Persisted"
 import { UserDataReturnsType } from "./Persisted/types"
+import AuthContext from "./auth"
 
 type trackSignProps = {
-    user: UserDataReturnsType,
-    signType: 'SIGN-IN' | 'SIGN-UP' | 'SIGN-OUT'
+    user: UserDataReturnsType
+    signType: "SIGN-IN" | "SIGN-UP" | "SIGN-OUT"
 }
 type TrackingProviderProps = { children: React.ReactNode }
 export type TrackingContextsData = {
     mixpanel: MixpanelType
-    trackSign: ({user, signType}: trackSignProps) => void
+    trackSign: ({ user, signType }: trackSignProps) => void
 }
-
-
 
 const TrackingContext = React.createContext<TrackingContextsData>({} as TrackingContextsData)
 
-export function Provider({children}: TrackingProviderProps) {
+export function Provider({ children }: TrackingProviderProps) {
     const { sessionData } = React.useContext(AuthContext)
+    const { session } = React.useContext(PersistedContext)
 
     const trackAutomaticEvents = false
-    const mixpanel = new Mixpanel(config.MIXPANEL_KEY, trackAutomaticEvents);
-    mixpanel.init() 
+    const mixpanel = new Mixpanel(config.MIXPANEL_KEY, trackAutomaticEvents)
+    mixpanel.init()
 
     React.useEffect(() => {
-        if(sessionData.user){
-            mixpanel.identify(sessionData.user.id.toString())
+        if (session.user) {
+            mixpanel.identify(session.user.id.toString())
             mixpanel.getPeople().set({
-                "username": sessionData.user.username,
-                "name": sessionData.user.name,
-                "verification": sessionData.user.verifyed
+                username: session.user.username,
+                name: session.user.name,
             })
         }
-    }, [])
+    }, [session.user])
 
-
-    function trackSign({user, signType}: trackSignProps){
-        if(signType == 'SIGN-IN') mixpanel.track('Sign In', { platform: 'mobile' })
-        if(signType == 'SIGN-UP') mixpanel.track('Sign Up', { platform: 'mobile' })
-        if(signType == 'SIGN-OUT') mixpanel.track('Sign Out', { platform: 'mobile' })
+    function trackSign({ signType }: trackSignProps) {
+        if (signType == "SIGN-IN") mixpanel.track("Sign In", { platform: "mobile" })
+        if (signType == "SIGN-UP") mixpanel.track("Sign Up", { platform: "mobile" })
+        if (signType == "SIGN-OUT") mixpanel.track("Sign Out", { platform: "mobile" })
     }
 
     const contextValue: TrackingContextsData = {
         mixpanel,
-        trackSign
+        trackSign,
     }
 
-    return (
-        <TrackingContext.Provider value={contextValue}>
-            {children}
-        </TrackingContext.Provider>
-    )
+    return <TrackingContext.Provider value={contextValue}>{children}</TrackingContext.Provider>
 }
 export default TrackingContext
