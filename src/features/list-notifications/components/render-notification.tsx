@@ -25,16 +25,18 @@ export default function render_notification ({notification}: renderNotificationP
                     <Notification.Text/>
                 </Notification.Container.Center>
                 <Notification.Container.Right>
-                    { notification.midia?
-                        <MidiaRender.Root data={notification.midia} content_sizes={sizes.moment.micro}>
-                            <MidiaRender.RenderImage isFeed={false}/>
+                    {notification.midia ? (
+                        <MidiaRender.Root
+                            data={notification.midia}
+                            content_sizes={sizes.moment.micro}
+                        >
+                            <MidiaRender.RenderImage isFeed={false} />
                         </MidiaRender.Root>
-                        :
+                    ) : (
                         <UserShow.Root data={notification.sender_user}>
-                            <UserShow.FollowButton isFollowing={notification.you_follow}/>
+                            <UserShow.FollowButton isFollowing={notification.you_follow} />
                         </UserShow.Root>
-                    }
-
+                    )}
                 </Notification.Container.Right>
             </Notification.Container.Main>            
         </View>
