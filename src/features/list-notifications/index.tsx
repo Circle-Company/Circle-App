@@ -18,7 +18,7 @@ export default function ListNotifcations() {
     const [notificationsData, setNotificationsData] = React.useState([])
 
     const [page, setPage] = React.useState(1)
-    const [pageSize, setPageSize] = React.useState(8)
+    const [pageSize, setPageSize] = React.useState(6)
     const [loading, setLoading] = React.useState(false)
     const [refreshing, setRefreshing] = React.useState(false)
     const [endReached, setEndReached] = React.useState(false)
@@ -98,7 +98,12 @@ export default function ListNotifcations() {
                 )
             }}
             ListFooterComponent={() => {
-                if (endReached) return <EndReached text={t("No more Notifications")} />
+                if (endReached)
+                    return (
+                        <EndReached
+                            text={t("Notifications older than 15 days are automatically deleted")}
+                        />
+                    )
                 else
                     return (
                         <Loading.Container
