@@ -66,7 +66,7 @@ export default function Container({
                     tags: momentData.tags,
                     language: momentData.language,
                     created_at: momentData.created_at,
-                    isLiked: momentUserActions.liked,
+                    is_liked: momentUserActions.liked,
                 })
             }
             navigation.navigate("MomentNavigator", { screen: "DetailScreen" })
