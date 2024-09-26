@@ -15,6 +15,8 @@
     "Views": "Views",
     "viewed your profile": "viewed your profile",
 
+    "see what he is doing now": "see what he is doing now",
+
     "Comments": "Comments",
 
     "Statistics": "Statistics",
@@ -208,6 +210,8 @@
     "Moments successfully added to memory": "Moments successfully added to memory",
     "Memory title edited successfully": "Memory title edited successfully",
     "Memory deleted successfully": "Memory deleted successfully",
+
+    "Notifications older than 15 days are automatically deleted": "Notifications older than 15 days are automatically deleted",
 
     "We can't delete your Moments": "We can't delete your Moments",
     "We can't add these moments to memory": "We can't add these moments to memory",

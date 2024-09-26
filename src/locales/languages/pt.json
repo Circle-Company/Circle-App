@@ -17,6 +17,8 @@
     "View": "Visualização",
     "viewed your profile": "visualizou o seu perfil",
 
+    "see what he is doing now": "veja o que ele está fazendo agora",
+
     "Comments": "Comentários",
 
     "Statistics": "Statísticas",
@@ -210,6 +212,8 @@
     "Moments successfully added to memory": "Moments foram adicionados com sucesso na memória",
     "Memory title edited successfully": "O título da memória foi editado com sucesso",
     "Memory deleted successfully": "Memória foi deletada com sucesso",
+
+    "Notifications older than 15 days are automatically deleted": "Notificações mais antigas que 15 dias são deletadas automaticamente",
 
     "We can't delete your Moments": "Não conseguimos excluir seus Moments",
     "We can't add these moments to memory": "não conseguimos adicionar estes moments na memória",
