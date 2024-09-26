@@ -16,12 +16,9 @@ export default function notification_text() {
 
     const notificactionsText = {
         "LIKE-MOMENT": t("liked your moment"),
-        "LIKE-MOMENT-2": t("liked 2 of your moments"),
-        "LIKE-MOMENT-3": t("liked 3 of your moments"),
-        "LIKE-MEMORY": t("liked your memory"),
-        "LIKE-COMMENT": t("liked your comment"),
-        "COMMENT-MOMENT": t("commented on your moment"),
-        "FOLLOW-USER": t("is following you"),
+        "NEW-MEMORY": t("see what he is doing now") + "... ✨",
+        "ADD-TO-MEMORY": t("see what he is doing now") + "... ✨",
+        "FOLLOW-USER": t("is following you") + " 🎉",
         "VIEW-USER": t("viewed your profile"),
     }
 
@@ -36,7 +33,7 @@ export default function notification_text() {
 
     const textStyle: any = {
         fontFamily: fonts.family.Medium,
-        fontSize: fonts.size.body * 0.9,
+        fontSize: fonts.size.body * 1,
         lineHeight: 15,
     }
 
@@ -44,20 +41,20 @@ export default function notification_text() {
         fontFamily: fonts.family.Semibold,
         color: ColorTheme().textDisabled,
         fontSize: fonts.size.body * 0.9,
-        lineHeight: 15,
+        lineHeight: 17,
     }
 
     return (
         <View style={containerStyle}>
             <UserShow.Root data={notification.sender_user}>
                 <UserShow.Username displayOnMoment={false} fontSize={fonts.size.body * 0.9} />
-            </UserShow.Root>
-            <Text style={{ marginLeft: sizes.margins["1sm"] }}>
-                <Text style={textStyle}>{text}</Text>
                 <Text style={dataTextStyle}>
                     {" "}
                     {timeDifferenceConverter({ date: notification.created_at, small: true })}
                 </Text>
+            </UserShow.Root>
+            <Text style={{ marginLeft: sizes.margins["1sm"] }}>
+                <Text style={textStyle}>{text}</Text>
             </Text>
         </View>
     )
