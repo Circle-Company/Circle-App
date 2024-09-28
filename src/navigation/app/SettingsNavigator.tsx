@@ -9,6 +9,7 @@ import SettingsScreen from "../../pages/app/Settings"
 import AllMomentsScreen from "../../pages/app/Settings/AllMoments"
 import SettingsCommunityGuidelines from "../../pages/app/Settings/CommunityGuidelines"
 import SettingsDescriptionScreen from "../../pages/app/Settings/Description"
+import SettingsHapticFeedback from "../../pages/app/Settings/HapticFeedback"
 import LogOutScreen from "../../pages/app/Settings/LogOut"
 import SettingsNameScreen from "../../pages/app/Settings/Name"
 import OpenSourceScreen from "../../pages/app/Settings/OpenSource"
@@ -187,6 +188,19 @@ export function SettingsNavigator() {
                 component={ContentScreen}
                 options={{
                     headerTitle: t("Content"),
+                    headerStyle: HeaderStyle,
+                    headerTintColor: String(ColorTheme().text),
+                    cardStyle: { backgroundColor: String(ColorTheme().background) },
+                    cardOverlayEnabled: true,
+                    headerLeft: () => <SettingsHeaderLeft />,
+                }}
+            />
+
+            <SettingsStack.Screen
+                name="Settings-Preferences-Haptics"
+                component={SettingsHapticFeedback}
+                options={{
+                    headerTitle: t("Haptic Feedback"),
                     headerStyle: HeaderStyle,
                     headerTintColor: String(ColorTheme().text),
                     cardStyle: { backgroundColor: String(ColorTheme().background) },

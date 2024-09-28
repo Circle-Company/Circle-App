@@ -98,6 +98,8 @@
     "Error": "Error",
     "Reload": "Reload",
 
+    "Vibration": "Vibration",
+    "Haptic Feedback": "Haptic Feedback",
     "Public Profile": "Public Profile",
     "Profile Picture": "Profile Picture",
     "Name": "Name",
@@ -219,6 +221,8 @@
     "We can't delete the memory": "We can't delete the memory",
 
     "Made with love in Brazil": "Made with love in Brazil",
+
+    "The device gives haptic vibration feedback to confirm that an action has been maded.": "The device gives haptic vibration feedback to confirm that an action has been maded.",
 
     "You can view all the moments created and you can delete them if you want. They will be removed from the memories automatically.": "You can view all the moments created and you can delete them if you want. They will be removed from the memories automatically.",
     "When contributing to an open source project, it is essential to understand the project's license and adopt its code standards.": "When contributing to an open source project, it is essential to understand the project's license and adopt its code standards.",

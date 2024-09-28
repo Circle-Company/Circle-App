@@ -14,7 +14,7 @@ export default function PreferencesScreen() {
                     name: t("Language"),
                     value: null,
                     type: "TEXT",
-                    navigateTo: "Settings-Privacy-Policy",
+                    navigateTo: "Settings-Preferences-Language",
                     secure: false,
                 },
                 {
@@ -22,7 +22,7 @@ export default function PreferencesScreen() {
                     name: t("Haptic Feedback"),
                     value: null,
                     type: "TEXT",
-                    navigateTo: "Settings-Privacy-Policy",
+                    navigateTo: "Settings-Preferences-Haptics",
                     secure: false,
                 },
                 {

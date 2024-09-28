@@ -101,6 +101,8 @@
     "Error": "Erro",
     "Reload": "Recarregar",
 
+    "Vibration": "Vibração",
+    "Haptic Feedback": "Feedback Háptico",
     "Public Profile": "Perfil Público",
     "Profile Picture": "Foto de Perfil",
     "Name": "Nome",
@@ -221,6 +223,8 @@
     "We can't delete the memory": "Não conseguimos deletar a memória",
 
     "Made with love in Brazil": "Feito com amor no Brasil",
+
+    "The device gives haptic vibration feedback to confirm that an action has been maded.": "O dispositivo dá um feedback tátil de vibração para confirmar que uma ação foi realizada.",
 
     "You can view all the moments created and you can delete them if you want. They will be removed from the memories automatically.": "Você pode ver todos os Moments criados e pode deletá-los se quiser. Eles serão removido das Memórias automaticamente.",
     "When contributing to an open source project, it is essential to understand the project's license and adopt its code standards.": "Ao contribuir para um projeto de código aberto, é essencial compreender a licença do projeto e adotar seus padrões de código.",
