@@ -24,7 +24,7 @@ interface SkeletonViewProps extends ViewProps {
 }
 
 export const SkeletonView: React.FC<SkeletonViewProps> = React.memo(
-    ({ children, style, delay = 0, duration = 1000, backgroundColor, gradientColor, ...props }) => {
+    ({ children, style, delay = 0, duration = 3000, backgroundColor, gradientColor, ...props }) => {
         const isDarkMode = useColorScheme() === "dark"
         const x = useSharedValue(0)
 
