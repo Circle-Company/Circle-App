@@ -1,5 +1,4 @@
 /* eslint-disable no-var */
-import { BlurView } from "@react-native-community/blur"
 import React from "react"
 import { Animated, Pressable, View } from "react-native"
 import LikeIcon from "../../../assets/icons/svgs/heart.svg"
@@ -184,11 +183,7 @@ export default function like({
         return (
             <Animated.View style={animated_container}>
                 <Pressable onPress={() => onLikeAction()} style={pressable_container}>
-                    <BlurView
-                        overlayColor={String(colors.transparent.black_00)}
-                        blurAmount={sizes.blur.blurAmount}
-                        style={blur_container}
-                    >
+                    <View style={blur_container}>
                         <View style={container}>
                             <Animated.View style={icon_container}>
                                 <LikeIcon fill={like_fill} width={14} height={14} />
@@ -197,7 +192,7 @@ export default function like({
                                 {like_number}
                             </Text>
                         </View>
-                    </BlurView>
+                    </View>
                 </Pressable>
             </Animated.View>
         )
