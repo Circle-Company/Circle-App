@@ -6,7 +6,12 @@
             "@/components/*": ["components/*"],
             "@/contexts/*": ["contexts/*"],
             "@/features/*": ["features/*"],
-            "@/layout/*": ["layout/*"]
+            "@/layout/*": ["layout/*"],
+            "@/routes/*": ["routes/*"],
+            "@/pages/*": ["pages/*"],
+            "@/store/*": ["store/*"],
+            "@/lib/*": ["lib/*"],
+            "@/modules/*": ["modules/*"]
         }
     }
 }
