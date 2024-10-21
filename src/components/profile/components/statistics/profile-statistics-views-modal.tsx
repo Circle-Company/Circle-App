@@ -1,3 +1,4 @@
+import sizes from "@/layout/constants/sizes"
 import React from "react"
 import { View } from "react-native"
 import config from "../../../../config"
@@ -14,6 +15,10 @@ type ViewsModelProps = {
 
 export default function ViewsRenderModal({ user }: ViewsModelProps) {
     const { t } = React.useContext(LanguageContext)
+
+    const width =
+        sizes.screens.width - (sizes.paddings["2sm"] * 2 + sizes.bottomSheet.marginHorizontal * 2)
+
     const container = {
         alignItems: "center",
     }
@@ -27,12 +32,12 @@ export default function ViewsRenderModal({ user }: ViewsModelProps) {
     }
 
     const TextStyle = {
-        fontSize: fonts.size.body,
+        fontSize: fonts.size.body * 0.9,
         fontFamily: fonts.family["Semibold-Italic"],
         color: ColorTheme().text + "90",
     }
     return (
-        <View>
+        <View style={{ width }}>
             <Text style={NumberStyle}>
                 {formatNumberWithDots(user?.statistics?.total_views_num)}
                 <Text style={DescriptionStyle}> {t("Views")}</Text>
