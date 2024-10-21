@@ -1,28 +1,47 @@
 import BottomSheet, { BottomSheetModalProvider, BottomSheetProps } from "@gorhom/bottom-sheet"
 import React, { useCallback, useEffect, useMemo, useRef, useState } from "react"
-import { View, useColorScheme } from "react-native"
+import { StatusBar, View, useColorScheme } from "react-native"
 import { CustomBackdrop } from "../components/general/bottomSheet/backdrop"
 import { colors } from "../layout/constants/colors"
 import sizes from "../layout/constants/sizes"
-type BottomSheetProviderProps = { children: React.ReactNode }
+type BottomSheetProviderProps = {
+    children: React.ReactNode
+}
 
 export type BottomSheetContextData = {
     expand: React.Dispatch<React.SetStateAction<BottomSheetProps | null>>
     collapse: () => void
 }
 
+interface CustomBottomSheetProps extends BottomSheetProps {}
+
 const BottomSheetContext = React.createContext<BottomSheetContextData>({} as BottomSheetContextData)
 
 export function Provider({ children }: BottomSheetProviderProps) {
     const isDarkMode = useColorScheme() === "dark"
     const bottomSheetRef = useRef<BottomSheet>(null)
-    const [options, setOptions] = useState<BottomSheetProps | null>(null)
+    const [options, setOptions] = useState<CustomBottomSheetProps | null>(null)
     const snapPoints = useMemo(() => options?.snapPoints || [0], [options])
 
     useEffect(() => {
         if (options) bottomSheetRef.current?.expand()
         else bottomSheetRef.current?.collapse()
     }, [options])
+
+    useEffect(() => {
+        if (options) {
+            bottomSheetRef.current?.expand()
+            // Altera a cor da barra de status para acompanhar o backdrop
+            StatusBar.setTranslucent(true)
+            StatusBar.setBackgroundColor(isDarkMode ? colors.gray.black : "#6f6f6f")
+            StatusBar.setBarStyle(isDarkMode ? "light-content" : "light-content")
+        } else {
+            bottomSheetRef.current?.collapse()
+            // Restaura a cor original da barra de status
+            StatusBar.setBackgroundColor(isDarkMode ? colors.gray.black : colors.gray.white)
+            StatusBar.setBarStyle(isDarkMode ? "light-content" : "dark-content")
+        }
+    }, [options, isDarkMode])
 
     const collapseBottomSheet = useCallback(() => setOptions(null), [])
     const bottomSheetContext: BottomSheetContextData = useMemo(
@@ -61,7 +80,9 @@ export function Provider({ children }: BottomSheetProviderProps) {
                         index={-1}
                         snapPoints={snapPoints}
                         ref={bottomSheetRef}
-                        enablePanDownToClose={true}
+                        enablePanDownToClose={options.enablePanDownToClose} // Desabilitando fechar com gesto de deslize
+                        enableHandlePanningGesture={options.enableHandlePanningGesture} // Desabilitando gesto no handle
+                        enableContentPanningGesture={options.enableContentPanningGesture} // Desabilitando arrastar conteúdo
                         handleIndicatorStyle={handleIndicatorStyle}
                         handleStyle={handleStyle}
                         style={modalStyle}
