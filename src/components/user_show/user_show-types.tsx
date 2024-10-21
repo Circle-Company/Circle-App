@@ -12,6 +12,7 @@ export type userReciveDataProps = {
 }
 
 export type UserRootProps = {
+    executeBeforeClick?: () => void
     data: userReciveDataProps
     children: React.ReactNode
 }
