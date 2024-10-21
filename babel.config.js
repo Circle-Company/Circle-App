@@ -23,6 +23,7 @@ module.exports = {
                     "@/pages": "./src/pages",
                     "@/store": "./src/store",
                     "@/lib": "./src/lib",
+                    "@/helpers": "./src/helpers",
                     "@/modules": "./src/modules",
                 },
             },
