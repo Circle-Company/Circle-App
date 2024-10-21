@@ -16,7 +16,7 @@ export default function profile_picture({
     disableAnalytics = false,
     pictureDimensions,
 }: UserProfilePictureProps) {
-    const { user, view_profile } = useUserShowContext()
+    const { user, view_profile, executeBeforeClick } = useUserShowContext()
     const { setProfile } = React.useContext(ViewProfileContext)
     const navigation = useNavigation()
 
@@ -44,6 +44,7 @@ export default function profile_picture({
 
     const [profilePicture, setProfilePicture] = React.useState<string>("")
     async function onProfilePictureAction() {
+        executeBeforeClick ? executeBeforeClick() : null
         if (disableAnalytics == false) {
             UserShowActions.ProfilePicturePressed({
                 user_id: Number(user.id),

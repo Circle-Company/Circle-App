@@ -7,7 +7,7 @@ import api, { apiRoutes } from "../../../services/Api"
 import UserShowContext from "../user_show-context"
 import { UserRootProps } from "../user_show-types"
 
-export default function root({ children, data }: UserRootProps) {
+export default function root({ children, data, executeBeforeClick }: UserRootProps) {
     const { session } = React.useContext(PersistedContext)
     const { setCurrentUser } = React.useContext(ProfileContext)
 
@@ -84,6 +84,7 @@ export default function root({ children, data }: UserRootProps) {
 
     const contextValue = {
         user: data,
+        executeBeforeClick,
         follow,
         unfollow,
         view_profile,

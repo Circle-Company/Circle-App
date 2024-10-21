@@ -28,7 +28,7 @@ export default function user_username({
 }: UserUsernameProps) {
     const { session } = React.useContext(PersistedContext)
     const { t } = React.useContext(LanguageContext)
-    const { user, view_profile } = useUserShowContext()
+    const { user, view_profile, executeBeforeClick } = useUserShowContext()
     const { setProfile } = React.useContext(ViewProfileContext)
     const isDarkMode = useColorScheme() === "dark"
     const navigation = useNavigation()
@@ -61,6 +61,7 @@ export default function user_username({
     }
 
     async function onUsernameActions() {
+        executeBeforeClick ? executeBeforeClick() : null
         if (disableAnalytics == false || !isMe) {
             UserShowActions.UsernamePressed({
                 user_id: Number(user.id),

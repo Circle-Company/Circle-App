@@ -3,6 +3,7 @@ import { userReciveDataProps } from "./user_show-types"
 
 type contextValue = {
     user: userReciveDataProps
+    executeBeforeClick: () => void
     follow: () => void
     unfollow: () => void
     view_profile: () => void
