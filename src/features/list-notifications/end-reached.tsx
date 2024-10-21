@@ -3,12 +3,21 @@ import ColorTheme from "@/layout/constants/colors"
 import fonts from "@/layout/constants/fonts"
 import sizes from "@/layout/constants/sizes"
 
-export default function endReached({ text }: { text: string }) {
+export default function endReached({
+    text,
+    width = sizes.screens.width,
+    backgroundColor,
+}: {
+    text: string
+    backgroundColor?: string
+    width?: number
+}) {
     const container: any = {
-        width: sizes.screens.width,
+        width,
         height: sizes.headers.height,
         alignItems: "center",
         justifyContent: "center",
+        backgroundColor,
     }
 
     const title: any = {
