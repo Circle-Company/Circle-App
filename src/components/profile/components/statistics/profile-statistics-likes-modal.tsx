@@ -1,3 +1,4 @@
+import sizes from "@/layout/constants/sizes"
 import React from "react"
 import { View } from "react-native"
 import config from "../../../../config"
@@ -14,6 +15,10 @@ type LikesModelProps = {
 
 export default function LikesRenderModal({ user }: LikesModelProps) {
     const { t } = React.useContext(LanguageContext)
+
+    const width =
+        sizes.screens.width - (sizes.paddings["2sm"] * 2 + sizes.bottomSheet.marginHorizontal * 2)
+
     const container = {
         alignItems: "center",
     }
@@ -27,12 +32,12 @@ export default function LikesRenderModal({ user }: LikesModelProps) {
     }
 
     const TextStyle = {
-        fontSize: fonts.size.body,
+        fontSize: fonts.size.body * 0.9,
         fontFamily: fonts.family["Semibold-Italic"],
         color: ColorTheme().text + "90",
     }
     return (
-        <View>
+        <View style={{ width }}>
             <Text style={NumberStyle}>
                 {formatNumberWithDots(user?.statistics?.total_likes_num)}
                 <Text style={DescriptionStyle}> {t("Likes")}</Text>
