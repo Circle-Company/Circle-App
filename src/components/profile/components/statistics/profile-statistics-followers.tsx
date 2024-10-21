@@ -10,7 +10,7 @@ import { Text } from "../../../Themed"
 import Button from "../../../buttons/button-standart"
 import { useProfileContext } from "../../profile-context"
 import { ProfileStatisticsFollowersProps } from "../../profile-types"
-import FollowersRenderModal from "./profile-statistics-followers-modal"
+import { UserFollowersModal } from "../view-followers-modal"
 
 export default function statistics_followers({}: ProfileStatisticsFollowersProps) {
     const { user } = useProfileContext()
@@ -20,8 +20,12 @@ export default function statistics_followers({}: ProfileStatisticsFollowersProps
 
     function handlePress() {
         expand({
-            children: <FollowersRenderModal user={user} />,
-            snapPoints: ["15%"],
+            enablePanDownToClose: false,
+            enableHandlePanningGesture: false,
+            enableContentPanningGesture: false,
+            style: { margin: 0, padding: 0 },
+            children: <UserFollowersModal user={user} />,
+            snapPoints: ["99%"],
         })
     }
 
