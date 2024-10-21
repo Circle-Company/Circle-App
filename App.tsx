@@ -37,13 +37,13 @@ function InnerApp() {
     return (
         <KeyboardProvider enabled={true}>
             <NotificationProvider>
-                <BottomSheetProvider>
-                    <BottomTabsProvider>
-                        <AccountProvider>
-                            <ProfileProvider>
-                                <ViewProfileProvider>
-                                    <FeedProvider>
-                                        <NavigationContainer theme={myTheme}>
+                <BottomTabsProvider>
+                    <AccountProvider>
+                        <ProfileProvider>
+                            <ViewProfileProvider>
+                                <FeedProvider>
+                                    <NavigationContainer theme={myTheme}>
+                                        <BottomSheetProvider>
                                             <SelectMomentsProvider>
                                                 <MemoryProvider>
                                                     <NewMomentProvider>
@@ -51,13 +51,13 @@ function InnerApp() {
                                                     </NewMomentProvider>
                                                 </MemoryProvider>
                                             </SelectMomentsProvider>
-                                        </NavigationContainer>
-                                    </FeedProvider>
-                                </ViewProfileProvider>
-                            </ProfileProvider>
-                        </AccountProvider>
-                    </BottomTabsProvider>
-                </BottomSheetProvider>
+                                        </BottomSheetProvider>
+                                    </NavigationContainer>
+                                </FeedProvider>
+                            </ViewProfileProvider>
+                        </ProfileProvider>
+                    </AccountProvider>
+                </BottomTabsProvider>
             </NotificationProvider>
         </KeyboardProvider>
     )
