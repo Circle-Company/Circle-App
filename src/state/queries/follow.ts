@@ -4,6 +4,7 @@ import { apiRoutes } from "../../services/Api"
 type useFollowMutationProps = {
     userId: number
     followedUserId: number
+    authorizationToken: string
 }
 
 export function useFollowMutation({ followedUserId, userId }: useFollowMutationProps) {
