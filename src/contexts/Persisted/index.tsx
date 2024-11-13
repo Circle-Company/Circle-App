@@ -67,7 +67,7 @@ export function Provider({ children }: PersistedProviderProps) {
                 }
             }
         )
-    }, [sessionAccount])
+    }, [])
 
     React.useEffect(() => {
         const isSigned = checkIsSigned()
