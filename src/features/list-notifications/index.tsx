@@ -15,7 +15,7 @@ import { ListNotificationsSkeleton } from "./skeleton"
 export default function ListNotifcations() {
     const { t } = React.useContext(LanguageContext)
     const { session } = React.useContext(PersistedContext)
-    const [notificationsData, setNotificationsData] = React.useState([])
+    const [notificationsData, setNotificationsData]: any = React.useState([])
 
     const [page, setPage] = React.useState(1)
     const [pageSize, setPageSize] = React.useState(6)
