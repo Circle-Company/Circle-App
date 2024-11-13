@@ -20,7 +20,7 @@ export default function Container({
         React.useContext(MomentContext)
     const { session } = React.useContext(PersistedContext)
     const { commentEnabled, setFocusedMoment } = React.useContext(FeedContext)
-    const navigation = useNavigation()
+    const navigation: any = useNavigation()
 
     const container: any = {
         ...momentSize,
