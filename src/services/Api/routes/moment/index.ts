@@ -1,94 +1,93 @@
 import api from "../.."
-import { storage, storageKeys } from "../../../../store"
 import { PostLikeProps, PostStatisticsPreviewProps, PostUnlikeProps } from "./types"
 
-async function like({ momentId }: PostLikeProps): Promise<void> {
+async function like({ momentId, authorizationToken }: PostLikeProps): Promise<void> {
     await api.post(
         `/moments/${momentId}/like`,
         {},
         {
             headers: {
-                authorization_token: storage.getString(storageKeys().account.jwt.token) || "",
+                authorization_token: authorizationToken,
             },
         }
     )
 }
 
-async function unlike({ momentId }: PostUnlikeProps): Promise<void> {
+async function unlike({ momentId, authorizationToken }: PostUnlikeProps): Promise<void> {
     await api.post(
         `/moments/${momentId}/unlike`,
         {},
         {
             headers: {
-                authorization_token: storage.getString(storageKeys().account.jwt.token) || "",
+                authorization_token: authorizationToken,
             },
         }
     )
 }
 
-async function view({ momentId }: PostLikeProps): Promise<void> {
+async function view({ momentId, authorizationToken }: PostLikeProps): Promise<void> {
     await api.post(
         `/moments/${momentId}/view`,
         {},
         {
             headers: {
-                authorization_token: storage.getString(storageKeys().account.jwt.token) || "",
+                authorization_token: authorizationToken,
             },
         }
     )
 }
 
-async function hide({ momentId }: PostLikeProps): Promise<void> {
+async function hide({ momentId, authorizationToken }: PostLikeProps): Promise<void> {
     await api.post(
         `/moments/${momentId}/hide`,
         {},
         {
             headers: {
-                authorization_token: storage.getString(storageKeys().account.jwt.token) || "",
+                authorization_token: authorizationToken,
             },
         }
     )
 }
 
-async function unhide({ momentId }: PostLikeProps): Promise<void> {
+async function unhide({ momentId, authorizationToken }: PostLikeProps): Promise<void> {
     await api.post(
         `/moments/${momentId}/unhide`,
         {},
         {
             headers: {
-                authorization_token: storage.getString(storageKeys().account.jwt.token) || "",
+                authorization_token: authorizationToken,
             },
         }
     )
 }
 
-async function deleteMoment({ momentId }: PostLikeProps): Promise<void> {
+async function deleteMoment({ momentId, authorizationToken }: PostLikeProps): Promise<void> {
     await api.post(
         `/moments/${momentId}/delete`,
         {},
         {
             headers: {
-                authorization_token: storage.getString(storageKeys().account.jwt.token) || "",
+                authorization_token: authorizationToken,
             },
         }
     )
 }
 
-async function undeleteMoment({ momentId }: PostLikeProps): Promise<void> {
+async function undeleteMoment({ momentId, authorizationToken }: PostLikeProps): Promise<void> {
     await api.post(
         `/moments/${momentId}/undelete`,
         {},
         {
             headers: {
-                authorization_token: storage.getString(storageKeys().account.jwt.token) || "",
+                authorization_token: authorizationToken,
             },
         }
     )
 }
 
-async function statisticsPreview({ momentId }: PostStatisticsPreviewProps) {
+async function statisticsPreview({ momentId, authorizationToken }: PostStatisticsPreviewProps) {
     return await api.get(`/moments/${momentId}/statistics/preview`, {
-        headers: { authorization_token: storage.getString(storageKeys().account.jwt.token) || "" },
+        headers: { authorization_token: authorizationToken },
     })
 }
 
