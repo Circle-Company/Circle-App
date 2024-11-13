@@ -8,7 +8,7 @@ import ColorTheme, { colors } from "../../../layout/constants/colors"
 import fonts from "../../../layout/constants/fonts"
 import sizes from "../../../layout/constants/sizes"
 import { Vibrate } from "../../../lib/hooks/useHapticFeedback"
-import { useLikeMutation, useUnlikeMutation } from "../../../state/queries/like"
+import api from "../../../services/Api"
 import { Text } from "../../Themed"
 import MomentContext from "../context"
 import { MomentLikeProps } from "../moment-types"
@@ -27,9 +27,6 @@ export default function like({
     var animatedScale = React.useRef(new Animated.Value(1)).current
     var animatedScaleIconPressed = React.useRef(new Animated.Value(1)).current
     var animatedScaleIcon = React.useRef(new Animated.Value(1)).current
-
-    const likeMutation = useLikeMutation({ momentId: momentData.id, userId: session.user.id })
-    const unlikeMutation = useUnlikeMutation({ momentId: momentData.id, userId: session.user.id })
 
     React.useEffect(() => {
         animatedScale.setValue(1)
@@ -104,7 +101,7 @@ export default function like({
     const blur_container_likePressed = {
         backgroundColor: ColorTheme().like,
     }
-    const pressable_container = {
+    const pressable_container: any = {
         overflow: "hidden",
         borderRadius: Number([sizes.buttons.width / 4]) / 2,
     }
@@ -127,13 +124,29 @@ export default function like({
         Vibrate("effectClick")
         HandleButtonAnimation()
         momentUserActions.handleLikeButtonPressed({ likedValue: true })
-        likeMutation.mutate()
+        await api.post(
+            `/moments/${momentData.id}/like`,
+            {},
+            {
+                headers: {
+                    authorization_token: session.account.jwtToken,
+                },
+            }
+        )
     }
     async function onUnlikeAction() {
         Vibrate("effectTick")
         HandleButtonAnimation()
         momentUserActions.handleLikeButtonPressed({ likedValue: false })
-        unlikeMutation.mutate()
+        await api.post(
+            `/moments/${momentData.id}/unlike`,
+            {},
+            {
+                headers: {
+                    authorization_token: session.account.jwtToken,
+                },
+            }
+        )
     }
 
     const like_fill: string = String(colors.gray.white)
