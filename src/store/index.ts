@@ -12,7 +12,6 @@ export function storageKeys() {
         },
         account: {
             unreadNotificationsCount: baseKey + "account:unreadnotificationscount",
-            firebasePushToken: baseKey + "account:firebasepushtoken",
             blocked: baseKey + "account:block",
             muted: baseKey + "account:mute",
             last_active_at: baseKey + "account:lastactive",

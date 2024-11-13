@@ -1,16 +1,15 @@
-import React, { useState, useEffect } from "react"
+import React, { useState } from "react"
 import { Pressable, TextInput, useColorScheme } from "react-native"
-import ColorTheme, { colors } from "../../layout/constants/colors"
-import fonts from "../../layout/constants/fonts"
-import Icon from "../../assets/icons/svgs/lock.svg"
-import { Text, View } from "../Themed"
 import CheckIcon from "../../assets/icons/svgs/check_circle.svg"
 import XIcon from "../../assets/icons/svgs/close.svg"
 import Eye from "../../assets/icons/svgs/eye.svg"
 import EyeSlash from "../../assets/icons/svgs/eye_slash.svg"
-import sizes from "../../layout/constants/sizes"
-import api from "../../services/Api"
+import Icon from "../../assets/icons/svgs/lock.svg"
 import AuthContext from "../../contexts/auth"
+import ColorTheme, { colors } from "../../layout/constants/colors"
+import fonts from "../../layout/constants/fonts"
+import sizes from "../../layout/constants/sizes"
+import { Text, View } from "../Themed"
 
 export default function PasswordInput({ sign = true }: { sign?: boolean }) {
     const isDarkMode = useColorScheme() === "dark"
@@ -18,7 +17,7 @@ export default function PasswordInput({ sign = true }: { sign?: boolean }) {
     const [password, setPassword] = useState("")
     const [showStatusMessage, setShowStatusMessage] = useState(false)
     const [statusMessage, setStatusMessage] = useState("")
-    const [isValidPassword, setIsValidPassword] = useState(true)
+    const [isValidPassword, setIsValidPassword] = useState(false)
     const [isVisible, setIsVisible] = useState(false)
     const inputRef = React.useRef<TextInput>(null)
 
@@ -146,6 +145,15 @@ export default function PasswordInput({ sign = true }: { sign?: boolean }) {
             }
         }
     }, [password, inputRef])
+
+    React.useEffect(() => {
+        if (password.length <= 5) {
+            setIsValidPassword(false)
+            setStatusMessage("The Password needs least 6 characters.")
+            setShowStatusMessage(true)
+            setSignInputPassword("")
+        }
+    })
 
     return (
         <View style={styles.container}>

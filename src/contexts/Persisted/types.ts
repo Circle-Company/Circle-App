@@ -58,7 +58,6 @@ export type AccountDataType = {
     muted: boolean
     last_active_at: string
     last_login_at: string
-    firebasePushToken: string
     jwtToken: string
     jwtExpiration: string
 }

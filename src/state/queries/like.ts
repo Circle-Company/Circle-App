@@ -4,13 +4,15 @@ import { apiRoutes } from "../../services/Api"
 type useLikeMutationProps = {
     userId: number
     momentId: number
+    authorizationToken: string
 }
 
-export function useLikeMutation({ momentId, userId }: useLikeMutationProps) {
+export function useLikeMutation({ momentId, userId, authorizationToken }: useLikeMutationProps) {
     const mutation = useMutation({
         mutationFn: async () => {
             await apiRoutes.moment.like({
                 userId,
+                authorizationToken,
                 momentId,
             })
         },
@@ -22,11 +24,12 @@ export function useLikeMutation({ momentId, userId }: useLikeMutationProps) {
     return mutation
 }
 
-export function useUnlikeMutation({ momentId, userId }: useLikeMutationProps) {
+export function useUnlikeMutation({ momentId, userId, authorizationToken }: useLikeMutationProps) {
     const mutation = useMutation({
         mutationFn: async () => {
             await apiRoutes.moment.unlike({
                 userId,
+                authorizationToken,
                 momentId,
             })
         },
