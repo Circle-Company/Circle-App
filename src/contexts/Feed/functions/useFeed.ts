@@ -35,8 +35,9 @@ export const useFeed = (userId: number) => {
 
     const fetchFeed = useCallback(
         async (isReloading = false) => {
-            if (!session.user) throw new Error("has not user")
+            if (!session.user) throw new Error("User not found")
             const currentTime = Date.now()
+
             // Verifica se já passou tempo suficiente (debounce) para evitar requisições seguidas
             if (currentTime - lastRequestTime < DEBOUNCE_TIME) {
                 console.log("Debounce ativo, evitando nova requisição")
@@ -48,59 +49,53 @@ export const useFeed = (userId: number) => {
             resetTimer()
 
             try {
-                await api
-                    .post(
-                        `/moments/feed`,
-                        {
-                            period,
-                            length: interactions.length,
-                            data: interactions,
-                        },
-                        { headers: { authorization_token: session.account.jwtToken } }
+                const response = await api.post(
+                    `/moments/feed`,
+                    {
+                        period,
+                        length: interactions.length,
+                        data: interactions,
+                    },
+                    { headers: { authorization_token: session.account.jwtToken } }
+                )
+
+                const moments: MomentProps[] = response.data || []
+                const newChunkIds = moments.map((moment) => moment.id)
+                const currentPostIds = feedData.map((item) => item.id)
+
+                const { addChunkOnList, resetFeedList, updatedList } = ChunksManager({
+                    reloading: isReloading,
+                    period,
+                    previousList: currentPostIds,
+                    newList: newChunkIds,
+                    maxItems: 100, // Define o máximo de itens na lista
+                })
+
+                if (resetFeedList) {
+                    setFeedData(moments) // Substitui completamente o feed
+                    setCurrentChunkIds(newChunkIds)
+                } else if (addChunkOnList) {
+                    const uniqueNewChunks = moments.filter(
+                        (moment) => !currentPostIds.includes(moment.id)
                     )
-                    .then((response) => {
-                        if (response.data.length >= 1) {
-                            const newChunkIds = response.data?.map((moment: any) => moment.id)
-                            const currentPostIds = feedData.map((item) => item.id)
 
-                            // Remove itens que já estão em currentChunkIds
-                            const filteredNewChunks = response.data?.filter(
-                                (moment: any) => !currentChunkIds.includes(moment.id)
-                            )
+                    setFeedData(updatedList.map((id) => moments.find((m) => m.id === id)!)) // Atualiza mantendo a ordem dos IDs
+                    setCurrentChunkIds((prevChunkIds) => [
+                        ...prevChunkIds,
+                        ...uniqueNewChunks.map((m) => m.id),
+                    ])
+                }
 
-                            const { addChunkOnList } = ChunksManager({
-                                reloading: isReloading,
-                                period,
-                                previousList: currentPostIds,
-                                newList: newChunkIds,
-                            })
-
-                            if (addChunkOnList) {
-                                // Adiciona apenas os novos chunks que não estão em currentChunkIds
-                                setFeedData((prevFeedData) => [
-                                    ...prevFeedData,
-                                    ...filteredNewChunks,
-                                ])
-                                setCurrentChunkIds((prevChunkIds) => [
-                                    ...prevChunkIds,
-                                    ...filteredNewChunks.map((chunk: any) => chunk.id),
-                                ])
-                            }
-
-                            // Atualiza o timestamp da última requisição
-                            setLastRequestTime(currentTime)
-                        }
-                    })
-                    .catch(() => {
-                        setLoading(false)
-                    })
+                setLastRequestTime(currentTime) // Atualiza o timestamp da última requisição
+            } catch (error) {
+                console.error("Erro ao buscar feed:", error)
             } finally {
                 setScrollEnabled(true)
                 setLoading(false)
                 setInteractions([]) // Limpa interações após a resposta
             }
         },
-        [userId]
+        [userId, feedData, interactions, session, lastRequestTime, resetTimer]
     )
 
     useEffect(() => {
