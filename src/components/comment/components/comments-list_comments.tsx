@@ -1,4 +1,5 @@
 import PersistedContext from "@/contexts/Persisted"
+import LanguageContext from "@/contexts/Preferences/language"
 import React from "react"
 import { FlatList, RefreshControl, useColorScheme } from "react-native"
 import Reanimated, { FadeInUp } from "react-native-reanimated"
@@ -11,11 +12,12 @@ import OfflineCard from "../../general/offline"
 import { Loading } from "../../loading"
 import MomentContext from "../../moment/context"
 import { useCommentsContext } from "../comments-context"
-import { CommentsListCommentsProps } from "../comments-types"
 import RenderComment from "./comments-render_comment"
+import ZeroComments from "./comments-zero_comments"
 
-export default function list_comments({ preview = true }: CommentsListCommentsProps) {
-    const { comment } = useCommentsContext()
+export default function list_comments() {
+    const { comment, preview } = useCommentsContext()
+    const { t } = React.useContext(LanguageContext)
     const { session } = React.useContext(PersistedContext)
     const { networkStats } = React.useContext(NetworkContext)
     const isDarkMode = useColorScheme() === "dark"
@@ -92,7 +94,7 @@ export default function list_comments({ preview = true }: CommentsListCommentsPr
             }}
             onEndReachedThreshold={0.1}
             scrollEnabled={false}
-            data={preview ? comment.comments : allComments}
+            data={preview ? comment?.comments : allComments}
             keyExtractor={(item: any, index: any) => index}
             refreshControl={
                 <>
@@ -130,8 +132,8 @@ export default function list_comments({ preview = true }: CommentsListCommentsPr
                                 width={sizes.moment.standart.width}
                                 text={
                                     allComments?.length == 0
-                                        ? "No one has commented yet."
-                                        : "No more comments."
+                                        ? t("No one has commented yet.")
+                                        : t("No more comments.")
                                 }
                             />
                         )
@@ -144,7 +146,10 @@ export default function list_comments({ preview = true }: CommentsListCommentsPr
                                 <Loading.ActivityIndicator />
                             </Loading.Container>
                         )
-                } else return null
+                }
+                if (preview && comment?.comments?.length == 0) {
+                    return <ZeroComments />
+                }
             }}
         />
     )
