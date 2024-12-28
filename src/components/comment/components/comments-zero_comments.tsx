@@ -2,21 +2,21 @@ import PlusIcon from "@/assets/icons/svgs/plus_circle.svg"
 import { Text } from "@/components/Themed"
 import ButtonStandart from "@/components/buttons/button-standart"
 import LanguageContext from "@/contexts/Preferences/language"
-import ColorTheme from "@/layout/constants/colors"
+import ColorTheme, { colors } from "@/layout/constants/colors"
 import fonts from "@/layout/constants/fonts"
 import sizes from "@/layout/constants/sizes"
 import { Vibrate } from "@/lib/hooks/useHapticFeedback"
 import React from "react"
-import { StyleSheet, View } from "react-native"
+import { View, useColorScheme } from "react-native"
 
 export default function ZeroComments() {
     const { t } = React.useContext(LanguageContext)
-
+    const isDarkMode = useColorScheme() === "dark"
     const container: any = {
         width: sizes.screens.width * 0.7,
         flex: 1,
         borderRadius: sizes.borderRadius["1md"] * 1.2,
-        backgroundColor: ColorTheme().backgroundDisabled,
+        backgroundColor: isDarkMode ? colors.gray.grey_08 : colors.gray.grey_02,
         alignSelf: "center",
         alignItems: "center",
         justifyContent: "center",
@@ -24,14 +24,14 @@ export default function ZeroComments() {
         paddingTop: sizes.paddings["1sm"],
     }
 
-    const animatedGradient: any = {
-        width: "100%",
-        height: "100%",
+    const buttonContainer = {
         alignSelf: "center",
         alignItems: "center",
-        justifyContent: "center",
-        flexDirection: "row",
-        paddingHorizontal: sizes.paddings["2sm"],
+        width: sizes.buttons.width * 0.5,
+        height: sizes.buttons.height * 0.5,
+        borderRadius: sizes.borderRadius["1md"],
+        overflow: "hidden",
+        backgroundColor: isDarkMode ? colors.gray.grey_06 : colors.gray.grey_03,
     }
 
     const buttonTitle: any = {
@@ -71,35 +71,11 @@ export default function ZeroComments() {
                 }}
                 margins={false}
                 bounciness={2}
-                style={styles.buttonContainer}
+                style={buttonContainer}
             >
                 <Text style={buttonTitle}>{t("Add Comment")}</Text>
-                <PlusIcon style={{ top: -0.5 }} width={16} height={16} fill={"#ffffff"} />
+                <PlusIcon style={{ top: -0.5 }} width={16} height={16} fill={ColorTheme().text} />
             </ButtonStandart>
         </View>
     )
 }
-
-const styles = StyleSheet.create({
-    buttonContainer: {
-        alignSelf: "center",
-        alignItems: "center",
-        width: sizes.buttons.width * 0.5,
-        height: sizes.buttons.height * 0.5,
-        borderRadius: sizes.borderRadius["1md"],
-        overflow: "hidden",
-        backgroundColor: "#FFFFFF20",
-    },
-    gradientWrapper: {
-        flex: 1,
-        width: "100%",
-        justifyContent: "center",
-        alignItems: "center",
-    },
-    buttonTitle: {
-        top: -1,
-        color: "#fff",
-        fontFamily: fonts.family.Semibold,
-        fontSize: fonts.size.caption1,
-    },
-})
