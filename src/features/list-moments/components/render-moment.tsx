@@ -15,7 +15,7 @@ type renderMomentProps = {
 
 export default function render_moment({ momentData, isFocused, isFeed }: renderMomentProps) {
     const { height, progress } = useKeyboardAnimation()
-    const { commentEnabled } = React.useContext(FeedContext)
+    const { commentEnabled, next, previous } = React.useContext(FeedContext)
     const [animatedValue] = React.useState(new Animated.Value(0))
     const [commentValue] = React.useState(new Animated.Value(0))
     const [opacityValue] = React.useState(new Animated.Value(1))
@@ -144,6 +144,7 @@ export default function render_moment({ momentData, isFocused, isFeed }: renderM
                                 <UserShow.Username
                                     truncatedSize={momentData.user.you_follow ? 14 : 8}
                                 />
+
                                 <UserShow.FollowButton
                                     isFollowing={momentData.user.you_follow}
                                     displayOnMoment={true}
@@ -151,13 +152,14 @@ export default function render_moment({ momentData, isFocused, isFeed }: renderM
                             </UserShow.Root>
                         </Moment.Root.TopLeft>
                         <Moment.Root.TopRight>
-                            <Moment.LikeButton isLiked={false} />
+                            <></>
                         </Moment.Root.TopRight>
                     </Moment.Root.Top>
 
                     <Moment.Root.Center>
                         <View style={{ marginBottom: sizes.margins["2sm"] }}>
                             <Moment.Description />
+                            <Moment.LikeButton isLiked={false} />
                         </View>
                     </Moment.Root.Center>
                 </Moment.Container>
