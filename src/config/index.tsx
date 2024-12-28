@@ -12,7 +12,7 @@ const environment = {
 
 const api = {
     API_VERSION: API_VERSION,
-    ENDPOINT: "192.168.15.10:3000", //"52.202.133.96:3000",
+    ENDPOINT: "54.224.60.84:3000", //"52.202.133.96:3000",
 }
 
 const analytics = {
