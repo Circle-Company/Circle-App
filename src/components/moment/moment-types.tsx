@@ -51,6 +51,7 @@ export type MomentDateProps = {
     color?: string
     backgroundColor?: string
     paddingHorizontal?: number
+    small?: boolean
 }
 
 export type TagProps = {

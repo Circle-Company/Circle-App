@@ -12,6 +12,7 @@ export default function date({
     color = String(ColorTheme().text),
     paddingHorizontal = sizes.paddings["2sm"],
     backgroundColor,
+    small = false,
 }: MomentDateProps) {
     const { momentData } = React.useContext(MomentContext)
 
@@ -38,7 +39,7 @@ export default function date({
                 style={{ marginRight: sizes.margins["1sm"] * 1.4 }}
             />
             <Text style={description_style}>
-                {timeDifferenceConverter({ date: String(momentData.created_at), small: false })}
+                {timeDifferenceConverter({ date: String(momentData.created_at), small })}
             </Text>
         </View>
     )
