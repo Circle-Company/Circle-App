@@ -98,6 +98,28 @@ export const useFeed = (userId: number) => {
         [userId, feedData, interactions, session, lastRequestTime, resetTimer]
     )
 
+    function next() {
+        if (
+            Number(focusedChunkItem?.index + 1) < feedData.length &&
+            commentEnabled == false &&
+            loading == false &&
+            scrollEnabled
+        )
+            return true
+        else return false
+    }
+
+    function previous() {
+        if (
+            Number(focusedChunkItem?.index) > 0 &&
+            commentEnabled == false &&
+            loading == false &&
+            scrollEnabled
+        )
+            return true
+        else return false
+    }
+
     useEffect(() => {
         fetchFeed()
     }, [fetchFeed])
@@ -115,6 +137,8 @@ export const useFeed = (userId: number) => {
         setFocusedChunkItemFunc,
         setInteractions,
         setFocusedMoment,
+        next,
+        previous,
         reloadFeed: () => fetchFeed(true),
     }
 }
