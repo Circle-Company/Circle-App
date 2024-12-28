@@ -48,7 +48,7 @@ export default function render_comment({ moment, focused }: renderCommentProps) 
     }
 
     return (
-        <Comments.MainRoot data={moment.comments}>
+        <Comments.MainRoot data={moment.comments} preview={true}>
             <Comments.Container focused={focused}>
                 <Animated.View style={animated_header_container}>
                     <Comments.TopRoot>
@@ -73,7 +73,7 @@ export default function render_comment({ moment, focused }: renderCommentProps) 
                 </Animated.View>
 
                 <Comments.CenterRoot>
-                    <Comments.ListComments preview={true} />
+                    <Comments.ListComments />
                 </Comments.CenterRoot>
             </Comments.Container>
         </Comments.MainRoot>
