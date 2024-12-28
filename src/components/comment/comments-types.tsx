@@ -16,6 +16,7 @@ export type CommentsReciveDataProps = Array<CommentObject>
 
 export type CommentsMainRootProps = {
     data: CommentsReciveDataProps
+    preview?: boolean
     children: React.ReactNode
 }
 export type CommentsContainerProps = {

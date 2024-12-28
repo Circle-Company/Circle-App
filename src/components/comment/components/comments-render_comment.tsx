@@ -13,11 +13,13 @@ import api from "../../../services/Api"
 import { Text } from "../../Themed"
 import MomentContext from "../../moment/context"
 import { UserShow } from "../../user_show"
+import { useCommentsContext } from "../comments-context"
 import { CommentsRenderCommentProps } from "../comments-types"
 
-export default function render_comment({ comment, preview }: CommentsRenderCommentProps) {
+export default function render_comment({ comment }: CommentsRenderCommentProps) {
     const { session } = React.useContext(PersistedContext)
     const { momentUserActions } = React.useContext(MomentContext)
+    const { preview } = useCommentsContext()
 
     const [like, setLike] = React.useState(comment.is_liked)
 
