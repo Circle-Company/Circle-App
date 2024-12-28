@@ -17,13 +17,34 @@ const ListMoments = () => {
         feedData,
         reloadFeed,
         loading: loadingFeed,
+        next,
+        focusedChunkItem,
+
+        previous,
     } = React.useContext(FeedContext)
     const [centerIndex, setCenterIndex] = useState<number | null>(0)
     const [loading, setLoading] = React.useState(false)
     const [refreshing, setRefreshing] = React.useState(false)
     const isDarkMode = useColorScheme() === "dark"
     const flatListRef = useRef<FlatList | null>(null)
+    const [trigger, setTrigger] = useState(false)
+    // Função que força a reexecução do efeito
+    const handleNext = () => {
+        next()
+        setTrigger((prev) => !prev) // Alterna o valor de `trigger`
+    }
 
+    useEffect(() => {
+        if (typeof next !== "function") {
+            console.error("The 'next' function is not defined in FeedContext.")
+            return
+        }
+        flatListRef.current?.scrollToIndex({
+            index: focusedChunkItem.index + 1,
+            animated: true,
+            viewPosition: sizes.moment.standart.width + margin,
+        })
+    }, [feedData.length, trigger])
     const handleScroll = useCallback(
         (event: any) => {
             const contentOffsetX = event.nativeEvent.contentOffset.x + 140
