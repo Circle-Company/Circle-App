@@ -25,6 +25,7 @@ module.exports = {
                     "@/lib": "./src/lib",
                     "@/helpers": "./src/helpers",
                     "@/modules": "./src/modules",
+                    "@/assets": "./src/assets",
                 },
             },
         ],

@@ -12,7 +12,8 @@
             "@/store/*": ["store/*"],
             "@/lib/*": ["lib/*"],
             "@/helpers/*": ["helpers/*"],
-            "@/modules/*": ["modules/*"]
+            "@/modules/*": ["modules/*"],
+            "@/assets/*": ["assets/*"]
         }
     }
 }
