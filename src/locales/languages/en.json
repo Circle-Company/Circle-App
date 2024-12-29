@@ -30,6 +30,10 @@
 
     "is following you": "is following you",
 
+    "No more comments.": "No more comments.",
+    "No one has commented yet.": "No one has commented yet.",
+    "This Moment has no comments.": "This Moment has no comments.",
+    "Be the first to comment.": "Be the first to comment.",
     "commented on your moment": "commented on your moment",
 
     "Type @username": "Type @username",
