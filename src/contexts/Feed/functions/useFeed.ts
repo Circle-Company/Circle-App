@@ -136,6 +136,7 @@ export const useFeed = (userId: number) => {
         setCommentEnabled,
         setFocusedChunkItemFunc,
         setInteractions,
+        setScrollEnabled,
         setFocusedMoment,
         next,
         previous,
