@@ -12,6 +12,8 @@ export type MemoryMomentObjectProps = {
 export type MemoryObjectProps = {
     id: number
     title: string
+    total_moments_num: number
+    updated_at: string
     moments: Array<MemoryMomentObjectProps>
 }
 

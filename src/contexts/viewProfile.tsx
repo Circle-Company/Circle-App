@@ -6,7 +6,7 @@ type ViewProfileProviderProps = {
     children: React.ReactNode
 }
 export type ProfileDataProps = {
-    id: number
+    id: string
     username: string
     access_level: number
     verifyed: boolean
@@ -30,7 +30,7 @@ export type ProfileDataProps = {
 }
 export type ViewProfileContextsData = {
     userProfile: ProfileDataProps
-    setProfile: (Id: number) => Promise<void>
+    setProfile: (Id: string) => Promise<void>
 }
 
 const ViewProfileContext = React.createContext<ViewProfileContextsData>(
@@ -41,7 +41,7 @@ export function Provider({ children }: ViewProfileProviderProps) {
     const { session } = React.useContext(PersistedContext)
     const [userProfile, setUserProfile] = React.useState<ProfileDataProps>({} as ProfileDataProps)
 
-    async function setProfile(Id: number) {
+    async function setProfile(Id: string) {
         try {
             if (!Id) throw new Error("Can´t possible find user without pass Id")
             const response = api
@@ -50,7 +50,7 @@ export function Provider({ children }: ViewProfileProviderProps) {
                     {
                         user_id: session.user.id,
                     },
-                    { headers: { authorization_token: session.account.jwtToken } }
+                    { headers: { Authorization: session.account.jwtToken } }
                 )
                 .then(function (response) {
                     setUserProfile(response.data)

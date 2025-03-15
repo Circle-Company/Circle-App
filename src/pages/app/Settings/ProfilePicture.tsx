@@ -98,7 +98,7 @@ export default function ProfilePictureScreen() {
                             resolution_height: IMG.width,
                         },
                     },
-                    { headers: { authorization_token: session.account.jwtToken } }
+                    { headers: { Authorization: session.account.jwtToken } }
                 )
                 .finally(() => {
                     setSelectedImage("")

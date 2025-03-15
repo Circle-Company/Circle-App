@@ -9,7 +9,7 @@ async function follow({ userId, followedUserId }: UserFollowProps): Promise<void
         { user_id: userId, followed_user_id: followedUserId },
         {
             headers: {
-                authorization_token: storage.getString(storageKeys().account.jwt.token) || "",
+                Authorization: storage.getString(storageKeys().account.jwt.token) || "",
             },
         }
     )
@@ -24,7 +24,7 @@ async function unfollow({ userId, followedUserId }: UserUnfollowProps): Promise<
         },
         {
             headers: {
-                authorization_token: storage.getString(storageKeys().account.jwt.token) || "",
+                Authorization: storage.getString(storageKeys().account.jwt.token) || "",
             },
         }
     )
@@ -38,7 +38,7 @@ async function getByPk({ userId, findedUserPk }: UserDataByPkProps): Promise<Pro
         },
         {
             headers: {
-                authorization_token: storage.getString(storageKeys().account.jwt.token) || "",
+                Authorization: storage.getString(storageKeys().account.jwt.token) || "",
             },
         }
     )

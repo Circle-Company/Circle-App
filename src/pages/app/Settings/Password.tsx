@@ -62,7 +62,7 @@ export default function PasswordScreen() {
                         user_id: session.user.id,
                         password_input: signInputPassword,
                     },
-                    { headers: { authorization_token: session.account.jwtToken } }
+                    { headers: { Authorization: session.account.jwtToken } }
                 )
                 setSignInputPassword("")
                 navigation.goBack()

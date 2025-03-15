@@ -100,7 +100,7 @@ export default function input({
                     {
                         content: commentText,
                     },
-                    { headers: { authorization_token: session.account.jwtToken } }
+                    { headers: { Authorization: session.account.jwtToken } }
                 )
                 .then(() => {
                     notify("toast", {

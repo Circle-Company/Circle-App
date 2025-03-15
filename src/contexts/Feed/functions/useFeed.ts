@@ -1,6 +1,6 @@
 import { MomentDataProps } from "@/components/moment/context/types"
 import PersistedContext from "@/contexts/Persisted"
-import React, { useCallback, useEffect, useState } from "react"
+import React, { useCallback, useState } from "react"
 import { useTimer } from "../../../lib/hooks/useTimer"
 import api from "../../../services/Api"
 import { InteractionProps, MomentProps } from "../types"
@@ -50,14 +50,15 @@ export const useFeed = (userId: number) => {
 
             try {
                 const response = await api.post(
-                    `/moments/feed`,
+                    "/moments/feed",
                     {
                         period,
                         length: interactions.length,
                         data: interactions,
                     },
-                    { headers: { authorization_token: session.account.jwtToken } }
+                    { headers: { Authorization: session.account.jwtToken } }
                 )
+                setFeedData(response.data)
 
                 const moments: MomentProps[] = response.data || []
                 const newChunkIds = moments.map((moment) => moment.id)
@@ -120,10 +121,6 @@ export const useFeed = (userId: number) => {
         else return false
     }
 
-    useEffect(() => {
-        fetchFeed()
-    }, [fetchFeed])
-
     return {
         feedData,
         loading,
@@ -136,8 +133,8 @@ export const useFeed = (userId: number) => {
         setCommentEnabled,
         setFocusedChunkItemFunc,
         setInteractions,
-        setScrollEnabled,
         setFocusedMoment,
+        setScrollEnabled,
         next,
         previous,
         reloadFeed: () => fetchFeed(true),

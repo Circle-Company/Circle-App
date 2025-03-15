@@ -83,7 +83,7 @@ export default function render_comment({ comment }: CommentsRenderCommentProps) 
                 .post(
                     `/moments/comments/${comment.id}/unlike`,
                     {},
-                    { headers: { authorization_token: session.account.jwtToken } }
+                    { headers: { Authorization: session.account.jwtToken } }
                 )
                 .catch((error) => console.log(error))
         } else {
@@ -94,7 +94,7 @@ export default function render_comment({ comment }: CommentsRenderCommentProps) 
                 .post(
                     `/moments/comments/${comment.id}/like`,
                     {},
-                    { headers: { authorization_token: session.account.jwtToken } }
+                    { headers: { Authorization: session.account.jwtToken } }
                 )
                 .catch((error) => console.log(error))
         }

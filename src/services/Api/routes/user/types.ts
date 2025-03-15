@@ -1,14 +1,14 @@
 export type UserFollowProps = {
-    userId: number
-    followedUserId: number
+    userId: string
+    followedUserId: string
 }
 
 export type UserUnfollowProps = {
-    userId: number
-    followedUserId: number
+    userId: string
+    followedUserId: string
 }
 
 export type UserDataByPkProps = {
-    userId: number
-    findedUserPk: number
+    userId: string
+    findedUserPk: string
 }

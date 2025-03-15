@@ -1,7 +1,11 @@
 export type UpdateCoordinatesProps = {
-    userId: number
+    userId: string
     coordinates: {
         latitude: number
         longitude: number
     }
+}
+
+export type findFollowingsProps = {
+    userId: string
 }

@@ -15,7 +15,7 @@ type SelectMomentsProviderProps = {
 }
 
 type Moment = {
-    id: number
+    id: string
     midia: {
         fullhd_resolution: string
     }
@@ -54,7 +54,7 @@ export function Provider({ children }: SelectMomentsProviderProps) {
         try {
             await api
                 .get(`/moments/tiny/${session.user.id}?page=1&pageSize=10000`, {
-                    headers: { authorization_token: session.account.jwtToken },
+                    headers: { Authorization: session.account.jwtToken },
                 })
                 .then(function (response) {
                     return setAllMoments(response.data.moments)
@@ -72,8 +72,8 @@ export function Provider({ children }: SelectMomentsProviderProps) {
             const response = await api
                 .post(
                     `/memory/create`,
-                    { user_id: session.user.id, title },
-                    { headers: { authorization_token: session.account.jwtToken } }
+                    { user_id: session.user.id.toString(), title },
+                    { headers: { Authorization: session.account.jwtToken } }
                 )
                 .then(function (response) {
                     notify("toast", {
@@ -103,14 +103,15 @@ export function Provider({ children }: SelectMomentsProviderProps) {
     async function storeMoments(memory_id: number) {
         try {
             const filtered_moments = selectedMoments.map((item) => {
-                return { id: item.id }
+                console.log({ id: item.id.toString() })
+                return { id: item.id.toString() }
             })
             console.log("store_moments: ", memory_id, filtered_moments)
             await api
                 .post(
                     `/memory/add-moment`,
                     { memory_id, moments_list: [...filtered_moments] },
-                    { headers: { authorization_token: session.account.jwtToken } }
+                    { headers: { Authorization: session.account.jwtToken } }
                 )
                 .then(function (response) {
                     return response.data
