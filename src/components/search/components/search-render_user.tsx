@@ -77,7 +77,7 @@ export default function render_user({ user }: SearchRenderItemReciveDataObjectPr
 
     return (
         <Reanimated.View entering={FadeInDown.duration(200)} style={container}>
-            <Animated.View style={{ transform: [{ scale: animatedScale }] }}>
+            <Animated.View style={{ transform: [{ scale: animatedScale }], flex: 1 }}>
                 <Pressable
                     style={container}
                     onPressIn={HandlePressIn}
@@ -105,10 +105,10 @@ export default function render_user({ user }: SearchRenderItemReciveDataObjectPr
                                             color={String(ColorTheme().textDisabled)}
                                         />
                                     )}
-                                    {user.name && user.statistic.total_followers_num > 0 ? (
+                                    {user.name && user.statistic?.total_followers_num > 0 ? (
                                         <Text style={dot_style}>•</Text>
                                     ) : null}
-                                    {user.statistic.total_followers_num > 0 && (
+                                    {user.statistic?.total_followers_num > 0 && (
                                         <Text style={total_followers_num_style}>
                                             {formatNumberWithDots(
                                                 user.statistic.total_followers_num
