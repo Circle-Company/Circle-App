@@ -114,7 +114,7 @@ export default function DescriptionScreen() {
                             user_id: session.user.id,
                             description,
                         },
-                        { headers: { authorization_token: session.account.jwtToken } }
+                        { headers: { Authorization: session.account.jwtToken } }
                     )
                     .finally(() => {
                         session.user.get(session.user.id)

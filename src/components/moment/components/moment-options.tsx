@@ -38,7 +38,7 @@ export default function options({ memory, momentData, momentOptions }: OptionsPr
                     moment_id: momentData.id,
                     user_id: session.user.id,
                 },
-                { headers: { authorization_token: session.account.jwtToken } }
+                { headers: { Authorization: session.account.jwtToken } }
             )
             .then(() => {
                 notify("toast", {

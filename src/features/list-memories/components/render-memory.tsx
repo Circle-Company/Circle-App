@@ -1,7 +1,7 @@
 import { useNavigation } from "@react-navigation/native"
 import React from "react"
 import { Pressable, View } from "react-native"
-import MemoryIcon from "../../../assets/icons/svgs/memory.svg"
+import MomentIcon from "../../../assets/icons/svgs/bolt.svg"
 import { Text } from "../../../components/Themed"
 import { Memory } from "../../../components/memory"
 import { MemoryObjectProps } from "../../../components/memory/memory-types"
@@ -9,7 +9,7 @@ import { Moment } from "../../../components/moment"
 import { userReciveDataProps } from "../../../components/user_show/user_show-types"
 import MemoryContext from "../../../contexts/memory"
 import { truncated } from "../../../helpers/processText"
-import { colors } from "../../../layout/constants/colors"
+import ColorTheme, { colors } from "../../../layout/constants/colors"
 import fonts from "../../../layout/constants/fonts"
 import sizes from "../../../layout/constants/sizes"
 
@@ -37,7 +37,7 @@ export default function render_memory({
     icon = false,
 }: RenderMemoryProps) {
     const { setMemory } = React.useContext(MemoryContext)
-    const navigation = useNavigation()
+    const navigation: any = useNavigation()
     const container: any = {
         marginRight: dinamicMargin
             ? (memory.moments.length == 1 && marginRight - 23 * scale) ||
@@ -71,10 +71,41 @@ export default function render_memory({
         fontFamily: fonts.family.Bold,
     }
     const icon_container: any = {
+        flexDirection: "row",
+        alignItems: "center",
+        justifyContent: "center",
+        paddingVertical: sizes.paddings["1sm"] * 0.2,
+        paddingLeft: sizes.paddings["1sm"] * 0.6,
+        paddingRight: sizes.paddings["1sm"],
+        backgroundColor: colors.gray.grey_08,
+        borderRadius: 10,
+        borderWidth: 1,
+        borderColor: "#ffffff20",
+    }
+
+    const headerContainer: any = {
         position: "absolute",
         zIndex: 2,
-        flex: 1,
-        padding: sizes.paddings["2sm"],
+        top: 12,
+        left: 12,
+        flexDirection: "row",
+        alignItems: "center",
+        justifyContent: "center",
+    }
+
+    const badge: any = {
+        backgroundColor: ColorTheme().error,
+        width: 7,
+        height: 7,
+        borderRadius: 5,
+        marginLeft: 3,
+    }
+
+    const icon_text: any = {
+        marginLeft: 4,
+        fontSize: fontSize * scale * 0.8,
+        fontFamily: fonts.family.Medium,
+        color: colors.gray.white,
     }
 
     async function handlePressed(memoryData: any) {
@@ -104,14 +135,20 @@ export default function render_memory({
                                 }}
                             >
                                 {icon && (
-                                    <View style={icon_container}>
-                                        <MemoryIcon
-                                            fill={`${colors.gray.white}`}
-                                            width={20}
-                                            height={20}
-                                        />
+                                    <View style={headerContainer}>
+                                        <View style={icon_container}>
+                                            <MomentIcon
+                                                fill={`${colors.gray.white}`}
+                                                width={10}
+                                                height={10}
+                                            />
+                                            <Text style={icon_text}>
+                                                {memory.total_moments_num}
+                                            </Text>
+                                        </View>
                                     </View>
                                 )}
+
                                 <Memory.Container
                                     contentRender={moment.midia}
                                     focused={Boolean(index !== 0)}

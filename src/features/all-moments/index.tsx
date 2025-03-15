@@ -31,7 +31,7 @@ export default function ListAllMoments() {
             try {
                 await api
                     .get(`/moments/tiny/${session.user.id}?page=${page}&pageSize=${pageSize}`, {
-                        headers: { authorization_token: session.account.jwtToken },
+                        headers: { Authorization: session.account.jwtToken },
                     })
                     .then(function (response) {
                         if (page === 1) {

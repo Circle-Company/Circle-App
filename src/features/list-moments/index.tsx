@@ -54,8 +54,8 @@ const ListMoments = () => {
 
     const prefetchNextImage = (index: number) => {
         const nextItem = feedData[index]
-        if (nextItem && nextItem.midia.fullhd_resolution) {
-            FastImage.preload([{ uri: nextItem.midia.fullhd_resolution.toString() }])
+        if (nextItem && nextItem?.midia?.fullhd_resolution) {
+            FastImage.preload([{ uri: nextItem?.midia?.fullhd_resolution.toString() }])
         }
     }
 

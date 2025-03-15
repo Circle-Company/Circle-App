@@ -111,7 +111,7 @@ export function Provider({ children }: NewMomentProviderProps) {
                             tags,
                         },
                     },
-                    { headers: { authorization_token: session.account.jwtToken } }
+                    { headers: { Authorization: session.account.jwtToken } }
                 )
                 .then(function (response) {
                     setCreatedMoment(response.data)
@@ -147,7 +147,7 @@ export function Provider({ children }: NewMomentProviderProps) {
                         memory_id: selectedMemory?.id,
                         moments_list: [{ id: createdMoment.id }],
                     },
-                    { headers: { authorization_token: session.account.jwtToken } }
+                    { headers: { Authorization: session.account.jwtToken } }
                 )
                 .then(function (response) {
                     setTags([])
@@ -216,7 +216,7 @@ export function Provider({ children }: NewMomentProviderProps) {
                 .post(
                     `memory/get-user-memories`,
                     { user_id: session.user.id },
-                    { headers: { authorization_token: session.account.jwtToken } }
+                    { headers: { Authorization: session.account.jwtToken } }
                 )
                 .then(function (response) {
                     return response.data

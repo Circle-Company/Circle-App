@@ -14,7 +14,7 @@ export function RenderProfileSkeleton() {
         flexDirection: "row",
         alignItems: "center",
         justifyContent: "center",
-        marginTop: sizes.margins["1xl"] * 0.78,
+        marginTop: sizes.margins["1xl"] * 0.6,
     }
 
     const statistic = {
@@ -43,15 +43,6 @@ export function RenderProfileSkeleton() {
                             borderRadius: 11,
                         }}
                     />
-                    <Skeleton.View
-                        style={{
-                            alignSelf: "center",
-                            width: 60,
-                            height: 10,
-                            borderRadius: 10,
-                            marginTop: sizes.margins["3sm"],
-                        }}
-                    />
                 </View>
                 <View style={statistic}>
                     <Skeleton.View
@@ -61,15 +52,6 @@ export function RenderProfileSkeleton() {
                             borderRadius: 11,
                         }}
                     />
-                    <Skeleton.View
-                        style={{
-                            alignSelf: "center",
-                            width: 60,
-                            height: 10,
-                            borderRadius: 10,
-                            marginTop: sizes.margins["3sm"],
-                        }}
-                    />
                 </View>
                 <View style={statistic}>
                     <Skeleton.View
@@ -77,15 +59,6 @@ export function RenderProfileSkeleton() {
                             width: 70,
                             height: 22,
                             borderRadius: 11,
-                        }}
-                    />
-                    <Skeleton.View
-                        style={{
-                            alignSelf: "center",
-                            width: 60,
-                            height: 10,
-                            borderRadius: 10,
-                            marginTop: sizes.margins["3sm"],
                         }}
                     />
                 </View>
@@ -94,9 +67,28 @@ export function RenderProfileSkeleton() {
             <Skeleton.View
                 style={{
                     alignSelf: "center",
-                    width: sizes.screens.width,
-                    height: sizes.sizes["3md"],
+                    width: 100,
+                    height: 15,
                     marginTop: sizes.margins["1lg"],
+                    borderRadius: 3,
+                }}
+            />
+            <Skeleton.View
+                style={{
+                    alignSelf: "center",
+                    width: 180,
+                    height: 15,
+                    marginTop: 10,
+                    borderRadius: 3,
+                }}
+            />
+            <Skeleton.View
+                style={{
+                    alignSelf: "center",
+                    width: 150,
+                    height: 15,
+                    marginTop: 10,
+                    borderRadius: 3,
                 }}
             />
         </View>

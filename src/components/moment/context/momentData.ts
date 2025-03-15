@@ -34,7 +34,7 @@ export function useMomentData(): MomentDataState {
         const { session } = React.useContext(PersistedContext)
         await api
             .get(`/moments/${id}/comments?page=${page}&pageSize=${pageSize}`, {
-                headers: { authorization_token: session.account.jwtToken },
+                headers: { Authorization: session.account.jwtToken },
             })
             .then((response) => {
                 if (page === 1) setComments(response.data.comments)
@@ -49,7 +49,7 @@ export function useMomentData(): MomentDataState {
         const { session } = React.useContext(PersistedContext)
         await api
             .get(`/moments/${id}/statistics/preview`, {
-                headers: { authorization_token: session.account.jwtToken },
+                headers: { Authorization: session.account.jwtToken },
             })
             .then((response) => {
                 setStatistics(response.data)
@@ -63,7 +63,7 @@ export function useMomentData(): MomentDataState {
         const { session } = React.useContext(PersistedContext)
         return await api
             .get(`/moments/${id}/tags?page=1&pageSize=100`, {
-                headers: { authorization_token: session.account.jwtToken },
+                headers: { Authorization: session.account.jwtToken },
             })
             .then((response) => {
                 setTags(response.data)

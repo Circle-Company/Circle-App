@@ -5,24 +5,23 @@ export type SearchRenderItemReciveDataProps = {
 }
 export type SearchRenderItemReciveDataObjectProps = {
     user: {
-        id: number,
-        username: string,
-        name: string | null,
-        verifyed: boolean,
+        id: string
+        username: string
+        name: string | null
+        verifyed: boolean
         profile_picture: {
-            fullhd_resolution: string | null,
+            fullhd_resolution: string | null
             tiny_resolution: string | null
-        },
+        }
         statistic: {
             total_followers_num: number
         }
-        you_follow: boolean        
+        you_follow: boolean
     }
-
 }
 
 export type SearchMainRootProps = {
-    data: SearchRenderItemReciveDataProps,
+    data: SearchRenderItemReciveDataProps
     children: React.ReactNode
 }
 export type SearchCenterRootProps = {

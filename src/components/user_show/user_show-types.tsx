@@ -1,7 +1,7 @@
 import React from "react"
 
 export type userReciveDataProps = {
-    id: number
+    id: string
     username: string
     verifyed: boolean
     profile_picture: {

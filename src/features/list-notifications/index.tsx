@@ -32,7 +32,7 @@ export default function ListNotifcations() {
     const fetchData = async () => {
         await api
             .get(`/notification/find?page=${page}&pageSize=${pageSize}`, {
-                headers: { authorization_token: session.account.jwtToken },
+                headers: { Authorization: session.account.jwtToken },
             })
             .then(function (response) {
                 if (page === 1) setNotificationsData(response.data.notifications)
