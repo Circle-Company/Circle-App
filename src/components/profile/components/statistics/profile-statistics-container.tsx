@@ -24,10 +24,10 @@ export default function statistics_container({ children }: ProfileStatisticsCont
         width: sizes.screens.width,
         flexDirection: "row",
         alignItems: "center",
-        justifyContent: "space-between",
-        paddingVertical: sizes.paddings["2sm"],
+        justifyContent: "space-between", // Distribui os itens uniformemente
         paddingHorizontal: sizes.paddings["1xl"] * 1.2,
         opacity: animatedOpacity,
+        gap: 10, // Adiciona espaçamento entre os itens (React Native 0.70+)
     }
 
     return <Animated.View style={container}>{children}</Animated.View>

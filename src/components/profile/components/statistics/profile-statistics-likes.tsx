@@ -1,3 +1,4 @@
+import { truncated } from "@/helpers/processText"
 import React from "react"
 import { useColorScheme, View } from "react-native"
 import BottomSheetContext from "../../../../contexts/bottomSheet"
@@ -24,23 +25,21 @@ export default function statistics_likes({}: ProfileStatisticsLikesProps) {
             snapPoints: ["15%"],
         })
     }
-
     const container: any = {
-        width: sizes.screens.width / 4,
-        marginTop: sizes.margins["1sm"],
         alignItems: "center",
         justifyContent: "center",
+        flexDirection: "row",
     }
 
     const num_style: any = {
         fontFamily: fonts.family.Bold,
-        fontSize: fonts.size.title2,
+        fontSize: fonts.size.body,
         color: ColorTheme().text,
+        marginRight: sizes.margins["1sm"],
     }
     const text_style: any = {
-        top: 1,
         fontFamily: fonts.family.Semibold,
-        fontSize: fonts.size.body * 0.8,
+        fontSize: fonts.size.body,
         color: ColorTheme().textDisabled,
     }
     return (
@@ -49,10 +48,12 @@ export default function statistics_likes({}: ProfileStatisticsLikesProps) {
             width={sizes.screens.width / 4}
             backgroundColor="#00000000"
             action={handlePress}
+            bounciness={5}
+            animationScale={0.9}
         >
             <View style={container}>
                 <Text style={num_style}>{NumberConversor(user?.statistics?.total_likes_num)}</Text>
-                <Text style={text_style}>{t("Likes")}</Text>
+                <Text style={text_style}>{truncated({ text: t("Likes"), size: 8 })}</Text>
             </View>
         </Button>
     )
