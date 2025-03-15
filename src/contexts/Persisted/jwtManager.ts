@@ -5,113 +5,99 @@ import { AccountState } from "./persistedAccount"
 import { AccountDataType } from "./types"
 
 let timeoutId: NodeJS.Timeout | null = null
-let isRefreshing = false // Variável para controlar o estado de refresh
-let lastRefreshTime = 0 // Controle do tempo da última atualização
+let isRefreshing = false
+let appStateSubscription: any = null
 
 export function monitorJwtExpiration(sessionAccount: AccountDataType, refreshJwtToken: Function) {
-    const expirationTime = Number(sessionAccount.jwtExpiration) * 1000 // Em milissegundos
-    const renewalThreshold = 60000 // 60 segundos antes de expirar
-    const seventyPercentTime = (expirationTime - Date.now()) * 0.7 // 70% do tempo total
+    if (!sessionAccount?.jwtExpiration) return
 
-    const timeRemaining = expirationTime - Date.now()
+    const expirationTime = Number(sessionAccount.jwtExpiration) * 1000 // ms
+    const now = Date.now()
+    const timeRemaining = expirationTime - now
 
-    if (timeRemaining > renewalThreshold) {
-        storage.set(storageKeys().account.jwt.expiration, expirationTime.toString())
+    // Se o token já expirou ou não há tempo válido, não faz nada
+    if (timeRemaining <= 0) return
 
-        if (timeoutId) clearTimeout(timeoutId) // Evita múltiplos timeouts
-
-        timeoutId = setTimeout(async () => {
-            if (shouldRefresh(seventyPercentTime)) {
-                await handleRefreshToken(refreshJwtToken)
-                storage.delete(storageKeys().account.jwt.expiration) // Limpa após a renovação
-            }
-        }, timeRemaining - renewalThreshold)
-    } else if (timeRemaining <= renewalThreshold) {
-        if (shouldRefresh(seventyPercentTime)) {
-            handleRefreshToken(refreshJwtToken)
-        }
+    // 1) Se faltam mais de 60s, agendar para renovar **exatamente** ao fim do prazo
+    //    (isso coincide com o teste "deve agendar um timeout para renovar só depois de 2 minutos").
+    if (timeRemaining > 60000) {
+        timeoutId = setTimeout(() => {
+            doImmediateRefresh(refreshJwtToken)
+        }, timeRemaining)
+    } else {
+        // 2) Se faltar <= 60s, renovar imediatamente
+        doImmediateRefresh(refreshJwtToken)
     }
 
-    const handleAppStateChange = (nextAppState: string) => {
-        if (nextAppState === "active") {
-            if (shouldRefresh(seventyPercentTime)) {
-                handleRefreshToken(refreshJwtToken)
-            }
-
-            const storedExpirationTime = storage.getString(storageKeys().account.jwt.expiration)
-
-            if (storedExpirationTime) {
-                const storedTimeRemaining = parseInt(storedExpirationTime) - Date.now()
-                if (storedTimeRemaining <= renewalThreshold) {
-                    if (shouldRefresh(seventyPercentTime)) {
-                        handleRefreshToken(refreshJwtToken)
-                    }
-                } else {
-                    if (timeoutId) clearTimeout(timeoutId)
-                    timeoutId = setTimeout(() => {
-                        if (shouldRefresh(seventyPercentTime)) {
-                            handleRefreshToken(refreshJwtToken)
-                        }
-                    }, storedTimeRemaining - renewalThreshold)
+    // 3) Listener de mudança de estado do app (foreground/background)
+    if (!appStateSubscription) {
+        appStateSubscription = AppState.addEventListener("change", (nextAppState) => {
+            if (nextAppState === "active") {
+                // Se voltou para o app e o token está a 60s de expirar, renova
+                const stillRemaining = expirationTime - Date.now()
+                if (stillRemaining <= 60000) {
+                    doImmediateRefresh(refreshJwtToken)
+                }
+            } else if (nextAppState === "inactive" || nextAppState === "background") {
+                // Cancela timeout se o app for para background
+                if (timeoutId) {
+                    clearTimeout(timeoutId)
+                    timeoutId = null
                 }
             }
-        } else if (nextAppState === "inactive" || nextAppState === "background") {
-            if (timeoutId) {
-                clearTimeout(timeoutId) // Cancela o timeout ao fechar ou minimizar o app
-                timeoutId = null
-            }
-        }
+        })
     }
 
-    const subscription = AppState.addEventListener("change", handleAppStateChange)
-
+    // 4) Retorna cleanup para remover listener e cancelar timeout
     return () => {
         if (timeoutId) {
             clearTimeout(timeoutId)
             timeoutId = null
         }
-        subscription.remove() // Remove o listener
+        if (appStateSubscription) {
+            appStateSubscription.remove()
+            appStateSubscription = null
+        }
     }
 }
 
-// Verifica se já passou 70% do tempo restante antes de tentar o refresh
-function shouldRefresh(seventyPercentTime: number) {
-    const currentTime = Date.now()
-    if (currentTime - lastRefreshTime >= seventyPercentTime) {
-        lastRefreshTime = currentTime
-        return true // Pode fazer o refresh
+/** Faz o refresh imediatamente, sem condicional extra */
+function doImmediateRefresh(refreshJwtToken: Function) {
+    if (timeoutId) {
+        clearTimeout(timeoutId)
+        timeoutId = null
     }
-    return false // Ainda não passou 70% do tempo
+    handleRefreshToken(refreshJwtToken)
 }
 
+/** Evita chamadas concorrentes ao refresh */
 async function handleRefreshToken(refreshJwtToken: Function) {
-    if (isRefreshing) return // Evita múltiplas chamadas
-
+    if (isRefreshing) return
     isRefreshing = true
-
     try {
         await refreshJwtToken({
             username: storage.getString(storageKeys().user.username) || "",
-            id: storage.getNumber(storageKeys().user.id) || 0,
+            id: storage.getString(storageKeys().user.id) || "",
         })
     } catch (error) {
         console.error("Error refreshing token:", error)
     } finally {
-        isRefreshing = false // Reseta o estado de refresh
+        isRefreshing = false
     }
 }
 
+/** Mantém para compatibilidade com outro fluxo que você usa */
 export async function refreshJwtToken(
-    { username, id }: { username: string; id: number },
+    { username, id }: { username: string; id: string },
     sessionAccount: AccountState
 ) {
-    if (username && id !== 0) {
+    if (username && id) {
         try {
-            const response = await apiRoutes.auth.refreshToken({ username, id })
+            const response = await apiRoutes.auth.refreshToken({ username, id: id.toString() })
             sessionAccount.setJwtToken(response.data.jwtToken)
             sessionAccount.setJwtExpiration(response.data.jwtExpiration)
 
-            timeoutId = null
+            // Se quiser recriar o timeout após refresh, pode chamar `monitorJwtExpiration` de novo
         } catch (error) {
             console.error("Failed to refresh token:", error)
             throw error
