@@ -41,7 +41,7 @@ export default function RenderMoment({
         if (!preview) {
             if (selectedMoments.length > 0) {
                 selectedMoments.map((item) => {
-                    if (moment.id == item.id) setSelected(true)
+                    if (moment.id.toString() == item.id.toString()) setSelected(true)
                 })
             }
         }
@@ -68,16 +68,16 @@ export default function RenderMoment({
         justifyContent: "center",
     }
 
-    async function Select() {
+    function Select() {
         if (!preview) {
-            await put_moment_on_list(moment), await setSelected(true)
+            put_moment_on_list(moment), setSelected(true)
         }
     }
 
-    async function Unselect() {
+    function Unselect() {
         if (!preview) {
-            await delete_moment_from_list(moment)
-            await setSelected(false)
+            delete_moment_from_list(moment)
+            setSelected(false)
         }
     }
 
