@@ -13,7 +13,7 @@ import {
 
 async function getUserPreferences({ userId }: GetUserPreferencesProps): Promise<any> {
     return await api.get(`/preferences/get/${userId}`, {
-        headers: { authorization_token: storage.getString(storageKeys().account.jwt.token) || "" },
+        headers: { Authorization: storage.getString(storageKeys().account.jwt.token) || "" },
     })
 }
 
@@ -26,7 +26,7 @@ async function setAppLanguage({ userId, appLanguage }: SetAppLanguageProps): Pro
         },
         {
             headers: {
-                authorization_token: storage.getString(storageKeys().account.jwt.token) || "",
+                Authorization: storage.getString(storageKeys().account.jwt.token) || "",
             },
         }
     )
@@ -41,7 +41,7 @@ async function setHaptics({ userId, disableHaptics }: SetHapticsProps): Promise<
         },
         {
             headers: {
-                authorization_token: storage.getString(storageKeys().account.jwt.token) || "",
+                Authorization: storage.getString(storageKeys().account.jwt.token) || "",
             },
         }
     )
@@ -56,7 +56,7 @@ async function setLikeMoment({ userId, disableLikeMoment }: SetLikeMomentProps):
         },
         {
             headers: {
-                authorization_token: storage.getString(storageKeys().account.jwt.token) || "",
+                Authorization: storage.getString(storageKeys().account.jwt.token) || "",
             },
         }
     )
@@ -71,7 +71,7 @@ async function setNewMemory({ userId, disableNewMemory }: SetNewMemoryProps): Pr
         },
         {
             headers: {
-                authorization_token: storage.getString(storageKeys().account.jwt.token) || "",
+                Authorization: storage.getString(storageKeys().account.jwt.token) || "",
             },
         }
     )
@@ -86,7 +86,7 @@ async function setAddToMemory({ userId, disableAddToMemory }: SetAddToMemoryProp
         },
         {
             headers: {
-                authorization_token: storage.getString(storageKeys().account.jwt.token) || "",
+                Authorization: storage.getString(storageKeys().account.jwt.token) || "",
             },
         }
     )
@@ -101,7 +101,7 @@ async function setFollowUser({ userId, disableFollowUser }: SetFollowUserProps):
         },
         {
             headers: {
-                authorization_token: storage.getString(storageKeys().account.jwt.token) || "",
+                Authorization: storage.getString(storageKeys().account.jwt.token) || "",
             },
         }
     )
@@ -116,7 +116,7 @@ async function setViewUser({ userId, disableViewUser }: SetViewUserProps): Promi
         },
         {
             headers: {
-                authorization_token: storage.getString(storageKeys().account.jwt.token) || "",
+                Authorization: storage.getString(storageKeys().account.jwt.token) || "",
             },
         }
     )
