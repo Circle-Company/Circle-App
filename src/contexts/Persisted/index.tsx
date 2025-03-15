@@ -18,7 +18,7 @@ export type PersistedContextProps = {
 const PersistedContext = React.createContext<PersistedContextProps>({} as PersistedContextProps)
 
 export function Provider({ children }: PersistedProviderProps) {
-    const { sessionData, signOut, checkIsSigned } = React.useContext(AuthContext)
+    const { sessionData, signOut, checkIsSigned, signIn, signUp } = React.useContext(AuthContext)
 
     const sessionUser = useUserStore()
     const sessionAccount = useAccountStore()
@@ -26,6 +26,9 @@ export function Provider({ children }: PersistedProviderProps) {
     const sessionStatistics = useStatisticsStore()
     const sessionHistory = useHistoryStore()
     const devicePermissions = usePermissionsStore()
+
+    // Ref para garantir que o monitoramento seja iniciado apenas uma vez
+    const isMonitoringJwtRef = React.useRef(false)
 
     React.useEffect(() => {
         if (sessionData.user) sessionUser.set(sessionData.user)
@@ -37,7 +40,7 @@ export function Provider({ children }: PersistedProviderProps) {
         if (sessionUser.username && sessionUser.id) {
             monitorJwtExpiration(
                 sessionAccount,
-                async ({ username, id }: { username: string; id: number }) => {
+                async ({ username, id }: { username: string; id: string }) => {
                     try {
                         await refreshJwtToken({ username, id }, sessionAccount)
                     } catch (error) {
@@ -46,7 +49,7 @@ export function Provider({ children }: PersistedProviderProps) {
                 }
             )
         }
-    }, [sessionData])
+    }, [sessionData, signIn, signUp, signOut])
 
     React.useEffect(() => {
         devicePermissions.set({
@@ -55,18 +58,45 @@ export function Provider({ children }: PersistedProviderProps) {
         })
     }, [])
 
-    // Inicializa o monitoramento do JWT
+    // **Monitoramento contínuo do JWT**
     React.useEffect(() => {
-        monitorJwtExpiration(
-            sessionAccount,
-            async ({ username, id }: { username: string; id: number }) => {
-                try {
-                    await refreshJwtToken({ username, id }, sessionAccount)
-                } catch (error) {
-                    throw new Error("cant possible refresh JWT Token")
+        if (!isMonitoringJwtRef.current) {
+            isMonitoringJwtRef.current = true
+            console.log("🔄 Iniciando monitoramento do JWT...")
+
+            monitorJwtExpiration(
+                sessionAccount,
+                async ({ username, id }: { username: string; id: string }) => {
+                    try {
+                        console.log("🔄 Tentando renovar o JWT...")
+                        await refreshJwtToken({ username, id: id.toString() }, sessionAccount)
+                    } catch (error) {
+                        console.error("❌ Erro ao renovar o JWT:", error)
+                    }
                 }
+            )
+
+            // Configurar intervalo para verificar a cada 60 segundos
+            const interval = setInterval(() => {
+                console.log("⏳ Verificando expiração do JWT...")
+                monitorJwtExpiration(
+                    sessionAccount,
+                    async ({ username, id }: { username: string; id: string }) => {
+                        try {
+                            console.log("🔄 Renovando token...")
+                            await refreshJwtToken({ username, id: id.toString() }, sessionAccount)
+                        } catch (error) {
+                            console.error("❌ Falha ao renovar JWT:", error)
+                        }
+                    }
+                )
+            }, 60000) // 60 segundos
+
+            return () => {
+                console.log("🛑 Parando monitoramento do JWT...")
+                clearInterval(interval)
             }
-        )
+        }
     }, [])
 
     React.useEffect(() => {
