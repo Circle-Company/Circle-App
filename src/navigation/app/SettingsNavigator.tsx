@@ -1,3 +1,4 @@
+import FollowingScreen from "@/pages/app/Settings/Following"
 import { createStackNavigator } from "@react-navigation/stack"
 import React from "react"
 import { useColorScheme } from "react-native"
@@ -68,6 +69,18 @@ export function SettingsNavigator() {
                 component={SettingsDescriptionScreen}
                 options={{
                     headerTitle: t("Add Description"),
+                    headerStyle: HeaderStyle,
+                    headerTintColor: String(ColorTheme().text),
+                    cardStyle: { backgroundColor: String(ColorTheme().background) },
+                    cardOverlayEnabled: true,
+                    headerLeft: () => <SettingsHeaderLeft />,
+                }}
+            />
+            <SettingsStack.Screen
+                name="Settings-Followings"
+                component={FollowingScreen}
+                options={{
+                    headerTitle: t("Following"),
                     headerStyle: HeaderStyle,
                     headerTintColor: String(ColorTheme().text),
                     cardStyle: { backgroundColor: String(ColorTheme().background) },
