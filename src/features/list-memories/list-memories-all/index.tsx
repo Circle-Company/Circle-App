@@ -32,7 +32,7 @@ export default function ListMemoriesAllSeparatedbyDate() {
                 {
                     user_id: allMemoriesUser.id,
                 },
-                { headers: { authorization_token: session.account.jwtToken } }
+                { headers: { Authorization: session.account.jwtToken } }
             )
             .then(function (response) {
                 if (page === 1) {

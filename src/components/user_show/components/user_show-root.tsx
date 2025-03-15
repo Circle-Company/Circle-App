@@ -27,7 +27,7 @@ export default function root({ children, data, executeBeforeClick }: UserRootPro
                         followed_user_id,
                     },
                     {
-                        headers: { authorization_token: session.account.jwtToken },
+                        headers: { Authorization: session.account.jwtToken },
                     }
                 )
                 .then(function (response) {
@@ -52,7 +52,7 @@ export default function root({ children, data, executeBeforeClick }: UserRootPro
                         followed_user_id,
                     },
                     {
-                        headers: { authorization_token: session.account.jwtToken },
+                        headers: { Authorization: session.account.jwtToken },
                     }
                 )
                 .then(function (response) {
@@ -75,7 +75,7 @@ export default function root({ children, data, executeBeforeClick }: UserRootPro
             queryFn: async () =>
                 await apiRoutes.user.getByPk({
                     userId: session.user.id,
-                    findedUserPk: Number(id),
+                    findedUserPk: id,
                 }),
         })
         console.log(data)

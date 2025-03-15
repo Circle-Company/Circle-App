@@ -38,7 +38,7 @@ export function FollowersList({ user }: FollowersListProps) {
             setLoading(true)
             await api
                 .get(`/user/${user.id}/followers?page=${page}&pageSize=${pageSize}`, {
-                    headers: { authorization_token: session.account.jwtToken },
+                    headers: { Authorization: session.account.jwtToken },
                 })
                 .then(function (response) {
                     if (page === 1) setFollowers(response.data.users)

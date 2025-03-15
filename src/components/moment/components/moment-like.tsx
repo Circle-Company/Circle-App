@@ -129,7 +129,7 @@ export default function like({
             {},
             {
                 headers: {
-                    authorization_token: session.account.jwtToken,
+                    Authorization: session.account.jwtToken,
                 },
             }
         )
@@ -143,7 +143,7 @@ export default function like({
             {},
             {
                 headers: {
-                    authorization_token: session.account.jwtToken,
+                    Authorization: session.account.jwtToken,
                 },
             }
         )
@@ -151,10 +151,10 @@ export default function like({
 
     const like_fill: string = String(colors.gray.white)
     const like_number: string = NumberConversor(
-        Number(momentData.statistics.total_likes_num - (isLiked ? 1 : 0))
+        Number(momentData?.statistics?.total_likes_num - (isLiked ? 1 : 0))
     )
     const like_number_pressed: string = NumberConversor(
-        Number(momentData.statistics.total_likes_num - (isLiked ? 1 : 0)) + 1
+        Number(momentData?.statistics?.total_likes_num - (isLiked ? 1 : 0)) + 1
     )
 
     if (!momentOptions.enableLikeButton) return null

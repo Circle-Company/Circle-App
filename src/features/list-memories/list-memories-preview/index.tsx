@@ -47,13 +47,14 @@ export default function ListMemoriesPreview({
     const isDarkMode = useColorScheme() === "dark"
 
     const fetchData = async () => {
+        console.log({ userId: user.id, token: session.account.jwtToken })
         await api
             .post(
                 `/memory/get-user-memories?page=${page}&pageSize=${pageSize}`,
                 {
                     user_id: user.id,
                 },
-                { headers: { authorization_token: session.account.jwtToken } }
+                { headers: { Authorization: session.account.jwtToken } }
             )
             .then(function (response) {
                 if (page === 1) {
@@ -179,7 +180,7 @@ export default function ListMemoriesPreview({
                     const memory = { ...item, isAccountScreen }
                     return (
                         <Animated.View entering={FadeInLeft.duration(200)}>
-                            <RenderMemory memory={memory} user={user} />
+                            <RenderMemory icon memory={memory} user={user} />
                         </Animated.View>
                     )
                 }}

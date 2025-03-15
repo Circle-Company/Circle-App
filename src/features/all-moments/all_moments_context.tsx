@@ -47,7 +47,7 @@ export function AllMomentsProvider({ children }: AllMomentsProviderProps) {
                     .post(
                         `/moments/delete-list`,
                         { moment_ids_list: [...filtered_moments] },
-                        { headers: { authorization_token: session.account.jwtToken } }
+                        { headers: { Authorization: session.account.jwtToken } }
                     )
                     .then(() => {
                         notify("toast", {

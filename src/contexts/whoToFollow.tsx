@@ -31,7 +31,7 @@ export function WhoToFollowContextProvider({ children }: WhoToFollowContextProvi
         try {
             const response = api
                 .get("/user/most-famous?page=1&pageSize=4", {
-                    headers: { authorization_token: session.account.jwtToken },
+                    headers: { Authorization: session.account.jwtToken },
                 })
                 .then(function (response) {
                     setUsersRecommendation(response.data)

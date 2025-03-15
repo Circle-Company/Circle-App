@@ -11,7 +11,7 @@ async function setToken({ userId, token }: PostTokenProps): Promise<void> {
         },
         {
             headers: {
-                authorization_token: storage.getString(storageKeys().account.jwt.token) || "",
+                Authorization: storage.getString(storageKeys().account.jwt.token) || "",
             },
         }
     )
