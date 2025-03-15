@@ -47,17 +47,24 @@ export default function ListSettings() {
             name: t("Account"),
             content: [
                 {
+                    name: t("Your Moments"),
+                    value: null,
+                    type: "TEXT",
+                    navigateTo: "Settings-All-Moments",
+                    secure: false,
+                },
+                {
+                    name: t("Following"),
+                    value: null,
+                    type: "TEXT",
+                    navigateTo: "Settings-Followings",
+                    secure: false,
+                },
+                {
                     name: t("Preferences"),
                     value: null,
                     type: "TEXT",
                     navigateTo: "Settings-Preferences",
-                    secure: false,
-                },
-                {
-                    name: t("Moments"),
-                    value: null,
-                    type: "TEXT",
-                    navigateTo: "Settings-All-Moments",
                     secure: false,
                 },
                 {
