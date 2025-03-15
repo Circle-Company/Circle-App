@@ -4,7 +4,7 @@ import { userReciveDataProps } from "../../user_show/user_show-types"
 import { MomentOptionsState } from "./momentOptions"
 
 export type MomentDataProps = {
-    id: number
+    id: string
     user: userReciveDataProps
     description: string
     midia: MomentMidiaProps
@@ -17,8 +17,8 @@ export type MomentDataProps = {
 }
 
 export type ExportMomentDataProps = {
-    id: number
-    userId: number
+    id: string
+    userId: string
     tags: TagProps[]
     type: "IMAGE" | "VIDEO"
     language: LanguagesCodesType
@@ -26,7 +26,7 @@ export type ExportMomentDataProps = {
 }
 
 export type MomentDataReturnsProps = {
-    id: number
+    id: string
     user: userReciveDataProps
     description: string
     midia: MomentMidiaProps
