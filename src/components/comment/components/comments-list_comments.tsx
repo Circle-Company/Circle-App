@@ -32,7 +32,7 @@ export default function list_comments() {
     async function fetchData() {
         await api
             .get(`/moments/${momentData.id}/comments?page=${page}&pageSize=${pageSize}`, {
-                headers: { authorization_token: session.account.jwtToken },
+                headers: { Authorization: session.account.jwtToken },
             })
             .then(function (response) {
                 if (page === 1) setAllComments(response.data.comments)
