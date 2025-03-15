@@ -1,6 +1,13 @@
 {
     "extends": "@tsconfig/react-native/tsconfig.json",
     "compilerOptions": {
+        "strict": true,
+        "esModuleInterop": true,
+        "allowJs": true,
+        "skipLibCheck": true,
+        "resolveJsonModule": true,
+        "jsx": "react-native",
+        "types": ["jest", "node"],
         "baseUrl": "src",
         "paths": {
             "@/components/*": ["components/*"],
