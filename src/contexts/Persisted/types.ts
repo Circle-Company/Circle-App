@@ -8,7 +8,7 @@ import { StatisticsState } from "./persistedStatistics"
 import { UserState } from "./persistedUser"
 
 export type UserDataType = {
-    id: number
+    id: string
     name: string
     username: string
     description: string
@@ -20,7 +20,7 @@ export type UserDataType = {
 }
 
 export type UserDataReturnsType = {
-    id: number
+    id: string
     name: string
     username: string
     description: string
@@ -29,7 +29,7 @@ export type UserDataReturnsType = {
         small_resolution: string
         tiny_resolution: string
     }
-    setId: (value: number) => void
+    setId: (value: string) => void
     setName: (value: string) => void
     setUsername: (value: string) => void
     setDescription: (value: string) => void
