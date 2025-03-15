@@ -5,7 +5,7 @@ import { UserDataType } from "./types"
 const storageKey = storageKeys().user
 
 export interface UserState {
-    id: number
+    id: string
     name: string
     username: string
     description: string
@@ -14,7 +14,7 @@ export interface UserState {
         small_resolution: string
         tiny_resolution: string
     }
-    setId: (value: number) => void
+    setId: (value: string) => void
     setName: (value: string) => void
     setUsername: (value: string) => void
     setDescription: (value: string) => void
@@ -27,7 +27,7 @@ export interface UserState {
 }
 
 export const useUserStore = create<UserState>((set) => ({
-    id: storage.getNumber(storageKey.id) || 0,
+    id: storage.getString(storageKey.id) || "",
     name: storage.getString(storageKey.name) || "",
     username: storage.getString(storageKey.username) || "",
     description: storage.getString(storageKey.description) || "",
@@ -37,7 +37,7 @@ export const useUserStore = create<UserState>((set) => ({
         tiny_resolution: storage.getString(storageKey.profile_picture.tiny) || "",
     },
 
-    setId: (value: number) => {
+    setId: (value: string) => {
         storage.set(storageKey.id, value)
         set({ id: value })
     },
@@ -67,11 +67,10 @@ export const useUserStore = create<UserState>((set) => ({
             const response = await api
                 .post(
                     `/user/session/data/pk/${id}`,
-                    { user_id: id },
+                    { user_id: id.toString() },
                     {
                         headers: {
-                            authorization_token:
-                                storage.getString(storageKeys().account.jwt.token) || "",
+                            Authorization: storage.getString(storageKeys().account.jwt.token),
                         },
                     }
                 )
@@ -131,7 +130,7 @@ export const useUserStore = create<UserState>((set) => ({
     },
     load: () => {
         set({
-            id: storage.getNumber(storageKey.id) || 0,
+            id: storage.getString(storageKey.id) || "",
             name: storage.getString(storageKey.name) || "",
             username: storage.getString(storageKey.username) || "",
             description: storage.getString(storageKey.description) || "",
@@ -152,7 +151,7 @@ export const useUserStore = create<UserState>((set) => ({
         storage.delete(storageKey.profile_picture.tiny)
 
         set({
-            id: 0,
+            id: "",
             name: "",
             username: "",
             description: "",
