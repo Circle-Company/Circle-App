@@ -10,6 +10,7 @@ import LanguageContext from "./Preferences/language"
 type AuthProviderProps = { children: React.ReactNode }
 
 export type AuthContextsData = {
+    loading: boolean
     signInputUsername: string
     signInputPassword: string
     sessionData: SessionDataType
@@ -29,13 +30,23 @@ export function Provider({ children }: AuthProviderProps) {
     const [signInputUsername, setSignInputUsername] = React.useState("")
     const [signInputPassword, setSignInputPassword] = React.useState("")
     const [sessionData, setSessionData] = useState<SessionDataType>({} as SessionDataType)
+    const [loading, setLoading] = useState(false)
     async function signIn() {
         await api
             .post("/auth/sign-in", { username: signInputUsername, password: signInputPassword })
             .then((response) => {
+                console.log(response.data)
+                setLoading(true)
                 setSessionData(response.data.session)
-                if (response.data.session.id)
-                    storage.set("@circle:sessionId", Number(response.data.session.id))
+                if (response.data.session.user.id)
+                    storage.set(
+                        storageKeys().account.jwt.token,
+                        response.data.session.account.jwtToken.toString()
+                    )
+                storage.set("@circle:sessionId", response.data.session.user.id.toString())
+            })
+            .finally(() => {
+                setLoading(false)
             })
             .catch((err) => {
                 notify("toast", {
@@ -54,9 +65,13 @@ export function Provider({ children }: AuthProviderProps) {
         await api
             .post("/auth/sign-up", { username: signInputUsername, password: signInputPassword })
             .then((response) => {
-                setSessionData(response.data.session)
-                if (response.data.session.id)
-                    storage.set("@circle:sessionId", Number(response.data.session.id))
+                setLoading(true)
+                setSessionData(response.data.session.user.id)
+                if (response.data.session.user.id)
+                    storage.set("@circle:sessionId", response.data.session.user.id.toString())
+            })
+            .finally(() => {
+                setLoading(false)
             })
             .catch((err) => {
                 notify("toast", {
@@ -89,6 +104,7 @@ export function Provider({ children }: AuthProviderProps) {
     return (
         <AuthContext.Provider
             value={{
+                loading,
                 sessionData,
                 signInputPassword,
                 signInputUsername,

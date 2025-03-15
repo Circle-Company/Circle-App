@@ -1,11 +1,12 @@
+import { Loading } from "@/components/loading"
 import React from "react"
 import { StatusBar, useColorScheme } from "react-native"
 import Icon from "../../../assets/icons/svgs/arrow_circle_right.svg"
+import { Text, View } from "../../../components/Themed"
 import PasswordInputSignIn from "../../../components/auth/password_input-sign_in"
 import AuthTermsText from "../../../components/auth/terms"
 import UsernameInputSignIn from "../../../components/auth/username_input-sign_in"
 import ButtonStandart from "../../../components/buttons/button-standart"
-import { Text, View } from "../../../components/Themed"
 import AuthContext from "../../../contexts/auth"
 import ColorTheme, { colors } from "../../../layout/constants/colors"
 import fonts from "../../../layout/constants/fonts"
@@ -13,7 +14,7 @@ import sizes from "../../../layout/constants/sizes"
 
 export default function SignInScreen() {
     const isDarkMode = useColorScheme() === "dark"
-    const { signIn, signInputUsername, signInputPassword } = React.useContext(AuthContext)
+    const { signIn, signInputUsername, signInputPassword, loading } = React.useContext(AuthContext)
 
     const container = {
         marginTop: sizes.margins["1xxl"] * 0.9,
@@ -40,7 +41,7 @@ export default function SignInScreen() {
     }
 
     function handlePress() {
-        if (signInputUsername && signInputPassword) signIn()
+        if (!loading && signInputUsername && signInputPassword) signIn()
     }
 
     return (
@@ -66,19 +67,28 @@ export default function SignInScreen() {
                         : ColorTheme().backgroundDisabled.toString()
                 }
             >
-                <Text style={button_text}>Enter Now</Text>
-                <Icon
-                    style={icon}
-                    fill={String(
-                        signInputPassword && signInputUsername
-                            ? colors.gray.white
-                            : isDarkMode
-                              ? colors.gray.grey_04 + "90"
-                              : colors.gray.grey_04 + "90"
-                    )}
-                    width={17}
-                    height={17}
-                />
+                {loading ? (
+                    <>
+                        <Text style={button_text}>Loading</Text>
+                        <Loading.ActivityIndicator />
+                    </>
+                ) : (
+                    <>
+                        <Text style={button_text}>Enter Now</Text>
+                        <Icon
+                            style={icon}
+                            fill={String(
+                                signInputPassword && signInputUsername
+                                    ? colors.gray.white
+                                    : isDarkMode
+                                      ? colors.gray.grey_04 + "90"
+                                      : colors.gray.grey_04 + "90"
+                            )}
+                            width={17}
+                            height={17}
+                        />
+                    </>
+                )}
             </ButtonStandart>
 
             <View style={{ marginTop: sizes.margins["1xl"] }}>
