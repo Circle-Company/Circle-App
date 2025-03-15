@@ -16,7 +16,6 @@ export default function RenderProfile({ user }: RenderProfileProps) {
     }
     const name_container: any = {
         paddingTop: sizes.paddings["1sm"],
-        paddingBottom: sizes.paddings["1sm"] * 0.6,
     }
 
     return (
@@ -29,7 +28,9 @@ export default function RenderProfile({ user }: RenderProfileProps) {
             </View>
 
             <RenderStatistics />
-            <Profile.Description />
+            <View style={{ marginTop: sizes.margins["1sm"], marginBottom: sizes.margins["1md"] }}>
+                <Profile.Description />
+            </View>
         </Profile.MainRoot>
     )
 }
