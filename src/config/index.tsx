@@ -1,5 +1,15 @@
 //@ts-ignore
-import { API_VERSION, APP_VERSION, DEBUG, LOG_DEBUG, LOG_LEVEL, MIXPANEL_KEY, NODE_ENV } from "@env"
+import {
+    API_VERSION,
+    APP_VERSION,
+    DEBUG,
+    DEV_API_ENDPOINT,
+    LOG_DEBUG,
+    LOG_LEVEL,
+    MIXPANEL_KEY,
+    NODE_ENV,
+    PROD_API_ENDPOINT,
+} from "@env"
 import emails from "./emails"
 import metadata from "./metadata"
 
@@ -13,7 +23,7 @@ const environment = {
 
 const api = {
     API_VERSION: API_VERSION,
-    ENDPOINT: "circlecompany.com.br",
+    ENDPOINT: environment.PRODUCTION ? DEV_API_ENDPOINT : PROD_API_ENDPOINT,
 }
 
 const analytics = {
