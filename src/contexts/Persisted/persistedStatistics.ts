@@ -9,7 +9,7 @@ export interface StatisticsState extends StatisticsDataType {
     setTotalLikesNum: (value: number) => void
     setTotalViewsNum: (value: number) => void
     set: (value: StatisticsDataType) => void
-    get: (user_id: number) => Promise<StatisticsState>
+    get: (user_id: string) => Promise<StatisticsState>
     load: () => void
     remove: () => void
 }
@@ -31,16 +31,16 @@ export const useStatisticsStore = create<StatisticsState>((set) => ({
         storage.set(storageKey.total_views, value)
         set({ total_views_num: value })
     },
-    get: async (user_id: number) => {
+    get: async (user_id: string) => {
         try {
+            console.log("JWT", storage.getString(storageKeys().account.jwt.token))
             const response = await api
                 .post(
                     `/user/session/statistics/pk/${user_id}`,
                     { user_id },
                     {
                         headers: {
-                            authorization_token:
-                                storage.getString(storageKeys().account.jwt.token) || "",
+                            Authorization: storage.getString(storageKeys().account.jwt.token),
                         },
                     }
                 )
