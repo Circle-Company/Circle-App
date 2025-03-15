@@ -1,3 +1,4 @@
+//@ts-ignore
 import { API_VERSION, APP_VERSION, DEBUG, LOG_DEBUG, LOG_LEVEL, MIXPANEL_KEY, NODE_ENV } from "@env"
 import emails from "./emails"
 import metadata from "./metadata"
@@ -12,7 +13,7 @@ const environment = {
 
 const api = {
     API_VERSION: API_VERSION,
-    ENDPOINT: "54.224.60.84:3000", //"52.202.133.96:3000",
+    ENDPOINT: "circlecompany.com.br",
 }
 
 const analytics = {
