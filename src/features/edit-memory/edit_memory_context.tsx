@@ -68,7 +68,7 @@ export function EditMemoryProvider({ children }: EditMemoryProviderProps) {
                         memory_id: memory.id,
                         moments_list: moments_ids_list,
                     },
-                    { headers: { authorization_token: session.account.jwtToken } }
+                    { headers: { Authorization: session.account.jwtToken } }
                 )
                 .then(() => {
                     notify("toast", {
@@ -116,7 +116,7 @@ export function EditMemoryProvider({ children }: EditMemoryProviderProps) {
                         memory_id: memory.id,
                         title,
                     },
-                    { headers: { authorization_token: session.account.jwtToken } }
+                    { headers: { Authorization: session.account.jwtToken } }
                 )
                 .then(() => {
                     notify("toast", {
@@ -167,7 +167,7 @@ export function EditMemoryProvider({ children }: EditMemoryProviderProps) {
                             user_id: session.user.id,
                             memory_id: memory.id,
                         },
-                        { headers: { authorization_token: session.account.jwtToken } }
+                        { headers: { Authorization: session.account.jwtToken } }
                     )
                     .then(() => {
                         notify("toast", {

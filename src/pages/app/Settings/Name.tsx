@@ -112,7 +112,7 @@ export default function NameScreen() {
                             user_id: session.user.id,
                             name: name,
                         },
-                        { headers: { authorization_token: session.account.jwtToken } }
+                        { headers: { Authorization: session.account.jwtToken } }
                     )
                     .finally(() => {
                         session.user.get(session.user.id)

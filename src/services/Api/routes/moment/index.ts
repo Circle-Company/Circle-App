@@ -7,7 +7,7 @@ async function like({ momentId, authorizationToken }: PostLikeProps): Promise<vo
         {},
         {
             headers: {
-                authorization_token: authorizationToken,
+                Authorization: authorizationToken,
             },
         }
     )
@@ -19,7 +19,7 @@ async function unlike({ momentId, authorizationToken }: PostUnlikeProps): Promis
         {},
         {
             headers: {
-                authorization_token: authorizationToken,
+                Authorization: authorizationToken,
             },
         }
     )
@@ -31,7 +31,7 @@ async function view({ momentId, authorizationToken }: PostLikeProps): Promise<vo
         {},
         {
             headers: {
-                authorization_token: authorizationToken,
+                Authorization: authorizationToken,
             },
         }
     )
@@ -43,7 +43,7 @@ async function hide({ momentId, authorizationToken }: PostLikeProps): Promise<vo
         {},
         {
             headers: {
-                authorization_token: authorizationToken,
+                Authorization: authorizationToken,
             },
         }
     )
@@ -55,7 +55,7 @@ async function unhide({ momentId, authorizationToken }: PostLikeProps): Promise<
         {},
         {
             headers: {
-                authorization_token: authorizationToken,
+                Authorization: authorizationToken,
             },
         }
     )
@@ -67,7 +67,7 @@ async function deleteMoment({ momentId, authorizationToken }: PostLikeProps): Pr
         {},
         {
             headers: {
-                authorization_token: authorizationToken,
+                Authorization: authorizationToken,
             },
         }
     )
@@ -79,7 +79,7 @@ async function undeleteMoment({ momentId, authorizationToken }: PostLikeProps): 
         {},
         {
             headers: {
-                authorization_token: authorizationToken,
+                Authorization: authorizationToken,
             },
         }
     )
@@ -87,7 +87,7 @@ async function undeleteMoment({ momentId, authorizationToken }: PostLikeProps): 
 
 async function statisticsPreview({ momentId, authorizationToken }: PostStatisticsPreviewProps) {
     return await api.get(`/moments/${momentId}/statistics/preview`, {
-        headers: { authorization_token: authorizationToken },
+        headers: { Authorization: authorizationToken },
     })
 }
 

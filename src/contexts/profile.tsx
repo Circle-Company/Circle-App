@@ -43,7 +43,7 @@ export function Provider({ children }: ProfileProviderProps) {
                     .post(
                         `/user/profile/data/pk/${user_id}`,
                         { user_id },
-                        { headers: { authorization_token: session.account.jwtToken } }
+                        { headers: { Authorization: session.account.jwtToken } }
                     )
                     .then(function (response) {
                         setCurrentUser(response.data)

@@ -49,18 +49,14 @@ export default function ListMomentsWithoutInMemory() {
         async function getMoments() {
             try {
                 await api
-                    .post(
-                        `/moment/get-user-moments/tiny/exclude-memory`,
-                        {
-                            user_id: session.user.id,
-                            memory_id: memory.id,
-                        },
-                        { headers: { authorization_token: session.account.jwtToken } }
-                    )
+                    .get(`/moments/tiny/exclude-memory/${memory.id}`, {
+                        headers: { Authorization: session.account.jwtToken },
+                    })
                     .then(function (response) {
                         if (page === 1) setAllMoments(response.data)
                         else setAllMoments([...allMoments, ...response.data])
                         setEndReached(response.data.length < pageSize)
+                        console.log(response.data)
                     })
                     .catch(function (error) {
                         console.log(error)
