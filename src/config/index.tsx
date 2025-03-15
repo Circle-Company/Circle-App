@@ -1,4 +1,4 @@
-//@ts-ignore
+//@ts-nocheck
 import {
     API_VERSION,
     APP_VERSION,
