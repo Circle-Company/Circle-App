@@ -2,8 +2,8 @@ import { useMutation } from "@tanstack/react-query"
 import { apiRoutes } from "../../services/Api"
 
 type useFindUserByPkMutationProps = {
-    userId: number
-    findedUserPk: number
+    userId: string
+    findedUserPk: string
 }
 
 export function useFindUserByPkMutation({ findedUserPk, userId }: useFindUserByPkMutationProps) {
