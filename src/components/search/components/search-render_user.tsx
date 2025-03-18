@@ -76,7 +76,7 @@ export default function render_user({ user }: SearchRenderItemReciveDataObjectPr
     }
 
     return (
-        <Reanimated.View entering={FadeInDown.duration(200)} style={container}>
+        <Reanimated.View entering={FadeInDown.duration(100)} style={container}>
             <Animated.View style={{ transform: [{ scale: animatedScale }], flex: 1 }}>
                 <Pressable
                     style={container}
