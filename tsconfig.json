@@ -10,6 +10,7 @@
         "types": ["jest", "node"],
         "baseUrl": "src",
         "paths": {
+            "@/*": ["*"],
             "@/components/*": ["components/*"],
             "@/contexts/*": ["contexts/*"],
             "@/features/*": ["features/*"],
@@ -20,7 +21,8 @@
             "@/lib/*": ["lib/*"],
             "@/helpers/*": ["helpers/*"],
             "@/modules/*": ["modules/*"],
-            "@/assets/*": ["assets/*"]
+            "@/assets/*": ["assets/*"],
+            "@/hooks/*": ["hooks/*"]
         }
     }
 }
