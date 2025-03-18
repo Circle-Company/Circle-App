@@ -41,13 +41,13 @@ export default function description({}: ProfileDescriptionProps) {
         textAlign: "center",
     }
 
-    if (!user.description) {
+    if (!user?.description) {
         return null
     }
 
     return (
         <Animated.View style={container}>
-            <Text style={description_style}>{user.description}</Text>
+            <Text style={description_style}>{user?.description}</Text>
         </Animated.View>
     )
 }

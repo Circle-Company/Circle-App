@@ -61,7 +61,7 @@ export default function picture({ fromProfile = false }: ProfilePictureProps) {
     }, [])
 
     React.useEffect(() => {
-        const { tiny_resolution, small_resolution } = user.profile_picture || {}
+        const { tiny_resolution, small_resolution } = user?.profile_picture || {}
 
         if (fromProfile) {
             setProfilePicture(small_resolution || tiny_resolution || "")
@@ -89,8 +89,8 @@ export default function picture({ fromProfile = false }: ProfilePictureProps) {
                         left: Number(outlineSize) / 2,
                     }}
                 />
-                {!user.profile_picture?.tiny_resolution &&
-                    !user.profile_picture?.small_resolution && (
+                {!user?.profile_picture?.tiny_resolution &&
+                    !user?.profile_picture?.small_resolution && (
                         <View style={iconContainer}>
                             <Icon
                                 width={pictureDimensions.width * 0.5}
