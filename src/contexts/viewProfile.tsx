@@ -1,3 +1,4 @@
+import { UseQueryResult, useQuery } from "@tanstack/react-query"
 import React from "react"
 import api from "../services/Api"
 import PersistedContext from "./Persisted"
@@ -30,7 +31,7 @@ export type ProfileDataProps = {
 }
 export type ViewProfileContextsData = {
     userProfile: ProfileDataProps
-    setProfile: (Id: string) => Promise<void>
+    useUserProfile: (findedUserPk: string) => UseQueryResult<ProfileDataProps, Error>
 }
 
 const ViewProfileContext = React.createContext<ViewProfileContextsData>(
@@ -39,40 +40,33 @@ const ViewProfileContext = React.createContext<ViewProfileContextsData>(
 
 export function Provider({ children }: ViewProfileProviderProps) {
     const { session } = React.useContext(PersistedContext)
-    const [userProfile, setUserProfile] = React.useState<ProfileDataProps>({} as ProfileDataProps)
+    const [userProfile, setUserProfile] = React.useState({} as ProfileDataProps)
 
-    async function setProfile(Id: string) {
-        try {
-            if (!Id) throw new Error("Can´t possible find user without pass Id")
-            const response = api
-                .post(
-                    `/user/profile/data/pk/${Id}`,
+    const useUserProfile = (findedUserPk: string) => {
+        return useQuery<ProfileDataProps, Error>({
+            queryKey: ["view-profile", findedUserPk],
+            queryFn: async () => {
+                const response = await api.post(
+                    `/user/profile/data/pk/${findedUserPk}`,
                     {
                         user_id: session.user.id,
                     },
-                    { headers: { Authorization: session.account.jwtToken } }
+                    {
+                        headers: {
+                            Authorization: session.account.jwtToken,
+                        },
+                    }
                 )
-                .then(function (response) {
-                    setUserProfile(response.data)
-                })
-                .catch(function (error) {
-                    console.log(error)
-                })
-
-            console.log(response)
-            return await response
-        } catch (err) {
-            console.error(err)
-        }
+                setUserProfile(response.data)
+                return response.data
+            },
+            enabled: !!session?.user?.id && !!findedUserPk, // Executa a query somente se os dados necessários estiverem disponíveis
+        })
     }
 
-    React.useEffect(() => {
-        setProfile(userProfile.id)
-    }, [setUserProfile])
-
     const contextValue: any = {
-        setProfile,
-        userProfile: userProfile,
+        userProfile,
+        useUserProfile,
     }
     return (
         <ViewProfileContext.Provider value={contextValue}>{children}</ViewProfileContext.Provider>

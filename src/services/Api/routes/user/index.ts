@@ -1,4 +1,3 @@
-import { ProfileData } from "@/contexts/profile"
 import api from "../.."
 import { storage, storageKeys } from "../../../../store"
 import { UserDataByPkProps, UserFollowProps, UserUnfollowProps } from "./types"
@@ -30,8 +29,8 @@ async function unfollow({ userId, followedUserId }: UserUnfollowProps): Promise<
     )
 }
 
-async function getByPk({ userId, findedUserPk }: UserDataByPkProps): Promise<ProfileData> {
-    const response = await api.post(
+async function getByPk({ userId, findedUserPk }: UserDataByPkProps) {
+    return await api.post(
         `/user/profile/data/pk/${findedUserPk}`,
         {
             user_id: userId,
@@ -42,7 +41,6 @@ async function getByPk({ userId, findedUserPk }: UserDataByPkProps): Promise<Pro
             },
         }
     )
-    return response.data
 }
 
 export const routes = {
