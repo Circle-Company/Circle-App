@@ -1,3 +1,5 @@
+import ColorTheme from "@/layout/constants/colors"
+import sizes from "@/layout/constants/sizes"
 import React from "react"
 import { FlatList } from "react-native"
 import { Search } from "../../components/search"
@@ -9,6 +11,11 @@ export default function ListSearch() {
     const { searchTerm, fetchData, isConnected } = useSearchContext()
     const [searchResults, setSearchResults] = React.useState<SearchResult[]>([])
 
+    const listStyle: any = {
+        marginTop: sizes.margins["2sm"],
+        borderTopWidth: searchResults ? 1 : 0,
+        borderColor: ColorTheme().backgroundDisabled,
+    }
     // Use useEffect para atualizar a lista quando o searchTerm mudar
     React.useEffect(() => {
         const fetchDataFromApi = async () => {
@@ -34,6 +41,7 @@ export default function ListSearch() {
     else {
         return (
             <FlatList
+                style={listStyle}
                 scrollEnabled={false}
                 data={searchResults}
                 keyExtractor={(item: any) => item.id}
