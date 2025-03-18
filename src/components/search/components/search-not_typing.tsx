@@ -1,32 +1,38 @@
+import { Text, View } from "@/components/Themed"
+import LanguageContext from "@/contexts/Preferences/language"
+import ColorTheme, { colors } from "@/layout/constants/colors"
+import fonts from "@/layout/constants/fonts"
+import sizes from "@/layout/constants/sizes"
 import React from "react"
-import sizes from "../../../layout/constants/sizes"
-import ColorTheme from "../../../layout/constants/colors"
-import fonts from "../../../layout/constants/fonts"
-import Icon from '../../../assets/icons/svgs/binoculars_outline.svg'
-import { Text, View} from "../../Themed"
+import { useColorScheme } from "react-native"
 
 export default function not_typing() {
+    const { t } = React.useContext(LanguageContext)
+    const isDarkMode = useColorScheme() === "dark"
 
     const container: any = {
+        marginTop: sizes.margins["2sm"],
         width: sizes.screens.width,
-        height: sizes.screens.height - sizes.bottomTab.height,
-        alignItems: 'center',
-        justifyContent: 'center',
+        height: sizes.headers.height,
+        alignItems: "center",
+        justifyContent: "center",
+        flexDirection: "row",
+        backgroundColor: isDarkMode ? colors.gray.grey_09 : colors.gray.grey_01,
+        borderBottomWidth: 1,
+        borderTopWidth: 1,
+        paddingHorizontal: sizes.paddings["2sm"],
+        borderColor: isDarkMode ? colors.gray.grey_08 : colors.gray.grey_02,
+    }
+    const title: any = {
+        fontSize: fonts.size.footnote,
+        fontFamily: fonts.family.Medium,
+        color: ColorTheme().textDisabled,
+        flex: 1,
     }
 
-    const text_style: any = {
-        fontSize: fonts.size.headline,
-        fontFamily: fonts.family.Semibold,
-        color: ColorTheme().primary
-    }
     return (
         <View style={container}>
-            <Icon
-                fill={String(ColorTheme().primary)}
-                width={60}
-                height={60}
-            />         
-            <Text style={text_style}>Search for your friends</Text>     
+            <Text style={title}>{t("Search for some @username to show results.")}</Text>
         </View>
     )
 }
