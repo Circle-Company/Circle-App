@@ -9,7 +9,7 @@ import { ExploreScreenNavigator } from "./ExploreScreenNavigator"
 import { InboxNavigator } from "./InboxNavigator"
 import { MemoriesNavigator } from "./MemoriesNavigator"
 import { MomentNavigator } from "./MomentNavigator"
-import { ProfileNavigator } from "./ProfileNavigator"
+import { ProfileNavigator, ProfileStackParamList } from "./ProfileNavigator"
 import { SettingsNavigator } from "./SettingsNavigator"
 
 export default function AppNavigator() {
@@ -68,4 +68,10 @@ export default function AppNavigator() {
             />
         </App.Navigator>
     )
+}
+
+declare global {
+    namespace ReactNavigation {
+        interface ProfileParamList extends ProfileStackParamList {}
+    }
 }

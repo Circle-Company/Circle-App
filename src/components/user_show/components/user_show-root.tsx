@@ -1,16 +1,12 @@
-import ProfileContext from "@/contexts/profile"
-import { useQuery } from "@tanstack/react-query"
 import React from "react"
 import { View } from "react-native"
 import PersistedContext from "../../../contexts/Persisted"
-import api, { apiRoutes } from "../../../services/Api"
+import api from "../../../services/Api"
 import UserShowContext from "../user_show-context"
 import { UserRootProps } from "../user_show-types"
 
 export default function root({ children, data, executeBeforeClick }: UserRootProps) {
     const { session } = React.useContext(PersistedContext)
-    const { setCurrentUser } = React.useContext(ProfileContext)
-
     const container: any = {
         flexDirection: "row",
         alignItems: "center",
@@ -68,26 +64,11 @@ export default function root({ children, data, executeBeforeClick }: UserRootPro
         }
     }
 
-    const view_profile = async (id: string) => {
-        console.log("view_profile")
-        const { data, isSuccess, isError } = useQuery({
-            queryKey: [""],
-            queryFn: async () =>
-                await apiRoutes.user.getByPk({
-                    userId: session.user.id,
-                    findedUserPk: id,
-                }),
-        })
-        console.log(data)
-        if (isSuccess) setCurrentUser(data)
-    }
-
-    const contextValue = {
+    const contextValue: any = {
         user: data,
         executeBeforeClick,
         follow,
         unfollow,
-        view_profile,
     }
 
     return (
