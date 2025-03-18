@@ -1,5 +1,6 @@
+import { useNavigation } from "@react-navigation/native"
 import React from "react"
-import { Animated, Pressable, Text, useColorScheme, View } from "react-native"
+import { Animated, Pressable, Text, View } from "react-native"
 import Reanimated, { FadeInDown } from "react-native-reanimated"
 import LanguageContext from "../../../contexts/Preferences/language"
 import { formatNumberWithDots } from "../../../helpers/numberConversor"
@@ -11,11 +12,11 @@ import { UserShow } from "../../user_show"
 import { SearchRenderItemReciveDataObjectProps } from "../search-types"
 
 export default function render_user({ user }: SearchRenderItemReciveDataObjectProps) {
-    var bounciness = 12
+    var bounciness = 8
     var animationScale = 0.9
 
     const { t } = React.useContext(LanguageContext)
-    const isDarkMode = useColorScheme() === "dark"
+    const navigation: any = useNavigation()
 
     var animatedScale = React.useRef(new Animated.Value(1)).current
     React.useEffect(() => {
@@ -28,6 +29,13 @@ export default function render_user({ user }: SearchRenderItemReciveDataObjectPr
             speed: 10,
             useNativeDriver: true,
         }).start()
+    }
+    const HandlePressOut = () => {
+        HandleButtonAnimation()
+        navigation.navigate("ProfileNavigator", {
+            screen: "Profile",
+            params: { findedUserPk: user.id },
+        })
     }
 
     const HandlePressIn = () => {
@@ -78,11 +86,7 @@ export default function render_user({ user }: SearchRenderItemReciveDataObjectPr
     return (
         <Reanimated.View entering={FadeInDown.duration(100)} style={container}>
             <Animated.View style={{ transform: [{ scale: animatedScale }], flex: 1 }}>
-                <Pressable
-                    style={container}
-                    onPressIn={HandlePressIn}
-                    onPressOut={HandleButtonAnimation}
-                >
+                <Pressable style={container} onPressIn={HandlePressIn} onPressOut={HandlePressOut}>
                     <UserShow.Root data={user}>
                         <View style={container_left}>
                             <UserShow.ProfilePicture
