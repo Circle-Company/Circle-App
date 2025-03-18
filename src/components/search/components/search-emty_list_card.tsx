@@ -6,7 +6,7 @@ import sizes from "@/layout/constants/sizes"
 import React from "react"
 import { useColorScheme } from "react-native"
 
-export default function not_typing() {
+export default function EmptyListCard() {
     const { t } = React.useContext(LanguageContext)
     const isDarkMode = useColorScheme() === "dark"
 
@@ -32,7 +32,7 @@ export default function not_typing() {
 
     return (
         <View style={container}>
-            <Text style={title}>{t("Search for some @username to show results.")}</Text>
+            <Text style={title}>{t("We have no results to show you.")}</Text>
         </View>
     )
 }

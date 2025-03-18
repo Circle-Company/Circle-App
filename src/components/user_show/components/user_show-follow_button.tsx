@@ -6,7 +6,6 @@ import ColorTheme from "../../../layout/constants/colors"
 import fonts from "../../../layout/constants/fonts"
 import sizes from "../../../layout/constants/sizes"
 import { Text } from "../../Themed"
-import { UserShowActions } from "../user_show-actions"
 import { useUserShowContext } from "../user_show-context"
 import { UserFollowButtonProps } from "../user_show-types"
 
@@ -71,11 +70,9 @@ export default function follow_button({
         if (followPressed) {
             HandleButtonAnimation()
             setFollowPressed(false)
-            UserShowActions.UnfollowPressed({ user_id: Number(user.id), action: unfollow })
         } else {
             HandleButtonAnimation()
             setFollowPressed(true)
-            UserShowActions.FollowPressed({ user_id: Number(user.id), action: follow })
         }
     }
 

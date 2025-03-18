@@ -34,8 +34,7 @@ export function SearchContextProvider({ children }: SearchContextProvider) {
                 .post(
                     "/user/search",
                     {
-                        username_to_search: searchTerm,
-                        user_id: session.user.id,
+                        searchTerm: searchTerm.toString(),
                     },
                     {
                         headers: { Authorization: session.account.jwtToken },
@@ -45,7 +44,7 @@ export function SearchContextProvider({ children }: SearchContextProvider) {
                     return response.data
                 })
                 .catch(function (error) {
-                    console.log(error)
+                    throw new Error(error)
                 })
             return await response
         } catch (err) {
