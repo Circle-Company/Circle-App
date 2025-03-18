@@ -50,7 +50,7 @@ export default function render_user({ user }: SearchRenderItemReciveDataObjectPr
     const container: any = {
         width: sizes.screens.width,
         paddingHorizontal: sizes.paddings["1sm"] * 0.7,
-        height: sizes.sizes["3lg"] * 0.85,
+        height: sizes.sizes["3lg"] * 0.8,
         alignItems: "flex-start",
         justifyContent: "center",
     }
