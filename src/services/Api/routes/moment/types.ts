@@ -1,14 +1,14 @@
 export type PostLikeProps = {
-    momentId: number
+    momentId: string
     authorizationToken: string
 }
 
 export type PostUnlikeProps = {
-    momentId: number
+    momentId: string
     authorizationToken: string
 }
 
 export type PostStatisticsPreviewProps = {
-    momentId: number
+    momentId: string
     authorizationToken: string
 }

@@ -2,8 +2,8 @@ import { useMutation } from "@tanstack/react-query"
 import { apiRoutes } from "../../services/Api"
 
 type useFollowMutationProps = {
-    userId: number
-    followedUserId: number
+    userId: string
+    followedUserId: string
     authorizationToken: string
 }
 
