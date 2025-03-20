@@ -2,8 +2,8 @@ import { useMutation } from "@tanstack/react-query"
 import { apiRoutes } from "../../services/Api"
 
 type useLikeMutationProps = {
-    userId: number
-    momentId: number
+    userId: string
+    momentId: string
     authorizationToken: string
 }
 

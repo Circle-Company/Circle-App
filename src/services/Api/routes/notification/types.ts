@@ -1,4 +1,4 @@
 export type PostTokenProps = {
-    userId: number
+    userId: string
     token: string
 }
