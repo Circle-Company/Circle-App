@@ -5,7 +5,7 @@ import { usePermissionsStore } from "@/contexts/persisted/persistedPermissions"
 import { usePreferencesStore } from "@/contexts/persisted/persistedPreferences"
 import { useStatisticsStore } from "@/contexts/persisted/persistedStatistics"
 import { useUserStore } from "@/contexts/persisted/persistedUser"
-import { refreshJwtToken } from "@/hooks/refreshJwtToken"
+import { refreshJwtToken } from "@/lib/hooks/useRefreshJwtToken"
 import React from "react"
 import { DeviceDataType, SessionDataType } from "./types"
 
