@@ -1,40 +1,40 @@
 import { LanguagesCodesType } from "locales/LanguageTypes"
 
 export type GetUserPreferencesProps = {
-    userId: number
+    userId: string
 }
 
 export type SetAppLanguageProps = {
-    userId: number
+    userId: string
     appLanguage: LanguagesCodesType
 }
 
 export type SetHapticsProps = {
-    userId: number
+    userId: string
     disableHaptics: boolean
 }
 
 export type SetLikeMomentProps = {
-    userId: number
+    userId: string
     disableLikeMoment: boolean
 }
 
 export type SetNewMemoryProps = {
-    userId: number
+    userId: string
     disableNewMemory: boolean
 }
 
 export type SetAddToMemoryProps = {
-    userId: number
+    userId: string
     disableAddToMemory: boolean
 }
 
 export type SetFollowUserProps = {
-    userId: number
+    userId: string
     disableFollowUser: boolean
 }
 
 export type SetViewUserProps = {
-    userId: number
+    userId: string
     disableViewUser: boolean
 }
