@@ -2,18 +2,18 @@ import { useNavigation } from "@react-navigation/native"
 import React from "react"
 import { StatusBar, useColorScheme } from "react-native"
 import NextIcon from "../../../assets/icons/svgs/arrow_circle_right.svg"
+import { Text, View } from "../../../components/Themed"
 import UsernameInput from "../../../components/auth/username_input"
 import ButtonStandart from "../../../components/buttons/button-standart"
-import { Text, View } from "../../../components/Themed"
-import AuthContext from "../../../contexts/auth"
+import AuthContext from "../../../contexts/Auth"
 import ColorTheme, { colors } from "../../../layout/constants/colors"
 import fonts from "../../../layout/constants/fonts"
 import sizes from "../../../layout/constants/sizes"
 
 export default function UsernameScreen() {
     const isDarkMode = useColorScheme() === "dark"
-    const { signInputUsername } = React.useContext(AuthContext)
-    const navigation = useNavigation()
+    const { signInputUsername, setErrorMessage } = React.useContext(AuthContext)
+    const navigation: any = useNavigation()
 
     const container = {
         flex: 1,
@@ -53,6 +53,10 @@ export default function UsernameScreen() {
             navigation.navigate("Auth-SignUp-Password")
         }
     }
+
+    React.useEffect(() => {
+        setErrorMessage("")
+    }, [])
 
     return (
         <View style={container}>
