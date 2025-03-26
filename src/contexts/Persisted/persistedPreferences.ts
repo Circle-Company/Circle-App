@@ -19,7 +19,7 @@ export interface PreferencesState extends PreferencesDataStorageType {
     setDisableFollowUser: (value: boolean) => void
     setDisableViewUser: (value: boolean) => void
 
-    get: (id: number) => Promise<void>
+    get: (id: string) => Promise<void>
     set: (value: PreferencesDataStorageType) => void
     load: () => void
     remove: () => void
@@ -147,7 +147,7 @@ export const usePreferencesStore = create<PreferencesState>((set) => ({
         }))
     },
 
-    get: async (id: number) => {
+    get: async (id: string) => {
         const { data } = useQuery({
             queryKey: ["get-user-preferences"],
             queryFn: async () => {
