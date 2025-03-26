@@ -1,4 +1,4 @@
-import AuthContext from "@/contexts/auth"
+import AuthContext from "@/contexts/Auth"
 import { useAccountStore } from "@/contexts/persisted/persistedAccount"
 import { useHistoryStore } from "@/contexts/persisted/persistedHistory"
 import { usePermissionsStore } from "@/contexts/persisted/persistedPermissions"

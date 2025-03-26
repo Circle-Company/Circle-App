@@ -1,7 +1,8 @@
+import { SessionDataType } from "@/contexts/Persisted/types"
+import api from "@/services/Api"
+import { storage, storageKeys } from "@/store"
 import React, { useState } from "react"
-import api from "../services/Api"
-import { storage, storageKeys } from "../store"
-import { SessionDataType } from "./Persisted/types"
+import { RedirectContext } from "../redirect"
 
 type AuthProviderProps = { children: React.ReactNode }
 
@@ -11,6 +12,7 @@ export type AuthContextsData = {
     signInputUsername: string
     signInputPassword: string
     sessionData: SessionDataType
+    getSessionData: ({ sessionId }: { sessionId: string }) => Promise<void>
     signIn: () => Promise<void>
     signUp: () => Promise<void>
     signOut(): void
@@ -23,54 +25,63 @@ export type AuthContextsData = {
 const AuthContext = React.createContext<AuthContextsData>({} as AuthContextsData)
 
 export function Provider({ children }: AuthProviderProps) {
+    const { setRedirectTo, setAppData } = React.useContext(RedirectContext)
     const [signInputUsername, setSignInputUsername] = React.useState("")
     const [signInputPassword, setSignInputPassword] = React.useState("")
     const [sessionData, setSessionData] = useState<SessionDataType>({} as SessionDataType)
-    const [errorMessage, setErrorMessage] = useState("")
     const [loading, setLoading] = useState(false)
+    const [errorMessage, setErrorMessage] = useState("")
+
     async function signIn() {
         setErrorMessage("")
         setLoading(true)
+
         await api
             .post("/auth/sign-in", { username: signInputUsername, password: signInputPassword })
             .then((response) => {
+                console.log(response.data)
+                setLoading(true)
+                setAppData(response.data.session)
                 setSessionData(response.data.session)
-                if (response.data.session.user.id)
-                    storage.set(
-                        storageKeys().account.jwt.token,
-                        response.data.session.account.jwtToken.toString()
-                    )
                 storage.set("@circle:sessionId", response.data.session.user.id.toString())
+                setRedirectTo("APP")
             })
             .finally(() => {
                 setLoading(false)
             })
             .catch((err) => {
-                setErrorMessage(err.response.data.error)
+                setErrorMessage(err.response.data.message.split(". ")[0])
             })
     }
 
     async function signUp() {
         setErrorMessage("")
         setLoading(true)
+
         await api
             .post("/auth/sign-up", { username: signInputUsername, password: signInputPassword })
             .then((response) => {
-                setSessionData(response.data.session.user.id)
+                setLoading(true)
+                setAppData(response.data.session)
+                setSessionData(response.data.session)
                 if (response.data.session.user.id)
                     storage.set("@circle:sessionId", response.data.session.user.id.toString())
+                setRedirectTo("APP")
             })
             .finally(() => {
                 setLoading(false)
             })
             .catch((err) => {
-                setErrorMessage(err.response.data.error)
+                setErrorMessage(err.response.data.message.split(". ")[0])
             })
     }
+
+    async function getSessionData() {}
 
     function signOut() {
         storage.clearAll()
         setSessionData({} as SessionDataType)
+        setRedirectTo("AUTH")
     }
 
     function checkIsSigned() {
@@ -78,19 +89,20 @@ export function Provider({ children }: AuthProviderProps) {
             if (key == "@circle:sessionId") return true
             else return false
         })
-        if (storage.getNumber(storageKeys().user.id) && hasSessionId) return true
+        if (storage.getString(storageKeys().user.id) && hasSessionId) return true
         else return false
     }
     return (
         <AuthContext.Provider
             value={{
-                errorMessage,
                 loading,
+                errorMessage,
                 sessionData,
                 signInputPassword,
                 signInputUsername,
                 setSignInputPassword,
                 setSignInputUsername,
+                getSessionData,
                 setErrorMessage,
                 checkIsSigned,
                 signIn,
