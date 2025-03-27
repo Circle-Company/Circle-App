@@ -1,31 +1,20 @@
+import AuthContext from "@/contexts/Auth"
+import { RedirectContext } from "@/contexts/redirect"
 import React from "react"
-import AuthContext from "../contexts/auth"
 import LoadingScreen from "../pages/auth/Loading"
 import AppRoute from "./app.routes"
 import AuthRoute from "./auth.routes"
 
 export default function Routes() {
-    const { checkIsSigned, sessionData } = React.useContext(AuthContext)
-    const [redirectTo, setRedirectTo] = React.useState<string | null>(null)
+    const { checkIsSigned } = React.useContext(AuthContext)
+    const { redirectTo, setRedirectTo } = React.useContext(RedirectContext)
 
+    // Verifica na montagem
     React.useEffect(() => {
-        const checkAuth = async () => {
-            const isAuthenticated = checkIsSigned()
-            if (isAuthenticated) setRedirectTo("App")
-            else setRedirectTo("Auth")
-        }
-        checkAuth()
-    }, [checkIsSigned, sessionData])
-
-    React.useEffect(() => {
-        const checkAuth = async () => {
-            const isAuthenticated = checkIsSigned()
-            if (isAuthenticated) setRedirectTo("App")
-            else setRedirectTo("Auth")
-        }
-        checkAuth()
+        const isAuthenticated = checkIsSigned()
+        setRedirectTo(isAuthenticated ? "APP" : "AUTH")
     }, [])
 
-    if (!sessionData || !redirectTo) return <LoadingScreen />
-    return redirectTo === "App" ? <AppRoute /> : <AuthRoute />
+    if (!redirectTo) return <LoadingScreen />
+    return redirectTo === "APP" ? <AppRoute /> : <AuthRoute />
 }

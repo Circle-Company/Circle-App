@@ -84,16 +84,13 @@ export const useAccountStore = create<AccountState>((set) => ({
             jwtToken: value.jwtToken || "",
             jwtExpiration: value.jwtExpiration || "",
         })
-
-        /**
-         
         storage.set(storageKey.unreadNotificationsCount, value.unreadNotificationsCount || 0)
         storage.set(storageKey.blocked, value.blocked || false)
         storage.set(storageKey.muted, value.muted || false)
         storage.set(storageKey.jwt.token, value.jwtToken || "")
         storage.set(storageKey.jwt.expiration, value.jwtExpiration || "")
         storage.set(storageKey.last_active_at, value.last_active_at || new Date().toString())
-        storage.set(storageKey.last_login_at, value.last_login_at || new Date().toString())*/
+        storage.set(storageKey.last_login_at, value.last_login_at || new Date().toString())
     },
     load: () => {
         set({
