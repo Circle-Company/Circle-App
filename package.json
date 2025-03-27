@@ -20,7 +20,6 @@
         "@lingui/react": "^4.10.1",
         "@motify/components": "^0.18.0",
         "@notifee/react-native": "^7.8.2",
-        "@nozbe/watermelondb": "^0.27.1",
         "@react-native-async-storage/async-storage": "^1.21.0",
         "@react-native-community/netinfo": "^11.3.1",
         "@react-native-firebase/app": "^20.3.0",
@@ -82,7 +81,6 @@
     },
     "devDependencies": {
         "@babel/core": "^7.20.0",
-        "@babel/plugin-proposal-decorators": "^7.25.9",
         "@babel/preset-env": "^7.20.0",
         "@babel/runtime": "^7.20.0",
         "@eslint/js": "^9.6.0",

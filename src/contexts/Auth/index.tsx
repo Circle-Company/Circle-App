@@ -25,7 +25,7 @@ export type AuthContextsData = {
 const AuthContext = React.createContext<AuthContextsData>({} as AuthContextsData)
 
 export function Provider({ children }: AuthProviderProps) {
-    const { setRedirectTo, setAppData } = React.useContext(RedirectContext)
+    const { setRedirectTo } = React.useContext(RedirectContext)
     const [signInputUsername, setSignInputUsername] = React.useState("")
     const [signInputPassword, setSignInputPassword] = React.useState("")
     const [sessionData, setSessionData] = useState<SessionDataType>({} as SessionDataType)
@@ -39,11 +39,8 @@ export function Provider({ children }: AuthProviderProps) {
         await api
             .post("/auth/sign-in", { username: signInputUsername, password: signInputPassword })
             .then((response) => {
-                console.log(response.data)
-                setLoading(true)
-                setAppData(response.data.session)
-                setSessionData(response.data.session)
                 storage.set("@circle:sessionId", response.data.session.user.id.toString())
+                setSessionData(response.data.session)
                 setRedirectTo("APP")
             })
             .finally(() => {
@@ -61,11 +58,8 @@ export function Provider({ children }: AuthProviderProps) {
         await api
             .post("/auth/sign-up", { username: signInputUsername, password: signInputPassword })
             .then((response) => {
-                setLoading(true)
-                setAppData(response.data.session)
+                storage.set("@circle:sessionId", response.data.session.user.id.toString())
                 setSessionData(response.data.session)
-                if (response.data.session.user.id)
-                    storage.set("@circle:sessionId", response.data.session.user.id.toString())
                 setRedirectTo("APP")
             })
             .finally(() => {
