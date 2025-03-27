@@ -28,8 +28,8 @@ export function RenderProfileSkeleton() {
             <Skeleton.View
                 style={{
                     width: 100,
-                    height: 20,
-                    borderRadius: 10,
+                    height: 15,
+                    borderRadius: 3,
                     marginTop: sizes.margins["1md"],
                 }}
             />
