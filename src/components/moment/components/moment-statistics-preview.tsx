@@ -1,3 +1,4 @@
+import PersistedContext from "@/contexts/Persisted"
 import React from "react"
 import { FlatList, View } from "react-native"
 import LanguageContext from "../../../contexts/Preferences/language"
@@ -14,17 +15,23 @@ type StatisticsPreviewProps = {
 }
 
 export function statisticsPreview({ momentOptions, momentData }: StatisticsPreviewProps) {
+    const { session } = React.useContext(PersistedContext)
     const { t } = React.useContext(LanguageContext)
     const [likes, setLikes] = React.useState("--")
     const [views, setViews] = React.useState("--")
     const [comments, setComments] = React.useState("--")
 
     async function fetch() {
-        await apiRoutes.moment.statisticsPreview({ momentId: momentData.id }).then((response) => {
-            setLikes(response.data.total_likes_num)
-            setViews(response.data.total_views_num)
-            setComments(response.data.total_comments_num)
-        })
+        await apiRoutes.moment
+            .statisticsPreview({
+                momentId: momentData.id,
+                authorizationToken: session.account.jwtToken,
+            })
+            .then((response) => {
+                setLikes(response.data.total_likes_num)
+                setViews(response.data.total_views_num)
+                setComments(response.data.total_comments_num)
+            })
     }
 
     React.useEffect(() => {
@@ -37,7 +44,7 @@ export function statisticsPreview({ momentOptions, momentData }: StatisticsPrevi
         borderRadius: sizes.borderRadius["1sm"] * 1.2,
     }
 
-    const itemContainer = {
+    const itemContainer: any = {
         flexDirection: "row",
         alignItems: "center",
         justifyContent: "center",
