@@ -2,8 +2,8 @@ import { MMKV } from "react-native-mmkv"
 export const storage = new MMKV()
 
 export function storageKeys() {
-    const sessionId = storage.getNumber("@circle:sessionId")
-    const baseKey = `@circle:sessionId=${sessionId}:`
+    const sessionId = storage.getString("@circle:sessionId")
+    const baseKey = `@circle:`
     return {
         sessionId,
         baseKey,
