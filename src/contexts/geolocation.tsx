@@ -36,17 +36,19 @@ export function Provider({ children }: GeolocationProviderProps) {
 
     // Função para atualizar a localização do usuário
     const updateUserCoordinates = async (payload: UpdateCoordinatesPayload): Promise<void> => {
-        try {
-            await apiRoutes.account.updateCoordinates({
-                userId: session?.user?.id,
-                coordinates: {
-                    latitude: payload.latitude,
-                    longitude: payload.longitude,
-                },
-            })
-        } catch (error) {
-            console.error("Error updating coordinates:", error)
-            throw error
+        if (session.user.id) {
+            try {
+                await apiRoutes.account.updateCoordinates({
+                    userId: session?.user?.id,
+                    coordinates: {
+                        latitude: payload.latitude,
+                        longitude: payload.longitude,
+                    },
+                })
+            } catch (error) {
+                console.error("Error updating coordinates:", error)
+                throw error
+            }
         }
     }
 
@@ -76,7 +78,7 @@ export function Provider({ children }: GeolocationProviderProps) {
     }
 
     const updateUserLocation = async (): Promise<void> => {
-        if (!session?.user?.id) {
+        if (!session.user.id) {
             throw new Error("User ID is not available")
         }
         useUpdateUserLocation()

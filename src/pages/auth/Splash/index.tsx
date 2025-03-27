@@ -1,10 +1,10 @@
 import { useNavigation } from "@react-navigation/native"
 import React from "react"
-import { Image, StatusBar, useColorScheme, View } from "react-native"
+import { Image, StatusBar, View, useColorScheme } from "react-native"
 import LinearGradient from "react-native-linear-gradient"
 import Icon from "../../../assets/icons/svgs/arrow_circle_right.svg"
-import Button from "../../../components/buttons/button-standart"
 import { Text } from "../../../components/Themed"
+import Button from "../../../components/buttons/button-standart"
 import config from "../../../config"
 import ColorTheme, { colors } from "../../../layout/constants/colors"
 import { default as Fonts, default as fonts } from "../../../layout/constants/fonts"
@@ -24,7 +24,7 @@ export default function SplashScreen() {
         justifyContent: "center",
         position: "absolute",
         top: 70,
-        color: ColorTheme().text,
+        color: colors.gray.white,
         zIndex: 2,
     }
     const center: any = {
@@ -39,7 +39,7 @@ export default function SplashScreen() {
         alignSelf: "center",
         fontFamily: Fonts.family["Black-Italic"],
         fontSize: 48,
-        color: ColorTheme().text,
+        color: colors.gray.white,
         marginBottom: 10,
     }
     const slogan: any = {
@@ -47,7 +47,7 @@ export default function SplashScreen() {
         alignSelf: "center",
         textAlign: "center",
         fontSize: fonts.size.subheadline,
-        color: ColorTheme().text,
+        color: colors.gray.white,
     }
     const buttons: any = {
         alignItems: "center",
@@ -96,11 +96,7 @@ export default function SplashScreen() {
 
     return (
         <View style={container}>
-            <StatusBar
-                translucent
-                barStyle={isDarkMode ? "light-content" : "dark-content"}
-                backgroundColor={ColorTheme().background.toString()}
-            />
+            <StatusBar translucent barStyle={"light-content"} backgroundColor={colors.gray.black} />
             <Image
                 style={{ width: sizes.window.width, height: sizes.window.height, opacity: 0.9 }}
                 resizeMode="cover"
