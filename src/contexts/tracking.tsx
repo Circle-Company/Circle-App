@@ -1,9 +1,9 @@
 import { Mixpanel, MixpanelType } from "mixpanel-react-native"
 import React from "react"
 import config from "../config"
+import AuthContext from "./Auth"
 import PersistedContext from "./Persisted"
 import { UserDataReturnsType } from "./Persisted/types"
-import AuthContext from "./auth"
 
 type trackSignProps = {
     user: UserDataReturnsType

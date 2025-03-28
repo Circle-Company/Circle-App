@@ -1,18 +1,20 @@
+import { Loading } from "@/components/loading"
 import React from "react"
 import { StatusBar, useColorScheme } from "react-native"
 import Icon from "../../../assets/icons/svgs/plus_circle.svg"
+import { Text, View } from "../../../components/Themed"
 import PasswordInput from "../../../components/auth/password_input"
 import AuthTermsText from "../../../components/auth/terms"
 import ButtonStandart from "../../../components/buttons/button-standart"
-import { Text, View } from "../../../components/Themed"
-import AuthContext from "../../../contexts/auth"
+import AuthContext from "../../../contexts/Auth"
 import ColorTheme, { colors } from "../../../layout/constants/colors"
 import fonts from "../../../layout/constants/fonts"
 import sizes from "../../../layout/constants/sizes"
 
 export default function PasswordScreen() {
     const isDarkMode = useColorScheme() === "dark"
-    const { signUp, signInputPassword } = React.useContext(AuthContext)
+    const { signUp, setErrorMessage, signInputPassword, errorMessage, loading } =
+        React.useContext(AuthContext)
 
     const container = {
         flex: 1,
@@ -35,11 +37,12 @@ export default function PasswordScreen() {
     const button_text = {
         fontSize: fonts.size.body * 0.9,
         fontFamily: fonts.family.Semibold,
-        color: signInputPassword
-            ? colors.gray.white
-            : isDarkMode
-              ? colors.gray.grey_04 + "90"
-              : colors.gray.grey_04 + "90",
+        color:
+            signInputPassword && !loading
+                ? colors.gray.white
+                : isDarkMode
+                  ? colors.gray.grey_04 + "90"
+                  : colors.gray.grey_04 + "90",
     }
 
     const icon = {
@@ -47,11 +50,26 @@ export default function PasswordScreen() {
         top: 0.4,
     }
 
+    const errorContainer: any = {
+        marginTop: -sizes.margins["2sm"],
+        marginBottom: sizes.margins["1md"],
+    }
+
+    const errorText: any = {
+        fontSize: fonts.size.body * 0.9,
+        fontFamily: fonts.family.Medium,
+        color: isDarkMode ? colors.red.red_05 : colors.red.red_05,
+    }
+
     function handlePress() {
         if (signInputPassword) {
             signUp()
         }
     }
+
+    React.useEffect(() => {
+        setErrorMessage("")
+    }, [])
 
     return (
         <View style={container}>
@@ -63,30 +81,50 @@ export default function PasswordScreen() {
                 <Text style={description}>You can't get it back if you forget it.</Text>
                 <PasswordInput />
             </View>
+            {errorMessage && (
+                <View style={errorContainer}>
+                    <Text style={errorText}>{errorMessage}</Text>
+                </View>
+            )}
             <ButtonStandart
                 margins={false}
                 width={sizes.buttons.width / 2.05}
                 height={40}
                 action={handlePress}
                 backgroundColor={
-                    signInputPassword
+                    signInputPassword && !loading
                         ? ColorTheme().primary.toString()
                         : ColorTheme().backgroundDisabled.toString()
                 }
             >
-                <Text style={button_text}>Create Account</Text>
-                <Icon
-                    style={icon}
-                    fill={String(
-                        signInputPassword
-                            ? colors.gray.white
-                            : isDarkMode
-                              ? colors.gray.grey_04 + "90"
-                              : colors.gray.grey_04 + "90"
-                    )}
-                    width={17}
-                    height={17}
-                />
+                {loading ? (
+                    <View
+                        style={{
+                            flexDirection: "row",
+                            alignItems: "center",
+                            backgroundColor: "#00000000",
+                        }}
+                    >
+                        <Text style={[button_text, { marginRight: 4 }]}>Loading</Text>
+                        <Loading.ActivityIndicator size={15} />
+                    </View>
+                ) : (
+                    <>
+                        <Text style={button_text}>Create Account</Text>
+                        <Icon
+                            style={icon}
+                            fill={String(
+                                signInputPassword && !loading
+                                    ? colors.gray.white
+                                    : isDarkMode
+                                      ? colors.gray.grey_04 + "90"
+                                      : colors.gray.grey_04 + "90"
+                            )}
+                            width={17}
+                            height={17}
+                        />
+                    </>
+                )}
             </ButtonStandart>
 
             <View style={{ marginTop: sizes.margins["1xl"] * 0.8 }}>

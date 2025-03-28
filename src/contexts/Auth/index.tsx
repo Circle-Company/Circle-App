@@ -1,16 +1,14 @@
+import { SessionDataType } from "@/contexts/Persisted/types"
+import api from "@/services/Api"
+import { storage, storageKeys } from "@/store"
 import React, { useState } from "react"
-import { notify } from "react-native-notificated"
-import ErrorIcon from "../assets/icons/svgs/exclamationmark_circle.svg"
-import { colors } from "../layout/constants/colors"
-import api from "../services/Api"
-import { storage, storageKeys } from "../store"
-import { SessionDataType } from "./Persisted/types"
-import LanguageContext from "./Preferences/language"
+import { RedirectContext } from "../redirect"
 
 type AuthProviderProps = { children: React.ReactNode }
 
 export type AuthContextsData = {
     loading: boolean
+    errorMessage: string
     signInputUsername: string
     signInputPassword: string
     sessionData: SessionDataType
@@ -19,6 +17,7 @@ export type AuthContextsData = {
     signUp: () => Promise<void>
     signOut(): void
     checkIsSigned: () => boolean
+    setErrorMessage: React.Dispatch<React.SetStateAction<string>>
     setSignInputPassword: React.Dispatch<React.SetStateAction<string>>
     setSignInputUsername: React.Dispatch<React.SetStateAction<string>>
 }
@@ -26,63 +25,48 @@ export type AuthContextsData = {
 const AuthContext = React.createContext<AuthContextsData>({} as AuthContextsData)
 
 export function Provider({ children }: AuthProviderProps) {
-    const { t } = React.useContext(LanguageContext)
+    const { setRedirectTo } = React.useContext(RedirectContext)
     const [signInputUsername, setSignInputUsername] = React.useState("")
     const [signInputPassword, setSignInputPassword] = React.useState("")
     const [sessionData, setSessionData] = useState<SessionDataType>({} as SessionDataType)
     const [loading, setLoading] = useState(false)
+    const [errorMessage, setErrorMessage] = useState("")
+
     async function signIn() {
+        setErrorMessage("")
+        setLoading(true)
+
         await api
             .post("/auth/sign-in", { username: signInputUsername, password: signInputPassword })
             .then((response) => {
-                console.log(response.data)
-                setLoading(true)
-                setSessionData(response.data.session)
-                if (response.data.session.user.id)
-                    storage.set(
-                        storageKeys().account.jwt.token,
-                        response.data.session.account.jwtToken.toString()
-                    )
                 storage.set("@circle:sessionId", response.data.session.user.id.toString())
+                setSessionData(response.data.session)
+                setRedirectTo("APP")
             })
             .finally(() => {
                 setLoading(false)
             })
             .catch((err) => {
-                notify("toast", {
-                    params: {
-                        description: err.message,
-                        title: t("Error"),
-                        icon: (
-                            <ErrorIcon fill={colors.red.red_05.toString()} width={15} height={15} />
-                        ),
-                    },
-                })
+                setErrorMessage(err.response.data.message.split(". ")[0])
             })
     }
 
     async function signUp() {
+        setErrorMessage("")
+        setLoading(true)
+
         await api
             .post("/auth/sign-up", { username: signInputUsername, password: signInputPassword })
             .then((response) => {
-                setLoading(true)
-                setSessionData(response.data.session.user.id)
-                if (response.data.session.user.id)
-                    storage.set("@circle:sessionId", response.data.session.user.id.toString())
+                storage.set("@circle:sessionId", response.data.session.user.id.toString())
+                setSessionData(response.data.session)
+                setRedirectTo("APP")
             })
             .finally(() => {
                 setLoading(false)
             })
             .catch((err) => {
-                notify("toast", {
-                    params: {
-                        description: err.message,
-                        title: t("Error"),
-                        icon: (
-                            <ErrorIcon fill={colors.red.red_05.toString()} width={15} height={15} />
-                        ),
-                    },
-                })
+                setErrorMessage(err.response.data.message.split(". ")[0])
             })
     }
 
@@ -91,6 +75,7 @@ export function Provider({ children }: AuthProviderProps) {
     function signOut() {
         storage.clearAll()
         setSessionData({} as SessionDataType)
+        setRedirectTo("AUTH")
     }
 
     function checkIsSigned() {
@@ -98,19 +83,21 @@ export function Provider({ children }: AuthProviderProps) {
             if (key == "@circle:sessionId") return true
             else return false
         })
-        if (storage.getNumber(storageKeys().user.id) && hasSessionId) return true
+        if (storage.getString(storageKeys().user.id) && hasSessionId) return true
         else return false
     }
     return (
         <AuthContext.Provider
             value={{
                 loading,
+                errorMessage,
                 sessionData,
                 signInputPassword,
                 signInputUsername,
                 setSignInputPassword,
                 setSignInputUsername,
                 getSessionData,
+                setErrorMessage,
                 checkIsSigned,
                 signIn,
                 signOut,

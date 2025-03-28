@@ -54,13 +54,6 @@ export default function ListSettings() {
                     secure: false,
                 },
                 {
-                    name: t("Following"),
-                    value: null,
-                    type: "TEXT",
-                    navigateTo: "Settings-Followings",
-                    secure: false,
-                },
-                {
                     name: t("Preferences"),
                     value: null,
                     type: "TEXT",

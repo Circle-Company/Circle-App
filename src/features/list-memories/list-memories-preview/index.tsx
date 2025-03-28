@@ -31,7 +31,7 @@ export default function ListMemoriesPreview({
     isAccountScreen = false,
     user,
 }: RenderMemoriesPreviewProps) {
-    const { setProfile } = React.useContext(ViewProfileContext)
+    const { useUserProfile } = React.useContext(ViewProfileContext)
     const accountContext = React.useContext(AccountContext)
     const { t } = React.useContext(LanguageContext)
     const [memories, setMemories] = React.useState([])
@@ -87,7 +87,7 @@ export default function ListMemoriesPreview({
             await handleRefresh()
         }
         fetch()
-    }, [setProfile, accountContext.setRefreshing])
+    }, [useUserProfile])
 
     React.useEffect(() => {
         if (networkStats !== "OFFLINE") {

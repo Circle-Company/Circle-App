@@ -6,7 +6,6 @@ type contextValue = {
     executeBeforeClick: () => void
     follow: () => void
     unfollow: () => void
-    view_profile: () => void
 }
 const UserShowContext = createContext<contextValue | null>(null)
 
