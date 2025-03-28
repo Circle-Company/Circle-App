@@ -20,7 +20,6 @@ export type UserRootProps = {
 export type UserUsernameProps = {
     displayOnMoment?: boolean
     displayYou?: boolean
-    disableAnalytics?: boolean
     truncatedSize?: number
     color?: string
     fontSize?: number
@@ -36,7 +35,6 @@ export type UserProfilePictureProps = {
         height: number
     }
     displayOnMoment?: boolean
-    disableAnalytics?: boolean
     isLoading?: boolean
     onClickAction?: () => void
 }

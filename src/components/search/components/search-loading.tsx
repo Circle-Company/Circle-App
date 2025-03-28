@@ -1,13 +1,11 @@
-import { Text, View } from "@/components/Themed"
-import LanguageContext from "@/contexts/Preferences/language"
-import ColorTheme, { colors } from "@/layout/constants/colors"
-import fonts from "@/layout/constants/fonts"
+import { View } from "@/components/Themed"
+import { Loading } from "@/components/loading"
+import { colors } from "@/layout/constants/colors"
 import sizes from "@/layout/constants/sizes"
 import React from "react"
 import { useColorScheme } from "react-native"
 
-export default function not_typing() {
-    const { t } = React.useContext(LanguageContext)
+export default function loading_card() {
     const isDarkMode = useColorScheme() === "dark"
 
     const container: any = {
@@ -23,16 +21,10 @@ export default function not_typing() {
         paddingHorizontal: sizes.paddings["2sm"],
         borderColor: isDarkMode ? colors.gray.grey_08 : colors.gray.grey_02,
     }
-    const title: any = {
-        fontSize: fonts.size.footnote,
-        fontFamily: fonts.family.Medium,
-        color: ColorTheme().textDisabled,
-        flex: 1,
-    }
 
     return (
         <View style={container}>
-            <Text style={title}>{t("Search for some @username to show results.")}</Text>
+            <Loading.ActivityIndicator size={20} />
         </View>
     )
 }

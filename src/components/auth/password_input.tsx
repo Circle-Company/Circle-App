@@ -5,7 +5,7 @@ import XIcon from "../../assets/icons/svgs/close.svg"
 import Eye from "../../assets/icons/svgs/eye.svg"
 import EyeSlash from "../../assets/icons/svgs/eye_slash.svg"
 import Icon from "../../assets/icons/svgs/lock.svg"
-import AuthContext from "../../contexts/auth"
+import AuthContext from "../../contexts/Auth"
 import ColorTheme, { colors } from "../../layout/constants/colors"
 import fonts from "../../layout/constants/fonts"
 import sizes from "../../layout/constants/sizes"
@@ -13,7 +13,8 @@ import { Text, View } from "../Themed"
 
 export default function PasswordInput({ sign = true }: { sign?: boolean }) {
     const isDarkMode = useColorScheme() === "dark"
-    const { setSignInputPassword, signInputUsername } = React.useContext(AuthContext)
+    const { setSignInputPassword, signInputUsername, errorMessage, loading } =
+        React.useContext(AuthContext)
     const [password, setPassword] = useState("")
     const [showStatusMessage, setShowStatusMessage] = useState(false)
     const [statusMessage, setStatusMessage] = useState("")
@@ -222,15 +223,20 @@ export default function PasswordInput({ sign = true }: { sign?: boolean }) {
                 <View style={styles.bottomTopContainer}>
                     {showStatusMessage && (
                         <View style={styles.statusContainer}>
-                            {isValidPassword && statusMessage !== "Checking availability..." && (
-                                <CheckIcon
-                                    style={{ top: 0.4, marginRight: 7 }}
-                                    fill={colors.green.green_05.toString()}
-                                    width={sizes.icons["1sm"].width * 0.7}
-                                    height={sizes.icons["1sm"].height * 0.7}
-                                />
-                            )}
-                            <Text style={styles.status}>{statusMessage}</Text>
+                            {isValidPassword &&
+                                statusMessage !== "Checking availability..." &&
+                                !loading &&
+                                !errorMessage && (
+                                    <>
+                                        <CheckIcon
+                                            style={{ top: 0.4, marginRight: 7 }}
+                                            fill={colors.green.green_05.toString()}
+                                            width={sizes.icons["1sm"].width * 0.7}
+                                            height={sizes.icons["1sm"].height * 0.7}
+                                        />
+                                        <Text style={styles.status}>{statusMessage}</Text>
+                                    </>
+                                )}
                         </View>
                     )}
                     <View style={styles.charcetsCounterContainer}>
@@ -240,12 +246,14 @@ export default function PasswordInput({ sign = true }: { sign?: boolean }) {
                     </View>
                 </View>
 
-                <View style={styles.legendContainer}>
-                    <Text style={styles.legend}>
-                        It is recommended that the password has numbers and special characters for
-                        greater security.
-                    </Text>
-                </View>
+                {!errorMessage && !loading && (
+                    <View style={styles.legendContainer}>
+                        <Text style={styles.legend}>
+                            It is recommended that the password has numbers and special characters
+                            for greater security.
+                        </Text>
+                    </View>
+                )}
             </View>
         </View>
     )

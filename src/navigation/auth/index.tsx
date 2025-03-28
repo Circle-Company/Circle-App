@@ -1,6 +1,6 @@
+import LanguageContext from "@/contexts/Preferences/language"
 import { createStackNavigator } from "@react-navigation/stack"
 import React from "react"
-import LanguageContext from "../../contexts/Preferences/language"
 import ColorTheme from "../../layout/constants/colors"
 import fonts from "../../layout/constants/fonts"
 import sizes from "../../layout/constants/sizes"
