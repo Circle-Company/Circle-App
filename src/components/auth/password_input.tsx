@@ -1,5 +1,5 @@
-import React, { useState } from "react"
-import { Pressable, TextInput, useColorScheme } from "react-native"
+import React, { useContext, useEffect, useRef, useState } from "react"
+import { Animated, Easing, Pressable, TextInput, useColorScheme } from "react-native"
 import CheckIcon from "../../assets/icons/svgs/check_circle.svg"
 import XIcon from "../../assets/icons/svgs/close.svg"
 import Eye from "../../assets/icons/svgs/eye.svg"
@@ -11,37 +11,170 @@ import fonts from "../../layout/constants/fonts"
 import sizes from "../../layout/constants/sizes"
 import { Text, View } from "../Themed"
 
-export default function PasswordInput({ sign = true }: { sign?: boolean }) {
+type PasswordInputProps = {
+    type: "signIn" | "signUp"
+    onPasswordValidated?: (valid: boolean) => void
+}
+
+export default function PasswordInput({ type, onPasswordValidated }: PasswordInputProps) {
     const isDarkMode = useColorScheme() === "dark"
     const { setSignInputPassword, signInputUsername, errorMessage, loading } =
-        React.useContext(AuthContext)
-    const [password, setPassword] = useState("")
-    const [showStatusMessage, setShowStatusMessage] = useState(false)
-    const [statusMessage, setStatusMessage] = useState("")
-    const [isValidPassword, setIsValidPassword] = useState(false)
-    const [isVisible, setIsVisible] = useState(false)
-    const inputRef = React.useRef<TextInput>(null)
+        useContext(AuthContext)
 
+    const [password, setPassword] = useState("")
+    const [isValidPassword, setIsValidPassword] = useState(false)
+    const [statusMessage, setStatusMessage] = useState("")
+    const [showStatusMessage, setShowStatusMessage] = useState(false)
+    const [isVisible, setIsVisible] = useState(false)
+
+    const inputRef = useRef<TextInput>(null)
     const inputWidth = sizes.screens.width - sizes.paddings["1lg"] * 2
 
+    // 🎯 Animated values
+    const scaleAnim = useRef(new Animated.Value(1)).current
+    const shadowOpacity = useRef(new Animated.Value(0)).current
+    const fadeIcons = useRef(new Animated.Value(0)).current
+    const statusFade = useRef(new Animated.Value(0)).current
+    const statusTranslate = useRef(new Animated.Value(4)).current
+    const charCounterFade = useRef(new Animated.Value(0)).current
+    const lockBounce = useRef(new Animated.Value(1)).current
+
+    const handleFocus = () => {
+        Animated.parallel([
+            Animated.timing(scaleAnim, {
+                toValue: 1.03,
+                duration: 200,
+                easing: Easing.out(Easing.exp),
+                useNativeDriver: true,
+            }),
+            Animated.timing(shadowOpacity, {
+                toValue: 0.2,
+                duration: 200,
+                useNativeDriver: true,
+            }),
+        ]).start()
+    }
+
+    const handleBlur = () => {
+        Animated.parallel([
+            Animated.timing(scaleAnim, {
+                toValue: 1,
+                duration: 200,
+                easing: Easing.out(Easing.exp),
+                useNativeDriver: true,
+            }),
+            Animated.timing(shadowOpacity, {
+                toValue: 0,
+                duration: 200,
+                useNativeDriver: true,
+            }),
+        ]).start()
+    }
+
+    useEffect(() => {
+        Animated.timing(fadeIcons, {
+            toValue: password.length > 0 ? 1 : 0,
+            duration: 1000,
+            easing: Easing.out(Easing.poly(6)),
+            useNativeDriver: true,
+        }).start()
+
+        Animated.timing(charCounterFade, {
+            toValue: password.length > 0 ? 1 : 0,
+            duration: 250,
+            useNativeDriver: true,
+        }).start()
+    }, [password])
+
+    const validatePassword = (value: string) => {
+        let valid = false
+
+        if (type === "signUp") {
+            if (value.length < 6) {
+                setIsValidPassword(false)
+                setStatusMessage("The password needs at least 6 characters.")
+            } else if (value === signInputUsername) {
+                setIsValidPassword(false)
+                setStatusMessage("Password cannot be the same as username.")
+            } else {
+                valid = true
+                setIsValidPassword(true)
+                setStatusMessage("This password can be used.")
+            }
+        } else {
+            valid = value.length > 0
+            setIsValidPassword(valid)
+            setStatusMessage(valid ? "" : "")
+        }
+
+        // Feedback para status
+        Animated.parallel([
+            Animated.timing(statusFade, {
+                toValue: showStatusMessage && statusMessage ? 1 : 0,
+                duration: 200,
+                useNativeDriver: true,
+            }),
+            Animated.timing(statusTranslate, {
+                toValue: showStatusMessage && statusMessage ? 0 : 4,
+                duration: 200,
+                useNativeDriver: true,
+            }),
+        ]).start()
+
+        // Feedback visual no cadeado
+        if (valid) {
+            Animated.sequence([
+                Animated.timing(lockBounce, {
+                    toValue: 1.2,
+                    duration: 250,
+                    useNativeDriver: true,
+                }),
+                Animated.timing(lockBounce, {
+                    toValue: 1,
+                    duration: 400,
+                    useNativeDriver: true,
+                }),
+            ]).start()
+        }
+    }
+
+    const handleInputChange = (text: string) => {
+        setPassword(text)
+        setSignInputPassword(text)
+        validatePassword(text)
+        setShowStatusMessage(true)
+    }
+
+    const handleClearPressed = () => {
+        setPassword("")
+        setSignInputPassword("")
+        setIsValidPassword(false)
+        setShowStatusMessage(false)
+    }
+
+    const handleVisiblePressed = () => {
+        setIsVisible((prev) => !prev)
+    }
+
+    useEffect(() => {
+        onPasswordValidated?.(isValidPassword)
+    }, [isValidPassword])
+
     const styles: any = {
-        container: {
-            width: sizes.screens.width,
-            alignItems: "center",
-        },
+        container: { width: sizes.screens.width, alignItems: "center" },
         inputContainer: {
             width: inputWidth,
             height: sizes.headers.height,
             backgroundColor: isDarkMode ? colors.gray.grey_08 + "90" : colors.gray.grey_02 + "80",
             borderRadius: sizes.headers.height / 2,
-            paddingVertical: sizes.paddings["1sm"],
             paddingHorizontal: sizes.paddings["1md"],
-            alignItems: "center",
-            justifyContent: "flex-start",
             flexDirection: "row",
+            alignItems: "center",
+            shadowColor: "#000",
+            shadowOffset: { width: 0, height: 2 },
+            shadowRadius: 10,
         },
         input: {
-            top: 2.5,
             marginLeft: 10,
             fontFamily: fonts.family.Semibold,
             flex: 1,
@@ -51,27 +184,18 @@ export default function PasswordInput({ sign = true }: { sign?: boolean }) {
             marginTop: sizes.margins["1sm"],
             width: sizes.screens.width,
             alignItems: "flex-start",
-            justifyContent: "flex-start",
             paddingHorizontal: sizes.paddings["1xl"] * 1.1,
         },
-        bottomTopContainer: {
-            flexDirection: "row",
-            alignItems: "center",
-            justifyContent: "center",
-        },
-        charcetsCounterContainer: {
+        charCounterContainer: {
             borderRadius: sizes.sizes["1md"],
             paddingHorizontal: sizes.paddings["1sm"],
             paddingVertical: sizes.paddings["1sm"] * 0.3,
             backgroundColor: ColorTheme().backgroundDisabled + "80",
         },
-        charctersCounter: {
+        charCounter: {
             fontSize: fonts.size.caption2,
             fontFamily: fonts.family.Medium,
             color: ColorTheme().textDisabled,
-        },
-        legendContainer: {
-            marginTop: sizes.margins["1md"],
         },
         legend: {
             marginTop: sizes.margins["1sm"],
@@ -80,10 +204,9 @@ export default function PasswordInput({ sign = true }: { sign?: boolean }) {
             color: ColorTheme().textDisabled,
         },
         statusContainer: {
-            flex: 1,
             flexDirection: "row",
             alignItems: "center",
-            justifyContent: "flex-start",
+            marginBottom: 4,
         },
         status: {
             fontSize: fonts.size.caption1,
@@ -96,6 +219,7 @@ export default function PasswordInput({ sign = true }: { sign?: boolean }) {
             borderRadius: 10,
             alignItems: "center",
             justifyContent: "center",
+            alignSelf: "center",
             backgroundColor: ColorTheme().backgroundDisabled,
         },
         visibleButtonContainer: {
@@ -108,153 +232,114 @@ export default function PasswordInput({ sign = true }: { sign?: boolean }) {
         },
     }
 
-    const handleVisiblePressed = () => {
-        if (isVisible) setIsVisible(false)
-        else setIsVisible(true)
-    }
-
-    const handleClearPressed = () => {
-        setPassword("")
-        setIsValidPassword(false)
-        setStatusMessage("The Password needs least 6 characters.")
-        setShowStatusMessage(true)
-        setSignInputPassword("")
-    }
-
-    const handleInputChange = (text: string) => {
-        setPassword(text)
-    }
-
-    React.useEffect(() => {
-        if (password.length <= 5) {
-            setIsValidPassword(false)
-            setStatusMessage("The Password needs least 6 characters.")
-            setShowStatusMessage(true)
-            setSignInputPassword("")
-        }
-        if (password == signInputUsername && sign) {
-            setIsValidPassword(false)
-            setStatusMessage("Your password cannot be the same as the username.")
-            setShowStatusMessage(true)
-            setSignInputPassword("")
-        } else {
-            if (sign || password.length >= 6) {
-                setIsValidPassword(true)
-                setShowStatusMessage(true)
-                setStatusMessage("This password can be used.")
-                setSignInputPassword(password)
-            }
-        }
-    }, [password, inputRef])
-
-    React.useEffect(() => {
-        if (password.length <= 5) {
-            setIsValidPassword(false)
-            setStatusMessage("The Password needs least 6 characters.")
-            setShowStatusMessage(true)
-            setSignInputPassword("")
-        }
-    })
-
     return (
         <View style={styles.container}>
-            <View style={styles.inputContainer}>
-                <Icon
-                    fill={ColorTheme().text.toString()}
-                    width={sizes.icons["1md"].width * 0.73}
-                    height={sizes.icons["1md"].height * 0.73}
-                />
+            <Animated.View
+                style={[
+                    styles.inputContainer,
+                    {
+                        transform: [{ scale: scaleAnim }],
+                        shadowOpacity: shadowOpacity,
+                    },
+                ]}
+            >
+                <Animated.View style={{ transform: [{ scale: lockBounce }] }}>
+                    <Icon
+                        fill={
+                            password.length > 0
+                                ? ColorTheme().text.toString()
+                                : ColorTheme().backgroundDisabled
+                        }
+                        width={password.length > 0 ? 16 : 14}
+                        height={16}
+                    />
+                </Animated.View>
+
                 <TextInput
                     value={password}
                     ref={inputRef}
-                    textAlignVertical="center"
-                    multiline={false}
-                    secureTextEntry={isVisible}
+                    secureTextEntry={!isVisible}
                     returnKeyType="done"
                     keyboardType="default"
                     autoCapitalize="none"
                     textContentType="password"
-                    autoFocus={true}
                     autoCorrect={false}
                     onChangeText={handleInputChange}
+                    onFocus={handleFocus}
+                    onBlur={handleBlur}
                     numberOfLines={1}
                     maxLength={20}
                     style={styles.input}
+                    selectionColor={ColorTheme().primaryAccent}
+                    placeholder={type === "signUp" ? "Type a Password" : "Password"}
                     placeholderTextColor={String(ColorTheme().textDisabled + "99")}
                 />
-                {password && (
-                    <>
-                        <Pressable onPress={handleClearPressed} style={styles.closeButtonContainer}>
-                            <XIcon
-                                fill={String(
-                                    isDarkMode ? colors.gray.grey_04 : colors.gray.grey_04
-                                )}
-                                width={sizes.icons["1sm"].width * 0.7}
-                                height={sizes.icons["1sm"].height * 0.7}
-                            />
-                        </Pressable>
 
-                        <Pressable
-                            onPress={handleVisiblePressed}
-                            style={[styles.visibleButtonContainer]}
-                        >
-                            {isVisible ? (
-                                <Eye
-                                    fill={String(
-                                        isDarkMode ? colors.gray.grey_04 : colors.gray.grey_04
-                                    )}
-                                    width={sizes.icons["1sm"].width * 1.2}
-                                    height={sizes.icons["1sm"].height * 1.2}
+                <Animated.View style={{ flexDirection: "row", opacity: fadeIcons }}>
+                    {!!password && (
+                        <>
+                            <Pressable
+                                onPress={handleClearPressed}
+                                style={styles.closeButtonContainer}
+                            >
+                                <XIcon
+                                    fill={colors.gray.grey_04}
+                                    width={sizes.icons["1sm"].width * 0.7}
+                                    height={sizes.icons["1sm"].height * 0.7}
                                 />
-                            ) : (
-                                <EyeSlash
-                                    fill={String(
-                                        isDarkMode ? colors.gray.grey_04 : colors.gray.grey_04
-                                    )}
-                                    width={sizes.icons["1sm"].width * 1.2}
-                                    height={sizes.icons["1sm"].height * 1.2}
-                                />
-                            )}
-                        </Pressable>
-                    </>
-                )}
-            </View>
-            <View style={styles.bottomContainer}>
-                <View style={styles.bottomTopContainer}>
-                    {showStatusMessage && (
-                        <View style={styles.statusContainer}>
-                            {isValidPassword &&
-                                statusMessage !== "Checking availability..." &&
-                                !loading &&
-                                !errorMessage && (
-                                    <>
-                                        <CheckIcon
-                                            style={{ top: 0.4, marginRight: 7 }}
-                                            fill={colors.green.green_05.toString()}
-                                            width={sizes.icons["1sm"].width * 0.7}
-                                            height={sizes.icons["1sm"].height * 0.7}
-                                        />
-                                        <Text style={styles.status}>{statusMessage}</Text>
-                                    </>
+                            </Pressable>
+                            <Pressable
+                                onPress={handleVisiblePressed}
+                                style={styles.visibleButtonContainer}
+                            >
+                                {isVisible ? (
+                                    <Eye fill={colors.gray.grey_04} width={18} height={18} />
+                                ) : (
+                                    <EyeSlash fill={colors.gray.grey_04} width={18} height={18} />
                                 )}
-                        </View>
+                            </Pressable>
+                        </>
                     )}
-                    <View style={styles.charcetsCounterContainer}>
-                        <Text style={styles.charctersCounter}>
-                            {password.length} - {20}
-                        </Text>
-                    </View>
-                </View>
+                </Animated.View>
+            </Animated.View>
 
-                {!errorMessage && !loading && (
-                    <View style={styles.legendContainer}>
-                        <Text style={styles.legend}>
-                            It is recommended that the password has numbers and special characters
-                            for greater security.
-                        </Text>
-                    </View>
+            <Animated.View style={styles.bottomContainer}>
+                {type === "signUp" && showStatusMessage && statusMessage !== "" && (
+                    <Animated.View
+                        style={[
+                            styles.statusContainer,
+                            {
+                                opacity: statusFade,
+                                transform: [{ translateY: statusTranslate }],
+                            },
+                        ]}
+                    >
+                        {isValidPassword && (
+                            <CheckIcon
+                                style={{ marginRight: 6 }}
+                                fill={colors.green.green_05}
+                                width={14}
+                                height={14}
+                            />
+                        )}
+                        <Text style={styles.status}>{statusMessage}</Text>
+                    </Animated.View>
                 )}
-            </View>
+
+                {type === "signUp" && (
+                    <Animated.View
+                        style={[styles.charCounterContainer, { opacity: charCounterFade }]}
+                    >
+                        <Text style={styles.charCounter}>{password.length} - 20</Text>
+                    </Animated.View>
+                )}
+
+                {type === "signUp" && !errorMessage && !loading && (
+                    <Text style={styles.legend}>
+                        Use numbers and special characters for stronger passwords.
+                    </Text>
+                )}
+            </Animated.View>
         </View>
     )
 }
