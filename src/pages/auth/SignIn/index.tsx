@@ -1,9 +1,10 @@
 import Icon from "@/assets/icons/svgs/arrow_circle_right.svg"
 import { Text, View } from "@/components/Themed"
-import PasswordInputSignIn from "@/components/auth/password_input-sign_in"
+import PasswordInput from "@/components/auth/password_input"
 import AuthTermsText from "@/components/auth/terms"
 import UsernameInputSignIn from "@/components/auth/username_input-sign_in"
 import ButtonStandart from "@/components/buttons/button-standart"
+import ButtonClose from "@/components/buttons/close"
 import { Loading } from "@/components/loading"
 import AuthContext from "@/contexts/Auth"
 import ColorTheme, { colors } from "@/layout/constants/colors"
@@ -18,9 +19,22 @@ export default function SignInScreen() {
         React.useContext(AuthContext)
 
     const container = {
-        marginTop: sizes.margins["1xxl"] * 0.9,
         flex: 1,
         alignItems: "center",
+    }
+
+    const headerContainer = {
+        width: sizes.screens.width,
+        height: sizes.headers.height,
+        flexDirection: "row",
+        paddingHorizontal: sizes.paddings["1md"],
+        justifyContent: "flex-start",
+        alignItems: "center",
+        marginBottom: sizes.margins["1xl"] * 0.8,
+    }
+    const headerTitle = {
+        fontSize: fonts.size.title2,
+        fontFamily: fonts.family.Bold,
     }
     const input_container = {
         alignItems: "center",
@@ -61,15 +75,19 @@ export default function SignInScreen() {
 
     return (
         <View style={container}>
-            <StatusBar
-                backgroundColor={String(ColorTheme().background)}
-                barStyle={isDarkMode ? "light-content" : "dark-content"}
-            />
+            <StatusBar backgroundColor={colors.gray.black} barStyle={"light-content"} />
+            <View style={headerContainer}>
+                <ButtonClose />
+                <View style={{ flex: 1, marginLeft: sizes.margins["2sm"] }}>
+                    <Text style={headerTitle}>Sign In</Text>
+                </View>
+            </View>
+
             <View style={input_container}>
                 <View style={{ marginBottom: sizes.margins["1md"] }}>
                     <UsernameInputSignIn />
                 </View>
-                <PasswordInputSignIn />
+                <PasswordInput type="signIn" />
             </View>
 
             {errorMessage && (
