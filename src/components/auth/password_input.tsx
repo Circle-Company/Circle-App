@@ -233,7 +233,7 @@ export default function PasswordInput({ type, onPasswordValidated }: PasswordInp
     }
 
     return (
-        <View style={styles.container}>
+        <View style={styles.container} testID="password-container">
             <Animated.View
                 style={[
                     styles.inputContainer,
@@ -256,6 +256,7 @@ export default function PasswordInput({ type, onPasswordValidated }: PasswordInp
                 </Animated.View>
 
                 <TextInput
+                    testID="password-input"
                     value={password}
                     ref={inputRef}
                     secureTextEntry={!isVisible}
@@ -279,6 +280,7 @@ export default function PasswordInput({ type, onPasswordValidated }: PasswordInp
                     {!!password && (
                         <>
                             <Pressable
+                                testID="password-toggle-clear"
                                 onPress={handleClearPressed}
                                 style={styles.closeButtonContainer}
                             >
@@ -289,6 +291,7 @@ export default function PasswordInput({ type, onPasswordValidated }: PasswordInp
                                 />
                             </Pressable>
                             <Pressable
+                                testID="password-toggle-visibility"
                                 onPress={handleVisiblePressed}
                                 style={styles.visibleButtonContainer}
                             >
