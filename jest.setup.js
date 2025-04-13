@@ -4,11 +4,6 @@ import "react-native-gesture-handler/jestSetup"
 // Mock das animações para evitar erro em transições de telas
 jest.mock("react-native/Libraries/Animated/NativeAnimatedHelper")
 
-// Mock do AsyncStorage caso esteja usando
-jest.mock("@react-native-async-storage/async-storage", () =>
-    require("@react-native-async-storage/async-storage/jest/async-storage-mock")
-)
-
 jest.mock("react-native-keyboard-controller", () => ({
     KeyboardProvider: ({ children }) => children,
 }))
