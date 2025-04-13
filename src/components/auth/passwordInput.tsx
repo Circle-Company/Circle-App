@@ -88,24 +88,21 @@ export default function PasswordInput({ type, onPasswordValidated }: PasswordInp
 
     const validatePassword = (value: string) => {
         let valid = false
-
-        if (type === "signUp") {
-            if (value.length < 6) {
-                setIsValidPassword(false)
-                setStatusMessage("The password needs at least 6 characters.")
-            } else if (value === signInputUsername) {
-                setIsValidPassword(false)
-                setStatusMessage("Password cannot be the same as username.")
-            } else {
-                valid = true
-                setIsValidPassword(true)
-                setStatusMessage("This password can be used.")
-            }
+        if (value.length < 6) {
+            setIsValidPassword(false)
+            setStatusMessage("The password needs at least 6 characters.")
+        } else if (value === signInputUsername) {
+            setIsValidPassword(false)
+            setStatusMessage("Password cannot be the same as username.")
         } else {
-            valid = value.length > 0
-            setIsValidPassword(valid)
-            setStatusMessage(valid ? "" : "")
+            valid = true
+            setIsValidPassword(true)
+            setStatusMessage("This password can be used.")
         }
+        valid = value.length > 0
+        setIsValidPassword(valid)
+        setSignInputPassword(password)
+        setStatusMessage(valid ? "" : "")
 
         // Feedback para status
         Animated.parallel([
@@ -125,13 +122,13 @@ export default function PasswordInput({ type, onPasswordValidated }: PasswordInp
         if (valid) {
             Animated.sequence([
                 Animated.timing(lockBounce, {
-                    toValue: 1.2,
-                    duration: 250,
+                    toValue: 1.1,
+                    duration: 50,
                     useNativeDriver: true,
                 }),
                 Animated.timing(lockBounce, {
                     toValue: 1,
-                    duration: 400,
+                    duration: 100,
                     useNativeDriver: true,
                 }),
             ]).start()
@@ -140,8 +137,9 @@ export default function PasswordInput({ type, onPasswordValidated }: PasswordInp
 
     const handleInputChange = (text: string) => {
         setPassword(text)
+        if (type === "signUp") validatePassword(text)
+
         setSignInputPassword(text)
-        validatePassword(text)
         setShowStatusMessage(true)
     }
 
@@ -248,10 +246,10 @@ export default function PasswordInput({ type, onPasswordValidated }: PasswordInp
                         fill={
                             password.length > 0
                                 ? ColorTheme().text.toString()
-                                : ColorTheme().backgroundDisabled
+                                : ColorTheme().textDisabled + 80
                         }
                         width={password.length > 0 ? 16 : 14}
-                        height={16}
+                        height={password.length > 0 ? 16 : 14}
                     />
                 </Animated.View>
 
@@ -271,8 +269,8 @@ export default function PasswordInput({ type, onPasswordValidated }: PasswordInp
                     numberOfLines={1}
                     maxLength={20}
                     style={styles.input}
-                    selectionColor={ColorTheme().primaryAccent}
-                    placeholder={type === "signUp" ? "Type a Password" : "Password"}
+                    selectionColor={ColorTheme().primary}
+                    placeholder={"Password"}
                     placeholderTextColor={String(ColorTheme().textDisabled + "99")}
                 />
 
@@ -295,7 +293,7 @@ export default function PasswordInput({ type, onPasswordValidated }: PasswordInp
                                 onPress={handleVisiblePressed}
                                 style={styles.visibleButtonContainer}
                             >
-                                {isVisible ? (
+                                {!isVisible ? (
                                     <Eye fill={colors.gray.grey_04} width={18} height={18} />
                                 ) : (
                                     <EyeSlash fill={colors.gray.grey_04} width={18} height={18} />
