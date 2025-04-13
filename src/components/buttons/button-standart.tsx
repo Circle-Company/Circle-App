@@ -1,11 +1,11 @@
 import React from "react"
-import { Animated, Pressable } from "react-native"
+import { Animated, Pressable, StyleProp, ViewStyle } from "react-native"
 import ColorTheme from "../../layout/constants/colors"
 import sizes from "../../layout/constants/sizes"
 
-type ButtonStandartProps = {
-    style?: any
-    testID?: any
+export interface ButtonStandartProps {
+    style?: StyleProp<ViewStyle>
+    testID?: string
     bounciness?: number
     animationScale?: number
     width?: number | string
@@ -18,7 +18,7 @@ type ButtonStandartProps = {
     vibrate?: () => void
 }
 
-export default function button_standart({
+export default function ButtonStandart({
     style,
     bounciness = 12,
     animationScale = 0.8,
@@ -27,16 +27,18 @@ export default function button_standart({
     backgroundColor = String(ColorTheme().backgroundDisabled),
     children,
     margins = true,
-    borderRadius = Number(width) / 2,
+    borderRadius = typeof width === "number" ? width / 2 : 50,
     testID,
     action,
     vibrate,
 }: ButtonStandartProps) {
-    var animatedScale = React.useRef(new Animated.Value(1)).current
+    const animatedScale = React.useRef(new Animated.Value(1)).current
+
     React.useEffect(() => {
         animatedScale.setValue(1)
-    }, [])
-    const HandleButtonAnimation = () => {
+    }, [animatedScale])
+
+    const handleButtonAnimation = () => {
         Animated.spring(animatedScale, {
             toValue: 1,
             bounciness: bounciness,
@@ -45,7 +47,7 @@ export default function button_standart({
         }).start()
     }
 
-    const HandlePressIn = () => {
+    const handlePressIn = () => {
         Animated.spring(animatedScale, {
             toValue: animationScale,
             bounciness: bounciness,
@@ -54,7 +56,7 @@ export default function button_standart({
         }).start()
     }
 
-    const container: any = {
+    const container: StyleProp<ViewStyle> = {
         flexDirection: "row",
         alignItems: "center",
         justifyContent: "center",
@@ -63,22 +65,24 @@ export default function button_standart({
         width: width,
         height: height,
         borderRadius: borderRadius,
+        // @ts-ignore
         ...style,
     }
 
     async function onPress() {
-        HandleButtonAnimation
+        handleButtonAnimation()
         if (vibrate) vibrate()
         action()
     }
+
     return (
         <Animated.View style={{ transform: [{ scale: animatedScale }] }}>
             <Pressable
-                style={container}
-                onPressIn={HandlePressIn}
-                onPressOut={HandleButtonAnimation}
-                onPress={onPress}
                 testID={testID}
+                style={container}
+                onPressIn={handlePressIn}
+                onPressOut={handleButtonAnimation}
+                onPress={onPress}
             >
                 {children}
             </Pressable>
