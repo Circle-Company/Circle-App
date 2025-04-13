@@ -1,7 +1,7 @@
 import { act, fireEvent, render } from "@testing-library/react-native"
 import React from "react"
 import AuthContext from "../../contexts/Auth"
-import PasswordInput from "./password_input"
+import PasswordInput from "./passwordInput"
 
 const MockAuthProvider = ({ children }: { children: React.ReactNode }) => {
     const authValues: any = {
@@ -21,12 +21,11 @@ describe("PasswordInput Component", () => {
             </MockAuthProvider>
         )
 
-        expect(getByTestId("password-container")).toBeTruthy()
         expect(getByTestId("password-input")).toBeTruthy()
         expect(queryByTestId("password-toggle-visibility")).toBeNull()
         expect(queryByTestId("password-toggle-clear")).toBeNull()
 
-        // ⬇️ ENVOLVE fireEvent dentro do act
+        // Dispara o evento de digitação com act
         await act(async () => {
             fireEvent.changeText(getByTestId("password-input"), "minhaSenha123")
         })

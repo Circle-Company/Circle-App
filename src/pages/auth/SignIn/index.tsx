@@ -1,6 +1,6 @@
 import Icon from "@/assets/icons/svgs/arrow_circle_right.svg"
 import { Text, View } from "@/components/Themed"
-import PasswordInput from "@/components/auth/password_input"
+import PasswordInput from "@/components/auth/passwordInput"
 import AuthTermsText from "@/components/auth/terms"
 import UsernameInputSignIn from "@/components/auth/username_input-sign_in"
 import ButtonStandart from "@/components/buttons/button-standart"
