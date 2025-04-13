@@ -1,7 +1,7 @@
 import ButtonClose from "@/components/buttons/close"
 import { Loading } from "@/components/loading"
 import React from "react"
-import { StatusBar, useColorScheme } from "react-native"
+import { StatusBar, StyleProp, TextStyle, ViewStyle, useColorScheme } from "react-native"
 import Icon from "../../../assets/icons/svgs/plus_circle.svg"
 import { Text, View } from "../../../components/Themed"
 import PasswordInput from "../../../components/auth/passwordInput"
@@ -17,12 +17,12 @@ export default function PasswordScreen() {
     const { signUp, setErrorMessage, signInputPassword, errorMessage, loading } =
         React.useContext(AuthContext)
 
-    const container = {
+    const container: StyleProp<ViewStyle> = {
         flex: 1,
         alignItems: "center",
     }
 
-    const headerContainer = {
+    const headerContainer: StyleProp<ViewStyle> = {
         width: sizes.screens.width,
         height: sizes.headers.height,
         flexDirection: "row",
@@ -31,24 +31,24 @@ export default function PasswordScreen() {
         alignItems: "center",
         marginBottom: sizes.margins["1xl"] * 0.8,
     }
-    const headerTitle = {
+    const headerTitle: StyleProp<TextStyle> = {
         fontSize: fonts.size.title2,
         fontFamily: fonts.family.Bold,
     }
 
-    const input_container = {
+    const input_container: StyleProp<ViewStyle> = {
         alignItems: "center",
         paddingBottom: sizes.paddings["1xl"] * 0.8,
     }
 
-    const description = {
+    const description: StyleProp<TextStyle> = {
         fontSize: fonts.size.body,
         fontFamily: fonts.family.Medium,
         color: ColorTheme().text,
         marginBottom: sizes.margins["1md"],
     }
 
-    const button_text = {
+    const button_text: StyleProp<TextStyle> = {
         fontSize: fonts.size.body * 0.9,
         fontFamily: fonts.family.Semibold,
         color:
@@ -59,17 +59,17 @@ export default function PasswordScreen() {
                   : colors.gray.grey_04 + "90",
     }
 
-    const icon = {
+    const icon: StyleProp<ViewStyle> = {
         marginLeft: sizes.margins["2sm"],
         top: 0.4,
     }
 
-    const errorContainer: any = {
+    const errorContainer: StyleProp<ViewStyle> = {
         marginTop: -sizes.margins["2sm"],
         marginBottom: sizes.margins["1md"],
     }
 
-    const errorText: any = {
+    const errorText: StyleProp<TextStyle> = {
         fontSize: fonts.size.body * 0.9,
         fontFamily: fonts.family.Medium,
         color: isDarkMode ? colors.red.red_05 : colors.red.red_05,
@@ -107,6 +107,7 @@ export default function PasswordScreen() {
                 </View>
             )}
             <ButtonStandart
+                testID="handle-submit"
                 margins={false}
                 width={sizes.buttons.width / 2.05}
                 height={40}
