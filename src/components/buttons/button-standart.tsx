@@ -5,6 +5,7 @@ import sizes from "../../layout/constants/sizes"
 
 type ButtonStandartProps = {
     style?: any
+    testID?: any
     bounciness?: number
     animationScale?: number
     width?: number | string
@@ -27,6 +28,7 @@ export default function button_standart({
     children,
     margins = true,
     borderRadius = Number(width) / 2,
+    testID,
     action,
     vibrate,
 }: ButtonStandartProps) {
@@ -76,6 +78,7 @@ export default function button_standart({
                 onPressIn={HandlePressIn}
                 onPressOut={HandleButtonAnimation}
                 onPress={onPress}
+                testID={testID}
             >
                 {children}
             </Pressable>
