@@ -17,11 +17,6 @@ export default function UsernameScreen() {
         React.useContext(AuthContext)
     const navigation: any = useNavigation()
 
-    React.useEffect(() => {
-        setSignInputPassword("")
-        setSignInputUsername("")
-    }, [])
-
     const container: any = {
         flex: 1,
         alignItems: "center",
@@ -74,26 +69,29 @@ export default function UsernameScreen() {
     }
 
     React.useEffect(() => {
+        setSignInputUsername("")
+        setSignInputPassword("")
         setErrorMessage("")
     }, [])
 
     return (
         <View style={container}>
             <StatusBar backgroundColor={colors.gray.black} barStyle={"light-content"} />
-            <View style={headerContainer}>
+            <View style={headerContainer} testID="header-container">
                 <ButtonClose />
                 <View style={{ flex: 1, marginLeft: sizes.margins["2sm"] }}>
-                    <Text style={headerTitle} testID="title">
+                    <Text style={headerTitle} testID="header-title">
                         Sign Up
                     </Text>
                 </View>
             </View>
 
-            <View style={input_container}>
+            <View style={input_container} testID="input-container">
                 <Text style={description}>You can't change it later.</Text>
                 <UsernameInput type="signUp" />
             </View>
             <ButtonStandart
+                testID="handle-submit"
                 margins={false}
                 width={sizes.buttons.width / 2.8}
                 height={40}
