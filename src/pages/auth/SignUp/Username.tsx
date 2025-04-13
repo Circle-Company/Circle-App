@@ -3,7 +3,7 @@ import React from "react"
 import { StatusBar, useColorScheme } from "react-native"
 import NextIcon from "../../../assets/icons/svgs/arrow_circle_right.svg"
 import { Text, View } from "../../../components/Themed"
-import UsernameInput from "../../../components/auth/username_input"
+import UsernameInput from "../../../components/auth/usernameInput"
 import ButtonStandart from "../../../components/buttons/button-standart"
 import AuthContext from "../../../contexts/Auth"
 import ColorTheme, { colors } from "../../../layout/constants/colors"
@@ -66,7 +66,7 @@ export default function UsernameScreen() {
             />
             <View style={input_container}>
                 <Text style={description}>You can't change it later.</Text>
-                <UsernameInput />
+                <UsernameInput type="signUp" />
             </View>
             <ButtonStandart
                 margins={false}
