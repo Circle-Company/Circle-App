@@ -20,6 +20,7 @@ module.exports = {
         "\\.svg$": "<rootDir>/__mocks__/svgMock.js",
         "^@/(.*)$": "<rootDir>/src/$1",
     },
+    reporters: ["jest-silent-reporter"],
     collectCoverage: false,
     collectCoverageFrom: ["src/**/*.{ts,tsx}"],
     coverageDirectory: "coverage",
