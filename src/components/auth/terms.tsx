@@ -32,6 +32,7 @@ export default function AuthTermsText({ signText }: Props) {
             </Text>
             <Text style={{}}>
                 <TouchableOpacity
+                    testID="handle-privacy-policy"
                     onPress={() => {
                         navigation.navigate("Auth-Privacy-Policy")
                     }}
@@ -40,6 +41,7 @@ export default function AuthTermsText({ signText }: Props) {
                 </TouchableOpacity>
                 <Text style={[termsText, { paddingTop: 0 }]}>, </Text>
                 <TouchableOpacity
+                    testID="handle-terms-of-service"
                     onPress={() => {
                         navigation.navigate("Auth-Terms-Of-Service")
                     }}
@@ -48,6 +50,7 @@ export default function AuthTermsText({ signText }: Props) {
                 </TouchableOpacity>
                 <Text style={[termsText, { paddingTop: 0 }]}> and </Text>
                 <TouchableOpacity
+                    testID="handle-community-guidelines"
                     onPress={() => {
                         navigation.navigate("Auth-Community-Guidelines")
                     }}
