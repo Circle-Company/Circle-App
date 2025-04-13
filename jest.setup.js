@@ -19,3 +19,8 @@ jest.mock("react-native-reanimated", () => {
     Reanimated.default.call = () => {}
     return Reanimated
 })
+
+module.exports = async () => {
+    jest.useRealTimers()
+    jest.clearAllTimers()
+}
