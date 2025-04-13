@@ -11,19 +11,32 @@ import ColorTheme, { colors } from "@/layout/constants/colors"
 import fonts from "@/layout/constants/fonts"
 import sizes from "@/layout/constants/sizes"
 import React from "react"
-import { StatusBar, useColorScheme } from "react-native"
+import { StatusBar, StyleProp, TextStyle, ViewStyle, useColorScheme } from "react-native"
 
 export default function SignInScreen() {
     const isDarkMode = useColorScheme() === "dark"
-    const { signIn, setErrorMessage, signInputUsername, signInputPassword, loading, errorMessage } =
-        React.useContext(AuthContext)
+    const {
+        signIn,
+        setErrorMessage,
+        signInputUsername,
+        signInputPassword,
+        loading,
+        errorMessage,
+        setSignInputPassword,
+        setSignInputUsername,
+    } = React.useContext(AuthContext)
 
-    const container = {
+    React.useEffect(() => {
+        setSignInputPassword("")
+        setSignInputUsername("")
+    }, [])
+
+    const container: StyleProp<ViewStyle> = {
         flex: 1,
         alignItems: "center",
     }
 
-    const headerContainer = {
+    const headerContainer: StyleProp<ViewStyle> = {
         width: sizes.screens.width,
         height: sizes.headers.height,
         flexDirection: "row",
@@ -32,11 +45,11 @@ export default function SignInScreen() {
         alignItems: "center",
         marginBottom: sizes.margins["1xl"] * 0.8,
     }
-    const headerTitle = {
+    const headerTitle: StyleProp<TextStyle> = {
         fontSize: fonts.size.title2,
         fontFamily: fonts.family.Bold,
     }
-    const input_container = {
+    const input_container: StyleProp<ViewStyle> = {
         alignItems: "center",
         paddingBottom: sizes.paddings["1xl"] * 0.8,
     }
@@ -79,23 +92,28 @@ export default function SignInScreen() {
             <View style={headerContainer}>
                 <ButtonClose />
                 <View style={{ flex: 1, marginLeft: sizes.margins["2sm"] }}>
-                    <Text style={headerTitle}>Sign In</Text>
+                    <Text style={headerTitle} testID="title">
+                        Sign In
+                    </Text>
                 </View>
             </View>
 
-            <View style={input_container}>
+            <View style={input_container} testID="inputs-container">
                 <View style={{ marginBottom: sizes.margins["1md"] }}>
-                    <UsernameInputSignIn />
+                    <UsernameInput type="signIn" />
                 </View>
                 <PasswordInput type="signIn" />
             </View>
 
             {errorMessage && (
-                <View style={errorContainer}>
-                    <Text style={errorText}>Error: {errorMessage}</Text>
+                <View testID="error-container" style={errorContainer}>
+                    <Text testID="error-message" style={errorText}>
+                        Error: {errorMessage}
+                    </Text>
                 </View>
             )}
             <ButtonStandart
+                testID="handle-submit"
                 margins={false}
                 width={sizes.buttons.width / 2.7}
                 height={40}
@@ -108,6 +126,7 @@ export default function SignInScreen() {
             >
                 {loading ? (
                     <View
+                        testID="handle-submit-loading"
                         style={{
                             flexDirection: "row",
                             alignItems: "center",
@@ -119,7 +138,9 @@ export default function SignInScreen() {
                     </View>
                 ) : (
                     <>
-                        <Text style={button_text}>Enter Now</Text>
+                        <Text style={button_text} testID="handle-submit-text">
+                            Enter Now
+                        </Text>
                         <Icon
                             style={icon}
                             fill={String(
@@ -136,7 +157,7 @@ export default function SignInScreen() {
                 )}
             </ButtonStandart>
 
-            <View style={{ marginTop: sizes.margins["1xl"] }}>
+            <View testID="auth-terms" style={{ marginTop: sizes.margins["1xl"] }}>
                 <AuthTermsText signText="Enter Now" />
             </View>
         </View>
