@@ -9,7 +9,7 @@ export function Interpolation({
     layouts: { screen },
     insets,
 }: StackCardInterpolationProps): StackCardInterpolatedStyle {
-    const topOffset = screen.height / 3.5
+    const topOffset = 20
     const statusBarHeight = insets.top
     const aspectRatio = screen.height / screen.width
 

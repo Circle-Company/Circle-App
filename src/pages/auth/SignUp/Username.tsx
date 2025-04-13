@@ -1,3 +1,4 @@
+import ButtonClose from "@/components/buttons/close"
 import { useNavigation } from "@react-navigation/native"
 import React from "react"
 import { StatusBar, useColorScheme } from "react-native"
@@ -12,28 +13,46 @@ import sizes from "../../../layout/constants/sizes"
 
 export default function UsernameScreen() {
     const isDarkMode = useColorScheme() === "dark"
-    const { signInputUsername, setErrorMessage } = React.useContext(AuthContext)
+    const { signInputUsername, setErrorMessage, setSignInputPassword, setSignInputUsername } =
+        React.useContext(AuthContext)
     const navigation: any = useNavigation()
 
-    const container = {
+    React.useEffect(() => {
+        setSignInputPassword("")
+        setSignInputUsername("")
+    }, [])
+
+    const container: any = {
         flex: 1,
         alignItems: "center",
     }
-
-    const input_container = {
+    const headerContainer: any = {
+        width: sizes.screens.width,
+        height: sizes.headers.height,
+        flexDirection: "row",
+        paddingHorizontal: sizes.paddings["1md"],
+        justifyContent: "flex-start",
         alignItems: "center",
-        paddingTop: sizes.paddings["1xxl"] * 0.6,
+        marginBottom: sizes.margins["1xl"] * 0.8,
+    }
+    const headerTitle: any = {
+        fontSize: fonts.size.title2,
+        fontFamily: fonts.family.Bold,
+    }
+
+    const input_container: any = {
+        alignItems: "center",
         paddingBottom: sizes.paddings["1xl"] * 0.8,
     }
 
-    const description = {
+    const description: any = {
         fontSize: fonts.size.body,
         fontFamily: fonts.family.Medium,
         color: ColorTheme().text,
         marginBottom: sizes.margins["1md"],
     }
 
-    const button_text = {
+    const button_text: any = {
         fontSize: fonts.size.body * 0.9,
         fontFamily: fonts.family.Semibold,
         color: signInputUsername
@@ -60,10 +79,16 @@ export default function UsernameScreen() {
 
     return (
         <View style={container}>
-            <StatusBar
-                backgroundColor={String(ColorTheme().background)}
-                barStyle={isDarkMode ? "light-content" : "dark-content"}
-            />
+            <StatusBar backgroundColor={colors.gray.black} barStyle={"light-content"} />
+            <View style={headerContainer}>
+                <ButtonClose />
+                <View style={{ flex: 1, marginLeft: sizes.margins["2sm"] }}>
+                    <Text style={headerTitle} testID="title">
+                        Sign Up
+                    </Text>
+                </View>
+            </View>
+
             <View style={input_container}>
                 <Text style={description}>You can't change it later.</Text>
                 <UsernameInput type="signUp" />

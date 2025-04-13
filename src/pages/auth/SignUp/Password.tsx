@@ -1,9 +1,10 @@
+import ButtonClose from "@/components/buttons/close"
 import { Loading } from "@/components/loading"
 import React from "react"
 import { StatusBar, useColorScheme } from "react-native"
 import Icon from "../../../assets/icons/svgs/plus_circle.svg"
 import { Text, View } from "../../../components/Themed"
-import PasswordInput from "../../../components/auth/password_input"
+import PasswordInput from "../../../components/auth/passwordInput"
 import AuthTermsText from "../../../components/auth/terms"
 import ButtonStandart from "../../../components/buttons/button-standart"
 import AuthContext from "../../../contexts/Auth"
@@ -21,9 +22,22 @@ export default function PasswordScreen() {
         alignItems: "center",
     }
 
+    const headerContainer = {
+        width: sizes.screens.width,
+        height: sizes.headers.height,
+        flexDirection: "row",
+        paddingHorizontal: sizes.paddings["1md"],
+        justifyContent: "flex-start",
+        alignItems: "center",
+        marginBottom: sizes.margins["1xl"] * 0.8,
+    }
+    const headerTitle = {
+        fontSize: fonts.size.title2,
+        fontFamily: fonts.family.Bold,
+    }
+
     const input_container = {
         alignItems: "center",
-        paddingTop: sizes.paddings["1xxl"] * 0.6,
         paddingBottom: sizes.paddings["1xl"] * 0.8,
     }
 
@@ -73,13 +87,19 @@ export default function PasswordScreen() {
 
     return (
         <View style={container}>
-            <StatusBar
-                backgroundColor={String(ColorTheme().background)}
-                barStyle={isDarkMode ? "light-content" : "dark-content"}
-            />
+            <StatusBar backgroundColor={colors.gray.black} barStyle={"light-content"} />
+            <View style={headerContainer}>
+                <ButtonClose />
+                <View style={{ flex: 1, marginLeft: sizes.margins["2sm"] }}>
+                    <Text style={headerTitle} testID="title">
+                        Sign Up
+                    </Text>
+                </View>
+            </View>
+
             <View style={input_container}>
                 <Text style={description}>You can't get it back if you forget it.</Text>
-                <PasswordInput />
+                <PasswordInput type="signUp" />
             </View>
             {errorMessage && (
                 <View style={errorContainer}>
