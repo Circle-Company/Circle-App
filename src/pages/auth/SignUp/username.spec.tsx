@@ -1,23 +1,24 @@
 // Filename: UsernameScreen.spec.tsx
 
-import AuthContext from "@/contexts/Auth"
+import AuthContext, { AuthContextsData } from "@/contexts/Auth"
 import { useNavigation } from "@react-navigation/native"
-import { fireEvent, render } from "@testing-library/react-native"
+import { act, fireEvent, render } from "@testing-library/react-native"
 import React from "react"
 import UsernameScreen from "./Username"
+
 const mockedColorScheme = jest.fn()
+const mockedNavigate = jest.fn()
 
 jest.mock("@react-navigation/native", () => ({
     useNavigation: jest.fn(),
 }))
 
-// Mock de useColorScheme
 jest.mock("react-native/Libraries/Utilities/useColorScheme", () => ({
     ...jest.requireActual("react-native/Libraries/Utilities/useColorScheme"),
-    useColorScheme: mockedColorScheme,
+    default: mockedColorScheme,
 }))
-// Mock do contexto de autenticação
-const mockAuthContext = (overrides = {}) => ({
+
+const mockAuthContext = (overrides = {}): Partial<AuthContextsData> => ({
     signIn: jest.fn(),
     setSignInputUsername: jest.fn(),
     setSignInputPassword: jest.fn(),
@@ -30,7 +31,7 @@ const mockAuthContext = (overrides = {}) => ({
 })
 
 const renderWithProvider = (contextOverrides = {}) => {
-    const contextValue: any = mockAuthContext(contextOverrides)
+    const contextValue = mockAuthContext(contextOverrides) as AuthContextsData
 
     const utils = render(
         <AuthContext.Provider value={contextValue}>
@@ -42,40 +43,61 @@ const renderWithProvider = (contextOverrides = {}) => {
 }
 
 describe("UsernameScreen", () => {
-    mockedColorScheme.mockImplementationOnce(() => "dark")
-    const navigateMock = jest.fn()
-
-    beforeEach(() => {
-        jest.clearAllMocks()
-        ;(useNavigation as jest.Mock).mockReturnValue({ navigate: navigateMock })
+    beforeAll(() => {
+        jest.useFakeTimers()
     })
 
-    it("renderiza os principais elementos da tela", () => {
+    beforeEach(() => {
+        mockedColorScheme.mockImplementation(() => "dark")
+        ;(useNavigation as jest.Mock).mockReturnValue({ navigate: mockedNavigate })
+    })
+
+    afterEach(() => {
+        jest.clearAllMocks()
+        jest.clearAllTimers()
+        jest.runOnlyPendingTimers()
+    })
+
+    afterAll(() => {
+        jest.useRealTimers()
+    })
+
+    it("renderiza os principais elementos da tela", async () => {
         const { getByTestId } = renderWithProvider()
+
+        await act(async () => {
+            jest.runAllTimers()
+        })
 
         expect(getByTestId("header-container")).toBeTruthy()
         expect(getByTestId("header-title")).toBeTruthy()
         expect(getByTestId("input-container")).toBeTruthy()
     })
 
-    it("não navega se o username estiver vazio", () => {
+    it("não navega se o username estiver vazio", async () => {
         const { getByTestId } = renderWithProvider({
             signInputUsername: "",
         })
 
-        fireEvent.press(getByTestId("handle-submit"))
+        await act(async () => {
+            fireEvent.press(getByTestId("handle-submit"))
+            jest.runAllTimers()
+        })
 
-        expect(navigateMock).not.toHaveBeenCalled()
+        expect(mockedNavigate).not.toHaveBeenCalled()
     })
 
-    it("navega se o username estiver preenchido e loading for falso", () => {
+    it("navega se o username estiver preenchido e loading for falso", async () => {
         const { getByTestId } = renderWithProvider({
             signInputUsername: "usuario_teste",
             loading: false,
         })
 
-        fireEvent.press(getByTestId("handle-submit"))
+        await act(async () => {
+            fireEvent.press(getByTestId("handle-submit"))
+            jest.runAllTimers()
+        })
 
-        expect(navigateMock).toHaveBeenCalledWith("Auth-SignUp-Password")
+        expect(mockedNavigate).toHaveBeenCalledWith("Auth-SignUp-Password")
     })
 })

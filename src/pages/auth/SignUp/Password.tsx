@@ -98,7 +98,7 @@ export default function PasswordScreen() {
             </View>
 
             <View style={input_container}>
-                <Text style={description}>You can't get it back if you forget it.</Text>
+                <Text style={description}>You can&apos;t get it back if you forget it.</Text>
                 <PasswordInput type="signUp" />
             </View>
             {errorMessage && (
