@@ -1,3 +1,4 @@
+/* global jest */
 import "@testing-library/jest-native/extend-expect"
 import "react-native-gesture-handler/jestSetup"
 
@@ -12,13 +13,6 @@ jest.mock("react-native-keyboard-controller", () => ({
 jest.mock("@react-navigation/native", () => ({
     useNavigation: () => ({ navigate: jest.fn() }),
 }))
-
-// Mock do Reanimated (usado por algumas bibliotecas como Gesture Handler)
-jest.mock("react-native-reanimated", () => {
-    const Reanimated = require("react-native-reanimated/mock")
-    Reanimated.default.call = () => {}
-    return Reanimated
-})
 
 module.exports = async () => {
     jest.useRealTimers()
