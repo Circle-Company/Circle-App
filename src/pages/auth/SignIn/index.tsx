@@ -68,12 +68,12 @@ export default function SignInScreen() {
         top: 0.4,
     }
 
-    const errorContainer: any = {
+    const errorContainer: StyleProp<ViewStyle> = {
         marginTop: -sizes.margins["2sm"],
         marginBottom: sizes.margins["1md"],
     }
 
-    const errorText: any = {
+    const errorText: StyleProp<TextStyle> = {
         fontSize: fonts.size.body * 0.9,
         fontFamily: fonts.family.Medium,
         color: isDarkMode ? colors.red.red_05 : colors.red.red_05,
