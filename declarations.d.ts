@@ -5,6 +5,16 @@ declare module "*.svg" {
     export default content
 }
 
+declare module "@env" {
+    export const API_VERSION: string
+    export const APP_VERSION: string
+    export const DEBUG: string
+    export const LOG_DEBUG: string
+    export const LOG_LEVEL: string
+    export const MIXPANEL_KEY: string
+    export const NODE_ENV: "development" | "production" | "test"
+}
+
 declare module "react-native-haptic-feedback" {
     export interface HapticOptions {
         enableVibrateFallback?: boolean

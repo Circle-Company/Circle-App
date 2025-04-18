@@ -2,7 +2,6 @@ import LanguageContext from "@/contexts/Preferences/language"
 import { createStackNavigator } from "@react-navigation/stack"
 import React from "react"
 import ColorTheme from "../../layout/constants/colors"
-import fonts from "../../layout/constants/fonts"
 import sizes from "../../layout/constants/sizes"
 import SettingsCommunityGuidelines from "../../pages/app/Settings/CommunityGuidelines"
 import SettingsPrivacyPolicy from "../../pages/app/Settings/PrivacyPolicy"
@@ -11,7 +10,7 @@ import LoginScreen from "../../pages/auth/SignIn"
 import PasswordScreen from "../../pages/auth/SignUp/Password"
 import UsernameScreen from "../../pages/auth/SignUp/Username"
 import InitScreen from "../../pages/auth/Splash"
-import { Interpolation as Horizontal } from "../transitions/horizontal-right"
+import { Interpolation as ModalPresentation } from "../transitions/modal-presentation"
 
 const AuthStack = createStackNavigator()
 export default function AuthNavigator() {
@@ -24,68 +23,49 @@ export default function AuthNavigator() {
 
     const CardStyle = {
         backgroundColor: String(ColorTheme().background),
-        paddingTop: sizes.paddings["1lg"],
+        paddingTop: sizes.paddings["1sm"],
     }
     return (
         <AuthStack.Navigator
             initialRouteName={"Init"}
-            screenOptions={{ cardStyleInterpolator: Horizontal }}
+            screenOptions={{
+                presentation: "transparentModal", // <- IMPORTANTE
+                cardOverlayEnabled: true,
+            }}
         >
             <AuthStack.Screen name="Init" component={InitScreen} options={{ headerShown: false }} />
             <AuthStack.Screen
                 name="Auth-SignIn"
                 component={LoginScreen}
                 options={{
-                    headerTitle: "Wellcome Back",
-                    headerTitleAlign: "center",
-                    headerTransparent: false,
-                    headerTitleStyle: {
-                        fontFamily: fonts.family["Black-Italic"],
-                        fontSize: fonts.size.title2,
-                    },
-                    headerTintColor: String(ColorTheme().text),
-                    headerStyle: HeaderStyle,
+                    headerShown: false,
                     cardStyle: CardStyle,
                     cardOverlayEnabled: true,
                     headerRight: () => null,
                     headerLeft: () => null,
+                    cardStyleInterpolator: ModalPresentation,
                 }}
             />
             <AuthStack.Screen
                 name="Auth-SignUp-Username"
                 component={UsernameScreen}
                 options={{
-                    headerTitle: "Chose a Username",
-                    headerTitleAlign: "center",
-                    headerTransparent: false,
-                    headerTitleStyle: {
-                        fontFamily: fonts.family["Bold-Italic"],
-                        fontSize: fonts.size.title2,
-                    },
-                    headerTintColor: String(ColorTheme().text),
-                    headerStyle: HeaderStyle,
+                    headerShown: false,
                     cardStyle: CardStyle,
                     headerRight: () => null,
                     headerLeft: () => null,
+                    cardStyleInterpolator: ModalPresentation,
                 }}
             />
             <AuthStack.Screen
                 name="Auth-SignUp-Password"
                 component={PasswordScreen}
                 options={{
-                    headerTitle: "Create a Password",
-                    headerTitleAlign: "center",
-                    headerTransparent: false,
-                    headerTitleStyle: {
-                        fontFamily: fonts.family["Bold-Italic"],
-                        fontSize: fonts.size.title2,
-                    },
-                    headerTintColor: String(ColorTheme().text),
-                    headerStyle: HeaderStyle,
+                    headerShown: false,
                     cardStyle: CardStyle,
-                    cardOverlayEnabled: true,
                     headerRight: () => null,
                     headerLeft: () => null,
+                    cardStyleInterpolator: ModalPresentation,
                 }}
             />
             <AuthStack.Screen
@@ -95,8 +75,9 @@ export default function AuthNavigator() {
                     headerTitle: t("Privacy Policy"),
                     headerStyle: HeaderStyle,
                     headerTintColor: String(ColorTheme().text),
-                    cardStyle: { backgroundColor: String(ColorTheme().background) },
+                    cardStyle: CardStyle,
                     cardOverlayEnabled: true,
+                    cardStyleInterpolator: ModalPresentation,
                 }}
             />
             <AuthStack.Screen
@@ -106,8 +87,9 @@ export default function AuthNavigator() {
                     headerTitle: t("Terms of Service"),
                     headerStyle: HeaderStyle,
                     headerTintColor: String(ColorTheme().text),
-                    cardStyle: { backgroundColor: String(ColorTheme().background) },
+                    cardStyle: CardStyle,
                     cardOverlayEnabled: true,
+                    cardStyleInterpolator: ModalPresentation,
                 }}
             />
             <AuthStack.Screen
@@ -117,8 +99,9 @@ export default function AuthNavigator() {
                     headerTitle: t("Community Guidelines"),
                     headerStyle: HeaderStyle,
                     headerTintColor: String(ColorTheme().text),
-                    cardStyle: { backgroundColor: String(ColorTheme().background) },
+                    cardStyle: CardStyle,
                     cardOverlayEnabled: true,
+                    cardStyleInterpolator: ModalPresentation,
                 }}
             />
         </AuthStack.Navigator>

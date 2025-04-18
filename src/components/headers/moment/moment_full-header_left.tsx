@@ -1,23 +1,23 @@
-import React from 'react'
-import { View } from 'react-native'
-import ColorTheme from '../../../layout/constants/colors'
-import {useNavigation} from '@react-navigation/native'
-import HeaderButton from '../headerButton'
-import More from '../../../assets/icons/svgs/arrow_left.svg'
+import { useNavigation } from "@react-navigation/native"
+import React from "react"
+import { View } from "react-native"
+import More from "../../../assets/icons/svgs/arrow_left.svg"
+import ColorTheme from "../../../layout/constants/colors"
+import HeaderButton from "../headerButton"
 
 export default function MomentFullHeaderLeft() {
     const navigation = useNavigation()
 
     const container: any = {
-        flexDirection: 'row',
-        alignItems: 'center'
+        flexDirection: "row",
+        alignItems: "center",
     }
 
-    return(
+    return (
         <View style={container}>
-            <HeaderButton action={() => navigation.goBack()} marginLeft>
-                <More fill={String(ColorTheme().text)} width={18} height={18}/>
-            </HeaderButton>                
+            <HeaderButton action={() => navigation.goBack()} marginLeft square>
+                <More fill={String(ColorTheme().text)} width={18} height={18} />
+            </HeaderButton>
         </View>
     )
 }

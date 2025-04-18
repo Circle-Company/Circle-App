@@ -1,7 +1,7 @@
 import { Skeleton } from "@/components/skeleton"
 import { useNavigation } from "@react-navigation/native"
 import React from "react"
-import { View } from "react-native"
+import { View, ViewStyle } from "react-native"
 import More from "../../../assets/icons/svgs/arrow_left.svg"
 import ViewProfileContext from "../../../contexts/viewProfile"
 import ColorTheme from "../../../layout/constants/colors"
@@ -21,13 +21,13 @@ export default function ProfileHeaderLeft() {
     }, [])
     const navigation = useNavigation()
 
-    const container: any = {
+    const container: ViewStyle = {
         flexDirection: "row",
     }
 
     return (
         <View style={container}>
-            <HeaderButton action={() => navigation.goBack()} marginLeft>
+            <HeaderButton action={() => navigation.goBack()} marginLeft square>
                 <More fill={String(ColorTheme().text)} width={18} height={18} />
             </HeaderButton>
             <View style={{ marginLeft: sizes.margins["2sm"] }}>
