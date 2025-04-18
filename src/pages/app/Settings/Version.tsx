@@ -52,7 +52,7 @@ export default function VersionScreen() {
     const data = [
         {
             title: config.APPLICATION_NAME + ` (${t("Release")})`,
-            version: config.APP_VERSION + "-" + t("beta"),
+            version: config.APP_VERSION,
         },
     ]
 

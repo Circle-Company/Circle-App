@@ -1,65 +1,63 @@
-import React from 'react'
-import { Pressable, View, Text, Animated} from 'react-native'
-import ColorTheme from '../../layout/constants/colors'
-import {useNavigation} from '@react-navigation/native'
-import Camera from '../../../assets/icons/svgs/camera.svg'
-import sizes from '../../layout/constants/sizes'
-import fonts from '../../layout/constants/fonts'
+import React from "react"
+import { Animated, Pressable } from "react-native"
+import ColorTheme from "../../layout/constants/colors"
+import sizes from "../../layout/constants/sizes"
 
 type HeaderButtonProps = {
-    width?: number,
-    height?: number,
-    marginRight?: boolean,
-    marginLeft?: boolean,
-    color?: string,
-    children: React.ReactNode,
+    height?: number
+    square?: boolean
+    marginRight?: boolean
+    marginLeft?: boolean
+    color?: string
+    children: React.ReactNode
     action(): void
 }
 
 export default function HeaderButton({
-    width = sizes.buttons.height*0.5,
-    height = sizes.buttons.height*0.5,
+    height = sizes.buttons.height * 0.5,
+    square = false,
     marginRight = false,
     marginLeft = false,
     color = String(ColorTheme().backgroundDisabled),
     children,
-    action
+    action,
 }: HeaderButtonProps) {
-
-    var animatedScale = React.useRef(new Animated.Value(1)).current
-    React.useEffect(() => { animatedScale.setValue(1) }, [])
+    const animatedScale = React.useRef(new Animated.Value(1)).current
+    React.useEffect(() => {
+        animatedScale.setValue(1)
+    }, [])
     const HandleButtonAnimation = () => {
         animatedScale.setValue(0.8)
         Animated.spring(animatedScale, {
             toValue: 1,
             bounciness: 12,
             speed: 10,
-            useNativeDriver: true
+            useNativeDriver: true,
         }).start()
     }
 
     const container: any = {
-        flexDirection: 'row',
-        alignItems: 'center',
-        justifyContent: 'center',
+        width: square ? height : "auto",
+        flexDirection: "row",
+        alignItems: "center",
+        justifyContent: "center",
         backgroundColor: color,
-        marginLeft: marginLeft? sizes.margins['3sm']: 0,
-        marginRight: marginRight? sizes.margins['3sm']: 0,
-        width: width,
+        marginLeft: marginLeft ? sizes.margins["3sm"] : 0,
+        marginRight: marginRight ? sizes.margins["3sm"] : 0,
         height: height,
-        borderRadius: (width)/2
+        borderRadius: height / 2,
+        paddingHorizontal: sizes.paddings["2sm"],
     }
 
     async function onPress() {
         action()
         HandleButtonAnimation()
-        
     }
-    return(
-        <Animated.View style={{transform: [{ scale: animatedScale }] }}>
+    return (
+        <Animated.View style={{ transform: [{ scale: animatedScale }] }}>
             <Pressable style={container} onPress={onPress}>
                 {children}
             </Pressable>
-        </Animated.View>  
+        </Animated.View>
     )
 }
