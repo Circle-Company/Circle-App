@@ -199,8 +199,11 @@
 
     "You can't get it back if you forget it.": "You can't get it back if you forget it.",
 
-    "We don't have any Moment to show": "We don't have any Moment to show",
+    "We don't have any Moment to show": "No moments to display right now",
     "Share a Moment": "Share a Moment",
+    "Reload Feed": "Reload Feed",
+    "Capture Your Day": "Capture Your Day",
+    "No recommendations available right now. Why not share a special moment from your day instead?": "No recommendations available right now. Why not share a special moment from your day instead?",
 
     "Like on Moment": "Like on Moment",
     "Memory Creation": "Memory Creation",
