@@ -91,7 +91,7 @@ export function EmptyList() {
         paddingVertical: sizes.paddings["2md"],
         marginBottom: sizes.margins["1md"],
         width: sizes.screens.width - sizes.paddings["2sm"] * 2,
-        backgroundColor: isDarkMode ? colors.gray.grey_08 : colors.gray.grey_02,
+        backgroundColor: isDarkMode ? colors.gray.grey_09 : colors.gray.grey_01,
     }
 
     const illustrationContainerStyle: ViewStyle = {
