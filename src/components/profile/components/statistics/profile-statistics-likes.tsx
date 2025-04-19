@@ -1,6 +1,6 @@
 import { truncated } from "@/helpers/processText"
 import React from "react"
-import { useColorScheme, View } from "react-native"
+import { TextStyle, View, ViewStyle } from "react-native"
 import BottomSheetContext from "../../../../contexts/bottomSheet"
 import LanguageContext from "../../../../contexts/Preferences/language"
 import NumberConversor from "../../../../helpers/numberConversor"
@@ -10,14 +10,12 @@ import sizes from "../../../../layout/constants/sizes"
 import Button from "../../../buttons/button-standart"
 import { Text } from "../../../Themed"
 import { useProfileContext } from "../../profile-context"
-import { ProfileStatisticsLikesProps } from "../../profile-types"
 import LikesRenderModal from "./profile-statistics-likes-modal"
 
-export default function statistics_likes({}: ProfileStatisticsLikesProps) {
+export default function statistics_likes() {
     const { user } = useProfileContext()
     const { t } = React.useContext(LanguageContext)
     const { expand } = React.useContext(BottomSheetContext)
-    const isDarkMode = useColorScheme() === "dark"
 
     function handlePress() {
         expand({
@@ -25,19 +23,19 @@ export default function statistics_likes({}: ProfileStatisticsLikesProps) {
             snapPoints: ["15%"],
         })
     }
-    const container: any = {
+    const container: ViewStyle = {
         alignItems: "center",
         justifyContent: "center",
         flexDirection: "row",
     }
 
-    const num_style: any = {
+    const num_style: TextStyle = {
         fontFamily: fonts.family.Bold,
         fontSize: fonts.size.body,
         color: ColorTheme().text,
         marginRight: sizes.margins["1sm"],
     }
-    const text_style: any = {
+    const text_style: TextStyle = {
         fontFamily: fonts.family.Semibold,
         fontSize: fonts.size.body,
         color: ColorTheme().textDisabled,
