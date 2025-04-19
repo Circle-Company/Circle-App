@@ -139,7 +139,7 @@
     "has a total of": "tem um total de",
     "likes throughout his time on": "de likes durante todo o seu tempo no",
     "views throughout his time on": "de visualizações durante todo o seu tempo no",
-
+    "Capture Your Day": "Compartilhe Seu Dia",
     "Select Image": "Selecione Imagem",
     "Select Other": "Selecione Outro",
     "Add to Memory": "Adicionar",
@@ -198,6 +198,7 @@
     "Are you sure you want to log out?": "Você tem certeza que deseja se deslogar?",
     "You will not be able to recover your account if you forget your password.": "Você não poderá recuperar sua conta se esquecer sua senha.",
     "You won't be able to see or interact with Moments of those you follow.": "Você não poderá ver ou interagir com Moments de quem você acompanha.",
+    "No recommendations available right now. Why not share a special moment from your day instead?": "Não há recomendações disponíveis no momento. Por que não compartilhar um momento especial do seu dia?",
 
     "You can't get it back if you forget it.": "Você não pode recuperá-la se esquecer.",
 
@@ -209,6 +210,7 @@
     "Added to Memory": "Adicionado á Memória",
     "New Follower": "Novo Seguidor",
     "Profile Visit": "Visita no Perfil",
+    "Reload Feed": "Recarregue o feed",
 
     "When your moment gets a like.": "Quando algum Moment seu receber uma curtida.",
     "When someone you follow posts a new Memory.": "Quando alguém que você segue postar uma nova Memória.",
