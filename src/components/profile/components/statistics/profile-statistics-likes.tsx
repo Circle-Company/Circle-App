@@ -1,6 +1,5 @@
-import { truncated } from "@/helpers/processText"
 import React from "react"
-import { TextStyle, View, ViewStyle } from "react-native"
+import { StyleProp, TextStyle, View, ViewStyle } from "react-native"
 import BottomSheetContext from "../../../../contexts/bottomSheet"
 import LanguageContext from "../../../../contexts/Preferences/language"
 import NumberConversor from "../../../../helpers/numberConversor"
@@ -23,21 +22,22 @@ export default function statistics_likes() {
             snapPoints: ["15%"],
         })
     }
-    const container: ViewStyle = {
+    const container: StyleProp<ViewStyle> = {
         alignItems: "center",
         justifyContent: "center",
-        flexDirection: "row",
+        width: sizes.screens.width / 4,
+        marginTop: sizes.margins["1sm"],
     }
 
-    const num_style: TextStyle = {
+    const num_style: StyleProp<TextStyle> = {
         fontFamily: fonts.family.Bold,
-        fontSize: fonts.size.body,
+        fontSize: fonts.size.title2,
         color: ColorTheme().text,
-        marginRight: sizes.margins["1sm"],
     }
-    const text_style: TextStyle = {
+    const text_style: StyleProp<TextStyle> = {
+        top: 1,
         fontFamily: fonts.family.Semibold,
-        fontSize: fonts.size.body,
+        fontSize: fonts.size.body * 0.8,
         color: ColorTheme().textDisabled,
     }
     return (
@@ -51,7 +51,7 @@ export default function statistics_likes() {
         >
             <View style={container}>
                 <Text style={num_style}>{NumberConversor(user?.statistics?.total_likes_num)}</Text>
-                <Text style={text_style}>{truncated({ text: t("Likes"), size: 8 })}</Text>
+                <Text style={text_style}>{t("Likes")}</Text>
             </View>
         </Button>
     )
