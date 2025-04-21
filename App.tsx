@@ -24,6 +24,7 @@ import { Provider as ViewProfileProvider } from "./src/contexts/viewProfile"
 import ColorTheme from "./src/layout/constants/colors"
 import sizes from "./src/layout/constants/sizes"
 import { QueryProvider } from "./src/lib/react-query"
+import { CameraProvider } from "./src/modules/camera"
 import Routes from "./src/routes"
 
 function InnerApp() {
@@ -43,17 +44,19 @@ function InnerApp() {
                         <ProfileProvider>
                             <ViewProfileProvider>
                                 <FeedProvider>
-                                    <NavigationContainer theme={myTheme}>
-                                        <BottomSheetProvider>
-                                            <SelectMomentsProvider>
-                                                <MemoryProvider>
-                                                    <NewMomentProvider>
-                                                        <Routes />
-                                                    </NewMomentProvider>
-                                                </MemoryProvider>
-                                            </SelectMomentsProvider>
-                                        </BottomSheetProvider>
-                                    </NavigationContainer>
+                                    <CameraProvider>
+                                        <NavigationContainer theme={myTheme}>
+                                            <BottomSheetProvider>
+                                                <SelectMomentsProvider>
+                                                    <MemoryProvider>
+                                                        <NewMomentProvider>
+                                                            <Routes />
+                                                        </NewMomentProvider>
+                                                    </MemoryProvider>
+                                                </SelectMomentsProvider>
+                                            </BottomSheetProvider>
+                                        </NavigationContainer>
+                                    </CameraProvider>
                                 </FeedProvider>
                             </ViewProfileProvider>
                         </ProfileProvider>
