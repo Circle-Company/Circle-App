@@ -1,5 +1,6 @@
-import { createStackNavigator } from "@react-navigation/stack"
+import { CardStyleInterpolators, createStackNavigator } from "@react-navigation/stack"
 import React from "react"
+import NotificationHeaderLeft from "../../components/headers/inbox/inbox-header_left"
 import MemoryHeaderLeft from "../../components/headers/memory/memory-header_left"
 import MomentFullHeaderLeft from "../../components/headers/moment/moment_full-header_left"
 import NewMomentImageRight from "../../components/headers/moment/new_moment_image-header_right"
@@ -8,6 +9,7 @@ import NewMomentSelectMemoryRight from "../../components/headers/moment/new_mome
 import LanguageContext from "../../contexts/Preferences/language"
 import ColorTheme, { colors } from "../../layout/constants/colors"
 import Sizes from "../../layout/constants/sizes"
+import CameraScreen from "../../modules/camera/screens/CameraScreen"
 import MomentFullScreen from "../../pages/app/Moment/moment-full"
 import NewMomentDescription from "../../pages/app/Moment/new_moment-description"
 import NewMomentGalleryScreen from "../../pages/app/Moment/new_moment-gallery"
@@ -25,7 +27,7 @@ export function MomentNavigator() {
     }
 
     return (
-        <MomentStack.Navigator>
+        <MomentStack.Navigator initialRouteName="CameraScreen">
             <MomentStack.Screen
                 name="MomentFullScreen"
                 component={MomentFullScreen}
@@ -68,6 +70,18 @@ export function MomentNavigator() {
                     cardStyleInterpolator: Horizontal,
                     headerLeft: () => <MemoryHeaderLeft />,
                     headerRight: () => <NewMomentImageRight />,
+                }}
+            />
+            <MomentStack.Screen
+                name="CameraScreen"
+                component={CameraScreen}
+                options={{
+                    headerTitle: () => null,
+                    headerStyle: [HeaderStyle],
+                    cardStyle: { backgroundColor: colors.gray.black.toString() },
+                    cardOverlayEnabled: true,
+                    headerLeft: () => <NotificationHeaderLeft />,
+                    cardStyleInterpolator: CardStyleInterpolators.forVerticalIOS,
                 }}
             />
             <MomentStack.Screen

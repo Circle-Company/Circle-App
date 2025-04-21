@@ -1,6 +1,7 @@
 import { createStackNavigator } from "@react-navigation/stack"
 import React from "react"
 import { useColorScheme } from "react-native"
+import NotificationHeaderLeft from "../../components/headers/inbox/inbox-header_left"
 import MemoriesHeaderLeft from "../../components/headers/memories/#"
 import MemoriesListMomentsHeaderLeft from "../../components/headers/memories/memories-list_moments-header_left"
 import MemoriesListMomentsHeaderRight from "../../components/headers/memories/memories-list_moments-header_right"
@@ -17,7 +18,6 @@ import MemoriesListMomentsScreen from "../../pages/app/Memories/list_moments"
 import NewMemorySelectMomentsScreen from "../../pages/app/Memories/new_memory_select_moments"
 import NewMemoryTitleScreen from "../../pages/app/Memories/new_memory_title"
 import { Interpolation as Horizontal } from "../transitions/horizontal-right"
-
 const MemoriesStack = createStackNavigator()
 
 export function MemoriesNavigator() {
@@ -88,13 +88,13 @@ export function MemoriesNavigator() {
                 name="NewMemorySelectMoments"
                 component={NewMemorySelectMomentsScreen}
                 options={{
-                    headerTitle: t("New Memory"),
+                    headerTitle: () => null,
                     headerStyle: [HeaderStyle],
                     headerTitleStyle: { color: String(ColorTheme().text) },
                     cardStyle: { backgroundColor: String(ColorTheme().background) },
                     cardOverlayEnabled: true,
                     cardStyleInterpolator: Horizontal,
-                    headerLeft: () => <MemoryHeaderLeft />,
+                    headerLeft: () => <NotificationHeaderLeft />,
                     headerRight: () => <MemoryHeaderRight />,
                 }}
             />
