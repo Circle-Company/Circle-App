@@ -109,6 +109,7 @@ const inputs = {
 }
 
 const momentAspectRatio = 1.566
+const cameraAspectRatio = 0.638
 
 const moment = {
     micro: {
@@ -215,4 +216,6 @@ export default {
     blur,
     icons,
     isSmallDevice,
+    momentAspectRatio,
+    cameraAspectRatio,
 }
