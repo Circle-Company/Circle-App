@@ -1,10 +1,10 @@
 import React from "react"
-import { Animated } from "react-native"
+import { Animated, ViewStyle } from "react-native"
 import sizes from "../../../../layout/constants/sizes"
 import { ProfileStatisticsContainerProps } from "../../profile-types"
 
 export default function statistics_container({ children }: ProfileStatisticsContainerProps) {
-    var animatedOpacity = React.useRef(new Animated.Value(0.2)).current
+    const animatedOpacity = React.useRef(new Animated.Value(0.2)).current
 
     function handleAnimation() {
         Animated.spring(animatedOpacity, {
@@ -20,7 +20,7 @@ export default function statistics_container({ children }: ProfileStatisticsCont
         handleAnimation()
     }, [])
 
-    const container: any = {
+    const container: ViewStyle = {
         width: sizes.screens.width,
         flexDirection: "row",
         alignItems: "center",
