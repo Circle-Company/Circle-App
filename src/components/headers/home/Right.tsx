@@ -49,6 +49,7 @@ export default function HeaderRightHome() {
             </ButtonStandart>
 
             <ButtonStandart
+                square
                 action={onPressSearch}
                 backgroundColor={String(ColorTheme().backgroundDisabled)}
             >
