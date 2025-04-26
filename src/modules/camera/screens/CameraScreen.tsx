@@ -1,19 +1,18 @@
-/**
- * Tela principal da câmera
- *
- * Implementação direta da câmera usando RCTCameraView e CameraContext
- */
 import { useFocusEffect } from "@react-navigation/native"
-import React, { useCallback, useEffect, useRef, useState } from "react"
+import React, { Component, useCallback, useEffect, useRef, useState } from "react"
 import {
     Dimensions,
     Modal,
+    NativeMethods,
     SafeAreaView,
     StatusBar,
     StyleSheet,
     View,
     requireNativeComponent,
 } from "react-native"
+
+import { GestureDetector, GestureHandlerRootView } from "react-native-gesture-handler"
+import Animated, { useAnimatedStyle, withTiming } from "react-native-reanimated"
 
 import sizes from "@/layout/constants/sizes"
 import CaptureButton from "../components/ui/buttons/capture"
@@ -22,59 +21,52 @@ import RotateButton from "../components/ui/buttons/rotate"
 import ErrorScreen from "../components/ui/ErrorScreen"
 import { useCamera } from "../core/CameraContext"
 import useCameraFunctions from "../hooks/useCameraFunctions"
+import useCameraGestures from "../hooks/useCameraGestures"
 import { RCTCameraViewProps } from "../types/camera.types"
 
-// Proporção fixa em 3:4 vertical (altura:largura)
-const ASPECT_RATIO = 3 / 4 // Definir explicitamente como 3/4
-
-// Dimensões da tela para calcular o tamanho da câmera
 const screenWidth = Dimensions.get("window").width
-
-// Importar o componente nativo diretamente
 const RCTCameraView = requireNativeComponent<RCTCameraViewProps>("CircleCameraView")
 
 const CameraScreen: React.FC = () => {
     const camera = useCamera()
-    const viewRef = useRef(null)
-    // Estado para controlar a visibilidade do modal de erro
+    const viewRef = useRef<Component<RCTCameraViewProps> & Readonly<NativeMethods>>(null)
     const [errorModalVisible, setErrorModalVisible] = useState(false)
 
     const {
-        error,
-        cameraType,
+        error: cameraError,
         flashMode,
         setError,
         initialize,
         handleCameraError,
-        handleCameraReady,
-        handleTakePhoto,
         handleToggleFlash,
         handleSwitchCamera,
+        handleTakePhoto,
     } = useCameraFunctions({ viewRef })
+
+    const { zoomLevel, composedGesture, setViewDimensions } = useCameraGestures({ viewRef })
 
     useEffect(() => {
         initialize().catch(console.error)
         return () => {
-            camera.stopCamera().catch(console.error)
+            if (camera && typeof camera.stopCamera === "function") {
+                camera.stopCamera().catch(console.error)
+            }
         }
-    }, [])
+    }, [initialize, camera])
 
-    // Atualiza o estado do modal de erro quando há um erro
     useEffect(() => {
-        setErrorModalVisible(!!error)
-    }, [error])
+        setErrorModalVisible(!!cameraError)
+    }, [cameraError])
 
-    // Função para fechar o modal de erro e limpar o erro
     const handleCloseErrorModal = useCallback(() => {
         setErrorModalVisible(false)
         setError(null)
     }, [setError])
 
-    // Resetar o erro quando a tela recebe foco
     useFocusEffect(
         useCallback(() => {
             setError(null)
-        }, [setError])
+        }, [setError, camera])
     )
 
     const renderControls = () => (
@@ -86,9 +78,7 @@ const CameraScreen: React.FC = () => {
                     color="#FFFFFF"
                     style={styles.controlButton}
                 />
-
                 <CaptureButton onPress={handleTakePhoto} />
-
                 <FlashButton
                     mode={flashMode}
                     onPress={handleToggleFlash}
@@ -100,39 +90,54 @@ const CameraScreen: React.FC = () => {
         </View>
     )
 
+    const animatedStyle = useAnimatedStyle(() => {
+        return {
+            height: withTiming(screenWidth * sizes.momentAspectRatio, {
+                duration: 300,
+            }),
+        }
+    })
+
     return (
-        <SafeAreaView style={styles.container}>
-            <StatusBar barStyle="light-content" backgroundColor="#000" translucent />
+        <GestureHandlerRootView style={{ flex: 1 }}>
+            <SafeAreaView style={styles.container}>
+                <StatusBar barStyle="light-content" backgroundColor="#000" translucent />
 
-            <View style={styles.cameraContainer}>
-                <RCTCameraView
-                    ref={viewRef}
-                    style={styles.camera}
-                    cameraType={cameraType}
-                    flashMode={flashMode}
-                    zoom={0}
-                    maintainAspectRatio={true}
-                    aspectRatio={ASPECT_RATIO}
-                    onCameraReady={handleCameraReady}
-                    onError={handleCameraError}
-                />
-            </View>
+                <GestureDetector gesture={composedGesture}>
+                    <Animated.View
+                        style={[styles.cameraContainer, animatedStyle]}
+                        onLayout={(event) => {
+                            setViewDimensions(event.nativeEvent.layout)
+                        }}
+                    >
+                        <RCTCameraView
+                            ref={viewRef}
+                            style={styles.camera}
+                            flashMode={flashMode}
+                            zoom={zoomLevel}
+                            onError={handleCameraError}
+                        />
+                    </Animated.View>
+                </GestureDetector>
 
-            {renderControls()}
+                {renderControls()}
 
-            {/* Modal de erro */}
-            <Modal
-                visible={errorModalVisible}
-                transparent={true}
-                animationType="fade"
-                onRequestClose={handleCloseErrorModal}
-                statusBarTranslucent={true}
-            >
-                <View style={styles.modalContainer}>
-                    <ErrorScreen errorMessage={error || ""} onGoBack={handleCloseErrorModal} />
-                </View>
-            </Modal>
-        </SafeAreaView>
+                <Modal
+                    visible={errorModalVisible}
+                    transparent={true}
+                    animationType="fade"
+                    onRequestClose={handleCloseErrorModal}
+                    statusBarTranslucent={true}
+                >
+                    <View style={styles.modalContainer}>
+                        <ErrorScreen
+                            errorMessage={cameraError || ""}
+                            onGoBack={handleCloseErrorModal}
+                        />
+                    </View>
+                </Modal>
+            </SafeAreaView>
+        </GestureHandlerRootView>
     )
 }
 
@@ -144,8 +149,9 @@ const styles = StyleSheet.create({
         justifyContent: "center",
     },
     cameraContainer: {
+        alignSelf: "center",
         width: screenWidth,
-        height: screenWidth * ASPECT_RATIO, // Usar a mesma proporção que passamos para o componente nativo
+        height: (screenWidth * 4) / 3,
         overflow: "hidden",
         borderRadius: sizes.moment.standart.borderRadius * 0.8,
         backgroundColor: "#111",
@@ -160,10 +166,7 @@ const styles = StyleSheet.create({
         backgroundColor: "rgba(0, 0, 0, 0.8)",
     },
     controlsContainer: {
-        position: "absolute",
-        bottom: 40,
-        left: 0,
-        right: 0,
+        marginTop: sizes.margins["1md"],
         alignItems: "center",
     },
     captureButtonsContainer: {
@@ -174,6 +177,8 @@ const styles = StyleSheet.create({
         paddingHorizontal: 20,
     },
     controlButton: {
+        padding: 15,
+        borderRadius: 30,
         backgroundColor: "rgba(40, 40, 40, 0.8)",
     },
 })
