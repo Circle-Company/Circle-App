@@ -10,15 +10,12 @@ export type CameraFlashMode = FlashMode
 
 export interface RCTCameraViewProps {
     style?: object
-    cameraType?: CameraType
     flashMode?: FlashMode
     zoom?: number
     maintainAspectRatio?: boolean
     aspectRatio?: number
     onCameraReady?: (event: { nativeEvent: Record<string, unknown> }) => void
     onError?: (event: { nativeEvent: { error: string } }) => void
-    onBarCodeRead?: (event: { nativeEvent: BarCodeReadEvent }) => void
-    onFaceDetected?: (event: { nativeEvent: FaceDetection }) => void
     onTakePhoto?: (event: { nativeEvent: PhotoResult }) => void
 }
 
