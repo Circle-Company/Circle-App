@@ -1,511 +1,286 @@
 package com.circle.camera;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
-import android.hardware.Camera;
 import android.util.Log;
-import android.view.SurfaceHolder;
-import android.view.SurfaceView;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
-import android.view.Gravity;
+import androidx.annotation.NonNull;
+import androidx.camera.core.*;
+import androidx.camera.lifecycle.ProcessCameraProvider;
+import androidx.camera.view.PreviewView;
+import androidx.core.content.ContextCompat;
+import androidx.lifecycle.LifecycleOwner;
+import com.google.common.util.concurrent.ListenableFuture;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
+import android.view.View;
 
-import java.io.IOException;
-import java.util.List;
-
-@SuppressWarnings("deprecation")
-public class CircleCameraView extends FrameLayout implements SurfaceHolder.Callback {
+public class CircleCameraView extends FrameLayout {
     private static final String TAG = "CircleCameraView";
-    
-    private SurfaceView surfaceView;
-    private Camera camera;
-    private int cameraId = Camera.CameraInfo.CAMERA_FACING_BACK;
-    private boolean isPreviewing = false;
-    private int rotation = 90; // Retrato por padrão - sempre vertical
-    
-    // Fixar aspect ratio em 3:4 (vertical)
-    private static final float ASPECT_RATIO = 3.0f/4.0f; // Proporção vertical 3:4 (altura/largura)
-    private boolean maintainAspectRatio = true;
 
-    public CircleCameraView(Context context) {
+    private PreviewView previewView;
+    private ListenableFuture<ProcessCameraProvider> cameraProviderFuture;
+    private ExecutorService cameraExecutor;
+    private ImageCapture imageCapture;
+    private Camera camera; // Para controle (zoom, foco, flash)
+    private ProcessCameraProvider cameraProvider;
+
+    private int lensFacing = CameraSelector.LENS_FACING_BACK; // Padrão: Câmera Traseira
+
+    public CircleCameraView(@NonNull Context context) {
         super(context);
-        
-        // Configurar layout
-        setLayoutParams(new ViewGroup.LayoutParams(
-                ViewGroup.LayoutParams.MATCH_PARENT,
-                ViewGroup.LayoutParams.MATCH_PARENT
-        ));
-        
-        // Criar SurfaceView para preview da câmera
-        surfaceView = new SurfaceView(context);
-        
-        // Usar um FrameLayout como container para podermos rotacionar a SurfaceView
-        FrameLayout surfaceContainer = new FrameLayout(context);
-        surfaceContainer.setLayoutParams(new LayoutParams(
-                LayoutParams.MATCH_PARENT,
-                LayoutParams.MATCH_PARENT,
-                Gravity.CENTER
-        ));
-        
-        // Configurar SurfaceView com rotação para modo retrato
-        LayoutParams surfaceParams = new LayoutParams(
-                LayoutParams.MATCH_PARENT,
-                LayoutParams.MATCH_PARENT,
-                Gravity.CENTER
-        );
-        surfaceView.setLayoutParams(surfaceParams);
-        
-        // Adicionar SurfaceView ao container
-        surfaceContainer.addView(surfaceView);
-        
-        // Adicionar container à view principal
-        addView(surfaceContainer);
-        
-        // Configurar SurfaceHolder
-        SurfaceHolder holder = surfaceView.getHolder();
-        holder.addCallback(this);
-        holder.setType(SurfaceHolder.SURFACE_TYPE_PUSH_BUFFERS); // Necessário para versões antigas do Android
-        
-        // Aplicar rotação para forçar modo retrato
-        setRotation(90);
+        init(context);
     }
 
+    // Modificar init: Apenas inicializar variáveis, não iniciar CameraX
+    private void init(Context context) {
+        previewView = new PreviewView(context);
+        previewView.setLayoutParams(new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT));
+        previewView.setScaleType(PreviewView.ScaleType.FILL_CENTER);
+        addView(previewView);
+
+        cameraExecutor = Executors.newSingleThreadExecutor();
+        // Não iniciar cameraProviderFuture ou addListener aqui
+    }
+
+    // Adicionar onAttachedToWindow para iniciar CameraX
     @Override
-    public void surfaceCreated(SurfaceHolder holder) {
-        try {
-            if (camera == null) {
-                openCamera();
-            }
-            
-            camera.setPreviewDisplay(holder);
-            startPreview();
-        } catch (IOException e) {
-            Log.e(TAG, "Erro ao configurar preview: " + e.getMessage(), e);
+    protected void onAttachedToWindow() {
+        super.onAttachedToWindow();
+        Log.d(TAG, "onAttachedToWindow - Iniciando CameraX.");
+        startCamera(); // Nova função para encapsular início
+    }
+
+    // Adicionar onDetachedFromWindow para limpar CameraX
+    @Override
+    protected void onDetachedFromWindow() {
+        super.onDetachedFromWindow();
+        Log.d(TAG, "onDetachedFromWindow - Desligando CameraX e Executor.");
+        if (cameraProvider != null) {
+            cameraProvider.unbindAll(); // Desvincular use cases
+        }
+        if (cameraExecutor != null) {
+            cameraExecutor.shutdown();
         }
     }
 
-    @Override
-    public void surfaceChanged(SurfaceHolder holder, int format, int width, int height) {
-        if (camera == null) {
+    // Nova função para iniciar a câmera
+    private void startCamera() {
+        Context context = getContext();
+        cameraProviderFuture = ProcessCameraProvider.getInstance(context);
+        cameraProviderFuture.addListener(() -> {
+            try {
+                cameraProvider = cameraProviderFuture.get();
+                Log.d(TAG, "CameraProvider obtido em startCamera. Tentando vincular Use Cases.");
+                bindCameraUseCases();
+            } catch (ExecutionException | InterruptedException e) {
+                Log.e(TAG, "Erro ao obter CameraProvider em startCamera: ", e);
+                 sendErrorToReact("Failed to get CameraProvider: " + e.getMessage());
+            } catch (IllegalStateException e) {
+                Log.e(TAG, "Contexto inválido para LifecycleOwner em startCamera: " + e.getMessage(), e);
+                sendErrorToReact("Invalid context for LifecycleOwner: " + e.getMessage());
+            }
+        }, ContextCompat.getMainExecutor(context));
+    }
+
+    @SuppressLint("RestrictedApi")
+    private void bindCameraUseCases() {
+        if (cameraProvider == null) {
+            Log.e(TAG, "CameraProvider não está pronto para vincular.");
+             sendErrorToReact("CameraProvider not ready.");
             return;
         }
 
-        try {
-            // Parar preview se estiver rodando
-            if (isPreviewing) {
-                camera.stopPreview();
-                isPreviewing = false;
-            }
+        LifecycleOwner lifecycleOwner = getLifecycleOwnerFromContext();
+        if (lifecycleOwner == null) {
+            Log.e(TAG, "ERRO CRÍTICO: Não foi possível obter um LifecycleOwner. CameraX não funcionará.");
+            sendErrorToReact("Failed to get LifecycleOwner.");
+            return;
+        }
 
-            // Configurar parâmetros da câmera
-            Camera.Parameters parameters = camera.getParameters();
-            
-            // Obter tamanho para o preview com base na proporção 3:4
-            Camera.Size previewSize = getPreviewSizeFor34(parameters.getSupportedPreviewSizes());
-            if (previewSize != null) {
-                parameters.setPreviewSize(previewSize.width, previewSize.height);
-                
-                // Ajustar layout para manter a proporção 3:4
-                post(() -> adjustViewTo34AspectRatio(previewSize.width, previewSize.height));
-            }
-            
-            // Definir o melhor formato de imagem disponível
-            List<Integer> supportedFormats = parameters.getSupportedPreviewFormats();
-            if (supportedFormats != null && supportedFormats.contains(android.graphics.ImageFormat.NV21)) {
-                parameters.setPreviewFormat(android.graphics.ImageFormat.NV21);
-            }
-            
-            // Definir área de foco e medição
-            if (parameters.getMaxNumFocusAreas() > 0) {
-                parameters.setFocusMode(Camera.Parameters.FOCUS_MODE_AUTO);
-            }
-            
-            // Aplicar parâmetros e iniciar preview
-            camera.setParameters(parameters);
-            
-            // Configurar orientação da câmera (modo retrato)
-            setCameraDisplayOrientation();
-            
-            camera.setPreviewDisplay(holder);
-            camera.startPreview();
-            isPreviewing = true;
-            
-            // Log da resolução final utilizada
-            Camera.Size actualPreviewSize = camera.getParameters().getPreviewSize();
-            Log.d(TAG, "Preview iniciado com resolução: " + actualPreviewSize.width + "x" + actualPreviewSize.height + 
-                  " e proporção: " + ((float)actualPreviewSize.height / actualPreviewSize.width) +
-                  " e rotação: " + rotation);
+        // Limpar bindings anteriores
+        cameraProvider.unbindAll();
+
+        CameraSelector cameraSelector = new CameraSelector.Builder()
+                .requireLensFacing(lensFacing)
+                .build();
+
+        Preview preview = new Preview.Builder()
+                .setTargetRotation(previewView.getDisplay().getRotation())
+                .build();
+        preview.setSurfaceProvider(previewView.getSurfaceProvider());
+
+        imageCapture = new ImageCapture.Builder()
+                .setCaptureMode(ImageCapture.CAPTURE_MODE_MAXIMIZE_QUALITY)
+                .setTargetRotation(previewView.getDisplay().getRotation())
+                .build();
+
+        try {
+            camera = cameraProvider.bindToLifecycle(
+                    lifecycleOwner, cameraSelector, preview, imageCapture);
+            Log.i(TAG, "CameraX Use Cases vinculados com sucesso para lensFacing: " + lensFacing);
+
+            // Iniciar foco automático contínuo se possível
+            setupContinuousFocus();
+
         } catch (Exception e) {
-            Log.e(TAG, "Erro ao configurar preview: " + e.getMessage(), e);
+            Log.e(TAG, "Falha ao vincular use cases: ", e);
+             sendErrorToReact("Failed to bind camera use cases: " + e.getMessage());
         }
     }
 
-    @Override
-    public void surfaceDestroyed(SurfaceHolder holder) {
-        // Liberar a câmera quando a surface for destruída
-        releaseCamera();
-    }
-
-    public void switchCamera() {
-        // Alternar entre câmera frontal e traseira
-        releaseCamera();
-        
-        cameraId = (cameraId == Camera.CameraInfo.CAMERA_FACING_BACK) 
-                ? Camera.CameraInfo.CAMERA_FACING_FRONT 
-                : Camera.CameraInfo.CAMERA_FACING_BACK;
-        
-        openCamera();
-        
-        try {
-            camera.setPreviewDisplay(surfaceView.getHolder());
-            
-            // Configurar rotação e parâmetros
-            camera.setDisplayOrientation(rotation);
-            
-            // Configurar para proporção 3:4 após mudar de câmera
-            Camera.Parameters parameters = camera.getParameters();
-            Camera.Size previewSize = getPreviewSizeFor34(parameters.getSupportedPreviewSizes());
-            
-            if (previewSize != null) {
-                parameters.setPreviewSize(previewSize.width, previewSize.height);
-                camera.setParameters(parameters);
-                
-                // Reajustar a view para proporção 3:4
-                post(() -> adjustViewTo34AspectRatio(previewSize.width, previewSize.height));
-            }
-            
-            startPreview();
-        } catch (IOException e) {
-            Log.e(TAG, "Erro ao alternar câmera: " + e.getMessage(), e);
-        }
-    }
-
-    public void setFlashMode(String mode) {
-        if (camera != null) {
-            try {
-                Camera.Parameters parameters = camera.getParameters();
-                
-                // Verificar se o dispositivo tem flash
-                if (!parameters.getSupportedFlashModes().contains(Camera.Parameters.FLASH_MODE_ON)) {
-                    Log.w(TAG, "Dispositivo não suporta flash");
-                    return;
-                }
-                
-                switch (mode) {
-                    case "on":
-                        parameters.setFlashMode(Camera.Parameters.FLASH_MODE_ON);
-                        break;
-                    case "off":
-                        parameters.setFlashMode(Camera.Parameters.FLASH_MODE_OFF);
-                        break;
-                    case "auto":
-                        parameters.setFlashMode(Camera.Parameters.FLASH_MODE_AUTO);
-                        break;
-                    case "torch":
-                        parameters.setFlashMode(Camera.Parameters.FLASH_MODE_TORCH);
-                        break;
-                    default:
-                        parameters.setFlashMode(Camera.Parameters.FLASH_MODE_OFF);
-                        break;
-                }
-                
-                camera.setParameters(parameters);
-                Log.d(TAG, "Modo do flash alterado para: " + mode);
-            } catch (Exception e) {
-                Log.e(TAG, "Erro ao definir modo do flash: " + e.getMessage());
-            }
-        }
-    }
-
-    public void setZoom(float zoomValue) {
-        if (camera != null) {
-            try {
-                Camera.Parameters parameters = camera.getParameters();
-                
-                if (parameters.isZoomSupported()) {
-                    int maxZoom = parameters.getMaxZoom();
-                    int zoom = (int) (zoomValue * maxZoom);
-                    
-                    // Garantir que o zoom esteja dentro dos limites
-                    zoom = Math.max(0, Math.min(zoom, maxZoom));
-                    
-                    parameters.setZoom(zoom);
-                    camera.setParameters(parameters);
-                }
-            } catch (Exception e) {
-                Log.e(TAG, "Erro ao definir zoom: " + e.getMessage());
-            }
-        }
-    }
-
-    public void setFocusPoint(float x, float y) {
-        if (camera != null) {
-            try {
-                Camera.Parameters parameters = camera.getParameters();
-                
-                if (parameters.getMaxNumFocusAreas() > 0) {
-                    // Converter coordenadas de 0-1 para o sistema de coordenadas da câmera (-1000 a 1000)
-                    int focusX = (int) ((x * 2 - 1) * 1000);
-                    int focusY = (int) ((y * 2 - 1) * 1000);
-                    
-                    // Criar áreas de foco
-                    List<Camera.Area> focusAreas = new java.util.ArrayList<>();
-                    focusAreas.add(new Camera.Area(
-                            new android.graphics.Rect(focusX - 100, focusY - 100, focusX + 100, focusY + 100), 
-                            1000)
-                    );
-                    
-                    parameters.setFocusAreas(focusAreas);
-                    parameters.setFocusMode(Camera.Parameters.FOCUS_MODE_AUTO);
-                    
-                    camera.setParameters(parameters);
-                    camera.autoFocus(null);
-                }
-            } catch (Exception e) {
-                Log.e(TAG, "Erro ao definir ponto de foco: " + e.getMessage());
-            }
-        }
-    }
-
-    public void openCamera() {
-        try {
-            camera = Camera.open(cameraId);
-            
-            // Configurar câmera
-            Camera.Parameters parameters = camera.getParameters();
-            
-            // Configurar orientação corretamente com base no tipo de câmera
-            setCameraDisplayOrientation();
-            
-            // Aplicar parâmetros
-            camera.setParameters(parameters);
-            
-        } catch (Exception e) {
-            Log.e(TAG, "Erro ao abrir câmera: " + e.getMessage());
-        }
-    }
-
-    // Método para definir a orientação correta da câmera - sempre em modo retrato (vertical)
-    private void setCameraDisplayOrientation() {
-        if (camera == null) return;
-        
-        Camera.CameraInfo info = new Camera.CameraInfo();
-        Camera.getCameraInfo(cameraId, info);
-        
-        // Sempre forçar orientação em modo retrato (vertical)
-        int displayRotation = 90; // Vertical
-        
-        // Calcular a orientação correta para o dispositivo
-        int degrees = 0;
-        int result;
-        
-        if (cameraId == Camera.CameraInfo.CAMERA_FACING_FRONT) {
-            // Para câmera frontal em orientação retrato (vertical)
-            result = (info.orientation + displayRotation) % 360;
-            result = (360 - result) % 360;  // Compensação para câmera frontal
+    // Função auxiliar para obter LifecycleOwner
+    private LifecycleOwner getLifecycleOwnerFromContext() {
+        Context context = getContext();
+        if (context instanceof LifecycleOwner) {
+            return (LifecycleOwner) context;
         } else {
-            // Para câmera traseira em orientação retrato (vertical)
-            result = (info.orientation - degrees + displayRotation) % 360;
+            Context activityContext = ReactContextUtils.getActivity(context);
+            if (activityContext instanceof LifecycleOwner) {
+                return (LifecycleOwner) activityContext;
+            }
         }
-        
-        Log.d(TAG, "Definindo orientação da câmera para: " + result + "° (cameraId: " + 
-              cameraId + ", info.orientation: " + info.orientation + ", display: " + displayRotation + ")");
-        
-        // Aplicar rotação ao preview
-        camera.setDisplayOrientation(result);
-        
-        // Salvar a rotação atual
-        rotation = result;
-        
-        // Também precisamos definir a rotação para fotos capturadas
-        Camera.Parameters parameters = camera.getParameters();
-        
-        // Definir rotação para as fotos - garantir que as fotos estejam em orientação vertical
-        if (cameraId == Camera.CameraInfo.CAMERA_FACING_FRONT) {
-            // Para câmera frontal, aplicamos uma rotação específica
-            parameters.setRotation((info.orientation + 270) % 360);
-            Log.d(TAG, "Rotação de captura para câmera frontal: " + ((info.orientation + 270) % 360) + "°");
+        return null; // Retorna null se não encontrar
+    }
+
+     // Função auxiliar para configurar foco contínuo
+    private void setupContinuousFocus() {
+         if (camera != null) {
+             MeteringPointFactory factory = previewView.getMeteringPointFactory();
+             // Foco no centro da tela por padrão
+             MeteringPoint point = factory.createPoint(previewView.getWidth() / 2f, previewView.getHeight() / 2f);
+             FocusMeteringAction action = new FocusMeteringAction.Builder(point, FocusMeteringAction.FLAG_AF)
+                    .disableAutoCancel() // Manter foco contínuo
+                    .build();
+             if (camera.getCameraInfo().isFocusMeteringSupported(action)) {
+                 camera.getCameraControl().startFocusAndMetering(action);
+                 Log.d(TAG, "Foco automático contínuo iniciado.");
+             } else {
+                 Log.w(TAG, "Foco automático contínuo não suportado.");
+             }
+         }
+    }
+
+    // --- Métodos Públicos (takePhoto, switchCamera, setZoom, setFocusPoint, setFlashMode) ---
+    // Nenhuma mudança necessária aqui, já interagem com as variáveis da classe
+
+     public void takePhoto(ImageCapture.OutputFileOptions outputFileOptions, ImageCapture.OnImageSavedCallback callback) {
+        if (imageCapture != null) {
+            Log.d(TAG, "Chamando imageCapture.takePicture...");
+            imageCapture.takePicture(outputFileOptions, cameraExecutor, callback);
         } else {
-            // Para câmera traseira, mantemos a rotação vertical
-            parameters.setRotation(90);
-            Log.d(TAG, "Rotação de captura para câmera traseira: 90°");
+            Log.e(TAG, "ImageCapture não inicializado ao tentar tirar foto.");
+            callback.onError(new ImageCaptureException(ImageCapture.ERROR_INVALID_CAMERA, "ImageCapture not ready", null));
         }
-        
-        camera.setParameters(parameters);
-    }
+     }
 
-    public void startPreview() {
-        if (camera != null && !isPreviewing) {
-            camera.startPreview();
-            isPreviewing = true;
+     public void switchCamera() {
+        Log.d(TAG, "Chamado switchCamera()");
+        lensFacing = (lensFacing == CameraSelector.LENS_FACING_BACK)
+                ? CameraSelector.LENS_FACING_FRONT
+                : CameraSelector.LENS_FACING_BACK;
+        Log.d(TAG, "Novo lensFacing: " + lensFacing);
+        bindCameraUseCases(); // Re-vincula com a nova câmera
+     }
+
+     public void setZoom(float linearZoom) {
+        // Verificar se a câmera e o ZoomState estão disponíveis
+        if (camera != null && camera.getCameraInfo().getZoomState().getValue() != null) {
+            float clampedZoom = Math.max(0f, Math.min(1f, linearZoom));
+             Log.d(TAG, "Definindo zoom linear para: " + clampedZoom);
+            ListenableFuture<Void> future = camera.getCameraControl().setLinearZoom(clampedZoom);
+            future.addListener(() -> {
+                try {
+                    future.get(); // Apenas para verificar erro
+                } catch (Exception e) {
+                    Log.e(TAG, "Falha assíncrona ao definir zoom: ", e);
+                }
+            }, ContextCompat.getMainExecutor(getContext()));
+        } else {
+             Log.w(TAG, "Zoom não suportado ou câmera não pronta.");
         }
-    }
+     }
 
-    public void stopPreview() {
-        if (camera != null && isPreviewing) {
-            camera.stopPreview();
-            isPreviewing = false;
-        }
-    }
-
-    public void releaseCamera() {
+     public void setFocusPoint(float x, float y) {
         if (camera != null) {
-            stopPreview();
-            camera.release();
-            camera = null;
-        }
-    }
+            Log.d(TAG, "Chamado setFocusPoint em x=" + x + ", y=" + y);
+            MeteringPointFactory factory = previewView.getMeteringPointFactory();
+            MeteringPoint point = factory.createPoint(x * previewView.getWidth(), y * previewView.getHeight());
+            FocusMeteringAction action = new FocusMeteringAction.Builder(point, FocusMeteringAction.FLAG_AF | FocusMeteringAction.FLAG_AE) // Foco e Exposição
+                    .setAutoCancelDuration(5, TimeUnit.SECONDS) // Cancela após 5s
+                    .build();
 
-    public Camera getCamera() {
-        return camera;
-    }
-
-    /**
-     * Encontra o tamanho de preview mais adequado para uma proporção 3:4 vertical
-     * 
-     * @param sizes Lista de tamanhos suportados
-     * @return O tamanho mais adequado para proporção 3:4
-     */
-    private Camera.Size getPreviewSizeFor34(List<Camera.Size> sizes) {
-        if (sizes == null || sizes.isEmpty()) return null;
-        
-        Camera.Size optimalSize = null;
-        double minDiff = Double.MAX_VALUE;
-        
-        // Procurar tamanho mais próximo da proporção 3:4 (vertical)
-        for (Camera.Size size : sizes) {
-            // Para orientação vertical precisamos inverter width/height
-            // A câmera naturalmente captura em landscape, mas vamos girar para portrait
-            double ratio = (double) size.height / size.width;
-            double diff = Math.abs(ratio - ASPECT_RATIO);
-            
-            Log.d(TAG, "Tamanho: " + size.width + "x" + size.height + ", ratio: " + ratio + ", diff: " + diff);
-            
-            if (diff < minDiff) {
-                optimalSize = size;
-                minDiff = diff;
+            if (!camera.getCameraInfo().isFocusMeteringSupported(action)) {
+                 Log.w(TAG, "Ação de Foco/Metering não suportada.");
+                 return;
             }
-        }
-        
-        Log.d(TAG, "Tamanho de preview selecionado: " + 
-              (optimalSize != null ? (optimalSize.width + "x" + optimalSize.height) : "nenhum"));
-        
-        return optimalSize;
-    }
 
-    /**
-     * Ajusta a view para exibir a câmera com proporção 3:4 vertical
-     * 
-     * @param previewWidth largura do preview da câmera
-     * @param previewHeight altura do preview da câmera
-     */
-    public void adjustViewTo34AspectRatio(int previewWidth, int previewHeight) {
-        Post.runOnUI(() -> {
-            Log.d(TAG, "Ajustando proporção da view para 3:4 vertical");
-            
-            // Se a view ainda não tem dimensões, adiar o ajuste
-            if (getWidth() == 0 || getHeight() == 0) {
-                Log.d(TAG, "View ainda não tem dimensões, adiando ajuste");
-                return;
-            }
-            
-            // Para obter um display vertical 3:4
-            float viewWidth = getWidth();
-            float viewHeight = getHeight();
-            float viewRatio = viewHeight / viewWidth;
-            
-            Log.d(TAG, "Dimensões da view: " + viewWidth + "x" + viewHeight + ", Proporção: " + viewRatio);
-            Log.d(TAG, "Proporção desejada (3:4): " + ASPECT_RATIO);
-            
-            // Centralizar view com proporção 3:4
-            if (maintainAspectRatio) {
-                float newWidth, newHeight;
-                
-                if (Math.abs(viewRatio - ASPECT_RATIO) < 0.05) {
-                    Log.d(TAG, "Já estamos na proporção 3:4, não ajustando");
-                    return;
+            ListenableFuture<FocusMeteringResult> future = camera.getCameraControl().startFocusAndMetering(action);
+            future.addListener(() -> {
+                try {
+                    FocusMeteringResult result = future.get();
+                    Log.d(TAG, "Foco/Metering concluído, sucesso AF: " + result.isFocusSuccessful());
+                } catch (Exception e) {
+                    Log.e(TAG, "Erro ao obter resultado do foco: ", e);
                 }
-                
-                if (viewRatio > ASPECT_RATIO) {
-                    // View atual é mais alta do que precisamos
-                    newWidth = viewWidth;
-                    newHeight = newWidth * ASPECT_RATIO;
-                    Log.d(TAG, "View mais alta, ajustando altura: " + newWidth + "x" + newHeight);
-                } else {
-                    // View atual é mais larga do que precisamos
-                    newHeight = viewHeight;
-                    newWidth = newHeight / ASPECT_RATIO;
-                    Log.d(TAG, "View mais larga, ajustando largura: " + newWidth + "x" + newHeight);
-                }
-                
-                // Garantir que estamos dentro dos limites da view pai
-                newWidth = Math.min(newWidth, getWidth());
-                newHeight = Math.min(newHeight, getHeight());
-                
-                Log.d(TAG, "Dimensões finais após ajuste: " + newWidth + "x" + newHeight + 
-                      ", Proporção: " + (newHeight / newWidth));
-                
-                LayoutParams params = new LayoutParams(
-                    (int)newWidth,
-                    (int)newHeight,
-                    Gravity.CENTER
-                );
-                
-                surfaceView.setLayoutParams(params);
-                requestLayout();
-            }
-        });
-    }
-
-    public void setMaintainAspectRatio(boolean maintain) {
-        this.maintainAspectRatio = maintain;
-    }
-    
-    /**
-     * Retorna a proporção de aspecto fixa 3:4
-     * 
-     * @return a proporção 3:4 (altura/largura)
-     */
-    public float getAspectRatio() {
-        return ASPECT_RATIO;
-    }
-
-    /**
-     * Define a rotação de exibição da câmera
-     * 
-     * @param rotation valor da rotação (0, 90, 180, 270)
-     */
-    public void setDisplayOrientation(int rotation) {
-        if (camera == null) return;
-        
-        try {
-            Camera.CameraInfo info = new Camera.CameraInfo();
-            Camera.getCameraInfo(cameraId, info);
-            
-            int result;
-            if (cameraId == Camera.CameraInfo.CAMERA_FACING_FRONT) {
-                result = (info.orientation + rotation) % 360;
-                result = (360 - result) % 360;  // Compensação para câmera frontal
-            } else {
-                result = (info.orientation - rotation + 360) % 360;
-            }
-            
-            this.rotation = result;
-            camera.setDisplayOrientation(result);
-            
-            // Atualizar também o parâmetro de rotação para fotos
-            Camera.Parameters parameters = camera.getParameters();
-            parameters.setRotation(result);
-            camera.setParameters(parameters);
-            
-            // Verificar se precisamos reconfigurar o preview com o novo tamanho
-            if (isPreviewing && getWidth() > 0 && getHeight() > 0) {
-                Camera.Size previewSize = parameters.getPreviewSize();
-                if (previewSize != null) {
-                    post(() -> adjustViewTo34AspectRatio(previewSize.width, previewSize.height));
-                }
-            }
-        } catch (Exception e) {
-            Log.e(TAG, "Erro ao definir orientação da câmera: " + e.getMessage(), e);
+            }, ContextCompat.getMainExecutor(getContext()));
+        } else {
+            Log.w(TAG, "Câmera não pronta para definir ponto de foco.");
         }
+     }
+
+     public void setFlashMode(String mode) {
+        if (imageCapture != null) {
+            int flashMode;
+            switch (mode.toLowerCase()) {
+                case "on":
+                    flashMode = ImageCapture.FLASH_MODE_ON;
+                    break;
+                case "auto":
+                    flashMode = ImageCapture.FLASH_MODE_AUTO;
+                    break;
+                case "off":
+                default:
+                    flashMode = ImageCapture.FLASH_MODE_OFF;
+                    break;
+            }
+             try {
+                imageCapture.setFlashMode(flashMode);
+                Log.d(TAG, "Modo de flash do ImageCapture definido para: " + flashMode);
+                // Para flash TORCH (lanterna), seria:
+                // if (camera != null) camera.getCameraControl().enableTorch(mode.equalsIgnoreCase("torch"));
+             } catch (IllegalArgumentException e) {
+                 Log.e(TAG, "Modo de flash inválido: " + mode, e);
+             }
+        } else {
+             Log.w(TAG, "ImageCapture não pronto para definir modo de flash.");
+        }
+     }
+
+    // Adicionar método para enviar erro ao React Native (opcional, mas útil)
+    private void sendErrorToReact(String errorMessage) {
+        Log.e(TAG, "Enviando erro para React Native: " + errorMessage);
+        // Implementar envio de evento onError aqui, se necessário
+        // (Exigiria acesso ao ReactContext, geralmente obtido via ViewManager)
+    }
+
+    // --- Limpeza ---
+    // onDetachedFromWindow já está implementado para limpar
+}
+
+// Classe ReactContextUtils permanece a mesma
+class ReactContextUtils {
+    static android.app.Activity getActivity(Context context) {
+        if (context instanceof android.app.Activity) {
+            return (android.app.Activity) context;
+        } else if (context instanceof com.facebook.react.bridge.ReactContext) {
+            return ((com.facebook.react.bridge.ReactContext) context).getCurrentActivity();
+        } else if (context instanceof android.content.ContextWrapper) {
+            return getActivity(((android.content.ContextWrapper) context).getBaseContext());
+        }
+        return null;
     }
 } 
