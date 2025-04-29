@@ -1,6 +1,6 @@
 /* eslint-disable no-var */
 import React from "react"
-import { Animated, Pressable, View } from "react-native"
+import { Animated, Pressable, TextStyle, View, ViewStyle } from "react-native"
 import LikeIcon from "../../../assets/icons/svgs/heart.svg"
 import PersistedContext from "../../../contexts/Persisted"
 import NumberConversor from "../../../helpers/numberConversor"
@@ -67,7 +67,7 @@ export default function like({
         }
     }, [momentUserActions.liked])
 
-    const container: any = {
+    const container: ViewStyle = {
         minWidth: sizes.buttons.width / 4,
         height: sizes.buttons.height / 2,
         borderRadius: Number([sizes.buttons.width / 4]) / 2,
@@ -80,13 +80,13 @@ export default function like({
         borderColor: colors.transparent.white_30,
         overflow: "hidden",
     }
-    const like_text_pressed = {
+    const like_text_pressed: TextStyle = {
         fontSize: fonts.size.body,
         fontFamily: fonts.family.Bold,
         color: colors.gray.white,
         marginLeft: sizes.margins["1sm"],
     }
-    const like_text = {
+    const like_text: TextStyle = {
         fontSize: fonts.size.body,
         fontFamily: fonts.family.Bold,
         color: colors.gray.white,
@@ -101,7 +101,7 @@ export default function like({
     const blur_container_likePressed = {
         backgroundColor: ColorTheme().like,
     }
-    const pressable_container: any = {
+    const pressable_container: ViewStyle = {
         overflow: "hidden",
         borderRadius: Number([sizes.buttons.width / 4]) / 2,
     }
@@ -149,13 +149,25 @@ export default function like({
         )
     }
 
+    // Quantidade total de likes que vem do backend
+    const totalLikes = Number(momentData?.statistics?.total_likes_num || 0)
+
+    // Determina se um like foi adicionado ou removido em relação ao estado inicial
+    const likeDifference = momentUserActions.liked
+        ? momentUserActions.initialLikedState
+            ? 0
+            : 1 // Se está curtido, não soma se já estava curtido, senão soma 1
+        : momentUserActions.initialLikedState
+          ? -1
+          : 0 // Se não está curtido, subtrai 1 se estava curtido, senão não muda
+
+    // Número de likes que será exibido, considerando a interação do usuário
+    const adjustedLikes = totalLikes + likeDifference
+
+    // Converte para formato legível
+    const displayLikes = NumberConversor(adjustedLikes)
+
     const like_fill: string = String(colors.gray.white)
-    const like_number: string = NumberConversor(
-        Number(momentData?.statistics?.total_likes_num - (isLiked ? 1 : 0))
-    )
-    const like_number_pressed: string = NumberConversor(
-        Number(momentData?.statistics?.total_likes_num - (isLiked ? 1 : 0)) + 1
-    )
 
     if (!momentOptions.enableLikeButton) return null
     else if (likedPressed) {
@@ -168,7 +180,7 @@ export default function like({
                                 <LikeIcon fill={like_fill} width={20} height={20} />
                             </Animated.View>
                             <Text style={likedPressed ? like_text_pressed : like_text}>
-                                {like_number_pressed}
+                                {displayLikes}
                             </Text>
                         </View>
                     </View>
@@ -185,7 +197,7 @@ export default function like({
                                 <LikeIcon fill={like_fill} width={14} height={14} />
                             </Animated.View>
                             <Text style={likedPressed ? like_text_pressed : like_text}>
-                                {like_number}
+                                {displayLikes}
                             </Text>
                         </View>
                     </View>
@@ -202,7 +214,7 @@ export default function like({
                                 <LikeIcon fill={like_fill} width={14} height={14} />
                             </Animated.View>
                             <Text style={likedPressed ? like_text_pressed : like_text}>
-                                {like_number}
+                                {displayLikes}
                             </Text>
                         </View>
                     </View>
