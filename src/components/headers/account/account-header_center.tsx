@@ -15,10 +15,10 @@ export default function AccountHeaderCenter() {
         <View style={container}>
             <UserShow.Root data={session.user}>
                 <UserShow.Username
+                    pressable={false}
                     displayYou={false}
                     displayOnMoment={false}
                     scale={1.3}
-                    disableAnalytics={true}
                     margin={0}
                 />
             </UserShow.Root>
