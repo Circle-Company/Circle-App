@@ -1,7 +1,6 @@
-import { useNavigation } from "@react-navigation/native"
+import { NavigationProp, useNavigation } from "@react-navigation/native"
 import React from "react"
-import { Pressable, View } from "react-native"
-import MomentIcon from "../../../assets/icons/svgs/bolt.svg"
+import { Pressable, TextStyle, View, ViewStyle } from "react-native"
 import { Text } from "../../../components/Themed"
 import { Memory } from "../../../components/memory"
 import { MemoryObjectProps } from "../../../components/memory/memory-types"
@@ -9,7 +8,7 @@ import { Moment } from "../../../components/moment"
 import { userReciveDataProps } from "../../../components/user_show/user_show-types"
 import MemoryContext from "../../../contexts/memory"
 import { truncated } from "../../../helpers/processText"
-import ColorTheme, { colors } from "../../../layout/constants/colors"
+import { colors } from "../../../layout/constants/colors"
 import fonts from "../../../layout/constants/fonts"
 import sizes from "../../../layout/constants/sizes"
 
@@ -37,32 +36,32 @@ export default function render_memory({
     icon = false,
 }: RenderMemoryProps) {
     const { setMemory } = React.useContext(MemoryContext)
-    const navigation: any = useNavigation()
-    const container: any = {
+    const navigation: NavigationProp<any> = useNavigation()
+    const container: ViewStyle = {
         marginRight: dinamicMargin
             ? (memory.moments.length == 1 && marginRight - 23 * scale) ||
               (memory.moments.length == 2 && marginRight - 5 * scale) ||
               (memory.moments.length == 3 && marginRight + 5 * scale)
             : marginRight,
     }
-    const c0 = {
+    const c0: ViewStyle = {
         zIndex: 3,
         transform: [{ scale }],
     }
-    const c1 = {
+    const c1: ViewStyle = {
         position: "absolute",
         zIndex: 2,
         left: 35 * scale,
         transform: [{ scale: 0.8 * scale }],
     }
-    const c2 = {
+    const c2: ViewStyle = {
         position: "absolute",
         zIndex: 1,
         left: 60 * scale,
         transform: [{ scale: 0.6 * scale }],
     }
 
-    const text_container: any = {
+    const text_container: ViewStyle = {
         marginTop: textMarginTop * scale,
         alignItems: "center",
     }
@@ -70,45 +69,37 @@ export default function render_memory({
         fontSize: fontSize * scale,
         fontFamily: fonts.family.Bold,
     }
-    const icon_container: any = {
+    const icon_container: ViewStyle = {
         flexDirection: "row",
         alignItems: "center",
         justifyContent: "center",
         paddingVertical: sizes.paddings["1sm"] * 0.2,
-        paddingLeft: sizes.paddings["1sm"] * 0.6,
-        paddingRight: sizes.paddings["1sm"],
+        paddingLeft: sizes.paddings["1sm"] * 0.4,
+        paddingRight: sizes.paddings["1sm"] * 0.9,
         backgroundColor: colors.gray.grey_08,
-        borderRadius: 10,
+        borderRadius: 50,
         borderWidth: 1,
         borderColor: "#ffffff20",
     }
 
-    const headerContainer: any = {
+    const headerContainer: ViewStyle = {
         position: "absolute",
         zIndex: 2,
         top: 12,
-        left: 12,
+        left: 14,
         flexDirection: "row",
         alignItems: "center",
         justifyContent: "center",
     }
 
-    const badge: any = {
-        backgroundColor: ColorTheme().error,
-        width: 7,
-        height: 7,
-        borderRadius: 5,
-        marginLeft: 3,
-    }
-
-    const icon_text: any = {
+    const icon_text: TextStyle = {
         marginLeft: 4,
         fontSize: fontSize * scale * 0.8,
         fontFamily: fonts.family.Medium,
         color: colors.gray.white,
     }
 
-    async function handlePressed(memoryData: any) {
+    async function handlePressed(memoryData: MemoryObjectProps) {
         if (pressable) {
             console.log("handlePressed: ", user)
             setMemory({ user, ...memoryData })
@@ -120,7 +111,7 @@ export default function render_memory({
         <View style={container}>
             <Memory.MainRoot data={memory}>
                 {memory.moments.map((moment, index) => {
-                    const container: any =
+                    const container: ViewStyle =
                         (index == 0 && c0) || (index == 1 && c1) || (index == 2 && c2)
                     return (
                         <Moment.Root.Main
@@ -134,14 +125,9 @@ export default function render_memory({
                                     handlePressed(memory)
                                 }}
                             >
-                                {icon && (
+                                {memory.total_moments_num > 1 && (
                                     <View style={headerContainer}>
                                         <View style={icon_container}>
-                                            <MomentIcon
-                                                fill={`${colors.gray.white}`}
-                                                width={10}
-                                                height={10}
-                                            />
                                             <Text style={icon_text}>
                                                 {memory.total_moments_num}
                                             </Text>
