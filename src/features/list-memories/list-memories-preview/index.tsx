@@ -1,19 +1,17 @@
 import { useNavigation } from "@react-navigation/native"
 import React from "react"
-import { FlatList, useColorScheme, View } from "react-native"
+import { FlatList, View } from "react-native"
 import Animated, { FadeInLeft } from "react-native-reanimated"
 import ViewMorebutton from "../../../components/buttons/view_more"
 import OfflineCard from "../../../components/general/offline"
 import { Loading } from "../../../components/loading"
 import { Memory } from "../../../components/memory"
 import { userReciveDataProps } from "../../../components/user_show/user_show-types"
-import AccountContext from "../../../contexts/account"
 import MemoryContext from "../../../contexts/memory"
 import NetworkContext from "../../../contexts/network"
 import PersistedContext from "../../../contexts/Persisted"
 import LanguageContext from "../../../contexts/Preferences/language"
 import ViewProfileContext from "../../../contexts/viewProfile"
-import fonts from "../../../layout/constants/fonts"
 import sizes from "../../../layout/constants/sizes"
 import api from "../../../services/Api"
 import RenderMemory from "../components/render-memory"
@@ -32,7 +30,6 @@ export default function ListMemoriesPreview({
     user,
 }: RenderMemoriesPreviewProps) {
     const { useUserProfile } = React.useContext(ViewProfileContext)
-    const accountContext = React.useContext(AccountContext)
     const { t } = React.useContext(LanguageContext)
     const [memories, setMemories] = React.useState([])
     const [memoriesCount, setMemoriesCount] = React.useState(0)
@@ -44,10 +41,8 @@ export default function ListMemoriesPreview({
     const [endReached, setEndReached] = React.useState(false)
     const { setAllMemoriesUser } = React.useContext(MemoryContext)
     const { networkStats } = React.useContext(NetworkContext)
-    const isDarkMode = useColorScheme() === "dark"
 
     const fetchData = async () => {
-        console.log({ userId: user.id, token: session.account.jwtToken })
         await api
             .post(
                 `/memory/get-user-memories?page=${page}&pageSize=${pageSize}`,
@@ -112,15 +107,8 @@ export default function ListMemoriesPreview({
 
     const navigation = useNavigation()
 
-    const container = {
-        marginTop: sizes.margins["2sm"],
-    }
     const content_container: any = {
         flexDirection: "row",
-    }
-    const headerTitle: any = {
-        fontSize: fonts.size.body * 0.9,
-        fontFamily: fonts.family.Semibold,
     }
 
     if (networkStats == "OFFLINE" && memories.length == 0)
@@ -129,7 +117,7 @@ export default function ListMemoriesPreview({
     if (loading) return <ListMemoriesPreviewSkeleton />
     if (memories.length === 0) return <AnyMemoryCard isAccountScreen={isAccountScreen} />
     return (
-        <View style={container}>
+        <>
             <Memory.Header>
                 <Memory.HeaderLeft number={memoriesCount} />
                 <Memory.HeaderRight>
@@ -185,6 +173,6 @@ export default function ListMemoriesPreview({
                     )
                 }}
             />
-        </View>
+        </>
     )
 }
