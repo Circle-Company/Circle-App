@@ -14,6 +14,7 @@ import { useUserShowContext } from "../user_show-context"
 import { UserUsernameProps } from "../user_show-types"
 
 export default function user_username({
+    pressable = true,
     displayOnMoment = true,
     truncatedSize = 30,
     displayYou = true,
@@ -57,11 +58,13 @@ export default function user_username({
     }
 
     async function onUsernameAction() {
-        executeBeforeClick ? executeBeforeClick() : null
-        await navigation.navigate("ProfileNavigator", {
-            screen: "Profile",
-            params: { findedUserPk: user.id },
-        })
+        if (pressable) {
+            executeBeforeClick ? executeBeforeClick() : null
+            await navigation.navigate("ProfileNavigator", {
+                screen: "Profile",
+                params: { findedUserPk: user.id },
+            })
+        }
     }
 
     const username = `${truncated({ text: user.username, size: Number(truncatedSize) })}`

@@ -18,6 +18,7 @@ export type UserRootProps = {
 }
 
 export type UserUsernameProps = {
+    pressable?: boolean
     displayOnMoment?: boolean
     displayYou?: boolean
     truncatedSize?: number
