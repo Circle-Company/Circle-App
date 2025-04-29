@@ -1,21 +1,20 @@
 import React from "react"
-import { View } from "react-native"
+import { View, ViewStyle } from "react-native"
 import { Profile } from "../../components/profile"
 import { userReciveDataProps } from "../../components/user_show/user_show-types"
 import sizes from "../../layout/constants/sizes"
-import RenderStatistics from "./render-statistics"
 
 type RenderProfileProps = {
     user: userReciveDataProps
 }
 
 export default function RenderProfile({ user }: RenderProfileProps) {
-    const top_container: any = {
-        paddingTop: sizes.paddings["1md"],
+    const top_container: ViewStyle = {
+        paddingTop: sizes.paddings["2sm"],
         alignItems: "center",
     }
-    const name_container: any = {
-        paddingTop: sizes.paddings["1sm"],
+    const name_container: ViewStyle = {
+        paddingTop: sizes.paddings["1sm"] * 0.6,
     }
 
     return (
@@ -26,11 +25,12 @@ export default function RenderProfile({ user }: RenderProfileProps) {
                     <Profile.Name scale={0.8} />
                 </View>
             </View>
-
-            <RenderStatistics />
-            <View style={{ marginTop: sizes.margins["1sm"], marginBottom: sizes.margins["1md"] }}>
-                <Profile.Description />
-            </View>
+            <Profile.Statistics.Container>
+                <Profile.Statistics.Followers />
+                <Profile.Statistics.Likes />
+                <Profile.Statistics.Views />
+            </Profile.Statistics.Container>
+            <Profile.Description />
         </Profile.MainRoot>
     )
 }
