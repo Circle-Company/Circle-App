@@ -120,11 +120,11 @@ const moment = {
         fontScale: 0.6,
     },
     tiny: {
-        width: 161,
-        height: momentAspectRatio * 161,
+        width: 182,
+        height: momentAspectRatio * 182,
         paddingTop: 2,
         padding: 5,
-        borderRadius: 30,
+        borderRadius: 34,
     },
     small: {
         width: 283,
