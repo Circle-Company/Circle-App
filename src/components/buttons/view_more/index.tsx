@@ -1,4 +1,3 @@
-import { useNavigation } from "@react-navigation/native"
 import React from "react"
 import { Animated, Pressable } from "react-native"
 import ColorTheme from "../../../layout/constants/colors"
@@ -31,7 +30,6 @@ export default function ViewMorebutton({
         <ChevronRight fill={String(ColorTheme().primary)} width={11 * scale} height={11 * scale} />
     ),
 }: ViewMorePuttonProps) {
-    const navigation = useNavigation()
     var animatedScale = React.useRef(new Animated.Value(1)).current
 
     var animatedScale = React.useRef(new Animated.Value(1)).current
