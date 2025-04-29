@@ -1,21 +1,17 @@
-import { truncated } from "@/helpers/processText"
 import React from "react"
-import { useColorScheme, View } from "react-native"
+import { TextStyle, View, ViewStyle } from "react-native"
 import BottomSheetContext from "../../../../contexts/bottomSheet"
 import LanguageContext from "../../../../contexts/Preferences/language"
 import NumberConversor from "../../../../helpers/numberConversor"
 import ColorTheme from "../../../../layout/constants/colors"
 import fonts from "../../../../layout/constants/fonts"
-import sizes from "../../../../layout/constants/sizes"
 import Button from "../../../buttons/button-standart"
 import { Text } from "../../../Themed"
 import { useProfileContext } from "../../profile-context"
-import { ProfileStatisticsViewsProps } from "../../profile-types"
 import ViewsRenderModal from "./profile-statistics-views-modal"
 
-export default function statistics_views({}: ProfileStatisticsViewsProps) {
+export default function statistics_views() {
     const { user } = useProfileContext()
-    const isDarkMode = useColorScheme() === "dark"
     const { expand } = React.useContext(BottomSheetContext)
     const { t } = React.useContext(LanguageContext)
 
@@ -26,35 +22,32 @@ export default function statistics_views({}: ProfileStatisticsViewsProps) {
         })
     }
 
-    const container: any = {
+    const container: ViewStyle = {
         alignItems: "center",
-        justifyContent: "center",
-        flexDirection: "row",
     }
 
-    const num_style: any = {
+    const num_style: TextStyle = {
         fontFamily: fonts.family.Bold,
-        fontSize: fonts.size.body,
+        fontSize: fonts.size.title3,
         color: ColorTheme().text,
-        marginRight: sizes.margins["1sm"],
     }
-    const text_style: any = {
-        fontFamily: fonts.family.Semibold,
-        fontSize: fonts.size.body,
+    const text_style: TextStyle = {
+        fontFamily: fonts.family.Medium,
+        fontSize: fonts.size.body * 0.8,
         color: ColorTheme().textDisabled,
     }
     return (
         <Button
             margins={false}
-            width={sizes.screens.width / 4}
-            backgroundColor="#00000000"
             action={handlePress}
             bounciness={5}
             animationScale={0.9}
+            borderRadius={0}
+            backgroundColor="#00000000"
         >
             <View style={container}>
-                <Text style={num_style}>{NumberConversor(user?.statistics?.total_views_num)}</Text>
-                <Text style={text_style}>{truncated({ text: t("Views"), size: 8 })}</Text>
+                <Text style={num_style}>{NumberConversor(user.statistics.total_views_num)}</Text>
+                <Text style={text_style}>{t("Views")}</Text>
             </View>
         </Button>
     )

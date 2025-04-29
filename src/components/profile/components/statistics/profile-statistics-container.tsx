@@ -1,6 +1,7 @@
+import ColorTheme from "@/layout/constants/colors"
+import sizes from "@/layout/constants/sizes"
 import React from "react"
 import { Animated, ViewStyle } from "react-native"
-import sizes from "../../../../layout/constants/sizes"
 import { ProfileStatisticsContainerProps } from "../../profile-types"
 
 export default function statistics_container({ children }: ProfileStatisticsContainerProps) {
@@ -21,13 +22,18 @@ export default function statistics_container({ children }: ProfileStatisticsCont
     }, [])
 
     const container: ViewStyle = {
-        width: sizes.screens.width,
-        flexDirection: "row",
+        gap: -sizes.margins["1md"],
+        alignSelf: "center",
         alignItems: "center",
-        justifyContent: "space-between", // Distribui os itens uniformemente
-        paddingHorizontal: sizes.paddings["1xl"] * 1.2,
-        opacity: animatedOpacity,
-        gap: 10, // Adiciona espaçamento entre os itens (React Native 0.70+)
+        justifyContent: "center",
+        marginTop: sizes.margins["1md"],
+        marginBottom: sizes.margins["1md"],
+        backgroundColor: ColorTheme().backgroundDisabled + 90,
+        borderRadius: 100,
+        paddingVertical: sizes.paddings["1sm"] * 0.7,
+        marginHorizontal: sizes.paddings["1lg"],
+        width: sizes.screens.width / 1.4,
+        flexDirection: "row",
     }
 
     return <Animated.View style={container}>{children}</Animated.View>
