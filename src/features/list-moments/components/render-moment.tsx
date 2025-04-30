@@ -15,7 +15,7 @@ type renderMomentProps = {
 
 export default function render_moment({ momentData, isFocused, isFeed }: renderMomentProps) {
     const { height, progress } = useKeyboardAnimation()
-    const { commentEnabled, next, previous } = React.useContext(FeedContext)
+    const { commentEnabled } = React.useContext(FeedContext)
     const [animatedValue] = React.useState(new Animated.Value(0))
     const [commentValue] = React.useState(new Animated.Value(0))
     const [opacityValue] = React.useState(new Animated.Value(1))
@@ -110,7 +110,7 @@ export default function render_moment({ momentData, isFocused, isFeed }: renderM
         outputRange: [0, 1.08], // Adjust the value as needed
     })
 
-    const animated_container: any = {
+    const animated_container = {
         opacity: opacityValue,
         transform: [
             { translateY: isFocused ? translateY : 0 },
@@ -119,7 +119,7 @@ export default function render_moment({ momentData, isFocused, isFeed }: renderM
         ],
     }
 
-    const animated_comment_container: any = {
+    const animated_comment_container = {
         transform: [{ translateY: isFocused ? translateCommentsY : 0 }],
     }
     return (
@@ -141,9 +141,7 @@ export default function render_moment({ momentData, isFocused, isFeed }: renderM
                                 <UserShow.ProfilePicture
                                     pictureDimensions={{ width: 30, height: 30 }}
                                 />
-                                <UserShow.Username
-                                    truncatedSize={momentData.user.you_follow ? 14 : 8}
-                                />
+                                <UserShow.Username truncatedSize={15} />
 
                                 <UserShow.FollowButton
                                     isFollowing={momentData.user.you_follow}

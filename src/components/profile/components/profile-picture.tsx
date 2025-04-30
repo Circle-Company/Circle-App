@@ -13,12 +13,12 @@ export default function picture({ fromProfile = false }: ProfilePictureProps) {
     const [profilePicture, setProfilePicture] = React.useState<string>("")
 
     const pictureDimensions = {
-        width: 100,
-        height: 100,
+        width: 130,
+        height: 130,
         padding: 10,
-        borderRadius: 133 / 2,
+        borderRadius: 130 / 2,
     }
-    const outlineSize: Number = Number(Number(pictureDimensions.width) / 20)
+    const outlineSize: number = Number(Number(pictureDimensions.width) / 20)
 
     const container: any = {
         alignItems: "center",
@@ -37,8 +37,8 @@ export default function picture({ fromProfile = false }: ProfilePictureProps) {
 
     async function onProfilePictureAction() {}
 
-    var animatedScale = React.useRef(new Animated.Value(0)).current
-    var animatedOpacity = React.useRef(new Animated.Value(0.2)).current
+    const animatedScale = React.useRef(new Animated.Value(0)).current
+    const animatedOpacity = React.useRef(new Animated.Value(0.2)).current
 
     function handleAnimation() {
         Animated.spring(animatedScale, {

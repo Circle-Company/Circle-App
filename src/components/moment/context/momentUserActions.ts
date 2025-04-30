@@ -12,6 +12,7 @@ export interface MomentUserActionsState extends MomentUserActionsProps {
     setSkipped: React.Dispatch<React.SetStateAction<boolean>>
     setShowLessOften: React.Dispatch<React.SetStateAction<boolean>>
     setReported: React.Dispatch<React.SetStateAction<boolean>>
+    setInitialLikedState: React.Dispatch<React.SetStateAction<boolean>>
     setMomentUserActions: (momentUserActions: MomentUserActionsProps) => void
     exportMomentUserActions: () => MomentUserActionsProps
     handleLikeButtonPressed: ({ likedValue }: { likedValue?: boolean }) => void
@@ -29,6 +30,7 @@ export function useMomentUserActions(): MomentUserActionsState {
     const [skipped, setSkipped] = React.useState<boolean>(false)
     const [showLessOften, setShowLessOften] = React.useState<boolean>(false)
     const [reported, setReported] = React.useState<boolean>(false)
+    const [initialLikedState, setInitialLikedState] = React.useState<boolean>(false)
 
     function exportMomentUserActions(): MomentUserActionsProps {
         return {
@@ -43,12 +45,16 @@ export function useMomentUserActions(): MomentUserActionsState {
             skipped,
             showLessOften,
             reported,
+            initialLikedState,
         }
     }
 
-    function handleLikeButtonPressed() {
-        if (liked == true) setLiked(false)
-        else setLiked(true)
+    function handleLikeButtonPressed({ likedValue }: { likedValue?: boolean } = {}) {
+        if (likedValue !== undefined) {
+            setLiked(likedValue)
+        } else {
+            setLiked(!liked)
+        }
     }
 
     function setMomentUserActions(momentUserActions: MomentUserActionsProps) {
@@ -63,6 +69,7 @@ export function useMomentUserActions(): MomentUserActionsState {
         setSkipped(momentUserActions.skipped)
         setShowLessOften(momentUserActions.showLessOften)
         setReported(momentUserActions.reported)
+        setInitialLikedState(momentUserActions.liked)
     }
 
     return {
@@ -77,6 +84,7 @@ export function useMomentUserActions(): MomentUserActionsState {
         skipped,
         showLessOften,
         reported,
+        initialLikedState,
         setShared,
         setViewed,
         setClickIntoMoment,
@@ -87,6 +95,7 @@ export function useMomentUserActions(): MomentUserActionsState {
         setSkipped,
         setShowLessOften,
         setReported,
+        setInitialLikedState,
 
         setMomentUserActions,
         exportMomentUserActions,

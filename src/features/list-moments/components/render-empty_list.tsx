@@ -69,6 +69,9 @@ export function EmptyList() {
             if (loading) startSpinAnimation()
         })
     }
+    useEffect(() => {
+        reloadFeed()
+    }, [])
 
     useEffect(() => {
         if (loading) {
@@ -197,6 +200,7 @@ export function EmptyList() {
             <ButtonStandart
                 width={loading ? sizes.screens.width * 0.2 : undefined}
                 animationScale={0.92}
+                margins={false}
                 backgroundColor={isDarkMode ? colors.gray.grey_08 : colors.gray.grey_02}
                 action={reloadFeed}
             >
