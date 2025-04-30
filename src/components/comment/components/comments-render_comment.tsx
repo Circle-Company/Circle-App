@@ -1,6 +1,6 @@
 import Button from "@/components/buttons/button-standart"
 import React from "react"
-import { View } from "react-native"
+import { TextStyle, View, ViewStyle } from "react-native"
 import HeartIconOutline from "../../../assets/icons/svgs/heart_2-outline.svg"
 import HeartIcon from "../../../assets/icons/svgs/heart_2.svg"
 import PersistedContext from "../../../contexts/Persisted"
@@ -23,46 +23,46 @@ export default function render_comment({ comment }: CommentsRenderCommentProps) 
 
     const [like, setLike] = React.useState(comment.is_liked)
 
-    const container: any = {
+    const container: ViewStyle = {
         flexDirection: "row",
         marginTop: preview ? sizes.margins["1sm"] * 0.8 : sizes.margins["1md"],
         marginBottom: preview ? sizes.margins["1sm"] * 0.5 : sizes.margins["2sm"],
     }
-    const container_left: any = {
+    const container_left: ViewStyle = {
         left: -2,
         alignItems: "center",
         justifyContent: "flex-start",
         marginRight: sizes.margins["1sm"] / 2,
     }
-    const container_center: any = {
+    const container_center: ViewStyle = {
         top: preview ? 0 : -4,
         left: -2,
         flex: 1,
         alignItems: "flex-start",
         justifyContent: "center",
     }
-    const container_right: any = {
+    const container_right: ViewStyle = {
         alignItems: "center",
         justifyContent: "center",
-        marginLeft: sizes.margins["3sm"],
+        marginLeft: sizes.margins["2sm"],
         marginTop: sizes.margins["2sm"] * 0.7,
     }
-    const like_container: any = {
+    const like_container: ViewStyle = {
         width: "100%",
         alignItems: "center",
         justifyContent: "center",
         padding: sizes.paddings["1sm"] / 5,
     }
-    const container_center_top: any = {
+    const container_center_top: ViewStyle = {
         flexDirection: "row",
         marginBottom: sizes.margins["1sm"] * 0.5,
     }
-    const content_style = {
+    const content_style: TextStyle = {
         marginTop: preview ? -2 : 0,
         fontSize: preview ? fonts.size.body * 0.9 : fonts.size.body,
         fontFamily: "RedHatDisplay-Medium",
     }
-    const date_style = {
+    const date_style: TextStyle = {
         marginLeft: 5,
         fontSize: preview ? fonts.size.caption1 : fonts.size.caption1 * 1.1,
         fontFamily: fonts.family.Medium,
@@ -138,6 +138,7 @@ export default function render_comment({ comment }: CommentsRenderCommentProps) 
                 height={sizes.sizes["2md"] * 0.7}
                 width={sizes.sizes["2md"] * 0.7}
                 style={container_right}
+                margins={false}
                 backgroundColor={ColorTheme().backgroundDisabled + 90}
             >
                 <View style={like_container}>
