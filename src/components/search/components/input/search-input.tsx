@@ -51,6 +51,11 @@ export default function input() {
         fetchDataFromApi()
     }, [searchTerm])
 
+    React.useEffect(() => {
+        setShowCancel(false)
+        setSearchTerm("")
+    }, [])
+
     const out_container: any = {
         width: sizes.screens.width,
         height: sizes.headers.height,
@@ -149,7 +154,7 @@ export default function input() {
                             value={searchTerm}
                             onChangeText={handleInputChange}
                             autoCapitalize="none"
-                            autoFocus={true}
+                            autoFocus={false}
                         />
                     </View>
                     {showCancel && (

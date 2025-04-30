@@ -2,7 +2,6 @@ import { useNavigation } from "@react-navigation/native"
 import React from "react"
 import { Text, View } from "react-native"
 import Camera from "../../../assets/icons/svgs/plus_circle.svg"
-import SearchIcon from "../../../assets/icons/svgs/search.svg"
 import LanguageContext from "../../../contexts/Preferences/language"
 import ColorTheme from "../../../layout/constants/colors"
 import fonts from "../../../layout/constants/fonts"
@@ -46,14 +45,6 @@ export default function HeaderRightHome() {
                     <Text style={text}>{t("Create")}</Text>
                 </View>
                 <Camera fill={String(ColorTheme().text)} width={16} height={16} />
-            </ButtonStandart>
-
-            <ButtonStandart
-                square
-                action={onPressSearch}
-                backgroundColor={String(ColorTheme().backgroundDisabled)}
-            >
-                <SearchIcon fill={String(ColorTheme().text)} width={18} height={18} />
             </ButtonStandart>
         </View>
     )

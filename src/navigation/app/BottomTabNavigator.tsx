@@ -2,14 +2,17 @@ import { BadgeIcon } from "@/components/general/badge-icon"
 import PersistedContext from "@/contexts/Persisted"
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs"
 import React from "react"
+import UserOutline from "../../assets/icons/svgs/@.svg"
+import User from "../../assets/icons/svgs/@3.svg"
+import WorldOutline from "../../assets/icons/svgs/compass-outline.svg"
+import World from "../../assets/icons/svgs/compass.svg"
 import MomentOutline from "../../assets/icons/svgs/moments-outline.svg"
 import Moment from "../../assets/icons/svgs/moments.svg"
-import UserOutline from "../../assets/icons/svgs/user_circle-outline.svg"
-import User from "../../assets/icons/svgs/user_circle.svg"
 import LanguageContext from "../../contexts/Preferences/language"
 import ColorTheme from "../../layout/constants/colors"
 import sizes from "../../layout/constants/sizes"
 import { AccountScreenNavigator } from "./AccountNavigator"
+import { ExploreScreenNavigator } from "./ExploreScreenNavigator"
 import { HomeScreenNavigator } from "./HomeScreenNavigator"
 
 const BottomTab = createBottomTabNavigator()
@@ -46,6 +49,27 @@ export default function BottomTabNavigator() {
                             />
                         ) : (
                             <MomentOutline
+                                fill={String(ColorTheme().icon)}
+                                width={iconWidth}
+                                height={iconHeight}
+                            />
+                        ),
+                }}
+            />
+            <BottomTab.Screen
+                name="World"
+                component={ExploreScreenNavigator}
+                options={{
+                    title: t("Explore"),
+                    tabBarIcon: ({ focused }) =>
+                        focused ? (
+                            <World
+                                fill={String(ColorTheme().iconFocused)}
+                                width={iconWidth}
+                                height={iconHeight}
+                            />
+                        ) : (
+                            <WorldOutline
                                 fill={String(ColorTheme().icon)}
                                 width={iconWidth}
                                 height={iconHeight}

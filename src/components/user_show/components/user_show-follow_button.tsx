@@ -35,26 +35,26 @@ export default function follow_button({
     }
 
     const container_unpressed: any = {
-        width: sizes.buttons.width / 4.8,
         height: sizes.buttons.height / 3.2,
-        borderRadius: sizes.borderRadius["1sm"] * 0.9,
+        borderRadius: sizes.buttons.height / 2,
         backgroundColor: ColorTheme().text,
         margin: sizes.margins["1sm"],
         alignItems: "center",
         justifyContent: "center",
         borderWidth: sizes.borders["1md"],
         borderColor: ColorTheme().text + "50",
+        paddingHorizontal: sizes.paddings["1sm"],
     }
     const container_pressed: any = {
-        width: sizes.buttons.width / 4.8,
         height: sizes.buttons.height / 3.2,
-        borderRadius: sizes.borderRadius["1sm"] * 0.9,
+        borderRadius: sizes.buttons.height / 2,
         backgroundColor: displayOnMoment
             ? ColorTheme().backgroundDisabled + "99"
             : ColorTheme().backgroundDisabled,
         margin: sizes.margins["1sm"],
         alignItems: "center",
         justifyContent: "center",
+        paddingHorizontal: sizes.paddings["1sm"],
     }
     const username_pressed: any = {
         fontSize: fonts.size.body * 0.76,
@@ -68,9 +68,11 @@ export default function follow_button({
     }
     async function ButtonAction() {
         if (followPressed) {
+            unfollow()
             HandleButtonAnimation()
             setFollowPressed(false)
         } else {
+            follow()
             HandleButtonAnimation()
             setFollowPressed(true)
         }

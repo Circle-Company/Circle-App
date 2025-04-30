@@ -88,6 +88,7 @@ export type MomentUserActionsProps = {
     skipped: boolean
     showLessOften: boolean
     reported: boolean
+    initialLikedState: boolean
 }
 
 export type MomentUserActionsReturnsProps = {
@@ -102,6 +103,7 @@ export type MomentUserActionsReturnsProps = {
     skipped: boolean
     showLessOften: boolean
     reported: boolean
+    initialLikedState: boolean
 
     setShared: React.Dispatch<React.SetStateAction<boolean>>
     setViewed: React.Dispatch<React.SetStateAction<boolean>>
@@ -113,6 +115,7 @@ export type MomentUserActionsReturnsProps = {
     setSkipped: React.Dispatch<React.SetStateAction<boolean>>
     setShowLessOften: React.Dispatch<React.SetStateAction<boolean>>
     setReported: React.Dispatch<React.SetStateAction<boolean>>
+    setInitialLikedState: React.Dispatch<React.SetStateAction<boolean>>
 
     setMomentUserActions: (momentUserActions: MomentUserActionsProps) => void
     injectInteractionsToList: () => void

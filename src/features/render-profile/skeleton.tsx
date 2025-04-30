@@ -1,36 +1,38 @@
-import { View } from "../../components/Themed"
+import React from "react"
+import { View, ViewStyle } from "react-native"
 import { Skeleton } from "../../components/skeleton"
 import sizes from "../../layout/constants/sizes"
 
 export function RenderProfileSkeleton() {
-    const container = {
+    const container: ViewStyle = {
         paddingTop: sizes.paddings["1md"],
         width: sizes.screens.width,
         alignItems: "center",
         justifyContent: "flex-start",
     }
 
-    const statisticsContainer = {
+    const statisticsContainer: ViewStyle = {
         flexDirection: "row",
         alignItems: "center",
         justifyContent: "center",
         marginTop: sizes.margins["1xl"] * 0.6,
     }
 
-    const statistic = {
+    const statistic: ViewStyle = {
         width: sizes.screens.width / 4,
         alignItems: "center",
         justifyContent: "center",
     }
     return (
         <View style={container}>
-            <Skeleton.View style={{ width: 100, height: 100, borderRadius: 50 }} />
+            <Skeleton.View style={{ width: 130, height: 130, borderRadius: 130 / 2 }} />
             <Skeleton.View
                 style={{
-                    width: 100,
-                    height: 20,
-                    borderRadius: 10,
-                    marginTop: sizes.margins["1md"],
+                    alignSelf: "center",
+                    width: 80,
+                    height: 15,
+                    marginTop: 15,
+                    borderRadius: 3,
                 }}
             />
 
@@ -38,27 +40,9 @@ export function RenderProfileSkeleton() {
                 <View style={statistic}>
                     <Skeleton.View
                         style={{
-                            width: 70,
-                            height: 22,
-                            borderRadius: 11,
-                        }}
-                    />
-                </View>
-                <View style={statistic}>
-                    <Skeleton.View
-                        style={{
-                            width: 70,
-                            height: 22,
-                            borderRadius: 11,
-                        }}
-                    />
-                </View>
-                <View style={statistic}>
-                    <Skeleton.View
-                        style={{
-                            width: 70,
-                            height: 22,
-                            borderRadius: 11,
+                            width: 260,
+                            height: 45,
+                            borderRadius: 45 / 2,
                         }}
                     />
                 </View>
@@ -67,25 +51,16 @@ export function RenderProfileSkeleton() {
             <Skeleton.View
                 style={{
                     alignSelf: "center",
-                    width: 100,
+                    width: 140,
                     height: 15,
-                    marginTop: sizes.margins["1lg"],
+                    marginTop: sizes.margins["1md"],
                     borderRadius: 3,
                 }}
             />
             <Skeleton.View
                 style={{
                     alignSelf: "center",
-                    width: 180,
-                    height: 15,
-                    marginTop: 10,
-                    borderRadius: 3,
-                }}
-            />
-            <Skeleton.View
-                style={{
-                    alignSelf: "center",
-                    width: 150,
+                    width: 90,
                     height: 15,
                     marginTop: 10,
                     borderRadius: 3,
