@@ -4,8 +4,8 @@ import { userReciveDataProps } from "../user_show/user_show-types"
 export type CommentObject = {
     id: number
     user: userReciveDataProps
-    content: String
-    created_at: String
+    content: string
+    created_at: string
     statistics: {
         total_likes_num: number
     }
@@ -40,7 +40,9 @@ export type CommentsRenderCommentProps = {
     preview: boolean
     index: number
 }
-export type CommentsHeaderLeftProps = {}
+export type CommentsHeaderLeftProps = {
+    children: React.ReactNode
+}
 export type CommentsInputProps = {
     placeholder?: string
     backgroundColor?: string
