@@ -4,7 +4,7 @@ import { AccountDataType } from "./types"
 const storageKey = storageKeys().account
 
 export interface AccountState extends AccountDataType {
-    setCoordinates: (value: { latitude: number, longitude: number }) => void    
+    setCoordinates: (value: { latitude: number; longitude: number }) => void
     setUnreadNotificationsCount: (value: number) => void
     setJwtToken: (value: string) => void
     setJwtExpiration: (value: string) => void
@@ -30,7 +30,7 @@ export const useAccountStore = create<AccountState>((set) => ({
     last_active_at: storage.getString(storageKey.last_active_at) || new Date().toString(),
     last_login_at: storage.getString(storageKey.last_login_at) || new Date().toString(),
 
-    setCoordinates: (value: { latitude: number, longitude: number }) => {
+    setCoordinates: (value: { latitude: number; longitude: number }) => {
         if (typeof value === "object") {
             storage.set(storageKey.coordinates.latitude, value.latitude)
             storage.set(storageKey.coordinates.longitude, value.longitude)
