@@ -1,0 +1,14 @@
+diff --git a/node_modules/react-native-haptic-feedback/android/build.gradle b/node_modules/react-native-haptic-feedback/android/build.gradle
+index f62f2f7..9bf5144 100644
+--- a/node_modules/react-native-haptic-feedback/android/build.gradle
++++ b/node_modules/react-native-haptic-feedback/android/build.gradle
+@@ -65,9 +65,7 @@ if (isNewArchitectureEnabled()) {
+ 
+ android {
+     def agpVersion = com.android.Version.ANDROID_GRADLE_PLUGIN_VERSION
+-    if (agpVersion.tokenize('.')[0].toInteger() >= 7) {
+       namespace "com.mkuczera"
+-    }
+ 
+     if (agpVersion.tokenize('.')[0].toInteger() >= 8) {
+         buildFeatures {
