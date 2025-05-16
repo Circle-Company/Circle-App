@@ -11,6 +11,10 @@ export function storageKeys() {
             search: baseKey + "history:search",
         },
         account: {
+            coordinates: {
+                latitude: baseKey + "account:coordinates:latitude",
+                longitude: baseKey + "account:coordinates:longitude",
+            },
             unreadNotificationsCount: baseKey + "account:unreadnotificationscount",
             blocked: baseKey + "account:block",
             muted: baseKey + "account:mute",

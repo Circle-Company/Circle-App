@@ -1,7 +1,6 @@
 import UserIcon from "@/assets/icons/svgs/@.svg"
-import { Text } from "@/components/Themed"
 import React from "react"
-import { Keyboard, Pressable, TextInput, View, useColorScheme } from "react-native"
+import { Pressable, TextInput, View, useColorScheme } from "react-native"
 import CloseIcon from "../../../../assets/icons/svgs/close.svg"
 import SearchIcon from "../../../../assets/icons/svgs/search.svg"
 import LanguageContext from "../../../../contexts/Preferences/language"
@@ -14,7 +13,6 @@ export default function input() {
     const { searchTerm, setSearchTerm, fetchData } = useSearchContext()
     const { t } = React.useContext(LanguageContext)
     const isDarkMode = useColorScheme() === "dark"
-    const [showCancel, setShowCancel] = React.useState(Keyboard.isVisible())
 
     const handleInputChange = (text: string) => {
         // Substitui espaços por ponto
@@ -30,17 +28,7 @@ export default function input() {
         setSearchTerm("")
     }
 
-    const handleCancelPress = () => {
-        Keyboard.dismiss()
-        setShowCancel(false)
-    }
-
     React.useEffect(() => {
-        setShowCancel(Keyboard.isVisible())
-    }, [Keyboard.isVisible()])
-
-    React.useEffect(() => {
-        setShowCancel(true)
         const fetchDataFromApi = async () => {
             try {
                 await fetchData(searchTerm)
@@ -52,7 +40,6 @@ export default function input() {
     }, [searchTerm])
 
     React.useEffect(() => {
-        setShowCancel(false)
         setSearchTerm("")
     }, [])
 
@@ -104,6 +91,7 @@ export default function input() {
     }
     const iconContainer2: any = {
         marginLeft: sizes.margins["1sm"],
+        marginRight: sizes.margins["1sm"],
         width: 22,
         height: 22,
         borderRadius: 20,
@@ -157,11 +145,6 @@ export default function input() {
                             autoFocus={false}
                         />
                     </View>
-                    {showCancel && (
-                        <Pressable style={cancelButtonContainer} onPress={handleCancelPress}>
-                            <Text style={cancelText}>Cancel</Text>
-                        </Pressable>
-                    )}
                     {searchTerm && (
                         <Pressable style={iconContainer2} onPress={handleClosePress}>
                             <CloseIcon

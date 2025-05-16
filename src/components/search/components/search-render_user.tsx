@@ -12,13 +12,13 @@ import { UserShow } from "../../user_show"
 import { SearchRenderItemReciveDataObjectProps } from "../search-types"
 
 export default function render_user({ user }: SearchRenderItemReciveDataObjectProps) {
-    var bounciness = 8
-    var animationScale = 0.9
+    const bounciness = 8
+    const animationScale = 0.9
 
     const { t } = React.useContext(LanguageContext)
     const navigation: any = useNavigation()
 
-    var animatedScale = React.useRef(new Animated.Value(1)).current
+    const animatedScale = React.useRef(new Animated.Value(1)).current
     React.useEffect(() => {
         animatedScale.setValue(1)
     }, [])

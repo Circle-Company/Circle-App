@@ -52,6 +52,7 @@ export type actionsProps = {
 }
 
 export type UserFollowButtonProps = {
+    followsYou?: boolean
     isFollowing: boolean
     displayOnMoment?: boolean
     hideOnFollowing?: boolean
