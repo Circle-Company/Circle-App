@@ -1,0 +1,22 @@
+diff --git a/node_modules/react-native-simple-biometrics/android/build.gradle b/node_modules/react-native-simple-biometrics/android/build.gradle
+index bb42230..0cb6e84 100644
+--- a/node_modules/react-native-simple-biometrics/android/build.gradle
++++ b/node_modules/react-native-simple-biometrics/android/build.gradle
+@@ -28,6 +28,7 @@ def getExtOrIntegerDefault(name) {
+ }
+ 
+ android {
++  namespace "com.reactnativesimplebiometrics"
+   compileSdkVersion getExtOrIntegerDefault('compileSdkVersion')
+ 
+   defaultConfig {
+@@ -40,6 +41,9 @@ android {
+       minifyEnabled false
+     }
+   }
++  buildFeatures {
++    buildConfig = true
++  }
+ 
+   lintOptions {
+     disable 'GradleCompatible'

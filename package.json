@@ -10,7 +10,8 @@
         "test": "jest --silent --reporters=default --reporters=jest-silent-reporter",
         "test:watch": "jest --watch",
         "test:coverage": "jest --coverage",
-        "debug": "adb reverse tcp:8097 tcp:8097 && react-devtools && react-native start"
+        "debug": "adb reverse tcp:8097 tcp:8097 && react-devtools && react-native start",
+        "postinstall": "patch-package"
     },
     "dependencies": {
         "@dev-plugins/react-native-mmkv": "^0.0.1",
@@ -98,6 +99,8 @@
         "jest-react-native": "^18.0.0",
         "jest-silent-reporter": "^0.6.0",
         "metro-react-native-babel-preset": "0.76.8",
+        "patch-package": "^8.0.0",
+        "postinstall-postinstall": "^2.1.0",
         "prettier": "^3.3.3",
         "react-native-dotenv": "^3.4.11",
         "react-refresh": "^0.14.2",
