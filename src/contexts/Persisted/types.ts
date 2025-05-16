@@ -34,7 +34,7 @@ export type UserDataReturnsType = {
     setUsername: (value: string) => void
     setDescription: (value: string) => void
     setVerifyed: (value: boolean) => void
-    setProfilePicture: (value: { small_resolution: String; tiny_resolution: String }) => void
+    setProfilePicture: (value: { small_resolution: string; tiny_resolution: string }) => void
     get: (id: number) => Promise<UserState>
     store: (value: userReciveDataProps) => userReciveDataProps
     load: () => userReciveDataProps
@@ -53,6 +53,10 @@ export type PermissionsData = {
 }
 
 export type AccountDataType = {
+    coordinates: {
+        latitude: number
+        longitude: number
+    }
     unreadNotificationsCount: number
     blocked: boolean
     muted: boolean
@@ -62,12 +66,17 @@ export type AccountDataType = {
     jwtExpiration: string
 }
 export type AccountDataReturnsType = {
+    coordinates: {
+        latitude: number
+        longitude: number
+    }
     unreadNotificationsCount: number
     blocked: boolean
     muted: boolean
     last_active_at: string
     last_login_at: string
     jwtToken: string
+    setCoordinates: (value: { latitude: number; longitude: number }) => void
     setUnreadNotificationsCount: (value: number) => void
     setBlocked: (value: boolean) => void
     setMuted: (value: boolean) => void
