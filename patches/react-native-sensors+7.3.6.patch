@@ -1,0 +1,22 @@
+diff --git a/node_modules/react-native-sensors/android/build.gradle b/node_modules/react-native-sensors/android/build.gradle
+index f1526ec..1654a27 100644
+--- a/node_modules/react-native-sensors/android/build.gradle
++++ b/node_modules/react-native-sensors/android/build.gradle
+@@ -23,6 +23,7 @@ buildscript {
+ apply plugin: 'com.android.library'
+ 
+ android {
++    namespace "com.sensors"
+     compileSdkVersion safeExtGet('compileSdkVersion', 23)
+ 
+     defaultConfig {
+@@ -34,6 +35,9 @@ android {
+             abiFilters "armeabi-v7a", "x86"
+         }
+     }
++    buildFeatures {
++        buildConfig = true
++    }
+     lintOptions {
+        warning 'InvalidPackage'
+     }
