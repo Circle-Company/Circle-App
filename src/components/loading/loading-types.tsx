@@ -1,9 +1,9 @@
 export type LoadingProps = {
-    color?: string,
-    size?: number,
+    color?: string
+    size?: number
 }
 export type LoadingContainerProps = {
-    width?: number,
-    height?: number,
+    width?: number
+    height?: number
     children: React.ReactNode
 }

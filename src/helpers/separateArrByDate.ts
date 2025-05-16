@@ -89,36 +89,36 @@ function getDateStringRelative(date: Date, timeInterval: TimeInterval): string {
         return weeksAgo === 0
             ? t("this week")
             : weeksAgo === 1
-              ? t("last week")
-              : `${weeksAgo} ${t("weeks ago")}`
+                ? t("last week")
+                : `${weeksAgo} ${t("weeks ago")}`
     } else if (timeInterval === TimeInterval.BIMONTH) {
         const bimonthsAgo = Math.floor(diff / timeInterval)
         return bimonthsAgo === 0
             ? t("this two months")
             : bimonthsAgo === 1
-              ? t("last two months")
-              : `${bimonthsAgo} ${t("two months ago")}`
+                ? t("last two months")
+                : `${bimonthsAgo} ${t("two months ago")}`
     } else if (timeInterval === TimeInterval.MONTH) {
         const monthsAgo = Math.floor(diff / timeInterval)
         return monthsAgo === 0
             ? t("this month")
             : monthsAgo === 1
-              ? t("last month")
-              : `${monthsAgo} ${t("months ago")}`
+                ? t("last month")
+                : `${monthsAgo} ${t("months ago")}`
     } else if (timeInterval === TimeInterval.TRIMESTER) {
         const trimestersAgo = Math.floor(diff / timeInterval)
         return trimestersAgo === 0
             ? t("this quarter")
             : trimestersAgo === 1
-              ? t("last quarter")
-              : `${trimestersAgo} ${t("quarters ago")}`
+                ? t("last quarter")
+                : `${trimestersAgo} ${t("quarters ago")}`
     } else if (timeInterval === TimeInterval.SEMESTER) {
         const semestersAgo = Math.floor(diff / timeInterval)
         return semestersAgo === 0
             ? t("this semester")
             : semestersAgo === 1
-              ? t("last semester")
-              : `${semestersAgo} ${t("semesters ago")}`
+                ? t("last semester")
+                : `${semestersAgo} ${t("semesters ago")}`
     } else if (timeInterval === TimeInterval.YEAR) {
         const currentYear = now.getFullYear()
         const objYear = date.getFullYear()

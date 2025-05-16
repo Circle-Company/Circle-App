@@ -44,8 +44,8 @@ export default function PasswordScreen() {
         color: signInputPassword
             ? colors.gray.white
             : isDarkMode
-              ? colors.gray.grey_04 + "90"
-              : colors.gray.grey_04 + "90",
+                ? colors.gray.grey_04 + "90"
+                : colors.gray.grey_04 + "90",
     }
 
     const icon = {
@@ -101,8 +101,8 @@ export default function PasswordScreen() {
                         signInputPassword
                             ? colors.gray.white
                             : isDarkMode
-                              ? colors.gray.grey_04 + "90"
-                              : colors.gray.grey_04 + "90"
+                                ? colors.gray.grey_04 + "90"
+                                : colors.gray.grey_04 + "90"
                     )}
                     width={17}
                     height={17}

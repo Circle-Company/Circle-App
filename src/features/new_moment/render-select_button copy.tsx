@@ -49,8 +49,8 @@ export default function RenderSelectFromGalleryButton() {
                     active
                         ? colors.blue.blue_05
                         : isDarkMode
-                          ? colors.gray.grey_07
-                          : colors.gray.grey_02
+                            ? colors.gray.grey_07
+                            : colors.gray.grey_02
                 )}
             >
                 <View style={textContainer}>
@@ -61,8 +61,8 @@ export default function RenderSelectFromGalleryButton() {
                         active
                             ? colors.gray.white
                             : isDarkMode
-                              ? colors.gray.white
-                              : colors.gray.black
+                                ? colors.gray.white
+                                : colors.gray.black
                     )}
                     width={14}
                     height={14}

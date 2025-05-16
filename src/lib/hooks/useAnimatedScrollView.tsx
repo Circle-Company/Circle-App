@@ -46,8 +46,8 @@ export function AnimatedVerticalScrollView({
     const [refreshing, setRefreshing] = React.useState(false)
 
     const gradientColors = useSharedValue({
-        startColor: `rgba(50, 0, 255, 0)`,
-        endColor: `rgba(50, 0, 0, 0)`,
+        startColor: "rgba(50, 0, 255, 0)",
+        endColor: "rgba(50, 0, 0, 0)",
     })
 
     const scrollHandler = useAnimatedScrollHandler({
@@ -159,7 +159,7 @@ export function AnimatedVerticalScrollView({
                 </Animated.View>
             </Animated.View>
 
-            <Animated.View style={[animatedScrollViewStyles]} {...panResponder.panHandlers}>
+            <Animated.View style={animatedScrollViewStyles} {...panResponder.panHandlers}>
                 <Animated.ScrollView
                     style={{ backgroundColor: ColorTheme().background }}
                     onScroll={scrollHandler}

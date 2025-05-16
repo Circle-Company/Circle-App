@@ -1,101 +1,101 @@
 {
-  "migIndex": 1,
-  "data": [
-    {
-      "path": "src/assets/fonts/RaptorV3Premium-Black.ttf",
-      "sha1": "6c7397be5b68bdcf5e02c428d9eb0bc2ecb478cd"
-    },
-    {
-      "path": "src/assets/fonts/RaptorV3Premium-BlackSlanted.ttf",
-      "sha1": "6fca1e9cd5a1450888d3f3d0dd4b9cf516899ec5"
-    },
-    {
-      "path": "src/assets/fonts/RaptorV3Premium-Bold.ttf",
-      "sha1": "ba3327cca994661b44ea883451b2d00823b32a47"
-    },
-    {
-      "path": "src/assets/fonts/RaptorV3Premium-BoldSlanted.ttf",
-      "sha1": "ccafd24055915b92b809d1be72bf68458e3494b2"
-    },
-    {
-      "path": "src/assets/fonts/RaptorV3Premium-Light.ttf",
-      "sha1": "7128ae2a419320894b76cce6aad9ea91feae6be4"
-    },
-    {
-      "path": "src/assets/fonts/RaptorV3Premium-LightSlanted.ttf",
-      "sha1": "9f5adc79ac9d1d4802c9acfd8d66161c7033245d"
-    },
-    {
-      "path": "src/assets/fonts/RaptorV3Premium-Medium.ttf",
-      "sha1": "b52890a27aee4b60b0ca1f802c29958150dc8cdb"
-    },
-    {
-      "path": "src/assets/fonts/RaptorV3Premium-MediumSlanted.ttf",
-      "sha1": "131cc5aa730f5fdd7d9306eb3c73cd211ad06d79"
-    },
-    {
-      "path": "src/assets/fonts/RaptorV3Premium-Regular.ttf",
-      "sha1": "8b910a850632f85c64d782cd317224aa6796159e"
-    },
-    {
-      "path": "src/assets/fonts/RaptorV3Premium-RegularSlanted.ttf",
-      "sha1": "94b59ae8f02795ba42d6472412d7ffe8cc391e6a"
-    },
-    {
-      "path": "src/assets/fonts/RaptorV3Premium-Semibold.ttf",
-      "sha1": "2626cf83f84d39e42b38af2d792bcb8f2ad52f9b"
-    },
-    {
-      "path": "src/assets/fonts/RaptorV3Premium-SemiboldSlanted.ttf",
-      "sha1": "22e6b86ac46b1f422c4f21f1c1074d99d3a344b7"
-    },
-    {
-      "path": "src/assets/fonts/Reality Sunday light.ttf",
-      "sha1": "18be1a1e1c5a4c641f55e5ca52e07fce6c10500c"
-    },
-    {
-      "path": "src/assets/fonts/Reality Sunday.ttf",
-      "sha1": "a30343d5357244887d5070bc496a015442260455"
-    },
-    {
-      "path": "src/assets/fonts/RedHatDisplay-Black.ttf",
-      "sha1": "4824467e1a8b2345c8528e1f317ea3055d96118f"
-    },
-    {
-      "path": "src/assets/fonts/RedHatDisplay-BlackItalic.ttf",
-      "sha1": "e8a08c34cee0f727fbfff8e8f71bfedbf1747d7b"
-    },
-    {
-      "path": "src/assets/fonts/RedHatDisplay-Bold.ttf",
-      "sha1": "a472ec21921d02265a3c7e66c7362243e37e742a"
-    },
-    {
-      "path": "src/assets/fonts/RedHatDisplay-BoldItalic.ttf",
-      "sha1": "2b85811585c2886fe60d333ffeccc05f79f86c5e"
-    },
-    {
-      "path": "src/assets/fonts/RedHatDisplay-Italic.ttf",
-      "sha1": "e0cd390b60cf150e229994c00723abebdea39e8a"
-    },
-    {
-      "path": "src/assets/fonts/RedHatDisplay-Medium.ttf",
-      "sha1": "86d634b9812b7495bb1ea27d43a358f88a73c659"
-    },
-    {
-      "path": "src/assets/fonts/RedHatDisplay-MediumItalic.ttf",
-      "sha1": "48a01d36fde9f704b068a3b784b8ca1e07abbf80"
-    },
-    {
-      "path": "src/assets/fonts/RedHatDisplay-Regular.ttf",
-      "sha1": "2931dff9a5bf36316342bcd0c654381a4a958821"
-    },
-    {
-      "path": "src/assets/fonts/segoeui.ttf",
-      "sha1": "a132afa6a9e4489e5758d9a23242d1aa69fc0464"
-    },
-    {
-      "path": "src/assets/fonts/segoeuib.ttf",
-      "sha1": "b118b30b4af719a33a76b8a563a75382c93d3af8"
-    }
-  ]
+    "migIndex": 1,
+    "data": [
+        {
+            "path": "src/assets/fonts/RaptorV3Premium-Black.ttf",
+            "sha1": "6c7397be5b68bdcf5e02c428d9eb0bc2ecb478cd"
+        },
+        {
+            "path": "src/assets/fonts/RaptorV3Premium-BlackSlanted.ttf",
+            "sha1": "6fca1e9cd5a1450888d3f3d0dd4b9cf516899ec5"
+        },
+        {
+            "path": "src/assets/fonts/RaptorV3Premium-Bold.ttf",
+            "sha1": "ba3327cca994661b44ea883451b2d00823b32a47"
+        },
+        {
+            "path": "src/assets/fonts/RaptorV3Premium-BoldSlanted.ttf",
+            "sha1": "ccafd24055915b92b809d1be72bf68458e3494b2"
+        },
+        {
+            "path": "src/assets/fonts/RaptorV3Premium-Light.ttf",
+            "sha1": "7128ae2a419320894b76cce6aad9ea91feae6be4"
+        },
+        {
+            "path": "src/assets/fonts/RaptorV3Premium-LightSlanted.ttf",
+            "sha1": "9f5adc79ac9d1d4802c9acfd8d66161c7033245d"
+        },
+        {
+            "path": "src/assets/fonts/RaptorV3Premium-Medium.ttf",
+            "sha1": "b52890a27aee4b60b0ca1f802c29958150dc8cdb"
+        },
+        {
+            "path": "src/assets/fonts/RaptorV3Premium-MediumSlanted.ttf",
+            "sha1": "131cc5aa730f5fdd7d9306eb3c73cd211ad06d79"
+        },
+        {
+            "path": "src/assets/fonts/RaptorV3Premium-Regular.ttf",
+            "sha1": "8b910a850632f85c64d782cd317224aa6796159e"
+        },
+        {
+            "path": "src/assets/fonts/RaptorV3Premium-RegularSlanted.ttf",
+            "sha1": "94b59ae8f02795ba42d6472412d7ffe8cc391e6a"
+        },
+        {
+            "path": "src/assets/fonts/RaptorV3Premium-Semibold.ttf",
+            "sha1": "2626cf83f84d39e42b38af2d792bcb8f2ad52f9b"
+        },
+        {
+            "path": "src/assets/fonts/RaptorV3Premium-SemiboldSlanted.ttf",
+            "sha1": "22e6b86ac46b1f422c4f21f1c1074d99d3a344b7"
+        },
+        {
+            "path": "src/assets/fonts/Reality Sunday light.ttf",
+            "sha1": "18be1a1e1c5a4c641f55e5ca52e07fce6c10500c"
+        },
+        {
+            "path": "src/assets/fonts/Reality Sunday.ttf",
+            "sha1": "a30343d5357244887d5070bc496a015442260455"
+        },
+        {
+            "path": "src/assets/fonts/RedHatDisplay-Black.ttf",
+            "sha1": "4824467e1a8b2345c8528e1f317ea3055d96118f"
+        },
+        {
+            "path": "src/assets/fonts/RedHatDisplay-BlackItalic.ttf",
+            "sha1": "e8a08c34cee0f727fbfff8e8f71bfedbf1747d7b"
+        },
+        {
+            "path": "src/assets/fonts/RedHatDisplay-Bold.ttf",
+            "sha1": "a472ec21921d02265a3c7e66c7362243e37e742a"
+        },
+        {
+            "path": "src/assets/fonts/RedHatDisplay-BoldItalic.ttf",
+            "sha1": "2b85811585c2886fe60d333ffeccc05f79f86c5e"
+        },
+        {
+            "path": "src/assets/fonts/RedHatDisplay-Italic.ttf",
+            "sha1": "e0cd390b60cf150e229994c00723abebdea39e8a"
+        },
+        {
+            "path": "src/assets/fonts/RedHatDisplay-Medium.ttf",
+            "sha1": "86d634b9812b7495bb1ea27d43a358f88a73c659"
+        },
+        {
+            "path": "src/assets/fonts/RedHatDisplay-MediumItalic.ttf",
+            "sha1": "48a01d36fde9f704b068a3b784b8ca1e07abbf80"
+        },
+        {
+            "path": "src/assets/fonts/RedHatDisplay-Regular.ttf",
+            "sha1": "2931dff9a5bf36316342bcd0c654381a4a958821"
+        },
+        {
+            "path": "src/assets/fonts/segoeui.ttf",
+            "sha1": "a132afa6a9e4489e5758d9a23242d1aa69fc0464"
+        },
+        {
+            "path": "src/assets/fonts/segoeuib.ttf",
+            "sha1": "b118b30b4af719a33a76b8a563a75382c93d3af8"
+        }
+    ]
 }

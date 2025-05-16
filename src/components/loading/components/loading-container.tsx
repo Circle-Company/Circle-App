@@ -1,19 +1,18 @@
-import React from 'react'
-import {View} from 'react-native'
-import sizes from '../../../layout/constants/sizes'
-import { LoadingContainerProps } from '../loading-types'
+import React from "react"
+import { View } from "react-native"
+import sizes from "../../../layout/constants/sizes"
+import { LoadingContainerProps } from "../loading-types"
 
-export default function container ({
+export default function container({
     width = sizes.screens.width,
     height = sizes.screens.height,
-    children
+    children,
 }: LoadingContainerProps) {
-
-    const container : any = {
-        alignItems: 'center',
-        justifyContent: 'center',
+    const container: any = {
+        alignItems: "center",
+        justifyContent: "center",
         width: width,
-        height: height
+        height: height,
     }
 
     return <View style={container}>{children}</View>

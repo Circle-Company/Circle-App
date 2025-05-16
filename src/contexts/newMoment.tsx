@@ -91,7 +91,7 @@ export function Provider({ children }: NewMomentProviderProps) {
             const imageBase64 = await RNFS.readFile(IMG.uri, "base64")
             await api
                 .post(
-                    `/moment/create`,
+                    "/moment/create",
                     {
                         user_id: session.user.id,
                         moment: {
@@ -142,7 +142,7 @@ export function Provider({ children }: NewMomentProviderProps) {
         if (createdMoment) {
             await api
                 .post(
-                    `/memory/add-moment`,
+                    "/memory/add-moment",
                     {
                         memory_id: selectedMemory?.id,
                         moments_list: [{ id: createdMoment.id }],
@@ -214,7 +214,7 @@ export function Provider({ children }: NewMomentProviderProps) {
         try {
             const response = await api
                 .post(
-                    `memory/get-user-memories`,
+                    "memory/get-user-memories",
                     { user_id: session.user.id },
                     { headers: { Authorization: session.account.jwtToken } }
                 )

@@ -21,7 +21,7 @@ type Moment = {
 }
 
 export type EditMemoryContextsData = {
-    title: String
+    title: string
     editTitle: () => Promise<void>
     deleteMemory: () => Promise<void>
     addMoments: () => Promise<void>
@@ -63,7 +63,7 @@ export function EditMemoryProvider({ children }: EditMemoryProviderProps) {
         try {
             await api
                 .post(
-                    `/memory/add-moment`,
+                    "/memory/add-moment",
                     {
                         memory_id: memory.id,
                         moments_list: moments_ids_list,
@@ -110,7 +110,7 @@ export function EditMemoryProvider({ children }: EditMemoryProviderProps) {
         try {
             await api
                 .post(
-                    `/memory/edit/title`,
+                    "/memory/edit/title",
                     {
                         user_id: session.user.id,
                         memory_id: memory.id,
@@ -162,7 +162,7 @@ export function EditMemoryProvider({ children }: EditMemoryProviderProps) {
             if (isAuthenticated) {
                 await api
                     .post(
-                        `/memory/delete`,
+                        "/memory/delete",
                         {
                             user_id: session.user.id,
                             memory_id: memory.id,

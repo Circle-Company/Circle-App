@@ -158,8 +158,8 @@ export default function like({
             ? 0
             : 1 // Se está curtido, não soma se já estava curtido, senão soma 1
         : momentUserActions.initialLikedState
-          ? -1
-          : 0 // Se não está curtido, subtrai 1 se estava curtido, senão não muda
+            ? -1
+            : 0 // Se não está curtido, subtrai 1 se estava curtido, senão não muda
 
     // Número de likes que será exibido, considerando a interação do usuário
     const adjustedLikes = totalLikes + likeDifference

@@ -89,16 +89,16 @@ export const SwitchButton: React.FC<SwitchButtonProps> = ({
 }
 
 const styles = StyleSheet.create({
+    circle: {
+        borderRadius: 40,
+        height: 24,
+        width: 24,
+    },
     track: {
-        width: 54,
-        height: 30,
         borderRadius: 17,
+        height: 30,
         justifyContent: "center",
         padding: 2,
-    },
-    circle: {
-        width: 24,
-        height: 24,
-        borderRadius: 40,
+        width: 54,
     },
 })

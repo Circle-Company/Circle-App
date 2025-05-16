@@ -101,14 +101,18 @@ export function Provider({ children }: GeolocationProviderProps) {
         if (intervalRef.current) {
             clearInterval(intervalRef.current)
         }
-        
+
         intervalRef.current = setInterval(() => {
-            console.log(`⏰ Executando atualização periódica de localização (intervalo de ${LOCATION_UPDATE_INTERVAL/60000} minutos)`)
-            updateUserLocation().catch(error => {
+            console.log(
+                `⏰ Executando atualização periódica de localização (intervalo de ${LOCATION_UPDATE_INTERVAL / 60000} minutos)`
+            )
+            updateUserLocation().catch((error) => {
                 console.error("Error updating location in interval:", error)
             })
         }, LOCATION_UPDATE_INTERVAL)
-        console.log(`⏱️ Intervalo de atualização de localização iniciado: a cada ${LOCATION_UPDATE_INTERVAL/60000} minutos`)
+        console.log(
+            `⏱️ Intervalo de atualização de localização iniciado: a cada ${LOCATION_UPDATE_INTERVAL / 60000} minutos`
+        )
     }
 
     // Limpa o intervalo quando o componente é desmontado
@@ -125,27 +129,31 @@ export function Provider({ children }: GeolocationProviderProps) {
         const checkUserAndStartUpdating = async () => {
             // Verifica se temos dados do usuário na memória
             if (session.user.id) {
-                console.log(`🔄 Iniciando serviço de localização para usuário ID: ${session.user.id}`)
+                console.log(
+                    `🔄 Iniciando serviço de localização para usuário ID: ${session.user.id}`
+                )
                 try {
                     // Atualiza a localização imediatamente
                     await updateUserLocation()
-                    
+
                     // Inicia o intervalo para atualizações periódicas
                     startLocationUpdateInterval()
                 } catch (error) {
                     console.error("Error in initial location update:", error)
                 }
             } else {
-                console.log("⚠️ Usuário não encontrado na memória, serviço de localização não iniciado")
+                console.log(
+                    "⚠️ Usuário não encontrado na memória, serviço de localização não iniciado"
+                )
             }
         }
-        
+
         checkUserAndStartUpdating()
     }, [session.user.id]) // Dependência na ID do usuário para reiniciar quando mudar
 
     const contextValue: GeolocationContextsData = {
         updateUserLocation,
-        isUpdating
+        isUpdating,
     }
 
     return (

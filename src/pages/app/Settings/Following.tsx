@@ -13,7 +13,7 @@ export default function FollowingScreen() {
         flex: 1,
     }
 
-    const { data, isSuccess, isError, isLoading, refetch, isFetching} =
+    const { data, isSuccess, isError, isLoading, refetch, isFetching } =
         useFindAccountFollowingsQuery()
 
     if (isLoading) {
@@ -30,10 +30,10 @@ export default function FollowingScreen() {
             />
             {isSuccess && data ? (
                 <AnimatedVerticalFlatlist
-                onEndReached={refetch}
-                onEndReachedThreshold={0.1}
-                handleRefresh={handleRefresh}
-                showRefreshSpinner={false}
+                    onEndReached={refetch}
+                    onEndReachedThreshold={0.1}
+                    handleRefresh={handleRefresh}
+                    showRefreshSpinner={false}
                     data={data.data}
                     renderItem={({ item }) => {
                         return <Search.RenderUser user={item} />
