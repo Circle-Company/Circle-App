@@ -1,6 +1,6 @@
 import create from "zustand"
-import api from "../../services/Api"
-import { storage, storageKeys } from "../../store"
+import api from "@/services/Api"
+import { storage, storageKeys } from "@/store"
 import { UserDataType } from "./types"
 const storageKey = storageKeys().user
 
