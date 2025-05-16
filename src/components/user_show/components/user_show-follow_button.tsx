@@ -1,15 +1,17 @@
-import React from "react"
 import { Animated, Pressable } from "react-native"
-import PersistedContext from "../../../contexts/Persisted"
-import LanguageContext from "../../../contexts/Preferences/language"
-import ColorTheme from "../../../layout/constants/colors"
-import fonts from "../../../layout/constants/fonts"
-import sizes from "../../../layout/constants/sizes"
-import { Text } from "../../Themed"
+
+import { Text } from "@/components/Themed"
+import PersistedContext from "@/contexts/Persisted"
+import LanguageContext from "@/contexts/Preferences/language"
+import ColorTheme from "@/layout/constants/colors"
+import fonts from "@/layout/constants/fonts"
+import sizes from "@/layout/constants/sizes"
+import React from "react"
 import { useUserShowContext } from "../user_show-context"
 import { UserFollowButtonProps } from "../user_show-types"
 
 export default function follow_button({
+    followsYou = false,
     isFollowing = false,
     hideOnFollowing = true,
     displayOnMoment = false,
@@ -93,7 +95,9 @@ export default function follow_button({
             return (
                 <Animated.View style={{ transform: [{ scale: animatedScale }] }}>
                     <Pressable style={container_unpressed} onPress={() => ButtonAction()}>
-                        <Text style={username_unpressed}>{t("Follow")}</Text>
+                        <Text style={username_unpressed}>
+                            {followsYou ? t("Follow Back") : t("Follow")}
+                        </Text>
                     </Pressable>
                 </Animated.View>
             )
@@ -111,7 +115,9 @@ export default function follow_button({
             return (
                 <Animated.View style={{ transform: [{ scale: animatedScale }] }}>
                     <Pressable style={container_unpressed} onPress={() => ButtonAction()}>
-                        <Text style={username_unpressed}>{t("Follow")}</Text>
+                        <Text style={username_unpressed}>
+                            {followsYou ? t("Follow Back") : t("Follow")}
+                        </Text>
                     </Pressable>
                 </Animated.View>
             )
