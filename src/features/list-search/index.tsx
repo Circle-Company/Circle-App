@@ -12,6 +12,8 @@ export default function ListSearch() {
     const [searchResults, setSearchResults] = React.useState<SearchResult[]>([])
 
     const listStyle: any = {
+        width: "100%",
+        flex: 1,
         marginTop: sizes.margins["2sm"],
         borderTopWidth: searchResults ? 1 : 0,
         borderColor: ColorTheme().backgroundDisabled,
@@ -34,7 +36,7 @@ export default function ListSearch() {
     }, [searchTerm, fetchData])
 
     if (isConnected == false) return <Search.Offline />
-    if (searchTerm.length == 0) return <Search.NotTyping />
+    if (searchTerm.length == 0) return null
     if (isLoading) return <Search.LoadingCard />
     if ((searchTerm && searchResults?.length == 0) || (undefined && !isLoading))
         return <Search.EmptyListCard />
