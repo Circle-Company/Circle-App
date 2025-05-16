@@ -173,12 +173,10 @@ export function EmptyList() {
                 </Animated.View>
 
                 <Animated.View
-                    style={[
-                        {
-                            opacity: fadeAnim,
-                            transform: [{ translateY: moveAnim }, { scale: scaleAnim }],
-                        },
-                    ]}
+                    style={{
+                        opacity: fadeAnim,
+                        transform: [{ translateY: moveAnim }, { scale: scaleAnim }],
+                    }}
                 >
                     <ButtonStandart
                         animationScale={0.92}

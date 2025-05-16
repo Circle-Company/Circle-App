@@ -1,6 +1,5 @@
 import React from "react"
-import { Text, View} from "../../components/Themed"
-import {Button} from "react-native"
+import { View } from "../../components/Themed"
 import sizes from "../../layout/constants/sizes"
 import NewMomentContext from "../../contexts/newMoment"
 import { FlatList } from "react-native-gesture-handler"
@@ -8,13 +7,13 @@ import RenderMemory from "./components/render_memory"
 import HeaderList from "./components/header_list"
 
 export default function RenderMemoriesSelector() {
-    const {getAllMemories, allMemories, setSelectedMemory} = React.useContext(NewMomentContext)
-    
+    const { getAllMemories, allMemories, setSelectedMemory } = React.useContext(NewMomentContext)
+
     React.useEffect(() => {
         async function get() {
             await getAllMemories()
-        };get()
-        
+        }
+        get()
     }, [])
 
     React.useEffect(() => {
@@ -22,9 +21,9 @@ export default function RenderMemoriesSelector() {
     }, [allMemories])
 
     const container: any = {
-        alignSelf: 'center',
-        alignItems: 'center',
-        justifyContent: 'center',
+        alignSelf: "center",
+        alignItems: "center",
+        justifyContent: "center",
         paddingLeft: 4,
     }
 
@@ -33,15 +32,19 @@ export default function RenderMemoriesSelector() {
     }
 
     return (
-        <View style = {container}>
+        <View style={container}>
             <FlatList
                 numColumns={3}
                 horizontal={false}
                 showsVerticalScrollIndicator={false}
                 data={allMemories}
                 style={list_container}
-                renderItem={({item}) => { return ( <RenderMemory memory={item}/>) }}
-                ListHeaderComponent={() => { return ( <HeaderList/> ) }}
+                renderItem={({ item }) => {
+                    return <RenderMemory memory={item} />
+                }}
+                ListHeaderComponent={() => {
+                    return <HeaderList />
+                }}
             />
         </View>
     )

@@ -86,7 +86,7 @@ export default function ProfilePictureScreen() {
             const imageBase64 = await RNFS.readFile(IMG.uri, "base64")
             await api
                 .put(
-                    `/account/edit/profile-picture`,
+                    "/account/edit/profile-picture",
                     {
                         user_id: session.user.id,
                         midia: { base64: imageBase64 },

@@ -1,6 +1,6 @@
 import React from "react"
 
-export type BottomTabsProps = 'Home' | 'Account'
+export type BottomTabsProps = "Home" | "Account"
 type BottomTabsProviderProps = { children: React.ReactNode }
 
 export type BottomTabsContextsData = {
@@ -9,18 +9,14 @@ export type BottomTabsContextsData = {
 }
 const BottomTabsContext = React.createContext<BottomTabsContextsData>({} as BottomTabsContextsData)
 
-export function Provider({children}: BottomTabsProviderProps) {
-    const [ currentTab, setCurrentTab ] = React.useState<BottomTabsProps>('Home')
+export function Provider({ children }: BottomTabsProviderProps) {
+    const [currentTab, setCurrentTab] = React.useState<BottomTabsProps>("Home")
 
     const contextValue: BottomTabsContextsData = {
         currentTab,
-        setCurrentTab
+        setCurrentTab,
     }
 
-    return (
-        <BottomTabsContext.Provider value={contextValue}>
-            {children}
-        </BottomTabsContext.Provider>
-    )
+    return <BottomTabsContext.Provider value={contextValue}>{children}</BottomTabsContext.Provider>
 }
 export default BottomTabsContext

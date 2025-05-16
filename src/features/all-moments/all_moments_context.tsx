@@ -45,7 +45,7 @@ export function AllMomentsProvider({ children }: AllMomentsProviderProps) {
                 })
                 await api
                     .post(
-                        `/moments/delete-list`,
+                        "/moments/delete-list",
                         { moment_ids_list: [...filtered_moments] },
                         { headers: { Authorization: session.account.jwtToken } }
                     )
@@ -63,7 +63,7 @@ export function AllMomentsProvider({ children }: AllMomentsProviderProps) {
                                 ),
                             },
                         }),
-                            setSelectedMoments([])
+                        setSelectedMoments([])
                     })
                     .catch(() => {
                         notify("toast", {

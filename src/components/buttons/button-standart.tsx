@@ -107,8 +107,8 @@ export default function ButtonStandart({
         ...(width
             ? { width, alignSelf: "center" }
             : square
-              ? { width: height, aspectRatio: 1, alignSelf: "center" }
-              : { alignSelf: "flex-start", flexShrink: 1 }),
+                ? { width: height, aspectRatio: 1, alignSelf: "center" }
+                : { alignSelf: "flex-start", flexShrink: 1 }),
         ...(style as ViewStyle),
     }
 
