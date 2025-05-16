@@ -1,0 +1,27 @@
+diff --git a/node_modules/react-native-screens/android/build.gradle b/node_modules/react-native-screens/android/build.gradle
+index 6fc7919..a0e893c 100644
+--- a/node_modules/react-native-screens/android/build.gradle
++++ b/node_modules/react-native-screens/android/build.gradle
+@@ -47,10 +47,7 @@ def reactNativeArchitectures() {
+ 
+ android {
+     compileSdkVersion safeExtGet('compileSdkVersion', rnsDefaultCompileSdkVersion)
+-    def agpVersion = Version.ANDROID_GRADLE_PLUGIN_VERSION
+-    if (agpVersion.tokenize('.')[0].toInteger() >= 7) {
+-        namespace "com.swmansion.rnscreens"
+-    }
++    namespace "com.swmansion.rnscreens"
+ 
+     // Used to override the NDK path/version on internal CI or by allowing
+     // users to customize the NDK path/version from their root project (e.g. for M1 support)
+@@ -61,6 +58,10 @@ android {
+         ndkVersion rootProject.ext.ndkVersion
+     }
+ 
++    buildFeatures {
++        buildConfig = true
++    }
++
+     defaultConfig {
+         minSdkVersion safeExtGet('minSdkVersion', rnsDefaultMinSdkVersion)
+         targetSdkVersion safeExtGet('targetSdkVersion', rnsDefaultTargetSdkVersion)
