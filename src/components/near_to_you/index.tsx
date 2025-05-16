@@ -1,9 +1,6 @@
-import header from "./components/header/near_to_you-header";
-import header_left from "./components/header/near_to_you-header_left";
-import header_right from "./components/header/near_to_you-header_right";
-
+import render_user from "./components/render_user"
+import Skeleton from "./components/skeleton"
 export const NearToYou = {
-    Header: header,
-    HeaderLeft: header_left,
-    HeaderRight: header_right
+    RenderUser: render_user,
+    Skeleton: Skeleton,
 }
