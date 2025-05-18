@@ -1,10 +1,11 @@
+import ColorTheme from "../../layout/constants/colors"
+
 import FollowingScreen from "@/pages/app/Settings/Following"
 import { createStackNavigator } from "@react-navigation/stack"
 import React from "react"
 import { useColorScheme } from "react-native"
 import SettingsHeaderLeft from "../../components/headers/settings/settings-header_left"
 import LanguageContext from "../../contexts/Preferences/language"
-import ColorTheme, { colors } from "../../layout/constants/colors"
 import Sizes from "../../layout/constants/sizes"
 import SettingsScreen from "../../pages/app/Settings"
 import AllMomentsScreen from "../../pages/app/Settings/AllMoments"
@@ -34,8 +35,6 @@ export function SettingsNavigator() {
     const HeaderStyle = {
         ...Sizes.headers,
         backgroundColor: ColorTheme().background,
-        borderBottomWidth: 1,
-        borderColor: isDarkMode ? colors.gray.grey_08 : colors.gray.grey_02,
     }
 
     return (
@@ -45,7 +44,7 @@ export function SettingsNavigator() {
                 component={SettingsScreen}
                 options={{
                     headerTitle: t("Settings"),
-                    headerStyle: HeaderStyle,
+                    headerStyle: [HeaderStyle, {borderBottomWidth: 0, borderBottomColor: "transparent"}],
                     headerTintColor: String(ColorTheme().text),
                     cardStyle: { backgroundColor: String(ColorTheme().background) },
                     cardOverlayEnabled: true,
