@@ -1,17 +1,20 @@
-import React from "react"
 import { PanResponder, View, useColorScheme } from "react-native"
 import Animated, {
+    Easing,
     interpolate,
     runOnJS,
     useAnimatedScrollHandler,
     useAnimatedStyle,
     useSharedValue,
+    withRepeat,
     withTiming,
 } from "react-native-reanimated"
-import { Text } from "../../components/Themed"
-import { Loading } from "../../components/loading"
-import config from "../../config"
 import ColorTheme, { colors } from "../../layout/constants/colors"
+
+import React from "react"
+import { Loading } from "../../components/loading"
+import { Text } from "../../components/Themed"
+import config from "../../config"
 import fonts from "../../layout/constants/fonts"
 import sizes from "../../layout/constants/sizes"
 import { Vibrate } from "./useHapticFeedback"
@@ -44,10 +47,11 @@ export function AnimatedVerticalScrollView({
     const pullDownPosition = useSharedValue(0)
     const isReadyToRefresh = useSharedValue(false)
     const [refreshing, setRefreshing] = React.useState(false)
+    const rotation = useSharedValue(0)
 
     const gradientColors = useSharedValue({
-        startColor: `rgba(50, 0, 255, 0)`,
-        endColor: `rgba(50, 0, 0, 0)`,
+        startColor: "rgba(50, 0, 255, 0)",
+        endColor: "rgba(50, 0, 0, 0)",
     })
 
     const scrollHandler = useAnimatedScrollHandler({
@@ -106,10 +110,35 @@ export function AnimatedVerticalScrollView({
         [scrollPosition.value, pullDownPosition.value, isReadyToRefresh.value]
     )
 
-    const refreshIconStyles = useAnimatedStyle(() => ({
-        opacity: refreshing ? 0.8 : pullDownPosition.value / 75 - 0.2,
-        transform: [{ scale: pullDownPosition.value / 75 }],
-    }))
+    const refreshIconStyles = useAnimatedStyle(() => {
+        "worklet"
+        const pullRotation = interpolate(
+            pullDownPosition.value,
+            [0, 120],
+            [0, 360],
+            { extrapolateRight: "clamp" }
+        )
+
+        return {
+            opacity: refreshing 
+                ? 0.8 
+                : interpolate(pullDownPosition.value, [0, 25, 120], [0.3, 0.6, 1], {
+                    extrapolateRight: "clamp",
+                }),
+            transform: [
+                {
+                    scale: refreshing
+                        ? 1
+                        : interpolate(pullDownPosition.value, [0, 120], [0.7, 1], {
+                            extrapolateRight: "clamp",
+                        }),
+                },
+                {
+                    rotate: refreshing ? `${rotation.value}deg` : `${pullRotation}deg`,
+                },
+            ],
+        }
+    })
 
     const loadingAnimationStyle = useAnimatedStyle(() => ({
         opacity: withTiming(refreshing ? 1 : 0, { duration: 300 }),
@@ -124,6 +153,24 @@ export function AnimatedVerticalScrollView({
             overflow: "hidden",
         }
     })
+
+    React.useEffect(() => {
+        if (refreshing) {
+            rotation.value = withRepeat(
+                withTiming(360, {
+                    duration: 800,
+                    easing: Easing.bezier(0.4, 0, 0.2, 1),
+                }),
+                -1,
+                false
+            )
+        } else {
+            rotation.value = withTiming(0, {
+                duration: 200,
+                easing: Easing.bezier(0.4, 0, 0.2, 1),
+            })
+        }
+    }, [refreshing])
 
     return (
         <View
@@ -159,7 +206,7 @@ export function AnimatedVerticalScrollView({
                 </Animated.View>
             </Animated.View>
 
-            <Animated.View style={[animatedScrollViewStyles]} {...panResponder.panHandlers}>
+            <Animated.View style={animatedScrollViewStyles} {...panResponder.panHandlers}>
                 <Animated.ScrollView
                     style={{ backgroundColor: ColorTheme().background }}
                     onScroll={scrollHandler}

@@ -1,25 +1,22 @@
-import { View } from "@/components/Themed"
+import { View, ViewStyle } from "@/components/Themed"
+
 import { Loading } from "@/components/loading"
 import { colors } from "@/layout/constants/colors"
 import sizes from "@/layout/constants/sizes"
 import React from "react"
 import { useColorScheme } from "react-native"
 
-export default function loading_card() {
+export default function LoadingCard() {
     const isDarkMode = useColorScheme() === "dark"
 
-    const container: any = {
+    const container: ViewStyle = {
         marginTop: sizes.margins["2sm"],
-        width: sizes.screens.width,
+        width: sizes.screens.width - sizes.paddings["2sm"] * 2,
         height: sizes.headers.height,
         alignItems: "center",
         justifyContent: "center",
-        flexDirection: "row",
         backgroundColor: isDarkMode ? colors.gray.grey_09 : colors.gray.grey_01,
-        borderBottomWidth: 1,
-        borderTopWidth: 1,
-        paddingHorizontal: sizes.paddings["2sm"],
-        borderColor: isDarkMode ? colors.gray.grey_08 : colors.gray.grey_02,
+        borderRadius: sizes.borderRadius["1md"],
     }
 
     return (

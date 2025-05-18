@@ -21,5 +21,5 @@ export const Memory = {
     Header: header,
     HeaderLeft: header_left,
     HeaderRight: header_right,
-    Title: title
+    Title: title,
 }

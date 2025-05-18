@@ -27,7 +27,7 @@ export default function input({
     const isDarkMode = useColorScheme() === "dark"
     const { notify } = useNotifications()
 
-    var animatedScale = React.useRef(new Animated.Value(0)).current
+    const animatedScale = React.useRef(new Animated.Value(0)).current
 
     React.useEffect(() => {
         animatedScale.setValue(1)

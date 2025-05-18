@@ -1,24 +1,23 @@
-import React from 'react'
-import ColorTheme from '../../../layout/constants/colors'
-import { LoadingProps } from '../loading-types'
-import { MotiView } from '@motify/components'
-import Loading from '../../../assets/icons/svgs/loading.svg'
+import Loading from "@/assets/icons/svgs/circle-spinner.svg"
+import ColorTheme from "@/layout/constants/colors"
+import { MotiView } from "@motify/components"
+import React from "react"
+import { LoadingProps } from "../loading-types"
 
 export default function activity_indicator({
     size = 30,
-    color = ColorTheme().textDisabled.toString() + '50'
+    color = ColorTheme().textDisabled.toString() + "50",
 }: LoadingProps) {
-
     return (
         <MotiView
             from={{
-                rotate: '0deg',
+                rotate: "0deg",
             }}
             animate={{
-                rotate: '360deg', // Rotação completa em 360 graus
+                rotate: "360deg", // Rotação completa em 360 graus
             }}
             transition={{
-                type: 'timing',
+                type: "timing",
                 duration: 1000,
                 repeatReverse: false,
                 loop: true,
@@ -26,11 +25,11 @@ export default function activity_indicator({
             style={{
                 width: size,
                 height: size,
-                alignItems: 'center',
-                justifyContent: 'center',
+                alignItems: "center",
+                justifyContent: "center",
             }}
         >
-            <Loading width={size} height={size} fill={color}/>
+            <Loading width={size} height={size} fill={color} />
         </MotiView>
     )
 }

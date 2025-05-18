@@ -77,8 +77,8 @@ export default function DescriptionScreen() {
         color: description
             ? colors.gray.white
             : isDarkMode
-              ? colors.gray.grey_04 + "90"
-              : colors.gray.grey_04 + "90",
+                ? colors.gray.grey_04 + "90"
+                : colors.gray.grey_04 + "90",
     }
 
     const icon = {
@@ -177,8 +177,8 @@ export default function DescriptionScreen() {
                         description
                             ? colors.gray.white
                             : isDarkMode
-                              ? colors.gray.grey_04 + "90"
-                              : colors.gray.grey_04 + "90"
+                                ? colors.gray.grey_04 + "90"
+                                : colors.gray.grey_04 + "90"
                     )}
                     width={17}
                     height={17}

@@ -53,8 +53,8 @@ export default function UsernameScreen() {
         color: signInputUsername
             ? colors.gray.white
             : isDarkMode
-              ? colors.gray.grey_04 + "90"
-              : colors.gray.grey_04 + "90",
+                ? colors.gray.grey_04 + "90"
+                : colors.gray.grey_04 + "90",
     }
 
     const icon = {
@@ -109,8 +109,8 @@ export default function UsernameScreen() {
                         signInputUsername
                             ? colors.gray.white
                             : isDarkMode
-                              ? colors.gray.grey_04 + "90"
-                              : colors.gray.grey_04 + "90"
+                                ? colors.gray.grey_04 + "90"
+                                : colors.gray.grey_04 + "90"
                     )}
                     width={17}
                     height={17}

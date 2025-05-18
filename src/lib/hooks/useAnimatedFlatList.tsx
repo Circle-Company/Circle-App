@@ -1,20 +1,21 @@
-import React from "react"
-import { PanResponder, View, useColorScheme } from "react-native"
+import { PanResponder, TextStyle, View, ViewStyle, useColorScheme } from "react-native"
 import Animated, {
+    Easing,
     interpolate,
     runOnJS,
     useAnimatedScrollHandler,
     useAnimatedStyle,
     useSharedValue,
+    withRepeat,
     withSpring,
     withTiming,
-    withRepeat,
-    Easing,
 } from "react-native-reanimated"
-import { Text } from "../../components/Themed"
-import { Loading } from "../../components/loading"
-import config from "../../config"
 import ColorTheme, { colors } from "../../layout/constants/colors"
+
+import React from "react"
+import { Loading } from "../../components/loading"
+import { Text } from "../../components/Themed"
+import config from "../../config"
 import fonts from "../../layout/constants/fonts"
 import sizes from "../../layout/constants/sizes"
 import { Vibrate } from "./useHapticFeedback"
@@ -32,33 +33,35 @@ type AnimatedFlatlistProps<T> = {
     endRefreshAnimationDelay?: number
     disableVibrate?: boolean
     onEndReached: () => Promise<void>
-    handleRefresh: () => void
+    handleRefresh: () => Promise<void>
     CustomRefreshIcon?: React.ComponentType
 }
 
-const DefaultEmptyComponent = () => (
-    <View
-        style={{
-            flex: 1,
-            justifyContent: "center",
-            alignItems: "center",
-            padding: sizes.paddings["2md"],
-            backgroundColor: "transparent",
-            opacity: 0.8,
-        }}
-    >
-        <Text
-            style={{
-                fontSize: fonts.size.body,
-                color: colors.gray.grey_04,
-                textAlign: "center",
-                fontFamily: fonts.family.Medium,
-            }}
-        >
-            Nenhum item encontrado
-        </Text>
-    </View>
-)
+const DefaultEmptyComponent = () => {
+    const emptyContainerStyle: ViewStyle = {
+        flex: 1,
+        justifyContent: "center",
+        alignItems: "center",
+        padding: sizes.paddings["2md"],
+        backgroundColor: "transparent",
+        opacity: 0.8,
+    }
+
+    const emptyTextStyle: TextStyle = {
+        fontSize: fonts.size.body,
+        color: colors.gray.grey_04,
+        textAlign: "center" as const,
+        fontFamily: fonts.family.Medium,
+    }
+
+    return (
+        <View style={emptyContainerStyle}>
+            <Text style={emptyTextStyle}>
+                Nenhum item encontrado
+            </Text>
+        </View>
+    )
+}
 
 // Componente de item animado
 const AnimatedListItem = React.memo(
@@ -103,6 +106,11 @@ const AnimatedListItem = React.memo(
     }
 )
 
+AnimatedListItem.displayName = "AnimatedListItem"
+
+// Reduzir o threshold de ativação do refresh
+const REFRESH_THRESHOLD = 50 // Era 75, agora mais fácil de ativar
+
 export function AnimatedVerticalFlatlist<T>({
     data,
     renderItem,
@@ -111,7 +119,7 @@ export function AnimatedVerticalFlatlist<T>({
     ListHeaderComponent,
     skeleton,
     onEndReached,
-    handleRefresh,
+    handleRefresh = async () => {},
     disableVibrate = false,
     showRefreshSpinner = true,
     endRefreshAnimationDelay = 200,
@@ -220,6 +228,7 @@ export function AnimatedVerticalFlatlist<T>({
         }
     }, [isReadyToRefresh, disableVibrate, onRefresh])
 
+    // Ajustar a resistência do pull para ser mais suave
     const panResponder = React.useMemo(
         () =>
             PanResponder.create({
@@ -229,15 +238,15 @@ export function AnimatedVerticalFlatlist<T>({
                     scrollPosition.value <= 0 && gestureState.dy > 0,
                 onPanResponderMove: (_, gestureState) => {
                     "worklet"
-                    const maxDistance = 150
-                    const resistance = 0.6
+                    const maxDistance = 100 // Reduzido de 150 para 100
+                    const resistance = 0.8 // Aumentado de 0.6 para 0.8 (mais suave)
                     const newPosition = Math.min(
                         maxDistance,
                         Math.max(0, gestureState.dy * resistance)
                     )
 
                     pullDownPosition.value = newPosition
-                    isReadyToRefresh.value = newPosition > 75
+                    isReadyToRefresh.value = newPosition > REFRESH_THRESHOLD
                 },
                 onPanResponderRelease: () => runOnJS(onPanRelease)(),
                 onPanResponderTerminate: () => {
@@ -253,38 +262,20 @@ export function AnimatedVerticalFlatlist<T>({
         [scrollPosition.value, onPanRelease]
     )
 
-    // Atualiza o valor de rotação quando refreshing muda
-    React.useEffect(() => {
-        if (refreshing) {
-            rotation.value = withRepeat(
-                withTiming(360, {
-                    duration: 1000,
-                    easing: Easing.bezier(0.4, 0, 0.2, 1),
-                }),
-                -1, // loop infinito
-                false // não reverte
-            )
-        } else {
-            rotation.value = withTiming(0, {
-                duration: 300,
-                easing: Easing.bezier(0.4, 0, 0.2, 1),
-            })
-        }
-    }, [refreshing])
-
+    // Otimizar a animação do ícone de refresh
     const refreshIconStyles = useAnimatedStyle(() => {
         "worklet"
         const pullRotation = interpolate(
             pullDownPosition.value,
-            [0, 75],
-            [0, 720], // 2 voltas completas
+            [0, REFRESH_THRESHOLD],
+            [0, 360], // Reduzido de 720 para 360 (uma volta completa)
             { extrapolateRight: "clamp" }
         )
 
         return {
             opacity: refreshing
                 ? 0.8
-                : interpolate(pullDownPosition.value, [0, 25, 50, 75], [0.2, 0.4, 0.7, 1], {
+                : interpolate(pullDownPosition.value, [0, 25, REFRESH_THRESHOLD], [0.3, 0.6, 1], {
                     extrapolateRight: "clamp",
                 }),
             transform: [
@@ -293,8 +284,8 @@ export function AnimatedVerticalFlatlist<T>({
                         ? 1
                         : interpolate(
                             pullDownPosition.value,
-                            [0, 25, 50, 75],
-                            [0.5, 0.65, 0.85, 1],
+                            [0, REFRESH_THRESHOLD],
+                            [0.7, 1], // Simplificado para ser mais direto
                             { extrapolateRight: "clamp" }
                         ),
                 },
@@ -304,6 +295,25 @@ export function AnimatedVerticalFlatlist<T>({
             ],
         }
     })
+
+    // Otimizar o tempo de animação do refresh
+    React.useEffect(() => {
+        if (refreshing) {
+            rotation.value = withRepeat(
+                withTiming(360, {
+                    duration: 800, // Reduzido de 1000 para 800
+                    easing: Easing.bezier(0.4, 0, 0.2, 1),
+                }),
+                -1,
+                false
+            )
+        } else {
+            rotation.value = withTiming(0, {
+                duration: 200, // Reduzido de 300 para 200
+                easing: Easing.bezier(0.4, 0, 0.2, 1),
+            })
+        }
+    }, [refreshing])
 
     const loadingAnimationStyle = useAnimatedStyle(() => {
         "worklet"
@@ -354,36 +364,74 @@ export function AnimatedVerticalFlatlist<T>({
         [renderItem, elasticDistortion]
     )
 
+    const styles = {
+        container: {
+            backgroundColor: ColorTheme().backgroundDisabled + "70",
+            flex: 1,
+        } as ViewStyle,
+
+        refreshContainer: {
+            position: "absolute",
+            top: -50,
+            width: "100%",
+            alignItems: "center",
+            zIndex: 1,
+        } as ViewStyle,
+
+        loadingSpinner: {
+            backgroundColor: isDarkMode ? colors.gray.grey_09 : colors.gray.grey_01,
+            padding: sizes.paddings["1md"],
+            borderRadius: sizes.borderRadius["1xxl"],
+            borderWidth: 2,
+            borderColor: isDarkMode ? colors.gray.grey_08 : colors.gray.grey_02,
+            position: "absolute",
+            top: "40%",
+            left: sizes.screens.width / 2 - 38,
+            transform: [{ translateX: -50 }, { translateY: -50 }],
+            shadowColor: isDarkMode ? colors.gray.black : colors.gray.grey_02,
+            shadowOffset: { width: 0, height: 2 },
+            shadowOpacity: 0.25,
+            shadowRadius: 3.84,
+            elevation: 5,
+        } as ViewStyle,
+
+        skeletonContainer: {
+            flex: 1,
+            backgroundColor: isDarkMode ? colors.gray.black : colors.gray.white,
+        } as ViewStyle,
+
+        flatlistContainer: {
+            flex: 1,
+            overflow: "hidden",
+        } as ViewStyle,
+
+        refreshText: {
+            fontFamily: fonts.family["Black-Italic"],
+            fontSize: fonts.size.body,
+        } as ViewStyle,
+
+        flatlist: {
+            backgroundColor: isDarkMode ? colors.gray.black : colors.gray.white,
+        } as ViewStyle,
+    }
+
     return (
         <View
             pointerEvents={refreshing ? "none" : "auto"}
-            style={{
-                backgroundColor: ColorTheme().backgroundDisabled + "70",
-                flex: 1,
-            }}
+            style={styles.container}
         >
             <Animated.View
-                style={[
-                    {
-                        position: "absolute",
-                        top: -50,
-                        width: "100%",
-                        alignItems: "center",
-                        zIndex: 1,
-                    },
-                    pullDownStyles,
-                ]}
+                style={[styles.refreshContainer, pullDownStyles]}
             >
                 <Animated.View style={refreshIconStyles}>
                     {CustomRefreshIcon ? (
                         <CustomRefreshIcon />
                     ) : (
                         <Text
-                            style={{
-                                fontFamily: fonts.family["Black-Italic"],
-                                fontSize: fonts.size.body,
-                                opacity: interpolate(pullDownPosition.value, [0, 75], [0.5, 1]),
-                            }}
+                            style={[
+                                styles.refreshText,
+                                { opacity: interpolate(pullDownPosition.value, [0, REFRESH_THRESHOLD], [0.5, 1]) }
+                            ]}
                         >
                             {config.APPLICATION_SHORT_NAME}
                         </Text>
@@ -392,26 +440,19 @@ export function AnimatedVerticalFlatlist<T>({
             </Animated.View>
 
             <Animated.View
-                style={[animatedFlatlistStyles, { flex: 1, overflow: "hidden" }]}
+                style={[animatedFlatlistStyles, styles.flatlistContainer]}
                 {...panResponder.panHandlers}
             >
                 {isLoading ? (
                     skeleton ? (
-                        <View
-                            style={{
-                                flex: 1,
-                                backgroundColor: isDarkMode ? colors.gray.black : colors.gray.white,
-                            }}
-                        >
+                        <View style={styles.skeletonContainer}>
                             {skeleton}
                         </View>
                     ) : null
                 ) : (
                     <Animated.FlatList
                         data={data}
-                        style={{
-                            backgroundColor: isDarkMode ? colors.gray.black : colors.gray.white,
-                        }}
+                        style={styles.flatlist}
                         onScroll={scrollHandler}
                         scrollEventThrottle={8}
                         showsVerticalScrollIndicator={false}
@@ -437,27 +478,7 @@ export function AnimatedVerticalFlatlist<T>({
             </Animated.View>
 
             {refreshing && showRefreshSpinner && (
-                <Animated.View
-                    style={[
-                        {
-                            backgroundColor: isDarkMode ? colors.gray.grey_09 : colors.gray.grey_01,
-                            padding: sizes.paddings["1md"],
-                            borderRadius: sizes.borderRadius["1xxl"],
-                            borderWidth: 2,
-                            borderColor: isDarkMode ? colors.gray.grey_08 : colors.gray.grey_02,
-                            position: "absolute",
-                            top: "40%",
-                            left: sizes.screens.width / 2 - 38,
-                            transform: [{ translateX: -50 }, { translateY: -50 }],
-                            shadowColor: isDarkMode ? colors.gray.black : colors.gray.grey_02,
-                            shadowOffset: { width: 0, height: 2 },
-                            shadowOpacity: 0.25,
-                            shadowRadius: 3.84,
-                            elevation: 5,
-                        },
-                        loadingAnimationStyle,
-                    ]}
-                >
+                <Animated.View style={[styles.loadingSpinner, loadingAnimationStyle]}>
                     <Loading.ActivityIndicator size={40} />
                 </Animated.View>
             )}
