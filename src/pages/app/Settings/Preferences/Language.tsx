@@ -1,12 +1,14 @@
-import React from "react"
+import { View, ViewStyle } from "@/components/Themed"
 import { StatusBar, useColorScheme } from "react-native"
-import { View } from "../../../../components/Themed"
+
+import ColorTheme from "@/layout/constants/colors"
+import React from "react"
 import ListLanguagesSelector from "../../../../features/list-languages-selector"
-import ColorTheme from "../../../../layout/constants/colors"
+
 export default function LanguageScreen() {
     const isDarkMode = useColorScheme() === "dark"
 
-    const container = {
+    const container: ViewStyle = {
         alignItems: "center",
         flex: 1,
     }

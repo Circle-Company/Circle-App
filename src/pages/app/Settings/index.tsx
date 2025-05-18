@@ -1,13 +1,14 @@
-import React from "react"
+import { View, ViewStyle } from "@/components/Themed"
 import { StatusBar, useColorScheme } from "react-native"
-import { View } from "../../../components/Themed"
-import ListSettings from "../../../features/list-settings"
-import ColorTheme from "../../../layout/constants/colors"
+
+import ListSettings from "@/features/list-settings"
+import ColorTheme from "@/layout/constants/colors"
+import React from "react"
 
 export default function SettingsScreen() {
     const isDarkMode = useColorScheme() === "dark"
 
-    const container = {
+    const container: ViewStyle = {
         alignItems: "center",
         flex: 1,
     }
