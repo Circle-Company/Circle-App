@@ -1,10 +1,11 @@
+import { View, ViewStyle } from "@/components/Themed"
+
+import CheckCircle from "@/assets/icons/svgs/check_circle.svg"
+import { MidiaRender } from "@/components/midia_render"
+import { Moment } from "@/components/moment"
+import { colors } from "@/layout/constants/colors"
 import React from "react"
-import { View } from "../../../components/Themed"
-import { MidiaRender } from "../../../components/midia_render"
-import { Pressable, useColorScheme } from "react-native"
-import CheckCircle from "../../../assets/icons/svgs/check_circle.svg"
-import { Moment } from "../../../components/moment"
-import { colors } from "../../../layout/constants/colors"
+import { Pressable } from "react-native"
 import EditMemoryContext from "../edit_memory_context"
 
 type RenderMomentProps = {
@@ -34,9 +35,9 @@ export default function RenderMoment({
     borderRadius = 13,
     preview = false,
 }: RenderMomentProps) {
-    const { putMomentOnList, deleteMomentFromList, selectedMoments } =
-        React.useContext(EditMemoryContext)
-    const isDarkMode = useColorScheme() === "dark"
+    const { putMomentOnList, deleteMomentFromList, selectedMoments } = React.useContext(EditMemoryContext)
+    const [selected, setSelected] = React.useState(false)
+
     React.useEffect(() => {
         setSelected(false)
         if (!preview) {
@@ -46,10 +47,9 @@ export default function RenderMoment({
                 })
             }
         }
-    }, [selectedMoments])
-
-    const [selected, setSelected] = React.useState(false)
-    const container: any = {
+    }, [selectedMoments, moment.id, preview])
+    
+    const container: ViewStyle = {
         overflow: "hidden",
         borderRadius: borderRadius * scale,
         marginTop,
@@ -57,7 +57,7 @@ export default function RenderMoment({
         marginRight,
     }
 
-    const selected_container = {
+    const selected_container: ViewStyle = {
         top: 0,
         left: 0,
         position: "absolute",
@@ -66,6 +66,10 @@ export default function RenderMoment({
         height: 181 * scale,
         alignItems: "center",
         justifyContent: "center",
+    }
+
+    const opacity_container: ViewStyle = {
+        opacity: 0.8
     }
 
     async function handlePress() {
@@ -84,24 +88,29 @@ export default function RenderMoment({
         return (
             <Pressable onPress={handlePress}>
                 <View style={container}>
-                    <View style={selected_container}>
-                        <CheckCircle
-                            fill={String(isDarkMode ? colors.gray.white : colors.gray.black)}
-                        />
-                    </View>
-                    <View style={{ opacity: 0.5 }}>
+                    <View style={opacity_container}>
                         <MidiaRender.Root
                             data={moment.midia}
-                            content_sizes={{ width: 117 * scale, height: 181 * scale, padding: 0 }}
+                            content_sizes={{ 
+                                width: 117 * scale, 
+                                height: 181 * scale, 
+                                padding: 0,
+                                borderRadius: borderRadius * scale 
+                            }}
                         >
                             <MidiaRender.RenderImage
                                 isFeed={false}
                                 enableBlur={true}
                                 blur={true}
-                                blurRadius={20}
+                                blurRadius={8}
                                 blurColor="#000000"
                             />
                         </MidiaRender.Root>
+                    </View>
+                    <View style={selected_container}>
+                        <CheckCircle
+                            fill={String(colors.gray.white)}
+                        />
                     </View>
                 </View>
             </Pressable>
@@ -112,7 +121,12 @@ export default function RenderMoment({
                 <View style={container}>
                     <MidiaRender.Root
                         data={moment.midia}
-                        content_sizes={{ width: 117 * scale, height: 181 * scale, padding: 0 }}
+                        content_sizes={{ 
+                            width: 117 * scale, 
+                            height: 181 * scale, 
+                            padding: 0,
+                            borderRadius: borderRadius * scale 
+                        }}
                     >
                         <MidiaRender.RenderImage isFeed={false} blur={false} />
                     </MidiaRender.Root>
