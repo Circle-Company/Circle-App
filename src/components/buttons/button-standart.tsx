@@ -1,5 +1,6 @@
-import React from "react"
 import { Animated, Pressable, StyleProp, ViewStyle } from "react-native"
+
+import React from "react"
 import ColorTheme from "../../layout/constants/colors"
 import sizes from "../../layout/constants/sizes"
 
@@ -32,7 +33,7 @@ export interface ButtonStandartProps {
     margins?: boolean
     borderRadius?: number
     square?: boolean
-    action(): void
+    action?: () => void
     vibrate?: () => void
 }
 
@@ -62,7 +63,7 @@ export default function ButtonStandart({
     borderRadius = typeof height === "number" ? height / 2 : 50,
     square = false,
     testID,
-    action,
+    action = () => {},
     vibrate,
 }: ButtonStandartProps) {
     // Referência para a animação de escala
@@ -115,7 +116,7 @@ export default function ButtonStandart({
     async function onPress() {
         handleButtonAnimation()
         if (vibrate) vibrate()
-        action()
+        if (typeof action === "function") action()
     }
 
     return (
