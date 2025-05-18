@@ -9,6 +9,7 @@
     "New Memory": "Criar Memória",
 
     "Follow": "Seguir",
+    "Follow Back": "Seguir de Volta",
     "Following": "Seguindo",
     "Followers": "Seguidores",
     "followers": "seguidores",
@@ -156,6 +157,7 @@
     "Add Moments": "Adicionar Moments",
     "Confirm": "Confirmar",
     "Log Out Anyway": "Deslogar Mesmo Assim",
+    "Fetch Again": "Procurar Novamente",
 
     "description": "descrição",
     "Tags": "Tags",
@@ -210,6 +212,7 @@
     "Added to Memory": "Adicionado á Memória",
     "New Follower": "Novo Seguidor",
     "Profile Visit": "Visita no Perfil",
+    "Near to You": "Perto de Você",
     "Reload Feed": "Recarregue o feed",
 
     "When your moment gets a like.": "Quando algum Moment seu receber uma curtida.",
