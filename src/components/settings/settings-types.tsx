@@ -1,22 +1,17 @@
 import React from "react"
-
-export type SettignsSectionProps = {
-    name: string
-    type: "COMMON" | "ACCOUNT"
-    content: Array<SettingsiItemObjectProps>
-}
-
 export type SettingsiItemObjectProps = {
-    name: string
-    navigateTo: string
-}
-
-export type SettingsiItemAccountObjectProps = {
     icon?: React.ReactNode
     name: string
-    value: string | Object
+    value: string | object
     type: "TEXT" | "IMAGE"
     navigator: string
     navigateTo: string
     secure: boolean
+    
 }
+export type SettignsSectionProps = {
+    name: string
+    content: Array<SettingsiItemObjectProps>
+}
+
+
