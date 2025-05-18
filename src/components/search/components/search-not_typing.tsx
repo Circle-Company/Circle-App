@@ -1,29 +1,27 @@
-import { Text, View } from "@/components/Themed"
-import LanguageContext from "@/contexts/Preferences/language"
+import { Text, TextStyle, View, ViewStyle } from "@/components/Themed"
 import ColorTheme, { colors } from "@/layout/constants/colors"
+
+import LanguageContext from "@/contexts/Preferences/language"
 import fonts from "@/layout/constants/fonts"
 import sizes from "@/layout/constants/sizes"
 import React from "react"
 import { useColorScheme } from "react-native"
 
-export default function not_typing() {
+export default function NotTyping() {
     const { t } = React.useContext(LanguageContext)
     const isDarkMode = useColorScheme() === "dark"
 
-    const container: any = {
+    const container: ViewStyle = {
         marginTop: sizes.margins["2sm"],
-        width: sizes.screens.width,
+        width: sizes.screens.width - sizes.paddings["2sm"] * 2,
         height: sizes.headers.height,
         alignItems: "center",
         justifyContent: "center",
-        flexDirection: "row",
         backgroundColor: isDarkMode ? colors.gray.grey_09 : colors.gray.grey_01,
-        borderBottomWidth: 1,
-        borderTopWidth: 1,
-        paddingHorizontal: sizes.paddings["2sm"],
-        borderColor: isDarkMode ? colors.gray.grey_08 : colors.gray.grey_02,
+        borderRadius: sizes.borderRadius["1md"],
     }
-    const title: any = {
+
+    const title: TextStyle = {
         fontSize: fonts.size.footnote,
         fontFamily: fonts.family.Medium,
         color: ColorTheme().textDisabled,
