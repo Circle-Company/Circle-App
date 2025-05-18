@@ -1,5 +1,6 @@
-import React from "react"
 import { Animated, View, useColorScheme } from "react-native"
+
+import React from "react"
 import { useKeyboardAnimation } from "react-native-keyboard-controller"
 import { Moment } from "../../../components/moment"
 import { MomentDataProps } from "../../../components/moment/context/types"
@@ -7,13 +8,14 @@ import { UserShow } from "../../../components/user_show"
 import FeedContext from "../../../contexts/Feed"
 import sizes from "../../../layout/constants/sizes"
 import RenderComment from "./render-comment"
+
 type renderMomentProps = {
     momentData: MomentDataProps
     isFocused: boolean
     isFeed: boolean
 }
 
-export default function render_moment({ momentData, isFocused, isFeed }: renderMomentProps) {
+export default function RenderMoment({ momentData, isFocused, isFeed }: renderMomentProps) {
     const { height, progress } = useKeyboardAnimation()
     const { commentEnabled } = React.useContext(FeedContext)
     const [animatedValue] = React.useState(new Animated.Value(0))
