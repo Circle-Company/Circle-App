@@ -1,3 +1,5 @@
+import ColorTheme, { colors } from "../../layout/constants/colors"
+
 import { createStackNavigator } from "@react-navigation/stack"
 import React from "react"
 import { useColorScheme } from "react-native"
@@ -7,9 +9,8 @@ import MemoriesListMomentsHeaderRight from "../../components/headers/memories/me
 import MemoryHeaderLeft from "../../components/headers/memory/memory-header_left"
 import MemoryHeaderRight from "../../components/headers/memory/memory-header_right"
 import MemoryTitleHeaderRight from "../../components/headers/memory/memory_title-header_right"
-import LanguageContext from "../../contexts/Preferences/language"
 import MemoryContext from "../../contexts/memory"
-import ColorTheme, { colors } from "../../layout/constants/colors"
+import LanguageContext from "../../contexts/Preferences/language"
 import Sizes from "../../layout/constants/sizes"
 import MemoriesScreen from "../../pages/app/Memories"
 import EditMemoryScreen from "../../pages/app/Memories/edit_memory"
@@ -23,6 +24,7 @@ const MemoriesStack = createStackNavigator()
 export function MemoriesNavigator() {
     const { t } = React.useContext(LanguageContext)
     const { memory } = React.useContext(MemoryContext)
+    const user_id = memory?.user?.id
 
     const isDarkMode = useColorScheme() === "dark"
     const HeaderStyle = {
@@ -62,7 +64,7 @@ export function MemoriesNavigator() {
                     cardOverlayEnabled: true,
                     cardStyleInterpolator: Horizontal,
                     headerLeft: () => <MemoriesListMomentsHeaderLeft />,
-                    headerRight: () => <MemoriesListMomentsHeaderRight user_id={memory.user_id} />,
+                    headerRight: () => <MemoriesListMomentsHeaderRight user_id={Number(user_id)} />,
                 }}
             />
             <MemoriesStack.Screen
@@ -70,13 +72,7 @@ export function MemoriesNavigator() {
                 component={EditMemoryScreen}
                 options={{
                     headerTitle: memory ? `${t("Edit")} "${memory.title}"` : t("Edit Memory"),
-                    headerStyle: [
-                        HeaderStyle,
-                        {
-                            borderBottomWidth: 1,
-                            borderColor: isDarkMode ? colors.gray.grey_08 : colors.gray.grey_02,
-                        },
-                    ],
+                    headerStyle: [HeaderStyle],
                     headerTitleStyle: { color: String(ColorTheme().text) },
                     cardStyle: { backgroundColor: String(ColorTheme().background) },
                     cardOverlayEnabled: true,
