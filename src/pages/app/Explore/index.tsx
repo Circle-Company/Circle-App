@@ -1,11 +1,13 @@
+import { StatusBar, ViewStyle, useColorScheme } from "react-native"
+
 import React from "react"
-import { StatusBar, useColorScheme, ViewStyle } from "react-native"
 import { Search } from "../../../components/search"
 import { SearchContextProvider } from "../../../components/search/search-context"
 import { View } from "../../../components/Themed"
+import ListNearToYou from "../../../features/list-near"
 import ListSearch from "../../../features/list-search"
 import ColorTheme from "../../../layout/constants/colors"
-import ListNearToYou from "../../../features/list-near_to_you"
+
 export default function ExploreScreen() {
     const isDarkMode = useColorScheme() === "dark"
 
