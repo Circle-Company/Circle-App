@@ -1,5 +1,7 @@
-import React from "react"
 import { FlatList, ScrollView } from "react-native"
+
+import { SettignsSectionProps } from "@/components/settings/settings-types"
+import React from "react"
 import { Settings } from "../../components/settings"
 import PersistedContext from "../../contexts/Persisted"
 import LanguageContext from "../../contexts/Preferences/language"
@@ -16,15 +18,16 @@ export default function ListSettings() {
         ? truncated({ text: session.user.description.replace(/(\r\n|\n|\r)/gm, " "), size: 18 })
         : t("add new description")
 
-    const ListData = [
+    const ListData: Array<SettignsSectionProps> = [
         {
             name: t("Public Profile"),
             content: [
                 {
                     name: t("Profile Picture"),
-                    value: null,
+                    value: "",
                     type: "IMAGE",
                     navigateTo: "Settings-ProfilePicture",
+                    navigator: "SettingsNavigator",
                     secure: false,
                 },
                 {
@@ -32,6 +35,7 @@ export default function ListSettings() {
                     value: name_text,
                     type: "TEXT",
                     navigateTo: "Settings-Name",
+                    navigator: "SettingsNavigator",
                     secure: false,
                 },
                 {
@@ -39,6 +43,7 @@ export default function ListSettings() {
                     value: description_text,
                     type: "TEXT",
                     navigateTo: "Settings-Description",
+                    navigator: "SettingsNavigator",
                     secure: false,
                 },
             ],
@@ -48,23 +53,26 @@ export default function ListSettings() {
             content: [
                 {
                     name: t("Your Moments"),
-                    value: null,
+                    value: "",
                     type: "TEXT",
                     navigateTo: "Settings-All-Moments",
+                    navigator: "SettingsNavigator",
                     secure: false,
                 },
                 {
                     name: t("Preferences"),
-                    value: null,
+                    value: "",
                     type: "TEXT",
                     navigateTo: "Settings-Preferences",
+                    navigator: "SettingsNavigator",
                     secure: false,
                 },
                 {
                     name: t("Password"),
-                    value: null,
+                    value: "",
                     type: "TEXT",
                     navigateTo: "Settings-Password",
+                    navigator: "SettingsNavigator",
                     secure: true,
                 },
             ],
@@ -74,23 +82,26 @@ export default function ListSettings() {
             content: [
                 {
                     name: t("Privacy Policy"),
-                    value: null,
+                    value: "",
                     type: "TEXT",
                     navigateTo: "Settings-Privacy-Policy",
+                    navigator: "SettingsNavigator",
                     secure: false,
                 },
                 {
                     name: t("Terms of Service"),
-                    value: null,
+                    value: "",
                     type: "TEXT",
                     navigateTo: "Settings-Terms-Of-Service",
+                    navigator: "SettingsNavigator",
                     secure: false,
                 },
                 {
                     name: t("Community Guidelines"),
-                    value: null,
+                    value: "",
                     type: "TEXT",
                     navigateTo: "Settings-Community-Guidelines",
+                    navigator: "SettingsNavigator",
                     secure: false,
                 },
             ],
@@ -100,30 +111,34 @@ export default function ListSettings() {
             content: [
                 {
                     name: t("Open Source"),
-                    value: null,
+                    value: "",
                     type: "TEXT",
                     navigateTo: "Settings-Open-Source",
+                    navigator: "SettingsNavigator",
                     secure: false,
                 },
                 {
                     name: t("Version"),
-                    value: null,
+                    value: "",
                     type: "TEXT",
                     navigateTo: "Settings-Version",
+                    navigator: "SettingsNavigator",
                     secure: false,
                 },
                 {
                     name: t("Support"),
-                    value: null,
+                    value: "",
                     type: "TEXT",
                     navigateTo: "Settings-Support",
+                    navigator: "SettingsNavigator",
                     secure: false,
                 },
                 {
                     name: t("Log Out"),
-                    value: null,
+                    value: "",
                     type: "TEXT",
                     navigateTo: "Settings-Log-Out",
+                    navigator: "SettingsNavigator",
                     secure: false,
                 },
             ],
@@ -141,7 +156,6 @@ export default function ListSettings() {
                             key={index}
                             name={item.name}
                             content={item.content}
-                            type="ACCOUNT"
                         />
                     )
                 }}
