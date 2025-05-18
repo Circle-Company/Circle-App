@@ -16,6 +16,7 @@
 </div>
 
 ### ✨ Sobre o Projeto
+
 Nossa missão é criar uma rede social realmente diferente, intuitiva de usar, simples de criar, e divertido de assistir e acompanhar amigos. Onde compartilhar o dia a dia seja uma atividade leve.
 E acima de tudo com autenticidade, trazendo um visual inovador, funções diferentes, e tudo isso Open Source.
 
@@ -23,27 +24,26 @@ E acima de tudo com autenticidade, trazendo um visual inovador, funções difere
 
 ### 🧠 Funcionalidades
 
-- 📸 Criar e editar momentos com fotos, vídeos e texto
-- 📂 Organizar momentos em memórias personalizadas
-- 💬 Curtidas, comentários e interações sociais
-- 📱 Perfil público com galeria de memórias
-- 🔒 Autenticação segura com JWT
-- 🌗 Suporte a temas claro e escuro
-- 🚀 Arquitetura escalável com React Native + TypeScript
+-   📸 Criar e editar momentos com fotos, vídeos e texto
+-   📂 Organizar momentos em memórias personalizadas
+-   💬 Curtidas, comentários e interações sociais
+-   📱 Perfil público com galeria de memórias
+-   🔒 Autenticação segura com JWT
+-   🌗 Suporte a temas claro e escuro
+-   🚀 Arquitetura escalável com React Native + TypeScript
 
 ---
 
 ### 🛣️ Roadmap
 
-| Etapa | Status |
-|-------|--------|
-| Notificações em tempo real | ✅ Concluído |
-| Lançamento beta na Play Store | ✅ Concluído |
-| Câmera interna do App | ⚙️ Em Desenvolvimento |
-| Feed com sistema de recomendação | ⚙️ Em Desenvolvimento |
-| Sistema de Pesquisa de Moments | 🧠 Em planejamento |
-| Compartilhamento externo de moments | 🔜 Em breve |
-
+| Etapa                               | Status                |
+| ----------------------------------- | --------------------- |
+| Notificações em tempo real          | ✅ Concluído          |
+| Lançamento beta na Play Store       | ✅ Concluído          |
+| Câmera interna do App               | ⚙️ Em Desenvolvimento |
+| Feed com sistema de recomendação    | ⚙️ Em Desenvolvimento |
+| Sistema de Pesquisa de Moments      | 🧠 Em planejamento    |
+| Compartilhamento externo de moments | 🔜 Em breve           |
 
 ---
 
@@ -58,6 +58,7 @@ Estamos procurando colaboradores! Se você é dev mobile, backend, designer ou t
 </div>
 
 Para contribuir:
+
 1. Faça um fork do projeto
 2. Crie uma branch: `git checkout -b minha-feature`
 3. Faça suas alterações
@@ -67,9 +68,9 @@ Para contribuir:
 
 ### 📎 Links Úteis
 
-- [🔗 Repositório Principal](https://github.com/Circle-Company/Circle-App)
-- [🧠 Roadmap no GitHub Projects](https://github.com/Circle-Company/Circle-App/projects)
-- [📱 Protótipo no Figma (se tiver)](https://figma.com/...)
+-   [🔗 Repositório Principal](https://github.com/Circle-Company/Circle-App)
+-   [🧠 Roadmap no GitHub Projects](https://github.com/Circle-Company/Circle-App/projects)
+-   [📱 Protótipo no Figma (se tiver)](https://figma.com/...)
 
 ---
 

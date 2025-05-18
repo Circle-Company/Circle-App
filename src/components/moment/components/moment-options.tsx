@@ -98,7 +98,7 @@ export default function options({ memory, momentData, momentOptions }: OptionsPr
             </View>
 
             <View style={textsContainer}>
-                <Text style={[descriptionStyle]}>
+                <Text style={descriptionStyle}>
                     {t("The Moment will only be removed from this memory.")}
                 </Text>
                 <Text style={[descriptionStyle, { fontSize: fonts.size.body * 0.56 }]}>

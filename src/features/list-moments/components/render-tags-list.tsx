@@ -8,18 +8,19 @@ import Tag from "../../../components/moment/components/moment-tag"
 export default function RenderTagsList() {
     const { momentData } = React.useContext(MomentContext)
     const container: any = {
-        left: -sizes.paddings['1md'],
-        flexDirection: 'row',
+        left: -sizes.paddings["1md"],
+        flexDirection: "row",
         paddingTop: sizes.paddings["1sm"] * 0.5,
-        width: sizes.screens.width
+        width: sizes.screens.width,
     }
 
-    if(!momentData.tags) return null
+    if (!momentData.tags) return null
 
     React.useEffect(() => {
         async function fetch() {
             await momentData.getTags()
-        }; fetch()
+        }
+        fetch()
     }, [])
 
     return (
@@ -29,8 +30,8 @@ export default function RenderTagsList() {
                 data={momentData.tags}
                 showsHorizontalScrollIndicator={false}
                 contentContainerStyle={{ paddingHorizontal: sizes.paddings["2sm"] }}
-                renderItem={({item, index}) => {
-                    return ( <Tag title={item.title} color="#000000"/> )
+                renderItem={({ item, index }) => {
+                    return <Tag title={item.title} color="#000000" />
                 }}
             />
         </View>

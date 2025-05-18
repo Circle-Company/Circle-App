@@ -1,24 +1,25 @@
-import { Text } from "@/components/Themed"
-import ColorTheme from "@/layout/constants/colors"
-import { useDistanceFormatter } from "@/lib/hooks/useDistanceFormatter"
-import { NavigationProp, ParamListBase, useNavigation } from "@react-navigation/native"
-import React from "react"
-import { Animated, Pressable, TextStyle, View, ViewStyle } from "react-native"
+import ColorTheme, { colors } from "@/layout/constants/colors"
+import { Animated, Pressable, TextStyle, View, ViewStyle, useColorScheme } from "react-native"
 import Reanimated, { FadeInDown } from "react-native-reanimated"
+
+import { Text } from "@/components/Themed"
+import { useDistanceFormatter } from "@/lib/hooks/useDistanceFormatter"
+import React from "react"
 import fonts from "../../../layout/constants/fonts"
 import sizes from "../../../layout/constants/sizes"
 import { UserShow } from "../../user_show"
 import { RenderItemReciveDataObjectProps } from "../types"
-export default function render_user({ user }: RenderItemReciveDataObjectProps) {
+
+export default function RenderUser({ user }: RenderItemReciveDataObjectProps) {
     const bounciness = 8
     const animationScale = 0.9
-
-    const navigation: NavigationProp<ParamListBase> = useNavigation()
-
+    const isDarkMode = useColorScheme() === "dark"
     const animatedScale = React.useRef(new Animated.Value(1)).current
+    
     React.useEffect(() => {
         animatedScale.setValue(1)
-    }, [])
+    }, [animatedScale, user])
+    
     const HandleButtonAnimation = () => {
         Animated.spring(animatedScale, {
             toValue: 1,
@@ -50,10 +51,13 @@ export default function render_user({ user }: RenderItemReciveDataObjectProps) {
     const container: ViewStyle = {
         width: sizes.screens.width - sizes.margins["2sm"] * 2,
         paddingHorizontal: sizes.paddings["1sm"] * 0.7,
-        height: sizes.sizes["2lg"],
+        paddingVertical: sizes.paddings["1sm"],
         flexDirection: "row",
         alignSelf: "center",
         alignItems: "center",
+        backgroundColor: isDarkMode ? colors.gray.grey_09: colors.gray.grey_02,
+        borderRadius: sizes.borderRadius["1md"],
+        marginBottom: sizes.margins["2sm"]
     }
     const container_left: ViewStyle = {
         alignItems: "center",
@@ -64,73 +68,81 @@ export default function render_user({ user }: RenderItemReciveDataObjectProps) {
         alignItems: "center",
         justifyContent: "flex-start",
         flexDirection: "row",
-        paddingRight: sizes.paddings["1sm"] * 0.2,
-        fontSize: fonts.size.body * 0.9,
+        fontSize: fonts.size.body * 0.7,
         fontFamily: fonts.family.Bold,
     }
     const container_center: ViewStyle = {
         flex: 1,
-        marginLeft: sizes.margins["1md"],
+        marginLeft: sizes.margins["1sm"],
         alignItems: "flex-start",
         flexDirection: "column",
         justifyContent: "center",
     }
     const inner_container_left: ViewStyle = {
-        top: 25,
-        marginLeft: -30,
-        paddingHorizontal: sizes.paddings["1sm"] * 0.8,
+        paddingHorizontal: sizes.paddings["1sm"] * 0.6,
         paddingVertical: sizes.paddings["1sm"] * 0.4,
-        backgroundColor: "#7B61FF",
+        backgroundColor: isDarkMode ? colors.gray.grey_06 : colors.gray.grey_02,
+        marginLeft: sizes.margins["1sm"] * 1.2,
+        marginRight: sizes.margins["1sm"],
         borderRadius: 100,
         alignItems: "center",
         justifyContent: "center",
+        flexDirection: "row"
+    }
+    const container_right: ViewStyle = {
+        alignItems: "flex-end",
+        justifyContent: "flex-end",
         flexDirection: "row",
-        borderWidth: 3,
-        borderColor: ColorTheme().background,
+    }
+
+    const animated_container: ViewStyle = {
+        transform: [{ scale: animatedScale }],
+        flex: 1
     }
 
     return (
         <Reanimated.View entering={FadeInDown.duration(100)} style={container}>
-            <Animated.View style={{ transform: [{ scale: animatedScale }], flex: 1 }}>
-                <Pressable style={container} onPressIn={HandlePressIn} onPressOut={HandlePressOut}>
-                    <UserShow.Root data={user}>
+            <Animated.View style={animated_container}>
+                <Pressable onPressIn={HandlePressIn} onPressOut={HandlePressOut}>
+                    <UserShow.Root data={{
+                        ...user,
+                        profile_picture: {
+                            small_resolution: user.profile_picture.tiny_resolution || "",
+                            tiny_resolution: user.profile_picture.tiny_resolution || ""
+                        }
+                    }}>
                         <View style={container_left}>
-                            <UserShow.ProfilePicture
-                                pictureDimensions={{ width: 50, height: 50 }}
-                                displayOnMoment={false}
-                            />
                             <View style={inner_container_left}>
                                 <Text style={container_left_text}>
                                     {useDistanceFormatter(user.distance_km)}
                                 </Text>
-                            </View>
+                            </View>                            
+                            <UserShow.ProfilePicture
+                                pictureDimensions={{ width: 40, height: 40 }}
+                                displayOnMoment={false}
+                            />
+
                         </View>
                         <View style={container_center}>
                             <UserShow.Username
                                 margin={0}
-                                truncatedSize={20}
+                                truncatedSize={user.follow_you ? user.verifyed ? 7 : 10 : 14}
                                 fontSize={fonts.size.body}
                                 displayOnMoment={false}
-                                fontFamily={fonts.family.Medium}
+                                fontFamily={fonts.family.Bold}
                             />
 
                             <Text
                                 style={{
-                                    fontSize: fonts.size.body,
-                                    fontFamily: fonts.family.Medium,
+                                    fontSize: fonts.size.body * 0.9,
+                                    fontFamily: fonts.family.Semibold,
+                                    color: ColorTheme().textDisabled
                                 }}
                             >
                                 {user.name}
                             </Text>
                         </View>
-                        <View
-                            style={{
-                                marginRight: sizes.margins["2sm"],
-                                alignItems: "flex-end",
-                                justifyContent: "flex-end",
-                                flexDirection: "row",
-                            }}
-                        >
+                        <View style={container_right}>
                             <UserShow.FollowButton
                                 followsYou={user.follow_you}
                                 isFollowing={user.you_follow}

@@ -71,7 +71,7 @@ export function Provider({ children }: SelectMomentsProviderProps) {
         try {
             const response = await api
                 .post(
-                    `/memory/create`,
+                    "/memory/create",
                     { user_id: session.user.id.toString(), title },
                     { headers: { Authorization: session.account.jwtToken } }
                 )
@@ -109,7 +109,7 @@ export function Provider({ children }: SelectMomentsProviderProps) {
             console.log("store_moments: ", memory_id, filtered_moments)
             await api
                 .post(
-                    `/memory/add-moment`,
+                    "/memory/add-moment",
                     { memory_id, moments_list: [...filtered_moments] },
                     { headers: { Authorization: session.account.jwtToken } }
                 )

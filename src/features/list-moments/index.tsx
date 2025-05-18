@@ -126,11 +126,11 @@ const ListMoments = () => {
                         index === 0
                             ? container_0
                             : index + 1 === feedData.length
-                              ? container_1
-                              : container
+                                ? container_1
+                                : container
 
                     return (
-                        <Animated.View style={[container_style]} key={item.unique_id}>
+                        <Animated.View style={container_style} key={item.unique_id}>
                             <RenderMoment isFeed={true} momentData={item} isFocused={focusedItem} />
                         </Animated.View>
                     )

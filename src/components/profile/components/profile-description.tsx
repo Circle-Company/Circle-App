@@ -10,8 +10,8 @@ export default function description({}: ProfileDescriptionProps) {
     const { user } = useProfileContext()
     const isDarkMode = useColorScheme() === "dark"
 
-    var animatedScale = React.useRef(new Animated.Value(1)).current
-    var animatedOpacity = React.useRef(new Animated.Value(0)).current
+    const animatedScale = React.useRef(new Animated.Value(1)).current
+    const animatedOpacity = React.useRef(new Animated.Value(0)).current
 
     function handleAnimation() {
         Animated.spring(animatedOpacity, {

@@ -8,7 +8,7 @@ function postNotifications(): void {
 }
 async function firebaseMessaging(): Promise<boolean> {
     const { device } = React.useContext(PersistedContext)
-    let authStatus: number = await messaging().requestPermission()
+    const authStatus: number = await messaging().requestPermission()
     const enabled =
         authStatus === messaging.AuthorizationStatus.AUTHORIZED ||
         authStatus === messaging.AuthorizationStatus.PROVISIONAL

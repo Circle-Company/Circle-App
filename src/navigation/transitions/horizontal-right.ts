@@ -15,10 +15,10 @@ export const Interpolation = ({
         }),
         next
             ? next.progress.interpolate({
-                  inputRange: [0, 1],
-                  outputRange: [0, 1],
-                  extrapolate: "clamp",
-              })
+                inputRange: [0, 1],
+                outputRange: [0, 1],
+                extrapolate: "clamp",
+            })
             : 0
     )
 

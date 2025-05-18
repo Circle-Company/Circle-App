@@ -28,7 +28,7 @@ export default function CancelButton({
     action,
     vibrate,
 }: ButtonStandartProps) {
-    var animatedScale = React.useRef(new Animated.Value(1)).current
+    const animatedScale = React.useRef(new Animated.Value(1)).current
     React.useEffect(() => {
         animatedScale.setValue(1)
     }, [])

@@ -16,7 +16,7 @@ export default function name({
 }: ProfileNameProps) {
     const { user } = useProfileContext()
 
-    var animatedOpacity = React.useRef(new Animated.Value(0.2)).current
+    const animatedOpacity = React.useRef(new Animated.Value(0.2)).current
 
     function handleAnimation() {
         Animated.spring(animatedOpacity, {

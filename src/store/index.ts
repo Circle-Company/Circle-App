@@ -3,7 +3,7 @@ export const storage = new MMKV()
 
 export function storageKeys() {
     const sessionId = storage.getString("@circle:sessionId")
-    const baseKey = `@circle:`
+    const baseKey = "@circle:"
     return {
         sessionId,
         baseKey,

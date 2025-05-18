@@ -11,14 +11,14 @@ type NotificationContainerProps = {
     notification: NotificationProps
 }
 export default function container_main({ children, notification }: NotificationContainerProps) {
-    var bounciness = 12
-    var animationScale = 0.9
+    const bounciness = 12
+    const animationScale = 0.9
 
     const { setProfile } = React.useContext(ViewProfileContext)
 
     const navigation: any = useNavigation()
 
-    var animatedScale = React.useRef(new Animated.Value(1)).current
+    const animatedScale = React.useRef(new Animated.Value(1)).current
     React.useEffect(() => {
         animatedScale.setValue(1)
     }, [])

@@ -1,3 +1,3 @@
 type NetworkProps = {
-    stats: "ONLINE" | "OFFLINE" | "RECONNECTING",
+    stats: "ONLINE" | "OFFLINE" | "RECONNECTING"
 }

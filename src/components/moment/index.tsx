@@ -22,7 +22,7 @@ export const Moment = {
         TopLeft: top_left_root,
         TopRight: top_right_root,
         Center: center_root,
-        Bottom: bottom_root,        
+        Bottom: bottom_root,
     },
     ShareButton: share,
     MoreButton: more,
@@ -35,7 +35,6 @@ export const Moment = {
     Full: {
         Views: views,
         Comments: comments,
-        Shares: shares
-    }
-
+        Shares: shares,
+    },
 }

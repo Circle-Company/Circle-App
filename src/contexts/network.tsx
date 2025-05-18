@@ -25,7 +25,7 @@ export function Provider({ children }: NetworkProviderProps) {
 
     useEffect(() => {
         let previousState = isConnected
-        let previousIsInternetReachable = isInternetReachable
+        const previousIsInternetReachable = isInternetReachable
 
         const unsubscribe = NetInfo.addEventListener((state) => {
             const currentState = state.isConnected

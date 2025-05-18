@@ -33,7 +33,7 @@ export function Provider({ children }: NotificationProviderProps) {
     async function refreshToken() {
         console.log("refreshToken")
         if (session.user.id && session.account.jwtToken) {
-            let token = await messaging().getToken()
+            const token = await messaging().getToken()
             if (typeof token == "string" && token !== "") {
                 notification.registerPushToken({
                     userId: Number(storage.getNumber(storageKeys().user.id)),
