@@ -1,27 +1,59 @@
+import React, { useRef } from "react"
+import { Animated, Easing, Pressable, TextInput, View, useColorScheme } from "react-native"
+import ColorTheme, { colors } from "../../../../layout/constants/colors"
+
 import UserIcon from "@/assets/icons/svgs/@.svg"
-import React from "react"
-import { Pressable, TextInput, View, useColorScheme } from "react-native"
 import CloseIcon from "../../../../assets/icons/svgs/close.svg"
 import SearchIcon from "../../../../assets/icons/svgs/search.svg"
 import LanguageContext from "../../../../contexts/Preferences/language"
-import ColorTheme, { colors } from "../../../../layout/constants/colors"
 import fonts from "../../../../layout/constants/fonts"
 import sizes from "../../../../layout/constants/sizes"
 import { useSearchContext } from "../../search-context"
 
-export default function input() {
+export default function SearchInput() {
     const { searchTerm, setSearchTerm, fetchData } = useSearchContext()
     const { t } = React.useContext(LanguageContext)
     const isDarkMode = useColorScheme() === "dark"
 
+    // Animações
+    const bounceAnim = useRef(new Animated.Value(1)).current
+    const containerScale = useRef(new Animated.Value(1)).current
+
+    const animateBounce = () => {
+        Animated.sequence([
+            Animated.timing(bounceAnim, {
+                toValue: 1.1,
+                duration: 100,
+                useNativeDriver: true,
+                easing: Easing.linear
+            }),
+            Animated.timing(bounceAnim, {
+                toValue: 1,
+                duration: 100,
+                useNativeDriver: true,
+                easing: Easing.bounce
+            })
+        ]).start()
+    }
+
     const handleInputChange = (text: string) => {
+        animateBounce()
         // Substitui espaços por ponto
         const replacedSpaces = text.replace(/\s+/g, ".")
         // Permite somente letras, números, ponto (.) e underline (_)
         const filtered = replacedSpaces.replace(/[^a-zA-Z0-9._]/g, "")
         // Remove ocorrências consecutivas de ponto ou underline, substituindo-as por uma única ocorrência
         const noConsecutive = filtered.replace(/([._])\1+/g, "$1")
-        setSearchTerm(noConsecutive.toLowerCase())
+        const newValue = noConsecutive.toLowerCase()
+        setSearchTerm(newValue)
+
+        // Anima a escala baseada no tamanho do texto
+        Animated.timing(containerScale, {
+            toValue: newValue.length > 0 ? 1.05 : 0.98,
+            duration: 300,
+            useNativeDriver: true,
+            easing: Easing.bezier(0.4, 0, 0.2, 1)
+        }).start()
     }
 
     const handleClosePress = () => {
@@ -52,8 +84,9 @@ export default function input() {
     }
 
     const container: any = {
-        borderRadius: sizes.inputs.height / 2,
+        width: sizes.screens.width - (sizes.paddings["2sm"] * 2),
         height: sizes.buttons.height / 1.8,
+        borderRadius: sizes.inputs.height / 2,
         overflow: "hidden",
         backgroundColor: ColorTheme().backgroundDisabled,
     }
@@ -117,15 +150,29 @@ export default function input() {
     }
     return (
         <View style={out_container}>
-            <View style={container}>
+            <Animated.View 
+                style={[
+                    container,
+                    {
+                        transform: [{ scale: containerScale }]
+                    }
+                ]}
+            >
                 <View style={input_container}>
-                    <View style={iconContainer}>
+                    <Animated.View 
+                        style={[
+                            iconContainer,
+                            {
+                                transform: [{ scale: bounceAnim }]
+                            }
+                        ]}
+                    >
                         <SearchIcon
                             fill={searchTerm ? ColorTheme().text : ColorTheme().textDisabled}
                             width={searchTerm ? 16 : 15}
                             height={searchTerm ? 16 : 15}
                         />
-                    </View>
+                    </Animated.View>
                     <View style={textContainer}>
                         <UserIcon
                             style={{ right: -2 }}
@@ -157,7 +204,7 @@ export default function input() {
                         </Pressable>
                     )}
                 </View>
-            </View>
+            </Animated.View>
         </View>
     )
 }
