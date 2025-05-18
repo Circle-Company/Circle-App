@@ -1,36 +1,44 @@
+import { FlatList, ScrollView } from "react-native"
+
+import NotificationIcon from "@/assets/icons/svgs/bell_fill.svg"
+import HapticsIcon from "@/assets/icons/svgs/hand_tap_fill.svg"
+import LanguageIcon from "@/assets/icons/svgs/text_format.svg"
 import LanguageContext from "@/contexts/Preferences/language"
 import React from "react"
-import { FlatList, ScrollView } from "react-native"
 import { Settings } from "../../../../components/settings"
+import ColorTheme from "../../../../layout/constants/colors"
 
 export default function PreferencesScreen() {
-    const { t } = React.useContext(LanguageContext)
+    const { t, atualAppLanguage} = React.useContext(LanguageContext)
     const ListData = [
         {
             name: t("App"),
             content: [
                 {
-                    //icon: <LanguageIcon width={20} height={20} fill={ColorTheme().text} />,
+                    icon: <LanguageIcon width={20} height={20} fill={ColorTheme().text} />,
                     name: t("Language"),
-                    value: null,
-                    type: "TEXT",
+                    value: atualAppLanguage.nativeName,
+                    type: "TEXT" as const,
                     navigateTo: "Settings-Preferences-Language",
+                    navigator: "SettingsNavigator",
                     secure: false,
                 },
                 {
-                    //icon: <HapticsIcon width={20} height={20} fill={ColorTheme().text} />,
+                    icon: <HapticsIcon width={20} height={20} fill={ColorTheme().text} />,
                     name: t("Haptic Feedback"),
-                    value: null,
-                    type: "TEXT",
+                    value: "",
+                    type: "TEXT" as const,
                     navigateTo: "Settings-Preferences-Haptics",
+                    navigator: "SettingsNavigator",
                     secure: false,
                 },
                 {
-                    //icon: <NotificationIcon width={20} height={20} fill={ColorTheme().text} />,
+                    icon: <NotificationIcon width={20} height={20} fill={ColorTheme().text} />,
                     name: t("Notifications"),
-                    value: null,
-                    type: "TEXT",
+                    value: "",
+                    type: "TEXT" as const,
                     navigateTo: "Settings-Preferences-PushNotifications",
+                    navigator: "SettingsNavigator",
                     secure: false,
                 },
             ],
@@ -44,7 +52,7 @@ export default function PreferencesScreen() {
                 keyExtractor={(item) => item.name}
                 renderItem={({ item }) => {
                     return (
-                        <Settings.Section name={item.name} content={item.content} type="ACCOUNT" />
+                        <Settings.Section name={item.name} content={item.content} />
                     )
                 }}
             />
