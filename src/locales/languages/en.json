@@ -212,7 +212,7 @@
     "Added to Memory": "Added to Memory",
     "New Follower": "New Follower",
     "Profile Visit": "Profile Visit",
-    "Near to You": "Near to You",
+    "Near to You Now": "Near to You Now",
 
     "When your moment gets a like.": "When your moment gets a like.",
     "When someone you follow posts a new Memory.": "When someone you follow posts a new Memory.",
@@ -236,6 +236,7 @@
     "We can't add these moments to memory": "We can't add these moments to memory",
     "We were unable to edit the memory title": "We were unable to edit the memory title",
     "We can't delete the memory": "We can't delete the memory",
+    "We have no results to show you.": "We have no results to show you.",
 
     "Made with love in Brazil": "Made with love in Brazil",
 
