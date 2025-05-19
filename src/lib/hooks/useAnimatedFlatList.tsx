@@ -1,4 +1,3 @@
-import { PanResponder, TextStyle, View, ViewStyle, useColorScheme } from "react-native"
 import Animated, {
     Easing,
     interpolate,
@@ -11,14 +10,15 @@ import Animated, {
     withTiming,
 } from "react-native-reanimated"
 import ColorTheme, { colors } from "../../layout/constants/colors"
+import { PanResponder, TextStyle, View, ViewStyle, useColorScheme } from "react-native"
 
-import React from "react"
 import { Loading } from "../../components/loading"
+import React from "react"
 import { Text } from "../../components/Themed"
+import { Vibrate } from "./useHapticFeedback"
 import config from "../../config"
 import fonts from "../../layout/constants/fonts"
 import sizes from "../../layout/constants/sizes"
-import { Vibrate } from "./useHapticFeedback"
 
 type AnimatedFlatlistProps<T> = {
     data: Array<T>
@@ -35,6 +35,8 @@ type AnimatedFlatlistProps<T> = {
     onEndReached: () => Promise<void>
     handleRefresh: () => Promise<void>
     CustomRefreshIcon?: React.ComponentType
+    containerStyle?: ViewStyle
+    backgroundColor?: string
 }
 
 const DefaultEmptyComponent = () => {
@@ -126,6 +128,8 @@ export function AnimatedVerticalFlatlist<T>({
     onEndReachedThreshold,
     CustomRefreshIcon,
     ListEmptyComponent = DefaultEmptyComponent,
+    containerStyle,
+    backgroundColor,
 }: AnimatedFlatlistProps<T>) {
     const isDarkMode = useColorScheme() === "dark"
     const scrollPosition = useSharedValue(0)
@@ -182,20 +186,25 @@ export function AnimatedVerticalFlatlist<T>({
         },
     })
 
-    const onRefresh = React.useCallback(() => {
+    const onRefresh = React.useCallback(async () => {
         setRefreshing(true)
-        handleRefresh()
-        if (!disableVibrate) Vibrate("effectTick")
-        setTimeout(() => {
-            setRefreshing(false)
-            pullDownPosition.value = withSpring(0, {
-                damping: 20,
-                stiffness: 90,
-                mass: 0.8,
-                velocity: 0.1,
-            })
-        }, endRefreshAnimationDelay)
-    }, [handleRefresh, disableVibrate, endRefreshAnimationDelay])
+        try {
+            await handleRefresh()
+        } catch (error) {
+            console.error("Erro ao atualizar lista:", error)
+        } finally {
+            if (!disableVibrate) Vibrate("effectTick")
+            setTimeout(() => {
+                setRefreshing(false)
+                pullDownPosition.value = withSpring(0, {
+                    damping: 20,
+                    stiffness: 90,
+                    mass: 0.8,
+                    velocity: 0.1,
+                })
+            }, endRefreshAnimationDelay)
+        }
+    }, [handleRefresh, disableVibrate, endRefreshAnimationDelay, pullDownPosition])
 
     const pullDownStyles = useAnimatedStyle(() => {
         "worklet"
@@ -226,7 +235,7 @@ export function AnimatedVerticalFlatlist<T>({
                 velocity: 0.1,
             })
         }
-    }, [isReadyToRefresh, disableVibrate, onRefresh])
+    }, [isReadyToRefresh, disableVibrate, onRefresh, pullDownPosition])
 
     // Ajustar a resistência do pull para ser mais suave
     const panResponder = React.useMemo(
@@ -259,7 +268,7 @@ export function AnimatedVerticalFlatlist<T>({
                     })
                 },
             }),
-        [scrollPosition.value, onPanRelease]
+        [scrollPosition.value, onPanRelease, isReadyToRefresh, pullDownPosition]
     )
 
     // Otimizar a animação do ícone de refresh
@@ -309,11 +318,11 @@ export function AnimatedVerticalFlatlist<T>({
             )
         } else {
             rotation.value = withTiming(0, {
-                duration: 200, // Reduzido de 300 para 200
+                duration: 200,
                 easing: Easing.bezier(0.4, 0, 0.2, 1),
             })
         }
-    }, [refreshing])
+    }, [refreshing, rotation])
 
     const loadingAnimationStyle = useAnimatedStyle(() => {
         "worklet"
@@ -368,6 +377,7 @@ export function AnimatedVerticalFlatlist<T>({
         container: {
             backgroundColor: ColorTheme().backgroundDisabled + "70",
             flex: 1,
+            ...containerStyle,
         } as ViewStyle,
 
         refreshContainer: {
@@ -403,6 +413,7 @@ export function AnimatedVerticalFlatlist<T>({
         flatlistContainer: {
             flex: 1,
             overflow: "hidden",
+            backgroundColor: backgroundColor || ColorTheme().backgroundDisabled,
         } as ViewStyle,
 
         refreshText: {
@@ -411,7 +422,7 @@ export function AnimatedVerticalFlatlist<T>({
         } as ViewStyle,
 
         flatlist: {
-            backgroundColor: isDarkMode ? colors.gray.black : colors.gray.white,
+            backgroundColor: backgroundColor? backgroundColor : isDarkMode ? colors.gray.black : colors.gray.white,
         } as ViewStyle,
     }
 
