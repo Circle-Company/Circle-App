@@ -1,56 +1,71 @@
+import { ViewStyle, useColorScheme } from "react-native"
+
 import { Skeleton } from "@/components/skeleton"
 import { View } from "@/components/Themed"
+import { colors } from "@/layout/constants/colors"
 import sizes from "@/layout/constants/sizes"
-import { ViewStyle } from "react-native"
 
 export function ListNearToYouSkeleton() {
+    const isDarkMode = useColorScheme() === "dark"
+
     const container: ViewStyle = {
-        padding: sizes.paddings["1md"],
         width: sizes.screens.width,
+        marginTop: sizes.margins["1lg"],
+        alignItems: "center",
     }
 
     const itemContainer: ViewStyle = {
-        marginBottom: sizes.margins["1md"],
-        flexDirection: "row" as const,
-        alignItems: "center" as const,
-        padding: 10,
-        borderRadius: 8,
+        marginBottom: sizes.margins["2sm"],
+        borderRadius: sizes.borderRadius["1md"],
     }
 
-    const usernameSkeletonStyle: ViewStyle = {
-        width: 120,
+    const titleSkeletonStyle: ViewStyle = {
+        width: 180,
         height: 16,
-        borderRadius: 8,
-        marginBottom: 6,
+        marginBottom: sizes.margins["1md"],
+        borderRadius: sizes.borderRadius["1md"],
     }
 
-    const distanceSkeletonStyle: ViewStyle = {
-        width: 60,
-        height: 12,
-        borderRadius: 6,
-    }
-
-    const profilePictureSkeletonStyle: ViewStyle = {
-        width: 40,
-        height: 40,
+    const userSkeletonStyle: ViewStyle = {
+        width: sizes.screens.width  - sizes.paddings["2sm"] * 2,
+        height: 60,
+        marginHorizontal: sizes.paddings["2sm"],
         borderRadius: 20,
     }
 
-    const contentContainerStyle: ViewStyle = {
-        marginLeft: 10
+    const buttonSkeletonStyle: ViewStyle = {
+        marginTop: sizes.margins["1md"],
+        width: 180,
+        height: 35,
+        marginHorizontal: sizes.paddings["2sm"],
+        borderRadius: sizes.borderRadius["1md"],
     }
 
     return (
         <View style={container}>
-            {Array.from({ length: 8 }).map((_, index) => (
+
+            <Skeleton.View
+                backgroundColor={isDarkMode ? colors.gray.grey_01 + 80 : colors.gray.grey_09 + 80}
+                duration={2000}
+                style={titleSkeletonStyle}
+            />
+
+            {Array.from({ length: 6 }).map((_, index) => (
                 <View key={index} style={itemContainer}>
-                    {/* Foto de perfil */}
                     <Skeleton.View
+                        backgroundColor={isDarkMode ? colors.gray.grey_01 + 80 : colors.gray.grey_09 + 80}
                         duration={2000}
-                        style={profilePictureSkeletonStyle}
+                        style={userSkeletonStyle}
                     />
+
                 </View>
+
             ))}
+            <Skeleton.View
+                backgroundColor={isDarkMode ? colors.gray.grey_01 + 80 : colors.gray.grey_09 + 80}
+                duration={2000}
+                style={buttonSkeletonStyle}
+            />
         </View>
     )
 }
