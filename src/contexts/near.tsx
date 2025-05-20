@@ -1,8 +1,7 @@
-import React from "react"
-import api from "../services/Api"
-import GeolocationContext from "./geolocation"
 import PersistedContext from "./Persisted"
+import React from "react"
 import { UserDataType } from "./Persisted/types"
+import { useFindNearbyUsers } from "../state/queries"
 
 // Types
 type ModifiedProfilePicture = Omit<UserDataType["profile_picture"], "small_resolution">
@@ -14,142 +13,101 @@ export interface NearUserData extends Omit<UserDataType, "profile_picture"> {
     follow_you?: boolean
 }
 
-interface NearbyUsersResponse {
-    data: NearUserData[]
-    search_params: {
-        latitude: number
-        longitude: number
-        radius_km: number
-    }
-}
-
 type NearProviderProps = { children: React.ReactNode }
 
 export type NearContextData = {
     nearbyUsers: NearUserData[]
+    getNearbyUsers: () => Promise<void>
     loading: boolean
     error: string | null
     radius: number
-    getNearbyUsers: () => Promise<void>
+    refresh: () => Promise<void>
     setRadius: React.Dispatch<React.SetStateAction<number>>
-    setLoading: React.Dispatch<React.SetStateAction<boolean>>
 }
 
 // Context
-const NearContext = React.createContext<NearContextData>({} as NearContextData)
+const NearContext = React.createContext<NearContextData | null>(null)
 
 // Provider
 export function Provider({ children }: NearProviderProps) {
     // Contexts
     const { session } = React.useContext(PersistedContext)
-    const { isUpdating } = React.useContext(GeolocationContext)
 
     // States
-    const [loading, setLoading] = React.useState(false)
-    const [error, setError] = React.useState<string | null>(null)
+    const [radius, setRadius] = React.useState(100)
     const [nearbyUsers, setNearbyUsers] = React.useState<NearUserData[]>([])
-    const [radius, setRadius] = React.useState(5)
-    const [lastCoordinates, setLastCoordinates] = React.useState<{
-        latitude: number | null
-        longitude: number | null
-    }>({
-        latitude: null,
-        longitude: null,
-    })
+    const [error, setError] = React.useState<string | null>(null)
 
-    // Handlers
+    // Mutation para buscar usuários próximos
+    const findNearbyUsersMutation = useFindNearbyUsers()
+
+    // Memoize as funções para evitar recriações desnecessárias
     const getNearbyUsers = React.useCallback(async () => {
-        if (loading) return
-
-        const currentCoords = {
-            latitude: session.account.coordinates?.latitude,
-            longitude: session.account.coordinates?.longitude,
+        if (!session?.account?.coordinates) {
+            setError("Coordenadas não disponíveis")
+            return
         }
 
-        if (!currentCoords.latitude || !currentCoords.longitude) {
-            console.log("📍 Coordenadas não disponíveis")
+        const { latitude, longitude } = session.account.coordinates
+        const jwtToken = session.account.jwtToken
+
+        if (!jwtToken) {
+            setError("Token não disponível")
             return
         }
 
         try {
-            setLoading(true)
-            setError(null)
-
-            const response = await api.post<NearbyUsersResponse>("/near/users/find", {
-                radius,
-                latitude: currentCoords.latitude,
-                longitude: currentCoords.longitude,
-            }, {
-                headers: { Authorization: session.account.jwtToken }
+            const result = await findNearbyUsersMutation.mutateAsync({ 
+                latitude: latitude.toString(), 
+                longitude: longitude.toString(), 
+                radius,     
+                jwtToken 
             })
-
-            setNearbyUsers(response.data.data)
-            setLastCoordinates(currentCoords)
-        } catch (err: unknown) {
-            const error = err as Error
-            setError(error.message || "Erro ao buscar usuários próximos")
-            console.error("Erro ao buscar usuários próximos:", error)
-        } finally {
-            setLoading(false)
+            setNearbyUsers(result.data || [])
+            setError(null)
+        } catch (err: any) {
+            setError(err.message || "Erro ao buscar usuários próximos")
+            setNearbyUsers([])
         }
-    }, [
-        session.account.coordinates?.latitude,
-        session.account.coordinates?.longitude,
-        session.account.jwtToken,
-        radius,
-        loading
-    ])
+    }, [session?.account?.coordinates, session?.account?.jwtToken, radius, findNearbyUsersMutation])
 
-    // Effects
-    React.useEffect(() => {
-        const initializeNearUsers = async () => {
-            const hasCoordinates = session.account.coordinates?.latitude && 
-                                 session.account.coordinates?.longitude
+    const refresh = React.useCallback(async () => {
+        await getNearbyUsers()
+    }, [getNearbyUsers])
 
-            if (hasCoordinates) {
-                await getNearbyUsers()
-            } else {
-                const timer = setTimeout(() => {
-                    if (session.account.coordinates?.latitude && 
-                        session.account.coordinates?.longitude) {
-                        getNearbyUsers()
-                    }
-                }, 5000)
-                return () => clearTimeout(timer)
-            }
-        }
-        initializeNearUsers()
-    }, [getNearbyUsers, session.account.coordinates?.latitude, session.account.coordinates?.longitude])
-
-    React.useEffect(() => {
-        const { latitude, longitude } = session.account.coordinates || {}
-        const hasNewCoordinates = latitude && longitude && 
-            (latitude !== lastCoordinates.latitude || longitude !== lastCoordinates.longitude)
-
-        if (hasNewCoordinates) {
-            getNearbyUsers()
-        }
-    }, [
-        session.account.coordinates,
-        radius,
-        isUpdating,
-        getNearbyUsers,
-        lastCoordinates.latitude,
-        lastCoordinates.longitude
-    ])
-
-    // Context Value
-    const contextValue: NearContextData = {
+    // Memoize o valor do contexto para evitar recriações desnecessárias
+    const contextValue = React.useMemo(() => ({
         nearbyUsers,
-        loading,
+        getNearbyUsers,
+        loading: findNearbyUsersMutation.isPending,
         error,
         radius,
-        getNearbyUsers,
+        refresh,
         setRadius,
-        setLoading,
-    }
+    }), [
+        nearbyUsers,
+        getNearbyUsers,
+        findNearbyUsersMutation.isPending,
+        error,
+        radius,
+        refresh,
+        setRadius
+    ])
 
-    return <NearContext.Provider value={contextValue}>{children}</NearContext.Provider>
+    return (
+        <NearContext.Provider value={contextValue}>
+            {children}
+        </NearContext.Provider>
+    )
+}
+
+// Hook personalizado para usar o contexto
+export function useNearContext() {
+    const context = React.useContext(NearContext)
+    if (!context) {
+        throw new Error("useNearContext deve ser usado dentro de um NearProvider")
+    }
+    return context
 }
 
 export default NearContext
