@@ -1,12 +1,13 @@
-import { BadgeIcon } from "@/components/general/badge-icon"
-import PersistedContext from "@/contexts/Persisted"
-import { useNavigation } from "@react-navigation/native"
-import React from "react"
 import { View, ViewStyle } from "react-native"
-import Icon from "../../../assets/icons/svgs/tray.svg"
-import ColorTheme from "../../../layout/constants/colors"
-import sizes from "../../../layout/constants/sizes"
+
+import { BadgeIcon } from "@/components/general/badge-icon"
 import ButtonStandart from "../../buttons/button-standart"
+import ColorTheme from "../../../layout/constants/colors"
+import Icon from "../../../assets/icons/svgs/bell_fill.svg"
+import PersistedContext from "@/contexts/Persisted"
+import React from "react"
+import sizes from "../../../layout/constants/sizes"
+import { useNavigation } from "@react-navigation/native"
 
 export default function AccountHeaderLeft() {
     const { session } = React.useContext(PersistedContext)
@@ -29,7 +30,7 @@ export default function AccountHeaderLeft() {
                 margins={false}
                 backgroundColor={String(ColorTheme().backgroundDisabled)}
             >
-                <Icon fill={String(ColorTheme().text)} width={18} height={18} />
+                <Icon fill={String(ColorTheme().text)} width={16} height={16} />
             </ButtonStandart>
             <BadgeIcon number={session.account.unreadNotificationsCount} />
         </View>
