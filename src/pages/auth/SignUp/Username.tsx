@@ -1,15 +1,16 @@
-import ButtonClose from "@/components/buttons/close"
-import { useNavigation } from "@react-navigation/native"
-import React from "react"
-import { StatusBar, useColorScheme } from "react-native"
-import NextIcon from "../../../assets/icons/svgs/arrow_circle_right.svg"
-import { Text, View } from "../../../components/Themed"
-import UsernameInput from "../../../components/auth/usernameInput"
-import ButtonStandart from "../../../components/buttons/button-standart"
-import AuthContext from "../../../contexts/Auth"
 import ColorTheme, { colors } from "../../../layout/constants/colors"
+import { StatusBar, useColorScheme } from "react-native"
+import { Text, View } from "../../../components/Themed"
+
+import AuthContext from "../../../contexts/Auth"
+import ButtonClose from "@/components/buttons/close"
+import ButtonStandart from "../../../components/buttons/button-standart"
+import NextIcon from "../../../assets/icons/svgs/arrow_circle_right.svg"
+import React from "react"
+import UsernameInput from "../../../components/auth/usernameInput"
 import fonts from "../../../layout/constants/fonts"
 import sizes from "../../../layout/constants/sizes"
+import { useNavigation } from "@react-navigation/native"
 
 export default function UsernameScreen() {
     const isDarkMode = useColorScheme() === "dark"
@@ -93,8 +94,6 @@ export default function UsernameScreen() {
             <ButtonStandart
                 testID="handle-submit"
                 margins={false}
-                width={sizes.buttons.width / 2.8}
-                height={40}
                 action={handlePress}
                 backgroundColor={
                     signInputUsername
