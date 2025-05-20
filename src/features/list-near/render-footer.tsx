@@ -1,18 +1,18 @@
 import ColorTheme, { colors } from "@/layout/constants/colors"
 import { TextStyle, ViewStyle, useColorScheme } from "react-native"
 
-import RadiowavesIcon from "@/assets/icons/svgs/antenna_radiowaves_left_and_right.svg"
 import ButtonStandart from "@/components/buttons/button-standart"
 import { Loading } from "@/components/loading"
-import { Text } from "@/components/Themed"
 import NearContext from "@/contexts/near"
+import RadiowavesIcon from "@/assets/icons/svgs/antenna_radiowaves_left_and_right.svg"
+import React from "react"
+import { Text } from "@/components/Themed"
 import fonts from "@/layout/constants/fonts"
 import sizes from "@/layout/constants/sizes"
 import { t } from "i18next"
-import React from "react"
 
 export function RenderFooter() {
-    const { loading, getNearbyUsers, nearbyUsers} = React.useContext(NearContext) || {}
+    const { loading, refresh, getNearbyUsers } = React.useContext(NearContext) || {}
     const isDarkMode = useColorScheme() === "dark"
 
     const reloadTextStyle: TextStyle = {
@@ -26,10 +26,8 @@ export function RenderFooter() {
         alignItems: "center",
         justifyContent: "center",
         alignSelf: "center",
-        marginTop: sizes.margins["2md"],
+        marginTop: sizes.margins["1md"],
     }
-
-    if (nearbyUsers?.length === 0) return null
 
     return (
         <ButtonStandart
