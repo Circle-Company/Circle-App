@@ -1,4 +1,3 @@
-import React, { useCallback, useEffect } from "react"
 import {
     Animated,
     Easing,
@@ -6,23 +5,25 @@ import {
     ViewStyle,
     useColorScheme,
 } from "react-native"
-import { Text, View } from "../../components/Themed"
 import ColorTheme, { colors } from "../../layout/constants/colors"
+import React, { useCallback, useEffect } from "react"
+import { Text, View } from "../../components/Themed"
 
-import NearContext from "@/contexts/near"
 import LanguageContext from "../../contexts/Preferences/language"
 import fonts from "../../layout/constants/fonts"
 import sizes from "../../layout/constants/sizes"
+import { useNearContext } from "@/contexts/near"
 
 export function EmptyList() {
     const { t } = React.useContext(LanguageContext)
-    const { loading} = React.useContext(NearContext)
+    const { loading, getNearbyUsers } = useNearContext()
     const isDarkMode = useColorScheme() === "dark"
 
     const fadeAnim = React.useRef(new Animated.Value(0)).current
     const scaleAnim = React.useRef(new Animated.Value(0.8)).current
     const moveAnim = React.useRef(new Animated.Value(30)).current
     const spinAnim = React.useRef(new Animated.Value(0)).current
+    const buttonFadeAnim = React.useRef(new Animated.Value(0)).current
 
     useEffect(() => {
         Animated.parallel([
@@ -44,8 +45,15 @@ export function EmptyList() {
                 easing: Easing.out(Easing.cubic),
                 useNativeDriver: true,
             }),
+            Animated.timing(buttonFadeAnim, {
+                toValue: 1,
+                duration: 1000,
+                delay: 300,
+                easing: Easing.out(Easing.cubic),
+                useNativeDriver: true,
+            }),
         ]).start()
-    }, [fadeAnim, moveAnim, scaleAnim])
+    }, [fadeAnim, moveAnim, scaleAnim, buttonFadeAnim])
 
     const startSpinAnimation = useCallback(() => {
         spinAnim.setValue(0)
@@ -65,14 +73,15 @@ export function EmptyList() {
         }
     }, [loading, startSpinAnimation])
 
+
     const cardContainerStyle: ViewStyle = {
         alignItems: "center",
         justifyContent: "center",
         alignSelf: "center",
-        borderRadius: sizes.borderRadius["1lg"],
+        borderRadius: sizes.borderRadius["1md"],
         paddingHorizontal: sizes.paddings["1md"],
         paddingVertical: sizes.paddings["2md"],
-        marginTop: sizes.margins["2md"],
+        marginTop: sizes.margins["2sm"],
         width: sizes.screens.width - sizes.paddings["2sm"] * 2,
         backgroundColor: isDarkMode ? colors.gray.grey_09 : colors.gray.grey_01,
     }
