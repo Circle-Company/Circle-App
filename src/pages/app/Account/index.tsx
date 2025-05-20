@@ -1,16 +1,16 @@
-import CircleIcon from "@/assets/icons/svgs/circle-spinner.svg"
-import { View } from "@/components/Themed"
 import AccountContext from "@/contexts/account"
-import PersistedContext from "@/contexts/Persisted"
+import { AnimatedVerticalScrollView } from "@/lib/hooks/useAnimatedScrollView"
+import CircleIcon from "@/assets/icons/svgs/circle-spinner.svg"
 import ListMemories from "@/features/list-memories/list-memories-preview"
+import PersistedContext from "@/contexts/Persisted"
+import React from "react"
 import RenderProfile from "@/features/render-profile"
 import { RenderProfileSkeleton } from "@/features/render-profile/skeleton"
+import { View } from "@/components/Themed"
 import { colors } from "@/layout/constants/colors"
-import { AnimatedVerticalScrollView } from "@/lib/hooks/useAnimatedScrollView"
-import React from "react"
 
 export default function AccountScreen() {
-    const { setRefreshing, refreshing } = React.useContext(AccountContext)
+    const { setRefreshing } = React.useContext(AccountContext)
     const { session } = React.useContext(PersistedContext)
     const [loading, setLoading] = React.useState(false)
 
