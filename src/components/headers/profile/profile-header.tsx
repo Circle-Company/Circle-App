@@ -1,13 +1,16 @@
+import ColorTheme from "@/layout/constants/colors"
+import ProfileHeaderLeft from "./profile-header_left"
+import ProfileHeaderRight from "./profile-header_right"
 import React from "react"
 import { View } from "react-native"
 import sizes from "../../../layout/constants/sizes"
-import ProfileHeaderLeft from "./profile-header_left"
-import ProfileHeaderRight from "./profile-header_right"
 
 export default function ProfileHeader() {
     const container: any = {
         ...sizes.headers,
         flexDirection: "row",
+        backgroundColor: ColorTheme().background,
+        zIndex: 1000,
     }
     const left_container: any = {
         flex: 1,
