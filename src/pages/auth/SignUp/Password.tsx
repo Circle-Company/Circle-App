@@ -1,14 +1,15 @@
-import ButtonClose from "@/components/buttons/close"
-import { Loading } from "@/components/loading"
-import React from "react"
-import { StatusBar, StyleProp, TextStyle, ViewStyle, useColorScheme } from "react-native"
-import Icon from "../../../assets/icons/svgs/plus_circle.svg"
-import { Text, View } from "../../../components/Themed"
-import PasswordInput from "../../../components/auth/passwordInput"
-import AuthTermsText from "../../../components/auth/terms"
-import ButtonStandart from "../../../components/buttons/button-standart"
-import AuthContext from "../../../contexts/Auth"
 import ColorTheme, { colors } from "../../../layout/constants/colors"
+import { StatusBar, StyleProp, TextStyle, ViewStyle, useColorScheme } from "react-native"
+import { Text, View } from "../../../components/Themed"
+
+import AuthContext from "../../../contexts/Auth"
+import AuthTermsText from "../../../components/auth/terms"
+import ButtonClose from "@/components/buttons/close"
+import ButtonStandart from "../../../components/buttons/button-standart"
+import Icon from "../../../assets/icons/svgs/plus_circle.svg"
+import { Loading } from "@/components/loading"
+import PasswordInput from "../../../components/auth/passwordInput"
+import React from "react"
 import fonts from "../../../layout/constants/fonts"
 import sizes from "../../../layout/constants/sizes"
 
@@ -141,8 +142,6 @@ export default function PasswordScreen() {
                                         ? colors.gray.grey_04 + "90"
                                         : colors.gray.grey_04 + "90"
                             )}
-                            width={17}
-                            height={17}
                         />
                     </>
                 )}
