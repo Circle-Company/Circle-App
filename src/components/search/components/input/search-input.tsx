@@ -1,11 +1,11 @@
-import React, { useRef } from "react"
 import { Animated, Easing, Pressable, TextInput, View, useColorScheme } from "react-native"
 import ColorTheme, { colors } from "../../../../layout/constants/colors"
+import React, { useRef } from "react"
 
-import UserIcon from "@/assets/icons/svgs/@.svg"
 import CloseIcon from "../../../../assets/icons/svgs/close.svg"
-import SearchIcon from "../../../../assets/icons/svgs/search.svg"
 import LanguageContext from "../../../../contexts/Preferences/language"
+import SearchIcon from "../../../../assets/icons/svgs/search.svg"
+import UserIcon from "@/assets/icons/svgs/@.svg"
 import fonts from "../../../../layout/constants/fonts"
 import sizes from "../../../../layout/constants/sizes"
 import { useSearchContext } from "../../search-context"
@@ -38,11 +38,14 @@ export default function SearchInput() {
 
     const handleInputChange = (text: string) => {
         animateBounce()
-        // Substitui espaços por ponto
+        /**
+         * Substitui espaços por ponto
+         * Remove caracteres não alfanuméricos
+         * Remove caracteres consecutivos
+         * Converte para minúsculas
+         */
         const replacedSpaces = text.replace(/\s+/g, ".")
-        // Permite somente letras, números, ponto (.) e underline (_)
         const filtered = replacedSpaces.replace(/[^a-zA-Z0-9._]/g, "")
-        // Remove ocorrências consecutivas de ponto ou underline, substituindo-as por uma única ocorrência
         const noConsecutive = filtered.replace(/([._])\1+/g, "$1")
         const newValue = noConsecutive.toLowerCase()
         setSearchTerm(newValue)
@@ -69,11 +72,7 @@ export default function SearchInput() {
             }
         }
         fetchDataFromApi()
-    }, [searchTerm])
-
-    React.useEffect(() => {
-        setSearchTerm("")
-    }, [])
+    }, [searchTerm, fetchData])
 
     const out_container: any = {
         width: sizes.screens.width,
@@ -133,21 +132,7 @@ export default function SearchInput() {
         justifyContent: "center",
         backgroundColor: isDarkMode ? colors.gray.grey_06 : colors.gray.grey_03,
     }
-    const cancelButtonContainer: any = {
-        height: 22,
-        borderRadius: 20,
-        marginRight: sizes.margins["1sm"],
-        paddingHorizontal: sizes.paddings["1sm"],
-        alignSelf: "center",
-        alignItems: "center",
-        justifyContent: "center",
-        backgroundColor: isDarkMode ? colors.gray.grey_06 : colors.gray.grey_03,
-    }
-    const cancelText: any = {
-        fontSize: fonts.size.caption1,
-        fontFamily: fonts.family.Medium,
-        color: ColorTheme().text + 90,
-    }
+
     return (
         <View style={out_container}>
             <Animated.View 
