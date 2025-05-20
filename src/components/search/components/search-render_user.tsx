@@ -1,15 +1,16 @@
-import { useNavigation } from "@react-navigation/native"
-import React from "react"
-import { Animated, Pressable, Text, View } from "react-native"
+import { Animated, Pressable, Text, View, useColorScheme } from "react-native"
+import ColorTheme, { colors } from "../../../layout/constants/colors"
 import Reanimated, { FadeInDown } from "react-native-reanimated"
+
 import LanguageContext from "../../../contexts/Preferences/language"
-import { formatNumberWithDots } from "../../../helpers/numberConversor"
-import ColorTheme from "../../../layout/constants/colors"
-import fonts from "../../../layout/constants/fonts"
-import sizes from "../../../layout/constants/sizes"
 import { Profile } from "../../profile"
-import { UserShow } from "../../user_show"
+import React from "react"
 import { SearchRenderItemReciveDataObjectProps } from "../search-types"
+import { UserShow } from "../../user_show"
+import fonts from "../../../layout/constants/fonts"
+import { formatNumberWithDots } from "../../../helpers/numberConversor"
+import sizes from "../../../layout/constants/sizes"
+import { useNavigation } from "@react-navigation/native"
 
 export default function render_user({ user }: SearchRenderItemReciveDataObjectProps) {
     const bounciness = 8
@@ -17,7 +18,7 @@ export default function render_user({ user }: SearchRenderItemReciveDataObjectPr
 
     const { t } = React.useContext(LanguageContext)
     const navigation: any = useNavigation()
-
+    const isDarkMode = useColorScheme() === "dark"
     const animatedScale = React.useRef(new Animated.Value(1)).current
     React.useEffect(() => {
         animatedScale.setValue(1)
@@ -48,11 +49,14 @@ export default function render_user({ user }: SearchRenderItemReciveDataObjectPr
     }
 
     const container: any = {
-        width: sizes.screens.width,
+        width: sizes.screens.width - sizes.margins["2sm"] * 2,
+        marginHorizontal: sizes.margins["2sm"],
         paddingHorizontal: sizes.paddings["1sm"] * 0.7,
-        height: sizes.sizes["3lg"] * 0.8,
+        paddingVertical: sizes.paddings["1sm"] * 0.7,
         alignItems: "flex-start",
         justifyContent: "center",
+        borderRadius: sizes.borderRadius["1md"],
+        backgroundColor: isDarkMode ? colors.gray.grey_09 : colors.gray.grey_01,
     }
     const container_left: any = {
         alignItems: "flex-start",
@@ -84,7 +88,7 @@ export default function render_user({ user }: SearchRenderItemReciveDataObjectPr
     }
 
     return (
-        <Reanimated.View entering={FadeInDown.duration(100)} style={container}>
+        <Reanimated.View entering={FadeInDown.duration(100)}>
             <Animated.View style={{ transform: [{ scale: animatedScale }], flex: 1 }}>
                 <Pressable style={container} onPressIn={HandlePressIn} onPressOut={HandlePressOut}>
                     <UserShow.Root data={user}>
