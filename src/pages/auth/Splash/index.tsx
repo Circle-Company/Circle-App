@@ -1,17 +1,17 @@
-import { useNavigation } from "@react-navigation/native"
-import React from "react"
-import { Image, StatusBar, View, useColorScheme } from "react-native"
-import LinearGradient from "react-native-linear-gradient"
-import Icon from "../../../assets/icons/svgs/arrow_circle_right.svg"
-import { Text } from "../../../components/Themed"
-import Button from "../../../components/buttons/button-standart"
-import config from "../../../config"
+import { Image, StatusBar, View } from "react-native"
 import ColorTheme, { colors } from "../../../layout/constants/colors"
 import { default as Fonts, default as fonts } from "../../../layout/constants/fonts"
+
+import { useNavigation } from "@react-navigation/native"
+import React from "react"
+import LinearGradient from "react-native-linear-gradient"
+import Icon from "../../../assets/icons/svgs/arrow_circle_right.svg"
+import Button from "../../../components/buttons/button-standart"
+import { Text } from "../../../components/Themed"
+import config from "../../../config"
 import sizes from "../../../layout/constants/sizes"
 
 export default function SplashScreen() {
-    const isDarkMode = useColorScheme() === "dark"
     const navigation: any = useNavigation()
 
     const container: any = {
@@ -75,7 +75,7 @@ export default function SplashScreen() {
     const secundaryActionText: any = {
         fontSize: fonts.size.body,
         fontFamily: fonts.family.Semibold,
-        color: colors.gray.white + 99,
+        color: colors.gray.white,
     }
 
     const inferior_gradient: any = {
@@ -116,8 +116,6 @@ export default function SplashScreen() {
                         navigation.navigate("Auth-SignIn")
                     }}
                     backgroundColor={"#00000000"}
-                    width={200}
-                    height={20}
                 >
                     <Text style={secundaryActionText}>Already have a account</Text>
                 </Button>
