@@ -1,12 +1,16 @@
-import ProfileHeader from "@/components/headers/profile/profile-header"
-import { RenderProfileSkeleton } from "@/features/render-profile/skeleton"
 import { RouteProp, useRoute } from "@react-navigation/native"
-import React from "react"
-import { View } from "react-native"
-import ViewProfileContext from "../../../contexts/viewProfile"
-import ListMemories from "../../../features/list-memories/list-memories-preview"
-import RenderProfile from "../../../features/render-profile"
+import { View, ViewStyle } from "react-native"
+
 import { AnimatedVerticalScrollView } from "../../../lib/hooks/useAnimatedScrollView"
+import CircleIcon from "@/assets/icons/svgs/circle-spinner.svg"
+import ListMemories from "../../../features/list-memories/list-memories-preview"
+import ProfileHeader from "@/components/headers/profile/profile-header"
+import React from "react"
+import RenderProfile from "../../../features/render-profile"
+import { RenderProfileSkeleton } from "@/features/render-profile/skeleton"
+import ViewProfileContext from "../../../contexts/viewProfile"
+import { colors } from "@/layout/constants/colors"
+import sizes from "@/layout/constants/sizes"
 
 type ProfileScreenRouteParams = {
     findedUserPk: string
@@ -15,16 +19,18 @@ type ProfileScreenRouteParams = {
 type ProfileScreenRouteProp = RouteProp<{ Profile: ProfileScreenRouteParams }, "Profile">
 
 export default function ProfileScreen() {
-    const { useUserProfile, userProfile } = React.useContext(ViewProfileContext)
+    const { useUserProfile } = React.useContext(ViewProfileContext)
     const route = useRoute<ProfileScreenRouteProp>()
     // Se não existir o parâmetro, pode exibir uma mensagem de erro ou redirecionar
 
-    const { data, isLoading, isError, isRefetching, refetch, isFetched } = useUserProfile(
+    const { data, isLoading, isRefetching, refetch, isFetched } = useUserProfile(
         route.params.findedUserPk
     )
 
-    const container = {
+    const container: ViewStyle = {
         top: 0,
+        height: sizes.screens.height + sizes.headers.height,
+        overflow: "hidden" as const,
     }
 
     React.useEffect(() => {
@@ -39,14 +45,23 @@ export default function ProfileScreen() {
         }
     }
 
-    if (isLoading || !isFetched) {
+    if (isLoading || !isFetched || !data) {
         return (
             <View style={container}>
                 <ProfileHeader />
                 <RenderProfileSkeleton />
             </View>
         )
-    } else
+    } else {
+        // Garantir que o profile_picture tem o formato correto
+        const userData = {
+            ...data,
+            profile_picture: {
+                ...data.profile_picture,
+                small_resolution: data.profile_picture.tiny_resolution
+            }
+        }
+
         return (
             <View style={container}>
                 <ProfileHeader />
@@ -56,14 +71,17 @@ export default function ProfileScreen() {
                     endRefreshAnimationDelay={400}
                     showRefreshSpinner={false}
                     onEndReached={async () => await handleRefresh()}
+                    CustomRefreshIcon={() => (
+                        <CircleIcon width={26} height={26} fill={colors.gray.grey_06} />
+                    )}
                 >
-                    <RenderProfile user={data} />
+                    <RenderProfile user={userData} />
                     <ListMemories
-                        userRefreshing={isRefetching}
                         isAccountScreen={false}
-                        user={data}
+                        user={userData}
                     />
                 </AnimatedVerticalScrollView>
             </View>
         )
+    }
 }
