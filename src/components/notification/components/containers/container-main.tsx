@@ -1,10 +1,12 @@
-import ViewProfileContext from "@/contexts/viewProfile"
-import { useNavigation } from "@react-navigation/native"
-import React from "react"
-import { Animated, Pressable } from "react-native"
-import sizes from "../../../../layout/constants/sizes"
+import { Animated, Pressable, useColorScheme } from "react-native"
+
 import IndividualNotificationContext from "../../notification-individual_context"
 import { NotificationProps } from "../../notification-types"
+import React from "react"
+import ViewProfileContext from "@/contexts/viewProfile"
+import { colors } from "../../../../layout/constants/colors"
+import sizes from "../../../../layout/constants/sizes"
+import { useNavigation } from "@react-navigation/native"
 
 type NotificationContainerProps = {
     children: React.ReactNode
@@ -15,6 +17,7 @@ export default function container_main({ children, notification }: NotificationC
     const animationScale = 0.9
 
     const { setProfile } = React.useContext(ViewProfileContext)
+    const isDarkMode = useColorScheme() === "dark"
 
     const navigation: any = useNavigation()
 
@@ -48,13 +51,18 @@ export default function container_main({ children, notification }: NotificationC
         }
     }
     const container: any = {
-        width: sizes.screens.width,
+        width: sizes.screens.width - sizes.paddings["2sm"] * 2,
+        marginHorizontal: sizes.margins["2sm"],
         minHeight: sizes.headers.height * 0.9,
         maxHeight: sizes.headers.height * 1.8,
+        paddingVertical: sizes.paddings["1sm"],
         paddingHorizontal: sizes.paddings["2sm"],
+        borderRadius: sizes.borderRadius["1md"],
         alignItems: "center",
         flexDirection: "row",
         justifyContent: "center",
+        alignSelf: "center",
+        backgroundColor: isDarkMode ? colors.gray.grey_09 : colors.gray.grey_01,
     }
 
     return (
