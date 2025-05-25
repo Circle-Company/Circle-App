@@ -1,21 +1,22 @@
-/* eslint-disable no-var */
-import React from "react"
 import { Animated, Pressable, TextStyle, View, ViewStyle } from "react-native"
+import ColorTheme, { colors } from "../../../layout/constants/colors"
+
 import LikeIcon from "../../../assets/icons/svgs/heart.svg"
 import PersistedContext from "../../../contexts/Persisted"
 import NumberConversor from "../../../helpers/numberConversor"
-import ColorTheme, { colors } from "../../../layout/constants/colors"
+import MomentContext from "../context"
+import { MomentLikeProps } from "../moment-types"
+/* eslint-disable no-var */
+import React from "react"
 import fonts from "../../../layout/constants/fonts"
 import sizes from "../../../layout/constants/sizes"
 import { Vibrate } from "../../../lib/hooks/useHapticFeedback"
 import api from "../../../services/Api"
 import { Text } from "../../Themed"
-import MomentContext from "../context"
-import { MomentLikeProps } from "../moment-types"
 
-export default function like({
+export default function Like({
     isLiked,
-    backgroundColor = String(ColorTheme().blur_button_color),
+    backgroundColor = colors.gray.grey_07,
     paddingHorizontal = sizes.paddings["2sm"],
     margin = sizes.margins["1sm"],
 }: MomentLikeProps) {
