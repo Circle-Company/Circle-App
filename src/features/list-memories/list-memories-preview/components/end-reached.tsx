@@ -1,6 +1,7 @@
-import { Text } from "../../../../components/Themed"
-import { View } from "react-native"
+import { View, useColorScheme } from "react-native"
+
 import ColorTheme from "../../../../layout/constants/colors"
+import { Text } from "../../../../components/Themed"
 import fonts from "../../../../layout/constants/fonts"
 import sizes from "../../../../layout/constants/sizes"
 
@@ -16,12 +17,13 @@ export default function endReached({
     height = sizes.headers.height,
     style,
 }: EndReachedProps) {
+    const isDarkMode = useColorScheme() === "dark"
     const container: any = {
-        width,
-        height,
+        alignSelf: "center",
+        width: width,
+        height: height,
         alignItems: "center",
         justifyContent: "center",
-        ...style,
     }
 
     const title: any = {
