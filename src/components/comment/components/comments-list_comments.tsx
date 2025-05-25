@@ -1,11 +1,11 @@
+import { FlatList, useColorScheme } from "react-native"
+import Reanimated, { FadeInUp } from "react-native-reanimated"
+
 import PersistedContext from "@/contexts/Persisted"
 import LanguageContext from "@/contexts/Preferences/language"
 import React from "react"
-import { FlatList, RefreshControl, useColorScheme } from "react-native"
-import Reanimated, { FadeInUp } from "react-native-reanimated"
 import NetworkContext from "../../../contexts/network"
 import EndReached from "../../../features/list-memories/list-memories-preview/components/end-reached"
-import { colors } from "../../../layout/constants/colors"
 import sizes from "../../../layout/constants/sizes"
 import api from "../../../services/Api"
 import OfflineCard from "../../general/offline"
@@ -15,7 +15,7 @@ import { useCommentsContext } from "../comments-context"
 import RenderComment from "./comments-render_comment"
 import ZeroComments from "./comments-zero_comments"
 
-export default function list_comments() {
+export default function ListComments() {
     const { comment, preview } = useCommentsContext()
     const { t } = React.useContext(LanguageContext)
     const { session } = React.useContext(PersistedContext)
@@ -63,17 +63,6 @@ export default function list_comments() {
         if (preview == false) fetchData()
     }, [networkStats])
 
-    const handleRefresh = async () => {
-        setPage(1)
-        setLoading(true)
-        await fetchData().finally(() => {
-            setTimeout(() => {
-                setLoading(false)
-                setRefreshing(false)
-            }, 200)
-        })
-    }
-
     if (networkStats == "OFFLINE" && allComments?.length == 0 && preview == false)
         return <OfflineCard height={sizes.screens.height - sizes.headers.height} />
     if (loading && preview == false)
@@ -88,31 +77,15 @@ export default function list_comments() {
 
     return (
         <FlatList
-            showsVerticalScrollIndicator={true}
+            showsVerticalScrollIndicator={false}
             onEndReached={async () => {
                 await fetchData()
             }}
+            scrollEventThrottle={16}
             onEndReachedThreshold={0.1}
             scrollEnabled={false}
             data={preview ? comment?.comments : allComments}
             keyExtractor={(item: any, index: any) => index}
-            refreshControl={
-                <>
-                    {!preview && (
-                        <RefreshControl
-                            progressBackgroundColor={String(
-                                isDarkMode ? colors.gray.grey_08 : colors.gray.grey_02
-                            )}
-                            colors={[
-                                String(isDarkMode ? colors.gray.grey_04 : colors.gray.grey_04),
-                                "#00000000",
-                            ]}
-                            refreshing={refreshing}
-                            onRefresh={async () => await handleRefresh()}
-                        />
-                    )}
-                </>
-            }
             renderItem={({ item, index }) => {
                 return (
                     <Reanimated.View
@@ -151,6 +124,7 @@ export default function list_comments() {
                     return <ZeroComments />
                 }
             }}
+            style={{ width: sizes.moment.standart.width }}
         />
     )
 }
