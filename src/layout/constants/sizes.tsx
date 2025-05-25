@@ -111,6 +111,7 @@ const inputs = {
 const momentAspectRatio = 1.566
 
 const moment = {
+    aspectRatio: momentAspectRatio,
     micro: {
         width: 36,
         height: momentAspectRatio * 36,
