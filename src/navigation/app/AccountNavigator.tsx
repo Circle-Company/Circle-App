@@ -1,7 +1,6 @@
 import { createStackNavigator } from "@react-navigation/stack"
 import React from "react"
 import AccountHeaderCenter from "../../components/headers/account/account-header_center"
-import AccountHeaderLeft from "../../components/headers/account/account-header_left"
 import AccountHeaderRight from "../../components/headers/account/account-header_right"
 import LanguageContext from "../../contexts/Preferences/language"
 import ColorTheme from "../../layout/constants/colors"
@@ -36,9 +35,9 @@ export function AccountScreenNavigator() {
                     },
                     headerTitleAlign: "center",
                     cardOverlayEnabled: true,
-                    headerTitle: () => <AccountHeaderCenter />,
+                    headerLeft: () => <AccountHeaderCenter />,
+                    headerTitle: undefined,
                     headerRight: () => <AccountHeaderRight />,
-                    headerLeft: () => <AccountHeaderLeft />,
                 }}
             />
             <AccountScreenStack.Screen
