@@ -6,7 +6,7 @@ import LanguageContext from "../../contexts/Preferences/language"
 import ColorTheme from "../../layout/constants/colors"
 import Sizes from "../../layout/constants/sizes"
 import InboxScreen from "../../pages/app/Inbox"
-import { Interpolation as HorizontalLeft } from "../transitions/horizontal-left"
+import { Interpolation as HorizontalRight } from "../transitions/horizontal-right"
 
 const InboxStack = createStackNavigator()
 
@@ -22,7 +22,7 @@ export function InboxNavigator() {
     return (
         <InboxStack.Navigator
             screenOptions={{
-                cardStyleInterpolator: HorizontalLeft,
+                cardStyleInterpolator: HorizontalRight,
             }}
         >
             <InboxStack.Screen
