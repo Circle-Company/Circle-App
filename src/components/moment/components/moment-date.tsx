@@ -1,5 +1,6 @@
-import React from "react"
 import { Text, View } from "react-native"
+
+import React from "react"
 import ClockIcon from "../../../assets/icons/svgs/clock.svg"
 import { timeDifferenceConverter } from "../../../helpers/dateConversor"
 import ColorTheme from "../../../layout/constants/colors"
@@ -30,6 +31,12 @@ export default function date({
         color,
     }
 
+    if (momentData.created_at === null) {
+        return null
+    }
+
+    const date = timeDifferenceConverter({ date: String(momentData.created_at), small })
+
     return (
         <View style={container}>
             <ClockIcon
@@ -39,7 +46,7 @@ export default function date({
                 style={{ marginRight: sizes.margins["1sm"] * 1.4 }}
             />
             <Text style={description_style}>
-                {timeDifferenceConverter({ date: String(momentData.created_at), small })}
+                {date}
             </Text>
         </View>
     )
