@@ -1,16 +1,18 @@
-import sizes from "@/layout/constants/sizes"
-import React from "react"
-import { Text, View, ViewStyle } from "react-native"
 import ColorTheme, { colors } from "../../layout/constants/colors"
+import { Text, TextStyle, View, ViewStyle } from "react-native"
+
+import React from "react"
 import fonts from "../../layout/constants/fonts"
+import sizes from "@/layout/constants/sizes"
 
 type BadgeIconProps = {
     active?: boolean
     style?: ViewStyle
+    numberStyle?: TextStyle
     number: number
 }
 
-export function BadgeIcon({ active = true, number, style }: BadgeIconProps) {
+export function BadgeIcon({ active = true, number, style, numberStyle }: BadgeIconProps) {
     const [isVisible, setIsVisible] = React.useState<boolean>(false)
 
     // Monitorar as mudanças nas propriedades para determinar a visibilidade do badge
@@ -22,7 +24,7 @@ export function BadgeIcon({ active = true, number, style }: BadgeIconProps) {
         }
     }, [active, number])
 
-    const badgeStyleWithNumber = style
+    const badgeStyleWithNumber: ViewStyle = style
         ? {
             zIndex: 10,
             position: "absolute",
@@ -52,14 +54,21 @@ export function BadgeIcon({ active = true, number, style }: BadgeIconProps) {
             borderColor: ColorTheme().background,
         }
 
-    const badgeTextStyle: any = {
+        
+    const badgeTextStyle: TextStyle = numberStyle ? {
+        top: -0.2,
+        left: 0.2,
+        fontSize: fonts.size.caption1 * 0.95,
+        fontFamily: fonts.family.Bold,
+        color: colors.gray.white,
+        ...numberStyle,
+    } : {
         top: -0.2,
         left: 0.2,
         fontSize: fonts.size.caption1 * 0.95,
         fontFamily: fonts.family.Bold,
         color: colors.gray.white,
     }
-
     if (!isVisible) return null
 
     return (
