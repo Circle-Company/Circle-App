@@ -1,205 +1,201 @@
-import React from "react"
-import { Animated, View } from "react-native"
-import { Text } from "../../../components/Themed"
+import { Animated, View, useColorScheme } from "react-native"
+import ColorTheme, { colors } from "../../../layout/constants/colors"
+
+import { AnimatedVerticalScrollView } from "@/lib/hooks/useAnimatedScrollView"
+import FeedContext from "../../../contexts/Feed"
 import { Loading } from "../../../components/loading"
 import { Moment } from "../../../components/moment"
 import { MomentDataProps } from "../../../components/moment/context/types"
-import { UserShow } from "../../../components/user_show"
-import FeedContext from "../../../contexts/Feed"
 import PersistedContext from "../../../contexts/Persisted"
-import ColorTheme from "../../../layout/constants/colors"
+import React from "react"
+import RenderCommentFull from "./render-comment-full"
+import { Text } from "../../../components/Themed"
+import { UserShow } from "../../../components/user_show"
 import fonts from "../../../layout/constants/fonts"
 import sizes from "../../../layout/constants/sizes"
-import RenderCommentFull from "./render-comment-full"
-import RenderTagsList from "./render-tags-list"
+import { userReciveDataProps } from "../../../components/user_show/user_show-types"
 
-type renderMomentProps = {
+type RenderMomentFullProps = {
     momentData: MomentDataProps
     isFocused: boolean
     fromFeed: boolean
     fromAccount: boolean
 }
 
-export default function render_moment_full({
+const RenderMomentFull: React.FC<RenderMomentFullProps> = ({
     momentData,
     fromFeed,
-    fromAccount,
-    isFocused,
-}: renderMomentProps) {
+    fromAccount: initialFromAccount,
+}: RenderMomentFullProps) => {
     const { session } = React.useContext(PersistedContext)
     const { setFocusedChunkItemFunc } = React.useContext(FeedContext)
     const [loading, setLoading] = React.useState(false)
+    const [fromAccount, setFromAccount] = React.useState(initialFromAccount)
+    const isDarkMode = useColorScheme() === "dark"
     const scrollY = React.useRef(new Animated.Value(0)).current
+    const fadeAnim = React.useRef(new Animated.Value(0)).current
 
-    const imageScale = scrollY.interpolate({
-        inputRange: [0, sizes.moment.full.width], // Faixa de entrada
-        outputRange: [1, 0.75], // Faixa de saída (escala de 1 a 0.5)
-        extrapolate: "clamp", // Impedir valores fora do range
-    })
+    React.useEffect(() => {
+        Animated.timing(fadeAnim, {
+            toValue: 1,
+            duration: 500,
+            useNativeDriver: true,
+        }).start()
+    }, [fadeAnim])
 
-    const imageY = scrollY.interpolate({
-        inputRange: [0, 800], // Faixa de entrada
-        outputRange: [0, 160], // Faixa de saída (translada de 0 a -50)
-        extrapolate: "clamp", // Impedir valores fora do range
-    })
+    React.useEffect(() => {
+        setFocusedChunkItemFunc({ id: Number(momentData.id) })
+    }, [momentData.id, setFocusedChunkItemFunc])
 
-    const borderRadius = imageY.interpolate({
-        inputRange: [0, 1], // Ajuste os valores conforme necessário
-        outputRange: [0, 0.4], // O valor do borderRadius vai de 50 a 0, por exemplo
-    })
 
     const imageOpacity = scrollY.interpolate({
-        inputRange: [1, 1], // Faixa de entrada
-        outputRange: [1, 0.9], // Faixa de saída (escala de 1 a 0.5)
-        extrapolate: "clamp", // Impedir valores fora do range
+        inputRange: [0, 400],
+        outputRange: [1, 0.7],
+        extrapolate: "clamp",
     })
 
-    let userDataRender: any
-    if (momentData.user) {
-        if (momentData.user?.id == session.user.id) {
-            userDataRender = session.user
-            fromAccount = true
-        } else {
-            userDataRender = momentData.user
-            fromAccount = false
+    const contentTranslateY = scrollY.interpolate({
+        inputRange: [0, 400],
+        outputRange: [0, -30],
+        extrapolate: "clamp",
+    })
+
+    const userDataRender = React.useMemo<userReciveDataProps>(() => {
+        if (momentData.user) {
+            if (momentData.user?.id === session.user.id) {
+                setFromAccount(true)
+                return {
+                    ...session.user,
+                    you_follow: false
+                }
+            }
+            setFromAccount(false)
+            return momentData.user
         }
-    } else {
-        userDataRender = session.user
-        fromAccount = true
-    }
-    console.log("render_moment_full: ", userDataRender)
-    const bottom_container: any = {
-        width: sizes.screens.width,
-        paddingHorizontal: sizes.paddings["2sm"],
-        paddingTop: sizes.paddings["2sm"],
-        paddingBottom: sizes.paddings["1sm"],
-        borderBottomWidth: 1,
-        borderColor: ColorTheme().backgroundDisabled,
+        setFromAccount(true)
+        return {
+            ...session.user,
+            you_follow: false
+        }
+    }, [momentData.user, session.user])
+
+    const styles = {
+        bottom_container: {
+            width: sizes.screens.width - sizes.margins["1md"] * 2,
+            marginHorizontal: sizes.margins["1md"],
+            marginTop: sizes.margins["1md"],
+            paddingHorizontal: sizes.paddings["2sm"],
+            paddingTop: sizes.paddings["2sm"],
+            paddingBottom: sizes.paddings["1sm"],
+            borderRadius: sizes.borderRadius["1md"],
+            backgroundColor: isDarkMode ? colors.gray.grey_09 : colors.gray.grey_01
+        },
+        descriptionStyle: {
+            lineHeight: 18,
+            fontSize: fonts.size.body,
+            fontFamily: fonts.family.Semibold,
+            flexDirection: "row" as const,
+            justifyContent: "flex-start" as const,
+        },
+        informations_container: {
+            flexDirection: "row" as const,
+            justifyContent: "flex-start" as const,
+            paddingTop: sizes.paddings["2sm"],
+            paddingBottom: sizes.paddings["1sm"] * 0.3,
+        },
+        description_container: {
+            margin: sizes.margins["1sm"],
+            marginBottom: sizes.margins["1sm"] * 0.7,
+        },
+        in_moment_bottom_container: {
+            flexDirection: "row" as const,
+            justifyContent: "flex-end" as const,
+            alignItems: "center" as const,
+        },
+        in_moment_button_left_container: {
+            flex: 1,
+            alignItems: "flex-end" as const,
+            flexDirection: "row" as const,
+            marginRight: sizes.margins["2sm"],
+        },
     }
 
-    const descriptionStyle: any = {
-        lineHeight: 18,
-        fontSize: fonts.size.body,
-        fontFamily: fonts.family.Semibold,
-        flexDirection: "row",
-        justifyContent: "flex-start", // Ajuste para que o texto comece do início
-    }
-
-    const informations_container: any = {
-        flexDirection: "row",
-        justifyContent: "flex-start",
-        paddingTop: sizes.paddings["2sm"],
-        paddingBottom: sizes.paddings["1sm"] * 0.3,
-    }
-    const description_container: any = {
-        margin: sizes.margins["1sm"],
-        marginBottom: sizes.margins["1sm"] * 0.7,
-    }
-
-    const in_moment_bottom_container: any = {
-        flexDirection: "row",
-        justifyContent: "flex-end",
-        alignItems: "center",
-    }
-
-    const in_moment_button_left_container: any = {
-        flex: 1,
-        alignItems: "flex-end",
-        flexDirection: "row",
-        marginRight: sizes.margins["2sm"],
-    }
-
-    if (loading)
+    if (loading) {
         return (
             <Loading.Container>
                 <Loading.ActivityIndicator />
             </Loading.Container>
         )
+    }
 
-    React.useEffect(() => {
-        console.log(JSON.stringify(momentData))
-        setFocusedChunkItemFunc({ id: momentData.id })
-    }, [])
     return (
-        <Animated.ScrollView
-            onScroll={Animated.event(
-                [{ nativeEvent: { contentOffset: { y: scrollY } } }],
-                { useNativeDriver: true } // Use o driver nativo para melhor performance
-            )}
-            scrollEventThrottle={16} // Frequência de atualização da animação
-            showsVerticalScrollIndicator={false}
+        <AnimatedVerticalScrollView
+            handleRefresh={() => {}}
+            onEndReachedThreshold={0.1}
+            showRefreshSpinner={false}
+            onEndReached={async () => {
+                await Promise.resolve()
+            }}
         >
             <Moment.Root.Main
                 momentData={momentData}
                 isFeed={fromFeed}
                 isFocused={true}
-                momentSize={{ ...sizes.moment.full, width: sizes.screens.width }}
+                momentSize={{ ...sizes.moment.standart, width: sizes.screens.width, height: sizes.screens.width * sizes.moment.aspectRatio, borderTopLeftRadius: 0, borderTopRightRadius: 0, borderBottomLeftRadius: sizes.moment.full.borderRadius, borderBottomRightRadius: sizes.moment.full.borderRadius }}
             >
-                <Animated.View
-                    style={{
-                        transform: [{ scale: imageScale }, { translateY: imageY }],
-                        borderRadius: borderRadius,
-                        overflow: "hidden",
-                    }}
-                >
-                    <Moment.Container contentRender={momentData.midia}>
-                        <Moment.Root.Center />
-                        <Moment.Root.Bottom>
-                            <View style={in_moment_bottom_container}>
-                                <View style={in_moment_button_left_container}>
-                                    <UserShow.Root data={userDataRender}>
-                                        <UserShow.ProfilePicture
-                                            pictureDimensions={{ width: 30, height: 30 }}
+                <Moment.Container contentRender={momentData.midia}>
+                    <Moment.Root.Center />
+                    <Moment.Root.Bottom>
+                        <View style={styles.in_moment_bottom_container}>
+                            <View style={styles.in_moment_button_left_container}>
+                                <UserShow.Root data={userDataRender}>
+                                    <UserShow.ProfilePicture
+                                        pictureDimensions={{ width: 30, height: 30 }}
+                                    />
+                                    <UserShow.Username />
+                                    {!fromAccount && (
+                                        <UserShow.FollowButton
+                                            isFollowing={Boolean(momentData.user.you_follow)}
+                                            displayOnMoment={true}
                                         />
-                                        <UserShow.Username />
-                                        {!fromAccount && (
-                                            <UserShow.FollowButton
-                                                isFollowing={Boolean(momentData.user.you_follow)}
-                                                displayOnMoment={true}
-                                            />
-                                        )}
-                                    </UserShow.Root>
-                                </View>
-                                {!fromAccount && (
-                                    <Moment.LikeButton
-                                        isLiked={false}
-                                        paddingHorizontal={0}
-                                        margin={0}
-                                    />
-                                )}
+                                    )}
+                                </UserShow.Root>
                             </View>
-                        </Moment.Root.Bottom>
-                    </Moment.Container>
-                </Animated.View>
-
-                <View style={bottom_container}>
-                    <Animated.View style={{ opacity: imageOpacity }}>
-                        <View style={description_container}>
-                            <Text style={descriptionStyle}>{momentData.description}</Text>
-                            <View style={informations_container}>
-                                <Moment.Date
-                                    color={ColorTheme().text.toString()}
+                            {!fromAccount && (
+                                <Moment.LikeButton
+                                    isLiked={false}
                                     paddingHorizontal={0}
+                                    margin={0}
                                 />
-                                {momentData?.statistics?.total_comments_num && (
-                                    <Moment.Full.Comments
-                                        comments={momentData.statistics.total_comments_num}
-                                    />
-                                )}
-                                {momentData?.statistics?.total_views_num && (
-                                    <Moment.Full.Views
-                                        views={momentData.statistics.total_views_num}
-                                    />
-                                )}
-                            </View>
+                            )}
                         </View>
-                    </Animated.View>
+                    </Moment.Root.Bottom>
+                </Moment.Container>
 
-                    <RenderTagsList />
-                </View>
+                <Animated.View
+                    style={[
+                        styles.bottom_container,
+                        {
+                            opacity: imageOpacity,
+                            transform: [{ translateY: contentTranslateY }],
+                        },
+                    ]}
+                >
+                    <View style={styles.description_container}>
+                        <Text style={styles.descriptionStyle}>{momentData.description}</Text>
+                        <View style={styles.informations_container}>
+                            <Moment.Date
+                                color={ColorTheme().text.toString()}
+                                paddingHorizontal={0}
+                            />
+                        </View>
+                    </View>
+                </Animated.View>
 
                 <RenderCommentFull />
             </Moment.Root.Main>
-        </Animated.ScrollView>
+        </AnimatedVerticalScrollView>
     )
 }
+
+export default RenderMomentFull
