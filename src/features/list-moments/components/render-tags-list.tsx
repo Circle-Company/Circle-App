@@ -1,9 +1,9 @@
 import React from "react"
-import { View } from "../../../components/Themed"
 import { FlatList } from "react-native"
-import sizes from "../../../layout/constants/sizes"
-import MomentContext from "../../../components/moment/context"
 import Tag from "../../../components/moment/components/moment-tag"
+import MomentContext from "../../../components/moment/context"
+import { View } from "../../../components/Themed"
+import sizes from "../../../layout/constants/sizes"
 
 export default function RenderTagsList() {
     const { momentData } = React.useContext(MomentContext)
@@ -30,7 +30,7 @@ export default function RenderTagsList() {
                 data={momentData.tags}
                 showsHorizontalScrollIndicator={false}
                 contentContainerStyle={{ paddingHorizontal: sizes.paddings["2sm"] }}
-                renderItem={({ item, index }) => {
+                renderItem={({ item }) => {
                     return <Tag title={item.title} color="#000000" />
                 }}
             />
