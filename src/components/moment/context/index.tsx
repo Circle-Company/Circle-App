@@ -1,11 +1,13 @@
 import React, { useEffect, useMemo } from "react"
+import { MomentContextsData, MomentProviderProps } from "./types"
+
 import FeedContext from "../../../contexts/Feed"
 import PersistedContext from "../../../contexts/Persisted"
 import sizes from "../../../layout/constants/sizes"
 import { useMomentData } from "./momentData"
 import { useMomentOptions } from "./momentOptions"
 import { useMomentUserActions } from "./momentUserActions"
-import { MomentContextsData, MomentProviderProps } from "./types"
+import { useMomentVideo } from "./momentVideo"
 
 const MomentContext = React.createContext<MomentContextsData>({} as MomentContextsData)
 
@@ -21,6 +23,7 @@ export function MomentProvider({
     const momentDataStore = useMomentData()
     const momentUserActionsStore = useMomentUserActions()
     const momentOptionsStore = useMomentOptions()
+    const momentVideoStore = useMomentVideo()
     const isMe = momentData.user?.id ? session.user.id === momentData.user.id : true
 
     useEffect(() => {
@@ -53,6 +56,25 @@ export function MomentProvider({
         })
     }, [isFeed, isFocused, isMe])
 
+    // Inicializar o vídeo apenas uma vez
+    useEffect(() => {
+        const globalMuteAudio = session?.preferences?.content?.muteAudio || false
+        momentVideoStore.setMomentVideo({
+            currentTime: 0,
+            duration: 0,
+            isPaused: !isFocused,
+            isMuted: globalMuteAudio
+        })
+    }, [isFocused]) // Removido session?.preferences?.content?.muteAudio
+
+    // Sincronizar mudanças na preferência global com o estado do vídeo
+    useEffect(() => {
+        const globalMuteAudio = session?.preferences?.content?.muteAudio || false
+        if (momentVideoStore?.setIsMuted) {
+            momentVideoStore.setIsMuted(globalMuteAudio)
+        }
+    }, [session?.preferences?.content?.muteAudio])
+
     useEffect(() => {
         async function fetch() {
             if (currentChunkIds.includes(Number(momentDataStore.id)) && feedData) {
@@ -60,7 +82,7 @@ export function MomentProvider({
                     const momentData = await momentDataStore.exportMomentData()
                     const interaction = momentUserActionsStore.exportMomentUserActions()
                     const chunkData = {
-                        id: momentData.id,
+                        id: Number(momentData.id),
                         userId: momentData.userId,
                         tags: momentData.tags,
                         duration: momentData.duration,
@@ -82,8 +104,9 @@ export function MomentProvider({
             momentSize: momentSize,
             momentData: momentDataStore,
             momentUserActions: momentUserActionsStore,
+            momentVideo: momentVideoStore,
         }),
-        [momentOptionsStore, momentSize, momentDataStore, momentUserActionsStore]
+        [momentOptionsStore, momentSize, momentDataStore, momentUserActionsStore, momentVideoStore]
     )
 
     return <MomentContext.Provider value={contextValue}>{children}</MomentContext.Provider>
