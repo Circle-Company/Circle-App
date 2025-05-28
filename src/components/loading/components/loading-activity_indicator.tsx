@@ -1,11 +1,12 @@
-import Loading from "@/assets/icons/svgs/circle-spinner.svg"
 import ColorTheme from "@/layout/constants/colors"
+import Loading from "@/assets/icons/svgs/circle-spinner.svg"
+import { LoadingProps } from "../loading-types"
 import { MotiView } from "@motify/components"
 import React from "react"
-import { LoadingProps } from "../loading-types"
 
 export default function activity_indicator({
     size = 30,
+    duration = 1000,
     color = ColorTheme().textDisabled.toString() + "50",
 }: LoadingProps) {
     return (
@@ -18,7 +19,7 @@ export default function activity_indicator({
             }}
             transition={{
                 type: "timing",
-                duration: 1000,
+                duration,
                 repeatReverse: false,
                 loop: true,
             }}
