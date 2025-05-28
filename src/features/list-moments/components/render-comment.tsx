@@ -1,23 +1,25 @@
+import { Animated, ViewStyle } from "react-native"
+
+import AddIcon from "@/assets/icons/svgs/plus_circle-outline.svg"
+import ColorTheme from "@/layout/constants/colors"
+import { Comments } from "@/components/comment"
+import FeedContext from "@/contexts/Feed"
+import LanguageContext from "@/contexts/Preferences/language"
+import { MomentDataProps } from "@/components/moment/context/types"
 import React from "react"
-import { Animated } from "react-native"
-import AddIcon from "../../../assets/icons/svgs/plus_circle-outline.svg"
-import ViewMorebutton from "../../../components/buttons/view_more"
-import { Comments } from "../../../components/comment"
-import { MomentDataProps } from "../../../components/moment/context/types"
-import FeedContext from "../../../contexts/Feed"
-import LanguageContext from "../../../contexts/Preferences/language"
-import ColorTheme from "../../../layout/constants/colors"
+import ViewMorebutton from "@/components/buttons/view_more"
 
 type renderCommentProps = {
     moment: MomentDataProps
     focused: boolean
 }
 
-export default function render_comment({ moment, focused }: renderCommentProps) {
+export default function RenderComment({ moment, focused }: renderCommentProps) {
     const { t } = React.useContext(LanguageContext)
     const { commentEnabled, setCommentEnabled, setKeyboardVisible, setFocusedMoment } =
         React.useContext(FeedContext)
     const [animatedOpacityValue] = React.useState(new Animated.Value(1))
+    
     React.useEffect(() => {
         if (focused) {
             Animated.timing(animatedOpacityValue, {
@@ -34,11 +36,13 @@ export default function render_comment({ moment, focused }: renderCommentProps) 
                 }).start()
             }
         }
-    }, [commentEnabled])
+    }, [commentEnabled, focused, animatedOpacityValue])
 
-    const animated_header_container: any = {
+    const animated_header_container: ViewStyle = {
         opacity: animatedOpacityValue,
     }
+
+    const iconStyle = { top: 0.6 }
 
     function handlePress() {
         if (commentEnabled) setCommentEnabled(false)
@@ -53,7 +57,9 @@ export default function render_comment({ moment, focused }: renderCommentProps) 
                 <Animated.View style={animated_header_container}>
                     <Comments.TopRoot>
                         <Comments.TopLeftRoot>
-                            <Comments.HeaderLeft />
+                            <Comments.HeaderLeft>
+                                <></>
+                            </Comments.HeaderLeft>
                         </Comments.TopLeftRoot>
                         <Comments.TopRightRoot>
                             <ViewMorebutton
@@ -61,7 +67,7 @@ export default function render_comment({ moment, focused }: renderCommentProps) 
                                 text={t("Add Comment")}
                                 icon={
                                     <AddIcon
-                                        style={{ top: 0.6 }}
+                                        style={iconStyle}
                                         fill={ColorTheme().primary.toString()}
                                         width={12}
                                         height={12}
