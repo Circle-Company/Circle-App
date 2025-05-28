@@ -6,17 +6,21 @@ import PersistedContext from "../../contexts/Persisted"
 function postNotifications(): void {
     PermissionsAndroid.request(PermissionsAndroid.PERMISSIONS.POST_NOTIFICATIONS)
 }
-async function firebaseMessaging(): Promise<boolean> {
-    const { device } = React.useContext(PersistedContext)
-    const authStatus: number = await messaging().requestPermission()
-    const enabled =
-        authStatus === messaging.AuthorizationStatus.AUTHORIZED ||
-        authStatus === messaging.AuthorizationStatus.PROVISIONAL
-    device.permissions.setFirebaseMessaging(enabled)
-    return enabled
-}
 
-export const useRequestPermission = {
-    firebaseMessaging,
-    postNotifications,
+export function useRequestPermission() {
+    const { device } = React.useContext(PersistedContext)
+    
+    const firebaseMessaging = React.useCallback(async (): Promise<boolean> => {
+        const authStatus: number = await messaging().requestPermission()
+        const enabled =
+            authStatus === messaging.AuthorizationStatus.AUTHORIZED ||
+            authStatus === messaging.AuthorizationStatus.PROVISIONAL
+        device.permissions.setFirebaseMessaging(enabled)
+        return enabled
+    }, [device])
+
+    return {
+        firebaseMessaging,
+        postNotifications,
+    }
 }
