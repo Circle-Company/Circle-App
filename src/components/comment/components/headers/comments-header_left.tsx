@@ -1,11 +1,12 @@
-import React from "react"
-import { View, Text } from "react-native"
-import { CommentsHeaderLeftProps } from "../../comments-types"
-import Trend from "../../../../assets/icons/svgs/trend.svg"
+import { Text, View } from "react-native"
+
 import ColorTheme from "../../../../layout/constants/colors"
+import { CommentsHeaderLeftProps } from "../../comments-types"
+import LanguageContext from "../../../../contexts/Preferences/language"
+import React from "react"
+import Trend from "../../../../assets/icons/svgs/text_bubble.svg"
 import fonts from "../../../../layout/constants/fonts"
 import sizes from "../../../../layout/constants/sizes"
-import LanguageContext from "../../../../contexts/Preferences/language"
 
 export default function header_left({}: CommentsHeaderLeftProps) {
     const { t } = React.useContext(LanguageContext)
@@ -25,8 +26,8 @@ export default function header_left({}: CommentsHeaderLeftProps) {
 
     return (
         <View style={container}>
-            <Trend style={{ top: 1 }} fill={String(ColorTheme().text)} width={15} height={15} />
-            <Text style={text}>{t("Most Relevants")}</Text>
+            <Trend style={{ top: 3 }} fill={String(ColorTheme().text)} width={12} height={12} />
+            <Text style={text}>{t("Comments")}</Text>
         </View>
     )
 }
