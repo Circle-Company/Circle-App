@@ -1,10 +1,11 @@
+import { Animated, Text, View } from "react-native"
+import ColorTheme, { colors } from "../../../layout/constants/colors"
 import React, { useEffect, useRef } from "react"
-import { View, Text, Animated } from "react-native"
+
+import MomentContext from "../context"
+import { MomentDescriptionProps } from "../moment-types"
 import Sizes from "../../../layout/constants/sizes"
 import fonts from "../../../layout/constants/fonts"
-import ColorTheme, { colors } from "../../../layout/constants/colors"
-import { MomentDescriptionProps } from "../moment-types"
-import MomentContext from "../context"
 
 export default function description({ displayOnMoment = true }: MomentDescriptionProps) {
     const { momentData } = React.useContext(MomentContext)
@@ -14,6 +15,7 @@ export default function description({ displayOnMoment = true }: MomentDescriptio
     }
 
     const descriptionStyle: any = {
+        marginLeft: Sizes.margins["2sm"],
         lineHeight: 18,
         fontSize: fonts.size.body,
         fontFamily: fonts.family.Semibold,
