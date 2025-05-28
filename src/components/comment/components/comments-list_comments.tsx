@@ -1,9 +1,9 @@
-import { FlatList, useColorScheme } from "react-native"
 import Reanimated, { FadeInUp } from "react-native-reanimated"
 
 import PersistedContext from "@/contexts/Persisted"
 import LanguageContext from "@/contexts/Preferences/language"
 import React from "react"
+import { FlatList } from "react-native"
 import NetworkContext from "../../../contexts/network"
 import EndReached from "../../../features/list-memories/list-memories-preview/components/end-reached"
 import sizes from "../../../layout/constants/sizes"
@@ -12,6 +12,7 @@ import OfflineCard from "../../general/offline"
 import { Loading } from "../../loading"
 import MomentContext from "../../moment/context"
 import { useCommentsContext } from "../comments-context"
+import { CommentObject } from "../comments-types"
 import RenderComment from "./comments-render_comment"
 import ZeroComments from "./comments-zero_comments"
 
@@ -20,16 +21,27 @@ export default function ListComments() {
     const { t } = React.useContext(LanguageContext)
     const { session } = React.useContext(PersistedContext)
     const { networkStats } = React.useContext(NetworkContext)
-    const isDarkMode = useColorScheme() === "dark"
     const [page, setPage] = React.useState<number>(1)
-    const [pageSize, setPageSize] = React.useState<number>(4)
     const [loading, setLoading] = React.useState<boolean>(false)
-    const [refreshing, setRefreshing] = React.useState<boolean>(false)
     const [endReached, setEndReached] = React.useState<boolean>(false)
-    const [allComments, setAllComments] = React.useState<Object[]>()
-    const { momentData } = React.useContext(MomentContext)
+    const [allComments, setAllComments] = React.useState<CommentObject[]>([])
+    
+    // Verificar se o MomentContext está disponível
+    let momentData: any = null
+    try {
+        const momentContext = React.useContext(MomentContext)
+        momentData = momentContext?.momentData
+    } catch (error) {
+        // MomentContext não está disponível, usar apenas dados do preview
+    }
+    
+    const pageSize = 4
 
     async function fetchData() {
+        if (!momentData?.id) {
+            return
+        }
+        
         await api
             .get(`/moments/${momentData.id}/comments?page=${page}&pageSize=${pageSize}`, {
                 headers: { Authorization: session.account.jwtToken },
@@ -49,18 +61,17 @@ export default function ListComments() {
     }
 
     React.useEffect(() => {
-        if (preview == false) {
+        if (preview == false && momentData?.id) {
             setLoading(true)
-            if (momentData.id !== 0)
+            if (momentData.id && momentData.id !== "0")
                 fetchData().finally(() => {
                     setLoading(false)
-                    setRefreshing(false)
                 })
         }
-    }, [momentData.id])
+    }, [momentData?.id])
 
     React.useEffect(() => {
-        if (preview == false) fetchData()
+        if (preview == false && momentData?.id) fetchData()
     }, [networkStats])
 
     if (networkStats == "OFFLINE" && allComments?.length == 0 && preview == false)
@@ -75,20 +86,25 @@ export default function ListComments() {
             </Loading.Container>
         )
 
+    const dataToRender = preview ? comment : allComments
+
     return (
         <FlatList
             showsVerticalScrollIndicator={false}
             onEndReached={async () => {
-                await fetchData()
+                if (!preview && momentData?.id) {
+                    await fetchData()
+                }
             }}
             scrollEventThrottle={16}
             onEndReachedThreshold={0.1}
             scrollEnabled={false}
-            data={preview ? comment?.comments : allComments}
-            keyExtractor={(item: any, index: any) => index}
+            data={dataToRender}
+            keyExtractor={(item: CommentObject, index: number) => String(item.id || index)}
             renderItem={({ item, index }) => {
                 return (
                     <Reanimated.View
+                        style={{width: "95%", alignSelf: "center"}}
                         entering={
                             preview ? FadeInUp.duration(100 * (index + 1)) : FadeInUp.duration(250)
                         }
@@ -120,11 +136,11 @@ export default function ListComments() {
                             </Loading.Container>
                         )
                 }
-                if (preview && comment?.comments?.length == 0) {
+                if (preview && comment?.length == 0) {
                     return <ZeroComments />
                 }
             }}
-            style={{ width: sizes.moment.standart.width }}
+            style={{ width: sizes.moment.standart.width, alignSelf: "center" }}
         />
     )
 }
