@@ -37,6 +37,7 @@ export function storageKeys() {
             haptics: baseKey + "preferences:content:haptics",
             translation: baseKey + "preferences:content:translation",
             translationLanguage: baseKey + "preferences:content:translation:language",
+            muteAudio: baseKey + "preferences:content:muteaudio",
             likeMoment: baseKey + "preferences:pushnotification:likemoment",
             newMemory: baseKey + "preferences:pushnotification:newmemory",
             addToMemory: baseKey + "preferences:pushnotification:addtomemory",
