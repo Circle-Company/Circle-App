@@ -2,17 +2,17 @@ import { Animated, Pressable, TextStyle, View, ViewStyle } from "react-native"
 import ColorTheme, { colors } from "../../../layout/constants/colors"
 
 import LikeIcon from "../../../assets/icons/svgs/heart.svg"
-import PersistedContext from "../../../contexts/Persisted"
-import NumberConversor from "../../../helpers/numberConversor"
 import MomentContext from "../context"
 import { MomentLikeProps } from "../moment-types"
+import NumberConversor from "../../../helpers/numberConversor"
+import PersistedContext from "../../../contexts/Persisted"
 /* eslint-disable no-var */
 import React from "react"
-import fonts from "../../../layout/constants/fonts"
-import sizes from "../../../layout/constants/sizes"
+import { Text } from "../../Themed"
 import { Vibrate } from "../../../lib/hooks/useHapticFeedback"
 import api from "../../../services/Api"
-import { Text } from "../../Themed"
+import fonts from "../../../layout/constants/fonts"
+import sizes from "../../../layout/constants/sizes"
 
 export default function Like({
     isLiked,
@@ -77,8 +77,6 @@ export default function Like({
         flexDirection: "row",
         paddingHorizontal,
         backgroundColor: "transparent",
-        borderWidth: sizes.borders["1md"],
-        borderColor: colors.transparent.white_30,
         overflow: "hidden",
     }
     const like_text_pressed: TextStyle = {
