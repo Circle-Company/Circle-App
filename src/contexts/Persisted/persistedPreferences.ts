@@ -1,7 +1,7 @@
-import { useQuery } from "@tanstack/react-query"
+import { storage, storageKeys } from "../../store"
+
 import create from "zustand"
 import { apiRoutes } from "../../services/Api"
-import { storage, storageKeys } from "../../store"
 import { PreferencesDataStorageType } from "./types"
 
 const storageKey = storageKeys().preferences
@@ -13,6 +13,7 @@ export interface PreferencesState extends PreferencesDataStorageType {
     setDisableHaptics: (value: boolean) => void
     setDisableTranslation: (value: boolean) => void
     setTranslationLanguage: (value: string) => void
+    setMuteAudio: (value: boolean) => void
     setDisableLikeMoment: (value: boolean) => void
     setDisableNewMemory: (value: boolean) => void
     setDisableAddToMemory: (value: boolean) => void
@@ -34,6 +35,7 @@ export const usePreferencesStore = create<PreferencesState>((set) => ({
         disableAutoplay: storage.getBoolean(storageKey.autoplay) || false,
         disableHaptics: storage.getBoolean(storageKey.haptics) || false,
         disableTranslation: storage.getBoolean(storageKey.translation) || false,
+        muteAudio: storage.getBoolean(storageKey.muteAudio) || false,
     },
     pushNotifications: {
         disableLikeMoment: storage.getBoolean(storageKey.likeMoment) || false,
@@ -84,6 +86,15 @@ export const usePreferencesStore = create<PreferencesState>((set) => ({
             content: {
                 ...state.content,
                 disableTranslation: value,
+            },
+        }))
+    },
+    setMuteAudio: (value: boolean) => {
+        storage.set(storageKey.muteAudio, value)
+        set((state) => ({
+            content: {
+                ...state.content,
+                muteAudio: value,
             },
         }))
     },
@@ -148,30 +159,66 @@ export const usePreferencesStore = create<PreferencesState>((set) => ({
     },
 
     get: async (id: string) => {
-        const { data } = useQuery({
-            queryKey: ["get-user-preferences"],
-            queryFn: async () => {
-                return await apiRoutes.preferences.pushNotification.getUserPreferences({
-                    userId: id,
-                })
-            },
-        })
+        try {
+            const response = await apiRoutes.preferences.pushNotification.getUserPreferences({
+                userId: id,
+            })
 
-        set({
-            language: data.language,
-            content: data.content,
-            pushNotifications: data.pushNotifications,
-        })
-        storage.set(storageKey.appLanguage, data.language.appLanguage)
-        storage.set(storageKey.translationLanguage, data.language.translationLanguage)
-        storage.set(storageKey.haptics, data.content.disableHaptics)
-        storage.set(storageKey.autoplay, data.content.disableAutoplay)
-        storage.set(storageKey.translation, data.content.disableTranslation)
-        storage.set(storageKey.likeMoment, data.pushNotifications.disableLikeMoment)
-        storage.set(storageKey.newMemory, data.pushNotifications.disableNewMemory)
-        storage.set(storageKey.addToMemory, data.pushNotifications.disableAddToMemory)
-        storage.set(storageKey.followUser, data.pushNotifications.disableFollowUser)
-        storage.set(storageKey.viewUser, data.pushNotifications.disableViewUser)
+            if (!response || !response.data) {
+                console.warn("Resposta da API de preferências está vazia ou inválida")
+                return
+            }
+
+            const { data } = response
+
+            if (!data.language || !data.content || !data.pushNotifications) {
+                console.warn("Estrutura de dados de preferências inválida:", data)
+                return
+            }
+
+            set({
+                language: data.language,
+                content: data.content,
+                pushNotifications: data.pushNotifications,
+            })
+            
+            if (data.language.appLanguage) {
+                storage.set(storageKey.appLanguage, data.language.appLanguage)
+            }
+            if (data.language.translationLanguage) {
+                storage.set(storageKey.translationLanguage, data.language.translationLanguage)
+            }
+            if (data.content.disableHaptics !== undefined) {
+                storage.set(storageKey.haptics, data.content.disableHaptics)
+            }
+            if (data.content.disableAutoplay !== undefined) {
+                storage.set(storageKey.autoplay, data.content.disableAutoplay)
+            }
+            if (data.content.disableTranslation !== undefined) {
+                storage.set(storageKey.translation, data.content.disableTranslation)
+            }
+            if (data.content.muteAudio !== undefined) {
+                storage.set(storageKey.muteAudio, data.content.muteAudio)
+            }
+            if (data.pushNotifications.disableLikeMoment !== undefined) {
+                storage.set(storageKey.likeMoment, data.pushNotifications.disableLikeMoment)
+            }
+            if (data.pushNotifications.disableNewMemory !== undefined) {
+                storage.set(storageKey.newMemory, data.pushNotifications.disableNewMemory)
+            }
+            if (data.pushNotifications.disableAddToMemory !== undefined) {
+                storage.set(storageKey.addToMemory, data.pushNotifications.disableAddToMemory)
+            }
+            if (data.pushNotifications.disableFollowUser !== undefined) {
+                storage.set(storageKey.followUser, data.pushNotifications.disableFollowUser)
+            }
+            if (data.pushNotifications.disableViewUser !== undefined) {
+                storage.set(storageKey.viewUser, data.pushNotifications.disableViewUser)
+            }
+        } catch (error) {
+            console.error("Erro ao buscar preferências do usuário:", error)
+            console.log("Carregando preferências do storage local como fallback")
+        }
     },
 
     set: (value: PreferencesDataStorageType) => {
@@ -185,6 +232,7 @@ export const usePreferencesStore = create<PreferencesState>((set) => ({
         storage.set(storageKey.haptics, value.content.disableHaptics)
         storage.set(storageKey.autoplay, value.content.disableAutoplay)
         storage.set(storageKey.translation, value.content.disableTranslation)
+        storage.set(storageKey.muteAudio, value.content.muteAudio)
         storage.set(storageKey.likeMoment, value.pushNotifications.disableLikeMoment)
         storage.set(storageKey.newMemory, value.pushNotifications.disableNewMemory)
         storage.set(storageKey.addToMemory, value.pushNotifications.disableAddToMemory)
@@ -201,6 +249,7 @@ export const usePreferencesStore = create<PreferencesState>((set) => ({
                 disableAutoplay: storage.getBoolean(storageKey.autoplay) || false,
                 disableHaptics: storage.getBoolean(storageKey.haptics) || false,
                 disableTranslation: storage.getBoolean(storageKey.translation) || false,
+                muteAudio: storage.getBoolean(storageKey.muteAudio) || false,
             },
             pushNotifications: {
                 disableLikeMoment: storage.getBoolean(storageKey.likeMoment) || false,
@@ -218,6 +267,7 @@ export const usePreferencesStore = create<PreferencesState>((set) => ({
         storage.delete(storageKey.haptics)
         storage.delete(storageKey.translation)
         storage.delete(storageKey.translationLanguage)
+        storage.delete(storageKey.muteAudio)
         storage.delete(storageKey.likeMoment)
         storage.delete(storageKey.newMemory)
         storage.delete(storageKey.addToMemory)
@@ -233,6 +283,7 @@ export const usePreferencesStore = create<PreferencesState>((set) => ({
                 disableAutoplay: false,
                 disableHaptics: false,
                 disableTranslation: false,
+                muteAudio: false,
             },
             pushNotifications: {
                 disableLikeMoment: false,
