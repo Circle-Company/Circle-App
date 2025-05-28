@@ -1,13 +1,14 @@
-import React, { useCallback, useEffect, useRef, useState } from "react"
 import { Animated, RefreshControl, useColorScheme } from "react-native"
+import React, { useCallback, useEffect, useRef, useState } from "react"
+
+import { EmptyList } from "./components/render-empty_list"
 import FastImage from "react-native-fast-image"
+import FeedContext from "../../contexts/Feed"
 import { FlatList } from "react-native-gesture-handler"
 import { Loading } from "../../components/loading"
-import FeedContext from "../../contexts/Feed"
+import RenderMomentFeed from "./components/feed/render-moment-feed"
 import { colors } from "../../layout/constants/colors"
 import sizes from "../../layout/constants/sizes"
-import { EmptyList } from "./components/render-empty_list"
-import RenderMoment from "./components/render-moment"
 
 const ListMoments = () => {
     const margin = 2
@@ -131,7 +132,7 @@ const ListMoments = () => {
 
                     return (
                         <Animated.View style={container_style} key={item.unique_id}>
-                            <RenderMoment isFeed={true} momentData={item} isFocused={focusedItem} />
+                            <RenderMomentFeed isFeed={true} momentData={item} isFocused={focusedItem} />
                         </Animated.View>
                     )
                 }}
