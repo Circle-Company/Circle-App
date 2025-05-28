@@ -1,11 +1,12 @@
-import messaging from "@react-native-firebase/messaging"
-import React from "react"
-import { notify } from "react-native-notificated"
-import { Vibrate } from "../lib/hooks/useHapticFeedback"
-import { useRequestPermission } from "../lib/hooks/userRequestPermissions"
-import { notification } from "../lib/notifications"
 import { storage, storageKeys } from "../store"
+
 import PersistedContext from "./Persisted"
+import React from "react"
+import { Vibrate } from "../lib/hooks/useHapticFeedback"
+import messaging from "@react-native-firebase/messaging"
+import { notification } from "../lib/notifications"
+import { notify } from "react-native-notificated"
+import { useRequestPermission } from "../lib/hooks/userRequestPermissions"
 
 type NotificationProviderProps = { children: React.ReactNode }
 export type NotificationContextData = {}
@@ -20,7 +21,7 @@ export function Provider({ children }: NotificationProviderProps) {
 
     async function requestUserPermission() {
         console.log("requestUserPermission")
-        if (session.user.id && session.account.jwtToken) {
+        if (session?.user?.id && session?.account?.jwtToken) {
             useRequestPermission.postNotifications()
             const status: number = await messaging().requestPermission()
             const enabled =
@@ -32,7 +33,7 @@ export function Provider({ children }: NotificationProviderProps) {
 
     async function refreshToken() {
         console.log("refreshToken")
-        if (session.user.id && session.account.jwtToken) {
+        if (session?.user?.id && session?.account?.jwtToken) {
             const token = await messaging().getToken()
             if (typeof token == "string" && token !== "") {
                 notification.registerPushToken({
@@ -42,13 +43,16 @@ export function Provider({ children }: NotificationProviderProps) {
             }
         }
     }
+    
     React.useEffect(() => {
         async function fetch() {
-            await requestUserPermission()
-            await refreshToken()
+            if (session?.user?.id && session?.account?.jwtToken) {
+                await requestUserPermission()
+                await refreshToken()
+            }
         }
         fetch()
-    }, [])
+    }, [session?.user?.id, session?.account?.jwtToken])
 
     messaging().onTokenRefresh((token) => {
         console.log("messaging().onTokenRefresh")
@@ -66,21 +70,25 @@ export function Provider({ children }: NotificationProviderProps) {
 
     messaging().onMessage(async (remoteMessage) => {
         console.log("messaging().onMessage")
-        const previousNotificationsNum = session.account.unreadNotificationsCount
-        session.account.setUnreadNotificationsCount(previousNotificationsNum + 1)
+        if (session?.account?.unreadNotificationsCount !== undefined && session?.account?.setUnreadNotificationsCount) {
+            const previousNotificationsNum = session.account.unreadNotificationsCount
+            session.account.setUnreadNotificationsCount(previousNotificationsNum + 1)
+        }
         Vibrate("effectClick")
 
         notify("notification", {
             params: {
-                title: remoteMessage.notification?.title,
-                description: remoteMessage.notification?.body,
+                title: remoteMessage.notification?.title || "",
+                description: remoteMessage.notification?.body || "",
             },
         })
     })
 
     messaging().setBackgroundMessageHandler(async (remoteMessage) => {
-        const previousNotificationsNum = session.account.unreadNotificationsCount
-        session.account.setUnreadNotificationsCount(previousNotificationsNum + 1)
+        if (session?.account?.unreadNotificationsCount !== undefined && session?.account?.setUnreadNotificationsCount) {
+            const previousNotificationsNum = session.account.unreadNotificationsCount
+            session.account.setUnreadNotificationsCount(previousNotificationsNum + 1)
+        }
         Vibrate("effectClick")
         /** 
         notify("notification", {
