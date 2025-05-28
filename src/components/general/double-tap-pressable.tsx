@@ -1,8 +1,8 @@
-import React, { useRef } from "react"
 import { Pressable, PressableProps } from "react-native"
+import React, { useRef } from "react"
 
 interface DoubleTapPressableProps extends PressableProps {
-    onSingleTap: () => void
+    onSingleTap?: () => void
     onDoubleTap: () => void
     delay?: number
 }
@@ -30,7 +30,7 @@ const DoubleTapPressable: React.FC<DoubleTapPressableProps> = ({
             lastTap.current = now
             tapTimeout.current = setTimeout(
                 () => {
-                    onSingleTap()
+                    onSingleTap? onSingleTap() : null
                     lastTap.current = null
                 },
                 delay ? delay : 300
