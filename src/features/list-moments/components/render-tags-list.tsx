@@ -1,12 +1,22 @@
-import React from "react"
 import { FlatList } from "react-native"
-import Tag from "../../../components/moment/components/moment-tag"
 import MomentContext from "../../../components/moment/context"
+import React from "react"
+import Tag from "../../../components/moment/components/moment-tag"
 import { View } from "../../../components/Themed"
 import sizes from "../../../layout/constants/sizes"
 
 export default function RenderTagsList() {
     const { momentData } = React.useContext(MomentContext)
+    
+    React.useEffect(() => {
+        async function fetch() {
+            if (momentData.getTags) {
+                await momentData.getTags()
+            }
+        }
+        fetch()
+    }, [momentData])
+
     const container: any = {
         left: -sizes.paddings["1md"],
         flexDirection: "row",
@@ -15,13 +25,6 @@ export default function RenderTagsList() {
     }
 
     if (!momentData.tags) return null
-
-    React.useEffect(() => {
-        async function fetch() {
-            await momentData.getTags()
-        }
-        fetch()
-    }, [])
 
     return (
         <View style={container}>
