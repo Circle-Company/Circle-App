@@ -1,11 +1,11 @@
-import { SearchRenderItemReciveDataObjectProps } from "../../components/search/search-types"
-import { userReciveDataProps } from "../../components/user_show/user_show-types"
-import { LanguagesCodesType } from "../../locales/LanguageTypes"
 import { AccountState } from "./persistedAccount"
+import { LanguagesCodesType } from "../../locales/LanguageTypes"
 import { PermissionsState } from "./persistedPermissions"
 import { PreferencesState } from "./persistedPreferences"
+import { SearchRenderItemReciveDataObjectProps } from "../../components/search/search-types"
 import { StatisticsState } from "./persistedStatistics"
 import { UserState } from "./persistedUser"
+import { userReciveDataProps } from "../../components/user_show/user_show-types"
 
 export type UserDataType = {
     id: string
@@ -112,6 +112,7 @@ export type ContentDataStorageType = {
     disableAutoplay: boolean
     disableHaptics: boolean
     disableTranslation: boolean
+    muteAudio: boolean
 }
 
 export type PushNotificationsStorageType = {
