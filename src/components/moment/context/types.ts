@@ -1,7 +1,8 @@
-import { LanguagesCodesType } from "../../../locales/LanguageTypes"
 import { CommentsReciveDataProps } from "../../comment/comments-types"
-import { userReciveDataProps } from "../../user_show/user_show-types"
+import { LanguagesCodesType } from "../../../locales/LanguageTypes"
 import { MomentOptionsState } from "./momentOptions"
+import { MomentVideoState } from "./momentVideo"
+import { userReciveDataProps } from "../../user_show/user_show-types"
 
 export type MomentDataProps = {
     id: string
@@ -44,6 +45,7 @@ export type MomentMidiaProps = {
     content_type: "IMAGE" | "VIDEO"
     fullhd_resolution?: string
     nhd_resolution?: string
+    nhd_thumbnail?: string
 }
 
 export type MomentStatisticsProps = {
@@ -134,9 +136,17 @@ export type MomentSizeProps = {
     borderBottomRightRadius?: number
 }
 
+export type MomentVideoProps = {
+    currentTime: number
+    duration: number
+    isPaused: boolean
+    isMuted: boolean
+}
+
 export type MomentContextsData = {
     momentData: MomentDataReturnsProps
     momentSize: MomentSizeProps
     momentOptions: MomentOptionsState
     momentUserActions: MomentUserActionsReturnsProps
+    momentVideo: MomentVideoState
 }
