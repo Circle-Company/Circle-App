@@ -1,8 +1,8 @@
-import React from "react"
 import { Comments } from "../../../components/comment"
 import MomentContext from "../../../components/moment/context"
+import React from "react"
 
-export default function render_comment_full() {
+export default function RenderCommentFull() {
     const { momentData, momentOptions } = React.useContext(MomentContext)
     return (
         <Comments.MainRoot data={momentData.comments} preview={false}>
