@@ -1,6 +1,6 @@
+import { MomentCenterRootProps } from "../../../moment-types"
 import React from "react"
 import { View } from "react-native"
-import { MomentCenterRootProps } from "../../../moment-types"
 import sizes from "../../../../../layout/constants/sizes"
 
 export default function center_root({ children }: MomentCenterRootProps) {
@@ -8,7 +8,7 @@ export default function center_root({ children }: MomentCenterRootProps) {
         flex: 1,
         alignItems: "flex-start",
         justifyContent: "flex-end",
-        paddingHorizontal: sizes.paddings["1md"],
+        paddingHorizontal: sizes.paddings["1sm"],
     }
 
     return <View style={container}>{children}</View>
