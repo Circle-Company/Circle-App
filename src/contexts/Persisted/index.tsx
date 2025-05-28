@@ -1,13 +1,14 @@
+import { DeviceDataType, SessionDataType } from "./types"
+
 import AuthContext from "@/contexts/Auth"
+import React from "react"
+import { refreshJwtToken } from "@/lib/hooks/useRefreshJwtToken"
 import { useAccountStore } from "@/contexts/Persisted/persistedAccount"
 import { useHistoryStore } from "@/contexts/Persisted/persistedHistory"
 import { usePermissionsStore } from "@/contexts/Persisted/persistedPermissions"
 import { usePreferencesStore } from "@/contexts/Persisted/persistedPreferences"
 import { useStatisticsStore } from "@/contexts/Persisted/persistedStatistics"
 import { useUserStore } from "@/contexts/Persisted/persistedUser"
-import { refreshJwtToken } from "@/lib/hooks/useRefreshJwtToken"
-import React from "react"
-import { DeviceDataType, SessionDataType } from "./types"
 
 type PersistedProviderProps = { children: React.ReactNode }
 export type PersistedContextProps = {
