@@ -1,5 +1,5 @@
-import { MomentUserActionsProps } from "@/components/moment/context/types"
 import { LanguagesCodesType } from "locales/LanguageTypes"
+import { MomentUserActionsProps } from "@/components/moment/context/types"
 import { TagProps } from "../newMoment"
 
 export interface ProfilePicture {
@@ -26,6 +26,8 @@ export interface Comment {
 }
 
 export interface Media {
+    content_type: "VIDEO" | "IMAGE" 
+    nhd_thumbnail: string
     fullhd_resolution: string
     nhd_resolution: string
 }
@@ -36,10 +38,8 @@ export interface MomentProps {
     description: string
     content_type: string
     midia: Media
-    comments: {
-        count: number
-        comments: Comment[]
-    }
+    comments_count: number
+    lastComment?: Comment
     likes_count: number
     isLiked: boolean
     deleted: boolean
