@@ -1,32 +1,37 @@
-import Button from "@/components/buttons/button-standart"
-import React from "react"
-import { TextStyle, View, ViewStyle } from "react-native"
-import HeartIconOutline from "../../../assets/icons/svgs/heart_2-outline.svg"
-import HeartIcon from "../../../assets/icons/svgs/heart_2.svg"
+import ColorTheme, { colors } from "../../../layout/constants/colors"
+import { TextStyle, View, ViewStyle, useColorScheme } from "react-native"
+
+import { CommentsRenderCommentProps } from "../comments-types"
+import MomentContext from "../../moment/context"
 import PersistedContext from "../../../contexts/Persisted"
-import { timeDifferenceConverter } from "../../../helpers/dateConversor"
-import ColorTheme from "../../../layout/constants/colors"
+import React from "react"
+import { Text } from "../../Themed"
+import { UserShow } from "../../user_show"
 import fonts from "../../../layout/constants/fonts"
 import sizes from "../../../layout/constants/sizes"
-import { Vibrate } from "../../../lib/hooks/useHapticFeedback"
-import api from "../../../services/Api"
-import { Text } from "../../Themed"
-import MomentContext from "../../moment/context"
-import { UserShow } from "../../user_show"
-import { useCommentsContext } from "../comments-context"
-import { CommentsRenderCommentProps } from "../comments-types"
+import { timeDifferenceConverter } from "../../../helpers/dateConversor"
 
-export default function render_comment({ comment }: CommentsRenderCommentProps) {
+export default function RenderComment({ comment, preview, index }: CommentsRenderCommentProps) {
     const { session } = React.useContext(PersistedContext)
-    const { momentUserActions } = React.useContext(MomentContext)
-    const { preview } = useCommentsContext()
-
+    const isDarkMode = useColorScheme() === "dark"
     const [like, setLike] = React.useState(comment.is_liked)
+
+    // Verificar se o MomentContext está disponível
+    let momentUserActions: any = null
+    try {
+        const momentContext = React.useContext(MomentContext)
+        momentUserActions = momentContext?.momentUserActions
+    } catch (error) {
+        // MomentContext não está disponível, funcionalidade de like será limitada
+    }
 
     const container: ViewStyle = {
         flexDirection: "row",
         marginTop: preview ? sizes.margins["1sm"] * 0.8 : sizes.margins["1md"],
         marginBottom: preview ? sizes.margins["1sm"] * 0.5 : sizes.margins["2sm"],
+        backgroundColor: preview?  isDarkMode ? colors.gray.grey_09 : colors.gray.grey_01 : "transparent",
+        borderRadius: preview? sizes.borderRadius["1md"] : 0,
+        padding: preview? sizes.paddings["1sm"] : 0,
     }
     const container_left: ViewStyle = {
         left: -2,
@@ -40,18 +45,6 @@ export default function render_comment({ comment }: CommentsRenderCommentProps) 
         flex: 1,
         alignItems: "flex-start",
         justifyContent: "center",
-    }
-    const container_right: ViewStyle = {
-        alignItems: "center",
-        justifyContent: "center",
-        marginLeft: sizes.margins["2sm"],
-        marginTop: sizes.margins["2sm"] * 0.7,
-    }
-    const like_container: ViewStyle = {
-        width: "100%",
-        alignItems: "center",
-        justifyContent: "center",
-        padding: sizes.paddings["1sm"] / 5,
     }
     const container_center_top: ViewStyle = {
         flexDirection: "row",
@@ -68,13 +61,19 @@ export default function render_comment({ comment }: CommentsRenderCommentProps) 
         fontFamily: fonts.family.Medium,
         color: ColorTheme().textDisabled,
     }
-
+    
+    /**
     const likesNum = like
         ? comment.statistics.total_likes_num + 1
         : comment.statistics.total_likes_num
     const likeLabel = likesNum == 1 ? "like" : "likes"
 
     async function handleLikePress() {
+        if (!momentUserActions) {
+            console.log("Não é possível curtir comentário sem MomentContext")
+            return
+        }
+
         if (like) {
             momentUserActions.setLikeComment(false)
             setLike(false)
@@ -99,6 +98,7 @@ export default function render_comment({ comment }: CommentsRenderCommentProps) 
                 .catch((error) => console.log(error))
         }
     }
+    */
 
     return (
         <View style={container}>
@@ -126,39 +126,9 @@ export default function render_comment({ comment }: CommentsRenderCommentProps) 
                     <Text style={date_style}>
                         {timeDifferenceConverter({ date: String(comment.created_at) })}
                     </Text>
-                    <Text style={date_style}>{likesNum > 0 ? "•" : null}</Text>
-                    <Text style={date_style}>
-                        {likesNum > 0 ? likesNum + " " + likeLabel : null}
-                    </Text>
                 </View>
                 <Text style={content_style}>{comment.content}</Text>
             </View>
-            <Button
-                action={handleLikePress}
-                height={sizes.sizes["2md"] * 0.7}
-                width={sizes.sizes["2md"] * 0.7}
-                style={container_right}
-                margins={false}
-                backgroundColor={ColorTheme().backgroundDisabled + 90}
-            >
-                <View style={like_container}>
-                    {like ? (
-                        <HeartIcon
-                            fill={ColorTheme().like.toString()}
-                            style={{ top: 1 }}
-                            width={12}
-                            height={12}
-                        />
-                    ) : (
-                        <HeartIconOutline
-                            fill={`${ColorTheme().textDisabled}60`}
-                            style={{ top: 1 }}
-                            width={13}
-                            height={13}
-                        />
-                    )}
-                </View>
-            </Button>
         </View>
     )
 }
