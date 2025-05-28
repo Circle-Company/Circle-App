@@ -1,10 +1,12 @@
-import React from "react"
-import { useTranslation } from "react-i18next"
 import { LanguageType, LanguagesCodesType, LanguagesListType } from "../../locales/LanguageTypes"
 import i18n, { languageResources } from "../../locales/i18n"
+
+import PersistedContext from "../Persisted"
+import React from "react"
 import { languagesList } from "../../locales/languagesList"
 import { useSetAppLanguageMutation } from "../../state/queries/preferences-language"
-import PersistedContext from "../Persisted"
+import { useTranslation } from "react-i18next"
+
 type LanguageProviderProps = { children: React.ReactNode }
 type languageContextData = {
     t: any
@@ -17,32 +19,52 @@ const LanguageContext = React.createContext<languageContextData>({} as languageC
 
 export function Provider({ children }: LanguageProviderProps) {
     const { session } = React.useContext(PersistedContext)
-    const [atualAppLanguage, setAtualAppLanguage] = React.useState<LanguageType>({} as LanguageType)
+    const [atualAppLanguage, setAtualAppLanguage] = React.useState<LanguageType>(languagesList[0])
 
     const setAppLanguageMutation = useSetAppLanguageMutation({
         appLanguage: atualAppLanguage.code,
     })
 
-    function changeAppLanguage(LanguageCode: LanguagesCodesType) {
-        i18n.changeLanguage(LanguageCode)
-        session.preferences.setAppLanguage(LanguageCode)
+    function changeAppLanguage(languageCode: LanguagesCodesType) {
+        i18n.changeLanguage(languageCode)
+        
+        if (session?.preferences?.setAppLanguage) {
+            session.preferences.setAppLanguage(languageCode)
+        } else {
+            console.warn("Não foi possível salvar a preferência de idioma: session.preferences indisponível")
+        }
     }
 
     function changeAtualAppLanguage() {
-        languagesList.map((language) => {
-            if (language.code == session.preferences.language.appLanguage)
-                setAtualAppLanguage(language)
-            else return
-        })
-        setAppLanguageMutation.mutate()
+        const currentLanguageCode = session?.preferences?.language?.appLanguage
+        
+        if (!currentLanguageCode) {
+            setAtualAppLanguage(languagesList[0])
+            return
+        }
+        
+        const selectedLanguage = languagesList.find(language => language.code === currentLanguageCode)
+        
+        if (selectedLanguage) {
+            setAtualAppLanguage(selectedLanguage)
+        } else {
+            setAtualAppLanguage(languagesList[0])
+        }
+        
+        if (currentLanguageCode) {
+            setAppLanguageMutation.mutate()
+        }
     }
 
     React.useEffect(() => {
-        changeAtualAppLanguage()
-    }, [session.preferences.language.appLanguage])
+        if (session?.preferences?.language?.appLanguage) {
+            changeAtualAppLanguage()
+        }
+    }, [session?.preferences?.language?.appLanguage])
 
     React.useEffect(() => {
-        i18n.changeLanguage(session.preferences.language.appLanguage)
+        const defaultLanguage = session?.preferences?.language?.appLanguage || "en"
+        i18n.changeLanguage(defaultLanguage)
         changeAtualAppLanguage()
     }, [])
 
