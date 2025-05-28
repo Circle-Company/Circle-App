@@ -1,26 +1,34 @@
-import PersistedContext from "@/contexts/Persisted"
-import { useNavigation } from "@react-navigation/native"
-import React from "react"
-import { View } from "react-native"
+import React, { useEffect } from "react"
 import Reanimated, { FadeIn, FadeOut } from "react-native-reanimated"
-import FeedContext from "../../../contexts/Feed"
+
 import ColorTheme from "../../../layout/constants/colors"
 import DoubleTapPressable from "../../general/double-tap-pressable"
+import FeedContext from "../../../contexts/Feed"
+import MediaRenderVideo from "../../midia_render/components/midia_render-video"
 import { MidiaRender } from "../../midia_render"
-import { UserShow } from "../../user_show"
-import MomentContext from "../context"
 import { MomentContainerProps } from "../moment-types"
+import MomentContext from "../context"
+import MomentVideoSlider from "../components/moment-video-slider"
+import PersistedContext from "@/contexts/Persisted"
+import { UserShow } from "../../user_show"
+import { View } from "react-native"
+
 export default function Container({
     children,
     contentRender,
     isFocused = true,
-    fromFullMomentScreen = false,
 }: MomentContainerProps) {
-    const { momentData, momentUserActions, momentSize, momentOptions } =
+    const { momentData, momentUserActions, momentSize, momentOptions, momentVideo } =
         React.useContext(MomentContext)
     const { session } = React.useContext(PersistedContext)
     const { commentEnabled, setFocusedMoment } = React.useContext(FeedContext)
-    const navigation: any = useNavigation()
+
+    // Atualizar o estado de pausa do vídeo quando muda o foco
+    useEffect(() => {
+        if (momentData.midia.content_type === "VIDEO") {
+            momentVideo.setIsPaused(!isFocused || commentEnabled)
+        }
+    }, [isFocused, commentEnabled, momentData.midia.content_type])
 
     const container: any = {
         ...momentSize,
@@ -47,11 +55,66 @@ export default function Container({
         zIndex: 1,
         transform: [{ scale: 3 }],
     }
+    
+    const muteButtonStyle = {
+        alignItems: "center" as const,
+        backgroundColor: "rgba(0,0,0,0.5)",
+        borderRadius: 18,
+        height: 36,
+        justifyContent: "center" as const,
+        position: "absolute" as const,
+        right: 12,
+        top: 12,
+        width: 36,
+        zIndex: 10,
+    }
+    
+    const sliderContainerStyle = {
+        position: "absolute" as const,
+        bottom: 0,
+        left: 0,
+        right: 0,
+        zIndex: 10,
+    }
 
     async function handleDoublePress() {
         if (momentData.user.id != session.user.id) momentUserActions.handleLikeButtonPressed({})
     }
+    
+    function handleProgressChange(currentTime: number, duration: number) {
+        momentVideo.setCurrentTime(currentTime)
+        momentVideo.setDuration(duration)
+    }
 
+    const renderVideoContent = () => {
+        // Agora sempre renderizamos o componente de vídeo, mas controlamos o estado através da prop isFocused
+        return (
+            <View style={{ width: momentSize.width, height: momentSize.height }}>
+                <MediaRenderVideo 
+                    uri={momentData.midia.fullhd_resolution}
+                    thumbnailUri={momentData.midia.nhd_thumbnail}
+                    autoPlay={!momentVideo.isPaused}
+                    style={{
+                        width: momentSize.width,
+                        height: momentSize.height
+                    }}
+                    onVideoLoad={(duration) => {
+                        console.log("Vídeo carregado com duração:", duration)
+                        momentVideo.setDuration(duration)
+                    }}
+                    onVideoEnd={() => {
+                        console.log("Vídeo terminou")
+                    }}
+                    isMuted={momentVideo.isMuted}
+                    onMuteChange={momentVideo.setIsMuted}
+                    onProgressChange={handleProgressChange}
+                    isFocused={isFocused}
+                />
+            </View>
+        )
+    }
+
+    /** 
     async function handleSinglePress() {
         if (!commentEnabled && momentOptions.isFeed) {
             if (!fromFullMomentScreen && isFocused) {
@@ -72,20 +135,38 @@ export default function Container({
             navigation.navigate("MomentNavigator", { screen: "DetailScreen" })
         }
     }
-
+*/
     return (
         <View style={container}>
             <View style={content_container}>
-                <DoubleTapPressable onSingleTap={handleSinglePress} onDoubleTap={handleDoublePress}>
+                <DoubleTapPressable onDoubleTap={handleDoublePress}>
                     <MidiaRender.Root data={contentRender} content_sizes={momentSize}>
-                        <MidiaRender.RenderImage
-                            isFeed={momentOptions.isFeed}
-                            enableBlur={true}
-                            blur={!isFocused}
-                        />
+                        {momentData.midia.content_type === "VIDEO" ? (
+                            renderVideoContent()
+                        ) : (
+                            <MidiaRender.RenderImage
+                                isFeed={momentOptions.isFeed}
+                                enableBlur={true}
+                                blur={!isFocused}
+                            />
+                        )}
                     </MidiaRender.Root>
                 </DoubleTapPressable>
             </View>
+            
+            {/* Controles de vídeo (áudio e slider) */}
+            {momentData.midia.content_type === "VIDEO" && isFocused && !commentEnabled && (
+                <>
+                    <View style={sliderContainerStyle}>
+                        <MomentVideoSlider 
+                            width={momentSize.width * 0.90}
+                            currentTime={momentVideo.currentTime}
+                            duration={momentVideo.duration}
+                        />
+                    </View>
+                </>
+            )}
+            
             {!commentEnabled ? (
                 isFocused ? (
                     children
@@ -99,13 +180,11 @@ export default function Container({
                     <UserShow.Root data={momentData.user}>
                         <View style={{ top: 1 }}>
                             <UserShow.ProfilePicture
-                                disableAnalytics={true}
                                 pictureDimensions={{ width: 15, height: 15 }}
                             />
                         </View>
                         <UserShow.Username
                             scale={0.8}
-                            disableAnalytics={true}
                             margin={0}
                             truncatedSize={8}
                         />
