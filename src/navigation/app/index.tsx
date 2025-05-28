@@ -1,15 +1,16 @@
 import { CardStyleInterpolators, createStackNavigator } from "@react-navigation/stack"
-import React from "react"
-import ColorTheme from "../../layout/constants/colors"
-import { Interpolation as HorizontalLeft } from "../transitions/horizontal-left"
-import { Interpolation as HorizontalRight } from "../transitions/horizontal-right"
+import { ProfileNavigator, ProfileStackParamList } from "./ProfileNavigator"
+
 import BottomTabNavigator from "./BottomTabNavigator"
+import ColorTheme from "../../layout/constants/colors"
 import CreateBottomTabNavigator from "./CreateBottomTabNavigator"
 import { ExploreScreenNavigator } from "./ExploreScreenNavigator"
+import { Interpolation as HorizontalLeft } from "../transitions/horizontal-left"
+import { Interpolation as HorizontalRight } from "../transitions/horizontal-right"
 import { InboxNavigator } from "./InboxNavigator"
 import { MemoriesNavigator } from "./MemoriesNavigator"
 import { MomentNavigator } from "./MomentNavigator"
-import { ProfileNavigator, ProfileStackParamList } from "./ProfileNavigator"
+import React from "react"
 import { SettingsNavigator } from "./SettingsNavigator"
 
 export default function AppNavigator() {
