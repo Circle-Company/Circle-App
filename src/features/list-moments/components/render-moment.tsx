@@ -1,13 +1,13 @@
 import { Animated, View, useColorScheme } from "react-native"
 
+import FeedContext from "@/contexts/Feed"
+import { Moment } from "@/components/moment"
+import { MomentDataProps } from "@/components/moment/context/types"
 import React from "react"
-import { useKeyboardAnimation } from "react-native-keyboard-controller"
-import { Moment } from "../../../components/moment"
-import { MomentDataProps } from "../../../components/moment/context/types"
-import { UserShow } from "../../../components/user_show"
-import FeedContext from "../../../contexts/Feed"
-import sizes from "../../../layout/constants/sizes"
 import RenderComment from "./render-comment"
+import { UserShow } from "@/components/user_show"
+import sizes from "@/layout/constants/sizes"
+import { useKeyboardAnimation } from "react-native-keyboard-controller"
 
 type renderMomentProps = {
     momentData: MomentDataProps
@@ -157,9 +157,16 @@ export default function RenderMoment({ momentData, isFocused, isFeed }: renderMo
                     </Moment.Root.Top>
 
                     <Moment.Root.Center>
-                        <View style={{ marginBottom: sizes.margins["2sm"] }}>
+                        <View style={{ marginBottom: sizes.margins["2sm"], width: "100%" }}>
                             <Moment.Description />
-                            <Moment.LikeButton isLiked={false} />
+                            <View style={{ flexDirection: "row", alignItems: "center"  }}>
+                                <View style={{ flex: 1 }}>
+                                    <Moment.LikeButton isLiked={false} />
+                                </View>
+                                <View>
+                                    <Moment.AudioControl />
+                                </View>
+                            </View>
                         </View>
                     </Moment.Root.Center>
                 </Moment.Container>
