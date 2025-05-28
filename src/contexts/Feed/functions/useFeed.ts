@@ -1,17 +1,19 @@
+import { InteractionProps, MomentProps } from "../types"
+import React, { useCallback, useState } from "react"
+
+import { ChunksManager } from "./chunks-mananger"
 import { MomentDataProps } from "@/components/moment/context/types"
 import PersistedContext from "@/contexts/Persisted"
-import React, { useCallback, useState } from "react"
-import { useTimer } from "../../../lib/hooks/useTimer"
 import api from "../../../services/Api"
-import { InteractionProps, MomentProps } from "../types"
-import { ChunksManager } from "./chunks-mananger"
+import { feedMock } from "@/mocks/feedMock"
+import { useTimer } from "../../../lib/hooks/useTimer"
 
 // Debounce de tempo em ms para evitar requisições excessivas
 const DEBOUNCE_TIME = 5000 // 5 segundos
 
 export const useFeed = (userId: number) => {
     const { session } = React.useContext(PersistedContext)
-    const [feedData, setFeedData] = useState<MomentProps[]>([])
+    const [feedData, setFeedData] = useState<MomentProps[]>(feedMock)
     const [loading, setLoading] = useState(false)
     const [scrollEnabled, setScrollEnabled] = useState(true)
     const [focusedChunkItem, setFocusedChunkItem] = useState<{ id: number; index: number } | null>(
@@ -58,7 +60,7 @@ export const useFeed = (userId: number) => {
                     },
                     { headers: { Authorization: session.account.jwtToken } }
                 )
-                setFeedData(response.data)
+                // setFeedData(response.data)
 
                 const moments: MomentProps[] = response.data || []
                 const newChunkIds = moments.map((moment) => moment.id)
@@ -73,7 +75,7 @@ export const useFeed = (userId: number) => {
                 })
 
                 if (resetFeedList) {
-                    setFeedData(moments) // Substitui completamente o feed
+                    // setFeedData(moments) // Substitui completamente o feed
                     setCurrentChunkIds(newChunkIds)
                 } else if (addChunkOnList) {
                     const uniqueNewChunks = moments.filter(
