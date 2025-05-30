@@ -7,7 +7,7 @@ import { Comments } from "../../../components/comment"
 import { View } from "../../../components/Themed"
 import FeedContext from "../../../contexts/Feed"
 import LanguageContext from "../../../contexts/Preferences/language"
-import RenderMomentFull from "../../../features/list-moments/components/render-moment-full"
+import RenderMomentFull from "../../../features/list-moments/moments/render-moment-full"
 import sizes from "../../../layout/constants/sizes"
 
 export default function MomentFullScreen() {
