@@ -21,6 +21,9 @@
     "see what he is doing now": "see what he is doing now",
 
     "Comments": "Comments",
+    "Comment": "Comment",
+    "comment": "comment",
+    "comments": "comments",
 
     "Statistics": "Statistics",
 
@@ -98,6 +101,7 @@
     "Next": "Next",
     "Add": "Add",
     "View All": "View All",
+    "View more": "View more",
     "All Memories": "All Memories",
     "Add Comment": "Add Comment",
     "Done": "Done",
@@ -137,6 +141,7 @@
     "has a total of": "has a total of",
     "likes throughout his time on": "likes throughout his time on",
     "views throughout his time on": "views throughout his time on",
+    "Users reacted to a Moment by": "Users reacted to a Moment by",
 
     "Select Image": "Select Image",
     "Select Other": "Select Other",

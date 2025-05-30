@@ -23,6 +23,9 @@
     "see what he is doing now": "veja o que ele está fazendo agora",
 
     "Comments": "Comentários",
+    "Comment": "Comentário",
+    "comment": "comentário",
+    "comments": "comentários",
 
     "Statistics": "Statísticas",
 
@@ -101,6 +104,7 @@
     "Next": "Próximo",
     "Add": "Adicionar",
     "View All": "Ver Tudo",
+    "View more": "Ver mais",
     "All Memories": "Todas as Memórias",
     "Add Comment": "Comentar",
     "Done": "Pronto",
@@ -140,6 +144,8 @@
     "has a total of": "tem um total de",
     "likes throughout his time on": "de likes durante todo o seu tempo no",
     "views throughout his time on": "de visualizações durante todo o seu tempo no",
+    "Users reacted to a Moment by": "Usuários reagiram a um Moment de",
+
     "Capture Your Day": "Compartilhe Seu Dia",
     "Select Image": "Selecione Imagem",
     "Select Other": "Selecione Outro",
