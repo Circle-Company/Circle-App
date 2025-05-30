@@ -1,14 +1,16 @@
 import { Animated, View, useColorScheme } from "react-native"
 
-import { Moment } from "@/components/moment"
-import { UserShow } from "@/components/user_show"
 import FeedContext from "@/contexts/Feed"
-import { MomentProps } from "@/contexts/Feed/types"
-import sizes from "@/layout/constants/sizes"
 import { LanguagesCodesType } from "@/locales/LanguageTypes"
+import { Moment } from "@/components/moment"
+import { MomentProps } from "@/contexts/Feed/types"
 import React from "react"
-import { useKeyboardAnimation } from "react-native-keyboard-controller"
 import RenderCommentFeed from "./render-comment-feed"
+import ReportButton from "@/components/moment/components/moment-report-button"
+import { UserShow } from "@/components/user_show"
+import { colors } from "@/layout/constants/colors"
+import sizes from "@/layout/constants/sizes"
+import { useKeyboardAnimation } from "react-native-keyboard-controller"
 
 type renderMomentProps = {
     momentData: MomentProps
@@ -176,7 +178,7 @@ export default function RenderMomentFeed({ momentData, isFocused, isFeed }: rend
                             </UserShow.Root>
                         </Moment.Root.TopLeft>
                         <Moment.Root.TopRight>
-                            <></>
+                            <ReportButton color={colors.gray.white} />
                         </Moment.Root.TopRight>
                     </Moment.Root.Top>
 
