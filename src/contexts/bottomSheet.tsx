@@ -1,6 +1,7 @@
 import BottomSheet, { BottomSheetModalProvider, BottomSheetProps } from "@gorhom/bottom-sheet"
 import React, { useCallback, useEffect, useMemo, useRef, useState } from "react"
 import { StatusBar, View, useColorScheme } from "react-native"
+
 import { CustomBackdrop } from "../components/general/bottomSheet/backdrop"
 import { colors } from "../layout/constants/colors"
 import sizes from "../layout/constants/sizes"
