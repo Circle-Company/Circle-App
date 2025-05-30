@@ -1,6 +1,8 @@
-import { Animated, Text, TextStyle, View, ViewStyle } from "react-native"
+import { Animated, Pressable, Text, TextStyle, ViewStyle } from "react-native"
 
 import AddIcon from "@/assets/icons/svgs/plus_circle-outline.svg"
+import BottomSheetContext from "@/contexts/bottomSheet"
+import ButtonStandart from "@/components/buttons/button-standart"
 import ColorTheme from "@/layout/constants/colors"
 import { CommentObject } from "@/components/comment/comments-types"
 import { Comments } from "@/components/comment"
@@ -9,6 +11,7 @@ import LanguageContext from "@/contexts/Preferences/language"
 import { MomentProps } from "@/contexts/Feed/types"
 import React from "react"
 import ViewMorebutton from "@/components/buttons/view_more"
+import fonts from "@/layout/constants/fonts"
 
 type renderCommentFeedProps = {
     moment: MomentProps
@@ -20,38 +23,53 @@ export default function RenderCommentFeed({ moment, focused }: renderCommentFeed
     const { commentEnabled, setCommentEnabled, setKeyboardVisible } =
         React.useContext(FeedContext)
     const [animatedOpacityValue] = React.useState(new Animated.Value(1))
-    
+    const [animatedHeaderOpacityValue] = React.useState(new Animated.Value(1))
+    const { expand, collapse} = React.useContext(BottomSheetContext)
+
+    function handlePressViewMore() {
+        expand({
+            enablePanDownToClose: true,
+            enableHandlePanningGesture: true,
+            enableContentPanningGesture: true,
+            children: <Pressable onPress={collapse}><Text>teste</Text></Pressable>,
+            snapPoints: ["70%","99%"],
+        })
+    }
+
     React.useEffect(() => {
-        if (focused) {
-            Animated.timing(animatedOpacityValue, {
-                toValue: commentEnabled ? 0 : 1,
-                duration: 200,
-                useNativeDriver: true,
-            }).start()
-            if (!commentEnabled) {
-                Animated.timing(animatedOpacityValue, {
-                    delay: 0,
-                    toValue: 1,
-                    duration: 200,
-                    useNativeDriver: true,
-                }).start()
-            }
-        } else {
-            // Quando não está focado, esconder os comentários
-            Animated.timing(animatedOpacityValue, {
+        if (commentEnabled) {
+            Animated.timing(animatedHeaderOpacityValue, {
                 toValue: 0,
                 duration: 200,
                 useNativeDriver: true,
             }).start()
+        } else {
+            Animated.timing(animatedHeaderOpacityValue, {
+                toValue: 1,
+                duration: 200,
+                useNativeDriver: true,
+            }).start()
         }
-    }, [commentEnabled, focused, animatedOpacityValue])
-
-    // Se não está focado, não renderizar nada
-    if (!focused) {
-        return null
-    }
+    }, [commentEnabled, animatedHeaderOpacityValue])
+    
+    React.useEffect(() => {
+        Animated.timing(animatedOpacityValue, {
+            toValue: focused ? 1 : 0,
+            duration: 500,
+            useNativeDriver: true,
+        }).start()
+        Animated.timing(animatedHeaderOpacityValue, {
+            toValue: focused ? 1 : 0,
+            duration: 500,
+            useNativeDriver: true,
+        }).start()
+    }, [focused, animatedOpacityValue, animatedHeaderOpacityValue])
 
     const animated_header_container: ViewStyle = {
+        opacity: animatedHeaderOpacityValue,
+    }
+
+    const animated_center_container: ViewStyle = {
         opacity: animatedOpacityValue,
     }
 
@@ -60,24 +78,17 @@ export default function RenderCommentFeed({ moment, focused }: renderCommentFeed
     const commentCountStyle: TextStyle = {
         fontSize: 12, 
         color: ColorTheme().textDisabled,
-        fontFamily: "RedHatDisplay-Medium"
+        fontFamily: fonts.family.Medium
     }
-
-    const viewMoreContainerStyle: ViewStyle = {
-        justifyContent: "center", 
-        alignItems: "center", 
-        marginTop: 8
-    }
-
     const viewMoreTextStyle: TextStyle = {
+        top: -4,
         fontSize: 12, 
         color: ColorTheme().textDisabled,
-        fontFamily: "RedHatDisplay-Medium"
+        fontFamily: fonts.family["Medium-Italic"]
     }
 
     function handlePress() {
-        if (commentEnabled) setCommentEnabled(false)
-        else setCommentEnabled(true)
+        setCommentEnabled(true)
         setKeyboardVisible(true)
     }
 
@@ -110,7 +121,7 @@ export default function RenderCommentFeed({ moment, focused }: renderCommentFeed
                         <Comments.TopLeftRoot>
                             <Comments.HeaderLeft>
                                 <Text style={commentCountStyle}>
-                                    {commentsCount > 0 ? `${commentsCount} comentários` : "Sem comentários"}
+                                    {commentsCount > 0 ? commentsCount > 1 ? `${commentsCount} ${t("Comments")}` : `${commentsCount} ${t("Comment")}` : t("No Comments")}
                                 </Text>
                             </Comments.HeaderLeft>
                         </Comments.TopLeftRoot>
@@ -130,18 +141,23 @@ export default function RenderCommentFeed({ moment, focused }: renderCommentFeed
                         </Comments.TopRightRoot>
                     </Comments.TopRoot>
                 </Animated.View>
+                <Animated.View style={animated_center_container}>
+                    <Comments.CenterRoot>
+                        <Comments.ListComments />
+                    </Comments.CenterRoot>
 
-                <Comments.CenterRoot>
-                    <Comments.ListComments />
-                </Comments.CenterRoot>
+                    <ButtonStandart style={{alignSelf: "center", marginVertical: 0, paddingVertical: 0, paddingHorizontal: 0}} action={handlePressViewMore} margins={false} backgroundColor="transparent">
+                        {commentsCount > 1 && (
+                            <Text style={viewMoreTextStyle}>
+                                {`${t("View more")} ${commentsCount - 1} ${commentsCount -1 > 1 ? t("comments") : t("comment")}`}
+                            </Text>
+                        )}    
+                    </ButtonStandart>
 
-                {commentsCount > 1 && (
-                    <View style={viewMoreContainerStyle}>
-                        <Text style={viewMoreTextStyle}>
-                            Ver mais {commentsCount - 1} comentários
-                        </Text>
-                    </View>
-                )}
+
+                </Animated.View>
+
+
             </Comments.Container>
         </Comments.MainRoot>
     )
