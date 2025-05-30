@@ -1,5 +1,5 @@
-import React, { useEffect, useMemo } from "react"
 import { MomentContextsData, MomentProviderProps } from "./types"
+import React, { useEffect, useMemo } from "react"
 
 import FeedContext from "../../../contexts/Feed"
 import PersistedContext from "../../../contexts/Persisted"
@@ -48,6 +48,7 @@ export function MomentProvider({
         momentOptionsStore.setMomentOptions({
             isFeed: isFeed,
             isFocused: isFocused,
+            enableReport: true,
             enableLikeButton: !isMe,
             enableAnalyticsView: isMe,
             enableModeration: !isMe,
