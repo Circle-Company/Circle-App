@@ -69,6 +69,7 @@ export type TagProps = {
 }
 
 export type MomentOptionsProps = {
+    enableReport: boolean
     enableLikeButton: boolean
     enableAnalyticsView: boolean
     enableStoreActions: boolean
