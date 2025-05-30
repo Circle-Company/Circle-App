@@ -1,19 +1,20 @@
-import React from "react"
 import { Animated, Keyboard, Pressable, Text, TextInput, View, useColorScheme } from "react-native"
-import { useNotifications } from "react-native-notificated"
-import CheckIcon from "../../../assets/icons/svgs/check_circle.svg"
-import Arrowbottom from "../../../assets/icons/svgs/paper_plane.svg"
-import FeedContext from "../../../contexts/Feed"
-import PersistedContext from "../../../contexts/Persisted"
-import LanguageContext from "../../../contexts/Preferences/language"
 import ColorTheme, { colors } from "../../../layout/constants/colors"
+
+import Arrowbottom from "../../../assets/icons/svgs/paper_plane.svg"
+import CheckIcon from "../../../assets/icons/svgs/check_circle.svg"
+import { CommentsInputProps } from "../comments-types"
+import FeedContext from "../../../contexts/Feed"
+import LanguageContext from "../../../contexts/Preferences/language"
+import PersistedContext from "../../../contexts/Persisted"
+import React from "react"
+import { UserShow } from "../../user_show"
+import api from "../../../services/Api"
 import fonts from "../../../layout/constants/fonts"
 import sizes from "../../../layout/constants/sizes"
-import api from "../../../services/Api"
-import { UserShow } from "../../user_show"
-import { CommentsInputProps } from "../comments-types"
+import { useNotifications } from "react-native-notificated"
 
-export default function input({
+export default function Input({
     preview = false,
     placeholder,
     color = String(ColorTheme().text),
