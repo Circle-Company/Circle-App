@@ -1,8 +1,9 @@
-import React from "react"
 import { MomentOptionsProps } from "./types"
+import React from "react"
 
 export interface MomentOptionsState extends MomentOptionsProps {
     showOptionsModal: boolean
+    setEnableReport: React.Dispatch<React.SetStateAction<boolean>>
     setShowOptionsModal: React.Dispatch<React.SetStateAction<boolean>>
     setEnableAnalyticsView: React.Dispatch<React.SetStateAction<boolean>>
     setEnableStoreActions: React.Dispatch<React.SetStateAction<boolean>>
@@ -14,6 +15,7 @@ export interface MomentOptionsState extends MomentOptionsProps {
 }
 
 export function useMomentOptions(): MomentOptionsState {
+    const [enableReport, setEnableReport] = React.useState<boolean>(false)
     const [showOptionsModal, setShowOptionsModal] = React.useState<boolean>(false)
     const [enableLikeButton, setEnableLikeButton] = React.useState<boolean>(false)
     const [enableAnalyticsView, setEnableAnalyticsView] = React.useState<boolean>(false)
@@ -24,6 +26,7 @@ export function useMomentOptions(): MomentOptionsState {
     const [isFocused, setIsFocused] = React.useState<boolean>(false)
 
     function setMomentOptions(momentOptionsProps: MomentOptionsProps) {
+        setEnableReport(momentOptionsProps.enableReport)
         setShowOptionsModal(false)
         setEnableLikeButton(momentOptionsProps.enableLikeButton)
         setEnableAnalyticsView(momentOptionsProps.enableAnalyticsView)
@@ -39,6 +42,7 @@ export function useMomentOptions(): MomentOptionsState {
     }, [isFocused])
 
     return {
+        enableReport,
         showOptionsModal,
         enableLikeButton,
         enableAnalyticsView,
@@ -47,6 +51,7 @@ export function useMomentOptions(): MomentOptionsState {
         enableModeration,
         isFeed,
         isFocused,
+        setEnableReport,
         setShowOptionsModal,
         setEnableAnalyticsView,
         setEnableStoreActions,
