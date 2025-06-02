@@ -1,19 +1,23 @@
-import React from "react"
-import { View, Text, useColorScheme } from "react-native"
-import { colors } from "../../layout/constants/colors"
-import { useNavigation } from "@react-navigation/native"
-import sizes from "../../layout/constants/sizes"
-import fonts from "../../layout/constants/fonts"
-import NewMomentContext from "../../contexts/newMoment"
-import ButtonStandart from "../../components/buttons/button-standart"
-import AddIcon from "../../assets/icons/svgs/camera.svg"
-import LanguageContext from "../../contexts/Preferences/language"
+import { Text, TextStyle, View, ViewStyle, useColorScheme } from "react-native"
 
-export default function RenderSelectButton() {
+import AddIcon from "../../assets/icons/svgs/camera.svg"
+import ButtonStandart from "../../components/buttons/button-standart"
+import LanguageContext from "../../contexts/Preferences/language"
+import NewMomentContext from "../../contexts/newMoment"
+import React from "react"
+import { colors } from "../../layout/constants/colors"
+import fonts from "../../layout/constants/fonts"
+import sizes from "../../layout/constants/sizes"
+
+interface RenderSelectButtonProps {
+    onPress?: () => void;
+    buttonText?: string;
+}
+
+export default function RenderSelectButton({ onPress, buttonText }: RenderSelectButtonProps) {
     const { selectedImage, handleLaunchImageLibrary } = React.useContext(NewMomentContext)
     const { t } = React.useContext(LanguageContext)
     const [active, setActive] = React.useState(true)
-    const navigation = useNavigation()
     const isDarkMode = useColorScheme() === "dark"
 
     React.useEffect(() => {
@@ -21,11 +25,11 @@ export default function RenderSelectButton() {
         else setActive(true)
     }, [selectedImage])
 
-    const container: any = {
+    const container: ViewStyle = {
         flexDirection: "row",
     }
 
-    const text: any = {
+    const text: TextStyle = {
         fontSize: fonts.size.footnote,
         fontFamily: fonts.family.Bold,
         color: active ? colors.gray.white : isDarkMode ? colors.gray.white : colors.gray.black,
@@ -35,7 +39,11 @@ export default function RenderSelectButton() {
     }
 
     async function onHandlePress() {
-        await handleLaunchImageLibrary()
+        if (onPress) {
+            onPress()
+        } else {
+            await handleLaunchImageLibrary()
+        }
     }
 
     return (
@@ -53,7 +61,7 @@ export default function RenderSelectButton() {
                 )}
             >
                 <View style={textContainer}>
-                    <Text style={text}>{t("Select Other")}</Text>
+                    <Text style={text}>{buttonText || t("Select Other")}</Text>
                 </View>
                 <AddIcon
                     fill={String(
