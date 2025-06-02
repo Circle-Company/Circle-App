@@ -18,6 +18,8 @@ interface VideoPlayerProps {
     showControls?: boolean;
     blurRadius?: number;
     isFocused?: boolean;
+    width?: number;
+    height?: number;
 }
 
 export default function MediaRenderVideo({
@@ -28,10 +30,15 @@ export default function MediaRenderVideo({
     onVideoEnd,
     onProgressChange,
     blurRadius = 10,
-    isFocused = true
+    isFocused = true,
+    width,
+    height
 }: VideoPlayerProps) {
 
     const { momentSize } = React.useContext(MomentContext)
+    // Se momentSize não existir, usa width/height das props
+    const videoWidth = momentSize?.width ?? width ?? 200
+    const videoHeight = momentSize?.height ?? height ?? 200
     
     // Estados
     const [isPlaying, setIsPlaying] = useState(autoPlay && isFocused)
@@ -123,10 +130,10 @@ export default function MediaRenderVideo({
         container: {
             alignItems: "center",
             backgroundColor: "transparent",
-            height: momentSize.height,
+            height: videoHeight,
             justifyContent: "center",
             overflow: "hidden",
-            width: momentSize.width,
+            width: videoWidth,
         },
         errorThumbnail: {
             ...StyleSheet.absoluteFillObject,
