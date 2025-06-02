@@ -1,16 +1,17 @@
-import { useNavigation } from "@react-navigation/native"
-import React from "react"
-import { PermissionsAndroid, Platform } from "react-native"
-import RNFS from "react-native-fs"
 import { ImagePickerResponse, launchImageLibrary } from "react-native-image-picker"
-import { useNotifications } from "react-native-notificated"
-import UploadIcon from "../assets/icons/svgs/arrow_up.svg"
+import { PermissionsAndroid, Platform } from "react-native"
+
 import CheckIcon from "../assets/icons/svgs/check_circle.svg"
-import { MemoryObjectProps } from "../components/memory/memory-types"
-import { colors } from "../layout/constants/colors"
-import api from "../services/Api"
-import PersistedContext from "./Persisted"
 import LanguageContext from "./Preferences/language"
+import { MemoryObjectProps } from "../components/memory/memory-types"
+import PersistedContext from "./Persisted"
+import RNFS from "react-native-fs"
+import React from "react"
+import UploadIcon from "../assets/icons/svgs/arrow_up.svg"
+import api from "../services/Api"
+import { colors } from "../layout/constants/colors"
+import { useNavigation } from "@react-navigation/native"
+import { useNotifications } from "react-native-notificated"
 
 type NewMomentProviderProps = {
     children: React.ReactNode
@@ -23,22 +24,34 @@ export type TagProps = {
 type Image = {
     uri: string
 }
+
+export type Video = {
+    uri: string;
+    duration?: number;
+    fileSize?: number;
+    type?: string;
+}
+
 export type NewMomentContextsData = {
     uploadMoment: () => Promise<void>
     tags: TagProps[]
     description: string
     selectedImage: Image
+    selectedVideo: Video
     allMemories: MemoryObjectProps[]
     selectedMemory: MemoryObjectProps
     setSelectedImage: React.Dispatch<React.SetStateAction<ImagePickerResponse>>
+    setSelectedVideo: React.Dispatch<React.SetStateAction<Video>>
     setDescription: React.Dispatch<React.SetStateAction<string>>
     setSelectedMemory: React.Dispatch<React.SetStateAction<MemoryObjectProps>>
     addTag: (tag: TagProps) => void
     removeTag: (index: number) => void
     requestPermission: () => Promise<boolean>
     handleLaunchImageLibrary: () => Promise<void>
+    handleLaunchVideoLibrary: () => Promise<void>
     getAllMemories: () => Promise<void>
     handleImagePickerResponse: () => Promise<void>
+    handleVideoPickerResponse: (response: any) => Promise<void>
     addToMemory: () => Promise<Object>
     endSession: () => void
 }
@@ -49,6 +62,7 @@ export function Provider({ children }: NewMomentProviderProps) {
     const { session } = React.useContext(PersistedContext)
     const { t } = React.useContext(LanguageContext)
     const [selectedImage, setSelectedImage] = React.useState<any>()
+    const [selectedVideo, setSelectedVideo] = React.useState<Video>()
     const [description, setDescription] = React.useState<string>("")
     const [tags, setTags] = React.useState<TagProps[]>([])
     const [allMemories, setAllMemories] = React.useState<MemoryObjectProps[]>([])
@@ -135,6 +149,56 @@ export function Provider({ children }: NewMomentProviderProps) {
                 .catch(function (error) {
                     console.log(error)
                 })
+        } else if (selectedVideo) {
+            try {
+                const videoBase64 = await RNFS.readFile(selectedVideo.uri, "base64")
+                await api
+                    .post(
+                        "/moment/create",
+                        {
+                            user_id: session.user.id,
+                            moment: {
+                                description: description ? description : null,
+                                midia: {
+                                    content_type: "VIDEO",
+                                    base64: videoBase64,
+                                },
+                                metadata: {
+                                    duration: selectedVideo.duration,
+                                    file_size: selectedVideo.fileSize,
+                                    file_type: selectedVideo.type,
+                                },
+                                tags,
+                            },
+                        },
+                        { headers: { Authorization: session.account.jwtToken } }
+                    )
+                    .then(function (response) {
+                        setCreatedMoment(response.data)
+                        notify("toast", {
+                            params: {
+                                description: t("Vídeo enviado com sucesso"),
+                                title: t("Momento Criado"),
+                                icon: (
+                                    <UploadIcon
+                                        fill={colors.green.green_05.toString()}
+                                        width={15}
+                                        height={15}
+                                    />
+                                ),
+                            },
+                        })
+                        setTags([])
+                        setDescription("")
+                        setSelectedMemory(null)
+                        setSelectedVideo(undefined)
+                    })
+                    .catch(function (error) {
+                        console.log(error)
+                    })
+            } catch (error) {
+                console.log("Erro ao fazer upload do vídeo:", error)
+            }
         }
     }
 
@@ -202,6 +266,40 @@ export function Provider({ children }: NewMomentProviderProps) {
         }
     }
 
+    async function handleLaunchVideoLibrary() {
+        requestPermission().then(() => {
+            launchImageLibrary(
+                {
+                    mediaType: "video",
+                    selectionLimit: 1,
+                },
+                handleVideoPickerResponse
+            )
+        })
+    }
+
+    const handleVideoPickerResponse = async (response: any) => {
+        if (response.didCancel) {
+            console.log("Usuário cancelou a seleção de vídeo")
+        } else if (response.errorCode) {
+            console.log("Erro ao selecionar vídeo: ", response.errorMessage)
+        } else {
+            try {
+                if (response.assets && response.assets.length > 0) {
+                    const video = {
+                        uri: response.assets[0].uri,
+                        duration: response.assets[0].duration,
+                        type: response.assets[0].type,
+                        fileSize: response.assets[0].fileSize,
+                    }
+                    setSelectedVideo(video)
+                }
+            } catch (error) {
+                console.log("Erro ao processar vídeo:", error)
+            }
+        }
+    }
+
     function addTag(tag: TagProps) {
         setTags([...tags, tag])
     }
@@ -235,6 +333,7 @@ export function Provider({ children }: NewMomentProviderProps) {
         navigation.navigate("BottomTab", { screen: "Home" })
         setDescription("")
         setSelectedImage(undefined)
+        setSelectedVideo(undefined)
         setTags([])
     }
 
@@ -242,18 +341,22 @@ export function Provider({ children }: NewMomentProviderProps) {
         description,
         tags,
         selectedImage,
+        selectedVideo,
         allMemories,
         selectedMemory,
         setSelectedMemory,
         uploadMoment,
         setSelectedImage,
+        setSelectedVideo,
         addTag,
         removeTag,
         addToMemory,
         setDescription,
         requestPermission,
         handleLaunchImageLibrary,
+        handleLaunchVideoLibrary,
         handleImagePickerResponse,
+        handleVideoPickerResponse,
         getAllMemories,
         endSession,
     }
