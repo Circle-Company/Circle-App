@@ -1,19 +1,35 @@
-import fonts from "@/layout/constants/fonts"
-import { createBottomTabNavigator } from "@react-navigation/bottom-tabs"
-import React from "react"
-import { Text, View, useColorScheme } from "react-native"
-import Moment from "../../assets/icons/svgs/bolt.svg" // Import de SVGs
-import Memory from "../../assets/icons/svgs/memory.svg"
 import ColorTheme, { colors } from "../../layout/constants/colors"
-import sizes from "../../layout/constants/sizes"
+import { Text, View, useColorScheme } from "react-native"
+
 import { MemoriesNavigator } from "./MemoriesNavigator"
-import { MomentNavigator } from "./MomentNavigator" // Importação de suas telas
+import Memory from "../../assets/icons/svgs/memory.svg"
+import Moment from "../../assets/icons/svgs/bolt.svg"
+import { MomentNavigator } from "./MomentNavigator"
+import React from "react"
+import { createBottomTabNavigator } from "@react-navigation/bottom-tabs"
+import fonts from "@/layout/constants/fonts"
+import sizes from "../../layout/constants/sizes"
 
 const BottomTab = createBottomTabNavigator()
 
+const focusedTabStyle = (isDarkMode: boolean) => ({
+    paddingLeft: 20,
+    width: 140,
+    borderRadius: (sizes.bottomTab.height * 1.2) / 2,
+    flex: 1,
+    backgroundColor: isDarkMode ? colors.gray.white : colors.gray.black,
+    flexDirection: "row" as const,
+    alignItems: "center" as const,
+})
+
+const unfocusedTabStyle = (side: "left" | "right") => ({
+    marginLeft: side === "left" ? 0 : undefined,
+    marginRight: side === "right" ? 0 : undefined,
+})
+
 export default function CreateBottomTabNavigator() {
     const isDarkMode = useColorScheme()
-    const { iconFocused, icon, background, backgroundDisabled, text } = ColorTheme() // Desestruturação de temas
+    const { icon, background, backgroundDisabled } = ColorTheme()
     const iconWidth = 24
     const iconHeight = 24
 
@@ -53,24 +69,11 @@ export default function CreateBottomTabNavigator() {
             <BottomTab.Screen
                 name="Moment"
                 component={MomentNavigator}
-                initialParams={{ screen: "NewMomentImageScreen" }} // Parâmetro inicial para tela específica
+                initialParams={{ screen: "NewMomentVideoScreen" }} // Parâmetro inicial para tela específica
                 options={{
                     tabBarIcon: ({ focused }) =>
                         focused ? (
-                            <View
-                                style={{
-                                    right: -20,
-                                    paddingLeft: 20,
-                                    width: 140,
-                                    borderRadius: (sizes.bottomTab.height * 1.2) / 2,
-                                    flex: 1,
-                                    backgroundColor: isDarkMode
-                                        ? colors.gray.white
-                                        : colors.gray.black,
-                                    flexDirection: "row",
-                                    alignItems: "center",
-                                }}
-                            >
+                            <View style={focusedTabStyle(!!isDarkMode)}>
                                 <Moment
                                     fill={String(background)}
                                     width={iconWidth}
@@ -79,7 +82,7 @@ export default function CreateBottomTabNavigator() {
                                 <Text style={titleStyle}>Moment</Text>
                             </View>
                         ) : (
-                            <View style={{ left: -20 }}>
+                            <View style={unfocusedTabStyle("left")}>
                                 <Moment fill={String(icon)} width={iconWidth} height={iconHeight} />
                             </View>
                         ),
@@ -93,20 +96,7 @@ export default function CreateBottomTabNavigator() {
                 options={{
                     tabBarIcon: ({ focused }) =>
                         focused ? (
-                            <View
-                                style={{
-                                    left: -20,
-                                    paddingLeft: 12,
-                                    width: 140,
-                                    borderRadius: (sizes.bottomTab.height * 1.2) / 2,
-                                    flex: 1,
-                                    backgroundColor: isDarkMode
-                                        ? colors.gray.white
-                                        : colors.gray.black,
-                                    flexDirection: "row",
-                                    alignItems: "center",
-                                }}
-                            >
+                            <View style={focusedTabStyle(!!isDarkMode)}>
                                 <Text style={titleStyle}>Memory</Text>
                                 <Memory
                                     fill={String(background)}
@@ -115,7 +105,7 @@ export default function CreateBottomTabNavigator() {
                                 />
                             </View>
                         ) : (
-                            <View style={{ right: -20 }}>
+                            <View style={unfocusedTabStyle("right")}>
                                 <Memory
                                     fill={String(icon)}
                                     width={iconWidth - 2}
