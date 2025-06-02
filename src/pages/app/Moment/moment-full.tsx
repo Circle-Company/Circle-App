@@ -1,14 +1,14 @@
-import { Animated, StatusBar, useColorScheme } from "react-native"
-import ColorTheme, { colors } from "../../../layout/constants/colors"
+import { Animated, StatusBar, ViewStyle, useColorScheme } from "react-native"
+import ColorTheme, { colors } from "@/layout/constants/colors"
 
+import { Comments } from "@/components/comment"
+import FeedContext from "@/contexts/Feed"
+import LanguageContext from "@/contexts/Preferences/language"
 import React from "react"
+import RenderMomentFull from "@/features/list-moments/components/moments/render-moment-full"
+import { View } from "@/components/Themed"
+import sizes from "@/layout/constants/sizes"
 import { useKeyboardAnimation } from "react-native-keyboard-controller"
-import { Comments } from "../../../components/comment"
-import { View } from "../../../components/Themed"
-import FeedContext from "../../../contexts/Feed"
-import LanguageContext from "../../../contexts/Preferences/language"
-import RenderMomentFull from "../../../features/list-moments/moments/render-moment-full"
-import sizes from "../../../layout/constants/sizes"
 
 export default function MomentFullScreen() {
     const { t } = React.useContext(LanguageContext)
@@ -17,14 +17,14 @@ export default function MomentFullScreen() {
     const { height } = useKeyboardAnimation()
     const bottomContainerRef = React.useRef(null)
 
-    const container = {
+    const container: ViewStyle = {
         alignItems: "center",
         overflow: "hidden",
         flex: 1,
         borderTopLeftRadius: 15,
         borderTopRightRadius: 15,
     }
-    const bottomContainer = {
+    const bottomContainer: ViewStyle = {
         bottom: 0,
         paddingVertical: sizes.paddings["1sm"] * 0.4,
         width: sizes.screens.width,
