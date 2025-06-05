@@ -1,9 +1,9 @@
-import ColorTheme, { colors } from "@/layout/constants/colors"
 import NewMomentContext, { Video as VideoType } from "@/contexts/newMoment"
-import { Platform, StatusBar, StyleSheet, Text, TouchableOpacity, View, useColorScheme } from "react-native"
-import React, { useRef, useState } from "react"
-import Video, { OnLoadData, OnProgressData } from "react-native-video"
+import ColorTheme, { colors } from "@/layout/constants/colors"
 import { useNavigation, useRoute } from "@react-navigation/native"
+import React, { useRef, useState } from "react"
+import { Platform, StatusBar, StyleSheet, Text, TouchableOpacity, View, useColorScheme } from "react-native"
+import Video, { OnLoadData, OnProgressData } from "react-native-video"
 
 import MultiSlider from "@ptomasroos/react-native-multi-slider"
 
@@ -14,17 +14,22 @@ export default function VideoTrimmerScreen() {
     const { videoUri } = route.params as { videoUri: string }
     const [isProcessing, setIsProcessing] = useState(false)
     const [maxDuration] = useState(30)
-    const [sliderValues, setSliderValues] = useState<[number, number]>([0, 30])
+    const [startTime, setStartTime] = useState(0)
     const [duration, setDuration] = useState(0)
     const videoRef = useRef<Video | null>(null)
     const isDarkMode = useColorScheme() === "dark"
+
+    // Calcula o tempo final com base no tempo inicial e na duração máxima
+    const getEndTime = () => {
+        return Math.min(startTime + maxDuration, duration)
+    }
 
     const confirmSelection = () => {
         setIsProcessing(true)
         setTimeout(() => {
             const videoData: VideoType = {
                 uri: videoUri,
-                duration: Math.min(maxDuration, sliderValues[1] - sliderValues[0]),
+                duration: Math.min(maxDuration, getEndTime() - startTime),
                 type: "video/mp4",
             }
             setSelectedVideo(videoData)
@@ -35,25 +40,31 @@ export default function VideoTrimmerScreen() {
 
     const handleLoad = (data: OnLoadData) => {
         setDuration(data.duration)
-        setSliderValues([0, Math.min(maxDuration, data.duration)])
+        // Se o vídeo for mais curto que a duração máxima, definimos o início como 0
+        // Caso contrário, permitimos escolher o início
+        if (data.duration <= maxDuration) {
+            setStartTime(0)
+        }
     }
 
     const handleProgress = (data: OnProgressData) => {
-        if (data.currentTime > sliderValues[1] || data.currentTime < sliderValues[0]) {
+        const endTime = getEndTime()
+        if (data.currentTime > endTime || data.currentTime < startTime) {
             if (videoRef.current) {
-                videoRef.current.seek(sliderValues[0])
+                videoRef.current.seek(startTime)
             }
         }
     }
 
     const onSliderChange = (values: number[]) => {
-        let [start, end] = values
-        if (end - start > maxDuration) {
-            end = start + maxDuration
-        }
-        setSliderValues([start, end])
+        const [start] = values
+        // Verificamos se temos espaço suficiente para os 30 segundos a partir do início
+        const maxPossibleStart = Math.max(0, duration - maxDuration)
+        const validStart = Math.min(start, maxPossibleStart)
+        
+        setStartTime(validStart)
         if (videoRef.current) {
-            videoRef.current.seek(start)
+            videoRef.current.seek(validStart)
         }
     }
 
@@ -77,36 +88,45 @@ export default function VideoTrimmerScreen() {
             </View>
             <View style={styles.trimmerContainer}>
                 <Text style={styles.instructionText}>
-                    Selecione o início e o fim do seu vídeo (máx. 30s)
+                    Selecione o ponto de início do seu vídeo (duração fixa: {maxDuration}s)
                 </Text>
-                <MultiSlider
-                    values={sliderValues}
-                    min={0}
-                    max={duration}
-                    step={0.1}
-                    allowOverlap={false}
-                    snapped
-                    onValuesChange={onSliderChange}
-                    selectedStyle={{ backgroundColor: colors.blue.blue_05 }}
-                    markerStyle={{
-                        backgroundColor: colors.blue.blue_05,
-                        height: 24,
-                        width: 24,
-                        borderRadius: 12,
-                        borderWidth: 2,
-                        borderColor: colors.gray.white,
-                    }}
-                    containerStyle={{ marginHorizontal: 10 }}
-                />
+                {duration > 0 && (
+                    <>
+                        <MultiSlider
+                            values={[startTime]}
+                            min={0}
+                            max={Math.max(0, duration - maxDuration)}
+                            step={0.1}
+                            allowOverlap={false}
+                            snapped
+                            onValuesChange={onSliderChange}
+                            selectedStyle={{ backgroundColor: colors.blue.blue_05 }}
+                            markerStyle={{
+                                backgroundColor: colors.blue.blue_05,
+                                height: 24,
+                                width: 24,
+                                borderRadius: 12,
+                                borderWidth: 2,
+                                borderColor: colors.gray.white,
+                            }}
+                            containerStyle={{ marginHorizontal: 10 }}
+                        />
+                        {duration <= maxDuration && (
+                            <Text style={styles.maxDurationText}>
+                                O vídeo é menor que {maxDuration} segundos, será usado por completo
+                            </Text>
+                        )}
+                    </>
+                )}
                 <View style={styles.durationInfo}>
                     <Text style={styles.durationText}>
-                        Início: {sliderValues[0].toFixed(1)}s
+                        Início: {startTime.toFixed(1)}s
                     </Text>
                     <Text style={styles.durationText}>
-                        Fim: {sliderValues[1].toFixed(1)}s
+                        Fim: {getEndTime().toFixed(1)}s
                     </Text>
                     <Text style={styles.durationText}>
-                        Duração: {(sliderValues[1] - sliderValues[0]).toFixed(1)}s
+                        Duração: {(getEndTime() - startTime).toFixed(1)}s
                     </Text>
                 </View>
             </View>
@@ -181,6 +201,13 @@ const styles = StyleSheet.create({
         fontSize: 16,
         fontWeight: "600",
         marginBottom: 15,
+        textAlign: "center",
+    },
+    maxDurationText: {
+        color: "#FF6B00",
+        fontSize: 14,
+        fontWeight: "500",
+        marginTop: 5,
         textAlign: "center",
     },
     trimmerContainer: {
