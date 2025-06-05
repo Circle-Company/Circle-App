@@ -1,11 +1,13 @@
+import { Pressable, View, ViewStyle, useColorScheme } from "react-native"
+
+import PersistedContext from "@/contexts/Persisted"
 import React from "react"
-import { Pressable, View, useColorScheme } from "react-native"
+import CheckCircle from "../../../assets/icons/svgs/check_circle.svg"
+import { MemoryObjectProps } from "../../../components/memory/memory-types"
+import NewMomentContext from "../../../contexts/newMoment"
 import { colors } from "../../../layout/constants/colors"
 import fonts from "../../../layout/constants/fonts"
-import NewMomentContext from "../../../contexts/newMoment"
-import { MemoryObjectProps } from "../../../components/memory/memory-types"
 import RenderMemory_ from "../../list-memories/components/render-memory"
-import CheckCircle from "../../../assets/icons/svgs/check_circle.svg"
 
 type RenderMemoryProps = {
     memory: MemoryObjectProps
@@ -13,7 +15,8 @@ type RenderMemoryProps = {
 
 export default function RenderMemory({ memory }: RenderMemoryProps) {
     const { setSelectedMemory, selectedMemory } = React.useContext(NewMomentContext)
-    const [selected, setSelected] = React.useState(false)
+    const { session } = React.useContext(PersistedContext)
+
     const isDarkMode = useColorScheme() === "dark"
 
     function handlePress() {
@@ -24,7 +27,7 @@ export default function RenderMemory({ memory }: RenderMemoryProps) {
 
     const container = {}
 
-    const pressable_container: any = {
+    const pressable_container: ViewStyle = {
         position: "absolute",
         zIndex: 10,
         width: "92%",
@@ -33,7 +36,7 @@ export default function RenderMemory({ memory }: RenderMemoryProps) {
         left: 5,
     }
 
-    const memory_container: any = {
+    const memory_container: ViewStyle = {
         transform: [{ scale: 0.6 }],
         marginLeft: -35,
         marginRight: -44,
@@ -43,7 +46,7 @@ export default function RenderMemory({ memory }: RenderMemoryProps) {
         zIndex: 1,
     }
 
-    const memory_container_selected: any = {
+    const memory_container_selected: ViewStyle = {
         transform: [{ scale: 0.45 }],
         marginLeft: -35,
         marginRight: -44,
@@ -53,7 +56,7 @@ export default function RenderMemory({ memory }: RenderMemoryProps) {
         zIndex: 1,
     }
 
-    const inner_container_selected: any = {
+    const inner_container_selected: ViewStyle = {
         width: "100%",
         height: "100%",
         borderRadius: 20,
@@ -64,8 +67,14 @@ export default function RenderMemory({ memory }: RenderMemoryProps) {
         zIndex: 0,
     }
 
-    const selectedMemoryId: any = selectedMemory?.id ?? false
+    const selectedMemoryId: number | boolean = selectedMemory?.id ?? false
 
+
+    const check_circle_style: ViewStyle = {
+        elevation: 10,
+        shadowOpacity: 1,
+        top: -6,
+    }
     const ContainerStyle =
         selectedMemoryId !== false
             ? selectedMemoryId == memory.id
@@ -80,7 +89,7 @@ export default function RenderMemory({ memory }: RenderMemoryProps) {
                     <View style={inner_container_selected}>
                         <CheckCircle
                             fill={String(colors.gray.white)}
-                            style={{ elevation: 10, shadowOpacity: 1, top: -6 }}
+                            style={check_circle_style}
                             width={35}
                             height={35}
                         />
@@ -89,6 +98,7 @@ export default function RenderMemory({ memory }: RenderMemoryProps) {
             </Pressable>
             <View style={ContainerStyle}>
                 <RenderMemory_
+                    user={{...session.user, you_follow: false}}
                     memory={memory}
                     pressable={false}
                     scale={1}
