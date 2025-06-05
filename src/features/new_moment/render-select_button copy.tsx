@@ -1,19 +1,18 @@
-import { useNavigation } from "@react-navigation/native"
-import React from "react"
 import { Text, View, useColorScheme } from "react-native"
-import AddIcon from "../../assets/icons/svgs/camera.svg"
-import ButtonStandart from "../../components/buttons/button-standart"
-import LanguageContext from "../../contexts/Preferences/language"
-import NewMomentContext from "../../contexts/newMoment"
-import { colors } from "../../layout/constants/colors"
-import fonts from "../../layout/constants/fonts"
-import sizes from "../../layout/constants/sizes"
+
+import AddIcon from "@/assets/icons/svgs/camera.svg"
+import ButtonStandart from "@/components/buttons/button-standart"
+import LanguageContext from "@/contexts/Preferences/language"
+import NewMomentContext from "@/contexts/newMoment"
+import { colors } from "@/layout/constants/colors"
+import fonts from "@/layout/constants/fonts"
+import sizes from "@/layout/constants/sizes"
+import React from "react"
 
 export default function RenderSelectFromGalleryButton() {
     const { selectedImage, handleLaunchImageLibrary } = React.useContext(NewMomentContext)
     const { t } = React.useContext(LanguageContext)
     const [active, setActive] = React.useState(true)
-    const navigation = useNavigation()
     const isDarkMode = useColorScheme() === "dark"
 
     React.useEffect(() => {
