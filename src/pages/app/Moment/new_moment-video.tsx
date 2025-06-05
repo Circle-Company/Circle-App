@@ -1,14 +1,14 @@
-import ColorTheme, { colors } from "../../../layout/constants/colors"
+import ColorTheme, { colors } from "@/layout/constants/colors"
 import { FlexAlignType, StatusBar, StyleSheet, useColorScheme } from "react-native"
 
-import { MidiaRender } from "../../../components/midia_render"
-import NewMomentContext from "../../../contexts/newMoment"
-import React from "react"
-import RenderSelectButton from "../../../features/new_moment/render-select_button"
-import RenderSelectVideoFromGalleryButton from "../../../features/new_moment/render-select-video_button"
-import { View } from "../../../components/Themed"
-import sizes from "../../../layout/constants/sizes"
+import { MidiaRender } from "@/components/midia_render"
+import { View } from "@/components/Themed"
+import NewMomentContext from "@/contexts/newMoment"
+import RenderSelectVideoFromGalleryButton from "@/features/new_moment/render-select-video_button"
+import RenderSelectButton from "@/features/new_moment/render-select_button"
+import sizes from "@/layout/constants/sizes"
 import { useNavigation } from "@react-navigation/native"
+import React from "react"
 
 export interface Video {
   uri: string;
