@@ -1,10 +1,10 @@
+import { View } from "@/components/Themed"
+import NewMomentContext from "@/contexts/newMoment"
+import HeaderList from "@/features/new_moment/components/header_list"
+import RenderMemory from "@/features/new_moment/components/render_memory"
+import sizes from "@/layout/constants/sizes"
 import React from "react"
-import { View } from "../../components/Themed"
-import sizes from "../../layout/constants/sizes"
-import NewMomentContext from "../../contexts/newMoment"
 import { FlatList } from "react-native-gesture-handler"
-import RenderMemory from "./components/render_memory"
-import HeaderList from "./components/header_list"
 
 export default function RenderMemoriesSelector() {
     const { getAllMemories, allMemories, setSelectedMemory } = React.useContext(NewMomentContext)
