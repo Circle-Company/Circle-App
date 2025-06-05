@@ -1,11 +1,13 @@
+import { Text, TextInput, TextStyle, ViewStyle } from "react-native"
+
+import ColorTheme from "@/layout/constants/colors"
+import LanguageContext from "@/contexts/Preferences/language"
+import NewMomentContext from "@/contexts/newMoment"
 import React from "react"
-import { View } from "../../../components/Themed"
-import { Text, TextInput } from "react-native"
-import sizes from "../../../layout/constants/sizes"
-import ColorTheme from "../../../layout/constants/colors"
-import fonts from "../../../layout/constants/fonts"
-import NewMomentContext from "../../../contexts/newMoment"
-import LanguageContext from "../../../contexts/Preferences/language"
+import { View } from "@/components/Themed"
+import fonts from "@/layout/constants/fonts"
+import sizes from "@/layout/constants/sizes"
+
 type RenderMomentProps = {
     height?: number
     keyboardIsVisible: boolean
@@ -23,7 +25,7 @@ export default function DescriptionInput({
         width: sizes.screens.width,
     }
 
-    const input_container = {
+    const input_container: ViewStyle = {
         width: input_width,
         backgroundColor: ColorTheme().backgroundDisabled,
         borderRadius: sizes.headers.height / 2,
@@ -35,14 +37,14 @@ export default function DescriptionInput({
         justifyContent: "flex-start",
     }
 
-    const text_style: any = {
+    const text_style: TextStyle = {
         marginLeft: input_width / 7,
         fontSize: fonts.size.body,
         fontFamily: fonts.family.Semibold,
         color: ColorTheme().text,
     }
 
-    const input_style: any = {
+    const input_style: TextStyle = {
         top: 2,
         alignSelf: "flex-start",
         fontFamily: fonts.family.Semibold,
@@ -50,13 +52,13 @@ export default function DescriptionInput({
         height: height - sizes.paddings["1sm"] * 2,
     }
 
-    const counter: any = {
+    const counter: TextStyle = {
         fontSize: fonts.size.caption1,
         alignSelf: "flex-end",
         color: maxLength == description.length ? ColorTheme().error : ColorTheme().textDisabled,
     }
 
-    const legend_style: any = {
+    const legend_style: TextStyle = {
         marginTop: sizes.margins["1sm"],
         alignSelf: "center",
         fontSize: fonts.size.caption2,
