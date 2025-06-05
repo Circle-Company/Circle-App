@@ -1,12 +1,14 @@
+import ColorTheme, { colors } from "@/layout/constants/colors"
+import { ColorValue, Text, TextInput, TextStyle, ViewStyle, useColorScheme } from "react-native"
+
+import ButtonStandart from "@/components/buttons/button-standart"
+import LanguageContext from "@/contexts/Preferences/language"
+import NewMomentContext from "@/contexts/newMoment"
 import React from "react"
-import { View } from "../../../components/Themed"
-import { Text, TextInput, useColorScheme } from "react-native"
-import sizes from "../../../layout/constants/sizes"
-import ColorTheme, { colors } from "../../../layout/constants/colors"
-import fonts from "../../../layout/constants/fonts"
-import NewMomentContext from "../../../contexts/newMoment"
-import ButtonStandart from "../../../components/buttons/button-standart"
-import LanguageContext from "../../../contexts/Preferences/language"
+import { View } from "@/components/Themed"
+import fonts from "@/layout/constants/fonts"
+import sizes from "@/layout/constants/sizes"
+
 type RenderMomentProps = {
     height?: number
     keyboardIsVisible: boolean
@@ -17,7 +19,6 @@ export default function TagsInput({
     height = keyboardIsVisible ? sizes.headers.height : sizes.headers.height,
 }: RenderMomentProps) {
     const { t } = React.useContext(LanguageContext)
-    const maxLength = 300
     const isDarkMode = useColorScheme() === "dark"
     const input_width = sizes.screens.width / 1 - sizes.paddings["1lg"] * 2
     const { tags, addTag } = React.useContext(NewMomentContext)
@@ -28,7 +29,7 @@ export default function TagsInput({
         marginVertical: keyboardIsVisible ? sizes.margins["1sm"] : sizes.margins["2sm"],
     }
 
-    const input_container = {
+    const input_container: ViewStyle = {
         width: input_width,
         height,
         backgroundColor: ColorTheme().backgroundDisabled,
@@ -43,14 +44,14 @@ export default function TagsInput({
         flexDirection: "row",
     }
 
-    const text_style: any = {
+    const text_style: TextStyle = {
         marginLeft: input_width / 7,
         fontSize: fonts.size.body,
         fontFamily: fonts.family.Semibold,
         color: ColorTheme().text,
     }
 
-    const input_style: any = {
+    const input_style: TextStyle = {
         top: 2,
         alignSelf: "flex-start",
         fontFamily: fonts.family.Semibold,
@@ -58,20 +59,20 @@ export default function TagsInput({
         height: height - sizes.paddings["1sm"] * 2,
     }
 
-    const button_background: any = tag ? ColorTheme().primary : ColorTheme().background
-    const button_text_style: any = {
+    const button_background: ColorValue = tag ? ColorTheme().primary : ColorTheme().background
+    const button_text_style: TextStyle = {
         fontSize: fonts.size.body,
         fontFamily: fonts.family.Semibold,
         color: tag ? colors.gray.white : isDarkMode ? colors.gray.white : colors.gray.black,
     }
 
-    const hash_style: any = {
+    const hash_style: TextStyle = {
         width: 20,
         fontFamily: fonts.family.Semibold,
         color: ColorTheme().text,
     }
 
-    const legend_style: any = {
+    const legend_style: TextStyle = {
         marginTop: sizes.margins["1sm"],
         alignSelf: "center",
         fontSize: fonts.size.caption2,
@@ -113,7 +114,6 @@ export default function TagsInput({
                 <ButtonStandart
                     action={handelButtonPress}
                     backgroundColor={button_background}
-                    width={input_width / 6}
                 >
                     <Text style={button_text_style}>{t("Add")}</Text>
                 </ButtonStandart>
