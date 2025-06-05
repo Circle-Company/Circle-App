@@ -1,20 +1,21 @@
+import { NavigationProp, useNavigation } from "@react-navigation/native"
+import { Text, TextStyle, View, ViewStyle } from "@/components/Themed"
+
+import AddIcon from "@/assets/icons/svgs/plus_circle-outline.svg"
+import ColorTheme from "@/layout/constants/colors"
+import LanguageContext from "@/contexts/Preferences/language"
 import React from "react"
-import { Text, View } from "../../../components/Themed"
-import { useNavigation } from "@react-navigation/native"
-import sizes from "../../../layout/constants/sizes"
-import AddIcon from "../../../assets/icons/svgs/plus_circle-outline.svg"
-import ViewMorebutton from "../../../components/buttons/view_more"
-import ColorTheme from "../../../layout/constants/colors"
-import fonts from "../../../layout/constants/fonts"
-import SelectMomentsContext from "../../../contexts/selectMoments"
-import LanguageContext from "../../../contexts/Preferences/language"
+import SelectMomentsContext from "@/contexts/selectMoments"
+import ViewMorebutton from "@/components/buttons/view_more"
+import fonts from "@/layout/constants/fonts"
+import sizes from "@/layout/constants/sizes"
 
 export default function HeaderList() {
     const { t } = React.useContext(LanguageContext)
     const { setFrom } = React.useContext(SelectMomentsContext)
-    const navigation = useNavigation()
+    const navigation: NavigationProp<any> = useNavigation()
 
-    const container: any = {
+    const container: ViewStyle = {
         top: 4,
         width: sizes.screens.width,
         paddingTop: sizes.paddings["2sm"],
@@ -23,14 +24,14 @@ export default function HeaderList() {
         justifyContent: "center",
     }
 
-    const title: any = {
+    const title: TextStyle = {
         flex: 1,
         marginLeft: sizes.margins["2sm"] * 0.8,
         fontFamily: fonts.family.Semibold,
         fontSize: fonts.size.body,
     }
 
-    const button_container: any = {
+    const button_container: ViewStyle = {
         marginRight: sizes.margins["1md"] * 0.8,
     }
 
