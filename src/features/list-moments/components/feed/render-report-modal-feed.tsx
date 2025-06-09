@@ -1,19 +1,19 @@
 import ColorTheme, { colors } from "@/layout/constants/colors"
 import { TextStyle, TouchableOpacity, View, ViewStyle, useColorScheme } from "react-native"
 
-import BottomSheetContext from "@/contexts/bottomSheet"
-import CancelButton from "@/components/buttons/cancel"
 import CheckIcon from "@/assets/icons/svgs/check_circle.svg"
-import LanguageContext from "@/contexts/Preferences/language"
+import CancelButton from "@/components/buttons/cancel"
 import { MomentDataProps } from "@/components/moment/context/types"
-import PersistedContext from "@/contexts/Persisted"
-import React from "react"
 import { Text } from "@/components/Themed"
+import BottomSheetContext from "@/contexts/bottomSheet"
+import PersistedContext from "@/contexts/Persisted"
+import LanguageContext from "@/contexts/Preferences/language"
+import fonts from "@/layout/constants/fonts"
+import sizes from "@/layout/constants/sizes"
 import { Vibrate } from "@/lib/hooks/useHapticFeedback"
 import api from "@/services/Api"
-import fonts from "@/layout/constants/fonts"
+import React from "react"
 import { notify } from "react-native-notificated"
-import sizes from "@/layout/constants/sizes"
 
 type ReportOption = {
     id: string
@@ -101,7 +101,6 @@ export function RenderReportModal({moment}: {moment: MomentDataProps}) {
 
     const centerContainer: ViewStyle = {
         width,
-        height: "88.25%",
     }
 
     const bottomContainer: ViewStyle = {
