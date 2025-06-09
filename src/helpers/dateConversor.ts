@@ -1,5 +1,6 @@
-import LanguageContext from "../contexts/Preferences/language"
+import { t } from "i18next"
 import React from "react"
+import LanguageContext from "../contexts/Preferences/language"
 
 interface TimeDifferenceConverterProps {
     date: string
@@ -61,18 +62,18 @@ export function timeDifferenceConverter({
 
     if (weeks > 0) {
         if (small) return `${weeks}w`
-        return `${weeks} ${weeks === 1 ? "week" : "weeks"} ago`
+        return `${weeks} ${weeks === 1 ? t("week") : t("weeks")} ${t("ago")}`
     } else if (days > 0) {
         if (small) return `${days}d`
-        return `${days} ${days === 1 ? "day" : "days"} ago`
+        return `${days} ${days === 1 ? t("day") : t("days")} ${t("ago")}`
     } else if (hours > 0) {
         if (small) return `${hours}h`
-        return `${hours} ${hours === 1 ? "hour" : "hours"} ago`
+        return `${hours} ${hours === 1 ? t("hour") : t("hours")} ${t("ago")}`
     } else if (minutes > 0) {
         if (small) return `${minutes}min`
-        return `${minutes} ${minutes === 1 ? "minute" : "minutes"} ago`
+        return `${minutes} ${minutes === 1 ? t("minute") : t("minutes")} ${t("ago")}`
     } else {
         if (small) return `${seconds}s`
-        return `${seconds} ${seconds === 1 ? "second" : "seconds"} ago`
+        return `${seconds} ${seconds === 1 ? t("second") : t("seconds")} ${t("ago")}`
     }
 }
