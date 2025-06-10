@@ -1,37 +1,37 @@
-import { Text, View } from "react-native"
+import { NavigationProp, useNavigation } from "@react-navigation/native"
+import { Text, TextStyle, View, ViewStyle } from "react-native"
 
 import { BadgeIcon } from "@/components/general/badge-icon"
-import Bell from "../../../assets/icons/svgs/tray.svg"
-import ButtonStandart from "../../buttons/button-standart"
-import Camera from "../../../assets/icons/svgs/camera.svg"
-import ColorTheme from "../../../layout/constants/colors"
-import LanguageContext from "../../../contexts/Preferences/language"
 import PersistedContext from "@/contexts/Persisted"
 import React from "react"
+import Camera from "../../../assets/icons/svgs/camera.svg"
+import Bell from "../../../assets/icons/svgs/tray.svg"
+import LanguageContext from "../../../contexts/Preferences/language"
+import ColorTheme from "../../../layout/constants/colors"
 import fonts from "../../../layout/constants/fonts"
 import sizes from "../../../layout/constants/sizes"
-import { useNavigation } from "@react-navigation/native"
+import ButtonStandart from "../../buttons/button-standart"
 
 export default function HeaderRightHome() {
     const { t } = React.useContext(LanguageContext)
     const {session} = React.useContext(PersistedContext)
 
-    const navigation: any = useNavigation()
+    const navigation: NavigationProp<any> = useNavigation()
 
-    const container: any = {
+    const container: ViewStyle = {
         flexDirection: "row",
         marginRight: sizes.margins["3sm"],
     }
 
-    const text: any = {
+    const text: TextStyle = {
         fontSize: fonts.size.footnote,
         fontFamily: fonts.family.Bold,
         color: ColorTheme().text,
     }
-    const textContainer = {
+    const textContainer: ViewStyle = {
         marginRight: sizes.margins["1sm"],
     }
-    const buttonContainer = {
+    const buttonContainer: ViewStyle = {
         flexDirection: "row",
         alignItems: "center",
         justifyContent: "center",
@@ -50,6 +50,7 @@ export default function HeaderRightHome() {
         <View style={container}>
             <View style={buttonContainer}>
                 <ButtonStandart
+                    style={{paddingHorizontal: sizes.paddings["2sm"]}}
                     action={onPressNewMoment}
                     margins={false}
                     backgroundColor={String(ColorTheme().backgroundDisabled)}
@@ -62,13 +63,13 @@ export default function HeaderRightHome() {
             </View>
             <ButtonStandart
                 style={{paddingHorizontal: sizes.paddings["1sm"]}}
-                square={false}
+                square={true}
                 action={onPressNotifications}
                 margins={false}
                 backgroundColor={String(ColorTheme().backgroundDisabled)}
-            >
-                <BadgeIcon style={{position: "relative", marginRight: 6, borderWidth: 0}}number={1} /> 
-                <Bell fill={String(ColorTheme().text)} width={16} height={16} />
+            ><Bell fill={String(ColorTheme().text)} width={16} height={16} />
+                <BadgeIcon number={session.account.unreadNotificationsCount} style={{top: -7, right: -10}}/> 
+                
             </ButtonStandart>
             
         </View>
