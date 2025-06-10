@@ -2,7 +2,7 @@ import React from "react"
 import { userReciveDataProps } from "../user_show/user_show-types"
 
 export type CommentObject = {
-    id: number
+    id: string
     user: userReciveDataProps
     content: string
     created_at: string
