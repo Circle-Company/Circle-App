@@ -13,7 +13,7 @@ import React from "react"
 import { useUserShowContext } from "../user_show-context"
 import { UserUsernameProps } from "../user_show-types"
 
-export default function user_username({
+export default function UserShowUsername({
     pressable = true,
     displayOnMoment = true,
     truncatedSize = 30,
