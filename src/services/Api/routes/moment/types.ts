@@ -1,14 +1,14 @@
-export type PostLikeProps = {
+import { InteractionType } from "@/components/moment/context/momentUserActions"
+
+export type MomentActionProps = {
     momentId: string
     authorizationToken: string
 }
 
-export type PostUnlikeProps = {
-    momentId: string
-    authorizationToken: string
+export type MomentActionPropsWithReportType = MomentActionProps & {
+    reportType: InteractionType
 }
 
-export type PostStatisticsPreviewProps = {
-    momentId: string
-    authorizationToken: string
+export type MomentActionPropsWithCommentType = MomentActionProps & {
+    commentId: string
 }
