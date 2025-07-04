@@ -1,15 +1,15 @@
-import { useNavigation } from "@react-navigation/native"
-import React from "react"
-import { TouchableOpacity } from "react-native"
-
 import Close from "../../assets/icons/svgs/close.svg"
 import ColorTheme from "../../layout/constants/colors"
+import React from "react"
+import { TouchableOpacity } from "react-native"
+import { useNavigation } from "@react-navigation/native"
 
 type ButtonCloseProps = {
     transparent?: boolean
     iconColor?: string
     backgroundColor?: string
     testID?: any
+    onPress?: () => void 
 }
 
 export default function ButtonClose({
@@ -17,6 +17,7 @@ export default function ButtonClose({
     backgroundColor = String(ColorTheme().backgroundDisabled),
     iconColor = String(ColorTheme().icon),
     testID,
+    onPress
 }: ButtonCloseProps) {
     const navigation = useNavigation()
     const container: any = {
@@ -33,7 +34,7 @@ export default function ButtonClose({
         <TouchableOpacity
             style={container}
             onPress={() => {
-                navigation.goBack()
+                onPress? onPress(): navigation.goBack()
             }}
             testID={testID}
         >
