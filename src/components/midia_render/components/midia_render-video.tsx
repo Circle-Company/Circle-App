@@ -10,6 +10,7 @@ import { t } from "i18next"
 interface VideoPlayerProps {
     uri?: string;
     thumbnailUri?: string;
+    hasVideoCache?: boolean,
     autoPlay?: boolean;
     onVideoLoad?: (duration: number) => void;
     onVideoEnd?: () => void;
@@ -25,6 +26,7 @@ interface VideoPlayerProps {
 export default function MediaRenderVideo({
     uri,
     thumbnailUri,
+    hasVideoCache = false,
     autoPlay = true,
     onVideoLoad,
     onVideoEnd,
@@ -282,7 +284,7 @@ export default function MediaRenderVideo({
             <Animated.View 
                 style={[
                     styles.thumbnailContainer, 
-                    { opacity: isFocused ? fadeAnim : 1 }
+                    { opacity: isFocused ? hasVideoCache? 0 : fadeAnim : 1 }
                 ]}
             >
                 <Image
