@@ -1,16 +1,14 @@
-import React from "react"
-import { useKeyboard } from "../../lib/hooks/useKeyboard"
-import PersistedContext from "../Persisted"
-import { useFeed } from "./functions/useFeed"
 import { FeedProviderProps } from "./types"
+import React from "react"
+import { useFeed } from "./functions/useFeed"
+import { useKeyboard } from "../../lib/hooks/useKeyboard"
 
 const FeedContext = React.createContext(
     {} as ReturnType<typeof useFeed> & ReturnType<typeof useKeyboard>
 )
 
 export function Provider({ children }: FeedProviderProps) {
-    const { session } = React.useContext(PersistedContext)
-    const feed = useFeed(session.user.id)
+    const feed = useFeed()
     const keyboard = useKeyboard()
 
     return <FeedContext.Provider value={{ ...feed, ...keyboard }}>{children}</FeedContext.Provider>

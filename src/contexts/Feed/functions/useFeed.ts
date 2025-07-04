@@ -7,11 +7,12 @@ import PersistedContext from "@/contexts/Persisted"
 import api from "../../../services/Api"
 import { feedMock } from "@/mocks/feedMock"
 import { useTimer } from "../../../lib/hooks/useTimer"
+import { videoCacher } from "./video-cacher"
 
 // Debounce de tempo em ms para evitar requisições excessivas
 const DEBOUNCE_TIME = 5000 // 5 segundos
 
-export const useFeed = (userId: number) => {
+export const useFeed = () => {
     const { session } = React.useContext(PersistedContext)
     const [feedData, setFeedData] = useState<MomentProps[]>(feedMock)
     const [loading, setLoading] = useState(false)
@@ -77,6 +78,7 @@ export const useFeed = (userId: number) => {
                 if (resetFeedList) {
                     // setFeedData(moments) // Substitui completamente o feed
                     setCurrentChunkIds(newChunkIds)
+                    videoCacher.clear()
                 } else if (addChunkOnList) {
                     const uniqueNewChunks = moments.filter(
                         (moment) => !currentPostIds.includes(moment.id)
@@ -87,6 +89,7 @@ export const useFeed = (userId: number) => {
                         ...prevChunkIds,
                         ...uniqueNewChunks.map((m) => m.id),
                     ])
+
                 }
 
                 setLastRequestTime(currentTime) // Atualiza o timestamp da última requisição
@@ -98,12 +101,12 @@ export const useFeed = (userId: number) => {
                 setInteractions([]) // Limpa interações após a resposta
             }
         },
-        [userId, feedData, interactions, session, lastRequestTime, resetTimer]
+        [feedData, interactions, session, lastRequestTime, period, resetTimer]
     )
 
     function next() {
         if (
-            Number(focusedChunkItem?.index + 1) < feedData.length &&
+            Number(focusedChunkItem?.index?? + 1) < feedData.length &&
             commentEnabled == false &&
             loading == false &&
             scrollEnabled

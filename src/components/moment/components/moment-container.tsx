@@ -12,6 +12,7 @@ import MomentVideoSlider from "../components/moment-video-slider"
 import PersistedContext from "@/contexts/Persisted"
 import { UserShow } from "../../user_show"
 import { View } from "react-native"
+import { videoCacher } from "@/contexts/Feed/functions/video-cacher"
 
 export default function Container({
     children,
@@ -21,14 +22,16 @@ export default function Container({
     const { momentData, momentUserActions, momentSize, momentOptions, momentVideo } =
         React.useContext(MomentContext)
     const { session } = React.useContext(PersistedContext)
-    const { commentEnabled, setFocusedMoment } = React.useContext(FeedContext)
+    const { commentEnabled } = React.useContext(FeedContext)
+    const [hasVideoCache, setHasVideoCache] = React.useState<boolean>(false)
+    const [cachedVideoUri, setCachedVideoUri] = React.useState<string | undefined>()
 
     // Atualizar o estado de pausa do vídeo quando muda o foco
     useEffect(() => {
         if (momentData.midia.content_type === "VIDEO") {
             momentVideo.setIsPaused(!isFocused || commentEnabled)
         }
-    }, [isFocused, commentEnabled, momentData.midia.content_type])
+    }, [isFocused, commentEnabled, momentData.midia.content_type, momentVideo])
 
     const container: any = {
         ...momentSize,
@@ -56,19 +59,6 @@ export default function Container({
         transform: [{ scale: 3 }],
     }
     
-    const muteButtonStyle = {
-        alignItems: "center" as const,
-        backgroundColor: "rgba(0,0,0,0.5)",
-        borderRadius: 18,
-        height: 36,
-        justifyContent: "center" as const,
-        position: "absolute" as const,
-        right: 12,
-        top: 12,
-        width: 36,
-        zIndex: 10,
-    }
-    
     const sliderContainerStyle = {
         position: "absolute" as const,
         bottom: 0,
@@ -76,6 +66,26 @@ export default function Container({
         right: 0,
         zIndex: 10,
     }
+
+    React.useEffect(() => {
+
+        if(momentData.midia.content_type !== "VIDEO") return
+        const url = momentData.midia.fullhd_resolution || momentData.midia.nhd_resolution
+
+        if (!url) return
+
+        videoCacher
+            .preload({ id: Number(momentData.id), url })
+            .then((localUri) => {
+                setCachedVideoUri(localUri)
+                setHasVideoCache(true)
+            })
+            .catch((err) => {
+                console.warn("Erro ao obter vídeo cacheado:", err)
+                setCachedVideoUri(url) // fallback se falhar
+                setHasVideoCache(false)
+            })
+    }, [momentData.id, momentData.midia])
 
     async function handleDoublePress() {
         if (momentData.user.id != session.user.id) momentUserActions.handleLikeButtonPressed({})
@@ -91,8 +101,9 @@ export default function Container({
         return (
             <View style={{ width: momentSize.width, height: momentSize.height }}>
                 <MediaRenderVideo 
-                    uri={momentData.midia.fullhd_resolution}
+                    uri={cachedVideoUri}
                     thumbnailUri={momentData.midia.nhd_thumbnail}
+                    hasVideoCache={hasVideoCache}
                     autoPlay={!momentVideo.isPaused}
                     style={{
                         width: momentSize.width,
@@ -105,8 +116,6 @@ export default function Container({
                     onVideoEnd={() => {
                         console.log("Vídeo terminou")
                     }}
-                    isMuted={momentVideo.isMuted}
-                    onMuteChange={momentVideo.setIsMuted}
                     onProgressChange={handleProgressChange}
                     isFocused={isFocused}
                 />
@@ -135,7 +144,10 @@ export default function Container({
             navigation.navigate("MomentNavigator", { screen: "DetailScreen" })
         }
     }
+        
 */
+
+
     return (
         <View style={container}>
             <View style={content_container}>
