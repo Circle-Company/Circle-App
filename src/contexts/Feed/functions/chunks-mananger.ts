@@ -6,6 +6,17 @@ type ChunksManagerProps = {
     maxItems: number // Maximum allowed items in the list
 }
 
+/**
+ * Ensures the list does not exceed the maximum allowed size.
+ * Removes the oldest items if the list exceeds the limit.
+ * @param list Current list of chunks
+ * @param maxItems Maximum allowed items
+ * @returns Trimmed list
+ */
+function limitListSize(list: number[], maxItems: number): number[] {
+    return list.slice(-maxItems) // Keep only the most recent items
+}
+
 export function ChunksManager({
     previousList,
     newList,
@@ -65,15 +76,4 @@ export function ChunksManager({
         resetFeedList,
         updatedList,
     }
-}
-
-/**
- * Ensures the list does not exceed the maximum allowed size.
- * Removes the oldest items if the list exceeds the limit.
- * @param list Current list of chunks
- * @param maxItems Maximum allowed items
- * @returns Trimmed list
- */
-function limitListSize(list: number[], maxItems: number): number[] {
-    return list.slice(-maxItems) // Keep only the most recent items
 }
