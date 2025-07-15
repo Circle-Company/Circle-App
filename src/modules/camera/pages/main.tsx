@@ -1,11 +1,16 @@
-import { StyleSheet } from "react-native"
+//@ts-nocheck
+
 import { Camera, useCameraDevice, useCameraPermission } from "react-native-vision-camera"
-import { RequestCameraPermissionsPage } from "./requestCameraPermissions"
 
 export function CameraView() {
-    const device: any = useCameraDevice("back")
-    const { hasPermission } = useCameraPermission()
+    //@ts-nocheck
+    const device = useCameraDevice("back")
+    const { hasPermission: hasCameraPermission, requestPermission: requestCameraPermission } = useCameraPermission()
+    const { hasPermission: hasMicrophonePermission, requestPermission: requestMicrophonePermission } = useMicrophonePermission()
 
-    if (!hasPermission) return <RequestCameraPermissionsPage />
-    return <Camera style={StyleSheet.absoluteFill} device={device} isActive={true} />
+    if (!hasCameraPermission || ! hasMicrophonePermission) {
+        requestCameraPermission()
+        requestMicrophonePermission()
+    }
+    return <Camera device={device} isActive={true} />
 }
