@@ -1,17 +1,20 @@
-import { Text, View } from "@/components/Themed"
+import { FlatList, TextStyle, ViewStyle } from "react-native"
 import Reanimated, { FadeInUp } from "react-native-reanimated"
+import { Text, View } from "@/components/Themed"
 
-import PersistedContext from "@/contexts/Persisted"
-import LanguageContext from "@/contexts/Preferences/language"
-import React from "react"
-import { FlatList } from "react-native"
-import NetworkContext from "../../../contexts/network"
-import EndReached from "../../../features/list-memories/list-memories-preview/components/end-reached"
-import sizes from "../../../layout/constants/sizes"
-import OfflineCard from "../../general/offline"
-import { Loading } from "../../loading"
+import BottomSheetContext from "@/contexts/bottomSheet"
+import ButtonClose from "@/components/buttons/close"
 import { CommentObject } from "../comments-types"
+import EndReached from "../../../features/list-memories/list-memories-preview/components/end-reached"
+import LanguageContext from "@/contexts/Preferences/language"
+import { Loading } from "../../loading"
+import NetworkContext from "../../../contexts/network"
+import OfflineCard from "../../general/offline"
+import PersistedContext from "@/contexts/Persisted"
+import React from "react"
 import RenderComment from "./comments-render_comment"
+import fonts from "@/layout/constants/fonts"
+import sizes from "../../../layout/constants/sizes"
 
 const MOCK_COMMENTS: CommentObject[] = [
     {
@@ -92,15 +95,40 @@ const MOCK_COMMENTS: CommentObject[] = [
     }
 ]
 
-function FetchedCommentsList({ momentId }: { momentId: string | number }) {
+function FetchedCommentsList({ totalCommentsNum, momentId }: { totalCommentsNum: number, momentId: string | number }) {
     const { t } = React.useContext(LanguageContext)
     const { session } = React.useContext(PersistedContext)
     const { networkStats } = React.useContext(NetworkContext)
+    const {collapse} = React.useContext(BottomSheetContext)
     const [page, setPage] = React.useState<number>(1)
     const [loading, setLoading] = React.useState<boolean>(false)
     const [endReached, setEndReached] = React.useState<boolean>(false)
     const [allComments, setAllComments] = React.useState<CommentObject[]>(MOCK_COMMENTS)
     const pageSize = 4
+
+    const titleContainer: ViewStyle = {
+        flex: 1,
+        flexDirection: "row",
+        alignSelf: "center",
+        paddingHorizontal: sizes.paddings["1sm"],
+        marginBottom: sizes.margins["2sm"],
+        height: sizes.headers.height * 0.7,
+        alignItems: "center",
+        justifyContent: "flex-start"
+    }
+
+    const title: TextStyle = {
+        marginLeft: sizes.margins["2sm"] * 0.7,
+        fontSize: fonts.size.body,
+        fontFamily: fonts.family.Bold
+    }
+
+    const inputOverflow: ViewStyle = {
+        zIndex: 100,
+        position: "absolute",
+        bottom: 0,
+        width: sizes.screens.width,
+    }
 
     async function fetchData() {
         // Temporariamente comentado para usar dados mock
@@ -168,8 +196,11 @@ function FetchedCommentsList({ momentId }: { momentId: string | number }) {
             data={allComments}
             keyExtractor={(item: CommentObject, index: number) => String(item.id || index)}
             ListHeaderComponent={() => (
-                <View style={{ width: "100%", alignSelf: "center", paddingHorizontal: sizes.paddings["1sm"], height: sizes.headers.height * 0.8, alignItems: "center", justifyContent: "center"}}>
-                    <Text>{t("Comments")}</Text>
+                <View style={titleContainer}>
+                    <View style={{flex: 1}}>
+                        <Text style={title}>{totalCommentsNum} {t("Comments")}</Text>
+                    </View>
+                    <ButtonClose onPress={collapse}/>
                 </View>
             )}
             renderItem={({ item, index }) => (
@@ -198,12 +229,13 @@ function FetchedCommentsList({ momentId }: { momentId: string | number }) {
                             width={sizes.moment.standart.width}
                             height={sizes.headers.height * 2}
                         >
-                            <Loading.ActivityIndicator size={10} />
+                            <Loading.ActivityIndicator size={25} />
                         </Loading.Container>
                     )
             }}
             style={{ width: sizes.moment.standart.width, alignSelf: "center" }}
-        />
+        />            
+
     )
 }
 
