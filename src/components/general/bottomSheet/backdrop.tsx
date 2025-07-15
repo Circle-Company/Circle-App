@@ -1,11 +1,24 @@
+import Animated, { FadeInUp } from "react-native-reanimated"
+
+import { BottomSheetBackdropProps } from "@gorhom/bottom-sheet"
+import BottomSheetContext from "../../../contexts/bottomSheet"
+import { Pressable } from "react-native"
 import React from "react"
 import sizes from "../../../layout/constants/sizes"
-import { Pressable } from "react-native"
-import Animated, { FadeInUp, FadeOut } from "react-native-reanimated"
-import BottomSheetContext from "../../../contexts/bottomSheet"
-export function CustomBackdrop({ style }: any) {
+
+// Adiciona as novas props
+interface CustomBackdropProps extends BottomSheetBackdropProps {
+    visible?: boolean
+}
+
+export function CustomBackdrop({ style, visible = true }: CustomBackdropProps) {
     // animated variables
     const { collapse } = React.useContext(BottomSheetContext)
+    const [localVisible, setLocalVisible] = React.useState(visible)
+
+    React.useEffect(() => {
+        setLocalVisible(visible)
+    }, [visible])
 
     // styles
     const containerStyle: any = React.useMemo(
@@ -23,13 +36,19 @@ export function CustomBackdrop({ style }: any) {
         [style]
     )
 
+    if (!localVisible) return null
+
+    function handlePress() {
+        setLocalVisible(false)
+        collapse()
+    }
+
     return (
         <Animated.View
             entering={FadeInUp.duration(450)}
-            exiting={FadeOut.duration(300)}
             style={containerStyle}
         >
-            <Pressable onPress={collapse} style={{ flex: 1 }} />
+            <Pressable onPress={handlePress} style={{ flex: 1 }} />
         </Animated.View>
     )
 }
