@@ -1,15 +1,15 @@
-import ColorTheme, { colors } from "../../../layout/constants/colors"
 import { TextStyle, View, ViewStyle, useColorScheme } from "react-native"
+import ColorTheme, { colors } from "../../../layout/constants/colors"
 
-import { CommentsRenderCommentProps } from "../comments-types"
-import MomentContext from "../../moment/context"
-import PersistedContext from "../../../contexts/Persisted"
 import React from "react"
-import { Text } from "../../Themed"
-import { UserShow } from "../../user_show"
+import PersistedContext from "../../../contexts/Persisted"
+import { timeDifferenceConverter } from "../../../helpers/dateConversor"
 import fonts from "../../../layout/constants/fonts"
 import sizes from "../../../layout/constants/sizes"
-import { timeDifferenceConverter } from "../../../helpers/dateConversor"
+import MomentContext from "../../moment/context"
+import { Text } from "../../Themed"
+import { UserShow } from "../../user_show"
+import { CommentsRenderCommentProps } from "../comments-types"
 
 export default function RenderComment({ comment, preview, index }: CommentsRenderCommentProps) {
     const { session } = React.useContext(PersistedContext)
@@ -27,11 +27,12 @@ export default function RenderComment({ comment, preview, index }: CommentsRende
 
     const container: ViewStyle = {
         flexDirection: "row",
-        marginTop: preview ? sizes.margins["1sm"] * 0.8 : sizes.margins["1md"],
-        marginBottom: preview ? sizes.margins["1sm"] * 0.5 : sizes.margins["2sm"],
-        backgroundColor: preview?  isDarkMode ? colors.gray.grey_09 : colors.gray.grey_01 : "transparent",
-        borderRadius: preview? sizes.borderRadius["1md"] : 0,
-        padding: preview? sizes.paddings["1sm"] : 0,
+        marginTop: preview ? sizes.margins["1sm"] * 0.8 : sizes.margins["1sm"] * 0.5,
+        marginBottom: preview ? sizes.margins["1sm"] * 0.5 : sizes.margins["1sm"],
+        backgroundColor: isDarkMode ? colors.gray.grey_09 : colors.gray.grey_01,
+        borderRadius: sizes.borderRadius["1md"],
+        padding: sizes.paddings["1sm"],
+        flex: 1
     }
     const container_left: ViewStyle = {
         left: -2,
@@ -51,9 +52,10 @@ export default function RenderComment({ comment, preview, index }: CommentsRende
         marginBottom: sizes.margins["1sm"] * 0.5,
     }
     const content_style: TextStyle = {
-        marginTop: preview ? -2 : 0,
-        fontSize: preview ? fonts.size.body * 0.9 : fonts.size.body,
-        fontFamily: "RedHatDisplay-Medium",
+        marginTop: preview ? -2 : 2,
+        fontSize: preview ? fonts.size.body * 0.9 : fonts.size.body * 0.85,
+        fontFamily: preview ? fonts.family.Medium : fonts.family.Semibold,
+        lineHeight: preview ? fonts.size.body * 1.2 : fonts.size.body,
     }
     const date_style: TextStyle = {
         marginLeft: 5,
@@ -124,7 +126,7 @@ export default function RenderComment({ comment, preview, index }: CommentsRende
                     </UserShow.Root>
                     <Text style={date_style}>•</Text>
                     <Text style={date_style}>
-                        {timeDifferenceConverter({ date: String(comment.created_at) })}
+                        {timeDifferenceConverter({ date: String(comment.created_at), small: false })}
                     </Text>
                 </View>
                 <Text style={content_style}>{comment.content}</Text>
