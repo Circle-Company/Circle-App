@@ -1,16 +1,16 @@
 import { Animated, Pressable } from "react-native"
 
-import { Text } from "@/components/Themed"
-import PersistedContext from "@/contexts/Persisted"
-import LanguageContext from "@/contexts/Preferences/language"
 import ColorTheme from "@/layout/constants/colors"
+import LanguageContext from "@/contexts/Preferences/language"
+import PersistedContext from "@/contexts/Persisted"
+import React from "react"
+import { Text } from "@/components/Themed"
+import { UserFollowButtonProps } from "../user_show-types"
 import fonts from "@/layout/constants/fonts"
 import sizes from "@/layout/constants/sizes"
-import React from "react"
 import { useUserShowContext } from "../user_show-context"
-import { UserFollowButtonProps } from "../user_show-types"
 
-export default function follow_button({
+export default function FollowButton({
     followsYou = false,
     isFollowing = false,
     hideOnFollowing = true,
@@ -43,8 +43,6 @@ export default function follow_button({
         margin: sizes.margins["1sm"],
         alignItems: "center",
         justifyContent: "center",
-        borderWidth: sizes.borders["1md"],
-        borderColor: ColorTheme().text + "50",
         paddingHorizontal: sizes.paddings["1sm"],
     }
     const container_pressed: any = {
