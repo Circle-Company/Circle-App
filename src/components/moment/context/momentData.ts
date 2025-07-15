@@ -1,9 +1,3 @@
-import PersistedContext from "@/contexts/Persisted"
-import React from "react"
-import { LanguagesCodesType } from "../../../locales/LanguageTypes"
-import api from "../../../services/Api"
-import { CommentsReciveDataProps } from "../../comment/comments-types"
-import { userReciveDataProps } from "../../user_show/user_show-types"
 import {
     ExportMomentDataProps,
     MomentDataProps,
@@ -11,6 +5,14 @@ import {
     MomentStatisticsProps,
     TagProps,
 } from "./types"
+
+import { CommentsReciveDataProps } from "@/components/comment/comments-types"
+import { LanguagesCodesType } from "@/locales/LanguageTypes"
+import PersistedContext from "@/contexts/Persisted"
+import React from "react"
+import api from "@/services/Api"
+import { userReciveDataProps } from "@/components/user_show/user_show-types"
+
 export interface MomentDataState extends Omit<MomentDataProps, "isLiked"> {
     getComments: ({ page, pageSize }: { page: number; pageSize: number }) => Promise<void>
     getStatistics: () => Promise<void>
@@ -20,7 +22,7 @@ export interface MomentDataState extends Omit<MomentDataProps, "isLiked"> {
 }
 
 export function useMomentData(): MomentDataState {
-    const [id, setId] = React.useState<number>(0)
+    const [id, setId] = React.useState<string>("")
     const [user, setUser] = React.useState({} as userReciveDataProps)
     const [description, setDescription] = React.useState<string>("")
     const [midia, setMidia] = React.useState({} as MomentMidiaProps)
@@ -28,13 +30,17 @@ export function useMomentData(): MomentDataState {
     const [statistics, setStatistics] = React.useState({} as MomentStatisticsProps)
     const [tags, setTags] = React.useState([] as TagProps[])
     const [language, setLanguage] = React.useState("" as LanguagesCodesType)
+    const [isLiked, setIsLiked] = React.useState<boolean>(false)
     const [createdAt, setCreatedAt] = React.useState<string>("")
 
+    const { session } = React.useContext(PersistedContext)
+
+    const jwtToken = session.account.jwtToken
+
     async function getComments({ page, pageSize }: { page: number; pageSize: number }) {
-        const { session } = React.useContext(PersistedContext)
         await api
             .get(`/moments/${id}/comments?page=${page}&pageSize=${pageSize}`, {
-                headers: { Authorization: session.account.jwtToken },
+                headers: { Authorization: jwtToken },
             })
             .then((response) => {
                 if (page === 1) setComments(response.data.comments)
@@ -46,10 +52,9 @@ export function useMomentData(): MomentDataState {
     }
 
     async function getStatistics() {
-        const { session } = React.useContext(PersistedContext)
         await api
             .get(`/moments/${id}/statistics/preview`, {
-                headers: { Authorization: session.account.jwtToken },
+                headers: { Authorization: jwtToken },
             })
             .then((response) => {
                 setStatistics(response.data)
@@ -60,10 +65,9 @@ export function useMomentData(): MomentDataState {
     }
 
     async function getTags() {
-        const { session } = React.useContext(PersistedContext)
         return await api
             .get(`/moments/${id}/tags?page=1&pageSize=100`, {
-                headers: { Authorization: session.account.jwtToken },
+                headers: { Authorization: jwtToken },
             })
             .then((response) => {
                 setTags(response.data)
@@ -76,8 +80,8 @@ export function useMomentData(): MomentDataState {
 
     async function exportMomentData(): Promise<ExportMomentDataProps> {
         return {
-            id: Number(id),
-            userId: Number(user.id),
+            id: String(id),
+            userId: String(user.id),
             tags: await getTags(),
             type: midia.content_type,
             language: language,
@@ -95,6 +99,7 @@ export function useMomentData(): MomentDataState {
         setTags(momentData.tags)
         setLanguage(momentData.language)
         setCreatedAt(momentData.created_at)
+        setIsLiked(momentData.is_liked)
     }
 
     return {
@@ -107,6 +112,7 @@ export function useMomentData(): MomentDataState {
         tags,
         language,
         created_at: createdAt,
+        is_liked: isLiked,
         getComments,
         getStatistics,
         getTags,
