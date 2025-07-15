@@ -1,27 +1,37 @@
-import BottomSheet, { BottomSheetModalProvider, BottomSheetProps } from "@gorhom/bottom-sheet"
+import BottomSheet, { BottomSheetBackdropProps, BottomSheetModalProvider, BottomSheetProps } from "@gorhom/bottom-sheet"
 import React, { useCallback, useEffect, useMemo, useRef, useState } from "react"
-import { StatusBar, View, useColorScheme } from "react-native"
+import { StatusBar, StyleSheet, View, ViewStyle, useColorScheme } from "react-native"
 
+import { FlexAlignType } from "react-native"
 import { CustomBackdrop } from "../components/general/bottomSheet/backdrop"
 import { colors } from "../layout/constants/colors"
 import sizes from "../layout/constants/sizes"
+
 type BottomSheetProviderProps = {
     children: React.ReactNode
 }
 
-export type BottomSheetContextData = {
-    expand: React.Dispatch<React.SetStateAction<BottomSheetProps | null>>
-    collapse: () => void
+// Estendendo o tipo para incluir estilos personalizados
+interface CustomBottomSheetOptions extends BottomSheetProps {
+    customStyles?: {
+        modalBackground?: Partial<ViewStyle>;
+        modal?: Partial<ViewStyle>;
+        handle?: Partial<ViewStyle>;
+        handleIndicator?: Partial<ViewStyle>;
+    }
 }
 
-interface CustomBottomSheetProps extends BottomSheetProps {}
+export type BottomSheetContextData = {
+    expand: React.Dispatch<React.SetStateAction<CustomBottomSheetOptions | null>>
+    collapse: () => void
+}
 
 const BottomSheetContext = React.createContext<BottomSheetContextData>({} as BottomSheetContextData)
 
 export function Provider({ children }: BottomSheetProviderProps) {
     const isDarkMode = useColorScheme() === "dark"
     const bottomSheetRef = useRef<BottomSheet>(null)
-    const [options, setOptions] = useState<CustomBottomSheetProps | null>(null)
+    const [options, setOptions] = useState<CustomBottomSheetOptions | null>(null)
     const snapPoints = useMemo(() => options?.snapPoints || [0], [options])
 
     useEffect(() => {
@@ -53,24 +63,39 @@ export function Provider({ children }: BottomSheetProviderProps) {
         [collapseBottomSheet]
     )
 
-    const modalBackgroundStyle: any = {
-        borderRadius: sizes.borderRadius["1xl"] * 0.8,
-        backgroundColor: isDarkMode ? colors.gray.grey_09 : colors.gray.grey_01,
-        alignItems: "center",
-    }
+    // Componente renderizável de backdrop
+    const renderBackdrop = useCallback(
+        (props: BottomSheetBackdropProps) => <CustomBackdrop {...props} />,
+        []
+    )
 
-    const modalStyle: any = {
-        ...sizes.bottomSheet,
-        alignItems: "center",
-    }
-
-    const handleStyle: any = {
-        height: 10,
-    }
-
-    const handleIndicatorStyle: any = {
-        backgroundColor: isDarkMode ? colors.gray.grey_07 : colors.gray.grey_03,
-    }
+    // Estilos do BottomSheet
+    const styles = useMemo(() => {
+        return StyleSheet.create({
+            contentContainer: {
+                marginTop: sizes.margins["2sm"]
+            },
+            handle: {
+                height: 10,
+                ...(options?.customStyles?.handle || {})
+            },
+            handleIndicator: {
+                backgroundColor: isDarkMode ? colors.gray.grey_07 : colors.gray.grey_03,
+                ...(options?.customStyles?.handleIndicator || {})
+            },
+            modal: {
+                ...sizes.bottomSheet,
+                alignItems: "center" as FlexAlignType,
+                ...(options?.customStyles?.modal || {})
+            },
+            modalBackground: {
+                alignItems: "center" as FlexAlignType,
+                backgroundColor: isDarkMode ? colors.gray.grey_09 : colors.gray.grey_01,
+                borderRadius: sizes.borderRadius["1xl"] * 0.8,
+                ...(options?.customStyles?.modalBackground || {})
+            }
+        })
+    }, [isDarkMode, options?.customStyles])
 
     return (
         <BottomSheetModalProvider>
@@ -81,19 +106,19 @@ export function Provider({ children }: BottomSheetProviderProps) {
                         index={-1}
                         snapPoints={snapPoints}
                         ref={bottomSheetRef}
-                        enablePanDownToClose={options.enablePanDownToClose} // Desabilitando fechar com gesto de deslize
-                        enableHandlePanningGesture={options.enableHandlePanningGesture} // Desabilitando gesto no handle
-                        enableContentPanningGesture={options.enableContentPanningGesture} // Desabilitando arrastar conteúdo
-                        handleIndicatorStyle={handleIndicatorStyle}
-                        handleStyle={handleStyle}
-                        style={modalStyle}
+                        enablePanDownToClose={options.enablePanDownToClose}
+                        enableHandlePanningGesture={options.enableHandlePanningGesture}
+                        enableContentPanningGesture={options.enableContentPanningGesture}
+                        handleIndicatorStyle={styles.handleIndicator}
+                        handleStyle={styles.handle}
+                        style={styles.modal}
                         bottomInset={36}
                         detached={true}
-                        backdropComponent={() => <CustomBackdrop />}
-                        backgroundStyle={modalBackgroundStyle}
+                        backdropComponent={renderBackdrop}
+                        backgroundStyle={styles.modalBackground}
                         onClose={() => bottomSheetRef.current?.collapse()}
                     >
-                        <View style={{ marginTop: sizes.margins["2sm"] }}>{options.children}</View>
+                        <View style={styles.contentContainer}>{options.children}</View>
                     </BottomSheet>
                 )}
             </BottomSheetContext.Provider>
