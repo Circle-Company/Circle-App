@@ -58,18 +58,17 @@ export default function MomentVideoSlider({
     }
 
     const backgroundTrack: ViewStyle = {
-        backgroundColor: colors.gray.grey_05,
-        height: 4,
+        backgroundColor: colors.gray.grey_04,
+        height: 2,
         opacity: 0.5,
     }
 
     const progressTrack: ViewStyle = {
-        backgroundColor: colors.gray.white,
+        backgroundColor: colors.gray.grey_03,
         height: 4,
         borderRadius: 3,
         left: 0,
         position: "absolute",
-        opacity: 0.5,
     }
     
     // O estilo de progresso para o Animated.View
