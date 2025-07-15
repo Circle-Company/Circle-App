@@ -15,14 +15,30 @@ export default function ReportButton({
     function handlePress() {
         expand({
             children: (
-                <RenderReportModal moment={{...momentData, is_liked: momentUserActions.liked}} />
+                <RenderReportModal moment={{...momentData, is_liked: momentUserActions.like}} />
             ),
-            snapPoints: ["99%"],
+            enablePanDownToClose: true,
+            enableHandlePanningGesture: true,
+            enableContentPanningGesture: true,
+            snapPoints: ["85%","99%"],
+            customStyles: {
+                modal: {
+                    marginHorizontal: 0,
+                    width: "100%",
+                }
+            }
         })
     }
     if (momentOptions.enableReport) {
         return (
-            <ButtonStandart action={handlePress} margins={false}style={{padding: 0, paddingHorizontal: 8, paddingVertical: 0, marginHorizontal: 0, marginVertical: 0, marginVertical: 0, backgroundColor: "transparent"}}>
+            <ButtonStandart action={handlePress} margins={false} style={{
+                padding: 0, 
+                paddingHorizontal: 8, 
+                paddingVertical: 0, 
+                marginHorizontal: 0, 
+                marginVertical: 0, 
+                backgroundColor: "transparent"
+            }}>
                 <MoreIcon fill={color} width={20} height={20} />
             </ButtonStandart>
         )
