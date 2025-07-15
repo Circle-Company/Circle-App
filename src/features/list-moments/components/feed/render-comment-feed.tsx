@@ -1,17 +1,20 @@
-import { Animated, Pressable, Text, TextStyle, ViewStyle } from "react-native"
+import { Animated, Text, TextStyle, ViewStyle, useColorScheme } from "react-native"
+import ColorTheme, { colors } from "@/layout/constants/colors"
 
 import AddIcon from "@/assets/icons/svgs/plus_circle-outline.svg"
 import BottomSheetContext from "@/contexts/bottomSheet"
 import ButtonStandart from "@/components/buttons/button-standart"
-import ColorTheme from "@/layout/constants/colors"
 import { CommentObject } from "@/components/comment/comments-types"
 import { Comments } from "@/components/comment"
 import FeedContext from "@/contexts/Feed"
+import FetchedCommentsList from "@/components/comment/components/fetched-comments-list"
 import LanguageContext from "@/contexts/Preferences/language"
 import { MomentProps } from "@/contexts/Feed/types"
+import PreviewCommentsList from "@/components/comment/components/comments-list_comments"
 import React from "react"
 import ViewMorebutton from "@/components/buttons/view_more"
 import fonts from "@/layout/constants/fonts"
+import sizes from "@/layout/constants/sizes"
 
 type renderCommentFeedProps = {
     moment: MomentProps
@@ -24,15 +27,26 @@ export default function RenderCommentFeed({ moment, focused }: renderCommentFeed
         React.useContext(FeedContext)
     const [animatedOpacityValue] = React.useState(new Animated.Value(1))
     const [animatedHeaderOpacityValue] = React.useState(new Animated.Value(1))
-    const { expand, collapse} = React.useContext(BottomSheetContext)
+    const { expand, collapse } = React.useContext(BottomSheetContext)
+    const isDarkMode = useColorScheme() === "dark"
 
     function handlePressViewMore() {
         expand({
             enablePanDownToClose: true,
             enableHandlePanningGesture: true,
             enableContentPanningGesture: true,
-            children: <Pressable onPress={collapse}><Text>teste</Text></Pressable>,
+            children: <FetchedCommentsList totalCommentsNum={moment.comments_count} momentId={moment.id} />,
             snapPoints: ["70%","99%"],
+            customStyles: { 
+                modal: {
+                    width: sizes.screens.width,
+                    marginHorizontal: 0,
+                    paddingHorizontal: 0
+                },
+                modalBackground: {
+                    backgroundColor: isDarkMode ? colors.gray.black: colors.gray.white
+                }
+            }
         })
     }
 
@@ -143,7 +157,7 @@ export default function RenderCommentFeed({ moment, focused }: renderCommentFeed
                 </Animated.View>
                 <Animated.View style={animated_center_container}>
                     <Comments.CenterRoot>
-                        <Comments.ListComments />
+                        <PreviewCommentsList comment={commentsData} />
                     </Comments.CenterRoot>
 
                     <ButtonStandart style={{alignSelf: "center", marginVertical: 0, paddingVertical: 0, paddingHorizontal: 0}} action={handlePressViewMore} margins={false} backgroundColor="transparent">
@@ -153,12 +167,8 @@ export default function RenderCommentFeed({ moment, focused }: renderCommentFeed
                             </Text>
                         )}    
                     </ButtonStandart>
-
-
                 </Animated.View>
-
-
             </Comments.Container>
-        </Comments.MainRoot>
+        </Comments.MainRoot>  
     )
 } 
