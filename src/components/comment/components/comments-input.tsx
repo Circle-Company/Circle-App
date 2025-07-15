@@ -18,7 +18,7 @@ export default function Input({
     preview = false,
     placeholder,
     color = String(ColorTheme().text),
-    backgroundColor = String(ColorTheme().blur_button_color),
+    backgroundColor = String(ColorTheme().backgroundDisabled + 50),
     autoFocus = false,
 }: CommentsInputProps) {
     const { t } = React.useContext(LanguageContext)
