@@ -1,14 +1,24 @@
 import { Animated, RefreshControl, useColorScheme } from "react-native"
-import React, { useCallback, useEffect, useRef, useState } from "react"
+import React, { useCallback, useRef, useState } from "react"
 
 import { EmptyList } from "./components/render-empty_list"
 import FastImage from "react-native-fast-image"
 import FeedContext from "../../contexts/Feed"
 import { FlatList } from "react-native-gesture-handler"
 import { Loading } from "../../components/loading"
+import { MomentDataProps } from "@/components/moment/context/types"
 import RenderMomentFeed from "./components/feed/render-moment-feed"
 import { colors } from "../../layout/constants/colors"
 import sizes from "../../layout/constants/sizes"
+import { videoCacher } from "@/contexts/Feed/functions/video-cacher"
+
+type ViewToken = {
+    item: any
+    key: string
+    index: number | null
+    isViewable: boolean
+    section?: any
+  }
 
 const ListMoments = () => {
     const margin = 2
@@ -53,12 +63,22 @@ const ListMoments = () => {
         waitForInteraction: false,
     }
 
-    const prefetchNextImage = (index: number) => {
-        const nextItem = feedData[index]
-        if (nextItem && nextItem?.midia?.fullhd_resolution) {
-            FastImage.preload([{ uri: nextItem?.midia?.fullhd_resolution.toString() }])
+    const onViewableItemsChanged = React.useRef(
+        ({ viewableItems }: { viewableItems: ViewToken[] }) => {
+            viewableItems.forEach((token) => {
+                const item = token.item as MomentDataProps
+                const url = item.midia.fullhd_resolution || item.midia.nhd_resolution
+      
+                if (url) {
+                    FastImage.preload([{ uri: url }])
+                    videoCacher.preload({
+                        id: Number(item.id),
+                        url,
+                    })
+                }
+            })
         }
-    }
+    )
 
     const handleRefresh = async () => {
         if (flatListRef.current) flatListRef.current.scrollToOffset({ animated: false, offset: 0 })
@@ -68,12 +88,6 @@ const ListMoments = () => {
             }, 200)
         })
     }
-
-    useEffect(() => {
-        if (centerIndex !== null) {
-            prefetchNextImage(centerIndex + 1)
-        }
-    }, [centerIndex])
 
     if (loading)
         return (
@@ -95,6 +109,7 @@ const ListMoments = () => {
                 viewabilityConfig={viewabilityConfig}
                 scrollEventThrottle={16}
                 snapToInterval={sizes.moment.standart.width + margin}
+                onViewableItemsChanged={onViewableItemsChanged.current}
                 decelerationRate="fast"
                 maxToRenderPerBatch={3}
                 keyExtractor={(moment: any) => moment.id.toString()}
@@ -104,6 +119,7 @@ const ListMoments = () => {
                 onEndReached={async () => {
                     await reloadFeed()
                 }}
+                
                 onEndReachedThreshold={0}
                 refreshControl={
                     <RefreshControl
