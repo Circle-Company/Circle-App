@@ -1,9 +1,9 @@
-import ColorTheme, { colors } from "../../layout/constants/colors"
 import { Text, TextStyle, View, ViewStyle } from "react-native"
+import ColorTheme, { colors } from "../../layout/constants/colors"
 
+import sizes from "@/layout/constants/sizes"
 import React from "react"
 import fonts from "../../layout/constants/fonts"
-import sizes from "@/layout/constants/sizes"
 
 type BadgeIconProps = {
     active?: boolean
