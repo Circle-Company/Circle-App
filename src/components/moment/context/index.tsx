@@ -1,9 +1,9 @@
 import { MomentContextsData, MomentProviderProps } from "./types"
 import React, { useEffect, useMemo } from "react"
 
-import FeedContext from "../../../contexts/Feed"
-import PersistedContext from "../../../contexts/Persisted"
-import sizes from "../../../layout/constants/sizes"
+import FeedContext from "@/contexts/Feed"
+import PersistedContext from "@/contexts/Persisted"
+import sizes from "@/layout/constants/sizes"
 import { useMomentData } from "./momentData"
 import { useMomentOptions } from "./momentOptions"
 import { useMomentUserActions } from "./momentUserActions"
@@ -21,7 +21,7 @@ export function MomentProvider({
     const { feedData, setFocusedChunkItemFunc, currentChunkIds } = React.useContext(FeedContext)
     const { session } = React.useContext(PersistedContext)
     const momentDataStore = useMomentData()
-    const momentUserActionsStore = useMomentUserActions()
+    const momentUserActionsStore = useMomentUserActions(momentData.id)
     const momentOptionsStore = useMomentOptions()
     const momentVideoStore = useMomentVideo()
     const isMe = momentData.user?.id ? session.user.id === momentData.user.id : true
@@ -32,18 +32,16 @@ export function MomentProvider({
 
     useEffect(() => {
         momentUserActionsStore.setMomentUserActions({
-            liked: momentData.is_liked,
+            like: false,
             initialLikedState: momentData.is_liked,
-            shared: false,
-            viewed: false,
-            clickIntoMoment: false,
-            watchTime: 0,
-            clickProfile: false,
-            commented: false,
+            share: false,
+            click: false,
+            comment: false,
             likeComment: false,
-            skipped: false,
             showLessOften: false,
-            reported: false,
+            report: false,
+            partialView: false,
+            completeView: false,
         })
         momentOptionsStore.setMomentOptions({
             isFeed: isFeed,
@@ -66,9 +64,8 @@ export function MomentProvider({
             isPaused: !isFocused,
             isMuted: globalMuteAudio
         })
-    }, [isFocused]) // Removido session?.preferences?.content?.muteAudio
+    }, [isFocused])
 
-    // Sincronizar mudanças na preferência global com o estado do vídeo
     useEffect(() => {
         const globalMuteAudio = session?.preferences?.content?.muteAudio || false
         if (momentVideoStore?.setIsMuted) {
