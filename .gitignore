@@ -1,6 +1,3 @@
-gradle.properties
-temp
-
 # OSX
 #
 .DS_Store
@@ -25,14 +22,13 @@ DerivedData
 *.xcuserstate
 ios/.xcode.env.local
 
-
 # Android/IntelliJ
 #
 build/
 .idea
-*.gradle
+.gradle
+.env
 local.properties
-
 *.iml
 *.hprof
 .cxx/
@@ -44,9 +40,6 @@ local.properties
 node_modules/
 npm-debug.log
 yarn-error.log
-google-services.json
-.env
-*.env
 
 # fastlane
 #
@@ -66,11 +59,6 @@ google-services.json
 # Ruby / CocoaPods
 /ios/Pods/
 /vendor/bundle/
-
-# local builds
-*.apk
-*.aab
-*.ipa
 
 # Temporary files created by Metro to check the health of the file watcher
 .metro-health-check*
