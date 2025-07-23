@@ -1,32 +1,26 @@
-/**
- * Metro configuration for React Native
- * https://github.com/facebook/react-native
- *
- * @format
- */
+const { getDefaultConfig } = require("metro-config");
 
-const { getDefaultConfig, mergeConfig } = require('@react-native/metro-config');
-
-const defaultConfig = getDefaultConfig(__dirname);
-
-const {
+module.exports = (async () => {
+  const {
     resolver: { sourceExts, assetExts },
-} = getDefaultConfig(__dirname);
+  } = await getDefaultConfig();
 
-const config = {
+  return {
     transformer: {
-        getTransformOptions: async () => ({
+      getTransformOptions: async () => ({
         transform: {
-            experimentalImportSupport: false,
-            inlineRequires: true,
+          experimentalImportSupport: false,
+          inlineRequires: true,
         },
-        }),
-        babelTransformerPath: require.resolve('react-native-svg-transformer'),
+      }),
+      babelTransformerPath: require.resolve("react-native-svg-transformer"),
     },
     resolver: {
-        assetExts: assetExts.filter(ext => ext !== 'svg'),
-        sourceExts: [...sourceExts, 'svg'],
+      assetExts: assetExts.filter(ext => ext !== "svg"),
+      sourceExts: [...sourceExts, "svg", "ts", "tsx", "cjs"],
+      extraNodeModules: {
+        'missing-asset-registry-path': require.resolve('react-native/Libraries/Image/AssetRegistry'),
+      },
     },
-};
-
-module.exports = mergeConfig(defaultConfig, config);
+  };
+})();
