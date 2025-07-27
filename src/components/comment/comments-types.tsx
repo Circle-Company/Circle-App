@@ -48,7 +48,7 @@ export type CommentsInputProps = {
     backgroundColor?: string
     color?: string
     preview?: boolean
-    autoFocus?: boolean
+    autoFocus: boolean
 }
 export type CommentsListCommentsProps = {
     preview: boolean
