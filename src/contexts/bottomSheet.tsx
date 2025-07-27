@@ -1,6 +1,5 @@
 import BottomSheet, { BottomSheetBackdropProps, BottomSheetModalProvider, BottomSheetProps } from "@gorhom/bottom-sheet"
 import React, { useCallback, useEffect, useMemo, useRef, useState } from "react"
-import { StatusBar, StyleSheet, View, ViewStyle, useColorScheme } from "react-native"
 
 import { FlexAlignType } from "react-native"
 import { CustomBackdrop } from "../components/general/bottomSheet/backdrop"
