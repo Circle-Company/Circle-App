@@ -1,7 +1,7 @@
 import { MomentUserActionsProps } from "./types"
 import PersistedContext from "@/contexts/Persisted"
 import React from "react"
-import { apiRoutes } from "@/services/Api"
+import { apiRoutes } from "../../../services/Api"
 
 export type InteractionType = "LIKE" | "CLICK" | "UNLIKE" | "PARTIAL_VIEW" | "COMPLETE_VIEW" | "HIDE" | "UNHIDE" | "SHARE" | "COMMENT" | "REPORT" | "SHOW_LESS_OFTEN" | "LIKE_COMMENT"
 
