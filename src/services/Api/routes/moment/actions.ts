@@ -1,6 +1,6 @@
 import { MomentActionProps, MomentActionPropsWithReportType } from "./types"
 
-import api from "@/services/Api"
+import api from "../../index"
 
 export async function like({ momentId, authorizationToken }: MomentActionProps): Promise<void> {
     await api.post(
