@@ -5,8 +5,6 @@ import React, { useRef, useState } from "react"
 import { Platform, StatusBar, StyleSheet, Text, TouchableOpacity, View, useColorScheme } from "react-native"
 import Video, { OnLoadData } from "react-native-video"
 
-import MultiSlider from "@ptomasroos/react-native-multi-slider"
-
 export default function VideoTrimmerScreen() {
     const navigation = useNavigation()
     const { videoUri } = useRoute().params as { videoUri: string }
@@ -72,20 +70,6 @@ export default function VideoTrimmerScreen() {
                 <Text style={styles.instructionText}>
                     Selecione o início do vídeo (duração: {maxDuration}s)
                 </Text>
-                
-                {duration > 0 && (
-                    <MultiSlider
-                        values={[startTime]}
-                        min={0}
-                        max={maxStartTime}
-                        step={0.1}
-                        sliderLength={280}
-                        onValuesChange={handleSliderChange}
-                        selectedStyle={{backgroundColor: colors.blue.blue_05}}
-                        markerStyle={styles.sliderMarker}
-                        containerStyle={styles.sliderContainer}
-                    />
-                )}
                 
                 <View style={styles.durationInfo}>
                     <Text style={styles.durationText}>Início: {startTime.toFixed(1)}s</Text>
