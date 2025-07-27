@@ -1,5 +1,4 @@
 import { Text, View, useColorScheme } from "react-native"
-
 import AddIcon from "@/assets/icons/svgs/camera.svg"
 import ButtonStandart from "@/components/buttons/button-standart"
 import LanguageContext from "@/contexts/Preferences/language"
