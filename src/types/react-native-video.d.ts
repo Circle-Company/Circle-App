@@ -1,6 +1,7 @@
+import { Component } from "react"
+import { StyleProp, ViewStyle } from "react-native"
 declare module "react-native-video" {
-  import { Component } from "react"
-    import { StyleProp, ViewStyle } from "react-native"
+
 
   export interface OnLoadData {
     currentTime: number;
