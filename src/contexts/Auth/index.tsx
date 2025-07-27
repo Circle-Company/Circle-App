@@ -1,5 +1,5 @@
 import { SessionDataType } from "@/contexts/Persisted/types"
-import api from "@/services/Api"
+import api from "../../services/Api"
 import { storage, storageKeys } from "@/store"
 import React, { useState } from "react"
 import { RedirectContext } from "../redirect"

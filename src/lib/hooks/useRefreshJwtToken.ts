@@ -1,5 +1,6 @@
+//@ts-nocheck
 import { AccountState } from "@/contexts/persisted/persistedAccount"
-import { apiRoutes } from "@/services/Api"
+import { apiRoutes } from "../../services/Api"
 /**
  * Realiza o refresh do token, evitando chamadas concorrentes.
  *

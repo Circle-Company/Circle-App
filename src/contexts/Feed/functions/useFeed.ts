@@ -5,7 +5,7 @@ import { ChunksManager } from "./chunks-mananger"
 import { MomentDataProps } from "@/components/moment/context/types"
 import PersistedContext from "@/contexts/Persisted"
 import api from "../../../services/Api"
-import { feedMock } from "@/mocks/feedMock"
+import { feedMock } from "../../../mocks/feedMock"
 import { useTimer } from "../../../lib/hooks/useTimer"
 import { videoCacher } from "./video-cacher"
 

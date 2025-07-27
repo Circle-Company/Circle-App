@@ -11,7 +11,7 @@ import LanguageContext from "@/contexts/Preferences/language"
 import fonts from "@/layout/constants/fonts"
 import sizes from "@/layout/constants/sizes"
 import { Vibrate } from "@/lib/hooks/useHapticFeedback"
-import api from "@/services/Api"
+import api from "../../../../services/Api"
 import React from "react"
 import { notify } from "react-native-notificated"
 
