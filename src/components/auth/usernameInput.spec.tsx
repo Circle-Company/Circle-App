@@ -41,7 +41,7 @@ describe("UsernameInput Component", () => {
         const { getByTestId, queryByTestId } = render(
             <MockAuthProvider>
                 <UsernameInput type="signUp" />
-            </MockAuthProvider>
+            </MockAuthProvider>,
         )
 
         await act(async () => {
@@ -64,7 +64,7 @@ describe("UsernameInput Component", () => {
         const { getByTestId } = render(
             <MockAuthProvider>
                 <UsernameInput type="signUp" />
-            </MockAuthProvider>
+            </MockAuthProvider>,
         )
 
         await act(async () => {

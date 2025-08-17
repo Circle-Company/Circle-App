@@ -39,7 +39,7 @@ describe("PasswordInput Component", () => {
         const { getByTestId, queryByTestId } = render(
             <MockAuthProvider>
                 <PasswordInput type="signUp" />
-            </MockAuthProvider>
+            </MockAuthProvider>,
         )
 
         await act(async () => {

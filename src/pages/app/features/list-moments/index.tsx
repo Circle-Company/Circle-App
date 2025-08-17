@@ -1,0 +1,174 @@
+import React, { useCallback, useRef, useState } from "react"
+import { Animated, RefreshControl, useColorScheme } from "react-native"
+
+import FastImage from "react-native-fast-image"
+import { FlatList } from "react-native-gesture-handler"
+import { Loading } from "../../../../components/loading"
+import { MomentDataProps } from "../../../../components/moment/context/types"
+import { colors } from "../../../../constants/colors"
+import sizes from "../../../../constants/sizes"
+import FeedContext from "../../../../contexts/Feed"
+import { videoCacher } from "../../../../contexts/Feed/functions/video-cacher"
+import RenderMomentFeed from "./components/feed/render-moment-feed"
+import { EmptyList } from "./components/render-empty_list"
+
+type ViewToken = {
+    item: any
+    key: string
+    index: number | null
+    isViewable: boolean
+    section?: any
+}
+
+const ListMoments = () => {
+    const margin = 2
+
+    const {
+        scrollEnabled: enableScrollFeed,
+        feedData,
+        reloadFeed,
+        loading: loadingFeed,
+    } = React.useContext(FeedContext)
+    const [centerIndex, setCenterIndex] = useState<number | null>(0)
+    const [loading, setLoading] = React.useState(false)
+    const [refreshing, setRefreshing] = React.useState(false)
+    const isDarkMode = useColorScheme() === "dark"
+    const flatListRef = useRef<FlatList | null>(null)
+
+    const handleScroll = useCallback(
+        (event: any) => {
+            const contentOffsetX = event.nativeEvent.contentOffset.x + 140
+            const centerIndex = Math.floor(
+                (contentOffsetX + sizes.screens.width / 2) / (sizes.moment.standart.width + margin),
+            )
+            setCenterIndex(centerIndex >= 0 ? centerIndex : 0)
+        },
+        [setCenterIndex],
+    )
+
+    const container_0 = {
+        marginLeft: (sizes.screens.width - sizes.moment.standart.width) / 2 - margin,
+        marginRight: margin,
+    }
+    const container = {
+        marginRight: margin,
+    }
+    const container_1 = {
+        marginRight: margin + (sizes.screens.width - sizes.moment.standart.width) / 2,
+    }
+
+    const viewabilityConfig = {
+        minimumViewTime: 3000,
+        viewAreaCoveragePercentThreshold: 10,
+        waitForInteraction: false,
+    }
+
+    const onViewableItemsChanged = React.useRef(
+        ({ viewableItems }: { viewableItems: ViewToken[] }) => {
+            viewableItems.forEach((token) => {
+                const item = token.item as MomentDataProps
+                const url = item.midia.fullhd_resolution || item.midia.nhd_resolution
+
+                if (url) {
+                    FastImage.preload([{ uri: url }])
+                    videoCacher.preload({
+                        id: Number(item.id),
+                        url,
+                    })
+                }
+            })
+        },
+    )
+
+    const handleRefresh = async () => {
+        if (flatListRef.current) flatListRef.current.scrollToOffset({ animated: false, offset: 0 })
+        await reloadFeed().finally(() => {
+            setTimeout(() => {
+                setRefreshing(false)
+            }, 200)
+        })
+    }
+
+    if (loading)
+        return (
+            <Loading.Container
+                width={sizes.screens.width}
+                height={sizes.screens.height - sizes.headers.height}
+            >
+                <Loading.ActivityIndicator />
+            </Loading.Container>
+        )
+
+    if (feedData.length > 0)
+        return (
+            <FlatList
+                data={feedData}
+                horizontal
+                scrollEnabled={enableScrollFeed}
+                showsHorizontalScrollIndicator={false}
+                viewabilityConfig={viewabilityConfig}
+                scrollEventThrottle={16}
+                snapToInterval={sizes.moment.standart.width + margin}
+                onViewableItemsChanged={onViewableItemsChanged.current}
+                decelerationRate="fast"
+                maxToRenderPerBatch={3}
+                keyExtractor={(moment: any) => moment.id.toString()}
+                disableIntervalMomentum={true}
+                onScroll={handleScroll}
+                directionalLockEnabled={true}
+                onEndReached={async () => {
+                    await reloadFeed()
+                }}
+                onEndReachedThreshold={0}
+                refreshControl={
+                    <RefreshControl
+                        progressBackgroundColor={String(
+                            isDarkMode ? colors.gray.grey_08 : colors.gray.grey_02,
+                        )}
+                        colors={[
+                            String(isDarkMode ? colors.gray.grey_04 : colors.gray.grey_04),
+                            "#00000000",
+                        ]}
+                        refreshing={refreshing}
+                        onRefresh={async () => await handleRefresh()}
+                    />
+                }
+                ref={(ref) => {
+                    flatListRef.current = ref
+                }}
+                renderItem={({ item, index }) => {
+                    const focusedItem = index === centerIndex
+                    const container_style =
+                        index === 0
+                            ? container_0
+                            : index + 1 === feedData.length
+                            ? container_1
+                            : container
+
+                    return (
+                        <Animated.View style={container_style} key={item.unique_id}>
+                            <RenderMomentFeed
+                                isFeed={true}
+                                momentData={item}
+                                isFocused={focusedItem}
+                            />
+                        </Animated.View>
+                    )
+                }}
+                ListFooterComponent={() => {
+                    if (loadingFeed)
+                        return (
+                            <Loading.Container
+                                height={sizes.moment.standart.height}
+                                width={sizes.moment.standart.width / 3.5}
+                            >
+                                <Loading.ActivityIndicator size={40} />
+                            </Loading.Container>
+                        )
+                }}
+            />
+        )
+    else return <EmptyList />
+}
+
+export default ListMoments
