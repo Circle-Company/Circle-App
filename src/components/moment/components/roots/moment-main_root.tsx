@@ -1,18 +1,21 @@
-import React from "react"
-import { View } from "react-native"
 import { MomentMainRootProps } from "../../moment-types"
-import MomentContext from "../../moment-context"
+import { MomentProvider } from "../../context"
 
-export default function main_root ({children, data, sizes}: MomentMainRootProps) {
-
-    const container: any = {
-    }
+export default function main_root({
+    children,
+    isFeed,
+    isFocused,
+    momentData,
+    momentSize,
+}: MomentMainRootProps) {
     return (
-        <MomentContext.Provider value={{moment: data, momentSizes: sizes}}>
-            <View style={container}>
-                {children}
-            </View>            
-        </MomentContext.Provider>
-
+        <MomentProvider
+            isFeed={isFeed}
+            isFocused={isFocused}
+            momentData={momentData}
+            momentSize={momentSize}
+        >
+            {children}
+        </MomentProvider>
     )
 }

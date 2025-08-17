@@ -1,80 +1,139 @@
-import React from 'react';
-import { SafeAreaView, StatusBar, StyleSheet, useColorScheme,TouchableOpacity, Image, Dimensions, View} from 'react-native'
-import ColorTheme from '../../../layout/constants/colors'
-import Sizes from '../../../layout/constants/sizes'
-import Fonts from '../../../layout/constants/fonts'
-import { Text } from '../../../components/Themed'
-import ButtonLarge from '../../../components/buttons/large' 
-import ButtonStandart from '../../../components/buttons/standart'
+import { Image, StatusBar, View } from "react-native"
+import ColorTheme, { colors } from "../../../layout/constants/colors"
+import { default as Fonts, default as fonts } from "../../../layout/constants/fonts"
+
+import { useNavigation } from "@react-navigation/native"
+import React from "react"
+import LinearGradient from "react-native-linear-gradient"
+import Icon from "../../../assets/icons/svgs/arrow_circle_right.svg"
+import Button from "../../../components/buttons/button-standart"
+import { Text } from "../../../components/Themed"
+import config from "../../../config"
+import sizes from "../../../layout/constants/sizes"
 
 export default function SplashScreen() {
-    const isDarkMode = useColorScheme() === 'dark'
+    const navigation: any = useNavigation()
 
-    const container:any  = {
+    const container: any = {
         flex: 1,
         backgroundColor: ColorTheme().background,
     }
-    const header:any  = {
-        alignitems: 'center',
-        alignSelf: 'center',
-        justifyContent: 'center',
-        position: 'absolute',
-        top: 100,
-        color: ColorTheme().text,
+    const header: any = {
+        alignitems: "center",
+        alignSelf: "center",
+        justifyContent: "center",
+        position: "absolute",
+        top: 70,
+        color: colors.gray.white,
+        zIndex: 2,
     }
-    const center:any  = {
-        alignItems: 'center',
-        position: 'absolute',
-        justifyContent: 'center',
+    const center: any = {
+        alignItems: "center",
+        position: "absolute",
+        justifyContent: "center",
         bottom: 150,
-        left: -30
+        left: -30,
+        zIndex: 2,
     }
-    const title:any  = {
-        alignSelf: 'center',
-        fontFamily: Fonts.family['Black-Italic'],
-        fontSize: 44,
-        color: ColorTheme().text,
-        marginBottom: 44
+    const title: any = {
+        alignSelf: "center",
+        fontFamily: Fonts.family["Black-Italic"],
+        fontSize: 48,
+        color: colors.gray.white,
+        marginBottom: 10,
     }
-    const slogan:any  = {
-        fontFamily: Fonts.family['Black-Italic'],
-        alignSelf: 'center',
-        width: 230,
-        textAlign: 'center',
-        fontSize: 18,
-        color: ColorTheme().text
+    const slogan: any = {
+        fontFamily: Fonts.family["Semibold-Italic"],
+        alignSelf: "center",
+        textAlign: "center",
+        fontSize: fonts.size.subheadline,
+        color: colors.gray.white,
     }
-    const buttons:any = {
-        alignItems: 'center',
-        position: 'absolute',
-        justifyContent: 'center',
-        bottom: 0
+    const buttons: any = {
+        alignItems: "center",
+        position: "absolute",
+        justifyContent: "center",
+        bottom: 0,
+        zIndex: 2,
+    }
+
+    const primaryActionContainer: any = {
+        width: sizes.screens.width,
+        height: sizes.headers.height,
+        marginTop: sizes.margins["1lg"],
+        marginBottom: sizes.margins["1xl"] * 0.95,
+        alignItems: "center",
+        justifyContent: "center",
+    }
+    const primaryActionText: any = {
+        fontSize: fonts.size.body * 1.2,
+        fontFamily: fonts.family["Bold-Italic"],
+        color: colors.gray.black,
+        marginRight: sizes.margins["2md"],
+    }
+
+    const secundaryActionText: any = {
+        fontSize: fonts.size.body,
+        fontFamily: fonts.family.Semibold,
+        color: colors.gray.white,
+    }
+
+    const inferior_gradient: any = {
+        width: sizes.window.width,
+        height: sizes.window.height / 1.8,
+        position: "absolute",
+        zIndex: 1,
+        bottom: 0,
+    }
+
+    const superior_gradient: any = {
+        width: sizes.window.width,
+        height: sizes.window.height / 2,
+        position: "absolute",
+        zIndex: 1,
+        top: 0,
     }
 
     return (
         <View style={container}>
-            <StatusBar barStyle={isDarkMode?'lght-content': 'dark-content'} translucent={true} backgroundColor={'transparent'}/>
-                <View style={header}>
-                    <Text style={title}>Circle</Text>
-                    <Text style={slogan}>Share momments and create memories</Text>
+            <StatusBar translucent barStyle={"light-content"} backgroundColor={colors.gray.black} />
+            <Image
+                style={{ width: sizes.window.width, height: sizes.window.height, opacity: 0.9 }}
+                resizeMode="cover"
+                source={require("../../../assets/images/bg/bg4.jpg")}
+            />
+            <LinearGradient colors={["#00000000", "#000000"]} style={inferior_gradient} />
+            <LinearGradient colors={["#000000", "#00000000"]} style={superior_gradient} />
+            <View style={header}>
+                <Text style={title}>{config.APPLICATION_SHORT_NAME}</Text>
+                <Text style={slogan}>{config.APPLICATION_DESCRIPTION}</Text>
+            </View>
+            <View style={center} />
+
+            <View style={buttons}>
+                <Button
+                    action={() => {
+                        navigation.navigate("Auth-SignIn")
+                    }}
+                    backgroundColor={"#00000000"}
+                >
+                    <Text style={secundaryActionText}>Already have a account</Text>
+                </Button>
+                <View style={primaryActionContainer}>
+                    <Button
+                        action={() => {
+                            navigation.navigate("Auth-SignUp-Username")
+                        }}
+                        backgroundColor={colors.gray.white.toString()}
+                        bounciness={10}
+                        width={300}
+                        height={70}
+                    >
+                        <Text style={primaryActionText}>Create Account</Text>
+                        <Icon width={26} height={26} fill={colors.gray.black.toString()} />
+                    </Button>
                 </View>
-                <View style={center}>
-                    <Image style={{width: 454, height: 430}} resizeMode='contain' source={require('../../../assets/images/bg/bg.png')}/>
-                </View>
-                <View style={buttons}>
-                    <ButtonStandart
-                        title={'I already have a account'}
-                        transparent={true}
-                        navigateTo={'SignInScreen'}
-                    />
-                    
-                    <View style={{marginBottom: 10}}>
-                        <ButtonLarge
-                            title={"Let's Get Started"}
-                            navigateTo={'Register'}
-                        />
-                    </View>
-                </View>
+            </View>
         </View>
     )
 }

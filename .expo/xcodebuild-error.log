@@ -1,0 +1,10 @@
+--- xcodebuild: WARNING: Using the first of multiple matching destinations:
+{ platform:iOS Simulator, arch:arm64, id:1B60843C-A119-4341-B6C0-E985BFBB7FF6, OS:26.0, name:iPhone 16 Pro Max }
+{ platform:iOS Simulator, arch:x86_64, id:1B60843C-A119-4341-B6C0-E985BFBB7FF6, OS:26.0, name:iPhone 16 Pro Max }
+** BUILD FAILED **
+
+
+The following build commands failed:
+	ScanDependencies /Users/tiagosavioli/Library/Developer/Xcode/DerivedData/CircleAppExpo-dzkrkbuoujztjpdwbbdkryhlzrge/Build/Intermediates.noindex/Pods.build/Debug-iphonesimulator/React-RuntimeHermes.build/Objects-normal/arm64/React-RuntimeHermes-dummy.o /Users/tiagosavioli/Projects/Circle-App-Expo/ios/Pods/Target\ Support\ Files/React-RuntimeHermes/React-RuntimeHermes-dummy.m normal arm64 objective-c com.apple.compilers.llvm.clang.1_0.compiler (in target 'React-RuntimeHermes' from project 'Pods')
+	Building workspace CircleAppExpo with scheme CircleAppExpo and configuration Debug
+(2 failures)

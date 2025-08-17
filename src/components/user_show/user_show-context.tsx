@@ -1,11 +1,17 @@
-import React, { createContext, useContext } from "react"
+import { createContext, useContext } from "react"
 import { userReciveDataProps } from "./user_show-types"
 
-const UserShowContext = createContext<{ user: userReciveDataProps} | null>(null)
+type contextValue = {
+    user: userReciveDataProps
+    executeBeforeClick: () => void
+    follow: () => void
+    unfollow: () => void
+}
+const UserShowContext = createContext<contextValue | null>(null)
 
 export function useUserShowContext() {
     const context = useContext(UserShowContext)
-    if(!context) {
+    if (!context) {
         throw new Error("UserShow.* component must be rendered as child of UserShow component")
     }
     return context

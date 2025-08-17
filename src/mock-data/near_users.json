@@ -1,0 +1,90 @@
+[
+    {
+        "id": "1",
+        "name": "João Silva",
+        "username": "joaosilva",
+        "verifyed": true,
+        "profile_picture": {
+            "tiny_resolution": "https://randomuser.me/api/portraits/thumb/men/1.jpg"
+        },
+        "distance_km": 0.5,
+        "you_follow": false,
+        "follow_you": true
+    },
+    {
+        "id": "2",
+        "name": "Maria Santos",
+        "username": "mariasantos",
+        "verifyed": false,
+        "profile_picture": {
+            "tiny_resolution": "https://randomuser.me/api/portraits/thumb/women/2.jpg"
+        },
+        "distance_km": 1.2,
+        "you_follow": true,
+        "follow_you": false
+    },
+    {
+        "id": "3",
+        "name": "Pedro Oliveira",
+        "username": "pedrooliveira",
+        "verifyed": true,
+        "profile_picture": {
+            "tiny_resolution": "https://randomuser.me/api/portraits/thumb/men/3.jpg"
+        },
+        "distance_km": 2.8,
+        "you_follow": false,
+        "follow_you": false
+    },
+    {
+        "id": "4",
+        "name": "Ana Costa",
+        "username": "anacosta",
+        "verifyed": false,
+        "profile_picture": {
+            "tiny_resolution": "https://randomuser.me/api/portraits/thumb/women/4.jpg"
+        },
+        "distance_km": 3.5,
+        "you_follow": true,
+        "follow_you": true
+    },
+    {
+        "id": 5,
+        "name": "Carlos Sousa",
+        "username": "carlossousa",
+        "verifyed": true,
+        "profile_picture": {
+            "tiny_resolution": "https://randomuser.me/api/portraits/thumb/men/5.jpg"
+        },
+        "distance_km": 4.2,
+        "you_follow": false,
+        "follow_you": false,
+        "statistic": {
+            "total_followers_num": 452,
+            "total_following_num": 278
+        }
+    },
+    {
+        "id": "6",
+        "name": "Fernanda Lima",
+        "username": "fernandalima",
+        "verifyed": false,
+        "profile_picture": {
+            "tiny_resolution": "https://randomuser.me/api/portraits/thumb/women/6.jpg"
+        },
+        "distance_km": 5.1,
+        "you_follow": true,
+        "follow_you": false
+    },
+    {
+        "id": "7",
+        "name": "Roberto Alves",
+        "username": "robertoalves",
+        "verifyed": true,
+        "profile_picture": {
+            "tiny_resolution": "https://randomuser.me/api/portraits/thumb/men/7.jpg"
+        },
+        "distance_km": 6.7,
+        "you_follow": false,
+        "follow_you": true
+    }
+]

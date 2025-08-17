@@ -1,67 +1,55 @@
-import React from "react"
-import { View, Text, Pressable } from "react-native"
+import { Animated, Text, View } from "react-native"
+import ColorTheme, { colors } from "../../../layout/constants/colors"
+import React, { useEffect, useRef } from "react"
 
+import MomentContext from "../context"
+import { MomentDescriptionProps } from "../moment-types"
 import Sizes from "../../../layout/constants/sizes"
 import fonts from "../../../layout/constants/fonts"
-import ColorTheme, { colors } from "../../../layout/constants/colors"
-import { MomentUsernameProps } from "../moment-types"
-import { useMomentContext } from "../moment-context"
-import { truncated } from "../../../algorithms/processText"
 
-export default function description ({
-}: MomentUsernameProps) {
-    const { moment } = useMomentContext()
+export default function description({ displayOnMoment = true }: MomentDescriptionProps) {
+    const { momentData } = React.useContext(MomentContext)
 
-    const [viewMore, setViewMore] = React.useState(false)
-    const [description, setDescription] = React.useState(moment.description)
-
-    const truncatedDescription = truncated({text:String(moment.description), size: 50})
-
-    React.useEffect(() => {
-        setDescription(truncatedDescription)
-    }, [])
-
-    function useViewMore() {
-        if(viewMore) {
-            setViewMore(false)
-            setDescription(truncatedDescription) 
-        }else {
-            setViewMore(true)
-            setDescription(moment.description)            
-        }
-    }
-
-    const container:any = {
+    const container: any = {
         margin: Sizes.margins["1sm"],
     }
-    const description_style:any = {
+
+    const descriptionStyle: any = {
+        marginLeft: Sizes.margins["2sm"],
+        lineHeight: 18,
         fontSize: fonts.size.body,
         fontFamily: fonts.family.Semibold,
-        color: colors.gray.white,
-        textShadowColor: '#00000070',
-        textShadowOffset: { width: 0.3, height: 0.7 },
-        textShadowRadius: 4,
-        flexDirection: 'row',
-        justifyContent: 'space-between'
+        color: displayOnMoment ? colors.gray.white : ColorTheme().text,
+        textShadowColor: displayOnMoment ? "#00000070" : "#00000000",
+        textShadowOffset: displayOnMoment ? { width: 0.3, height: 0.7 } : { width: 0, height: 0 },
+        textShadowRadius: displayOnMoment ? 4 : 0,
+        justifyContent: "flex-start", // Ajuste para que o texto comece do início
     }
+    const animationTime = momentData.description?.length * 700
+    const animationToValue = -(momentData.description?.length * 8)
+    const needAnimation = momentData.description?.length > 50 ? true : false
+    const textAnim = useRef(new Animated.Value(0)).current
 
-    const viewMore_style: any = {
-        fontSize: fonts.size.body,
-        fontFamily: fonts.family.Semibold,
-        color: colors.transparent.white_80,
-    }
+    useEffect(() => {
+        if (needAnimation && displayOnMoment) {
+            const animateText = () => {
+                Animated.timing(textAnim, {
+                    toValue: animationToValue, // Deslocamento horizontal desejado
+                    duration: animationTime, // Duração da animação em milissegundos
+                    useNativeDriver: true,
+                }).start(() => {
+                    // Após a animação, reinicie o valor de textAnim para continuar a animação
+                    textAnim.setValue(0)
+                    animateText() // Chamar a função recursivamente para criar um loop infinito
+                })
+            }
+            animateText()
+        }
+    }, [])
 
-
-    
     return (
         <View style={container}>
-            <Text style={description_style}>{description}
-                {moment.description?.length <= 50? null:
-                    <Pressable onPress={() => useViewMore()}>
-                        <Text style={viewMore_style}>{viewMore? 'Less': 'More'}</Text>
-                    </Pressable>              
-                }
-            </Text>  
+            <Text style={descriptionStyle}>{momentData.description}</Text>
         </View>
     )
 }

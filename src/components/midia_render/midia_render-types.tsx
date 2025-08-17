@@ -1,13 +1,10 @@
-import { momentSizes } from "../moment/moment-types"
+import { MomentMidiaProps, MomentSizeProps } from "../moment/context/types"
 
-export type MidiaReciveDataProps = {
-    fullhd_resolution: String,
-    nhd_resolution: String,
-}
+export type MidiaReciveDataProps = MomentMidiaProps
 
 export type MidiaRenderMainRootProps = {
-    data: any,
-    content_sizes: momentSizes,
+    data: any
+    content_sizes: MomentSizeProps
     children: React.ReactNode
 }
 export type MidiaRenderCenterRootProps = {
@@ -18,6 +15,6 @@ export type MidiaRenderBottomRootProps = {
 }
 
 export type MidiaRenderProgressBarProps = {
-    videoRef: React.ReactNode,
+    videoRef: React.ReactNode
     progress: number
 }

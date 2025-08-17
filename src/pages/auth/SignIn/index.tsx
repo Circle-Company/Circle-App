@@ -1,311 +1,164 @@
-import React, {useState, useEffect} from 'react';
-import { SafeAreaView, StatusBar, StyleSheet, useColorScheme, ScrollView, TouchableOpacity, Dimensions, Image, Pressable, TextInput} from 'react-native'
-import ColorTheme from '../../../layout/constants/colors'
-import { Text, View } from '../../../components/Themed'
-import {useNavigation} from '@react-navigation/native'
-import * as authActions from '../../../store/actions/auth'
-import { useDispatch } from 'react-redux'
+import { Text, View } from "@/components/Themed"
+import ColorTheme, { colors } from "@/layout/constants/colors"
+import { StatusBar, StyleProp, TextStyle, ViewStyle, useColorScheme } from "react-native"
 
-import ButtonClose from '../../../components/buttons/close'
-import AuthTitle from '../../../components/auth/title'
-import AuthSocialLogin from '../../../components/auth/social'
-import Loading from '../../../components/loading'
-import AuthTermsText from '../../../components/auth/terms'
-
-const WindowWidth = Dimensions.get('screen').width
-const WindowHeight = Dimensions.get('screen').height
+import Icon from "@/assets/icons/svgs/arrow_circle_right.svg"
+import PasswordInput from "@/components/auth/passwordInput"
+import AuthTermsText from "@/components/auth/terms"
+import UsernameInput from "@/components/auth/usernameInput"
+import ButtonStandart from "@/components/buttons/button-standart"
+import ButtonClose from "@/components/buttons/close"
+import { Loading } from "@/components/loading"
+import AuthContext from "@/contexts/Auth"
+import fonts from "@/layout/constants/fonts"
+import sizes from "@/layout/constants/sizes"
+import React from "react"
 
 export default function SignInScreen() {
-  const isDarkMode = useColorScheme() === 'dark'
-  const navigation = useNavigation()
-  //const dispatch = useDispatch()
+    const isDarkMode = useColorScheme() === "dark"
+    const {
+        signIn,
+        setErrorMessage,
+        signInputUsername,
+        signInputPassword,
+        loading,
+        errorMessage,
+        setSignInputPassword,
+        setSignInputUsername,
+    } = React.useContext(AuthContext)
 
-  const [ error, setError ] = useState(false)
-  const [ userError, setUserError ] = useState(false)
-  const [ passError, setPassError ] = useState(false)
-  const [ viewPass, setViewPass ] = useState(false)
-  const [ username, setUsername ] = useState('')
-  const [ password, setPassword ] = useState('')
-  const [ userShowMessage, setUserShowMessage ] = useState('Invalid Username')
-  const [ passShowMessage, setPassShowMessage ] = useState('Incorrect Password')
-  const [ isLoading, setIsLoading ] = useState(false)
+    React.useEffect(() => {
+        setSignInputPassword("")
+        setSignInputUsername("")
+    }, [])
 
-  const container = {
-    width: WindowWidth - 60,
-    alignItems: 'center',
-  }
-  const inputContainer = {
-    width: WindowWidth - 60,
-    alignItems: 'center',
-    flexDirection: 'row',
-  }
-  const icon = {
-    width: 24,
-    height: 24,
-    tintColor: ColorTheme().icon,
-    marginRight: 16
-  }
-  const icon2 = {
-    width: 18,
-    height: 18,
-    tintColor: ColorTheme().placeholder,
-    padding: 10,
-    marginLeft: 16,
-    marginRight: 8
-  }
-  const input = {
-    flex: 1,
-    fontFamily: 'RedHatDisplay-Regular',
-    color: ColorTheme().text,
-    borderBottomWidth: 0.5,
-    borderColor:ColorTheme().backgroundDisabled,        
-  }
-  const inputError = {
-    flex: 1,
-    fontFamily: 'RedHatDisplay-Regular',
-    color: ColorTheme().text,
-    borderBottomWidth: 0.7,
-    borderColor: ColorTheme().error,        
-  }
-  const subTitle = {
-    marginTop: 8,
-    fontSize: 11,
-    fontFamily: error? 'RedHatDisplay-Medium': 'RedHatDisplay-Regular',
-    color: ColorTheme().textDisabled,
-  }
-  const subTitleError = {
-    marginTop: 8,
-    flex: 1,
-    fontSize: 11,
-    fontFamily: 'RedHatDisplay-Regular',
-    color: ColorTheme().error,
-  }
-  const buttonContainerEnable = {
-    width: 160,
-    height: 56,
-    alignSelf: 'center',
-    alignItems: 'center',
-    justifyContent: 'center',
-    borderRadius: 50,
-    backgroundColor: ColorTheme().primary,
-    top: WindowHeight - 560
-  }  
-  const buttonTextEnable = {
-    fontSize: 16,
-    fontFamily: 'RedHatDisplay-Bold',
-    color: ColorTheme().background,
-  }
+    const container: StyleProp<ViewStyle> = {
+        flex: 1,
+        alignItems: "center",
+    }
 
-  async function ViewPassword() {
-    if(viewPass == true){
-        setViewPass(false)
-    }else{
-        setViewPass(true)
+    const headerContainer: StyleProp<ViewStyle> = {
+        width: sizes.screens.width,
+        height: sizes.headers.height,
+        flexDirection: "row",
+        paddingHorizontal: sizes.paddings["1md"],
+        justifyContent: "flex-start",
+        alignItems: "center",
+        marginBottom: sizes.margins["1xl"] * 0.8,
     }
-  }
-  async function FormValidation() {
-    const passwordRegex = new RegExp("^(((?=.*[a-z])(?=.*[A-Z]))|((?=.*[a-z])(?=.*[0-9]))|((?=.*[A-Z])(?=.*[0-9])))(?=.{6,})")
-    const usernameRegex = new RegExp(/^[a-z0-9_\.]+$/)
-    if(username.length < 4){
-      setUserShowMessage('Username should be atleast 4 characters long.')
-      setIsLoading(false)
-      setUserError(true)
+    const headerTitle: StyleProp<TextStyle> = {
+        fontSize: fonts.size.title2,
+        fontFamily: fonts.family.Bold,
     }
-    if(!username || username.length === 0){
-      setUserShowMessage('Username should be atleast 4 characters long.')
-      setIsLoading(false)
-      setUserError(true)
-      return false
+    const input_container: StyleProp<ViewStyle> = {
+        alignItems: "center",
+        paddingBottom: sizes.paddings["1xl"] * 0.8,
     }
-    if(!usernameRegex.test(username)){
-      setUserShowMessage('Username should contain a lowercase letter, ". and _" special charcters')
-      setIsLoading(false)
-      setUserError(true)
-      return false
+    const button_text = {
+        fontSize: fonts.size.body * 0.9,
+        fontFamily: fonts.family.Semibold,
+        color:
+            signInputUsername && signInputPassword && !loading
+                ? colors.gray.white
+                : isDarkMode
+                ? colors.gray.grey_04 + "90"
+                : colors.gray.grey_04 + "90",
     }
-    if(!password || password.length === 0){
-      setPassShowMessage('Password should be atleast 6 characters long.')
-      setIsLoading(false)
-      setPassError(true)
-      return false
+    const icon = {
+        marginLeft: sizes.margins["2sm"],
+        top: 0.4,
     }
-    if(password.length < 6){
-      setPassShowMessage('Password should be atleast 6 characters long.')
-      setIsLoading(false)
-      setPassError(true)
-      return false
-    }
-    if(!/\d/.test(password)){
-      setPassShowMessage('Password should contain at least one number.')
-      setIsLoading(false)
-      setPassError(true)
-      return false
-    }
-    if(!/[a-z]/.test(password)){
-      setPassShowMessage('Password should contain at least one lower case and one upper case.')
-      setIsLoading(false)
-      setPassError(true)
-      return false
-    }
-    setPassError(false)
-    setUserError(false)
-    return true
-  }
-  async function SignIn() {
-    if((await FormValidation()).valueOf()){
-      //dispatch(authActions.signin( username, password ))
-      setIsLoading(true)
-    }else{
-      setError(true)
-      setIsLoading(false)
-    }
-  }
 
-  if(isLoading){
-    return(
-      <View style={[styles.containerLoading]}>
-        <Loading/>
-      </View>
-      
+    const errorContainer: StyleProp<ViewStyle> = {
+        marginTop: -sizes.margins["2sm"],
+        marginBottom: sizes.margins["1md"],
+    }
+
+    const errorText: StyleProp<TextStyle> = {
+        fontSize: fonts.size.body * 0.9,
+        fontFamily: fonts.family.Medium,
+        color: isDarkMode ? colors.red.red_05 : colors.red.red_05,
+    }
+
+    function handlePress() {
+        if (!loading && signInputUsername && signInputPassword) signIn()
+    }
+    React.useEffect(() => {
+        setErrorMessage("")
+    }, [])
+
+    return (
+        <View style={container}>
+            <StatusBar backgroundColor={colors.gray.black} barStyle={"light-content"} />
+            <View style={headerContainer}>
+                <ButtonClose />
+                <View style={{ flex: 1, marginLeft: sizes.margins["2sm"] }}>
+                    <Text style={headerTitle} testID="title">
+                        Sign In
+                    </Text>
+                </View>
+            </View>
+
+            <View style={input_container} testID="inputs-container">
+                <View style={{ marginBottom: sizes.margins["1md"] }}>
+                    <UsernameInput type="signIn" />
+                </View>
+                <PasswordInput type="signIn" />
+            </View>
+
+            {errorMessage && (
+                <View testID="error-container" style={errorContainer}>
+                    <Text testID="error-message" style={errorText}>
+                        Error: {errorMessage}
+                    </Text>
+                </View>
+            )}
+            <ButtonStandart
+                testID="handle-submit"
+                margins={false}
+                action={handlePress}
+                backgroundColor={
+                    signInputPassword && signInputUsername && !loading
+                        ? ColorTheme().primary.toString()
+                        : ColorTheme().backgroundDisabled.toString()
+                }
+            >
+                {loading ? (
+                    <View
+                        testID="handle-submit-loading"
+                        style={{
+                            flexDirection: "row",
+                            alignItems: "center",
+                            backgroundColor: "#00000000",
+                        }}
+                    >
+                        <Text style={[button_text, { marginRight: 4 }]}>Loading</Text>
+                        <Loading.ActivityIndicator size={15} />
+                    </View>
+                ) : (
+                    <>
+                        <Text style={button_text} testID="handle-submit-text">
+                            Enter Now
+                        </Text>
+                        <Icon
+                            style={icon}
+                            fill={String(
+                                signInputPassword && signInputUsername && !loading
+                                    ? colors.gray.white
+                                    : isDarkMode
+                                    ? colors.gray.grey_04 + "90"
+                                    : colors.gray.grey_04 + "90",
+                            )}
+                            width={17}
+                            height={17}
+                        />
+                    </>
+                )}
+            </ButtonStandart>
+
+            <View testID="auth-terms" style={{ marginTop: sizes.margins["1xl"] }}>
+                <AuthTermsText signText="Enter Now" />
+            </View>
+        </View>
     )
-  }
-
-  return (
-    <View style={[styles.container]}>
-      <StatusBar style={'light-content'} translucent={true}/>
-
-      <View style={{marginBottom: 30}}>
-        <ButtonClose
-          style={{
-            backgroundColor: ColorTheme().backgroundDisabled,
-            iconColor: ColorTheme().icon
-          }}
-        />
-      </View>
-
-      <View style={{marginBottom: 18}}>
-        <AuthTitle
-          title={'Wellcome Back!'}
-          subTitle={'Sign In with Social of fill the form to continue.'}
-        />
-      </View>
-
-      <View style={[
-        styles.socialContainer,
-        {
-          borderColor: ColorTheme().backgroundDisabled
-        }
-      ]}>
-        <AuthSocialLogin/>
-      </View>
-
-      <View style={container}>
-        <View style={inputContainer}>
-          <Image 
-            source={require('../../../assets/icons/pngs/24/user.png')}
-            style={icon}
-          />
-          <TextInput
-            style={userError? inputError: input}
-            placeholder={'@username'}
-            textContentType={'username'}
-            autocomplete={'username-new'}
-            autoCapitalize={'none'}
-            autoCorrect={false}
-            maxLength={20}
-            returnKeyType={'next'}
-            value={username}
-            onChangeText={(text) => {setUsername(text)}}
-          />                        
-        </View>
-        {userError?
-          <View style={{flexDirection: 'row', alignItems: 'center'}}>
-            <Text style={subTitleError}>{userShowMessage}</Text>
-            <TouchableOpacity style={{paddingLeft: 10}} onPress={() => {setUsername('')}}>
-              <Text style={subTitle}>Reset</Text>
-            </TouchableOpacity>                    
-          </View>: null
-        }
-        
-        <View style={inputContainer}>
-          <Image 
-            source={require('../../../assets/icons/pngs/24/lock.png')}
-            style={icon}
-          />
-          <TextInput
-            style={passError? inputError: input}
-            placeholder={'Password'}
-            placeholderColor={ColorTheme().placeholder}
-            textContentType={'newPassword'}
-            autocomplete={'password-new'}
-            autoCapitalize={'none'}
-            autoCorrect={false}
-            clearButtonMode={'while-editing'}
-            maxLength={16}
-            returnKeyType={'go'}
-            secureTextEntry={!viewPass}
-            value={password}
-            onChangeText={(text) => {setPassword(text)}}
-          />
-          <TouchableOpacity onPress={() => {ViewPassword()}}>
-            <Image 
-              source={viewPass?require('../../../assets/icons/pngs/24/eye.png') : require('../../../assets/icons/pngs/24/eye-off.png')}
-              style={icon2}
-            />                                    
-          </TouchableOpacity>
-        </View>
-        {passError?
-          <View style={{flexDirection: 'row', alignItems: 'center'}}>
-            <Text style={subTitleError}>{passShowMessage}</Text>
-            <TouchableOpacity style={{paddingLeft: 10}} onPress={() => {setPassword('')}}>
-              <Text style={subTitle}>Reset</Text>
-            </TouchableOpacity>                    
-          </View>:
-          <Text style={subTitle}>At least 6 characters,1 number</Text>
-        }
-      </View>
-
-      <View style={styles.footerContainer}>
-        <AuthTermsText signText={'sign in'}/>
-      </View>
-      
-
-      <TouchableOpacity style={buttonContainerEnable} onPress={() => {SignIn()}}>
-        <Text style={buttonTextEnable}>Sign In</Text>
-      </TouchableOpacity>
-
-    </View>
-  );
-};
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    padding: 30
-  },
-  containerLoading: {
-    flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  socialContainer: {
-    paddingBottom: 20,
-    borderBottomWidth: 1,
-    marginBottom: 30
-  },
-  footerContainer: {
-    left: 30,
-    position: 'absolute',
-    top: WindowHeight - 230,
-    alignSelf: 'flex-start',
-},
-  buttonContainer: {
-    width: 160,
-    height: 56,
-    alignSelf: 'center',
-    position: 'absolute',
-    alignItems: 'center',
-    justifyContent: 'center',
-    bottom: 24
-  },
-});
+}

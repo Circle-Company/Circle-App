@@ -1,19 +1,11 @@
 import React from "react"
-import { View, Text } from "react-native"
-import { CommentsMainRootProps } from "../../comments-types"
 import CommentContext from "../../comments-context"
+import { CommentsMainRootProps } from "../../comments-types"
 
-export default function main_root ({children, data}: CommentsMainRootProps) {
-
-    const container: any = {
-    }
+export default function main_root({ children, data, preview = true }: CommentsMainRootProps) {
     return (
-        <CommentContext.Provider value={{comment: data}}>
-            <View style={container}>
-                {children}
-            </View>     
-                 
+        <CommentContext.Provider value={{ comment: data, preview }}>
+            {children}
         </CommentContext.Provider>
-
     )
 }

@@ -1,27 +1,27 @@
 import React from "react"
 import { userReciveDataProps } from "../user_show/user_show-types"
-import { MidiaReciveDataProps } from "../midia_render/midia_render-types"
 
-
-type CommentObject = {
-    id: number
+export type CommentObject = {
+    id: string
     user: userReciveDataProps
-    content: String,
-    created_at: String
+    content: string
+    created_at: string
+    statistics: {
+        total_likes_num: number
+    }
+    is_liked: boolean
 }
 
-export type CommentsReciveDataProps = {
-    comments_count: number,
-    comments_data: Array<CommentObject>
-}
+export type CommentsReciveDataProps = Array<CommentObject>
 
 export type CommentsMainRootProps = {
-    data: CommentsReciveDataProps,
+    data: CommentsReciveDataProps
+    preview?: boolean
     children: React.ReactNode
 }
 export type CommentsContainerProps = {
-    children: React.ReactNode,
-    focused?: boolean,
+    children: React.ReactNode
+    focused?: boolean
 }
 export type CommentsTopRootProps = {
     children: React.ReactNode
@@ -36,13 +36,20 @@ export type CommentsCenterRootProps = {
     children: React.ReactNode
 }
 export type CommentsRenderCommentProps = {
-    comment: CommentObject,
+    comment: CommentObject
+    preview: boolean
     index: number
 }
 export type CommentsHeaderLeftProps = {
+    children: React.ReactNode
 }
 export type CommentsInputProps = {
     placeholder?: string
+    backgroundColor?: string
+    color?: string
+    preview?: boolean
+    autoFocus: boolean
 }
 export type CommentsListCommentsProps = {
+    preview: boolean
 }

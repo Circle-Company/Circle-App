@@ -1,56 +1,108 @@
+import ColorTheme, { colors } from "@/layout/constants/colors"
+import { Pressable, Text, View, useColorScheme } from "react-native"
+
+import Icon from "@/assets/icons/svgs/@2.svg"
+import Verifyed from "@/assets/icons/svgs/check_circle_verify.svg"
+import PersistedContext from "@/contexts/Persisted"
+import LanguageContext from "@/contexts/Preferences/language"
+import { truncated } from "@/helpers/processText"
+import fonts from "@/layout/constants/fonts"
+import Sizes from "@/layout/constants/sizes"
+import { useNavigation } from "@react-navigation/native"
 import React from "react"
-import { View, Text } from "react-native"
-
-import Sizes from "../../../layout/constants/sizes"
-import fonts from "../../../layout/constants/fonts"
-import ColorTheme, { colors } from "../../../layout/constants/colors"
-import { UserUsernameProps } from "../user_show-types"
 import { useUserShowContext } from "../user_show-context"
-import { truncated } from "../../../algorithms/processText"
+import { UserUsernameProps } from "../user_show-types"
 
-import Verifyed from '../../../assets/icons/svgs/check_circle.svg'
-
-export default function user_username ({
+export default function UserShowUsername({
+    pressable = true,
     displayOnMoment = true,
-    truncatedSize,
+    truncatedSize = 30,
+    displayYou = true,
     color = ColorTheme().text,
     fontSize = fonts.size.footnote,
     fontFamily = fonts.family.Bold,
-    margin = Sizes.margins["1sm"]
+    margin = Sizes.margins["1sm"],
+    scale = 1,
 }: UserUsernameProps) {
+    const { session } = React.useContext(PersistedContext)
+    const { t } = React.useContext(LanguageContext)
+    const { user, executeBeforeClick } = useUserShowContext()
+    const isDarkMode = useColorScheme() === "dark"
+    const navigation: any = useNavigation()
 
-    const {user} = useUserShowContext()
-    const container:any = {
-        margin,
-        flexDirection: 'row',
-        alignItems: 'center',
+    const isMe = user.id == session.user.id ? true : false
+
+    const container: any = {
+        margin: margin * scale,
+        flexDirection: "row",
+        alignItems: "center",
     }
-    const username_style_moment:any = {
-        fontSize,
+    const username_style_moment: any = {
+        fontSize: fontSize * scale,
         fontFamily,
         color: colors.gray.white,
-        textShadowColor: '#00000070',
+        textShadowColor: "#00000070",
         textShadowOffset: { width: 0.3, height: 0.7 },
         textShadowRadius: 4,
     }
 
-    const username_style:any = {
-        fontSize,
+    const username_style: any = {
+        fontSize: fontSize * scale,
         fontFamily,
         color,
     }
-    
-    
-    return (
-        <View style={container}>
-            <Text style={displayOnMoment? username_style_moment: username_style}>@{truncated({text: user.username, size: Number(truncatedSize)})}</Text>
-            {user.verifyed && 
-            <View style={{alignItems: 'center', justifyContent: "center", marginTop: 1, marginLeft: 2}}>
-                <Verifyed fill={String(displayOnMoment? colors.gray.white: ColorTheme().verifyed)} width={12} height={12}/>
-            </View>
-                               
-            }
 
-        </View>
+    const icon_style = {
+        top: 2,
+        marginRight: 2 * scale,
+    }
+
+    async function onUsernameAction() {
+        if (pressable) {
+            executeBeforeClick ? executeBeforeClick() : null
+            await navigation.navigate("ProfileNavigator", {
+                screen: "Profile",
+                params: { findedUserPk: user.id },
+            })
+        }
+    }
+
+    const username = `${truncated({ text: user.username, size: Number(truncatedSize) })}`
+    const usernameText = displayYou ? (isMe ? t("You") : username) : username
+    return (
+        <Pressable onPress={async () => await onUsernameAction()} style={container}>
+            {displayYou ? (
+                isMe ? null : (
+                    <Icon style={icon_style} width={12 * scale} height={12 * scale} fill={color} />
+                )
+            ) : (
+                <Icon style={icon_style} width={12 * scale} height={12 * scale} fill={color} />
+            )}
+            <Text style={displayOnMoment ? username_style_moment : username_style}>
+                {usernameText}
+            </Text>
+            {user.verifyed && (
+                <View
+                    style={{
+                        alignItems: "center",
+                        justifyContent: "center",
+                        marginTop: 1 * scale * 2,
+                        marginLeft: 2 * scale,
+                    }}
+                >
+                    <Verifyed
+                        fill={String(
+                            displayOnMoment
+                                ? colors.gray.white
+                                : isDarkMode
+                                    ? colors.yellow.yellow_04
+                                    : colors.yellow.yellow_05
+                        )}
+                        width={12 * scale}
+                        height={12 * scale}
+                    />
+                </View>
+            )}
+        </Pressable>
     )
 }

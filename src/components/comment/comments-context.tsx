@@ -1,11 +1,14 @@
-import React, { createContext, useContext } from "react"
-import { CommentsReciveDataProps} from "./comments-types"
+import { createContext, useContext } from "react"
+import { CommentsReciveDataProps } from "./comments-types"
 
-const CommentsContext = createContext<{ comment: CommentsReciveDataProps} | null>(null)
+const CommentsContext = createContext<{
+    comment: CommentsReciveDataProps
+    preview: boolean
+} | null>(null)
 
 export function useCommentsContext() {
     const context = useContext(CommentsContext)
-    if(!context) {
+    if (!context) {
         throw new Error("Comment.* component must be rendered as child of Comment component")
     }
     return context

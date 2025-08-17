@@ -1,79 +1,79 @@
-This is a new [**React Native**](https://reactnative.dev) project, bootstrapped using [`@react-native-community/cli`](https://github.com/react-native-community/cli).
+<div align="center">
+  <a href="https://github.com/Circle-Company/Circle-App" target="_blank">
+    <picture>
+      <source media="(prefers-color-scheme: dark)" srcset="https://github.com/Circle-Company/.github/blob/017be356b03006489d7ae887a961f87f381dc681/profile/App%20Logo%20Dark.png">
+      <img alt="Circle Logo" src="https://github.com/Circle-Company/.github/blob/017be356b03006489d7ae887a961f87f381dc681/profile/App%20Logo%20Light.png" width="330"/>
+    </picture>
+  </a>
+</div>
 
-# Getting Started
+<h1 align="center">Crie momentos e Compartilhe Memórias</h1>
 
->**Note**: Make sure you have completed the [React Native - Environment Setup](https://reactnative.dev/docs/environment-setup) instructions till "Creating a new application" step, before proceeding.
+<div align="center">
+  <a href="https://github.com/Circle-Company/Circle-App" target="_blank">
+    <img alt="Circle Banner" src="https://github.com/Circle-Company/.github/blob/eb5113ac18899f6e96f6e6791ef2a1e43091affe/profile/Circle%20App%20Presentation%20Banner.png" width="730"/>
+  </a>
+</div>
 
-## Step 1: Start the Metro Server
+### ✨ Sobre o Projeto
 
-First, you will need to start **Metro**, the JavaScript _bundler_ that ships _with_ React Native.
+Nossa missão é criar uma rede social realmente diferente, intuitiva de usar, simples de criar, e divertido de assistir e acompanhar amigos. Onde compartilhar o dia a dia seja uma atividade leve.
+E acima de tudo com autenticidade, trazendo um visual inovador, funções diferentes, e tudo isso Open Source.
 
-To start Metro, run the following command from the _root_ of your React Native project:
+---
 
-```bash
-# using npm
-npm start
+### 🧠 Funcionalidades
 
-# OR using Yarn
-yarn start
-```
+-   📸 Criar e editar momentos com fotos, vídeos e texto
+-   📂 Organizar momentos em memórias personalizadas
+-   💬 Curtidas, comentários e interações sociais
+-   📱 Perfil público com galeria de memórias
+-   🔒 Autenticação segura com JWT
+-   🌗 Suporte a temas claro e escuro
+-   🚀 Arquitetura escalável com React Native + TypeScript
 
-## Step 2: Start your Application
+---
 
-Let Metro Bundler run in its _own_ terminal. Open a _new_ terminal from the _root_ of your React Native project. Run the following command to start your _Android_ or _iOS_ app:
+### 🛣️ Roadmap
 
-### For Android
+| Etapa                               | Status                |
+| ----------------------------------- | --------------------- |
+| Notificações em tempo real          | ✅ Concluído          |
+| Lançamento beta na Play Store       | ✅ Concluído          |
+| Câmera interna do App               | ⚙️ Em Desenvolvimento |
+| Feed com sistema de recomendação    | ⚙️ Em Desenvolvimento |
+| Sistema de Pesquisa de Moments      | 🧠 Em planejamento    |
+| Compartilhamento externo de moments | 🔜 Em breve           |
 
-```bash
-# using npm
-npm run android
+---
 
-# OR using Yarn
-yarn android
-```
+### 🤝 Contribuindo
 
-### For iOS
+Estamos procurando colaboradores! Se você é dev mobile, backend, designer ou tem boas ideias, será muito bem-vindo 💜
 
-```bash
-# using npm
-npm run ios
+<div align="center">
+  <a href="https://github.com/Circle-Company/Circle-App" target="_blank">
+    <img alt="Procurando Contribuidores" src="https://github.com/tiagosavioli/tiagosavioli/blob/bf6bb095107d902c2fba9d4e65ac989c7389768b/Procurando%20por%20Contribu%C3%ADdores.png" width="730"/>
+  </a>
+</div>
 
-# OR using Yarn
-yarn ios
-```
+Para contribuir:
 
-If everything is set up _correctly_, you should see your new app running in your _Android Emulator_ or _iOS Simulator_ shortly provided you have set up your emulator/simulator correctly.
+1. Faça um fork do projeto
+2. Crie uma branch: `git checkout -b minha-feature`
+3. Faça suas alterações
+4. Envie um PR com uma descrição clara
 
-This is one way to run your app — you can also run it directly from within Android Studio and Xcode respectively.
+---
 
-## Step 3: Modifying your App
+### 📎 Links Úteis
 
-Now that you have successfully run the app, let's modify it.
+-   [🔗 Repositório Principal](https://github.com/Circle-Company/Circle-App)
+-   [🧠 Roadmap no GitHub Projects](https://github.com/Circle-Company/Circle-App/projects)
+-   [📱 Protótipo no Figma (se tiver)](https://figma.com/...)
 
-1. Open `App.tsx` in your text editor of choice and edit some lines.
-2. For **Android**: Press the <kbd>R</kbd> key twice or select **"Reload"** from the **Developer Menu** (<kbd>Ctrl</kbd> + <kbd>M</kbd> (on Window and Linux) or <kbd>Cmd ⌘</kbd> + <kbd>M</kbd> (on macOS)) to see your changes!
+---
 
-   For **iOS**: Hit <kbd>Cmd ⌘</kbd> + <kbd>R</kbd> in your iOS Simulator to reload the app and see your changes!
-
-## Congratulations! :tada:
-
-You've successfully run and modified your React Native App. :partying_face:
-
-### Now what?
-
-- If you want to add this new React Native code to an existing application, check out the [Integration guide](https://reactnative.dev/docs/integration-with-existing-apps).
-- If you're curious to learn more about React Native, check out the [Introduction to React Native](https://reactnative.dev/docs/getting-started).
-
-# Troubleshooting
-
-If you can't get this to work, see the [Troubleshooting](https://reactnative.dev/docs/troubleshooting) page.
-
-# Learn More
-
-To learn more about React Native, take a look at the following resources:
-
-- [React Native Website](https://reactnative.dev) - learn more about React Native.
-- [Getting Started](https://reactnative.dev/docs/environment-setup) - an **overview** of React Native and how setup your environment.
-- [Learn the Basics](https://reactnative.dev/docs/getting-started) - a **guided tour** of the React Native **basics**.
-- [Blog](https://reactnative.dev/blog) - read the latest official React Native **Blog** posts.
-- [`@facebook/react-native`](https://github.com/facebook/react-native) - the Open Source; GitHub **repository** for React Native.
+<div align="center">
+  <strong>Feito com amor no Brasil 💚💛</strong>
+</div>

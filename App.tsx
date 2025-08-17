@@ -1,55 +1,103 @@
-import * as React from 'react'
-import { useColorScheme, Easing, Animated } from 'react-native'
-import { Colors } from 'react-native/Libraries/NewAppScreen'
-import { NavigationContainer } from '@react-navigation/native'
-import { createNativeStackNavigator } from '@react-navigation/native-stack'
-import { createStackNavigator, CardStyleInterpolators, HeaderStyleInterpolators, TransitionSpecs} from '@react-navigation/stack'
-import { useSelector } from 'react-redux'
+import * as React from "react"
 
-import {HomeScreenNavigator } from './src/navigation/HomeScreenNavigator'
-import AuthNavigator from './src/navigation/AuthNavigator'
-import BottomTabNavigator from './src/navigation/BottomTabNavigator'
+import { DefaultTheme, NavigationContainer } from "@react-navigation/native"
+import { SafeAreaProvider, initialWindowMetrics } from "react-native-safe-area-context"
 
-import StartScreen from './src/pages/auth/Splash'
+import { GestureHandlerRootView } from "react-native-gesture-handler"
+import { KeyboardProvider } from "react-native-keyboard-controller"
+import { Provider as AccountProvider } from "./src/contexts/account"
+import { Provider as AuthProvider } from "./src/contexts/Auth"
+import { Provider as BottomSheetProvider } from "./src/contexts/bottomSheet"
+import { Provider as BottomTabsProvider } from "./src/contexts/bottomTabs"
+import { Provider as FeedProvider } from "./src/contexts/Feed"
+import { Provider as GeolocationProvider } from "./src/contexts/geolocation"
+import { Provider as MemoryProvider } from "./src/contexts/memory"
+import { Provider as NearProvider } from "./src/contexts/near"
+import { Provider as NetworkProvider } from "./src/contexts/network"
+import { Provider as NewMomentProvider } from "./src/contexts/newMoment"
+import { Provider as NotificationProvider } from "./src/contexts/notification"
+import { Provider as PersistedProvider } from "./src/contexts/Persisted"
+import { Provider as PreferencesProvider } from "./src/contexts/Preferences"
+import { Provider as ProfileProvider } from "./src/contexts/profile"
+import { Provider as RedirectProvider } from "./src/contexts/redirect"
+import { Provider as SelectMomentsProvider } from "./src/contexts/selectMoments"
+import { Provider as ToastProvider } from "./src/contexts/Toast"
+import { Provider as TrackingProvider } from "./src/contexts/tracking"
+import { Provider as ViewProfileProvider } from "./src/contexts/viewProfile"
+import ColorTheme from "./src/layout/constants/colors"
+import sizes from "./src/layout/constants/sizes"
+import { QueryProvider } from "./src/lib/react-query"
+import Routes from "./src/routes"
 
-import {useMomentContext} from './src/components/moment/moment-context'
-import {useUserShowContext} from './src/components/user_show/user_show-context'
-import {useMidiaRenderContext} from './src/components/midia_render/midia_render-context'
+function InnerApp() {
+    const myTheme = {
+        ...DefaultTheme,
+        colors: {
+            ...DefaultTheme.colors,
+            background: ColorTheme().background.toString(),
+        },
+    }
 
-const ScreensNavigator = () => {
-  const Stack =  createStackNavigator()
-  return(
-    <NavigationContainer>
-      <Stack.Navigator 
-        initialRouteName='HomeNavigator'
-        screenOptions={{
-          headerShown: false,
-          cardStyleInterpolator: CardStyleInterpolators.forModalPresentationIOS
-        }}
-        >
-          <Stack.Screen
-            name="HomeNavigator"
-            component={HomeScreenNavigator}
-          />      
-      </Stack.Navigator>
-    </NavigationContainer>    
-  )
+    return (
+        <KeyboardProvider enabled={true}>
+            <NotificationProvider>
+                <BottomTabsProvider>
+                    <AccountProvider>
+                        <ProfileProvider>
+                            <ViewProfileProvider>
+                                <FeedProvider>
+                                    <NearProvider>
+                                        <NavigationContainer theme={myTheme}>
+                                            <BottomSheetProvider>
+                                                <SelectMomentsProvider>
+                                                    <MemoryProvider>
+                                                        <NewMomentProvider>
+                                                            <Routes />
+                                                        </NewMomentProvider>
+                                                    </MemoryProvider>
+                                                </SelectMomentsProvider>
+                                            </BottomSheetProvider>
+                                        </NavigationContainer>                                        
+                                    </NearProvider>
 
+                                </FeedProvider>
+                            </ViewProfileProvider>
+                        </ProfileProvider>
+                    </AccountProvider>
+                </BottomTabsProvider>
+            </NotificationProvider>
+        </KeyboardProvider>
+    )
 }
-/**
- *  { isAuth && <ScreensNavigator/>}
-    { !isAuth && didTryAutoLogin && <AuthNavigator/>}
-    { !isAuth && !didTryAutoLogin && <StartScreen/>}
- */
 
-const App = () => {
+function App() {
+    return (
+        <SafeAreaProvider initialMetrics={initialWindowMetrics}>
+            <GestureHandlerRootView
+                style={{ width: sizes.window.width, height: sizes.window.height }}
+            >
+                <ToastProvider>
+                    <RedirectProvider>
+                        <AuthProvider>
+                            <PersistedProvider>
+                                <QueryProvider>
+                                    <PreferencesProvider>
+                                        <NetworkProvider>
+                                            <TrackingProvider>
+                                                <GeolocationProvider>
+                                                    <InnerApp />
+                                                </GeolocationProvider>
+                                            </TrackingProvider>
+                                        </NetworkProvider>
+                                    </PreferencesProvider>
+                                </QueryProvider>
+                            </PersistedProvider>
+                        </AuthProvider>
+                    </RedirectProvider>
+                </ToastProvider>
+            </GestureHandlerRootView>
+        </SafeAreaProvider>
+    )
+}
 
-  return (
-      <NavigationContainer>
-        <BottomTabNavigator/>
-      </NavigationContainer>      
-
-  );
-};
-
-export default App;
+export default App
