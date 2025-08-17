@@ -43,7 +43,7 @@ export function Provider({ children }: NotificationProviderProps) {
             }
         }
     }
-    
+
     React.useEffect(() => {
         async function fetch() {
             if (session?.user?.id && session?.account?.jwtToken) {
@@ -70,7 +70,10 @@ export function Provider({ children }: NotificationProviderProps) {
 
     messaging().onMessage(async (remoteMessage) => {
         console.log("messaging().onMessage")
-        if (session?.account?.unreadNotificationsCount !== undefined && session?.account?.setUnreadNotificationsCount) {
+        if (
+            session?.account?.unreadNotificationsCount !== undefined &&
+            session?.account?.setUnreadNotificationsCount
+        ) {
             const previousNotificationsNum = session.account.unreadNotificationsCount
             session.account.setUnreadNotificationsCount(previousNotificationsNum + 1)
         }
@@ -85,7 +88,10 @@ export function Provider({ children }: NotificationProviderProps) {
     })
 
     messaging().setBackgroundMessageHandler(async (remoteMessage) => {
-        if (session?.account?.unreadNotificationsCount !== undefined && session?.account?.setUnreadNotificationsCount) {
+        if (
+            session?.account?.unreadNotificationsCount !== undefined &&
+            session?.account?.setUnreadNotificationsCount
+        ) {
             const previousNotificationsNum = session.account.unreadNotificationsCount
             session.account.setUnreadNotificationsCount(previousNotificationsNum + 1)
         }

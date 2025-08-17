@@ -7,11 +7,8 @@ export type SettingsiItemObjectProps = {
     navigator: string
     navigateTo: string
     secure: boolean
-    
 }
 export type SettignsSectionProps = {
     name: string
     content: Array<SettingsiItemObjectProps>
 }
-
-

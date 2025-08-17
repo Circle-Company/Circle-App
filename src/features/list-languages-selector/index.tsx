@@ -69,7 +69,8 @@ export default function ListLanguagesSelector() {
     const getContainerStyle = (code: LanguagesCodesType): ViewStyle => ({
         ...container,
         borderWidth: session.preferences.language.appLanguage === code ? 2 : 0,
-        borderColor: session.preferences.language.appLanguage === code ? colors.blue.blue_05 : "transparent",
+        borderColor:
+            session.preferences.language.appLanguage === code ? colors.blue.blue_05 : "transparent",
     })
 
     return (

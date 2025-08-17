@@ -111,10 +111,7 @@ export default function TagsInput({
                     placeholder={t("tag name")}
                     placeholderTextColor={String(ColorTheme().textDisabled)}
                 />
-                <ButtonStandart
-                    action={handelButtonPress}
-                    backgroundColor={button_background}
-                >
+                <ButtonStandart action={handelButtonPress} backgroundColor={button_background}>
                     <Text style={button_text_style}>{t("Add")}</Text>
                 </ButtonStandart>
             </View>

@@ -1,3 +1,4 @@
+<<<<<<< Updated upstream
 apply plugin: "com.android.application"
 apply plugin: "org.jetbrains.kotlin.android"
 apply plugin: "com.facebook.react"
@@ -84,7 +85,36 @@ android {
         targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode 1
         versionName "1.0"
+=======
+plugins {
+    id 'com.android.application'
+    id 'com.facebook.react'
+    id 'com.google.gms.google-services' // se precisa do Firebase
+}
+
+react {}
+
+def enableProguardInReleaseBuilds = true
+def jscFlavor = 'org.webkit:android-jsc:+'
+
+android {
+    ndkVersion "23.1.7779620"
+    namespace "com.circlecompany.circleapp"
+    lintOptions {
+        baseline file("lint-baseline.xml")
     }
+
+    defaultConfig {
+        applicationId "com.circlecompany.circleapp"
+        ndkVersion "23.1.7779620"
+        compileSdk 34
+        minSdk 23
+        targetSdk 34
+        versionCode 12
+        versionName "1.1.2"
+>>>>>>> Stashed changes
+    }
+
     signingConfigs {
         debug {
             storeFile file('debug.keystore')
@@ -93,6 +123,16 @@ android {
             keyPassword 'android'
         }
     }
+<<<<<<< Updated upstream
+=======
+    buildFeatures {
+        buildConfig true
+    }
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
+    }
+>>>>>>> Stashed changes
     buildTypes {
         debug {
             signingConfig signingConfigs.debug
@@ -116,4 +156,8 @@ dependencies {
     } else {
         implementation jscFlavor
     }
+<<<<<<< Updated upstream
 }
+=======
+}
+>>>>>>> Stashed changes

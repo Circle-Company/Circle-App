@@ -47,7 +47,6 @@ const RenderMomentFull: React.FC<RenderMomentFullProps> = ({
         setFocusedChunkItemFunc({ id: Number(momentData.id) })
     }, [momentData.id, setFocusedChunkItemFunc])
 
-
     const imageOpacity = scrollY.interpolate({
         inputRange: [0, 400],
         outputRange: [1, 0.7],
@@ -66,7 +65,7 @@ const RenderMomentFull: React.FC<RenderMomentFullProps> = ({
                 setFromAccount(true)
                 return {
                     ...session.user,
-                    you_follow: false
+                    you_follow: false,
                 }
             }
             setFromAccount(false)
@@ -75,7 +74,7 @@ const RenderMomentFull: React.FC<RenderMomentFullProps> = ({
         setFromAccount(true)
         return {
             ...session.user,
-            you_follow: false
+            you_follow: false,
         }
     }, [momentData.user, session.user])
 
@@ -88,7 +87,7 @@ const RenderMomentFull: React.FC<RenderMomentFullProps> = ({
             paddingTop: sizes.paddings["2sm"],
             paddingBottom: sizes.paddings["1sm"],
             borderRadius: sizes.borderRadius["1md"],
-            backgroundColor: isDarkMode ? colors.gray.grey_09 : colors.gray.grey_01
+            backgroundColor: isDarkMode ? colors.gray.grey_09 : colors.gray.grey_01,
         },
         descriptionStyle: {
             lineHeight: 18,
@@ -141,7 +140,15 @@ const RenderMomentFull: React.FC<RenderMomentFullProps> = ({
                 momentData={momentData}
                 isFeed={fromFeed}
                 isFocused={true}
-                momentSize={{ ...sizes.moment.standart, width: sizes.screens.width, height: sizes.screens.width * sizes.moment.aspectRatio, borderTopLeftRadius: 0, borderTopRightRadius: 0, borderBottomLeftRadius: sizes.moment.full.borderRadius, borderBottomRightRadius: sizes.moment.full.borderRadius }}
+                momentSize={{
+                    ...sizes.moment.standart,
+                    width: sizes.screens.width,
+                    height: sizes.screens.width * sizes.moment.aspectRatio,
+                    borderTopLeftRadius: 0,
+                    borderTopRightRadius: 0,
+                    borderBottomLeftRadius: sizes.moment.full.borderRadius,
+                    borderBottomRightRadius: sizes.moment.full.borderRadius,
+                }}
             >
                 <Moment.Container contentRender={momentData.midia}>
                     <Moment.Root.Center />

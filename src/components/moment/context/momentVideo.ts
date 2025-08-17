@@ -18,7 +18,7 @@ export function useMomentVideo(): MomentVideoState {
     const [isMuted, setIsMuted] = React.useState<boolean>(false)
 
     function togglePlay() {
-        setIsPaused(prev => !prev)
+        setIsPaused((prev) => !prev)
     }
 
     function exportMomentVideo(): MomentVideoProps {
@@ -50,6 +50,6 @@ export function useMomentVideo(): MomentVideoState {
         setIsMuted,
         togglePlay,
         setMomentVideo,
-        exportMomentVideo
+        exportMomentVideo,
     }
-} 
+}

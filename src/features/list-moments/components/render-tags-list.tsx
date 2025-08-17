@@ -7,7 +7,7 @@ import sizes from "../../../layout/constants/sizes"
 
 export default function RenderTagsList() {
     const { momentData } = React.useContext(MomentContext)
-    
+
     React.useEffect(() => {
         async function fetch() {
             if (momentData.getTags) {

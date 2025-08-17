@@ -56,8 +56,13 @@ export default function PasswordScreen() {
             signInputPassword && !loading
                 ? colors.gray.white
                 : isDarkMode
+<<<<<<< Updated upstream
                 ? colors.gray.grey_04 + "90"
                 : colors.gray.grey_04 + "90",
+=======
+                  ? colors.gray.grey_04 + "90"
+                  : colors.gray.grey_04 + "90",
+>>>>>>> Stashed changes
     }
 
     const icon: StyleProp<ViewStyle> = {
@@ -139,8 +144,13 @@ export default function PasswordScreen() {
                                 signInputPassword && !loading
                                     ? colors.gray.white
                                     : isDarkMode
+<<<<<<< Updated upstream
                                     ? colors.gray.grey_04 + "90"
                                     : colors.gray.grey_04 + "90",
+=======
+                                      ? colors.gray.grey_04 + "90"
+                                      : colors.gray.grey_04 + "90"
+>>>>>>> Stashed changes
                             )}
                         />
                     </>

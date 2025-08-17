@@ -89,7 +89,6 @@ export const useFeed = () => {
                         ...prevChunkIds,
                         ...uniqueNewChunks.map((m) => m.id),
                     ])
-
                 }
 
                 setLastRequestTime(currentTime) // Atualiza o timestamp da última requisição
@@ -106,7 +105,7 @@ export const useFeed = () => {
 
     function next() {
         if (
-            Number(focusedChunkItem?.index?? + 1) < feedData.length &&
+            Number(focusedChunkItem?.index ?? +1) < feedData.length &&
             commentEnabled == false &&
             loading == false &&
             scrollEnabled

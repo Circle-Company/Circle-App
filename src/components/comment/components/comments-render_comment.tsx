@@ -32,7 +32,7 @@ export default function RenderComment({ comment, preview, index }: CommentsRende
         backgroundColor: isDarkMode ? colors.gray.grey_09 : colors.gray.grey_01,
         borderRadius: sizes.borderRadius["1md"],
         padding: sizes.paddings["1sm"],
-        flex: 1
+        flex: 1,
     }
     const container_left: ViewStyle = {
         left: -2,
@@ -63,7 +63,7 @@ export default function RenderComment({ comment, preview, index }: CommentsRende
         fontFamily: fonts.family.Medium,
         color: ColorTheme().textDisabled,
     }
-    
+
     /**
     const likesNum = like
         ? comment.statistics.total_likes_num + 1
@@ -126,7 +126,10 @@ export default function RenderComment({ comment, preview, index }: CommentsRende
                     </UserShow.Root>
                     <Text style={date_style}>•</Text>
                     <Text style={date_style}>
-                        {timeDifferenceConverter({ date: String(comment.created_at), small: false })}
+                        {timeDifferenceConverter({
+                            date: String(comment.created_at),
+                            small: false,
+                        })}
                     </Text>
                 </View>
                 <Text style={content_style}>{comment.content}</Text>

@@ -19,6 +19,6 @@ export function Provider({ children }: React.PropsWithChildren<{}>) {
         }
         getPreferences()
     }, [session?.user?.id, preferencesLoaded])
-    
+
     return <LanguageProvider>{children}</LanguageProvider>
 }

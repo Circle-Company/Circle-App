@@ -53,7 +53,7 @@ export default function Buttonlarge(props: any) {
         <View style={container}>
             <Pressable
                 onPress={() => {
-                    handleButtonPress(), navigation.navigate(props.navigateTo)
+                    ;(handleButtonPress(), navigation.navigate(props.navigateTo))
                 }}
             >
                 <Animated.View style={[buttonContainer, { transform: [{ scale: animatedScale }] }]}>

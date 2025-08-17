@@ -1,4 +1,12 @@
-import { Animated, Easing, Keyboard, TextInput, TextStyle, ViewStyle, useColorScheme } from "react-native"
+import {
+    Animated,
+    Easing,
+    Keyboard,
+    TextInput,
+    TextStyle,
+    ViewStyle,
+    useColorScheme,
+} from "react-native"
 import { Text, View } from "../../../components/Themed"
 import ColorTheme, { colors } from "../../../layout/constants/colors"
 
@@ -70,8 +78,8 @@ export default function TitleMemory() {
                 title !== memory.title && title
                     ? colors.gray.white
                     : isDarkMode
-                        ? colors.gray.grey_06
-                        : colors.gray.grey_04 + "80"
+                      ? colors.gray.grey_06
+                      : colors.gray.grey_04 + "80"
             ),
         } as TextStyle,
         titleStyle: {
@@ -146,8 +154,8 @@ export default function TitleMemory() {
                             title !== memory.title && title
                                 ? colors.blue.blue_05
                                 : isDarkMode
-                                    ? colors.gray.grey_08
-                                    : colors.gray.grey_02
+                                  ? colors.gray.grey_08
+                                  : colors.gray.grey_02
                         )}
                     >
                         <Text style={styles.buttonText}>{t("Confirm")}</Text>

@@ -12,10 +12,10 @@ export default function ProfileHeaderRight() {
     const [isLoading, setIsLoading] = React.useState(true)
 
     React.useEffect(() => {
-        setIsLoading(true),
-        setTimeout(() => {
-            setIsLoading(false)
-        }, 400)
+        ;(setIsLoading(true),
+            setTimeout(() => {
+                setIsLoading(false)
+            }, 400))
     }, [])
     const container: any = {
         flexDirection: "row",

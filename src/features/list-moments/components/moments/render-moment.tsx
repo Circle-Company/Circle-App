@@ -159,7 +159,7 @@ export default function RenderMoment({ momentData, isFocused, isFeed }: renderMo
                     <Moment.Root.Center>
                         <View style={{ marginBottom: sizes.margins["2sm"], width: "100%" }}>
                             <Moment.Description />
-                            <View style={{ flexDirection: "row", alignItems: "center"  }}>
+                            <View style={{ flexDirection: "row", alignItems: "center" }}>
                                 <View style={{ flex: 1 }}>
                                     <Moment.LikeButton isLiked={false} />
                                 </View>

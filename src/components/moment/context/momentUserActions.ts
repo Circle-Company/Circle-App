@@ -3,7 +3,19 @@ import PersistedContext from "@/contexts/Persisted"
 import React from "react"
 import { apiRoutes } from "../../../services/Api"
 
-export type InteractionType = "LIKE" | "CLICK" | "UNLIKE" | "PARTIAL_VIEW" | "COMPLETE_VIEW" | "HIDE" | "UNHIDE" | "SHARE" | "COMMENT" | "REPORT" | "SHOW_LESS_OFTEN" | "LIKE_COMMENT"
+export type InteractionType =
+    | "LIKE"
+    | "CLICK"
+    | "UNLIKE"
+    | "PARTIAL_VIEW"
+    | "COMPLETE_VIEW"
+    | "HIDE"
+    | "UNHIDE"
+    | "SHARE"
+    | "COMMENT"
+    | "REPORT"
+    | "SHOW_LESS_OFTEN"
+    | "LIKE_COMMENT"
 
 export interface MomentUserActionsState extends MomentUserActionsProps {
     setShare: React.Dispatch<React.SetStateAction<boolean>>
@@ -23,7 +35,7 @@ export interface MomentUserActionsState extends MomentUserActionsProps {
 
 export function useMomentUserActions(momentId?: string): MomentUserActionsState {
     const { session } = React.useContext(PersistedContext)
-    
+
     // Estados para interações
     const [like, setLike] = React.useState<boolean>(false)
     const [share, setShare] = React.useState<boolean>(false)
@@ -37,65 +49,69 @@ export function useMomentUserActions(momentId?: string): MomentUserActionsState 
     const [completeView, setCompleteView] = React.useState<boolean>(false)
 
     // Função para enviar interação para o servidor
-    const registerInteraction = React.useCallback(async (interactionType: InteractionType, data?: any) => {
-        if (!momentId || !session.account.jwtToken) {
-            console.warn("MomentId ou token não disponível para enviar interação")
-            return
-        }
-
-        try {
-            const baseParams = {
-                momentId,
-                authorizationToken: session.account.jwtToken
+    const registerInteraction = React.useCallback(
+        async (interactionType: InteractionType, data?: any) => {
+            if (!momentId || !session.account.jwtToken) {
+                console.warn("MomentId ou token não disponível para enviar interação")
+                return
             }
 
-            switch (interactionType) {
-            case "LIKE":
-                await apiRoutes.moment.actions.like(baseParams)
-                break
-            case "LIKE_COMMENT":
-                await apiRoutes.moment.actions.likeComment(baseParams)
-                break
-            case "UNLIKE":
-                await apiRoutes.moment.actions.unlike(baseParams)
-                break
-            case "PARTIAL_VIEW":
-                await apiRoutes.moment.actions.partialView(baseParams)
-                break
-            case "COMPLETE_VIEW":
-                await apiRoutes.moment.actions.completeView(baseParams)
-                break
-            case "SHARE":
-                await apiRoutes.moment.actions.share(baseParams)
-                break
-            case "COMMENT":
-                await apiRoutes.moment.actions.comment(baseParams)
-                break
-            case "REPORT":
-                await apiRoutes.moment.actions.report(baseParams)
-                break
-            case "SHOW_LESS_OFTEN":
-                await apiRoutes.moment.actions.showLessOften(baseParams)
-                break                
-            case "HIDE":
-                await apiRoutes.moment.author.hide(baseParams)
-                break
-            case "UNHIDE":
-                await apiRoutes.moment.author.unhide(baseParams)
-                break
-            default:
-                console.warn(`Tipo de interação não reconhecido: ${interactionType}`)
+            try {
+                const baseParams = {
+                    momentId,
+                    authorizationToken: session.account.jwtToken,
+                }
+
+                switch (interactionType) {
+                    case "LIKE":
+                        await apiRoutes.moment.actions.like(baseParams)
+                        break
+                    case "LIKE_COMMENT":
+                        await apiRoutes.moment.actions.likeComment(baseParams)
+                        break
+                    case "UNLIKE":
+                        await apiRoutes.moment.actions.unlike(baseParams)
+                        break
+                    case "PARTIAL_VIEW":
+                        await apiRoutes.moment.actions.partialView(baseParams)
+                        break
+                    case "COMPLETE_VIEW":
+                        await apiRoutes.moment.actions.completeView(baseParams)
+                        break
+                    case "SHARE":
+                        await apiRoutes.moment.actions.share(baseParams)
+                        break
+                    case "COMMENT":
+                        await apiRoutes.moment.actions.comment(baseParams)
+                        break
+                    case "REPORT":
+                        await apiRoutes.moment.actions.report(baseParams)
+                        break
+                    case "SHOW_LESS_OFTEN":
+                        await apiRoutes.moment.actions.showLessOften(baseParams)
+                        break
+                    case "HIDE":
+                        await apiRoutes.moment.author.hide(baseParams)
+                        break
+                    case "UNHIDE":
+                        await apiRoutes.moment.author.unhide(baseParams)
+                        break
+                    default:
+                        console.warn(`Tipo de interação não reconhecido: ${interactionType}`)
+                }
+            } catch (error: any) {
+                const errorMessage =
+                    error.response?.data?.message || error.message || "Erro desconhecido"
+                console.error(`Erro ao enviar interação ${interactionType}:`, errorMessage)
+
+                // Reverter estado em caso de erro para like/unlike
+                if (interactionType === "LIKE" || interactionType === "UNLIKE") {
+                    setLike(interactionType === "UNLIKE")
+                }
             }
-        } catch (error: any) {
-            const errorMessage = error.response?.data?.message || error.message || "Erro desconhecido"
-            console.error(`Erro ao enviar interação ${interactionType}:`, errorMessage)
-            
-            // Reverter estado em caso de erro para like/unlike
-            if (interactionType === "LIKE" || interactionType === "UNLIKE") {
-                setLike(interactionType === "UNLIKE")
-            }
-        }
-    }, [momentId, session.account.jwtToken])
+        },
+        [momentId, session.account.jwtToken]
+    )
 
     const setPartialViewWithServerSync = React.useCallback(() => {
         if (!partialView) {
@@ -136,40 +152,47 @@ export function useMomentUserActions(momentId?: string): MomentUserActionsState 
         }
     }, [completeView, registerInteraction])
 
+    const setSharedWithServerSync = React.useCallback(
+        (value: boolean | ((prev: boolean) => boolean)) => {
+            const newValue = typeof value === "function" ? value(share) : value
 
+            if (newValue && !share) {
+                // Só envia se ainda não foi compartilhado
+                registerInteraction("SHARE")
+            }
 
-    const setSharedWithServerSync = React.useCallback((value: boolean | ((prev: boolean) => boolean)) => {
-        const newValue = typeof value === "function" ? value(share) : value
-        
-        if (newValue && !share) {
-            // Só envia se ainda não foi compartilhado
-            registerInteraction("SHARE")
-        }
-        
-        setShare(newValue)
-    }, [share, registerInteraction])
+            setShare(newValue)
+        },
+        [share, registerInteraction]
+    )
 
-    const setReportedWithServerSync = React.useCallback((value: boolean | ((prev: boolean) => boolean)) => {
-        const newValue = typeof value === "function" ? value(report) : value
-        
-        if (newValue && !report) {
-            // Só envia se ainda não foi reportado
-            registerInteraction("REPORT")
-        }
-        
-        setReport(newValue)
-    }, [report, registerInteraction])
+    const setReportedWithServerSync = React.useCallback(
+        (value: boolean | ((prev: boolean) => boolean)) => {
+            const newValue = typeof value === "function" ? value(report) : value
 
-    const setShowLessOftenWithServerSync = React.useCallback((value: boolean | ((prev: boolean) => boolean)) => {
-        const newValue = typeof value === "function" ? value(showLessOften) : value
-        
-        if (newValue && !showLessOften) {
-            // Só envia se ainda não foi mostrado menos frequentemente
-            registerInteraction("SHOW_LESS_OFTEN")
-        }
-        
-        setShowLessOften(newValue)
-    }, [showLessOften, registerInteraction])
+            if (newValue && !report) {
+                // Só envia se ainda não foi reportado
+                registerInteraction("REPORT")
+            }
+
+            setReport(newValue)
+        },
+        [report, registerInteraction]
+    )
+
+    const setShowLessOftenWithServerSync = React.useCallback(
+        (value: boolean | ((prev: boolean) => boolean)) => {
+            const newValue = typeof value === "function" ? value(showLessOften) : value
+
+            if (newValue && !showLessOften) {
+                // Só envia se ainda não foi mostrado menos frequentemente
+                registerInteraction("SHOW_LESS_OFTEN")
+            }
+
+            setShowLessOften(newValue)
+        },
+        [showLessOften, registerInteraction]
+    )
 
     function exportMomentUserActions(): MomentUserActionsProps {
         return {
@@ -188,10 +211,10 @@ export function useMomentUserActions(momentId?: string): MomentUserActionsState 
 
     function handleLikePressedWithServerSync({ likedValue }: { likedValue?: boolean } = {}) {
         const newLikedValue = likedValue !== undefined ? likedValue : !like
-        
+
         if (newLikedValue !== like) {
             setLike(newLikedValue)
-            
+
             // Envia automaticamente para o servidor
             const interactionType = newLikedValue ? "LIKE" : "UNLIKE"
             registerInteraction(interactionType)
@@ -228,14 +251,13 @@ export function useMomentUserActions(momentId?: string): MomentUserActionsState 
         setComment: setCommentWithServerSync,
         setLikeComment: setLikeCommentWithServerSync,
         setShowLessOften: setShowLessOftenWithServerSync,
-        setReport: setReportedWithServerSync,   
+        setReport: setReportedWithServerSync,
         setPartialView: setPartialViewWithServerSync,
-        setCompleteView: setCompleteViewWithServerSync,         
+        setCompleteView: setCompleteViewWithServerSync,
         setInitialLikedState,
         setMomentUserActions,
         exportMomentUserActions,
         handleLikePressedWithServerSync,
         registerInteraction,
-
     }
 }

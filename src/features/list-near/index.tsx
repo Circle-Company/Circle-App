@@ -16,12 +16,7 @@ import { useSearchContext } from "@/components/search/search-context"
 
 export default function ListNearToYou() {
     const { searchTerm } = useSearchContext()
-    const {
-        nearbyUsers,    
-        loading,
-        error,
-        getNearbyUsers,
-    } = useNearContext()
+    const { nearbyUsers, loading, error, getNearbyUsers } = useNearContext()
 
     React.useEffect(() => {
         getNearbyUsers()
@@ -37,18 +32,21 @@ export default function ListNearToYou() {
     }, [getNearbyUsers])
 
     // Memoize o renderItem para evitar recriações desnecessárias
-    const renderItem = React.useCallback(({ item }) => (
-        <NearToYou.RenderUser 
-            user={{
-                ...item,
-                profile_picture: { tiny_resolution: item.profile_picture.tiny_resolution},
-                id: String(item.id),
-                you_follow: item.you_follow ?? false,
-                follow_you: item.follow_you ?? false,
-                distance_km: item.distance_km ?? 0
-            }} 
-        />
-    ), [])
+    const renderItem = React.useCallback(
+        ({ item }) => (
+            <NearToYou.RenderUser
+                user={{
+                    ...item,
+                    profile_picture: { tiny_resolution: item.profile_picture.tiny_resolution },
+                    id: String(item.id),
+                    you_follow: item.you_follow ?? false,
+                    follow_you: item.follow_you ?? false,
+                    distance_km: item.distance_km ?? 0,
+                }}
+            />
+        ),
+        []
+    )
 
     // Memoize os componentes de lista
     const ListHeader = React.useCallback(() => <RenderHeader />, [])
@@ -85,7 +83,9 @@ export default function ListNearToYou() {
                 data={nearbyUsers || []}
                 skeleton={<ListSkeleton />}
                 handleRefresh={handleRefresh}
-                onEndReached={async () => { return Promise.resolve() }}
+                onEndReached={async () => {
+                    return Promise.resolve()
+                }}
                 onEndReachedThreshold={0.5}
                 ListHeaderComponent={ListHeader}
                 ListFooterComponent={ListFooter}

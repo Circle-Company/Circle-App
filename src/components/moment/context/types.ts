@@ -103,7 +103,6 @@ export type MomentDataReturnsProps = {
     getTags: () => Promise<void>
 }
 
-
 export type MomentProviderProps = {
     isFeed: boolean
     isFocused: boolean
@@ -111,8 +110,6 @@ export type MomentProviderProps = {
     momentData: MomentDataProps
     children: React.ReactNode
 }
-
-
 
 export type MomentUserActionsReturnsProps = {
     like: boolean

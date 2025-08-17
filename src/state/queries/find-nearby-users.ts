@@ -7,7 +7,7 @@ interface NearbyUsersResponse {
     searchParams: {
         center: {
             latitude: string
-            longitude: string       
+            longitude: string
         }
         radius: number
         total: number
@@ -23,26 +23,36 @@ interface FindNearbyUsersParams {
     jwtToken: string
 }
 
-async function findNearbyUsers({ latitude, longitude, radius, limit, jwtToken }: FindNearbyUsersParams) {
-    const response = await api.post<NearbyUsersResponse>("/near/users", {
-        latitude,
-        longitude,
-        radius,
-        limit
-    }, {
-        headers: { Authorization: jwtToken }
-    })
+async function findNearbyUsers({
+    latitude,
+    longitude,
+    radius,
+    limit,
+    jwtToken,
+}: FindNearbyUsersParams) {
+    const response = await api.post<NearbyUsersResponse>(
+        "/near/users",
+        {
+            latitude,
+            longitude,
+            radius,
+            limit,
+        },
+        {
+            headers: { Authorization: jwtToken },
+        }
+    )
 
     console.log(response.data)
-    
+
     // Adaptar a resposta para o formato esperado pelo contexto
     return {
         data: response.data.users,
         search_params: {
             latitude: response.data.searchParams.center.latitude,
             longitude: response.data.searchParams.center.longitude,
-            radius_km: response.data.searchParams.radius
-        }
+            radius_km: response.data.searchParams.radius,
+        },
     }
 }
 
@@ -50,4 +60,4 @@ export function useFindNearbyUsers() {
     return useMutation({
         mutationFn: findNearbyUsers,
     })
-} 
+}

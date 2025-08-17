@@ -1,8 +1,5 @@
 import React from "react"
-import {
-    TouchableOpacity,
-    useColorScheme,
-} from "react-native"
+import { TouchableOpacity, useColorScheme } from "react-native"
 import { useNavigation } from "@react-navigation/native"
 import Sizes from "../../layout/constants/sizes"
 import Fonts from "../../layout/constants/fonts"

@@ -2,7 +2,15 @@ import NewMomentContext, { Video as VideoType } from "@/contexts/newMoment"
 import ColorTheme, { colors } from "@/layout/constants/colors"
 import { useNavigation, useRoute } from "@react-navigation/native"
 import React, { useRef, useState } from "react"
-import { Platform, StatusBar, StyleSheet, Text, TouchableOpacity, View, useColorScheme } from "react-native"
+import {
+    Platform,
+    StatusBar,
+    StyleSheet,
+    Text,
+    TouchableOpacity,
+    View,
+    useColorScheme,
+} from "react-native"
 import Video, { OnLoadData } from "react-native-video"
 
 export default function VideoTrimmerScreen() {
@@ -11,26 +19,26 @@ export default function VideoTrimmerScreen() {
     const { setSelectedVideo } = React.useContext(NewMomentContext)
     const videoRef = useRef<Video | null>(null)
     const isDarkMode = useColorScheme() === "dark"
-    
+
     const [isProcessing, setIsProcessing] = useState(false)
     const [startTime, setStartTime] = useState(0)
     const [duration, setDuration] = useState(0)
     const maxDuration = 30 // Duração fixa de 30 segundos
-    
+
     const endTime = Math.min(startTime + maxDuration, duration)
     const actualDuration = endTime - startTime
     const maxStartTime = Math.max(0, duration - maxDuration)
-    
+
     const handleLoad = (data: OnLoadData) => {
         setDuration(data.duration)
     }
-    
+
     const handleSliderChange = (values: number[]) => {
         const newStart = Math.min(values[0], maxStartTime)
         setStartTime(newStart)
         videoRef.current?.seek(newStart)
     }
-    
+
     const handleConfirm = () => {
         setIsProcessing(true)
         const videoData: VideoType = {
@@ -49,7 +57,7 @@ export default function VideoTrimmerScreen() {
                 backgroundColor={ColorTheme().background}
                 barStyle={isDarkMode ? "light-content" : "dark-content"}
             />
-            
+
             <View style={styles.videoContainer}>
                 <Video
                     ref={videoRef}
@@ -57,7 +65,7 @@ export default function VideoTrimmerScreen() {
                     style={styles.video}
                     resizeMode="contain"
                     onLoad={handleLoad}
-                    onProgress={({currentTime}) => {
+                    onProgress={({ currentTime }) => {
                         if (currentTime < startTime || currentTime > endTime) {
                             videoRef.current?.seek(startTime)
                         }
@@ -65,30 +73,36 @@ export default function VideoTrimmerScreen() {
                     repeat={false}
                 />
             </View>
-            
+
             <View style={styles.trimmerContainer}>
                 <Text style={styles.instructionText}>
                     Selecione o início do vídeo (duração: {maxDuration}s)
                 </Text>
-                
+
                 <View style={styles.durationInfo}>
                     <Text style={styles.durationText}>Início: {startTime.toFixed(1)}s</Text>
                     <Text style={styles.durationText}>Fim: {endTime.toFixed(1)}s</Text>
                     <Text style={styles.durationText}>Duração: {actualDuration.toFixed(1)}s</Text>
                 </View>
             </View>
-            
+
             <View style={styles.buttonContainer}>
                 <TouchableOpacity
                     style={[styles.button, styles.cancelButton]}
-                    onPress={() => navigation.goBack()}>
+                    onPress={() => navigation.goBack()}
+                >
                     <Text style={styles.buttonText}>Cancelar</Text>
                 </TouchableOpacity>
-                
+
                 <TouchableOpacity
-                    style={[styles.button, styles.confirmButton, isProcessing && styles.disabledButton]}
+                    style={[
+                        styles.button,
+                        styles.confirmButton,
+                        isProcessing && styles.disabledButton,
+                    ]}
                     disabled={isProcessing}
-                    onPress={handleConfirm}>
+                    onPress={handleConfirm}
+                >
                     <Text style={styles.buttonText}>
                         {isProcessing ? "Processando..." : "Confirmar"}
                     </Text>
@@ -175,4 +189,4 @@ const styles = StyleSheet.create({
         marginTop: 20,
         overflow: "hidden",
     },
-}) 
+})

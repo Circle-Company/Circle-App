@@ -8,7 +8,11 @@ type useSendCommentMutationProps = {
     authorizationToken: string
 }
 
-export function useSendCommentMutation({ momentId, userId, authorizationToken }: useSendCommentMutationProps) {
+export function useSendCommentMutation({
+    momentId,
+    userId,
+    authorizationToken,
+}: useSendCommentMutationProps) {
     const mutation = useMutation({
         mutationFn: async () => {
             await apiRoutes.moment.comment({

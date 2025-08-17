@@ -57,11 +57,11 @@ export function Provider({ children }: NearProviderProps) {
         }
 
         try {
-            const result = await findNearbyUsersMutation.mutateAsync({ 
-                latitude: latitude.toString(), 
-                longitude: longitude.toString(), 
-                radius,     
-                jwtToken 
+            const result = await findNearbyUsersMutation.mutateAsync({
+                latitude: latitude.toString(),
+                longitude: longitude.toString(),
+                radius,
+                jwtToken,
             })
             setNearbyUsers(result.data || [])
             setError(null)
@@ -76,29 +76,28 @@ export function Provider({ children }: NearProviderProps) {
     }, [getNearbyUsers])
 
     // Memoize o valor do contexto para evitar recriações desnecessárias
-    const contextValue = React.useMemo(() => ({
-        nearbyUsers,
-        getNearbyUsers,
-        loading: findNearbyUsersMutation.isPending,
-        error,
-        radius,
-        refresh,
-        setRadius,
-    }), [
-        nearbyUsers,
-        getNearbyUsers,
-        findNearbyUsersMutation.isPending,
-        error,
-        radius,
-        refresh,
-        setRadius
-    ])
-
-    return (
-        <NearContext.Provider value={contextValue}>
-            {children}
-        </NearContext.Provider>
+    const contextValue = React.useMemo(
+        () => ({
+            nearbyUsers,
+            getNearbyUsers,
+            loading: findNearbyUsersMutation.isPending,
+            error,
+            radius,
+            refresh,
+            setRadius,
+        }),
+        [
+            nearbyUsers,
+            getNearbyUsers,
+            findNearbyUsersMutation.isPending,
+            error,
+            radius,
+            refresh,
+            setRadius,
+        ]
     )
+
+    return <NearContext.Provider value={contextValue}>{children}</NearContext.Provider>
 }
 
 // Hook personalizado para usar o contexto

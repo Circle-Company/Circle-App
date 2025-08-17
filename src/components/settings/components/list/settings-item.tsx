@@ -109,7 +109,9 @@ export default function SettingsItem({
             <View style={styles.containerRight}>
                 {type === "IMAGE" ? (
                     <View style={styles.valueContainerImage}>
-                        <UserShow.Root data={{ ...session.user, you_follow: false } as userReciveDataProps}>
+                        <UserShow.Root
+                            data={{ ...session.user, you_follow: false } as userReciveDataProps}
+                        >
                             <UserShow.ProfilePicture
                                 displayOnMoment={false}
                                 pictureDimensions={{ width: 22, height: 22 }}

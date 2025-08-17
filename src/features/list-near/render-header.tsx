@@ -24,7 +24,7 @@ export function RenderHeader() {
 
     return (
         <View style={headerStyle}>
-            <Text style={{ fontSize: fonts.size.body * 1.1, fontFamily: fonts.family.Bold}}>
+            <Text style={{ fontSize: fonts.size.body * 1.1, fontFamily: fonts.family.Bold }}>
                 {t("Near to You Now")}
             </Text>
         </View>

@@ -95,8 +95,8 @@ export default function UserShowUsername({
                             displayOnMoment
                                 ? colors.gray.white
                                 : isDarkMode
-                                    ? colors.yellow.yellow_04
-                                    : colors.yellow.yellow_05
+                                  ? colors.yellow.yellow_04
+                                  : colors.yellow.yellow_05
                         )}
                         width={12 * scale}
                         height={12 * scale}

@@ -112,26 +112,23 @@ export function AnimatedVerticalScrollView({
 
     const refreshIconStyles = useAnimatedStyle(() => {
         "worklet"
-        const pullRotation = interpolate(
-            pullDownPosition.value,
-            [0, 120],
-            [0, 360],
-            { extrapolateRight: "clamp" }
-        )
+        const pullRotation = interpolate(pullDownPosition.value, [0, 120], [0, 360], {
+            extrapolateRight: "clamp",
+        })
 
         return {
-            opacity: refreshing 
-                ? 0.8 
+            opacity: refreshing
+                ? 0.8
                 : interpolate(pullDownPosition.value, [0, 25, 120], [0.3, 0.6, 1], {
-                    extrapolateRight: "clamp",
-                }),
+                      extrapolateRight: "clamp",
+                  }),
             transform: [
                 {
                     scale: refreshing
                         ? 1
                         : interpolate(pullDownPosition.value, [0, 120], [0.7, 1], {
-                            extrapolateRight: "clamp",
-                        }),
+                              extrapolateRight: "clamp",
+                          }),
                 },
                 {
                     rotate: refreshing ? `${rotation.value}deg` : `${pullRotation}deg`,

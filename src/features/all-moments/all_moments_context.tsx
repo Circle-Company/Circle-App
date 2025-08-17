@@ -50,7 +50,7 @@ export function AllMomentsProvider({ children }: AllMomentsProviderProps) {
                         { headers: { Authorization: session.account.jwtToken } }
                     )
                     .then(() => {
-                        notify("toast", {
+                        ;(notify("toast", {
                             params: {
                                 description: t("Moments has been deleted with success"),
                                 title: t("Moments Deleted"),
@@ -63,7 +63,7 @@ export function AllMomentsProvider({ children }: AllMomentsProviderProps) {
                                 ),
                             },
                         }),
-                        setSelectedMoments([])
+                            setSelectedMoments([]))
                     })
                     .catch(() => {
                         notify("toast", {

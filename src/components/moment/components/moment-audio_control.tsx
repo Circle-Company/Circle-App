@@ -8,7 +8,7 @@ import React from "react"
 
 export default function MomentAudioControl() {
     const { session } = React.useContext(PersistedContext)
-    
+
     const isMuted = session?.preferences?.content?.muteAudio || false
 
     const handlePress = () => {
@@ -21,19 +21,26 @@ export default function MomentAudioControl() {
     return (
         <ButtonStandart
             style={{
-                marginRight: sizes.margins["1sm"]
+                marginRight: sizes.margins["1sm"],
             }}
             square
             margins={false}
             action={handlePress}
-            backgroundColor={colors.gray.grey_07}            
+            backgroundColor={colors.gray.grey_07}
         >
-            {
-                isMuted ?
-                    <InactiveSoundIcon fill={colors.gray.white} width={sizes.icons["2sm"].width} height={sizes.icons["2sm"].height} />
-                    :
-                    <ActiveSoundIcon fill={colors.gray.white} width={sizes.icons["2sm"].width} height={sizes.icons["2sm"].height} />
-            }
+            {isMuted ? (
+                <InactiveSoundIcon
+                    fill={colors.gray.white}
+                    width={sizes.icons["2sm"].width}
+                    height={sizes.icons["2sm"].height}
+                />
+            ) : (
+                <ActiveSoundIcon
+                    fill={colors.gray.white}
+                    width={sizes.icons["2sm"].width}
+                    height={sizes.icons["2sm"].height}
+                />
+            )}
         </ButtonStandart>
     )
 }

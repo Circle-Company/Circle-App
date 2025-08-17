@@ -62,7 +62,7 @@ export function MomentProvider({
             currentTime: 0,
             duration: 0,
             isPaused: !isFocused,
-            isMuted: globalMuteAudio
+            isMuted: globalMuteAudio,
         })
     }, [isFocused])
 

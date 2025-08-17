@@ -26,7 +26,7 @@ export function RenderError() {
     }
 
     return (
-        <Animated.View 
+        <Animated.View
             entering={FadeIn.duration(500).delay(200).withInitialValues({ opacity: 0 })}
             style={containerStyle}
         >

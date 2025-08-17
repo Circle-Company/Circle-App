@@ -3,9 +3,9 @@ import RNFS from "react-native-fs"
 const VIDEO_CACHE_DIR = `${RNFS.CachesDirectoryPath}/videos`
 
 type CacheEntry = {
-  id: number
-  localPath: string
-  originalUrl: string
+    id: number
+    localPath: string
+    originalUrl: string
 }
 
 export class VideoCacher {
@@ -13,7 +13,7 @@ export class VideoCacher {
     private accessQueue: number[] = [] // mantém ordem de uso
     private maxCacheSize: number
 
-    constructor({ maxCacheSize = 10}: {maxCacheSize: number}) {
+    constructor({ maxCacheSize = 10 }: { maxCacheSize: number }) {
         this.maxCacheSize = maxCacheSize
         this.init()
     }
@@ -54,7 +54,7 @@ export class VideoCacher {
         }
     }
 
-    public async preload({id, url}: {id: number, url: string}): Promise<string> {
+    public async preload({ id, url }: { id: number; url: string }): Promise<string> {
         if (this.cache.has(id)) {
             this.markAsUsed(id)
             return this.cache.get(id)!.localPath
@@ -98,7 +98,7 @@ export class VideoCacher {
         this.cache.forEach(async (entry) => {
             try {
                 await RNFS.unlink(entry.localPath.replace("file://", ""))
-            } catch(error) {
+            } catch (error) {
                 console.log(error)
             }
         })
@@ -107,4 +107,4 @@ export class VideoCacher {
     }
 }
 
-export const videoCacher = new VideoCacher({maxCacheSize: 10}) // exemplo: limite de 10 vídeos
+export const videoCacher = new VideoCacher({ maxCacheSize: 10 }) // exemplo: limite de 10 vídeos

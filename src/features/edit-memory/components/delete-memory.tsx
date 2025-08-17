@@ -1,4 +1,12 @@
-import { Animated, Easing, Keyboard, TextStyle, View, ViewStyle, useColorScheme } from "react-native"
+import {
+    Animated,
+    Easing,
+    Keyboard,
+    TextStyle,
+    View,
+    ViewStyle,
+    useColorScheme,
+} from "react-native"
 
 import { useNavigation } from "@react-navigation/native"
 import React from "react"
@@ -98,11 +106,11 @@ export default function DeleteMemory() {
                     backgroundColor={isDarkMode ? colors.red.red_09 : colors.red.red_05}
                 >
                     <Text style={styles.buttonText}>{t("Delete")}</Text>
-                    <Icon 
-                        style={styles.icon} 
-                        fill={isDarkMode ? colors.red.red_01 : colors.gray.white} 
-                        width={14} 
-                        height={14} 
+                    <Icon
+                        style={styles.icon}
+                        fill={isDarkMode ? colors.red.red_01 : colors.gray.white}
+                        width={14}
+                        height={14}
                     />
                 </ButtonStandart>
             </View>

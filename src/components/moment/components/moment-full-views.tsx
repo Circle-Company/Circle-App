@@ -12,10 +12,7 @@ interface MomentFullViewsProps {
     views: number
 }
 
-const MomentFullViews: React.FC<MomentFullViewsProps> = ({ 
-    views, 
-    color = ColorTheme().text 
-}) => {
+const MomentFullViews: React.FC<MomentFullViewsProps> = ({ views, color = ColorTheme().text }) => {
     if (views === 0) return null
 
     const styles = StyleSheet.create({
@@ -39,15 +36,8 @@ const MomentFullViews: React.FC<MomentFullViewsProps> = ({
 
     return (
         <View style={styles.container}>
-            <Icon
-                fill={color}
-                width={14}
-                height={14}
-                style={styles.icon}
-            />
-            <Text style={styles.numberText}>
-                {formatNumberWithDots(views)}
-            </Text>
+            <Icon fill={color} width={14} height={14} style={styles.icon} />
+            <Text style={styles.numberText}>{formatNumberWithDots(views)}</Text>
         </View>
     )
 }

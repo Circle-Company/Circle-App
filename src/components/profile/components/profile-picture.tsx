@@ -91,16 +91,16 @@ export default function picture({ fromProfile = false }: ProfilePictureProps) {
                 />
                 {!user?.profile_picture?.tiny_resolution &&
                     !user?.profile_picture?.small_resolution && (
-                    <View style={iconContainer}>
-                        <Icon
-                            width={pictureDimensions.width * 0.5}
-                            height={pictureDimensions.height * 0.5}
-                            fill={
-                                isDarkMode ? colors.gray.grey_04 + 90 : colors.gray.grey_04 + 50
-                            }
-                        />
-                    </View>
-                )}
+                        <View style={iconContainer}>
+                            <Icon
+                                width={pictureDimensions.width * 0.5}
+                                height={pictureDimensions.height * 0.5}
+                                fill={
+                                    isDarkMode ? colors.gray.grey_04 + 90 : colors.gray.grey_04 + 50
+                                }
+                            />
+                        </View>
+                    )}
             </Pressable>
         </Animated.View>
     )

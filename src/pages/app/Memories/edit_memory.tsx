@@ -26,7 +26,6 @@ export default function EditMemoryScreen() {
                 <TitleMemory />
                 <ListMomentsWithoutInMemory />
                 <DeleteMemory />
-                
             </EditMemoryProvider>
         </View>
     )

@@ -15,11 +15,24 @@ if linkage != nil
   use_frameworks! :linkage => linkage.to_sym
 end
 
+<<<<<<< Updated upstream
 target 'CircleApp' do
+=======
+pod 'GoogleUtilities', :modular_headers => true
+pod 'FirebaseCoreInternal', :modular_headers => true
+
+target 'Circle' do
+>>>>>>> Stashed changes
   config = use_native_modules!
 
   use_react_native!(
     :path => config[:reactNativePath],
+<<<<<<< Updated upstream
+=======
+    # Hermes is now enabled by default. Disable by setting this flag to false.
+    :hermes_enabled => flags[:hermes_enabled],
+    :fabric_enabled => flags[:fabric_enabled],
+>>>>>>> Stashed changes
     # An absolute path to your application root.
     :app_path => "#{Pod::Config.instance.installation_root}/.."
   )

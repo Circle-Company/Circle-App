@@ -32,4 +32,4 @@ export default function AnyMomentsWithoutInMemory() {
             <Text style={styles.text}>{t("No moments available to add")}</Text>
         </View>
     )
-} 
+}

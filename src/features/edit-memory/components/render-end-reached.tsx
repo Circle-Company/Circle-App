@@ -11,7 +11,7 @@ import React from "react"
 export default function RenderEndReached({ text }: { text: string }) {
     const { t } = React.useContext(LanguageContext)
     const isDarkMode = useColorScheme() === "dark"
-    
+
     const styles = {
         container: {
             alignItems: "center",

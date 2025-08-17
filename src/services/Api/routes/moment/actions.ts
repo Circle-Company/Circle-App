@@ -38,7 +38,10 @@ export async function share({ momentId, authorizationToken }: MomentActionProps)
     )
 }
 
-export async function partialView({ momentId, authorizationToken }: MomentActionProps): Promise<void> {
+export async function partialView({
+    momentId,
+    authorizationToken,
+}: MomentActionProps): Promise<void> {
     await api.post(
         `/moments/${momentId}/partial-view`,
         {},
@@ -50,7 +53,10 @@ export async function partialView({ momentId, authorizationToken }: MomentAction
     )
 }
 
-export async function completeView({ momentId, authorizationToken }: MomentActionProps): Promise<void> {
+export async function completeView({
+    momentId,
+    authorizationToken,
+}: MomentActionProps): Promise<void> {
     await api.post(
         `/moments/${momentId}/complete-view`,
         {},
@@ -74,7 +80,10 @@ export async function click({ momentId, authorizationToken }: MomentActionProps)
     )
 }
 
-export async function likeComment({ momentId, authorizationToken }: MomentActionProps): Promise<void> {
+export async function likeComment({
+    momentId,
+    authorizationToken,
+}: MomentActionProps): Promise<void> {
     await api.post(
         `/moments/${momentId}/like-comment`,
         {},
@@ -98,7 +107,10 @@ export async function comment({ momentId, authorizationToken }: MomentActionProp
     )
 }
 
-export async function showLessOften({ momentId, authorizationToken }: MomentActionProps): Promise<void> {
+export async function showLessOften({
+    momentId,
+    authorizationToken,
+}: MomentActionProps): Promise<void> {
     await api.post(
         `/moments/${momentId}/show-less-often`,
         {},
@@ -122,7 +134,11 @@ export async function report({ momentId, authorizationToken }: MomentActionProps
     )
 }
 
-export async function reportComment({ momentId, authorizationToken, reportType }: MomentActionPropsWithReportType): Promise<void> {
+export async function reportComment({
+    momentId,
+    authorizationToken,
+    reportType,
+}: MomentActionPropsWithReportType): Promise<void> {
     await api.post(
         `/moments/${momentId}/comment/report`,
         { report_type: reportType },

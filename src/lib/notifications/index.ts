@@ -1,6 +1,6 @@
 import { apiRoutes } from "../../services/Api"
 
-async function registerPushToken({ userId, token }: { userId: number; token: string }) {
+async function registerPushToken({ userId, token }: { userId: string; token: string }) {
     try {
         if (!userId || (typeof token !== "string" && token !== ""))
             throw Error("session.user.id or session.account.firebasePushToken have a null value")

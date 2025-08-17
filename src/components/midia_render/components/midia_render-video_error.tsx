@@ -6,8 +6,8 @@ import { colors } from "@/layout/constants/colors"
 import sizes from "@/layout/constants/sizes"
 
 export interface VideoErrorProps {
-    message: string;
-    onRetry?: () => void;
+    message: string
+    onRetry?: () => void
 }
 
 export default function MidiaRenderVideoError({ message, onRetry }: VideoErrorProps) {
@@ -40,5 +40,5 @@ const styles = StyleSheet.create({
         alignItems: "center",
         justifyContent: "center",
         marginBottom: sizes.margins["2sm"],
-    }
-})   
+    },
+})

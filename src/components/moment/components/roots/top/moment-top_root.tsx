@@ -9,7 +9,7 @@ export default function top_root({ children }: MomentTopRootProps) {
         alignItems: "center",
         flexDirection: "row",
         padding: sizes.paddings["1sm"] / 2,
-        paddingTop: sizes.paddings["1sm"] * 0.7
+        paddingTop: sizes.paddings["1sm"] * 0.7,
     }
 
     return <View style={container}>{children}</View>

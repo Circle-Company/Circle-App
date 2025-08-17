@@ -26,7 +26,7 @@ export interface Comment {
 }
 
 export interface Media {
-    content_type: "VIDEO" | "IMAGE" 
+    content_type: "VIDEO" | "IMAGE"
     nhd_thumbnail: string
     fullhd_resolution: string
     nhd_resolution: string

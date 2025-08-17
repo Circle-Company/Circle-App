@@ -25,14 +25,14 @@ export default function SearchInput() {
                 toValue: 1.1,
                 duration: 100,
                 useNativeDriver: true,
-                easing: Easing.linear
+                easing: Easing.linear,
             }),
             Animated.timing(bounceAnim, {
                 toValue: 1,
                 duration: 100,
                 useNativeDriver: true,
-                easing: Easing.bounce
-            })
+                easing: Easing.bounce,
+            }),
         ]).start()
     }
 
@@ -55,7 +55,7 @@ export default function SearchInput() {
             toValue: newValue.length > 0 ? 1.05 : 0.98,
             duration: 300,
             useNativeDriver: true,
-            easing: Easing.bezier(0.4, 0, 0.2, 1)
+            easing: Easing.bezier(0.4, 0, 0.2, 1),
         }).start()
     }
 
@@ -83,7 +83,7 @@ export default function SearchInput() {
     }
 
     const container: any = {
-        width: sizes.screens.width - (sizes.paddings["2sm"] * 2),
+        width: sizes.screens.width - sizes.paddings["2sm"] * 2,
         height: sizes.buttons.height / 1.8,
         borderRadius: sizes.inputs.height / 2,
         overflow: "hidden",
@@ -135,21 +135,21 @@ export default function SearchInput() {
 
     return (
         <View style={out_container}>
-            <Animated.View 
+            <Animated.View
                 style={[
                     container,
                     {
-                        transform: [{ scale: containerScale }]
-                    }
+                        transform: [{ scale: containerScale }],
+                    },
                 ]}
             >
                 <View style={input_container}>
-                    <Animated.View 
+                    <Animated.View
                         style={[
                             iconContainer,
                             {
-                                transform: [{ scale: bounceAnim }]
-                            }
+                                transform: [{ scale: bounceAnim }],
+                            },
                         ]}
                     >
                         <SearchIcon

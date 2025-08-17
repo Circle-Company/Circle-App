@@ -45,9 +45,7 @@ export default function date({
                 height={14}
                 style={{ marginRight: sizes.margins["1sm"] * 1.4 }}
             />
-            <Text style={description_style}>
-                {date}
-            </Text>
+            <Text style={description_style}>{date}</Text>
         </View>
     )
 }

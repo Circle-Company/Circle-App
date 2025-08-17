@@ -26,7 +26,10 @@ export async function unhide({ momentId, authorizationToken }: MomentActionProps
     )
 }
 
-export async function deleteMoment({ momentId, authorizationToken }: MomentActionProps): Promise<void> {
+export async function deleteMoment({
+    momentId,
+    authorizationToken,
+}: MomentActionProps): Promise<void> {
     await api.post(
         `/moments/${momentId}/delete`,
         {},
@@ -38,7 +41,11 @@ export async function deleteMoment({ momentId, authorizationToken }: MomentActio
     )
 }
 
-export async function deleteComment({ momentId, commentId, authorizationToken }: MomentActionPropsWithCommentType): Promise<void> {
+export async function deleteComment({
+    momentId,
+    commentId,
+    authorizationToken,
+}: MomentActionPropsWithCommentType): Promise<void> {
     await api.post(
         `/moments/${momentId}/comments/${commentId}/delete`,
         {},

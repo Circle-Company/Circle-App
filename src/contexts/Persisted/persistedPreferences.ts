@@ -181,7 +181,7 @@ export const usePreferencesStore = create<PreferencesState>((set) => ({
                 content: data.content,
                 pushNotifications: data.pushNotifications,
             })
-            
+
             if (data.language.appLanguage) {
                 storage.set(storageKey.appLanguage, data.language.appLanguage)
             }

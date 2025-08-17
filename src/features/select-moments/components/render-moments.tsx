@@ -70,7 +70,7 @@ export default function RenderMoment({
 
     function Select() {
         if (!preview) {
-            put_moment_on_list(moment), setSelected(true)
+            ;(put_moment_on_list(moment), setSelected(true))
         }
     }
 

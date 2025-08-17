@@ -1,12 +1,5 @@
 import React from "react"
-import {
-    StyleSheet,
-    TouchableOpacity,
-    View,
-    Dimensions,
-    useColorScheme,
-    Image,
-} from "react-native"
+import { StyleSheet, TouchableOpacity, View, Dimensions, useColorScheme, Image } from "react-native"
 import { useNavigation } from "@react-navigation/native"
 import Colors from "../../constants/Colors"
 

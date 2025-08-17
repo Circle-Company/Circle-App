@@ -25,16 +25,16 @@ const MOCK_COMMENTS: CommentObject[] = [
             verifyed: true,
             profile_picture: {
                 small_resolution: "https://picsum.photos/50/50",
-                tiny_resolution: "https://picsum.photos/30/30"
+                tiny_resolution: "https://picsum.photos/30/30",
             },
-            you_follow: true
+            you_follow: true,
         },
         content: "Que foto incrível! Adorei as cores e a composição. 📸✨",
         created_at: "2024-03-20T10:30:00Z",
         statistics: {
             total_likes_num: 15,
         },
-        is_liked: true
+        is_liked: true,
     },
     {
         id: "2",
@@ -44,16 +44,16 @@ const MOCK_COMMENTS: CommentObject[] = [
             verifyed: false,
             profile_picture: {
                 small_resolution: "https://picsum.photos/51/51",
-                tiny_resolution: "https://picsum.photos/31/31"
+                tiny_resolution: "https://picsum.photos/31/31",
             },
-            you_follow: false
+            you_follow: false,
         },
         content: "Esse lugar é maravilhoso! Onde fica? Quero muito conhecer! 🌎",
         created_at: "2024-03-20T11:15:00Z",
         statistics: {
             total_likes_num: 8,
         },
-        is_liked: false
+        is_liked: false,
     },
     {
         id: "3",
@@ -63,16 +63,16 @@ const MOCK_COMMENTS: CommentObject[] = [
             verifyed: true,
             profile_picture: {
                 small_resolution: "https://picsum.photos/52/52",
-                tiny_resolution: "https://picsum.photos/32/32"
+                tiny_resolution: "https://picsum.photos/32/32",
             },
-            you_follow: true
+            you_follow: true,
         },
         content: "A luz natural nessa foto está perfeita! Qual câmera você usou? 📷",
         created_at: "2024-03-20T12:00:00Z",
         statistics: {
             total_likes_num: 25,
         },
-        is_liked: true
+        is_liked: true,
     },
     {
         id: "4",
@@ -82,24 +82,30 @@ const MOCK_COMMENTS: CommentObject[] = [
             verifyed: false,
             profile_picture: {
                 small_resolution: "https://picsum.photos/53/53",
-                tiny_resolution: "https://picsum.photos/33/33"
+                tiny_resolution: "https://picsum.photos/33/33",
             },
-            you_follow: false
+            you_follow: false,
         },
         content: "Mais um lugar para adicionar na minha lista de destinos! 🗺️✈️",
         created_at: "2024-03-20T13:45:00Z",
         statistics: {
             total_likes_num: 12,
         },
-        is_liked: false
-    }
+        is_liked: false,
+    },
 ]
 
-function FetchedCommentsList({ totalCommentsNum, momentId }: { totalCommentsNum: number, momentId: string | number }) {
+function FetchedCommentsList({
+    totalCommentsNum,
+    momentId,
+}: {
+    totalCommentsNum: number
+    momentId: string | number
+}) {
     const { t } = React.useContext(LanguageContext)
     const { session } = React.useContext(PersistedContext)
     const { networkStats } = React.useContext(NetworkContext)
-    const {collapse} = React.useContext(BottomSheetContext)
+    const { collapse } = React.useContext(BottomSheetContext)
     const [page, setPage] = React.useState<number>(1)
     const [loading, setLoading] = React.useState<boolean>(false)
     const [endReached, setEndReached] = React.useState<boolean>(false)
@@ -114,13 +120,13 @@ function FetchedCommentsList({ totalCommentsNum, momentId }: { totalCommentsNum:
         marginBottom: sizes.margins["2sm"],
         height: sizes.headers.height * 0.7,
         alignItems: "center",
-        justifyContent: "flex-start"
+        justifyContent: "flex-start",
     }
 
     const title: TextStyle = {
         marginLeft: sizes.margins["2sm"] * 0.7,
         fontSize: fonts.size.body,
-        fontFamily: fonts.family.Bold
+        fontFamily: fonts.family.Bold,
     }
 
     const inputOverflow: ViewStyle = {
@@ -197,10 +203,12 @@ function FetchedCommentsList({ totalCommentsNum, momentId }: { totalCommentsNum:
             keyExtractor={(item: CommentObject, index: number) => String(item.id || index)}
             ListHeaderComponent={() => (
                 <View style={titleContainer}>
-                    <View style={{flex: 1}}>
-                        <Text style={title}>{totalCommentsNum} {t("Comments")}</Text>
+                    <View style={{ flex: 1 }}>
+                        <Text style={title}>
+                            {totalCommentsNum} {t("Comments")}
+                        </Text>
                     </View>
-                    <ButtonClose onPress={collapse}/>
+                    <ButtonClose onPress={collapse} />
                 </View>
             )}
             renderItem={({ item, index }) => (
@@ -234,8 +242,7 @@ function FetchedCommentsList({ totalCommentsNum, momentId }: { totalCommentsNum:
                     )
             }}
             style={{ width: sizes.moment.standart.width, alignSelf: "center" }}
-        />            
-
+        />
     )
 }
 

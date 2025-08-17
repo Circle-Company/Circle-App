@@ -26,10 +26,10 @@ type Image = {
 }
 
 export type Video = {
-    uri: string;
-    duration?: number;
-    fileSize?: number;
-    type?: string;
+    uri: string
+    duration?: number
+    fileSize?: number
+    type?: string
 }
 
 export type NewMomentContextsData = {

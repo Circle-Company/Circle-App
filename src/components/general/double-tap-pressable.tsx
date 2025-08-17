@@ -30,7 +30,7 @@ const DoubleTapPressable: React.FC<DoubleTapPressableProps> = ({
             lastTap.current = now
             tapTimeout.current = setTimeout(
                 () => {
-                    onSingleTap? onSingleTap() : null
+                    onSingleTap ? onSingleTap() : null
                     lastTap.current = null
                 },
                 delay ? delay : 300

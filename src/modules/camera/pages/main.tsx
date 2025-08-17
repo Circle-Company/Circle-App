@@ -5,10 +5,14 @@ import { Camera, useCameraDevice, useCameraPermission } from "react-native-visio
 export function CameraView() {
     //@ts-nocheck
     const device = useCameraDevice("back")
-    const { hasPermission: hasCameraPermission, requestPermission: requestCameraPermission } = useCameraPermission()
-    const { hasPermission: hasMicrophonePermission, requestPermission: requestMicrophonePermission } = useMicrophonePermission()
+    const { hasPermission: hasCameraPermission, requestPermission: requestCameraPermission } =
+        useCameraPermission()
+    const {
+        hasPermission: hasMicrophonePermission,
+        requestPermission: requestMicrophonePermission,
+    } = useMicrophonePermission()
 
-    if (!hasCameraPermission || ! hasMicrophonePermission) {
+    if (!hasCameraPermission || !hasMicrophonePermission) {
         requestCameraPermission()
         requestMicrophonePermission()
     }

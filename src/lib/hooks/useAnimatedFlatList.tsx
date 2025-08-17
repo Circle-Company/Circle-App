@@ -58,9 +58,7 @@ const DefaultEmptyComponent = () => {
 
     return (
         <View style={emptyContainerStyle}>
-            <Text style={emptyTextStyle}>
-                Nenhum item encontrado
-            </Text>
+            <Text style={emptyTextStyle}>Nenhum item encontrado</Text>
         </View>
     )
 }
@@ -285,18 +283,18 @@ export function AnimatedVerticalFlatlist<T>({
             opacity: refreshing
                 ? 0.8
                 : interpolate(pullDownPosition.value, [0, 25, REFRESH_THRESHOLD], [0.3, 0.6, 1], {
-                    extrapolateRight: "clamp",
-                }),
+                      extrapolateRight: "clamp",
+                  }),
             transform: [
                 {
                     scale: refreshing
                         ? 1
                         : interpolate(
-                            pullDownPosition.value,
-                            [0, REFRESH_THRESHOLD],
-                            [0.7, 1], // Simplificado para ser mais direto
-                            { extrapolateRight: "clamp" }
-                        ),
+                              pullDownPosition.value,
+                              [0, REFRESH_THRESHOLD],
+                              [0.7, 1], // Simplificado para ser mais direto
+                              { extrapolateRight: "clamp" }
+                          ),
                 },
                 {
                     rotate: refreshing ? `${rotation.value}deg` : `${pullRotation}deg`,
@@ -422,18 +420,17 @@ export function AnimatedVerticalFlatlist<T>({
         } as ViewStyle,
 
         flatlist: {
-            backgroundColor: backgroundColor? backgroundColor : isDarkMode ? colors.gray.black : colors.gray.white,
+            backgroundColor: backgroundColor
+                ? backgroundColor
+                : isDarkMode
+                  ? colors.gray.black
+                  : colors.gray.white,
         } as ViewStyle,
     }
 
     return (
-        <View
-            pointerEvents={refreshing ? "none" : "auto"}
-            style={styles.container}
-        >
-            <Animated.View
-                style={[styles.refreshContainer, pullDownStyles]}
-            >
+        <View pointerEvents={refreshing ? "none" : "auto"} style={styles.container}>
+            <Animated.View style={[styles.refreshContainer, pullDownStyles]}>
                 <Animated.View style={refreshIconStyles}>
                     {CustomRefreshIcon ? (
                         <CustomRefreshIcon />
@@ -441,7 +438,13 @@ export function AnimatedVerticalFlatlist<T>({
                         <Text
                             style={[
                                 styles.refreshText,
-                                { opacity: interpolate(pullDownPosition.value, [0, REFRESH_THRESHOLD], [0.5, 1]) }
+                                {
+                                    opacity: interpolate(
+                                        pullDownPosition.value,
+                                        [0, REFRESH_THRESHOLD],
+                                        [0.5, 1]
+                                    ),
+                                },
                             ]}
                         >
                             {config.APPLICATION_SHORT_NAME}
@@ -456,9 +459,7 @@ export function AnimatedVerticalFlatlist<T>({
             >
                 {isLoading ? (
                     skeleton ? (
-                        <View style={styles.skeletonContainer}>
-                            {skeleton}
-                        </View>
+                        <View style={styles.skeletonContainer}>{skeleton}</View>
                     ) : null
                 ) : (
                     <Animated.FlatList

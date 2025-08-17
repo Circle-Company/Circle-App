@@ -24,13 +24,13 @@ E acima de tudo com autenticidade, trazendo um visual inovador, funções difere
 
 ### 🧠 Funcionalidades
 
--   📸 Criar e editar momentos com fotos, vídeos e texto
--   📂 Organizar momentos em memórias personalizadas
--   💬 Curtidas, comentários e interações sociais
--   📱 Perfil público com galeria de memórias
--   🔒 Autenticação segura com JWT
--   🌗 Suporte a temas claro e escuro
--   🚀 Arquitetura escalável com React Native + TypeScript
+- 📸 Criar e editar momentos com fotos, vídeos e texto
+- 📂 Organizar momentos em memórias personalizadas
+- 💬 Curtidas, comentários e interações sociais
+- 📱 Perfil público com galeria de memórias
+- 🔒 Autenticação segura com JWT
+- 🌗 Suporte a temas claro e escuro
+- 🚀 Arquitetura escalável com React Native + TypeScript
 
 ---
 
@@ -68,9 +68,9 @@ Para contribuir:
 
 ### 📎 Links Úteis
 
--   [🔗 Repositório Principal](https://github.com/Circle-Company/Circle-App)
--   [🧠 Roadmap no GitHub Projects](https://github.com/Circle-Company/Circle-App/projects)
--   [📱 Protótipo no Figma (se tiver)](https://figma.com/...)
+- [🔗 Repositório Principal](https://github.com/Circle-Company/Circle-App)
+- [🧠 Roadmap no GitHub Projects](https://github.com/Circle-Company/Circle-App/projects)
+- [📱 Protótipo no Figma (se tiver)](https://figma.com/...)
 
 ---
 

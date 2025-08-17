@@ -58,8 +58,8 @@ export default function ProfileScreen() {
             ...data,
             profile_picture: {
                 ...data.profile_picture,
-                small_resolution: data.profile_picture.tiny_resolution
-            }
+                small_resolution: data.profile_picture.tiny_resolution,
+            },
         }
 
         return (
@@ -76,10 +76,7 @@ export default function ProfileScreen() {
                     )}
                 >
                     <RenderProfile user={userData} />
-                    <ListMemories
-                        isAccountScreen={false}
-                        user={userData}
-                    />
+                    <ListMemories isAccountScreen={false} user={userData} />
                 </AnimatedVerticalScrollView>
             </View>
         )

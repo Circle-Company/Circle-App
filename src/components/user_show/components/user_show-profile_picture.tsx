@@ -27,8 +27,8 @@ export default function profile_picture({
         backgroundColor: displayOnMoment
             ? ColorTheme().blur_display_color
             : isDarkMode
-                ? colors.gray.grey_07
-                : colors.gray.grey_02,
+              ? colors.gray.grey_07
+              : colors.gray.grey_02,
         width: Number(pictureDimensions.width) + Number(outlineSize),
         height: Number(pictureDimensions.height) + Number(outlineSize),
         overflow: "hidden",
@@ -72,16 +72,16 @@ export default function profile_picture({
                 />
                 {!user.profile_picture?.tiny_resolution &&
                     !user.profile_picture?.small_resolution && (
-                    <View style={iconContainer}>
-                        <Icon
-                            width={pictureDimensions.width * 0.5}
-                            height={pictureDimensions.height * 0.5}
-                            fill={
-                                isDarkMode ? colors.gray.grey_05 + 90 : colors.gray.grey_04 + 50
-                            }
-                        />
-                    </View>
-                )}
+                        <View style={iconContainer}>
+                            <Icon
+                                width={pictureDimensions.width * 0.5}
+                                height={pictureDimensions.height * 0.5}
+                                fill={
+                                    isDarkMode ? colors.gray.grey_05 + 90 : colors.gray.grey_04 + 50
+                                }
+                            />
+                        </View>
+                    )}
             </Pressable>
         </Animated.View>
     )

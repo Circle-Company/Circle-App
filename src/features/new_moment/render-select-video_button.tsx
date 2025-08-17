@@ -21,7 +21,7 @@ export default function RenderSelectVideoFromGalleryButton() {
     const buttonTextStyle: TextStyle = {
         color: colors.gray.white,
         fontSize: 16,
-        fontFamily: fonts.family.Bold
+        fontFamily: fonts.family.Bold,
     }
 
     const selectVideo = async () => {

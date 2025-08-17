@@ -41,7 +41,7 @@ export default function AccountScreen() {
             ...session.statistics,
         },
         you_follow: false,
-        follow_you: false
+        follow_you: false,
     }
 
     return (
@@ -57,10 +57,7 @@ export default function AccountScreen() {
                 )}
             >
                 {loading ? <RenderProfileSkeleton /> : <RenderProfile user={renderUser} />}
-                <ListMemories
-                    isAccountScreen={true}
-                    user={renderUser}
-                />
+                <ListMemories isAccountScreen={true} user={renderUser} />
             </AnimatedVerticalScrollView>
         </View>
     )

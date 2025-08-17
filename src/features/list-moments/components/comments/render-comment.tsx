@@ -19,7 +19,7 @@ export default function RenderComment({ moment, focused }: renderCommentProps) {
     const { commentEnabled, setCommentEnabled, setKeyboardVisible, setFocusedMoment } =
         React.useContext(FeedContext)
     const [animatedOpacityValue] = React.useState(new Animated.Value(1))
-    
+
     React.useEffect(() => {
         if (focused) {
             Animated.timing(animatedOpacityValue, {

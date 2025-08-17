@@ -69,7 +69,6 @@ export default function RenderMemory({ memory }: RenderMemoryProps) {
 
     const selectedMemoryId: number | boolean = selectedMemory?.id ?? false
 
-
     const check_circle_style: ViewStyle = {
         elevation: 10,
         shadowOpacity: 1,
@@ -98,7 +97,7 @@ export default function RenderMemory({ memory }: RenderMemoryProps) {
             </Pressable>
             <View style={ContainerStyle}>
                 <RenderMemory_
-                    user={{...session.user, you_follow: false}}
+                    user={{ ...session.user, you_follow: false }}
                     memory={memory}
                     pressable={false}
                     scale={1}

@@ -50,8 +50,8 @@ export default function MemoryTitleHeaderRight() {
                     active
                         ? colors.blue.blue_05
                         : isDarkMode
-                            ? colors.gray.grey_07
-                            : colors.gray.grey_02
+                          ? colors.gray.grey_07
+                          : colors.gray.grey_02
                 )}
             >
                 <View style={textContainer}>

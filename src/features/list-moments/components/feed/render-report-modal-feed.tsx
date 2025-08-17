@@ -25,62 +25,62 @@ const ReportOptions: ReportOption[] = [
     {
         id: "SPAM",
         title: "Spam",
-        description: "This moment is spam"
+        description: "This moment is spam",
     },
     {
         id: "INAPPROPRIATE",
         title: "Inappropriate",
-        description: "This moment is inappropriate"
+        description: "This moment is inappropriate",
     },
     {
         id: "VIOLENCE",
         title: "Violence",
-        description: "This moment contains violent or explicit content"
+        description: "This moment contains violent or explicit content",
     },
     {
         id: "HARASSMENT",
         title: "Harassment",
-        description: "This moment contains harassment or bullying"
+        description: "This moment contains harassment or bullying",
     },
     {
         id: "MISINFORMATION",
         title: "Misinformation",
-        description: "This moment contains false information"
+        description: "This moment contains false information",
     },
     {
         id: "COPYRIGHT",
         title: "Copyright",
-        description: "This moment violates copyright laws"
+        description: "This moment violates copyright laws",
     },
     {
         id: "HATE_SPEECH",
         title: "Hate Speech",
-        description: "This moment contains hate speech"
+        description: "This moment contains hate speech",
     },
     {
         id: "ILLEGAL_GOODS",
         title: "Illegal Goods",
-        description: "This moment promotes illegal goods or services"
+        description: "This moment promotes illegal goods or services",
     },
     {
         id: "SEXUAL_CONTENT",
         title: "Sexual Content",
-        description: "This moment contains nudity or sexual content"
+        description: "This moment contains nudity or sexual content",
     },
     {
         id: "OTHER",
         title: "Other",
-        description: "This moment violates other platform policies"
-    }
+        description: "This moment violates other platform policies",
+    },
 ]
 
-export function RenderReportModal({moment}: {moment: MomentDataProps}) {
+export function RenderReportModal({ moment }: { moment: MomentDataProps }) {
     const { t } = React.useContext(LanguageContext)
     const { collapse } = React.useContext(BottomSheetContext)
     const { session } = React.useContext(PersistedContext)
     const isDarkMode = useColorScheme() === "dark"
     const width =
-    sizes.screens.width - (sizes.paddings["2sm"] * 2 + sizes.bottomSheet.marginHorizontal * 2)
+        sizes.screens.width - (sizes.paddings["2sm"] * 2 + sizes.bottomSheet.marginHorizontal * 2)
 
     const container: ViewStyle = {
         width,
@@ -116,7 +116,7 @@ export function RenderReportModal({moment}: {moment: MomentDataProps}) {
         paddingHorizontal: sizes.paddings["2sm"],
         marginBottom: sizes.margins["1sm"] * 1.5,
         borderRadius: sizes.borderRadius["1sm"],
-        backgroundColor: isDarkMode? colors.gray.grey_08 : colors.gray.grey_02,
+        backgroundColor: isDarkMode ? colors.gray.grey_08 : colors.gray.grey_02,
     }
 
     const optionTitleStyle: TextStyle = {
@@ -135,13 +135,18 @@ export function RenderReportModal({moment}: {moment: MomentDataProps}) {
         console.log(option)
 
         try {
-            await api.post(`/moments/${momentId}/report`, {
-                report_type: option.id
-            },{
-                headers: {
-                    "Authorization": session.account.jwtToken
-                }
-            })
+            await api
+                .post(
+                    `/moments/${momentId}/report`,
+                    {
+                        report_type: option.id,
+                    },
+                    {
+                        headers: {
+                            Authorization: session.account.jwtToken,
+                        },
+                    }
+                )
                 .then(() => {
                     notify("toast", {
                         params: {
@@ -155,7 +160,7 @@ export function RenderReportModal({moment}: {moment: MomentDataProps}) {
                                 />
                             ),
                         },
-                    })                
+                    })
                 })
                 .finally(() => {
                     collapse()
@@ -168,15 +173,21 @@ export function RenderReportModal({moment}: {moment: MomentDataProps}) {
     return (
         <View style={container}>
             <View style={headerContainer}>
-                <Text style={TextStyle}>{`${t("Report this")} @${moment.user.username} ${t("moment")}`}.</Text>
+                <Text style={TextStyle}>
+                    {`${t("Report this")} @${moment.user.username} ${t("moment")}`}.
+                </Text>
             </View>
             <View style={centerContainer}>
                 {ReportOptions.map((option) => (
-                    <TouchableOpacity key={option.id} style={optionContainer} onPress={() => handleReport(option, moment.id)}>
+                    <TouchableOpacity
+                        key={option.id}
+                        style={optionContainer}
+                        onPress={() => handleReport(option, moment.id)}
+                    >
                         <Text style={optionTitleStyle}>{option.title}</Text>
                         <Text style={optionDescriptionStyle}>{option.description}</Text>
                     </TouchableOpacity>
-                ))}            
+                ))}
             </View>
             <View style={bottomContainer}>
                 <CancelButton

@@ -1,4 +1,8 @@
-import BottomSheet, { BottomSheetBackdropProps, BottomSheetModalProvider, BottomSheetProps } from "@gorhom/bottom-sheet"
+import BottomSheet, {
+    BottomSheetBackdropProps,
+    BottomSheetModalProvider,
+    BottomSheetProps,
+} from "@gorhom/bottom-sheet"
 import React, { useCallback, useEffect, useMemo, useRef, useState } from "react"
 
 import { FlexAlignType } from "react-native"
@@ -13,10 +17,10 @@ type BottomSheetProviderProps = {
 // Estendendo o tipo para incluir estilos personalizados
 interface CustomBottomSheetOptions extends BottomSheetProps {
     customStyles?: {
-        modalBackground?: Partial<ViewStyle>;
-        modal?: Partial<ViewStyle>;
-        handle?: Partial<ViewStyle>;
-        handleIndicator?: Partial<ViewStyle>;
+        modalBackground?: Partial<ViewStyle>
+        modal?: Partial<ViewStyle>
+        handle?: Partial<ViewStyle>
+        handleIndicator?: Partial<ViewStyle>
     }
 }
 
@@ -72,27 +76,27 @@ export function Provider({ children }: BottomSheetProviderProps) {
     const styles = useMemo(() => {
         return StyleSheet.create({
             contentContainer: {
-                marginTop: sizes.margins["2sm"]
+                marginTop: sizes.margins["2sm"],
             },
             handle: {
                 height: 10,
-                ...(options?.customStyles?.handle || {})
+                ...(options?.customStyles?.handle || {}),
             },
             handleIndicator: {
                 backgroundColor: isDarkMode ? colors.gray.grey_07 : colors.gray.grey_03,
-                ...(options?.customStyles?.handleIndicator || {})
+                ...(options?.customStyles?.handleIndicator || {}),
             },
             modal: {
                 ...sizes.bottomSheet,
                 alignItems: "center" as FlexAlignType,
-                ...(options?.customStyles?.modal || {})
+                ...(options?.customStyles?.modal || {}),
             },
             modalBackground: {
                 alignItems: "center" as FlexAlignType,
                 backgroundColor: isDarkMode ? colors.gray.grey_09 : colors.gray.grey_01,
                 borderRadius: sizes.borderRadius["1xl"] * 0.8,
-                ...(options?.customStyles?.modalBackground || {})
-            }
+                ...(options?.customStyles?.modalBackground || {}),
+            },
         })
     }, [isDarkMode, options?.customStyles])
 

@@ -1,10 +1,4 @@
-import {
-    Animated,
-    Easing,
-    TextStyle,
-    ViewStyle,
-    useColorScheme,
-} from "react-native"
+import { Animated, Easing, TextStyle, ViewStyle, useColorScheme } from "react-native"
 import ColorTheme, { colors } from "../../layout/constants/colors"
 import React, { useCallback, useEffect } from "react"
 import { Text, View } from "../../components/Themed"
@@ -72,7 +66,6 @@ export function EmptyList() {
             startSpinAnimation()
         }
     }, [loading, startSpinAnimation])
-
 
     const cardContainerStyle: ViewStyle = {
         alignItems: "center",

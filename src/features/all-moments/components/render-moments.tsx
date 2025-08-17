@@ -75,7 +75,7 @@ export default function RenderMoment({
                 delete_moment_from_list(moment)
                 setSelected(false)
             } else {
-                put_moment_on_list(moment), setSelected(true)
+                ;(put_moment_on_list(moment), setSelected(true))
             }
         }
     }

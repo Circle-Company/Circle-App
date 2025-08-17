@@ -44,10 +44,7 @@ export function CustomBackdrop({ style, visible = true }: CustomBackdropProps) {
     }
 
     return (
-        <Animated.View
-            entering={FadeInUp.duration(450)}
-            style={containerStyle}
-        >
+        <Animated.View entering={FadeInUp.duration(450)} style={containerStyle}>
             <Pressable onPress={handlePress} style={{ flex: 1 }} />
         </Animated.View>
     )

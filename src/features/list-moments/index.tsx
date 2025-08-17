@@ -18,7 +18,7 @@ type ViewToken = {
     index: number | null
     isViewable: boolean
     section?: any
-  }
+}
 
 const ListMoments = () => {
     const margin = 2
@@ -68,7 +68,7 @@ const ListMoments = () => {
             viewableItems.forEach((token) => {
                 const item = token.item as MomentDataProps
                 const url = item.midia.fullhd_resolution || item.midia.nhd_resolution
-      
+
                 if (url) {
                     FastImage.preload([{ uri: url }])
                     videoCacher.preload({
@@ -119,7 +119,6 @@ const ListMoments = () => {
                 onEndReached={async () => {
                     await reloadFeed()
                 }}
-                
                 onEndReachedThreshold={0}
                 refreshControl={
                     <RefreshControl
@@ -143,12 +142,16 @@ const ListMoments = () => {
                         index === 0
                             ? container_0
                             : index + 1 === feedData.length
-                                ? container_1
-                                : container
+                              ? container_1
+                              : container
 
                     return (
                         <Animated.View style={container_style} key={item.unique_id}>
-                            <RenderMomentFeed isFeed={true} momentData={item} isFocused={focusedItem} />
+                            <RenderMomentFeed
+                                isFeed={true}
+                                momentData={item}
+                                isFocused={focusedItem}
+                            />
                         </Animated.View>
                     )
                 }}

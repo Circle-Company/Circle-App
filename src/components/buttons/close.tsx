@@ -9,7 +9,7 @@ type ButtonCloseProps = {
     iconColor?: string
     backgroundColor?: string
     testID?: any
-    onPress?: () => void 
+    onPress?: () => void
 }
 
 export default function ButtonClose({
@@ -17,7 +17,7 @@ export default function ButtonClose({
     backgroundColor = String(ColorTheme().backgroundDisabled),
     iconColor = String(ColorTheme().icon),
     testID,
-    onPress
+    onPress,
 }: ButtonCloseProps) {
     const navigation = useNavigation()
     const container: any = {
@@ -34,7 +34,7 @@ export default function ButtonClose({
         <TouchableOpacity
             style={container}
             onPress={() => {
-                onPress? onPress(): navigation.goBack()
+                onPress ? onPress() : navigation.goBack()
             }}
             testID={testID}
         >

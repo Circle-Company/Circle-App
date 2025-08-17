@@ -9,8 +9,8 @@ import fonts from "../../layout/constants/fonts"
 import sizes from "../../layout/constants/sizes"
 
 interface RenderSelectButtonProps {
-    onPress?: () => void;
-    buttonText?: string;
+    onPress?: () => void
+    buttonText?: string
 }
 
 export default function RenderSelectButton({ onPress, buttonText }: RenderSelectButtonProps) {
@@ -55,8 +55,8 @@ export default function RenderSelectButton({ onPress, buttonText }: RenderSelect
                     active
                         ? colors.blue.blue_05
                         : isDarkMode
-                            ? colors.gray.grey_07
-                            : colors.gray.grey_02
+                          ? colors.gray.grey_07
+                          : colors.gray.grey_02
                 )}
             >
                 <View style={textContainer}>
@@ -67,8 +67,8 @@ export default function RenderSelectButton({ onPress, buttonText }: RenderSelect
                         active
                             ? colors.gray.white
                             : isDarkMode
-                                ? colors.gray.white
-                                : colors.gray.black
+                              ? colors.gray.white
+                              : colors.gray.black
                     )}
                     width={14}
                     height={14}

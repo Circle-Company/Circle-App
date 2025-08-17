@@ -61,8 +61,13 @@ export default function SignInScreen() {
             signInputUsername && signInputPassword && !loading
                 ? colors.gray.white
                 : isDarkMode
+<<<<<<< Updated upstream
                 ? colors.gray.grey_04 + "90"
                 : colors.gray.grey_04 + "90",
+=======
+                  ? colors.gray.grey_04 + "90"
+                  : colors.gray.grey_04 + "90",
+>>>>>>> Stashed changes
     }
     const icon = {
         marginLeft: sizes.margins["2sm"],
@@ -146,8 +151,13 @@ export default function SignInScreen() {
                                 signInputPassword && signInputUsername && !loading
                                     ? colors.gray.white
                                     : isDarkMode
+<<<<<<< Updated upstream
                                     ? colors.gray.grey_04 + "90"
                                     : colors.gray.grey_04 + "90",
+=======
+                                      ? colors.gray.grey_04 + "90"
+                                      : colors.gray.grey_04 + "90"
+>>>>>>> Stashed changes
                             )}
                             width={17}
                             height={17}

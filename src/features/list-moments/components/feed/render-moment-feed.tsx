@@ -32,7 +32,7 @@ export default function RenderMomentFeed({ momentData, isFocused, isFeed }: rend
         user: {
             ...momentData.user,
             id: String(momentData.user.id),
-            you_follow: momentData.user.isFollowing
+            you_follow: momentData.user.isFollowing,
         },
         description: momentData.description,
         midia: momentData.midia,
@@ -41,12 +41,12 @@ export default function RenderMomentFeed({ momentData, isFocused, isFeed }: rend
             total_likes_num: momentData.likes_count,
             total_comments_num: momentData.comments_count,
             total_shares_num: 0,
-            total_views_num: 0
+            total_views_num: 0,
         },
         tags: [], // Tags não estão disponíveis no MomentProps
         language: "pt" as LanguagesCodesType, // Idioma padrão
         created_at: momentData.created_at,
-        is_liked: momentData.isLiked
+        is_liked: momentData.isLiked,
     }
 
     React.useEffect(() => {
@@ -185,7 +185,7 @@ export default function RenderMomentFeed({ momentData, isFocused, isFeed }: rend
                     <Moment.Root.Center>
                         <View style={{ marginBottom: sizes.margins["2sm"], width: "100%" }}>
                             <Moment.Description />
-                            <View style={{ flexDirection: "row", alignItems: "center"  }}>
+                            <View style={{ flexDirection: "row", alignItems: "center" }}>
                                 <View style={{ flex: 1 }}>
                                     <Moment.LikeButton isLiked={false} />
                                 </View>

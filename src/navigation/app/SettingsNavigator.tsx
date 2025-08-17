@@ -43,7 +43,10 @@ export function SettingsNavigator() {
                 component={SettingsScreen}
                 options={{
                     headerTitle: t("Settings"),
-                    headerStyle: [HeaderStyle, {borderBottomWidth: 0, borderBottomColor: "transparent"}],
+                    headerStyle: [
+                        HeaderStyle,
+                        { borderBottomWidth: 0, borderBottomColor: "transparent" },
+                    ],
                     headerTintColor: String(ColorTheme().text),
                     cardStyle: { backgroundColor: String(ColorTheme().background) },
                     cardOverlayEnabled: true,

@@ -12,9 +12,5 @@ export default function header_left({ children }: CommentsHeaderLeftProps) {
         borderRadius: 20,
         paddingVertical: 4,
     }
-    return (
-        <View style={container}>
-            {children}
-        </View>
-    )
+    return <View style={container}>{children}</View>
 }

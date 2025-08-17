@@ -9,7 +9,7 @@ import { Settings } from "../../../../components/settings"
 import ColorTheme from "../../../../layout/constants/colors"
 
 export default function PreferencesScreen() {
-    const { t, atualAppLanguage} = React.useContext(LanguageContext)
+    const { t, atualAppLanguage } = React.useContext(LanguageContext)
     const ListData = [
         {
             name: t("App"),
@@ -51,9 +51,7 @@ export default function PreferencesScreen() {
                 scrollEnabled={false}
                 keyExtractor={(item) => item.name}
                 renderItem={({ item }) => {
-                    return (
-                        <Settings.Section name={item.name} content={item.content} />
-                    )
+                    return <Settings.Section name={item.name} content={item.content} />
                 }}
             />
         </ScrollView>

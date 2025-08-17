@@ -27,30 +27,34 @@ export function Provider({ children }: LanguageProviderProps) {
 
     function changeAppLanguage(languageCode: LanguagesCodesType) {
         i18n.changeLanguage(languageCode)
-        
+
         if (session?.preferences?.setAppLanguage) {
             session.preferences.setAppLanguage(languageCode)
         } else {
-            console.warn("Não foi possível salvar a preferência de idioma: session.preferences indisponível")
+            console.warn(
+                "Não foi possível salvar a preferência de idioma: session.preferences indisponível"
+            )
         }
     }
 
     function changeAtualAppLanguage() {
         const currentLanguageCode = session?.preferences?.language?.appLanguage
-        
+
         if (!currentLanguageCode) {
             setAtualAppLanguage(languagesList[0])
             return
         }
-        
-        const selectedLanguage = languagesList.find(language => language.code === currentLanguageCode)
-        
+
+        const selectedLanguage = languagesList.find(
+            (language) => language.code === currentLanguageCode
+        )
+
         if (selectedLanguage) {
             setAtualAppLanguage(selectedLanguage)
         } else {
             setAtualAppLanguage(languagesList[0])
         }
-        
+
         if (currentLanguageCode) {
             setAppLanguageMutation.mutate()
         }

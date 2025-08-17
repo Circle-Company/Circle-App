@@ -176,8 +176,8 @@ export default function ListMemoryMoments() {
                             index == 0
                                 ? container_0
                                 : container && index + 1 == memoryMoments.length
-                                    ? container_1
-                                    : container
+                                  ? container_1
+                                  : container
                         }
                     >
                         <RenderMemoryMoment focused={focused} moment={renderData} />

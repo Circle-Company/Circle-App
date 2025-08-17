@@ -23,10 +23,10 @@ export function Interpolation({
         }),
         next
             ? next.progress.interpolate({
-                inputRange: [0, 1],
-                outputRange: [0, 1],
-                extrapolate: "clamp",
-            })
+                  inputRange: [0, 1],
+                  outputRange: [0, 1],
+                  extrapolate: "clamp",
+              })
             : 0
     )
 
@@ -56,10 +56,10 @@ export function Interpolation({
     // 🟠 Bordas mais suaves ao abrir
     const borderRadius = isFirst
         ? progress.interpolate({
-            inputRange: [0, 0.8, 1, 1.1],
-            outputRange: [0, 8, 16, 24],
-            extrapolate: "clamp",
-        })
+              inputRange: [0, 0.8, 1, 1.1],
+              outputRange: [0, 8, 16, 24],
+              extrapolate: "clamp",
+          })
         : 30
 
     return {
