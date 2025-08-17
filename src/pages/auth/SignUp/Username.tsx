@@ -1,16 +1,16 @@
-import ColorTheme, { colors } from "../../../layout/constants/colors"
 import { StatusBar, useColorScheme } from "react-native"
 import { Text, View } from "../../../components/Themed"
+import ColorTheme, { colors } from "../../../layout/constants/colors"
 
-import AuthContext from "../../../contexts/Auth"
 import ButtonClose from "@/components/buttons/close"
-import ButtonStandart from "../../../components/buttons/button-standart"
-import NextIcon from "../../../assets/icons/svgs/arrow_circle_right.svg"
+import { useNavigation } from "@react-navigation/native"
 import React from "react"
+import NextIcon from "../../../assets/icons/svgs/arrow_circle_right.svg"
 import UsernameInput from "../../../components/auth/usernameInput"
+import ButtonStandart from "../../../components/buttons/button-standart"
+import AuthContext from "../../../contexts/Auth"
 import fonts from "../../../layout/constants/fonts"
 import sizes from "../../../layout/constants/sizes"
-import { useNavigation } from "@react-navigation/native"
 
 export default function UsernameScreen() {
     const isDarkMode = useColorScheme() === "dark"
@@ -54,8 +54,8 @@ export default function UsernameScreen() {
         color: signInputUsername
             ? colors.gray.white
             : isDarkMode
-                ? colors.gray.grey_04 + "90"
-                : colors.gray.grey_04 + "90",
+            ? colors.gray.grey_04 + "90"
+            : colors.gray.grey_04 + "90",
     }
 
     const icon = {
@@ -108,8 +108,8 @@ export default function UsernameScreen() {
                         signInputUsername
                             ? colors.gray.white
                             : isDarkMode
-                                ? colors.gray.grey_04 + "90"
-                                : colors.gray.grey_04 + "90"
+                            ? colors.gray.grey_04 + "90"
+                            : colors.gray.grey_04 + "90",
                     )}
                     width={17}
                     height={17}
