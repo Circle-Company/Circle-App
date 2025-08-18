@@ -1,8 +1,8 @@
 import { Animated, Pressable, StyleProp, ViewStyle } from "react-native"
 
 import React from "react"
-import ColorTheme from "../../layout/constants/colors"
-import sizes from "../../layout/constants/sizes"
+import ColorTheme from "../../constants/colors"
+import sizes from "../../constants/sizes"
 
 /**
  * Interface de propriedades para o componente ButtonStandart
@@ -108,8 +108,8 @@ export default function ButtonStandart({
         ...(width
             ? { width, alignSelf: "center" }
             : square
-                ? { width: height, aspectRatio: 1, alignSelf: "center" }
-                : { alignSelf: "flex-start", flexShrink: 1 }),
+            ? { width: height, aspectRatio: 1, alignSelf: "center" }
+            : { alignSelf: "flex-start", flexShrink: 1 }),
         ...(style as ViewStyle),
     }
 

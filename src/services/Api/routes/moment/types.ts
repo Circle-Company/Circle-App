@@ -1,4 +1,4 @@
-import { InteractionType } from "@/components/moment/context/momentUserActions"
+import { InteractionType } from "../../../../components/moment/context/momentUserActions"
 
 export type MomentActionProps = {
     momentId: string

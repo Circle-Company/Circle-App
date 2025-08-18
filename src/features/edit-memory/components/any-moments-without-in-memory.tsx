@@ -2,10 +2,10 @@ import { View, ViewStyle } from "react-native"
 
 import React from "react"
 import { Text } from "../../../components/Themed"
+import ColorTheme from "../../../constants/colors"
+import fonts from "../../../constants/fonts"
+import sizes from "../../../constants/sizes"
 import LanguageContext from "../../../contexts/Preferences/language"
-import ColorTheme from "../../../layout/constants/colors"
-import fonts from "../../../layout/constants/fonts"
-import sizes from "../../../layout/constants/sizes"
 
 export default function AnyMomentsWithoutInMemory() {
     const { t } = React.useContext(LanguageContext)
@@ -32,4 +32,4 @@ export default function AnyMomentsWithoutInMemory() {
             <Text style={styles.text}>{t("No moments available to add")}</Text>
         </View>
     )
-} 
+}

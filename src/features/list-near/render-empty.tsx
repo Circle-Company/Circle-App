@@ -1,22 +1,16 @@
-import {
-    Animated,
-    Easing,
-    TextStyle,
-    ViewStyle,
-    useColorScheme,
-} from "react-native"
-import ColorTheme, { colors } from "../../layout/constants/colors"
 import React, { useCallback, useEffect } from "react"
+import { Animated, Easing, TextStyle, ViewStyle, useColorScheme } from "react-native"
 import { Text, View } from "../../components/Themed"
+import ColorTheme, { colors } from "../../constants/colors"
 
+import fonts from "../../constants/fonts"
+import sizes from "../../constants/sizes"
+import { useNearContext } from "../../contexts/near"
 import LanguageContext from "../../contexts/Preferences/language"
-import fonts from "../../layout/constants/fonts"
-import sizes from "../../layout/constants/sizes"
-import { useNearContext } from "@/contexts/near"
 
 export function EmptyList() {
     const { t } = React.useContext(LanguageContext)
-    const { loading, getNearbyUsers } = useNearContext()
+    const { loading } = useNearContext()
     const isDarkMode = useColorScheme() === "dark"
 
     const fadeAnim = React.useRef(new Animated.Value(0)).current
@@ -73,7 +67,6 @@ export function EmptyList() {
         }
     }, [loading, startSpinAnimation])
 
-
     const cardContainerStyle: ViewStyle = {
         alignItems: "center",
         justifyContent: "center",
@@ -116,7 +109,7 @@ export function EmptyList() {
                     </Text>
                     <Text style={subMessageTextStyle}>
                         {t(
-                            "Verifique se sua conecção com a internet e localização estão habilitadas."
+                            "Verifique se sua conecção com a internet e localização estão habilitadas.",
                         )}
                     </Text>
                 </Animated.View>

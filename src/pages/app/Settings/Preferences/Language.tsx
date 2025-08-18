@@ -1,8 +1,8 @@
-import { View, ViewStyle } from "@/components/Themed"
 import { StatusBar, useColorScheme } from "react-native"
+import { View, ViewStyle } from "../../../../components/Themed"
 
-import ColorTheme from "@/layout/constants/colors"
 import React from "react"
+import ColorTheme from "../../../../constants/colors"
 import ListLanguagesSelector from "../../../../features/list-languages-selector"
 
 export default function LanguageScreen() {

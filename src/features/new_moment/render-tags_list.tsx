@@ -1,10 +1,10 @@
 import React from "react"
-import { View } from "../../components/Themed"
 import { FlatList, Pressable, Text, useColorScheme } from "react-native"
-import sizes from "../../layout/constants/sizes"
-import { colors } from "../../layout/constants/colors"
-import fonts from "../../layout/constants/fonts"
 import CloseIcon from "../../assets/icons/svgs/close.svg"
+import { View } from "../../components/Themed"
+import { colors } from "../../constants/colors"
+import fonts from "../../constants/fonts"
+import sizes from "../../constants/sizes"
 import NewMomentContext, { TagProps } from "../../contexts/newMoment"
 
 export default function RenderTagsList() {
@@ -82,7 +82,7 @@ export default function RenderTagsList() {
                                     fill={String(
                                         isDarkMode
                                             ? `${colors.blue.blue_01}70`
-                                            : `${colors.blue.blue_06}40`
+                                            : `${colors.blue.blue_06}40`,
                                     )}
                                     width={7}
                                     height={7}
@@ -90,7 +90,7 @@ export default function RenderTagsList() {
                                     stroke={String(
                                         isDarkMode
                                             ? `${colors.blue.blue_01}70`
-                                            : `${colors.blue.blue_06}40`
+                                            : `${colors.blue.blue_06}40`,
                                     )}
                                 />
                             </Pressable>

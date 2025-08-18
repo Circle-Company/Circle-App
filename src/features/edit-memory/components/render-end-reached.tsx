@@ -1,17 +1,17 @@
-import ColorTheme, { colors } from "@/layout/constants/colors"
 import { View, ViewStyle, useColorScheme } from "react-native"
+import ColorTheme, { colors } from "../../../constants/colors"
 
-import ButtonStandart from "@/components/buttons/button-standart"
-import { Text } from "@/components/Themed"
-import LanguageContext from "@/contexts/Preferences/language"
-import fonts from "@/layout/constants/fonts"
-import sizes from "@/layout/constants/sizes"
 import React from "react"
+import ButtonStandart from "../../../components/buttons/button-standart"
+import { Text } from "../../../components/Themed"
+import fonts from "../../../constants/fonts"
+import sizes from "../../../constants/sizes"
+import LanguageContext from "../../../contexts/Preferences/language"
 
 export default function RenderEndReached({ text }: { text: string }) {
     const { t } = React.useContext(LanguageContext)
     const isDarkMode = useColorScheme() === "dark"
-    
+
     const styles = {
         container: {
             alignItems: "center",

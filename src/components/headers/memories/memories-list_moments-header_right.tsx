@@ -1,11 +1,11 @@
 import { useNavigation } from "@react-navigation/native"
 import React from "react"
 import { View } from "react-native"
+import fonts from "../../../constants/fonts"
+import sizes from "../../../constants/sizes"
 import PersistedContext from "../../../contexts/Persisted"
 import LanguageContext from "../../../contexts/Preferences/language"
 import MemoryContext from "../../../contexts/memory"
-import fonts from "../../../layout/constants/fonts"
-import sizes from "../../../layout/constants/sizes"
 import ViewMorebutton from "../../buttons/view_more"
 
 export default function MemoriesListMomentsHeaderRight({ user_id }: { user_id: number }) {

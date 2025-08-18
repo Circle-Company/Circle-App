@@ -1,13 +1,10 @@
-import React from "react"
-import {
-    TouchableOpacity,
-    useColorScheme,
-} from "react-native"
 import { useNavigation } from "@react-navigation/native"
-import Sizes from "../../layout/constants/sizes"
-import Fonts from "../../layout/constants/fonts"
+import React from "react"
+import { TouchableOpacity, useColorScheme } from "react-native"
+import ColorTheme from "../../constants/colors"
+import Fonts from "../../constants/fonts"
+import Sizes from "../../constants/sizes"
 import { Text } from "../Themed"
-import ColorTheme from "../../layout/constants/colors"
 
 type buttonStandart = {
     navigateTo: any

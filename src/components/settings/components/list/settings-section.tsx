@@ -1,10 +1,10 @@
 import { FlatList, View, useColorScheme } from "react-native"
-import ColorTheme, { colors } from "../../../../layout/constants/colors"
+import ColorTheme, { colors } from "../../../../constants/colors"
 import { Text, TextStyle, ViewStyle } from "../../../Themed"
 import { SettignsSectionProps, SettingsiItemObjectProps } from "../../settings-types"
 
-import fonts from "../../../../layout/constants/fonts"
-import sizes from "../../../../layout/constants/sizes"
+import fonts from "../../../../constants/fonts"
+import sizes from "../../../../constants/sizes"
 import SettingsItem from "./settings-item"
 
 export default function SettingsSection({ name, content }: SettignsSectionProps) {

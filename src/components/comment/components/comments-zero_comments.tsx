@@ -1,14 +1,14 @@
 import PlusIcon from "@/assets/icons/svgs/plus_circle.svg"
-import { Text } from "@/components/Themed"
-import ButtonStandart from "@/components/buttons/button-standart"
-import FeedContext from "@/contexts/Feed"
-import LanguageContext from "@/contexts/Preferences/language"
-import ColorTheme, { colors } from "@/layout/constants/colors"
-import fonts from "@/layout/constants/fonts"
-import sizes from "@/layout/constants/sizes"
-import { Vibrate } from "@/lib/hooks/useHapticFeedback"
 import React from "react"
 import { View, useColorScheme } from "react-native"
+import ColorTheme, { colors } from "../../../constants/colors"
+import fonts from "../../../constants/fonts"
+import sizes from "../../../constants/sizes"
+import FeedContext from "../../../contexts/Feed"
+import LanguageContext from "../../../contexts/Preferences/language"
+import { Vibrate } from "../../../lib/hooks/useHapticFeedback"
+import { Text } from "../../Themed"
+import ButtonStandart from "../../buttons/button-standart"
 export default function ZeroComments() {
     const { t } = React.useContext(LanguageContext)
     const { commentEnabled, setCommentEnabled, setKeyboardVisible, setScrollEnabled } =

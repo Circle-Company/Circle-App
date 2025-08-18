@@ -1,21 +1,18 @@
 import { StyleSheet, Text, View } from "react-native"
 
+import Icon from "@/assets/icons/svgs/eye.svg"
 import React from "react"
-import Icon from "../../../assets/icons/svgs/eye.svg"
+import ColorTheme from "../../../constants/colors"
+import fonts from "../../../constants/fonts"
+import sizes from "../../../constants/sizes"
 import { formatNumberWithDots } from "../../../helpers/numberConversor"
-import ColorTheme from "../../../layout/constants/colors"
-import fonts from "../../../layout/constants/fonts"
-import sizes from "../../../layout/constants/sizes"
 
 interface MomentFullViewsProps {
     color?: string
     views: number
 }
 
-const MomentFullViews: React.FC<MomentFullViewsProps> = ({ 
-    views, 
-    color = ColorTheme().text 
-}) => {
+const MomentFullViews: React.FC<MomentFullViewsProps> = ({ views, color = ColorTheme().text }) => {
     if (views === 0) return null
 
     const styles = StyleSheet.create({
@@ -39,15 +36,8 @@ const MomentFullViews: React.FC<MomentFullViewsProps> = ({
 
     return (
         <View style={styles.container}>
-            <Icon
-                fill={color}
-                width={14}
-                height={14}
-                style={styles.icon}
-            />
-            <Text style={styles.numberText}>
-                {formatNumberWithDots(views)}
-            </Text>
+            <Icon fill={color} width={14} height={14} style={styles.icon} />
+            <Text style={styles.numberText}>{formatNumberWithDots(views)}</Text>
         </View>
     )
 }

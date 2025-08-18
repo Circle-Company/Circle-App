@@ -1,8 +1,8 @@
+import ArrowLeft from "@/assets/icons/svgs/close.svg"
 import { useNavigation } from "@react-navigation/native"
 import React from "react"
 import { View } from "react-native"
-import ArrowLeft from "../../../assets/icons/svgs/close.svg"
-import { colors } from "../../../layout/constants/colors"
+import { colors } from "../../../constants/colors"
 import HeaderButton from "../headerButton"
 
 export default function MemoriesListMomentsHeaderLeft() {

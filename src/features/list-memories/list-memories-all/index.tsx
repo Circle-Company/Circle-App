@@ -1,12 +1,12 @@
-import PersistedContext from "@/contexts/Persisted"
 import React from "react"
 import { useColorScheme } from "react-native"
 import OfflineCard from "../../../components/general/offline"
+import sizes from "../../../constants/sizes"
+import PersistedContext from "../../../contexts/Persisted"
 import LanguageContext from "../../../contexts/Preferences/language"
 import MemoryContext from "../../../contexts/memory"
 import NetworkContext from "../../../contexts/network"
 import { TimeInterval, groupObjectsByDate } from "../../../helpers/separateArrByDate"
-import sizes from "../../../layout/constants/sizes"
 import { AnimatedVerticalFlatlist } from "../../../lib/hooks/useAnimatedFlatList"
 import api from "../../../services/Api"
 import EndReached from "./components/end-reached"
@@ -17,7 +17,7 @@ export default function ListMemoriesAllSeparatedbyDate() {
     const { t } = React.useContext(LanguageContext)
     const { session } = React.useContext(PersistedContext)
     const { allMemoriesUser } = React.useContext(MemoryContext)
-    const [allMemories, setAllMemories] = React.useState<Object[]>([])
+    const [allMemories, setAllMemories] = React.useState<object[]>([])
     const [page, setPage] = React.useState(1)
     const [pageSize, setPageSize] = React.useState(30)
     const [loading, setLoading] = React.useState(false)
@@ -32,7 +32,7 @@ export default function ListMemoriesAllSeparatedbyDate() {
                 {
                     user_id: allMemoriesUser.id,
                 },
-                { headers: { Authorization: session.account.jwtToken } }
+                { headers: { Authorization: session.account.jwtToken } },
             )
             .then(function (response) {
                 if (page === 1) {

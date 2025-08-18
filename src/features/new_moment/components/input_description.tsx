@@ -1,12 +1,12 @@
 import { Text, TextInput, TextStyle, ViewStyle } from "react-native"
 
-import ColorTheme from "@/layout/constants/colors"
-import LanguageContext from "@/contexts/Preferences/language"
-import NewMomentContext from "@/contexts/newMoment"
 import React from "react"
-import { View } from "@/components/Themed"
-import fonts from "@/layout/constants/fonts"
-import sizes from "@/layout/constants/sizes"
+import { View } from "../../../components/Themed"
+import ColorTheme from "../../../constants/colors"
+import fonts from "../../../constants/fonts"
+import sizes from "../../../constants/sizes"
+import LanguageContext from "../../../contexts/Preferences/language"
+import NewMomentContext from "../../../contexts/newMoment"
 
 type RenderMomentProps = {
     height?: number

@@ -2,6 +2,7 @@ import { NavigationProp } from "@react-navigation/native"
 
 import { RouteParams, State } from "./types"
 
+//@ts-ignore
 export function getRootNavigation<T extends {}>(nav: NavigationProp<T>): NavigationProp<T> {
     while (nav.getParent()) {
         nav = nav.getParent()
@@ -73,7 +74,7 @@ export function buildStateObject(
     stack: string,
     route: string,
     params: RouteParams,
-    state: ExistingState[] = []
+    state: ExistingState[] = [],
 ) {
     if (stack === "Flat") {
         return {

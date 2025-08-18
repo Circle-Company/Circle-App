@@ -1,9 +1,9 @@
 import { View, useColorScheme } from "react-native"
 
-import ColorTheme from "../../../../layout/constants/colors"
 import { Text } from "../../../../components/Themed"
-import fonts from "../../../../layout/constants/fonts"
-import sizes from "../../../../layout/constants/sizes"
+import ColorTheme from "../../../../constants/colors"
+import fonts from "../../../../constants/fonts"
+import sizes from "../../../../constants/sizes"
 
 type EndReachedProps = {
     text: string

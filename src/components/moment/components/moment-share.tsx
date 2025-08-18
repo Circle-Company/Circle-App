@@ -1,9 +1,9 @@
+import ShareIcon from "@/assets/icons/svgs/arrow_shape_right.svg"
 import React from "react"
 import { View } from "react-native"
-import ColorTheme from "../../../layout/constants/colors"
-import { MomentDateProps } from "../moment-types"
-import ShareIcon from "../../../assets/icons/svgs/arrow_shape_right.svg"
+import ColorTheme from "../../../constants/colors"
 import ButtonStandart from "../../buttons/button-standart"
+import { MomentDateProps } from "../moment-types"
 export default function share({
     color = String(ColorTheme().text),
     backgroundColor = String(ColorTheme().backgroundDisabled),

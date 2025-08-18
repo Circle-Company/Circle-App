@@ -1,20 +1,20 @@
 import { NavigationProp, useNavigation } from "@react-navigation/native"
 import { Text, TextStyle, View, ViewStyle } from "react-native"
 
-import { BadgeIcon } from "@/components/general/badge-icon"
-import PersistedContext from "@/contexts/Persisted"
+import Camera from "@/assets/icons/svgs/camera.svg"
+import Bell from "@/assets/icons/svgs/tray.svg"
 import React from "react"
-import Camera from "../../../assets/icons/svgs/camera.svg"
-import Bell from "../../../assets/icons/svgs/tray.svg"
+import ColorTheme from "../../../constants/colors"
+import fonts from "../../../constants/fonts"
+import sizes from "../../../constants/sizes"
+import PersistedContext from "../../../contexts/Persisted"
 import LanguageContext from "../../../contexts/Preferences/language"
-import ColorTheme from "../../../layout/constants/colors"
-import fonts from "../../../layout/constants/fonts"
-import sizes from "../../../layout/constants/sizes"
 import ButtonStandart from "../../buttons/button-standart"
+import { BadgeIcon } from "../../general/badge-icon"
 
 export default function HeaderRightHome() {
     const { t } = React.useContext(LanguageContext)
-    const {session} = React.useContext(PersistedContext)
+    const { session } = React.useContext(PersistedContext)
 
     const navigation: NavigationProp<any> = useNavigation()
 
@@ -50,7 +50,7 @@ export default function HeaderRightHome() {
         <View style={container}>
             <View style={buttonContainer}>
                 <ButtonStandart
-                    style={{paddingHorizontal: sizes.paddings["2sm"]}}
+                    style={{ paddingHorizontal: sizes.paddings["2sm"] }}
                     action={onPressNewMoment}
                     margins={false}
                     backgroundColor={String(ColorTheme().backgroundDisabled)}
@@ -62,16 +62,18 @@ export default function HeaderRightHome() {
                 </ButtonStandart>
             </View>
             <ButtonStandart
-                style={{paddingHorizontal: sizes.paddings["1sm"]}}
+                style={{ paddingHorizontal: sizes.paddings["1sm"] }}
                 square={true}
                 action={onPressNotifications}
                 margins={false}
                 backgroundColor={String(ColorTheme().backgroundDisabled)}
-            ><Bell fill={String(ColorTheme().text)} width={16} height={16} />
-                <BadgeIcon number={session.account.unreadNotificationsCount} style={{top: -7, right: -10}}/> 
-                
+            >
+                <Bell fill={String(ColorTheme().text)} width={16} height={16} />
+                <BadgeIcon
+                    number={session.account.unreadNotificationsCount}
+                    style={{ top: -7, right: -10 }}
+                />
             </ButtonStandart>
-            
         </View>
     )
 }

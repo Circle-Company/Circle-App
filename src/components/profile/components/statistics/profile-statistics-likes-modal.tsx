@@ -1,11 +1,11 @@
-import sizes from "@/layout/constants/sizes"
 import React from "react"
 import { View } from "react-native"
 import config from "../../../../config"
+import ColorTheme from "../../../../constants/colors"
+import fonts from "../../../../constants/fonts"
+import sizes from "../../../../constants/sizes"
 import LanguageContext from "../../../../contexts/Preferences/language"
 import NumberConversor, { formatNumberWithDots } from "../../../../helpers/numberConversor"
-import ColorTheme from "../../../../layout/constants/colors"
-import fonts from "../../../../layout/constants/fonts"
 import { Text } from "../../../Themed"
 import { ProfileReciveDataProps } from "../../profile-types"
 
@@ -44,7 +44,9 @@ export default function LikesRenderModal({ user }: LikesModelProps) {
             </Text>
 
             <Text style={TextStyle}>
-                {`@${user?.username} ${t("has a total of")} ${NumberConversor(user?.statistics?.total_likes_num)} ${t("likes throughout his time on")} ${config.APPLICATION_NAME}`}
+                {`@${user?.username} ${t("has a total of")} ${NumberConversor(
+                    user?.statistics?.total_likes_num,
+                )} ${t("likes throughout his time on")} ${config.APPLICATION_NAME}`}
             </Text>
         </View>
     )

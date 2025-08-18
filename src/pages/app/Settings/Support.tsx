@@ -2,10 +2,10 @@ import React from "react"
 import { Linking, Pressable, StatusBar, useColorScheme } from "react-native"
 import { Text, View } from "../../../components/Themed"
 import config from "../../../config"
+import ColorTheme from "../../../constants/colors"
+import fonts from "../../../constants/fonts"
+import sizes from "../../../constants/sizes"
 import LanguageContext from "../../../contexts/Preferences/language"
-import ColorTheme from "../../../layout/constants/colors"
-import fonts from "../../../layout/constants/fonts"
-import sizes from "../../../layout/constants/sizes"
 
 export default function SupportScreen() {
     const { t } = React.useContext(LanguageContext)
@@ -38,7 +38,7 @@ export default function SupportScreen() {
 
     const textData = [
         t(
-            "If you have any questions or want to report something more serious, send an email to our support."
+            "If you have any questions or want to report something more serious, send an email to our support.",
         ),
         t("If you have found a bug, please help us by reporting it. Thanks!"),
     ]

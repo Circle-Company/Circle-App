@@ -1,10 +1,10 @@
 import React from "react"
 import { Linking, Pressable, StatusBar, useColorScheme } from "react-native"
 import { Text, View } from "../../../components/Themed"
+import ColorTheme from "../../../constants/colors"
+import fonts from "../../../constants/fonts"
+import sizes from "../../../constants/sizes"
 import LanguageContext from "../../../contexts/Preferences/language"
-import ColorTheme from "../../../layout/constants/colors"
-import fonts from "../../../layout/constants/fonts"
-import sizes from "../../../layout/constants/sizes"
 
 export default function OpenSourceScreen() {
     const { t } = React.useContext(LanguageContext)
@@ -37,15 +37,15 @@ export default function OpenSourceScreen() {
 
     const textData = [
         t(
-            "When contributing to an open source project, it is essential to understand the project's license and adopt its code standards."
+            "When contributing to an open source project, it is essential to understand the project's license and adopt its code standards.",
         ),
         t(
-            "Testing and documentation are crucial to ensuring code stability and understandability."
+            "Testing and documentation are crucial to ensuring code stability and understandability.",
         ),
         t("Be open to community feedback and break your contributions into manageable chunks."),
         t("Respect existing code and closely monitor revisions."),
         t(
-            "Above all, maintain ethical and collaborative conduct to promote a healthy environment in the open source community."
+            "Above all, maintain ethical and collaborative conduct to promote a healthy environment in the open source community.",
         ),
     ]
 

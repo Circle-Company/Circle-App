@@ -11,7 +11,7 @@ export type TagProps = {
 
 export type MemoryContextsData = {
     memory: MemoryReciveDataProps
-    memoryMoments: Array<MemoryMomentObjectProps>
+    memoryMoments: MemoryMomentObjectProps[]
     allMemoriesUser: userReciveDataProps
     setMemory: React.Dispatch<React.SetStateAction<MemoryReciveDataProps | undefined>>
     setMemoryMoments: React.Dispatch<React.SetStateAction<any>>
@@ -24,7 +24,7 @@ export function Provider({ children }: MemoryProviderProps) {
     const [memory, setMemory] = React.useState<MemoryReciveDataProps>()
     const [memoryMoments, setMemoryMoments] = React.useState<any>({} as userReciveDataProps)
     const [allMemoriesUser, setAllMemoriesUser] = React.useState<userReciveDataProps>(
-        {} as userReciveDataProps
+        {} as userReciveDataProps,
     )
 
     const contextValue: any = {

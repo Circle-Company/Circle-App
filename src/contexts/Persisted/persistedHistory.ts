@@ -1,4 +1,4 @@
-import create from "zustand"
+import { create } from "zustand"
 import { storage, storageKeys } from "../../store"
 import { HistoryDataStorageType } from "./types"
 const storageKey = storageKeys().history

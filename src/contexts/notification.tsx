@@ -1,32 +1,44 @@
 import { storage, storageKeys } from "../store"
 
-import PersistedContext from "./Persisted"
+import { getApp } from "@react-native-firebase/app"
+import {
+    AuthorizationStatus,
+    getMessaging,
+    getToken,
+    onMessage,
+    onTokenRefresh,
+    requestPermission,
+    setBackgroundMessageHandler,
+} from "@react-native-firebase/messaging"
+
 import React from "react"
-import { Vibrate } from "../lib/hooks/useHapticFeedback"
-import messaging from "@react-native-firebase/messaging"
-import { notification } from "../lib/notifications"
 import { notify } from "react-native-notificated"
+import { Vibrate } from "../lib/hooks/useHapticFeedback"
 import { useRequestPermission } from "../lib/hooks/userRequestPermissions"
+import { notification } from "../lib/notifications"
+import PersistedContext from "./Persisted"
 
 type NotificationProviderProps = { children: React.ReactNode }
 export type NotificationContextData = {}
 
 const NotificationContext = React.createContext<NotificationContextData>(
-    {} as NotificationContextData
+    {} as NotificationContextData,
 )
 
 export function Provider({ children }: NotificationProviderProps) {
     const { session } = React.useContext(PersistedContext)
     const [enableRequestToken, setEnableRequestToken] = React.useState(false)
 
+    const messagingInstance = React.useMemo(() => getMessaging(getApp()), [])
+
     async function requestUserPermission() {
         console.log("requestUserPermission")
         if (session?.user?.id && session?.account?.jwtToken) {
             useRequestPermission.postNotifications()
-            const status: number = await messaging().requestPermission()
+            const status: number = await requestPermission(messagingInstance)
             const enabled =
-                status === messaging.AuthorizationStatus.AUTHORIZED ||
-                status === messaging.AuthorizationStatus.PROVISIONAL
+                status === AuthorizationStatus.AUTHORIZED ||
+                status === AuthorizationStatus.PROVISIONAL
             setEnableRequestToken(enabled)
         }
     }
@@ -34,8 +46,8 @@ export function Provider({ children }: NotificationProviderProps) {
     async function refreshToken() {
         console.log("refreshToken")
         if (session?.user?.id && session?.account?.jwtToken) {
-            const token = await messaging().getToken()
-            if (typeof token == "string" && token !== "") {
+            const token = await getToken(messagingInstance)
+            if (typeof token === "string" && token !== "") {
                 notification.registerPushToken({
                     userId: Number(storage.getNumber(storageKeys().user.id)),
                     token,
@@ -43,7 +55,7 @@ export function Provider({ children }: NotificationProviderProps) {
             }
         }
     }
-    
+
     React.useEffect(() => {
         async function fetch() {
             if (session?.user?.id && session?.account?.jwtToken) {
@@ -54,50 +66,66 @@ export function Provider({ children }: NotificationProviderProps) {
         fetch()
     }, [session?.user?.id, session?.account?.jwtToken])
 
-    messaging().onTokenRefresh((token) => {
-        console.log("messaging().onTokenRefresh")
-        if (enableRequestToken) {
-            setTimeout(() => {
-                if (typeof token == "string" && token !== "") {
-                    notification.registerPushToken({
-                        userId: Number(storage.getNumber(storageKeys().user.id)),
-                        token,
-                    })
-                }
-            }, 10000)
-        }
-    })
-
-    messaging().onMessage(async (remoteMessage) => {
-        console.log("messaging().onMessage")
-        if (session?.account?.unreadNotificationsCount !== undefined && session?.account?.setUnreadNotificationsCount) {
-            const previousNotificationsNum = session.account.unreadNotificationsCount
-            session.account.setUnreadNotificationsCount(previousNotificationsNum + 1)
-        }
-        Vibrate("effectClick")
-
-        notify("notification", {
-            params: {
-                title: remoteMessage.notification?.title || "",
-                description: remoteMessage.notification?.body || "",
-            },
+    React.useEffect(() => {
+        const unsubscribeTokenRefresh = onTokenRefresh(messagingInstance, (token) => {
+            console.log("onTokenRefresh")
+            if (enableRequestToken) {
+                setTimeout(() => {
+                    if (typeof token === "string" && token !== "") {
+                        notification.registerPushToken({
+                            userId: Number(storage.getNumber(storageKeys().user.id)),
+                            token,
+                        })
+                    }
+                }, 10000)
+            }
         })
-    })
 
-    messaging().setBackgroundMessageHandler(async (remoteMessage) => {
-        if (session?.account?.unreadNotificationsCount !== undefined && session?.account?.setUnreadNotificationsCount) {
-            const previousNotificationsNum = session.account.unreadNotificationsCount
-            session.account.setUnreadNotificationsCount(previousNotificationsNum + 1)
+        const unsubscribeOnMessage = onMessage(messagingInstance, async (remoteMessage) => {
+            console.log("onMessage")
+            if (
+                session?.account?.unreadNotificationsCount !== undefined &&
+                session?.account?.setUnreadNotificationsCount
+            ) {
+                const previousNotificationsNum = session.account.unreadNotificationsCount
+                session.account.setUnreadNotificationsCount(previousNotificationsNum + 1)
+            }
+            Vibrate("effectClick")
+
+            notify("notification", {
+                params: {
+                    title: remoteMessage.notification?.title || "",
+                    description: remoteMessage.notification?.body || "",
+                },
+            })
+        })
+
+        setBackgroundMessageHandler(messagingInstance, async (remoteMessage) => {
+            if (
+                session?.account?.unreadNotificationsCount !== undefined &&
+                session?.account?.setUnreadNotificationsCount
+            ) {
+                const previousNotificationsNum = session.account.unreadNotificationsCount
+                session.account.setUnreadNotificationsCount(previousNotificationsNum + 1)
+            }
+            Vibrate("effectClick")
+            /*
+      notify("notification", {
+        params: {
+          title: remoteMessage.notification?.title,
+          description: remoteMessage.notification?.body,
+        },
+      });
+      */
+        })
+
+        return () => {
+            unsubscribeTokenRefresh()
+            unsubscribeOnMessage()
         }
-        Vibrate("effectClick")
-        /** 
-        notify("notification", {
-            params: {
-                title: remoteMessage.notification?.title,
-                description: remoteMessage.notification?.body,
-            },
-        })*/
-    })
+    }, [enableRequestToken, messagingInstance, session])
+
     return <NotificationContext.Provider value={{}}>{children}</NotificationContext.Provider>
 }
+
 export default NotificationContext

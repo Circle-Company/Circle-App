@@ -1,11 +1,11 @@
 // Filename: password.spec.tsx
 
-import AuthContext, { AuthContextsData } from "@/contexts/Auth"
 import { render } from "@testing-library/react-native"
 import React from "react"
+import AuthContext, { AuthContextsData } from "../../../contexts/Auth"
 
 // Mock para @motify/components e Loading
-jest.mock("@/components/loading", () => ({
+jest.mock("@/components//loading", () => ({
     Loading: {
         ActivityIndicator: () => null,
     },
@@ -55,7 +55,7 @@ const renderTest = () => {
         ...render(
             <AuthContext.Provider value={contextValue}>
                 <PasswordScreen />
-            </AuthContext.Provider>
+            </AuthContext.Provider>,
         ),
         contextValue,
     }

@@ -1,9 +1,9 @@
 import { ViewStyle, useColorScheme } from "react-native"
 
-import { Skeleton } from "@/components/skeleton"
-import { View } from "@/components/Themed"
-import { colors } from "@/layout/constants/colors"
-import sizes from "@/layout/constants/sizes"
+import { Skeleton } from "../../components/skeleton"
+import { View } from "../../components/Themed"
+import { colors } from "../../constants/colors"
+import sizes from "../../constants/sizes"
 
 export function ListNearToYouSkeleton() {
     const isDarkMode = useColorScheme() === "dark"
@@ -27,7 +27,7 @@ export function ListNearToYouSkeleton() {
     }
 
     const userSkeletonStyle: ViewStyle = {
-        width: sizes.screens.width  - sizes.paddings["2sm"] * 2,
+        width: sizes.screens.width - sizes.paddings["2sm"] * 2,
         height: 60,
         marginHorizontal: sizes.paddings["2sm"],
         borderRadius: 20,
@@ -43,7 +43,6 @@ export function ListNearToYouSkeleton() {
 
     return (
         <View style={container}>
-
             <Skeleton.View
                 backgroundColor={isDarkMode ? colors.gray.grey_01 + 80 : colors.gray.grey_09 + 80}
                 duration={2000}
@@ -53,13 +52,13 @@ export function ListNearToYouSkeleton() {
             {Array.from({ length: 6 }).map((_, index) => (
                 <View key={index} style={itemContainer}>
                     <Skeleton.View
-                        backgroundColor={isDarkMode ? colors.gray.grey_01 + 80 : colors.gray.grey_09 + 80}
+                        backgroundColor={
+                            isDarkMode ? colors.gray.grey_01 + 80 : colors.gray.grey_09 + 80
+                        }
                         duration={2000}
                         style={userSkeletonStyle}
                     />
-
                 </View>
-
             ))}
             <Skeleton.View
                 backgroundColor={isDarkMode ? colors.gray.grey_01 + 80 : colors.gray.grey_09 + 80}

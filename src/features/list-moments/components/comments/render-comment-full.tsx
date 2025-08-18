@@ -1,6 +1,6 @@
-import { Comments } from "@/components/comment"
-import MomentContext from "@/components/moment/context"
 import React from "react"
+import { Comments } from "../../../../components/comment"
+import MomentContext from "../../../../components/moment/context"
 
 export default function RenderCommentFull() {
     const { momentData, momentOptions } = React.useContext(MomentContext)

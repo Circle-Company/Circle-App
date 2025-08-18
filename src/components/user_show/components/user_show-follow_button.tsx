@@ -1,14 +1,14 @@
 import { Animated, Pressable } from "react-native"
 
-import ColorTheme from "@/layout/constants/colors"
-import LanguageContext from "@/contexts/Preferences/language"
-import PersistedContext from "@/contexts/Persisted"
 import React from "react"
-import { Text } from "@/components/Themed"
-import { UserFollowButtonProps } from "../user_show-types"
-import fonts from "@/layout/constants/fonts"
-import sizes from "@/layout/constants/sizes"
+import ColorTheme from "../../../constants/colors"
+import fonts from "../../../constants/fonts"
+import sizes from "../../../constants/sizes"
+import PersistedContext from "../../../contexts/Persisted"
+import LanguageContext from "../../../contexts/Preferences/language"
+import { Text } from "../../Themed"
 import { useUserShowContext } from "../user_show-context"
+import { UserFollowButtonProps } from "../user_show-types"
 
 export default function FollowButton({
     followsYou = false,

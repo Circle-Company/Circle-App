@@ -2,8 +2,8 @@ import React from "react"
 import { FlatList, View, useColorScheme } from "react-native"
 import RenderDate from "../../components/general/render-date"
 import { Memory } from "../../components/memory"
-import { colors } from "../../layout/constants/colors"
-import sizes from "../../layout/constants/sizes"
+import { colors } from "../../constants/colors"
+import sizes from "../../constants/sizes"
 import RenderNotification from "./components/render-notification"
 type RenderNotificationsAllProps = {
     data: any

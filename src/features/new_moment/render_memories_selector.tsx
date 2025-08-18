@@ -1,10 +1,10 @@
-import { View } from "@/components/Themed"
-import NewMomentContext from "@/contexts/newMoment"
-import HeaderList from "@/features/new_moment/components/header_list"
-import RenderMemory from "@/features/new_moment/components/render_memory"
-import sizes from "@/layout/constants/sizes"
 import React from "react"
 import { FlatList } from "react-native-gesture-handler"
+import { View } from "../../components/Themed"
+import sizes from "../../constants/sizes"
+import NewMomentContext from "../../contexts/newMoment"
+import HeaderList from "./components/header_list"
+import RenderMemory from "./components/render_memory"
 
 export default function RenderMemoriesSelector() {
     const { getAllMemories, allMemories, setSelectedMemory } = React.useContext(NewMomentContext)
@@ -14,11 +14,11 @@ export default function RenderMemoriesSelector() {
             await getAllMemories()
         }
         get()
-    }, [])
+    }, [getAllMemories])
 
     React.useEffect(() => {
         setSelectedMemory(allMemories[0])
-    }, [allMemories])
+    }, [allMemories, setSelectedMemory])
 
     const container: any = {
         alignSelf: "center",

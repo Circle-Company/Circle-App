@@ -1,18 +1,18 @@
-import ColorTheme, { colors } from "@/layout/constants/colors"
 import { TextStyle, ViewStyle, useColorScheme } from "react-native"
+import ColorTheme, { colors } from "../../constants/colors"
 
-import ButtonStandart from "@/components/buttons/button-standart"
-import { Loading } from "@/components/loading"
-import NearContext from "@/contexts/near"
 import RadiowavesIcon from "@/assets/icons/svgs/antenna_radiowaves_left_and_right.svg"
-import React from "react"
-import { Text } from "@/components/Themed"
-import fonts from "@/layout/constants/fonts"
-import sizes from "@/layout/constants/sizes"
 import { t } from "i18next"
+import React from "react"
+import ButtonStandart from "../../components/buttons/button-standart"
+import { Loading } from "../../components/loading"
+import { Text } from "../../components/Themed"
+import fonts from "../../constants/fonts"
+import sizes from "../../constants/sizes"
+import NearContext from "../../contexts/near"
 
 export function RenderFooter() {
-    const { loading, refresh, getNearbyUsers } = React.useContext(NearContext) || {}
+    const { loading, getNearbyUsers } = React.useContext(NearContext) || {}
     const isDarkMode = useColorScheme() === "dark"
 
     const reloadTextStyle: TextStyle = {

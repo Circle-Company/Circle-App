@@ -1,12 +1,12 @@
+import AddIcon from "@/assets/icons/svgs/memory.svg"
 import React from "react"
-import { View, Text, useColorScheme } from "react-native"
-import { colors } from "../../../layout/constants/colors"
-import sizes from "../../../layout/constants/sizes"
-import fonts from "../../../layout/constants/fonts"
+import { Text, useColorScheme, View } from "react-native"
+import { colors } from "../../../constants/colors"
+import fonts from "../../../constants/fonts"
+import sizes from "../../../constants/sizes"
+import LanguageContext from "../../../contexts/Preferences/language"
 import SelectMomentsContext from "../../../contexts/selectMoments"
 import ButtonStandart from "../../buttons/button-standart"
-import AddIcon from "../../../assets/icons/svgs/memory.svg"
-import LanguageContext from "../../../contexts/Preferences/language"
 
 export default function MemoryTitleHeaderRight() {
     const { selectedMoments, title, storeMemory, endSession } =
@@ -50,8 +50,8 @@ export default function MemoryTitleHeaderRight() {
                     active
                         ? colors.blue.blue_05
                         : isDarkMode
-                            ? colors.gray.grey_07
-                            : colors.gray.grey_02
+                        ? colors.gray.grey_07
+                        : colors.gray.grey_02,
                 )}
             >
                 <View style={textContainer}>

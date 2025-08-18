@@ -1,11 +1,11 @@
 import React from "react"
-import { Text, View } from "../../components/Themed"
-import LanguageContext from "../../contexts/Preferences/language"
-import sizes from "../../layout/constants/sizes"
-import fonts from "../../layout/constants/fonts"
-import config from "../../config"
-import ColorTheme, { colors } from "../../layout/constants/colors"
 import { useColorScheme } from "react-native"
+import { Text, View } from "../../components/Themed"
+import config from "../../config"
+import ColorTheme, { colors } from "../../constants/colors"
+import fonts from "../../constants/fonts"
+import sizes from "../../constants/sizes"
+import LanguageContext from "../../contexts/Preferences/language"
 
 export function SettingsFooterComponent() {
     const { t } = React.useContext(LanguageContext)

@@ -1,19 +1,19 @@
+import { createBottomTabNavigator } from "@react-navigation/bottom-tabs"
+import React from "react"
+import UserOutline from "../../assets/icons/svgs/@.svg"
+import User from "../../assets/icons/svgs/@3.svg"
+import WorldOutline from "../../assets/icons/svgs/compass-outline.svg"
+import World from "../../assets/icons/svgs/compass.svg"
+import MomentOutline from "../../assets/icons/svgs/moments-outline.svg"
+import Moment from "../../assets/icons/svgs/moments.svg"
+import { BadgeIcon } from "../../components/general/badge-icon"
+import ColorTheme from "../../constants/colors"
+import sizes from "../../constants/sizes"
+import PersistedContext from "../../contexts/Persisted"
+import LanguageContext from "../../contexts/Preferences/language"
 import { AccountScreenNavigator } from "./AccountNavigator"
-import { BadgeIcon } from "@/components/general/badge-icon"
-import ColorTheme from "../../layout/constants/colors"
 import { ExploreScreenNavigator } from "./ExploreScreenNavigator"
 import { HomeScreenNavigator } from "./HomeScreenNavigator"
-import LanguageContext from "../../contexts/Preferences/language"
-import Moment from "../../assets/icons/svgs/moments.svg"
-import MomentOutline from "../../assets/icons/svgs/moments-outline.svg"
-import PersistedContext from "@/contexts/Persisted"
-import React from "react"
-import User from "../../assets/icons/svgs/@3.svg"
-import UserOutline from "../../assets/icons/svgs/@.svg"
-import World from "../../assets/icons/svgs/compass.svg"
-import WorldOutline from "../../assets/icons/svgs/compass-outline.svg"
-import { createBottomTabNavigator } from "@react-navigation/bottom-tabs"
-import sizes from "../../layout/constants/sizes"
 
 const BottomTab = createBottomTabNavigator()
 
@@ -40,10 +40,12 @@ export default function BottomTabNavigator() {
                 component={HomeScreenNavigator}
                 options={{
                     title: t("Moments"),
+                    tabBarActiveTintColor: ColorTheme().text, // cor do texto quando ativo
+                    tabBarInactiveTintColor: ColorTheme().icon, // cor do texto quando inativo
                     tabBarIcon: ({ focused }) =>
                         focused ? (
                             <Moment
-                                fill={String(ColorTheme().iconFocused)}
+                                fill={String(ColorTheme().text)}
                                 width={iconWidth}
                                 height={iconHeight}
                             />
@@ -61,10 +63,12 @@ export default function BottomTabNavigator() {
                 component={ExploreScreenNavigator}
                 options={{
                     title: t("Explore"),
+                    tabBarActiveTintColor: ColorTheme().text, // cor do texto quando ativo
+                    tabBarInactiveTintColor: ColorTheme().icon, // cor do texto quando inativo
                     tabBarIcon: ({ focused }) =>
                         focused ? (
                             <World
-                                fill={String(ColorTheme().iconFocused)}
+                                fill={String(ColorTheme().text)}
                                 width={iconWidth}
                                 height={iconHeight}
                             />
@@ -82,10 +86,12 @@ export default function BottomTabNavigator() {
                 component={AccountScreenNavigator}
                 options={{
                     title: t("You"),
+                    tabBarActiveTintColor: ColorTheme().text, // cor do texto quando ativo
+                    tabBarInactiveTintColor: ColorTheme().icon, // cor do texto quando inativo
                     tabBarIcon: ({ focused }) =>
                         focused ? (
                             <User
-                                fill={String(ColorTheme().iconFocused)}
+                                fill={String(ColorTheme().text)}
                                 width={iconWidth}
                                 height={iconHeight}
                             />

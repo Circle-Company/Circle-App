@@ -9,7 +9,7 @@ function postNotifications(): void {
 
 export function useRequestPermission() {
     const { device } = React.useContext(PersistedContext)
-    
+
     const firebaseMessaging = React.useCallback(async (): Promise<boolean> => {
         const authStatus: number = await messaging().requestPermission()
         const enabled =

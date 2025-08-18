@@ -1,8 +1,8 @@
-import { CommentsReciveDataProps } from "../../comment/comments-types"
 import { LanguagesCodesType } from "../../../locales/LanguageTypes"
+import { CommentsReciveDataProps } from "../../comment/comments-types"
+import { userReciveDataProps } from "../../user_show/user_show-types"
 import { MomentOptionsState } from "./momentOptions"
 import { MomentVideoState } from "./momentVideo"
-import { userReciveDataProps } from "../../user_show/user_show-types"
 
 export type MomentMidiaProps = {
     content_type: "IMAGE" | "VIDEO"
@@ -103,7 +103,6 @@ export type MomentDataReturnsProps = {
     getTags: () => Promise<void>
 }
 
-
 export type MomentProviderProps = {
     isFeed: boolean
     isFocused: boolean
@@ -111,8 +110,6 @@ export type MomentProviderProps = {
     momentData: MomentDataProps
     children: React.ReactNode
 }
-
-
 
 export type MomentUserActionsReturnsProps = {
     like: boolean

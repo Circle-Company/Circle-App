@@ -1,4 +1,4 @@
-import { apiRoutes } from "@/services/Api"
+import { apiRoutes } from "../../services/Api"
 import { refreshJwtToken } from "./useRefreshJwtToken"
 
 // Mock dos módulos
@@ -29,11 +29,11 @@ jest.mock("../../store", () => ({
 }))
 
 jest.useFakeTimers() // Ativar fake timers para simular tempo
-jest.mock("../../services/Api", () => ({
+jest.mock("@/services/Api", () => ({
     apiRoutes: {
         auth: {
             refreshToken: jest.fn(() =>
-                Promise.resolve({ data: { jwtToken: "newToken", jwtExpiration: 9999999999 } })
+                Promise.resolve({ data: { jwtToken: "newToken", jwtExpiration: 9999999999 } }),
             ),
         },
     },

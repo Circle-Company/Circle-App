@@ -1,16 +1,17 @@
 import { Text, TextStyle, View, ViewStyle, useColorScheme } from "react-native"
+
+import React from "react"
 import AddIcon from "../../assets/icons/svgs/camera.svg"
 import ButtonStandart from "../../components/buttons/button-standart"
+import { colors } from "../../constants/colors"
+import fonts from "../../constants/fonts"
+import sizes from "../../constants/sizes"
 import LanguageContext from "../../contexts/Preferences/language"
 import NewMomentContext from "../../contexts/newMoment"
-import React from "react"
-import { colors } from "../../layout/constants/colors"
-import fonts from "../../layout/constants/fonts"
-import sizes from "../../layout/constants/sizes"
 
 interface RenderSelectButtonProps {
-    onPress?: () => void;
-    buttonText?: string;
+    onPress?: () => void
+    buttonText?: string
 }
 
 export default function RenderSelectButton({ onPress, buttonText }: RenderSelectButtonProps) {
@@ -55,8 +56,8 @@ export default function RenderSelectButton({ onPress, buttonText }: RenderSelect
                     active
                         ? colors.blue.blue_05
                         : isDarkMode
-                            ? colors.gray.grey_07
-                            : colors.gray.grey_02
+                        ? colors.gray.grey_07
+                        : colors.gray.grey_02,
                 )}
             >
                 <View style={textContainer}>
@@ -67,8 +68,8 @@ export default function RenderSelectButton({ onPress, buttonText }: RenderSelect
                         active
                             ? colors.gray.white
                             : isDarkMode
-                                ? colors.gray.white
-                                : colors.gray.black
+                            ? colors.gray.white
+                            : colors.gray.black,
                     )}
                     width={14}
                     height={14}

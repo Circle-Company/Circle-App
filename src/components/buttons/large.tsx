@@ -1,11 +1,11 @@
-import React, { useRef, useEffect } from "react"
-import { Text, View, Pressable, Animated } from "react-native"
 import { useNavigation } from "@react-navigation/native"
-import ColorTheme from "../../layout/constants/colors"
-import Sizes from "../../layout/constants/sizes"
-import Fonts from "../../layout/constants/fonts"
+import React, { useEffect, useRef } from "react"
+import { Animated, Pressable, Text, View } from "react-native"
+import ColorTheme from "../../constants/colors"
+import Fonts from "../../constants/fonts"
+import Sizes from "../../constants/sizes"
 
-import ArrowRight from "../../assets/icons/svgs/arrow_right.svg"
+import ArrowRight from "@/assets/icons/svgs/arrow_right.svg"
 
 export default function Buttonlarge(props: any) {
     const navigation = useNavigation()

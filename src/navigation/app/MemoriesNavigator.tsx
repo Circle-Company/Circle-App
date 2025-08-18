@@ -1,4 +1,4 @@
-import ColorTheme, { colors } from "../../layout/constants/colors"
+import ColorTheme, { colors } from "../../constants/colors"
 
 import { createStackNavigator } from "@react-navigation/stack"
 import React from "react"
@@ -9,9 +9,9 @@ import MemoriesListMomentsHeaderRight from "../../components/headers/memories/me
 import MemoryHeaderLeft from "../../components/headers/memory/memory-header_left"
 import MemoryHeaderRight from "../../components/headers/memory/memory-header_right"
 import MemoryTitleHeaderRight from "../../components/headers/memory/memory_title-header_right"
+import Sizes from "../../constants/sizes"
 import MemoryContext from "../../contexts/memory"
 import LanguageContext from "../../contexts/Preferences/language"
-import Sizes from "../../layout/constants/sizes"
 import MemoriesScreen from "../../pages/app/Memories"
 import EditMemoryScreen from "../../pages/app/Memories/edit_memory"
 import MemoriesListMomentsScreen from "../../pages/app/Memories/list_moments"

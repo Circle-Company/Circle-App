@@ -1,8 +1,8 @@
+import ArrowLeft from "@/assets/icons/svgs/arrow_left.svg"
 import { useNavigation } from "@react-navigation/native"
 import React from "react"
 import { View } from "react-native"
-import ArrowLeft from "../../../assets/icons/svgs/arrow_left.svg"
-import ColorTheme from "../../../layout/constants/colors"
+import ColorTheme from "../../../constants/colors"
 import HeaderButton from "../headerButton"
 
 export default function MemoryHeaderLeft() {

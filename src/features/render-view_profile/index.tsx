@@ -1,6 +1,6 @@
-import { View, useColorScheme } from "react-native"
+import { View } from "react-native"
 import { Profile } from "../../components/profile"
-import sizes from "../../layout/constants/sizes"
+import sizes from "../../constants/sizes"
 import RenderStatistics from "./render-statistics"
 
 type RenderViewProfileProps = {
@@ -8,7 +8,6 @@ type RenderViewProfileProps = {
 }
 export default function RenderViewProfile({ user }: RenderViewProfileProps) {
     console.log("RenderViewProfile: ", user)
-    const isDarkMode = useColorScheme() === "dark"
     const top_container: any = {
         paddingTop: sizes.paddings["1sm"],
         alignItems: "center",

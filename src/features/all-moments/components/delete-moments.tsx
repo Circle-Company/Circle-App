@@ -1,15 +1,15 @@
 import React from "react"
-import { Text, View } from "../../../components/Themed"
-import sizes from "../../../layout/constants/sizes"
-import AllMomentsContext from "../all_moments_context"
-import { colors } from "../../../layout/constants/colors"
 import { useColorScheme } from "react-native"
-import ButtonStandart from "../../../components/buttons/button-standart"
 import Icon from "../../../assets/icons/svgs/trash.svg"
-import fonts from "../../../layout/constants/fonts"
+import ButtonStandart from "../../../components/buttons/button-standart"
+import { Text, View } from "../../../components/Themed"
+import { colors } from "../../../constants/colors"
+import fonts from "../../../constants/fonts"
+import sizes from "../../../constants/sizes"
 import LanguageContext from "../../../contexts/Preferences/language"
+import AllMomentsContext from "../all_moments_context"
 
-export default function deleteMoments() {
+export default function DeleteMoments() {
     const isDarkMode = useColorScheme() === "dark"
     const { t } = React.useContext(LanguageContext)
     const { selectedMoments, deleteMoments } = React.useContext(AllMomentsContext)
@@ -53,7 +53,7 @@ export default function deleteMoments() {
                 <View style={description_container}>
                     <Text style={description_text}>
                         {t(
-                            "Are you sure you want to permanently delete your selected moments? You won't be able to recover them later."
+                            "Are you sure you want to permanently delete your selected moments? You won't be able to recover them later.",
                         )}
                     </Text>
                 </View>

@@ -1,36 +1,34 @@
-import AllMomentsScreen from "../../pages/app/Settings/AllMoments"
-import ColorTheme from "../../layout/constants/colors"
-import ContentScreen from "../../pages/app/Settings/Preferences/Content"
-import FollowingScreen from "@/pages/app/Settings/Following"
-import { Interpolation as Horizontal } from "../transitions/horizontal-right"
-import LanguageContext from "../../contexts/Preferences/language"
-import LanguageScreen from "../../pages/app/Settings/Preferences/Language"
-import LogOutScreen from "../../pages/app/Settings/LogOut"
-import OpenSourceScreen from "../../pages/app/Settings/OpenSource"
-import PreferencesScreen from "../../pages/app/Settings/Preferences"
-import ProfilePictureScreen from "../../pages/app/Settings/ProfilePicture"
+import { createStackNavigator } from "@react-navigation/stack"
 import React from "react"
+import SettingsHeaderLeft from "../../components/headers/settings/settings-header_left"
+import ColorTheme from "../../constants/colors"
+import Sizes from "../../constants/sizes"
+import LanguageContext from "../../contexts/Preferences/language"
+import SettingsScreen from "../../pages/app/Settings"
+import AllMomentsScreen from "../../pages/app/Settings/AllMoments"
 import SettingsCommunityGuidelines from "../../pages/app/Settings/CommunityGuidelines"
 import SettingsDescriptionScreen from "../../pages/app/Settings/Description"
+import FollowingScreen from "../../pages/app/Settings/Following"
 import SettingsHapticFeedback from "../../pages/app/Settings/HapticFeedback"
-import SettingsHeaderLeft from "../../components/headers/settings/settings-header_left"
+import LogOutScreen from "../../pages/app/Settings/LogOut"
 import SettingsNameScreen from "../../pages/app/Settings/Name"
+import OpenSourceScreen from "../../pages/app/Settings/OpenSource"
 import SettingsPasswordScreen from "../../pages/app/Settings/Password"
+import PreferencesScreen from "../../pages/app/Settings/Preferences"
+import ContentScreen from "../../pages/app/Settings/Preferences/Content"
+import LanguageScreen from "../../pages/app/Settings/Preferences/Language"
 import SettingsPrivacyPolicy from "../../pages/app/Settings/PrivacyPolicy"
+import ProfilePictureScreen from "../../pages/app/Settings/ProfilePicture"
 import SettingsPushNotifications from "../../pages/app/Settings/PushNotifications"
-import SettingsScreen from "../../pages/app/Settings"
-import SettingsTermsOfService from "../../pages/app/Settings/TermsOfService"
-import Sizes from "../../layout/constants/sizes"
 import SupportScreen from "../../pages/app/Settings/Support"
+import SettingsTermsOfService from "../../pages/app/Settings/TermsOfService"
 import VersionScreen from "../../pages/app/Settings/Version"
-import { createStackNavigator } from "@react-navigation/stack"
-import { useColorScheme } from "react-native"
+import { Interpolation as Horizontal } from "../transitions/horizontal-right"
 
 const SettingsStack = createStackNavigator()
 
 export function SettingsNavigator() {
     const { t } = React.useContext(LanguageContext)
-    const isDarkMode = useColorScheme() === "dark"
     const HeaderStyle = {
         ...Sizes.headers,
         backgroundColor: ColorTheme().background,
@@ -43,7 +41,10 @@ export function SettingsNavigator() {
                 component={SettingsScreen}
                 options={{
                     headerTitle: t("Settings"),
-                    headerStyle: [HeaderStyle, {borderBottomWidth: 0, borderBottomColor: "transparent"}],
+                    headerStyle: [
+                        HeaderStyle,
+                        { borderBottomWidth: 0, borderBottomColor: "transparent" },
+                    ],
                     headerTintColor: String(ColorTheme().text),
                     cardStyle: { backgroundColor: String(ColorTheme().background) },
                     cardOverlayEnabled: true,

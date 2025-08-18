@@ -2,7 +2,7 @@ import React from "react"
 import { Dimensions, StatusBar, useColorScheme } from "react-native"
 import { WebView } from "react-native-webview"
 import { View } from "../../../components/Themed"
-import { colors } from "../../../layout/constants/colors"
+import { colors } from "../../../constants/colors"
 const WindowWidth = Dimensions.get("window").width
 
 export default function SettingsPrivacyPolicy() {

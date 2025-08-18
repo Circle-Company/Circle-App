@@ -1,8 +1,8 @@
 import React from "react"
 import { Text, View } from "react-native"
+import { colors } from "../../../constants/colors"
+import fonts from "../../../constants/fonts"
 import { truncated } from "../../../helpers/processText"
-import { colors } from "../../../layout/constants/colors"
-import fonts from "../../../layout/constants/fonts"
 import MomentContext from "../../moment/context"
 
 type MemoryDescriptionProps = {}

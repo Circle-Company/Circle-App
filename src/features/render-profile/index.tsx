@@ -2,7 +2,7 @@ import React from "react"
 import { View, ViewStyle } from "react-native"
 import { Profile } from "../../components/profile"
 import { userReciveDataProps } from "../../components/user_show/user_show-types"
-import sizes from "../../layout/constants/sizes"
+import sizes from "../../constants/sizes"
 
 type RenderProfileProps = {
     user: userReciveDataProps

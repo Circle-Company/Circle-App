@@ -1,17 +1,17 @@
+import Icon from "@/assets/icons/svgs/arrow_up.svg"
+import EditIcon from "@/assets/icons/svgs/camera.svg"
 import { useNavigation } from "@react-navigation/native"
 import React from "react"
 import { Image, StatusBar, useColorScheme, View } from "react-native"
 import RNFS from "react-native-fs"
 import { ImagePickerResponse, launchImageLibrary } from "react-native-image-picker"
-import Icon from "../../../assets/icons/svgs/arrow_up.svg"
-import EditIcon from "../../../assets/icons/svgs/camera.svg"
 import ButtonStandart from "../../../components/buttons/button-standart"
 import { Loading } from "../../../components/loading"
 import { Text } from "../../../components/Themed"
+import ColorTheme, { colors } from "../../../constants/colors"
+import fonts from "../../../constants/fonts"
+import sizes from "../../../constants/sizes"
 import PersistedContext from "../../../contexts/Persisted"
-import ColorTheme, { colors } from "../../../layout/constants/colors"
-import fonts from "../../../layout/constants/fonts"
-import sizes from "../../../layout/constants/sizes"
 import api from "../../../services/Api"
 
 export default function ProfilePictureScreen() {
@@ -98,7 +98,7 @@ export default function ProfilePictureScreen() {
                             resolution_height: IMG.width,
                         },
                     },
-                    { headers: { Authorization: session.account.jwtToken } }
+                    { headers: { Authorization: session.account.jwtToken } },
                 )
                 .finally(() => {
                     setSelectedImage("")
@@ -131,7 +131,7 @@ export default function ProfilePictureScreen() {
                 mediaType: "photo",
                 selectionLimit: 1,
             },
-            handleImagePickerResponse
+            handleImagePickerResponse,
         )
     }
 

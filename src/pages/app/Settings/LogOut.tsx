@@ -1,13 +1,13 @@
+import * as LocalAuthentication from "expo-local-authentication"
 import React from "react"
 import { StatusBar, useColorScheme } from "react-native"
-import TouchID from "react-native-simple-biometrics"
 import { Text, View } from "../../../components/Themed"
 import ButtonStandart from "../../../components/buttons/button-standart"
+import ColorTheme, { colors } from "../../../constants/colors"
+import fonts from "../../../constants/fonts"
+import sizes from "../../../constants/sizes"
 import AuthContext from "../../../contexts/Auth"
 import LanguageContext from "../../../contexts/Preferences/language"
-import ColorTheme, { colors } from "../../../layout/constants/colors"
-import fonts from "../../../layout/constants/fonts"
-import sizes from "../../../layout/constants/sizes"
 
 export default function LogOutScreen() {
     const { t } = React.useContext(LanguageContext)
@@ -47,10 +47,11 @@ export default function LogOutScreen() {
 
     async function handlePress() {
         try {
-            const isAuthenticated = await TouchID.requestBioAuth(
-                t("Make sure it's you"),
-                t("You're logging out of your account")
-            )
+            const isAuthenticated = await LocalAuthentication.authenticateAsync({
+                biometricsSecurityLevel: "weak",
+                cancelLabel: t("Stay Logged In"),
+                promptMessage: t("Log Out Confirmation"),
+            })
             if (isAuthenticated) signOut()
         } catch (err: any) {
             console.error(err)

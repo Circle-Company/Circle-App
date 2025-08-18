@@ -1,8 +1,8 @@
-import ColorTheme from "@/layout/constants/colors"
 import Loading from "@/assets/icons/svgs/circle-spinner.svg"
-import { LoadingProps } from "../loading-types"
 import { MotiView } from "@motify/components"
 import React from "react"
+import ColorTheme from "../../../constants/colors"
+import { LoadingProps } from "../loading-types"
 
 export default function activity_indicator({
     size = 30,

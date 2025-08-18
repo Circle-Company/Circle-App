@@ -1,8 +1,8 @@
 import { View, ViewStyle } from "react-native"
 
-import { MomentTopRightRootProps } from "../../../moment-types"
 import React from "react"
-import sizes from "@/layout/constants/sizes"
+import sizes from "../../../../../constants/sizes"
+import { MomentTopRightRootProps } from "../../../moment-types"
 
 export default function top_right_root({ children }: MomentTopRightRootProps) {
     const container: ViewStyle = {

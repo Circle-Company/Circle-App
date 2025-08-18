@@ -1,15 +1,16 @@
+import CheckIcon from "@/assets/icons/svgs/check_circle.svg"
+import XIcon from "@/assets/icons/svgs/close.svg"
+import Eye from "@/assets/icons/svgs/eye.svg"
+import EyeSlash from "@/assets/icons/svgs/eye_slash.svg"
+import Icon from "@/assets/icons/svgs/lock.svg"
+import { Text, View } from "@/components/Themed"
+import ColorTheme, { colors } from "@/constants/colors"
+import fonts from "@/constants/fonts"
+import sizes from "@/constants/sizes"
+import AuthContext from "@/contexts/Auth"
 import React, { useContext, useEffect, useRef, useState } from "react"
+import { useTranslation } from "react-i18next"
 import { Animated, Easing, Pressable, TextInput, useColorScheme } from "react-native"
-import CheckIcon from "../../assets/icons/svgs/check_circle.svg"
-import XIcon from "../../assets/icons/svgs/close.svg"
-import Eye from "../../assets/icons/svgs/eye.svg"
-import EyeSlash from "../../assets/icons/svgs/eye_slash.svg"
-import Icon from "../../assets/icons/svgs/lock.svg"
-import AuthContext from "../../contexts/Auth"
-import ColorTheme, { colors } from "../../layout/constants/colors"
-import fonts from "../../layout/constants/fonts"
-import sizes from "../../layout/constants/sizes"
-import { Text, View } from "../Themed"
 
 type PasswordInputProps = {
     type: "signIn" | "signUp"
@@ -18,6 +19,7 @@ type PasswordInputProps = {
 
 export default function PasswordInput({ type, onPasswordValidated }: PasswordInputProps) {
     const isDarkMode = useColorScheme() === "dark"
+    const { t } = useTranslation()
     const { setSignInputPassword, signInputUsername, errorMessage, loading } =
         useContext(AuthContext)
 
@@ -159,18 +161,25 @@ export default function PasswordInput({ type, onPasswordValidated }: PasswordInp
     }, [isValidPassword])
 
     const styles: any = {
-        container: { width: sizes.screens.width, alignItems: "center" },
+        container: {
+            width: sizes.screens.width,
+            alignItems: "center",
+            backgroundColor: "transparent",
+        },
         inputContainer: {
             width: inputWidth,
-            height: sizes.headers.height,
-            backgroundColor: isDarkMode ? colors.gray.grey_08 + "90" : colors.gray.grey_02 + "80",
+            height: sizes.headers.height * 0.7,
+            backgroundColor: isDarkMode ? colors.gray.grey_08 : colors.gray.grey_02 + "80",
             borderRadius: sizes.headers.height / 2,
             paddingHorizontal: sizes.paddings["1md"],
             flexDirection: "row",
             alignItems: "center",
+            justifyContent: "center",
             shadowColor: "#000",
             shadowOffset: { width: 0, height: 2 },
             shadowRadius: 10,
+            borderWidth: password.length > 0 ? 2 : 0,
+            borderColor: ColorTheme().backgroundDisabled,
         },
         input: {
             marginLeft: 10,
@@ -179,12 +188,15 @@ export default function PasswordInput({ type, onPasswordValidated }: PasswordInp
             color: ColorTheme().text,
         },
         bottomContainer: {
-            marginTop: sizes.margins["1sm"],
+            marginTop: sizes.margins["2sm"],
             width: sizes.screens.width,
             alignItems: "flex-start",
             paddingHorizontal: sizes.paddings["1xl"] * 1.1,
+            backgroundColor: "#00000000",
         },
         charCounterContainer: {
+            alignItems: "center",
+            alignSelf: "center",
             borderRadius: sizes.sizes["1md"],
             paddingHorizontal: sizes.paddings["1sm"],
             paddingVertical: sizes.paddings["1sm"] * 0.3,
@@ -195,20 +207,30 @@ export default function PasswordInput({ type, onPasswordValidated }: PasswordInp
             fontFamily: fonts.family.Medium,
             color: ColorTheme().textDisabled,
         },
+        legendContainer: {
+            alignItems: "center",
+            alignSelf: "center",
+            flex: 1,
+            backgroundColor: "#00000000",
+        },
         legend: {
-            marginTop: sizes.margins["1sm"],
+            marginTop: sizes.margins["2sm"],
             fontSize: fonts.size.caption2,
-            fontFamily: fonts.family.Medium,
+            fontFamily: fonts.family.Semibold,
+            textAlign: "center",
             color: ColorTheme().textDisabled,
+            alignSelf: "center",
+            backgroundColor: "#00000000",
         },
         statusContainer: {
+            flex: 1,
             flexDirection: "row",
             alignItems: "center",
-            marginBottom: 4,
+            justifyContent: "flex-start",
         },
         status: {
-            fontSize: fonts.size.caption1,
-            fontFamily: fonts.family.Medium,
+            fontSize: fonts.size.caption2,
+            fontFamily: fonts.family.Semibold,
             color: isValidPassword ? ColorTheme().success : ColorTheme().textDisabled,
         },
         closeButtonContainer: {
@@ -217,14 +239,15 @@ export default function PasswordInput({ type, onPasswordValidated }: PasswordInp
             borderRadius: 10,
             alignItems: "center",
             justifyContent: "center",
-            alignSelf: "center",
             backgroundColor: ColorTheme().backgroundDisabled,
+            borderWidth: password.length > 0 ? 1 : 0,
+            borderColor: ColorTheme().backgroundAccent + 10,
         },
         visibleButtonContainer: {
             right: -5,
             width: 30,
             height: 30,
-            marginLeft: sizes.margins["1sm"],
+            marginRight: sizes.margins["3sm"],
             alignItems: "center",
             justifyContent: "center",
         },
@@ -270,13 +293,32 @@ export default function PasswordInput({ type, onPasswordValidated }: PasswordInp
                     maxLength={20}
                     style={styles.input}
                     selectionColor={ColorTheme().primary}
-                    placeholder={"Password"}
+                    placeholder={t("Password")}
                     placeholderTextColor={String(ColorTheme().textDisabled + "99")}
                 />
 
-                <Animated.View style={{ flexDirection: "row", opacity: fadeIcons }}>
+                <Animated.View
+                    style={{
+                        flexDirection: "row",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        height: "100%",
+                        opacity: fadeIcons,
+                    }}
+                >
                     {!!password && (
                         <>
+                            <Pressable
+                                testID="password-toggle-visibility"
+                                onPress={handleVisiblePressed}
+                                style={styles.visibleButtonContainer}
+                            >
+                                {!isVisible ? (
+                                    <Eye fill={colors.gray.grey_04} width={14} height={14} />
+                                ) : (
+                                    <EyeSlash fill={colors.gray.grey_04} width={14} height={14} />
+                                )}
+                            </Pressable>
                             <Pressable
                                 testID="password-toggle-clear"
                                 onPress={handleClearPressed}
@@ -287,17 +329,6 @@ export default function PasswordInput({ type, onPasswordValidated }: PasswordInp
                                     width={sizes.icons["1sm"].width * 0.7}
                                     height={sizes.icons["1sm"].height * 0.7}
                                 />
-                            </Pressable>
-                            <Pressable
-                                testID="password-toggle-visibility"
-                                onPress={handleVisiblePressed}
-                                style={styles.visibleButtonContainer}
-                            >
-                                {!isVisible ? (
-                                    <Eye fill={colors.gray.grey_04} width={18} height={18} />
-                                ) : (
-                                    <EyeSlash fill={colors.gray.grey_04} width={18} height={18} />
-                                )}
                             </Pressable>
                         </>
                     )}
@@ -327,7 +358,7 @@ export default function PasswordInput({ type, onPasswordValidated }: PasswordInp
                     </Animated.View>
                 )}
 
-                {type === "signUp" && (
+                {type === "signUp" && password.length > 0 && (
                     <Animated.View
                         style={[styles.charCounterContainer, { opacity: charCounterFade }]}
                     >
@@ -337,7 +368,9 @@ export default function PasswordInput({ type, onPasswordValidated }: PasswordInp
 
                 {type === "signUp" && !errorMessage && !loading && (
                     <Text style={styles.legend}>
-                        Use numbers and special characters for stronger passwords.
+                        {password.length >= 4
+                            ? t("Use numbers and special characters for stronger passwords.")
+                            : t("Password must to be at least 4 characters long")}
                     </Text>
                 )}
             </Animated.View>

@@ -1,8 +1,9 @@
-import LanguageContext from "@/contexts/Preferences/language"
+import AgreeScreen from "@/pages/auth/SignUp/Agree"
 import { createStackNavigator } from "@react-navigation/stack"
 import React from "react"
-import ColorTheme from "../../layout/constants/colors"
-import sizes from "../../layout/constants/sizes"
+import ColorTheme from "../../constants/colors"
+import sizes from "../../constants/sizes"
+import LanguageContext from "../../contexts/Preferences/language"
 import SettingsCommunityGuidelines from "../../pages/app/Settings/CommunityGuidelines"
 import SettingsPrivacyPolicy from "../../pages/app/Settings/PrivacyPolicy"
 import SettingsTermsOfService from "../../pages/app/Settings/TermsOfService"
@@ -22,6 +23,7 @@ export default function AuthNavigator() {
     }
 
     const CardStyle = {
+        borderRadius: 40,
         backgroundColor: String(ColorTheme().background),
         paddingTop: sizes.paddings["1sm"],
     }
@@ -60,6 +62,17 @@ export default function AuthNavigator() {
             <AuthStack.Screen
                 name="Auth-SignUp-Password"
                 component={PasswordScreen}
+                options={{
+                    headerShown: false,
+                    cardStyle: CardStyle,
+                    headerRight: () => null,
+                    headerLeft: () => null,
+                    cardStyleInterpolator: ModalPresentation,
+                }}
+            />
+            <AuthStack.Screen
+                name="Auth-SignUp-Agree"
+                component={AgreeScreen}
                 options={{
                     headerShown: false,
                     cardStyle: CardStyle,

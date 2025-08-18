@@ -6,12 +6,12 @@ import {
     TagProps,
 } from "./types"
 
-import { CommentsReciveDataProps } from "@/components/comment/comments-types"
-import { LanguagesCodesType } from "@/locales/LanguageTypes"
-import PersistedContext from "@/contexts/Persisted"
 import React from "react"
+import PersistedContext from "../../../contexts/Persisted"
+import { LanguagesCodesType } from "../../../locales/LanguageTypes"
 import api from "../../../services/Api"
-import { userReciveDataProps } from "@/components/user_show/user_show-types"
+import { CommentsReciveDataProps } from "../../comment/comments-types"
+import { userReciveDataProps } from "../../user_show/user_show-types"
 
 export interface MomentDataState extends Omit<MomentDataProps, "isLiked"> {
     getComments: ({ page, pageSize }: { page: number; pageSize: number }) => Promise<void>

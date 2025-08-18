@@ -1,6 +1,8 @@
 import ReactNativeHapticFeedback from "react-native-haptic-feedback"
 import { storage, storageKeys } from "../../store"
+
 export type HapticFeedbackTypes =
+    | "selection"
     | "impactLight"
     | "impactMedium"
     | "impactHeavy"
@@ -9,9 +11,7 @@ export type HapticFeedbackTypes =
     | "notificationSuccess"
     | "notificationWarning"
     | "notificationError"
-    | "selection"
     | "clockTick"
-    | "clockCLick"
     | "contextClick"
     | "keyboardPress"
     | "keyboardRelease"

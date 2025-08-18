@@ -1,15 +1,25 @@
+import Icon from "@/assets/icons/svgs/@2.svg" // Ícone representando "@" ou similar
+import CheckIcon from "@/assets/icons/svgs/check_circle.svg"
+import XIcon from "@/assets/icons/svgs/close.svg"
+import { Text } from "@/components/Themed"
+import ColorTheme, { colors } from "@/constants/colors"
+import fonts from "@/constants/fonts"
+import sizes from "@/constants/sizes"
+import AuthContext from "@/contexts/Auth"
 import { usernameRegex } from "@/lib/hooks/useUsernameRegex"
+import api from "@/services/Api" // Serviço para verificar disponibilidade do username
 import React, { useContext, useEffect, useRef, useState } from "react"
-import { Animated, Easing, Pressable, TextInput, useColorScheme } from "react-native"
-import Icon from "../../assets/icons/svgs/@.svg" // Ícone representando "@" ou similar
-import CheckIcon from "../../assets/icons/svgs/check_circle.svg"
-import XIcon from "../../assets/icons/svgs/close.svg"
-import AuthContext from "../../contexts/Auth"
-import ColorTheme, { colors } from "../../layout/constants/colors"
-import fonts from "../../layout/constants/fonts"
-import sizes from "../../layout/constants/sizes"
-import api from "../../services/Api" // Serviço para verificar disponibilidade do username
-import { Text, View } from "../Themed"
+import { useTranslation } from "react-i18next"
+import {
+    Animated,
+    Easing,
+    Pressable,
+    TextInput,
+    TextStyle,
+    useColorScheme,
+    View,
+    ViewStyle,
+} from "react-native"
 
 type UsernameInputProps = {
     type: "signIn" | "signUp"
@@ -18,7 +28,7 @@ type UsernameInputProps = {
 export default function UsernameInput({ type }: UsernameInputProps) {
     const isDarkMode = useColorScheme() === "dark"
     const { setSignInputUsername } = useContext(AuthContext)
-
+    const { t } = useTranslation()
     const [username, setUsername] = useState("")
     const [isUsernameAvailable, setIsUsernameAvailable] = useState(false)
     const [statusMessage, setStatusMessage] = useState("")
@@ -89,9 +99,9 @@ export default function UsernameInput({ type }: UsernameInputProps) {
     // --- Lógica de validação --- //
     const validateUsername = async (value: string): Promise<boolean> => {
         // Verifica formato usando regex
-        const { valid, message } = usernameRegex(value)
+        const { valid, message } = usernameRegex(value, t)
         if (!valid) {
-            setStatusMessage(message || "Invalid username.")
+            setStatusMessage(message || t("Invalid username."))
             setIsUsernameAvailable(false)
             setUsernameIsValid(false)
             setSignInputUsername("")
@@ -99,7 +109,7 @@ export default function UsernameInput({ type }: UsernameInputProps) {
         }
 
         // Se formato válido, dispara verificação de disponibilidade
-        setStatusMessage("Checking availability...")
+        setStatusMessage(t("Checking availability..."))
         setIsUsernameAvailable(false)
         setUsernameIsValid(false)
         setSignInputUsername("")
@@ -110,10 +120,10 @@ export default function UsernameInput({ type }: UsernameInputProps) {
             setSignInputUsername(value)
             setUsernameIsValid(true)
             setIsUsernameAvailable(response.data.enable_to_use)
-            setStatusMessage(response.data.message)
+            setStatusMessage(t(response.data.message))
             return response.data.enable_to_use
         } catch {
-            setStatusMessage("Error verifying username.")
+            setStatusMessage(t("Error verifying username."))
             setIsUsernameAvailable(false)
             setUsernameIsValid(false)
             return false
@@ -140,7 +150,7 @@ export default function UsernameInput({ type }: UsernameInputProps) {
         setSignInputUsername("")
         setIsUsernameAvailable(false)
         setUsernameIsValid(false)
-        setStatusMessage("The username needs at least 4 characters.")
+        setStatusMessage(t("The username needs at least 4 characters."))
         setShowStatusMessage(true)
     }
 
@@ -160,78 +170,94 @@ export default function UsernameInput({ type }: UsernameInputProps) {
         ]).start()
     }, [showStatusMessage, statusMessage])
 
-    const styles: any = {
-        container: { width: sizes.screens.width, alignItems: "center" },
-        inputContainer: {
-            width: inputWidth,
-            height: sizes.headers.height,
-            backgroundColor: isDarkMode ? colors.gray.grey_08 + "90" : colors.gray.grey_02 + "80",
-            borderRadius: sizes.headers.height / 2,
-            paddingHorizontal: sizes.paddings["1md"],
-            flexDirection: "row",
-            alignItems: "center",
-            shadowColor: "#000",
-            shadowOffset: { width: 0, height: 2 },
-            shadowRadius: 10,
-        },
-        input: {
-            marginLeft: 10,
-            fontFamily: fonts.family.Semibold,
-            flex: 1,
-            color: ColorTheme().text,
-        },
-        bottomContainer: {
-            marginTop: sizes.margins["1sm"],
-            width: sizes.screens.width,
-            alignItems: "flex-start",
-            paddingHorizontal: sizes.paddings["1xl"] * 1.1,
-        },
-        charCounterContainer: {
-            borderRadius: sizes.sizes["1md"],
-            paddingHorizontal: sizes.paddings["1sm"],
-            paddingVertical: sizes.paddings["1sm"] * 0.3,
-            backgroundColor: ColorTheme().backgroundDisabled + "80",
-        },
-        charCounter: {
-            fontSize: fonts.size.caption2,
-            fontFamily: fonts.family.Medium,
-            color: ColorTheme().textDisabled,
-        },
-        legendContainer: {
-            marginTop: sizes.margins["1md"],
-        },
-        legend: {
-            marginTop: sizes.margins["1sm"],
-            fontSize: fonts.size.caption2,
-            fontFamily: fonts.family.Medium,
-            color: ColorTheme().textDisabled,
-        },
-        statusContainer: {
-            flex: 1,
-            flexDirection: "row",
-            alignItems: "center",
-            justifyContent: "flex-start",
-        },
-        status: {
-            fontSize: fonts.size.caption1,
-            fontFamily: fonts.family.Medium,
-            color: usernameIsValid ? ColorTheme().success : ColorTheme().textDisabled,
-        },
-        closeButtonContainer: {
-            width: 20,
-            height: 20,
-            borderRadius: 10,
-            alignItems: "center",
-            justifyContent: "center",
-            backgroundColor: ColorTheme().backgroundDisabled,
-        },
+    const container: ViewStyle = {
+        width: sizes.screens.width,
+        alignItems: "center",
+        backgroundColor: "transparent",
+    }
+    const inputContainer: ViewStyle = {
+        width: inputWidth,
+        height: sizes.headers.height * 0.7,
+        backgroundColor: isDarkMode ? colors.gray.grey_08 : colors.gray.grey_02 + "80",
+        borderRadius: sizes.headers.height / 2,
+        paddingHorizontal: sizes.paddings["1md"],
+        flexDirection: "row",
+        alignItems: "center",
+        shadowColor: "#000",
+        shadowOffset: { width: 0, height: 2 },
+        shadowRadius: 10,
+        borderWidth: username.length > 0 ? 2 : 0,
+        borderColor: ColorTheme().backgroundDisabled,
+    }
+    const input: TextStyle = {
+        marginLeft: 10,
+        fontFamily: fonts.family.Semibold,
+        flex: 1,
+        color: ColorTheme().text,
+    }
+    const bottomContainer: ViewStyle = {
+        marginTop: sizes.margins["1md"],
+        width: sizes.screens.width,
+        alignItems: "flex-start",
+        paddingHorizontal: sizes.paddings["1xl"] * 1.1,
+        backgroundColor: "#00000000",
+    }
+    const charCounterContainer: ViewStyle = {
+        borderRadius: sizes.sizes["1md"],
+        paddingHorizontal: sizes.paddings["1sm"],
+        paddingVertical: sizes.paddings["1sm"] * 0.3,
+        backgroundColor: ColorTheme().backgroundDisabled + "80",
+    }
+    const charCounter: TextStyle = {
+        fontSize: fonts.size.caption2,
+        fontFamily: fonts.family.Medium,
+        color: ColorTheme().textDisabled,
+    }
+    const legendContainer: ViewStyle = {
+        alignItems: "center",
+        alignSelf: "center",
+        flex: 1,
+        backgroundColor: "#00000000",
+    }
+    const legend: TextStyle = {
+        fontSize: fonts.size.caption2,
+        fontFamily: fonts.family.Semibold,
+        textAlign: "center",
+        color: ColorTheme().textDisabled,
+        alignSelf: "center",
+        backgroundColor: "#00000000",
+    }
+    const statusContainer: ViewStyle = {
+        flex: 1,
+        flexDirection: "row",
+        alignItems: "center",
+        justifyContent: "flex-start",
+    }
+    const status: TextStyle = {
+        fontSize: fonts.size.caption2,
+        fontFamily: fonts.family.Semibold,
+        color: usernameIsValid
+            ? isUsernameAvailable
+                ? ColorTheme().success
+                : ColorTheme().error
+            : ColorTheme().textDisabled,
+    }
+    const closeButtonContainer: ViewStyle = {
+        width: 20,
+        height: 20,
+        borderRadius: 10,
+        alignItems: "center",
+        justifyContent: "center",
+        backgroundColor: ColorTheme().backgroundDisabled,
+        borderWidth: username.length > 0 ? 1 : 0,
+        borderColor: ColorTheme().backgroundAccent + 10,
     }
 
     return (
-        <View style={styles.container} testID="username-container">
+        <View style={container} testID="username-container">
             <Animated.View
                 style={[
-                    styles.inputContainer,
+                    inputContainer,
                     {
                         transform: [{ scale: scaleAnim }],
                         shadowOpacity: shadowOpacity,
@@ -265,20 +291,21 @@ export default function UsernameInput({ type }: UsernameInputProps) {
                     onChangeText={handleInputChange}
                     numberOfLines={1}
                     maxLength={20}
-                    style={styles.input}
+                    style={input}
+                    autoFocus={type === "signUp" ? true : false}
                     selectionColor={ColorTheme().primary}
-                    placeholder="Username"
+                    placeholder={type === "signUp" ? t("user.name") : t("Username")}
                     placeholderTextColor={String(ColorTheme().textDisabled + "99")}
                 />
                 <Animated.View style={{ flexDirection: "row", opacity: fadeIcons }}>
                     {username && (
                         <Pressable
                             onPress={handleClearPressed}
-                            style={styles.closeButtonContainer}
+                            style={closeButtonContainer}
                             testID="username-toggle-clear"
                         >
                             <XIcon
-                                fill={colors.gray.grey_04.toString()}
+                                fill={colors.gray.grey_01.toString()}
                                 width={sizes.icons["1sm"].width * 0.7}
                                 height={sizes.icons["1sm"].height * 0.7}
                             />
@@ -287,30 +314,51 @@ export default function UsernameInput({ type }: UsernameInputProps) {
                 </Animated.View>
             </Animated.View>
             {type === "signUp" && (
-                <View style={styles.bottomContainer}>
+                <View style={bottomContainer}>
                     <View style={{ flexDirection: "row", alignItems: "center" }}>
-                        {showStatusMessage && (
-                            <View style={styles.statusContainer}>
-                                {usernameIsValid && (
+                        {showStatusMessage && username.length > 0 ? (
+                            <View style={statusContainer}>
+                                {isUsernameAvailable ? (
                                     <CheckIcon
                                         style={{ marginRight: 6 }}
                                         fill={colors.green.green_05.toString()}
                                         width={sizes.icons["1sm"].width * 0.7}
                                         height={sizes.icons["1sm"].height * 0.7}
                                     />
+                                ) : (
+                                    usernameIsValid && (
+                                        <View
+                                            style={{
+                                                borderRadius: 20,
+                                                padding: 1,
+                                                backgroundColor: ColorTheme().error,
+                                                marginRight: 6,
+                                            }}
+                                        >
+                                            <XIcon
+                                                fill={ColorTheme().background}
+                                                width={sizes.icons["1sm"].width * 0.5}
+                                                height={sizes.icons["1sm"].height * 0.5}
+                                            />
+                                        </View>
+                                    )
                                 )}
-                                <Text style={styles.status}>{statusMessage}</Text>
+                                <Text style={status}>{statusMessage}</Text>
+                            </View>
+                        ) : (
+                            <View style={legendContainer}>
+                                <Text style={legend}>
+                                    {t(
+                                        "The username can only contain lowercase letters, numbers and '_' and '.'",
+                                    )}
+                                </Text>
                             </View>
                         )}
-                        <View style={styles.charCounterContainer}>
-                            <Text style={styles.charCounter}>{username.length} - 20</Text>
-                        </View>
-                    </View>
-
-                    <View style={styles.legendContainer}>
-                        <Text style={styles.legend}>
-                            The username can only contain lowercase letters, numbers and "_" and "."
-                        </Text>
+                        {username.length > 0 && isUsernameAvailable && (
+                            <View style={charCounterContainer}>
+                                <Text style={charCounter}>{username.length} - 20</Text>
+                            </View>
+                        )}
                     </View>
                 </View>
             )}

@@ -1,19 +1,18 @@
-import { Pressable, TextStyle, View, ViewStyle, useColorScheme } from "react-native"
-import ColorTheme, { colors } from "../../../../layout/constants/colors"
-
+import ChevronRight from "@/assets/icons/svgs/chevron_right.svg"
+import { SettingsiItemObjectProps } from "@/components/settings/settings-types"
+import { Text } from "@/components/Themed"
+import { UserShow } from "@/components/user_show"
+import { userReciveDataProps } from "@/components/user_show/user_show-types"
+import ColorTheme, { colors } from "@/constants/colors"
+import fonts from "@/constants/fonts"
+import sizes from "@/constants/sizes"
+import PersistedContext from "@/contexts/Persisted"
+import LanguageContext from "@/contexts/Preferences/language"
 import { useNavigation } from "@react-navigation/native"
 import { NativeStackNavigationProp } from "@react-navigation/native-stack"
+import * as LocalAuthentication from "expo-local-authentication"
 import React from "react"
-import TouchID from "react-native-simple-biometrics"
-import ChevronRight from "../../../../assets/icons/svgs/chevron_right.svg"
-import PersistedContext from "../../../../contexts/Persisted"
-import LanguageContext from "../../../../contexts/Preferences/language"
-import fonts from "../../../../layout/constants/fonts"
-import sizes from "../../../../layout/constants/sizes"
-import { Text } from "../../../Themed"
-import { UserShow } from "../../../user_show"
-import { userReciveDataProps } from "../../../user_show/user_show-types"
-import { SettingsiItemObjectProps } from "../../settings-types"
+import { Pressable, TextStyle, View, ViewStyle, useColorScheme } from "react-native"
 
 type SettingsNavigatorParamList = {
     SettingsNavigator: { screen: string }
@@ -88,10 +87,10 @@ export default function SettingsItem({
 
     const handlePress = async () => {
         if (secure) {
-            const isAuthenticated = await TouchID.requestBioAuth(
-                t("Make sure it's you"),
-                t("You're changing your password")
-            )
+            const isAuthenticated = await LocalAuthentication.authenticateAsync({
+                biometricsSecurityLevel: "weak",
+                promptMessage: t("You're changing your password"),
+            })
             if (isAuthenticated) {
                 navigation.navigate("SettingsNavigator", { screen: navigateTo })
             }
@@ -109,7 +108,9 @@ export default function SettingsItem({
             <View style={styles.containerRight}>
                 {type === "IMAGE" ? (
                     <View style={styles.valueContainerImage}>
-                        <UserShow.Root data={{ ...session.user, you_follow: false } as userReciveDataProps}>
+                        <UserShow.Root
+                            data={{ ...session.user, you_follow: false } as userReciveDataProps}
+                        >
                             <UserShow.ProfilePicture
                                 displayOnMoment={false}
                                 pictureDimensions={{ width: 22, height: 22 }}

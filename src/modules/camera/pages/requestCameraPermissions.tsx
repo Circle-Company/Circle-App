@@ -1,9 +1,10 @@
 import { Text, View } from "@/components/Themed"
-import ColorTheme from "@/layout/constants/colors"
-import sizes from "@/layout/constants/sizes"
+import ColorTheme from "@/constants/colors"
+import sizes from "@/constants/sizes"
+import { ViewStyle } from "react-native"
 
 export function RequestCameraPermissionsPage() {
-    const container = {
+    const container: ViewStyle = {
         width: sizes.screens.width,
         height: sizes.screens.height,
         backgroundColor: ColorTheme().background,

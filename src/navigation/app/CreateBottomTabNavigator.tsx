@@ -1,57 +1,55 @@
-import ColorTheme, { colors } from "../../layout/constants/colors"
 import { Text, View, useColorScheme } from "react-native"
+import ColorTheme, { colors } from "../../constants/colors"
 
-import { MemoriesNavigator } from "./MemoriesNavigator"
-import Memory from "../../assets/icons/svgs/memory.svg"
-import Moment from "../../assets/icons/svgs/bolt.svg"
-import { MomentNavigator } from "./MomentNavigator"
-import React from "react"
+import { CameraModule } from "@/modules/camera"
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs"
-import fonts from "@/layout/constants/fonts"
-import sizes from "../../layout/constants/sizes"
+import React from "react"
+import Moment from "../../assets/icons/svgs/bolt.svg"
+import Memory from "../../assets/icons/svgs/memory.svg"
+import fonts from "../../constants/fonts"
+import sizes from "../../constants/sizes"
+import { MemoriesNavigator } from "./MemoriesNavigator"
 
 const BottomTab = createBottomTabNavigator()
 
 const focusedTabStyle = (isDarkMode: boolean) => ({
-    paddingLeft: 20,
-    width: 140,
+    paddingLeft: 9,
+    width: 120,
     borderRadius: (sizes.bottomTab.height * 1.2) / 2,
-    flex: 1,
-    backgroundColor: isDarkMode ? colors.gray.white : colors.gray.black,
+    height: sizes.bottomTab.height * 0.6,
+    backgroundColor: isDarkMode ? colors.gray.grey_03 : colors.gray.black,
     flexDirection: "row" as const,
     alignItems: "center" as const,
 })
 
 const unfocusedTabStyle = (side: "left" | "right") => ({
-    marginLeft: side === "left" ? 0 : undefined,
-    marginRight: side === "right" ? 0 : undefined,
+    marginLeft: side === "left" ? -20 : undefined,
+    marginRight: side === "right" ? -20 : undefined,
 })
 
 export default function CreateBottomTabNavigator() {
     const isDarkMode = useColorScheme()
     const { icon, background, backgroundDisabled } = ColorTheme()
-    const iconWidth = 24
-    const iconHeight = 24
+    const iconWidth = 18
+    const iconHeight = 18
 
-    // Customização da TabBar
     const tabBarStyle: any = {
-        marginHorizontal: (sizes.screens.width - 200) / 2,
-        width: 200,
-        alignSelf: "center",
-        bottom: sizes.margins["1xl"],
-        borderRadius: (sizes.bottomTab.height * 1.4) / 2,
-        height: sizes.bottomTab.height * 1,
-        borderTopWidth: 0,
-        elevation: 0,
+        width: 140,
+        left: (sizes.window.width - 140 + 20) / 2,
         position: "absolute",
+        top: 35, // distância do topo
+        borderRadius: sizes.bottomTab.height / 2,
+        height: sizes.bottomTab.height * 0.6,
+        borderTopWidth: 0,
         backgroundColor: backgroundDisabled,
+        paddingTop: 2.5,
     }
 
     const titleStyle: any = {
         marginHorizontal: sizes.margins["2sm"],
         color: background,
         fontSize: fonts.size.body,
-        fontFamily: fonts.family.Bold,
+        fontFamily: fonts.family["Black-Italic"],
     }
 
     return (
@@ -62,14 +60,13 @@ export default function CreateBottomTabNavigator() {
                 headerShown: false,
                 tabBarStyle: tabBarStyle,
                 tabBarShowLabel: false, // Remove os labels
-                lazy: true,
             }}
         >
             {/* Tela de Moments */}
             <BottomTab.Screen
                 name="Moment"
-                component={MomentNavigator}
-                initialParams={{ screen: "NewMomentVideoScreen" }} // Parâmetro inicial para tela específica
+                component={CameraModule}
+                initialParams={{ screen: "NewMomentCameraModule" }} // Parâmetro inicial para tela específica
                 options={{
                     tabBarIcon: ({ focused }) =>
                         focused ? (
@@ -108,8 +105,8 @@ export default function CreateBottomTabNavigator() {
                             <View style={unfocusedTabStyle("right")}>
                                 <Memory
                                     fill={String(icon)}
-                                    width={iconWidth - 2}
-                                    height={iconHeight - 2}
+                                    width={iconWidth + 2}
+                                    height={iconHeight + 2}
                                 />
                             </View>
                         ),

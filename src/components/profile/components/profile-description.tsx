@@ -1,14 +1,12 @@
 import React from "react"
-import { Animated, useColorScheme } from "react-native"
-import fonts from "../../../layout/constants/fonts"
-import sizes from "../../../layout/constants/sizes"
+import { Animated } from "react-native"
+import fonts from "../../../constants/fonts"
+import sizes from "../../../constants/sizes"
 import { Text } from "../../Themed"
 import { useProfileContext } from "../profile-context"
-import { ProfileDescriptionProps } from "../profile-types"
 
-export default function description({}: ProfileDescriptionProps) {
+export default function Description() {
     const { user } = useProfileContext()
-    const isDarkMode = useColorScheme() === "dark"
 
     const animatedScale = React.useRef(new Animated.Value(1)).current
     const animatedOpacity = React.useRef(new Animated.Value(0)).current

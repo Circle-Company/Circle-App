@@ -1,9 +1,9 @@
 import { openSettings } from "react-native-permissions"
 import { Text, View } from "../../components/Themed"
 import ViewMorebutton from "../../components/buttons/view_more"
-import ColorTheme from "../../layout/constants/colors"
-import fonts from "../../layout/constants/fonts"
-import sizes from "../../layout/constants/sizes"
+import ColorTheme from "../../constants/colors"
+import fonts from "../../constants/fonts"
+import sizes from "../../constants/sizes"
 
 export function DisabledNotificationsCard() {
     const container = {

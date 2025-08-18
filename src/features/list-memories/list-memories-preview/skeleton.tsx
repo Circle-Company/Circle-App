@@ -1,7 +1,7 @@
 import React from "react"
 import { View, ViewStyle } from "react-native"
 import { Skeleton } from "../../../components/skeleton"
-import sizes from "../../../layout/constants/sizes"
+import sizes from "../../../constants/sizes"
 
 export function ListMemoriesPreviewSkeleton() {
     const container: ViewStyle = {

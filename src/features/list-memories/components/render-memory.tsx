@@ -6,11 +6,11 @@ import { Memory } from "../../../components/memory"
 import { MemoryObjectProps } from "../../../components/memory/memory-types"
 import { Moment } from "../../../components/moment"
 import { userReciveDataProps } from "../../../components/user_show/user_show-types"
+import { colors } from "../../../constants/colors"
+import fonts from "../../../constants/fonts"
+import sizes from "../../../constants/sizes"
 import MemoryContext from "../../../contexts/memory"
 import { truncated } from "../../../helpers/processText"
-import { colors } from "../../../layout/constants/colors"
-import fonts from "../../../layout/constants/fonts"
-import sizes from "../../../layout/constants/sizes"
 
 type RenderMemoryProps = {
     memory: MemoryObjectProps
@@ -24,7 +24,7 @@ type RenderMemoryProps = {
     icon?: boolean
 }
 
-export default function render_memory({
+export default function RenderMemory({
     memory,
     user,
     pressable = true,

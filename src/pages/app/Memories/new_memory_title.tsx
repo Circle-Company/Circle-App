@@ -1,13 +1,13 @@
 import React from "react"
 import { Animated, FlatList, Keyboard, StatusBar, useColorScheme } from "react-native"
 import { Text, View } from "../../../components/Themed"
+import ColorTheme from "../../../constants/colors"
+import fonts from "../../../constants/fonts"
+import sizes from "../../../constants/sizes"
 import SelectMomentsContext from "../../../contexts/selectMoments"
 import TitleInput from "../../../features/select-moments/components/input-title"
 import RenderMemory from "../../../features/select-moments/components/render-memory"
 import RenderMoment from "../../../features/select-moments/components/render-moments"
-import ColorTheme from "../../../layout/constants/colors"
-import fonts from "../../../layout/constants/fonts"
-import sizes from "../../../layout/constants/sizes"
 
 export default function NewMemoryTitleScreen() {
     const isDarkMode = useColorScheme() === "dark"

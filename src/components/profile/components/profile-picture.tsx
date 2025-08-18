@@ -1,13 +1,13 @@
+import Icon from "@/assets/icons/svgs/@2.svg"
+import { Image } from "expo-image"
 import React from "react"
 import { Animated, Pressable, View, useColorScheme } from "react-native"
-import FastImage from "react-native-fast-image"
-import Icon from "../../../assets/icons/svgs/@2.svg"
-import { colors } from "../../../layout/constants/colors"
-import sizes from "../../../layout/constants/sizes"
+import { colors } from "../../../constants/colors"
+import sizes from "../../../constants/sizes"
 import { useProfileContext } from "../profile-context"
 import { ProfilePictureProps } from "../profile-types"
 
-export default function picture({ fromProfile = false }: ProfilePictureProps) {
+export default function Picture({ fromProfile = false }: ProfilePictureProps) {
     const { user } = useProfileContext()
     const isDarkMode = useColorScheme() === "dark"
     const [profilePicture, setProfilePicture] = React.useState<string>("")
@@ -78,7 +78,10 @@ export default function picture({ fromProfile = false }: ProfilePictureProps) {
     return (
         <Animated.View style={animatedContainer}>
             <Pressable onPress={onProfilePictureAction} style={container}>
-                <FastImage
+                <Image
+                    priority={"normal"}
+                    cachePolicy={"memory"}
+                    recyclingKey={profilePicture}
                     source={{ uri: profilePicture }}
                     style={{
                         width: Number(pictureDimensions.width),
@@ -91,16 +94,16 @@ export default function picture({ fromProfile = false }: ProfilePictureProps) {
                 />
                 {!user?.profile_picture?.tiny_resolution &&
                     !user?.profile_picture?.small_resolution && (
-                    <View style={iconContainer}>
-                        <Icon
-                            width={pictureDimensions.width * 0.5}
-                            height={pictureDimensions.height * 0.5}
-                            fill={
-                                isDarkMode ? colors.gray.grey_04 + 90 : colors.gray.grey_04 + 50
-                            }
-                        />
-                    </View>
-                )}
+                        <View style={iconContainer}>
+                            <Icon
+                                width={pictureDimensions.width * 0.5}
+                                height={pictureDimensions.height * 0.5}
+                                fill={
+                                    isDarkMode ? colors.gray.grey_04 + 90 : colors.gray.grey_04 + 50
+                                }
+                            />
+                        </View>
+                    )}
             </Pressable>
         </Animated.View>
     )

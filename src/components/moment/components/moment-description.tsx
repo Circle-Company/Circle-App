@@ -1,13 +1,13 @@
-import { Animated, Text, View } from "react-native"
-import ColorTheme, { colors } from "../../../layout/constants/colors"
 import React, { useEffect, useRef } from "react"
+import { Animated, Text, View } from "react-native"
+import ColorTheme, { colors } from "../../../constants/colors"
 
+import fonts from "../../../constants/fonts"
+import Sizes from "../../../constants/sizes"
 import MomentContext from "../context"
 import { MomentDescriptionProps } from "../moment-types"
-import Sizes from "../../../layout/constants/sizes"
-import fonts from "../../../layout/constants/fonts"
 
-export default function description({ displayOnMoment = true }: MomentDescriptionProps) {
+export default function Description({ displayOnMoment = true }: MomentDescriptionProps) {
     const { momentData } = React.useContext(MomentContext)
 
     const container: any = {

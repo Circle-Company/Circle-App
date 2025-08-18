@@ -1,6 +1,6 @@
 import React from "react"
 import { View } from "react-native"
-import sizes from "../../../../layout/constants/sizes"
+import sizes from "../../../../constants/sizes"
 
 type NotificationContainerProps = {
     children: React.ReactNode

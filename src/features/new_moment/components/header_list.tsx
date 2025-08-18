@@ -1,14 +1,14 @@
 import { NavigationProp, useNavigation } from "@react-navigation/native"
-import { Text, TextStyle, View, ViewStyle } from "@/components/Themed"
+import { Text, TextStyle, View, ViewStyle } from "../../../components/Themed"
 
 import AddIcon from "@/assets/icons/svgs/plus_circle-outline.svg"
-import ColorTheme from "@/layout/constants/colors"
-import LanguageContext from "@/contexts/Preferences/language"
 import React from "react"
-import SelectMomentsContext from "@/contexts/selectMoments"
-import ViewMorebutton from "@/components/buttons/view_more"
-import fonts from "@/layout/constants/fonts"
-import sizes from "@/layout/constants/sizes"
+import ViewMorebutton from "../../../components/buttons/view_more"
+import ColorTheme from "../../../constants/colors"
+import fonts from "../../../constants/fonts"
+import sizes from "../../../constants/sizes"
+import LanguageContext from "../../../contexts/Preferences/language"
+import SelectMomentsContext from "../../../contexts/selectMoments"
 
 export default function HeaderList() {
     const { t } = React.useContext(LanguageContext)

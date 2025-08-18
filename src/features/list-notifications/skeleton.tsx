@@ -1,6 +1,6 @@
 import { View } from "../../components/Themed"
 import { Skeleton } from "../../components/skeleton"
-import sizes from "../../layout/constants/sizes"
+import sizes from "../../constants/sizes"
 
 export function ListNotificationsSkeleton() {
     const container = {

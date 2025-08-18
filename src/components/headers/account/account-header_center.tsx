@@ -1,6 +1,6 @@
 import React from "react"
+import sizes from "../../../constants/sizes"
 import PersistedContext from "../../../contexts/Persisted"
-import sizes from "../../../layout/constants/sizes"
 import { View } from "../../Themed"
 import { UserShow } from "../../user_show"
 export default function AccountHeaderCenter() {

@@ -8,7 +8,7 @@ import { apiRoutes } from "../../services/Api"
  */
 export async function refreshJwtToken(
     { username, id }: { username: string; id: string },
-    sessionAccount: AccountState
+    sessionAccount: AccountState,
 ) {
     if (username && id)
         try {
