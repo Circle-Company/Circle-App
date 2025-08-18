@@ -38,7 +38,7 @@ export function SearchContextProvider({ children }: SearchContextProvider) {
                     },
                     {
                         headers: { Authorization: session.account.jwtToken },
-                    }
+                    },
                 )
                 .then(function (response) {
                     return response.data

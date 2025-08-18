@@ -1,14 +1,14 @@
+import Icon from "@/assets/icons/svgs/check_circle.svg"
 import { useNavigation } from "@react-navigation/native"
 import React from "react"
 import { Keyboard, StatusBar, TextInput, useColorScheme } from "react-native"
-import Icon from "../../../assets/icons/svgs/check_circle.svg"
 import { Text, View } from "../../../components/Themed"
 import ButtonStandart from "../../../components/buttons/button-standart"
+import ColorTheme, { colors } from "../../../constants/colors"
+import fonts from "../../../constants/fonts"
+import sizes from "../../../constants/sizes"
 import PersistedContext from "../../../contexts/Persisted"
 import LanguageContext from "../../../contexts/Preferences/language"
-import ColorTheme, { colors } from "../../../layout/constants/colors"
-import fonts from "../../../layout/constants/fonts"
-import sizes from "../../../layout/constants/sizes"
 import api from "../../../services/Api"
 
 export default function NameScreen() {
@@ -17,7 +17,7 @@ export default function NameScreen() {
     const isDarkMode = useColorScheme() === "dark"
     const maxLength = 30
 
-    const [keyboardIsVisible, setKeyboardIsVisible] = React.useState(false)
+    const [setKeyboardIsVisible] = React.useState(false)
     const [name, setName] = React.useState(session.user.name ? session.user.name : "")
     const input_width = sizes.screens.width
     const navigation = useNavigation()
@@ -74,8 +74,8 @@ export default function NameScreen() {
         color: name
             ? colors.gray.white
             : isDarkMode
-                ? colors.gray.grey_04 + "90"
-                : colors.gray.grey_04 + "90",
+            ? colors.gray.grey_04 + "90"
+            : colors.gray.grey_04 + "90",
     }
 
     const icon = {
@@ -112,7 +112,7 @@ export default function NameScreen() {
                             user_id: session.user.id,
                             name: name,
                         },
-                        { headers: { Authorization: session.account.jwtToken } }
+                        { headers: { Authorization: session.account.jwtToken } },
                     )
                     .finally(() => {
                         session.user.get(session.user.id)
@@ -173,8 +173,8 @@ export default function NameScreen() {
                         name
                             ? colors.gray.white
                             : isDarkMode
-                                ? colors.gray.grey_04 + "90"
-                                : colors.gray.grey_04 + "90"
+                            ? colors.gray.grey_04 + "90"
+                            : colors.gray.grey_04 + "90",
                     )}
                     width={17}
                     height={17}

@@ -1,11 +1,11 @@
 import React from "react"
-import { View, Text, useColorScheme } from "react-native"
-import fonts from "../../../layout/constants/fonts"
-import ColorTheme, { colors } from "../../../layout/constants/colors"
+import { Text, useColorScheme, View } from "react-native"
+import ColorTheme, { colors } from "../../../constants/colors"
+import fonts from "../../../constants/fonts"
+import sizes from "../../../constants/sizes"
 import { TagProps } from "../moment-types"
-import sizes from "../../../layout/constants/sizes"
 
-export default function tag({
+export default function Tag({
     title,
     color = String(ColorTheme().text),
     backgroundColor = String(ColorTheme().backgroundDisabled),

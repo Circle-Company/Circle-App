@@ -1,24 +1,24 @@
-import Animated, { FadeInLeft } from "react-native-reanimated"
 import { FlatList, View } from "react-native"
+import Animated, { FadeInLeft } from "react-native-reanimated"
 
-import AnyMemoryCard from "./components/any_memory-card"
-import EndReached from "./components/end-reached"
-import LanguageContext from "../../../contexts/Preferences/language"
-import { ListMemoriesPreviewSkeleton } from "./skeleton"
+import { useNavigation } from "@react-navigation/native"
+import React from "react"
+import ViewMorebutton from "../../../components/buttons/view_more"
+import OfflineCard from "../../../components/general/offline"
 import { Loading } from "../../../components/loading"
 import { Memory } from "../../../components/memory"
+import { userReciveDataProps } from "../../../components/user_show/user_show-types"
+import sizes from "../../../constants/sizes"
 import MemoryContext from "../../../contexts/memory"
 import NetworkContext from "../../../contexts/network"
-import OfflineCard from "../../../components/general/offline"
 import PersistedContext from "../../../contexts/Persisted"
-import React from "react"
-import RenderMemory from "../components/render-memory"
-import ViewMorebutton from "../../../components/buttons/view_more"
+import LanguageContext from "../../../contexts/Preferences/language"
 import ViewProfileContext from "../../../contexts/viewProfile"
 import api from "../../../services/Api"
-import sizes from "../../../layout/constants/sizes"
-import { useNavigation } from "@react-navigation/native"
-import { userReciveDataProps } from "../../../components/user_show/user_show-types"
+import RenderMemory from "../components/render-memory"
+import AnyMemoryCard from "./components/any_memory-card"
+import EndReached from "./components/end-reached"
+import { ListMemoriesPreviewSkeleton } from "./skeleton"
 
 type RenderMemoriesPreviewProps = {
     enableScroll?: boolean
@@ -50,7 +50,7 @@ export default function ListMemoriesPreview({
                 {
                     user_id: user.id,
                 },
-                { headers: { Authorization: session.account.jwtToken } }
+                { headers: { Authorization: session.account.jwtToken } },
             )
             .then(function (response) {
                 if (page === 1) {
@@ -126,7 +126,7 @@ export default function ListMemoriesPreview({
                         action={() => {
                             navigation.navigate("MemoriesNavigator", { screen: "Memories" })
                             setAllMemoriesUser(
-                                isAccountScreen ? { ...session.user, isFollowing: false } : user
+                                isAccountScreen ? { ...session.user, isFollowing: false } : user,
                             )
                         }}
                         text={t("View All")}

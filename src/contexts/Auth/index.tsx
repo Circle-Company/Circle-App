@@ -1,7 +1,17 @@
-import { SessionDataType } from "@/contexts/Persisted/types"
-import api from "../../services/Api"
-import { storage, storageKeys } from "@/store"
 import React, { useState } from "react"
+import { Platform } from "react-native"
+import {
+    getDeviceId,
+    getDeviceName,
+    getDeviceToken,
+    getIpAddress,
+    getMacAddress,
+    getTotalDiskCapacity,
+    getUniqueId,
+} from "react-native-device-info"
+import api from "../../services/Api"
+import { storage, storageKeys } from "../../store"
+import { SessionDataType } from "../Persisted/types"
 import { RedirectContext } from "../redirect"
 
 type AuthProviderProps = { children: React.ReactNode }
@@ -55,15 +65,36 @@ export function Provider({ children }: AuthProviderProps) {
         setErrorMessage("")
         setLoading(true)
 
+        const signData = {
+            sign: {
+                username: signInputUsername,
+                password: signInputPassword,
+            },
+            metadata: {
+                device_id: getDeviceId(),
+                device_type: Platform.OS === "android" ? "android" : "ios",
+                device_name: await getDeviceName(),
+                total_device_memory: await getTotalDiskCapacity(),
+                unique_id: await getUniqueId(),
+                device_token: await getDeviceToken(),
+            },
+            location_info: {
+                ip_address: await getIpAddress(),
+                mac_address: await getMacAddress(),
+            },
+        }
+
         await api
-            .post("/auth/sign-up", { username: signInputUsername, password: signInputPassword })
+            .post("/auth/sign-up", signData)
             .then((response) => {
                 storage.set("@circle:sessionId", response.data.session.user.id.toString())
+                storage.set(storageKeys().account.jwt.token, response.data.session.account.jwtToken)
+                console.log("Session Data", response.data.session)
                 setSessionData(response.data.session)
-                setRedirectTo("APP")
             })
             .finally(() => {
                 setLoading(false)
+                setRedirectTo("APP")
             })
             .catch((err) => {
                 setErrorMessage(err.response.data.message.split(". ")[0])
@@ -80,7 +111,7 @@ export function Provider({ children }: AuthProviderProps) {
 
     function checkIsSigned() {
         const hasSessionId = storage.getAllKeys().map((key) => {
-            if (key == "@circle:sessionId") return true
+            if (key === "@circle:sessionId") return true
             else return false
         })
         if (storage.getString(storageKeys().user.id) && hasSessionId) return true

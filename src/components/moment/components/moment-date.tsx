@@ -1,15 +1,15 @@
 import { Text, View } from "react-native"
 
+import ClockIcon from "@/assets/icons/svgs/clock.svg"
 import React from "react"
-import ClockIcon from "../../../assets/icons/svgs/clock.svg"
+import ColorTheme from "../../../constants/colors"
+import fonts from "../../../constants/fonts"
+import sizes from "../../../constants/sizes"
 import { timeDifferenceConverter } from "../../../helpers/dateConversor"
-import ColorTheme from "../../../layout/constants/colors"
-import fonts from "../../../layout/constants/fonts"
-import sizes from "../../../layout/constants/sizes"
 import MomentContext from "../context"
 import { MomentDateProps } from "../moment-types"
 
-export default function date({
+export default function Date({
     color = String(ColorTheme().text),
     paddingHorizontal = sizes.paddings["2sm"],
     backgroundColor,
@@ -45,9 +45,7 @@ export default function date({
                 height={14}
                 style={{ marginRight: sizes.margins["1sm"] * 1.4 }}
             />
-            <Text style={description_style}>
-                {date}
-            </Text>
+            <Text style={description_style}>{date}</Text>
         </View>
     )
 }

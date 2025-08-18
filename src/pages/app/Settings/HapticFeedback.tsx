@@ -1,13 +1,13 @@
-import { View } from "@/components/Themed"
-import { SwitchButton } from "@/components/general/switch-button"
-import PersistedContext from "@/contexts/Persisted"
-import LanguageContext from "@/contexts/Preferences/language"
-import { ListPushNotificationsSettings } from "@/features/list-push-notifications-settings"
-import { DisabledNotificationsCard } from "@/features/list-push-notifications-settings/disabled-notifications-card"
-import { colors } from "@/layout/constants/colors"
 import messaging from "@react-native-firebase/messaging"
 import React, { useEffect, useState } from "react"
 import { StatusBar, useColorScheme } from "react-native"
+import { View } from "../../../components/Themed"
+import { SwitchButton } from "../../../components/general/switch-button"
+import { colors } from "../../../constants/colors"
+import PersistedContext from "../../../contexts/Persisted"
+import LanguageContext from "../../../contexts/Preferences/language"
+import { ListPushNotificationsSettings } from "../../../features/list-push-notifications-settings"
+import { DisabledNotificationsCard } from "../../../features/list-push-notifications-settings/disabled-notifications-card"
 import {
     useDisableHapticsMutation,
     useEnableEnableMutation,
@@ -56,7 +56,7 @@ export default function SettingsHapticFeedback() {
             <ListPushNotificationsSettings
                 title={t("Vibration")}
                 description={t(
-                    "The device gives haptic vibration feedback to confirm that an action has been maded."
+                    "The device gives haptic vibration feedback to confirm that an action has been maded.",
                 )}
                 leftComponent={
                     <SwitchButton

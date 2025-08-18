@@ -1,9 +1,9 @@
-import PersistedContext from "@/contexts/Persisted"
 import React from "react"
-import { UserRootProps } from "../user_show-types"
-import UserShowContext from "../user_show-context"
 import { View } from "react-native"
+import PersistedContext from "../../../contexts/Persisted"
 import api from "../../../services/Api"
+import UserShowContext from "../user_show-context"
+import { UserRootProps } from "../user_show-types"
 
 export default function root({ children, data, executeBeforeClick }: UserRootProps) {
     const { session } = React.useContext(PersistedContext)
@@ -24,7 +24,7 @@ export default function root({ children, data, executeBeforeClick }: UserRootPro
                     },
                     {
                         headers: { Authorization: session.account.jwtToken },
-                    }
+                    },
                 )
                 .then(function (response) {
                     return response.data
@@ -49,7 +49,7 @@ export default function root({ children, data, executeBeforeClick }: UserRootPro
                     },
                     {
                         headers: { Authorization: session.account.jwtToken },
-                    }
+                    },
                 )
                 .then(function (response) {
                     return response.data

@@ -1,9 +1,9 @@
-import { Skeleton } from "@/components/skeleton"
 import React from "react"
 import { View } from "react-native"
+import sizes from "../../../constants/sizes"
 import PersistedContext from "../../../contexts/Persisted"
 import ViewProfileContext from "../../../contexts/viewProfile"
-import sizes from "../../../layout/constants/sizes"
+import { Skeleton } from "../../skeleton"
 import { UserShow } from "../../user_show"
 
 export default function ProfileHeaderRight() {
@@ -13,9 +13,9 @@ export default function ProfileHeaderRight() {
 
     React.useEffect(() => {
         setIsLoading(true),
-        setTimeout(() => {
-            setIsLoading(false)
-        }, 400)
+            setTimeout(() => {
+                setIsLoading(false)
+            }, 400)
     }, [])
     const container: any = {
         flexDirection: "row",

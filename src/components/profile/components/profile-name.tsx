@@ -1,20 +1,20 @@
 import React from "react"
 import { Animated } from "react-native"
-import ColorTheme from "../../../layout/constants/colors"
-import fonts from "../../../layout/constants/fonts"
-import sizes from "../../../layout/constants/sizes"
+import ColorTheme from "../../../constants/colors"
+import fonts from "../../../constants/fonts"
+import sizes from "../../../constants/sizes"
 import { Text } from "../../Themed"
-import { useProfileContext } from "../profile-context"
+import { useProfileContext as UseProfileContext } from "../profile-context"
 import { ProfileNameProps } from "../profile-types"
 
-export default function name({
+export default function Name({
     color = String(ColorTheme().text),
     fontSize = fonts.size.title3,
     fontFamily = fonts.family.Bold,
     margin = sizes.margins["1sm"],
     scale = 1,
 }: ProfileNameProps) {
-    const { user } = useProfileContext()
+    const { user } = UseProfileContext()
 
     const animatedOpacity = React.useRef(new Animated.Value(0.2)).current
 

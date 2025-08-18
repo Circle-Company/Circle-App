@@ -1,31 +1,26 @@
-import { AnimatedVerticalFlatlist } from "@/lib/hooks/useAnimatedFlatList"
 import CircleIcon from "@/assets/icons/svgs/circle-spinner.svg"
-import { EmptyList } from "./render-empty"
-import { ListNearToYouSkeleton } from "./render-skeleton"
-import { NearToYou } from "@/components/near_to_you"
 import React from "react"
+import { ViewStyle } from "react-native"
+import { NearToYou } from "../../components/near_to_you"
+import { useSearchContext } from "../../components/search/search-context"
+import { View } from "../../components/Themed"
+import { colors } from "../../constants/colors"
+import sizes from "../../constants/sizes"
+import { useNearContext } from "../../contexts/near"
+import { AnimatedVerticalFlatlist } from "../../lib/hooks/useAnimatedFlatList"
+import { EmptyList } from "./render-empty"
 import { RenderError } from "./render-error"
 import { RenderFooter } from "./render-footer"
 import { RenderHeader } from "./render-header"
-import { View } from "@/components/Themed"
-import { ViewStyle } from "react-native"
-import { colors } from "@/layout/constants/colors"
-import sizes from "@/layout/constants/sizes"
-import { useNearContext } from "@/contexts/near"
-import { useSearchContext } from "@/components/search/search-context"
+import { ListNearToYouSkeleton } from "./render-skeleton"
 
 export default function ListNearToYou() {
     const { searchTerm } = useSearchContext()
-    const {
-        nearbyUsers,    
-        loading,
-        error,
-        getNearbyUsers,
-    } = useNearContext()
+    const { nearbyUsers, loading, error, getNearbyUsers } = useNearContext()
 
     React.useEffect(() => {
         getNearbyUsers()
-    }, [])
+    }, [getNearbyUsers])
 
     // Função para atualizar a lista
     const handleRefresh = React.useCallback(async () => {
@@ -37,18 +32,21 @@ export default function ListNearToYou() {
     }, [getNearbyUsers])
 
     // Memoize o renderItem para evitar recriações desnecessárias
-    const renderItem = React.useCallback(({ item }) => (
-        <NearToYou.RenderUser 
-            user={{
-                ...item,
-                profile_picture: { tiny_resolution: item.profile_picture.tiny_resolution},
-                id: String(item.id),
-                you_follow: item.you_follow ?? false,
-                follow_you: item.follow_you ?? false,
-                distance_km: item.distance_km ?? 0
-            }} 
-        />
-    ), [])
+    const renderItem = React.useCallback(
+        ({ item }: { item: any }) => (
+            <NearToYou.RenderUser
+                user={{
+                    ...item,
+                    profile_picture: { tiny_resolution: item.profile_picture.tiny_resolution },
+                    id: String(item.id),
+                    you_follow: item.you_follow ?? false,
+                    follow_you: item.follow_you ?? false,
+                    distance_km: item.distance_km ?? 0,
+                }}
+            />
+        ),
+        [],
+    )
 
     // Memoize os componentes de lista
     const ListHeader = React.useCallback(() => <RenderHeader />, [])
@@ -85,7 +83,9 @@ export default function ListNearToYou() {
                 data={nearbyUsers || []}
                 skeleton={<ListSkeleton />}
                 handleRefresh={handleRefresh}
-                onEndReached={async () => { return Promise.resolve() }}
+                onEndReached={async () => {
+                    return Promise.resolve()
+                }}
                 onEndReachedThreshold={0.5}
                 ListHeaderComponent={ListHeader}
                 ListFooterComponent={ListFooter}

@@ -1,15 +1,15 @@
-import ButtonStandart from "@/components/buttons/button-standart"
 import { useNavigation } from "@react-navigation/native"
 import { StackNavigationProp } from "@react-navigation/stack"
 import React from "react"
 import { Image, TextStyle, useColorScheme, ViewStyle } from "react-native"
+import ButtonStandart from "../../../../components/buttons/button-standart"
 import { Text, View } from "../../../../components/Themed"
+import ColorTheme, { colors } from "../../../../constants/colors"
+import fonts from "../../../../constants/fonts"
+import sizes from "../../../../constants/sizes"
 import LanguageContext from "../../../../contexts/Preferences/language"
 import SelectMomentsContext from "../../../../contexts/selectMoments"
 import ViewProfileContext from "../../../../contexts/viewProfile"
-import ColorTheme, { colors } from "../../../../layout/constants/colors"
-import fonts from "../../../../layout/constants/fonts"
-import sizes from "../../../../layout/constants/sizes"
 
 type RootStackParamList = {
     MemoriesNavigator: { screen: string }

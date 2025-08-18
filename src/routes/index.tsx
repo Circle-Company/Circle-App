@@ -1,9 +1,9 @@
 import AuthContext from "@/contexts/Auth"
 import { RedirectContext } from "@/contexts/redirect"
+import LoadingScreen from "@/pages/auth/Loading"
+import AppRoute from "@/routes/app.routes"
+import AuthRoute from "@/routes/auth.routes"
 import React from "react"
-import LoadingScreen from "../pages/auth/Loading"
-import AppRoute from "./app.routes"
-import AuthRoute from "./auth.routes"
 
 export default function Routes() {
     const { checkIsSigned } = React.useContext(AuthContext)

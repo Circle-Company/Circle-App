@@ -2,12 +2,12 @@ import { Pressable, View, ViewStyle, useColorScheme } from "react-native"
 
 import CheckCircle from "@/assets/icons/svgs/check_circle.svg"
 import { MemoryObjectProps } from "@/components/memory/memory-types"
-import NewMomentContext from "@/contexts/newMoment"
-import PersistedContext from "@/contexts/Persisted"
-import RenderMemory_ from "@/features/list-memories/components/render-memory"
-import { colors } from "@/layout/constants/colors"
-import fonts from "@/layout/constants/fonts"
 import React from "react"
+import { colors } from "../../../constants/colors"
+import fonts from "../../../constants/fonts"
+import NewMomentContext from "../../../contexts/newMoment"
+import PersistedContext from "../../../contexts/Persisted"
+import RenderMemory_ from "../../list-memories/components/render-memory"
 
 type RenderMemoryProps = {
     memory: MemoryObjectProps
@@ -69,7 +69,6 @@ export default function RenderMemory({ memory }: RenderMemoryProps) {
 
     const selectedMemoryId: number | boolean = selectedMemory?.id ?? false
 
-
     const check_circle_style: ViewStyle = {
         elevation: 10,
         shadowOpacity: 1,
@@ -85,7 +84,7 @@ export default function RenderMemory({ memory }: RenderMemoryProps) {
     return (
         <View style={container}>
             <Pressable style={pressable_container} onPress={handlePress}>
-                {selectedMemoryId == memory.id && (
+                {selectedMemoryId === memory.id && (
                     <View style={inner_container_selected}>
                         <CheckCircle
                             fill={String(colors.gray.white)}
@@ -98,7 +97,7 @@ export default function RenderMemory({ memory }: RenderMemoryProps) {
             </Pressable>
             <View style={ContainerStyle}>
                 <RenderMemory_
-                    user={{...session.user, you_follow: false}}
+                    user={{ ...session.user, you_follow: false }}
                     memory={memory}
                     pressable={false}
                     scale={1}

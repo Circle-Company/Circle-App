@@ -1,11 +1,11 @@
-import PersistedContext from "@/contexts/Persisted"
+import * as LocalAuthentication from "expo-local-authentication"
 import React from "react"
 import { notify } from "react-native-notificated"
-import TouchID from "react-native-simple-biometrics"
 import CheckIcon from "../../assets/icons/svgs/check_circle.svg"
 import ErrorIcon from "../../assets/icons/svgs/exclamationmark_circle.svg"
+import { colors } from "../../constants/colors"
+import PersistedContext from "../../contexts/Persisted"
 import LanguageContext from "../../contexts/Preferences/language"
-import { colors } from "../../layout/constants/colors"
 import api from "../../services/Api"
 
 type AllMomentsProviderProps = {
@@ -35,10 +35,10 @@ export function AllMomentsProvider({ children }: AllMomentsProviderProps) {
 
     async function deleteMoments() {
         try {
-            const isAuthenticated = await TouchID.requestBioAuth(
-                t("Make sure it's you"),
-                t("You're deleting the selected Moments")
-            )
+            const isAuthenticated = await LocalAuthentication.authenticateAsync({
+                biometricsSecurityLevel: "weak",
+                promptMessage: t("You're deleting the selected Moments"),
+            })
             if (isAuthenticated) {
                 const filtered_moments = selectedMoments.map((item) => {
                     return item.id
@@ -47,7 +47,7 @@ export function AllMomentsProvider({ children }: AllMomentsProviderProps) {
                     .post(
                         "/moments/delete-list",
                         { moment_ids_list: [...filtered_moments] },
-                        { headers: { Authorization: session.account.jwtToken } }
+                        { headers: { Authorization: session.account.jwtToken } },
                     )
                     .then(() => {
                         notify("toast", {
@@ -63,7 +63,7 @@ export function AllMomentsProvider({ children }: AllMomentsProviderProps) {
                                 ),
                             },
                         }),
-                        setSelectedMoments([])
+                            setSelectedMoments([])
                     })
                     .catch(() => {
                         notify("toast", {
@@ -96,7 +96,7 @@ export function AllMomentsProvider({ children }: AllMomentsProviderProps) {
     async function deleteMomentFromList(moment: Moment) {
         if (selectedMoments.length > 0)
             setSelectedMoments((prevSelectedMoments) =>
-                prevSelectedMoments.filter((m: Moment) => m.id !== moment.id)
+                prevSelectedMoments.filter((m: Moment) => m.id !== moment.id),
             )
     }
 

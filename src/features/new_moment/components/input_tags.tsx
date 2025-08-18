@@ -1,13 +1,13 @@
-import ColorTheme, { colors } from "@/layout/constants/colors"
 import { ColorValue, Text, TextInput, TextStyle, ViewStyle, useColorScheme } from "react-native"
+import ColorTheme, { colors } from "../../../constants/colors"
 
-import ButtonStandart from "@/components/buttons/button-standart"
-import LanguageContext from "@/contexts/Preferences/language"
-import NewMomentContext from "@/contexts/newMoment"
 import React from "react"
-import { View } from "@/components/Themed"
-import fonts from "@/layout/constants/fonts"
-import sizes from "@/layout/constants/sizes"
+import { View } from "../../../components/Themed"
+import ButtonStandart from "../../../components/buttons/button-standart"
+import fonts from "../../../constants/fonts"
+import sizes from "../../../constants/sizes"
+import LanguageContext from "../../../contexts/Preferences/language"
+import NewMomentContext from "../../../contexts/newMoment"
 
 type RenderMomentProps = {
     height?: number
@@ -111,10 +111,7 @@ export default function TagsInput({
                     placeholder={t("tag name")}
                     placeholderTextColor={String(ColorTheme().textDisabled)}
                 />
-                <ButtonStandart
-                    action={handelButtonPress}
-                    backgroundColor={button_background}
-                >
+                <ButtonStandart action={handelButtonPress} backgroundColor={button_background}>
                     <Text style={button_text_style}>{t("Add")}</Text>
                 </ButtonStandart>
             </View>

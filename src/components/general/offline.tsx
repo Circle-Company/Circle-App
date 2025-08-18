@@ -1,16 +1,16 @@
+import WifiIcon from "@/assets/icons/svgs/wifi_slash.svg"
 import React from "react"
-import sizes from "../../layout/constants/sizes"
-import ColorTheme from "../../layout/constants/colors"
-import fonts from "../../layout/constants/fonts"
-import WifiIcon from "../../assets/icons/svgs/wifi_slash.svg"
-import { Text, View } from "../Themed"
+import ColorTheme from "../../constants/colors"
+import fonts from "../../constants/fonts"
+import sizes from "../../constants/sizes"
 import LanguageContext from "../../contexts/Preferences/language"
+import { Text, View } from "../Themed"
 
 type OfflineCardProps = {
     width?: number
     height?: number
 }
-export default function offlineCard({
+export default function OfflineCard({
     width = sizes.screens.width,
     height = sizes.screens.height - sizes.bottomTab.height,
 }: OfflineCardProps) {

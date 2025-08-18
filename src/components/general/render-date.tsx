@@ -1,10 +1,10 @@
+import ClockIcon from "@/assets/icons/svgs/clock.svg"
 import React from "react"
 import { Text, View } from "react-native"
-import ClockIcon from "../../assets/icons/svgs/clock.svg"
+import ColorTheme from "../../constants/colors"
+import fonts from "../../constants/fonts"
+import sizes from "../../constants/sizes"
 import { capitalizeFirstLetter } from "../../helpers/processText"
-import ColorTheme from "../../layout/constants/colors"
-import fonts from "../../layout/constants/fonts"
-import sizes from "../../layout/constants/sizes"
 
 type DateProps = {
     capitalize?: boolean

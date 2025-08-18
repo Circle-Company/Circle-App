@@ -1,8 +1,8 @@
 import React from "react"
 import { StatusBar, useColorScheme } from "react-native"
 import { View } from "../../../components/Themed"
+import ColorTheme from "../../../constants/colors"
 import ListSelectMoments from "../../../features/select-moments"
-import ColorTheme from "../../../layout/constants/colors"
 
 export default function NewMemorySelectMomentsScreen() {
     const isDarkMode = useColorScheme() === "dark"

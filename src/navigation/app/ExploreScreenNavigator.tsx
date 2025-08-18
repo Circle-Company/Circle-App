@@ -1,8 +1,8 @@
 import { createStackNavigator } from "@react-navigation/stack"
 import React from "react"
+import ColorTheme from "../../constants/colors"
+import Sizes from "../../constants/sizes"
 import LanguageContext from "../../contexts/Preferences/language"
-import ColorTheme from "../../layout/constants/colors"
-import Sizes from "../../layout/constants/sizes"
 import ExploreScreen from "../../pages/app/Explore"
 import { Interpolation as Horizontal } from "../transitions/horizontal-right"
 

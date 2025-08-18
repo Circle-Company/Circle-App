@@ -1,9 +1,9 @@
-import { MomentContextsData, MomentProviderProps } from "./types"
 import React, { useEffect, useMemo } from "react"
+import { MomentContextsData, MomentProviderProps } from "./types"
 
-import FeedContext from "@/contexts/Feed"
-import PersistedContext from "@/contexts/Persisted"
-import sizes from "@/layout/constants/sizes"
+import sizes from "../../../constants/sizes"
+import FeedContext from "../../../contexts/Feed"
+import PersistedContext from "../../../contexts/Persisted"
 import { useMomentData } from "./momentData"
 import { useMomentOptions } from "./momentOptions"
 import { useMomentUserActions } from "./momentUserActions"
@@ -62,7 +62,7 @@ export function MomentProvider({
             currentTime: 0,
             duration: 0,
             isPaused: !isFocused,
-            isMuted: globalMuteAudio
+            isMuted: globalMuteAudio,
         })
     }, [isFocused])
 
@@ -104,7 +104,7 @@ export function MomentProvider({
             momentUserActions: momentUserActionsStore,
             momentVideo: momentVideoStore,
         }),
-        [momentOptionsStore, momentSize, momentDataStore, momentUserActionsStore, momentVideoStore]
+        [momentOptionsStore, momentSize, momentDataStore, momentUserActionsStore, momentVideoStore],
     )
 
     return <MomentContext.Provider value={contextValue}>{children}</MomentContext.Provider>

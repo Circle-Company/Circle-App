@@ -3,8 +3,8 @@ import { Pressable, useColorScheme } from "react-native"
 import CheckCircle from "../../../assets/icons/svgs/check_circle.svg"
 import { View } from "../../../components/Themed"
 import { MidiaRender } from "../../../components/midia_render"
+import { colors } from "../../../constants/colors"
 import SelectMomentsContext from "../../../contexts/selectMoments"
-import { colors } from "../../../layout/constants/colors"
 
 type RenderMomentProps = {
     moment: Moment

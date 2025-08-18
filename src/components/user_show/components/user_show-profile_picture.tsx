@@ -1,14 +1,14 @@
-import Animated, { FadeIn } from "react-native-reanimated"
-import ColorTheme, { colors } from "@/layout/constants/colors"
 import { Pressable, View, useColorScheme } from "react-native"
+import Animated, { FadeIn } from "react-native-reanimated"
+import ColorTheme, { colors } from "../../../constants/colors"
 
-import FastImage from "react-native-fast-image"
 import Icon from "@/assets/icons/svgs/@2.svg"
-import React from "react"
-import { UserProfilePictureProps } from "../user_show-types"
-import sizes from "@/layout/constants/sizes"
 import { useNavigation } from "@react-navigation/native"
+import { Image } from "expo-image"
+import React from "react"
+import sizes from "../../../constants/sizes"
 import { useUserShowContext } from "../user_show-context"
+import { UserProfilePictureProps } from "../user_show-types"
 
 export default function profile_picture({
     displayOnMoment = true,
@@ -27,8 +27,8 @@ export default function profile_picture({
         backgroundColor: displayOnMoment
             ? ColorTheme().blur_display_color
             : isDarkMode
-                ? colors.gray.grey_07
-                : colors.gray.grey_02,
+            ? colors.gray.grey_07
+            : colors.gray.grey_02,
         width: Number(pictureDimensions.width) + Number(outlineSize),
         height: Number(pictureDimensions.height) + Number(outlineSize),
         overflow: "hidden",
@@ -59,7 +59,10 @@ export default function profile_picture({
     return (
         <Animated.View entering={FadeIn.duration(200)}>
             <Pressable onPress={async () => await onProfilePictureAction()} style={container}>
-                <FastImage
+                <Image
+                    priority={"normal"}
+                    cachePolicy={"memory"}
+                    recyclingKey={profilePicture}
                     source={{ uri: String(profilePicture) || "" }}
                     style={{
                         width: Number(pictureDimensions.width),
@@ -72,16 +75,16 @@ export default function profile_picture({
                 />
                 {!user.profile_picture?.tiny_resolution &&
                     !user.profile_picture?.small_resolution && (
-                    <View style={iconContainer}>
-                        <Icon
-                            width={pictureDimensions.width * 0.5}
-                            height={pictureDimensions.height * 0.5}
-                            fill={
-                                isDarkMode ? colors.gray.grey_05 + 90 : colors.gray.grey_04 + 50
-                            }
-                        />
-                    </View>
-                )}
+                        <View style={iconContainer}>
+                            <Icon
+                                width={pictureDimensions.width * 0.5}
+                                height={pictureDimensions.height * 0.5}
+                                fill={
+                                    isDarkMode ? colors.gray.grey_05 + 90 : colors.gray.grey_04 + 50
+                                }
+                            />
+                        </View>
+                    )}
             </Pressable>
         </Animated.View>
     )

@@ -8,19 +8,19 @@ import {
     ViewStyle,
     useColorScheme,
 } from "react-native"
-import ColorTheme, { colors } from "../../../layout/constants/colors"
+import ColorTheme, { colors } from "../../../constants/colors"
 
 import React from "react"
 import AddIcon from "../../../assets/icons/svgs/plus_circle-outline.svg"
 import { Text } from "../../../components/Themed"
 import ViewMorebutton from "../../../components/buttons/view_more"
 import OfflineCard from "../../../components/general/offline"
+import fonts from "../../../constants/fonts"
+import sizes from "../../../constants/sizes"
 import PersistedContext from "../../../contexts/Persisted"
 import LanguageContext from "../../../contexts/Preferences/language"
 import MemoryContext from "../../../contexts/memory"
 import NetworkContext from "../../../contexts/network"
-import fonts from "../../../layout/constants/fonts"
-import sizes from "../../../layout/constants/sizes"
 import api from "../../../services/Api"
 import EditMemoryContext from "../edit_memory_context"
 import AnyMomentsWithoutInMemory from "./any-moments-without-in-memory"
@@ -56,7 +56,7 @@ export default function ListMomentsWithoutInMemory() {
             marginTop: sizes.paddings["1sm"],
             width: sizes.screens.width - sizes.paddings["1sm"] * 2,
             marginHorizontal: sizes.paddings["1sm"],
-            backgroundColor: isDarkMode ? colors.gray.grey_09: colors.gray.grey_01,
+            backgroundColor: isDarkMode ? colors.gray.grey_09 : colors.gray.grey_01,
             borderRadius: sizes.borderRadius["1md"],
             transform: [{ translateY: animation }],
         } as ViewStyle,
@@ -91,7 +91,7 @@ export default function ListMomentsWithoutInMemory() {
         } as ViewStyle,
         addIcon: {
             top: 0.5,
-        }
+        },
     }
 
     // Handlers
@@ -106,13 +106,13 @@ export default function ListMomentsWithoutInMemory() {
             const response = await api.get(`/moments/tiny/exclude-memory/${memory.id}`, {
                 headers: { Authorization: session.account.jwtToken },
             })
-            
+
             if (page === 1) {
                 setAllMoments(response.data)
             } else {
-                setAllMoments(prev => [...prev, ...response.data])
+                setAllMoments((prev) => [...prev, ...response.data])
             }
-            
+
             setEndReached(response.data.length < pageSize)
         } catch (error) {
             console.error("Erro ao buscar momentos:", error)
@@ -121,7 +121,7 @@ export default function ListMomentsWithoutInMemory() {
 
     const handleLoadMore = () => {
         if (!loading && !endReached) {
-            setPage(prev => prev + 1)
+            setPage((prev) => prev + 1)
             fetchMoments()
         }
     }
@@ -199,11 +199,12 @@ export default function ListMomentsWithoutInMemory() {
                         numColumns={3}
                         renderItem={({ item }) => <RenderMoment moment={item} />}
                         ListFooterComponent={() => {
-                            if (endReached) return (
-                                <View style={styles.endReachedContainer}>
-                                    <RenderEndReached text="Crie um novo Moment" />
-                                </View>
-                            )
+                            if (endReached)
+                                return (
+                                    <View style={styles.endReachedContainer}>
+                                        <RenderEndReached text="Crie um novo Moment" />
+                                    </View>
+                                )
                             return null
                         }}
                         onEndReachedThreshold={0.1}

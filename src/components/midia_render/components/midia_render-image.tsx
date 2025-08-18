@@ -1,7 +1,7 @@
+import { Image } from "expo-image"
 import React, { useState } from "react"
-import { Animated, Image } from "react-native"
-import FastImage from "react-native-fast-image"
-import ColorTheme from "../../../layout/constants/colors"
+import { Animated } from "react-native"
+import ColorTheme from "../../../constants/colors"
 import { useMidiaRenderContext } from "../midia_render-context"
 
 type RenderImageProps = {
@@ -12,7 +12,7 @@ type RenderImageProps = {
     isFeed?: boolean
 }
 
-export default function render_image({
+export default function RenderImage({
     blur = false,
     blurRadius = 35,
     blurColor = String(ColorTheme().background),
@@ -68,22 +68,24 @@ export default function render_image({
                 <Image
                     source={{ uri: midia?.nhd_resolution?.toString() }}
                     style={image}
-                    resizeMode="cover"
+                    recyclingKey={`${midia.fullhd_resolution}-`}
                     blurRadius={blurRadius}
+                    contentFit="cover"
                 />
             </Animated.View>
             {!blur && (
-                <FastImage
+                <Image
+                    priority={"high"}
                     source={{
                         uri: String(
                             midia?.fullhd_resolution
                                 ? midia?.fullhd_resolution
-                                : midia?.nhd_resolution
+                                : midia?.nhd_resolution,
                         ),
-                        priority: FastImage.priority.high,
                     }}
                     style={image}
-                    resizeMode="cover"
+                    contentFit="cover"
+                    cachePolicy={"memory"}
                     onLoadEnd={() => {
                         removeBlur()
                     }}

@@ -1,11 +1,11 @@
-import { Skeleton } from "@/components/skeleton"
+import More from "@/assets/icons/svgs/arrow_left.svg"
 import { useNavigation } from "@react-navigation/native"
 import React from "react"
 import { View, ViewStyle } from "react-native"
-import More from "../../../assets/icons/svgs/arrow_left.svg"
+import ColorTheme from "../../../constants/colors"
+import sizes from "../../../constants/sizes"
 import ViewProfileContext from "../../../contexts/viewProfile"
-import ColorTheme from "../../../layout/constants/colors"
-import sizes from "../../../layout/constants/sizes"
+import { Skeleton } from "../../skeleton"
 import { UserShow } from "../../user_show"
 import HeaderButton from "../headerButton"
 
@@ -15,9 +15,9 @@ export default function ProfileHeaderLeft() {
 
     React.useEffect(() => {
         setIsLoading(true),
-        setTimeout(() => {
-            setIsLoading(false)
-        }, 400)
+            setTimeout(() => {
+                setIsLoading(false)
+            }, 400)
     }, [])
     const navigation = useNavigation()
 

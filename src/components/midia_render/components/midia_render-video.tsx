@@ -1,26 +1,26 @@
-import { Animated, Image, StyleSheet, View } from "react-native"
 import React, { useCallback, useEffect, useRef, useState } from "react"
+import { Animated, Image, StyleSheet, View } from "react-native"
 import Video, { OnLoadData, OnProgressData } from "react-native-video"
 
-import MidiaRenderVideoError from "./midia_render-video_error"
-import MomentContext from "@/components/moment/context"
-import PersistedContext from "@/contexts/Persisted"
 import { t } from "i18next"
+import PersistedContext from "../../../contexts/Persisted"
+import MomentContext from "../../moment/context"
+import MidiaRenderVideoError from "./midia_render-video_error"
 
 interface VideoPlayerProps {
-    uri?: string;
-    thumbnailUri?: string;
-    hasVideoCache?: boolean,
-    autoPlay?: boolean;
-    onVideoLoad?: (duration: number) => void;
-    onVideoEnd?: () => void;
-    onProgressChange?: (currentTime: number, duration: number) => void;
-    style?: Record<string, unknown>;
-    showControls?: boolean;
-    blurRadius?: number;
-    isFocused?: boolean;
-    width?: number;
-    height?: number;
+    uri?: string
+    thumbnailUri?: string
+    hasVideoCache?: boolean
+    autoPlay?: boolean
+    onVideoLoad?: (duration: number) => void
+    onVideoEnd?: () => void
+    onProgressChange?: (currentTime: number, duration: number) => void
+    style?: Record<string, unknown>
+    showControls?: boolean
+    blurRadius?: number
+    isFocused?: boolean
+    width?: number
+    height?: number
 }
 
 export default function MediaRenderVideo({
@@ -34,14 +34,13 @@ export default function MediaRenderVideo({
     blurRadius = 10,
     isFocused = true,
     width,
-    height
+    height,
 }: VideoPlayerProps) {
-
     const { momentSize } = React.useContext(MomentContext)
     // Se momentSize não existir, usa width/height das props
     const videoWidth = momentSize?.width ?? width ?? 200
     const videoHeight = momentSize?.height ?? height ?? 200
-    
+
     // Estados
     const [isPlaying, setIsPlaying] = useState(autoPlay && isFocused)
     const [isLoading, setIsLoading] = useState(true)
@@ -54,14 +53,14 @@ export default function MediaRenderVideo({
     const videoRef = useRef<Video>(null)
     const retryCount = useRef(0)
     const maxRetries = 2
-    
+
     // Usar a thumbnail ou a própria URL do vídeo como fallback para a thumbnail
     const thumbnailSource = thumbnailUri || uri
-    
+
     // Usar apenas o estado global do MomentContext
-    const {session} = React.useContext(PersistedContext)
+    const { session } = React.useContext(PersistedContext)
     const isMuted = session?.preferences?.content?.muteAudio || false
-    
+
     // Declarações de funções auxiliares como useCallback para evitar problemas de dependências
     const fadeOutThumbnail = useCallback(() => {
         // Só faz fade da thumbnail se estiver focado
@@ -73,13 +72,13 @@ export default function MediaRenderVideo({
             }).start()
         }
     }, [fadeAnim, isFocused])
-    
+
     const resetVideoPosition = useCallback(() => {
         if (videoRef.current) {
             videoRef.current.seek(0)
         }
     }, [])
-    
+
     // Monitorar mudanças no estado de foco
     useEffect(() => {
         if (isFocused) {
@@ -92,17 +91,17 @@ export default function MediaRenderVideo({
         } else {
             // Quando perde o foco, pausa o vídeo e mostra a thumbnail imediatamente
             setIsPlaying(false)
-            
+
             // Garante que a thumbnail seja exibida imediatamente
             fadeAnim.setValue(1)
-            
+
             // Para completamente o vídeo quando não está em foco
             if (videoRef.current) {
                 videoRef.current.seek(0)
             }
         }
     }, [isFocused, videoLoaded, resetVideoPosition, fadeOutThumbnail, fadeAnim])
-    
+
     // Efeito para notificar sobre mudanças no progresso
     useEffect(() => {
         if (onProgressChange && !isLoading && isFocused) {
@@ -113,11 +112,15 @@ export default function MediaRenderVideo({
     // Tentar reproduzir novamente após um erro
     const retryPlayback = useCallback(() => {
         if (retryCount.current < maxRetries) {
-            console.log(`Tentando reproduzir o vídeo novamente. Tentativa ${retryCount.current + 1} de ${maxRetries}`)
+            console.log(
+                `Tentando reproduzir o vídeo novamente. Tentativa ${
+                    retryCount.current + 1
+                } de ${maxRetries}`,
+            )
             retryCount.current += 1
             setHasError(false)
             setIsLoading(true)
-            
+
             // Pequeno atraso antes de tentar novamente
             setTimeout(() => {
                 if (videoRef.current) {
@@ -159,7 +162,7 @@ export default function MediaRenderVideo({
             backgroundColor: "transparent",
             height: "100%",
             width: "100%",
-        }
+        },
     })
 
     // Handlers
@@ -168,15 +171,15 @@ export default function MediaRenderVideo({
         setIsLoading(false)
         setVideoLoaded(true)
         setDuration(data.duration)
-        
+
         // Reset retry counter on successful load
         retryCount.current = 0
-        
+
         // Só faz o fade da thumbnail se estiver em foco
         if (isFocused) {
             fadeOutThumbnail()
         }
-        
+
         if (onVideoLoad) {
             onVideoLoad(data.duration)
         }
@@ -191,23 +194,23 @@ export default function MediaRenderVideo({
 
     function handleError(error: unknown) {
         console.error("Video error:", error)
-        
+
         // Mensagem de erro mais específica
         let errorMsg = t("Erro ao carregar o vídeo")
-        
+
         if (error && typeof error === "object" && "error" in error) {
-            const videoError = error as { error: { extra: number, what: number } }
-            
+            const videoError = error as { error: { extra: number; what: number } }
+
             // Erros específicos baseados nos códigos
             if (videoError.error.extra === -1005) {
                 errorMsg = t("Não foi possível acessar o vídeo. Verifique sua conexão.")
             }
         }
-        
+
         setErrorMessage(errorMsg)
         setHasError(true)
         setIsLoading(false)
-        
+
         // Tentar novamente automaticamente se não excedeu o limite
         if (retryCount.current < maxRetries) {
             retryPlayback()
@@ -224,12 +227,10 @@ export default function MediaRenderVideo({
 
     // Renderização
     if (hasError) {
-        if(isFocused) { 
+        if (isFocused) {
             return (
                 <View style={styles.container}>
-                    <Animated.View 
-                        style={styles.errorThumbnail}
-                    >
+                    <Animated.View style={styles.errorThumbnail}>
                         <Image
                             source={{ uri: thumbnailSource }}
                             style={styles.thumbnail}
@@ -237,8 +238,8 @@ export default function MediaRenderVideo({
                             blurRadius={blurRadius}
                         />
                     </Animated.View>
-                    <MidiaRenderVideoError 
-                        message={errorMessage} 
+                    <MidiaRenderVideoError
+                        message={errorMessage}
                         onRetry={retryCount.current < maxRetries ? retryPlayback : undefined}
                     />
                 </View>
@@ -279,12 +280,12 @@ export default function MediaRenderVideo({
                     playInBackground={false}
                 />
             )}
-            
+
             {/* Thumbnail com efeito de fade - sempre presente, opacidade controlada */}
-            <Animated.View 
+            <Animated.View
                 style={[
-                    styles.thumbnailContainer, 
-                    { opacity: isFocused ? hasVideoCache? 0 : fadeAnim : 1 }
+                    styles.thumbnailContainer,
+                    { opacity: isFocused ? (hasVideoCache ? 0 : fadeAnim) : 1 },
                 ]}
             >
                 <Image
@@ -297,5 +298,3 @@ export default function MediaRenderVideo({
         </View>
     )
 }
-
-

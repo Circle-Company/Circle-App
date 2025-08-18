@@ -1,13 +1,13 @@
-import { Animated, Easing, Pressable, TextInput, View, useColorScheme } from "react-native"
-import ColorTheme, { colors } from "../../../../layout/constants/colors"
 import React, { useRef } from "react"
+import { Animated, Easing, Pressable, TextInput, View, useColorScheme } from "react-native"
+import ColorTheme, { colors } from "../../../../constants/colors"
 
-import CloseIcon from "../../../../assets/icons/svgs/close.svg"
-import LanguageContext from "../../../../contexts/Preferences/language"
-import SearchIcon from "../../../../assets/icons/svgs/search.svg"
 import UserIcon from "@/assets/icons/svgs/@.svg"
-import fonts from "../../../../layout/constants/fonts"
-import sizes from "../../../../layout/constants/sizes"
+import CloseIcon from "@/assets/icons/svgs/close.svg"
+import SearchIcon from "@/assets/icons/svgs/search.svg"
+import fonts from "../../../../constants/fonts"
+import sizes from "../../../../constants/sizes"
+import LanguageContext from "../../../../contexts/Preferences/language"
 import { useSearchContext } from "../../search-context"
 
 export default function SearchInput() {
@@ -25,14 +25,14 @@ export default function SearchInput() {
                 toValue: 1.1,
                 duration: 100,
                 useNativeDriver: true,
-                easing: Easing.linear
+                easing: Easing.linear,
             }),
             Animated.timing(bounceAnim, {
                 toValue: 1,
                 duration: 100,
                 useNativeDriver: true,
-                easing: Easing.bounce
-            })
+                easing: Easing.bounce,
+            }),
         ]).start()
     }
 
@@ -55,7 +55,7 @@ export default function SearchInput() {
             toValue: newValue.length > 0 ? 1.05 : 0.98,
             duration: 300,
             useNativeDriver: true,
-            easing: Easing.bezier(0.4, 0, 0.2, 1)
+            easing: Easing.bezier(0.4, 0, 0.2, 1),
         }).start()
     }
 
@@ -83,7 +83,7 @@ export default function SearchInput() {
     }
 
     const container: any = {
-        width: sizes.screens.width - (sizes.paddings["2sm"] * 2),
+        width: sizes.screens.width - sizes.paddings["2sm"] * 2,
         height: sizes.buttons.height / 1.8,
         borderRadius: sizes.inputs.height / 2,
         overflow: "hidden",
@@ -135,21 +135,21 @@ export default function SearchInput() {
 
     return (
         <View style={out_container}>
-            <Animated.View 
+            <Animated.View
                 style={[
                     container,
                     {
-                        transform: [{ scale: containerScale }]
-                    }
+                        transform: [{ scale: containerScale }],
+                    },
                 ]}
             >
                 <View style={input_container}>
-                    <Animated.View 
+                    <Animated.View
                         style={[
                             iconContainer,
                             {
-                                transform: [{ scale: bounceAnim }]
-                            }
+                                transform: [{ scale: bounceAnim }],
+                            },
                         ]}
                     >
                         <SearchIcon
@@ -181,7 +181,7 @@ export default function SearchInput() {
                         <Pressable style={iconContainer2} onPress={handleClosePress}>
                             <CloseIcon
                                 fill={String(
-                                    isDarkMode ? colors.gray.grey_03 : colors.gray.grey_04
+                                    isDarkMode ? colors.gray.grey_03 : colors.gray.grey_04,
                                 )}
                                 width={11}
                                 height={11}

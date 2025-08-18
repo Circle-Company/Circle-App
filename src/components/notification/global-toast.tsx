@@ -1,9 +1,9 @@
 import React from "react"
 import { Animated, useColorScheme } from "react-native"
-import sizes from "../../layout/constants/sizes"
-import { colors } from "../../layout/constants/colors"
-import { NotificationProps } from "./notification-types"
+import { colors } from "../../constants/colors"
+import sizes from "../../constants/sizes"
 import RenderNotification from "./components/render-notification"
+import { NotificationProps } from "./notification-types"
 type GLobalToastProps = {
     lastNotification: NotificationProps
     showNotification: boolean

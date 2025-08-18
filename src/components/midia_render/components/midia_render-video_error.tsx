@@ -2,12 +2,12 @@ import { StyleSheet, Text, View } from "react-native"
 
 import ErrorIcon from "@/assets/icons/svgs/exclamationmark_icloud_fill.svg"
 import React from "react"
-import { colors } from "@/layout/constants/colors"
-import sizes from "@/layout/constants/sizes"
+import { colors } from "../../../constants/colors"
+import sizes from "../../../constants/sizes"
 
 export interface VideoErrorProps {
-    message: string;
-    onRetry?: () => void;
+    message: string
+    onRetry?: () => void
 }
 
 export default function MidiaRenderVideoError({ message, onRetry }: VideoErrorProps) {
@@ -40,5 +40,5 @@ const styles = StyleSheet.create({
         alignItems: "center",
         justifyContent: "center",
         marginBottom: sizes.margins["2sm"],
-    }
-})   
+    },
+})

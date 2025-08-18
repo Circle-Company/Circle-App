@@ -1,22 +1,22 @@
 import { useIsFocused } from "@react-navigation/native"
 import React, { useEffect, useRef } from "react"
-import { Animated, Keyboard, StatusBar, useColorScheme } from "react-native"
-import { useKeyboardAnimation } from "react-native-keyboard-controller"
+import { Animated, Keyboard, StatusBar, useColorScheme, ViewStyle } from "react-native"
 import { View } from "../../../components/Themed"
 import { Comments } from "../../../components/comment"
+import ColorTheme, { colors } from "../../../constants/colors"
+import sizes from "../../../constants/sizes"
 import FeedContext from "../../../contexts/Feed"
 import LanguageContext from "../../../contexts/Preferences/language"
 import BottomTabsContext from "../../../contexts/bottomTabs"
 import ListMoments from "../../../features/list-moments"
-import ColorTheme, { colors } from "../../../layout/constants/colors"
-import sizes from "../../../layout/constants/sizes"
+import { useKeyboard } from "../../../lib/hooks/useKeyboard"
 
 export default function HomeScreen() {
     const isDarkMode = useColorScheme() === "dark"
     const { t } = React.useContext(LanguageContext)
     const { setCurrentTab } = React.useContext(BottomTabsContext)
-    const { commentEnabled, setCommentEnabled, isKeyboardVisible } = React.useContext(FeedContext)
-    const { height } = useKeyboardAnimation()
+    const { commentEnabled, setCommentEnabled, keyboardIsVisible } = React.useContext(FeedContext)
+    const { height } = useKeyboard()
     const isFocused = useIsFocused()
 
     const bottomContainerRef = useRef(null)
@@ -33,12 +33,12 @@ export default function HomeScreen() {
         setCurrentTab("Home")
     }, [isFocused])
 
-    const container = {
+    const container: ViewStyle = {
         alignItems: "center",
         flex: 1,
     }
 
-    const bottomContainer = {
+    const bottomContainer: ViewStyle = {
         bottom: 0,
         paddingVertical: sizes.paddings["1sm"] * 0.4,
         paddingHorizontal: sizes.paddings["2sm"] * 0.8,
@@ -46,6 +46,7 @@ export default function HomeScreen() {
         borderTopWidth: sizes.borders["1md"] * 0.7,
         borderColor: isDarkMode ? colors.transparent.white_10 : colors.transparent.black_10,
         backgroundColor: ColorTheme().background,
+        //@ts-ignore
         transform: [{ translateY: height }],
     }
 
@@ -65,9 +66,9 @@ export default function HomeScreen() {
                             isDarkMode ? colors.gray.white.toString() : colors.gray.black.toString()
                         }
                         backgroundColor={String(
-                            isDarkMode ? colors.gray.grey_09 : colors.gray.grey_01
+                            isDarkMode ? colors.gray.grey_09 : colors.gray.grey_01,
                         )}
-                        autoFocus={isKeyboardVisible}
+                        autoFocus={!!keyboardIsVisible}
                     />
                 </Animated.View>
             )}

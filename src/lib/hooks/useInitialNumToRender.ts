@@ -1,6 +1,6 @@
 import React from "react"
 import { Dimensions } from "react-native"
-import sizes from "../../layout/constants/sizes"
+import sizes from "../../constants/sizes"
 
 const MIN_POST_HEIGHT = sizes.moment.standart.height
 

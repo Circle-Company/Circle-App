@@ -1,6 +1,6 @@
-import PersistedContext from "@/contexts/Persisted"
-import { UserDataType } from "@/contexts/Persisted/types"
 import React from "react"
+import PersistedContext from "../../contexts/Persisted"
+import { UserDataType } from "../../contexts/Persisted/types"
 type SignInResponseProps = {
     accessToken: string
     user: UserDataType

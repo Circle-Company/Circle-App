@@ -1,7 +1,7 @@
 import React from "react"
 import { MoveDown, createNotifications } from "react-native-notificated"
 import { Notify, Variant } from "react-native-notificated/lib/typescript/types"
-import sizes from "../../layout/constants/sizes"
+import sizes from "../../constants/sizes"
 
 import { Toast as AlertToast } from "./CustomToast/alert"
 import { Toast as NotificationToast } from "./CustomToast/notification"

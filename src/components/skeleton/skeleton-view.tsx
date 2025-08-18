@@ -8,9 +8,9 @@ import Animated, {
     withRepeat,
     withTiming,
 } from "react-native-reanimated"
-import { View } from "../../components/Themed"
-import { colors } from "../../layout/constants/colors"
-import sizes from "../../layout/constants/sizes"
+import { colors } from "../../constants/colors"
+import sizes from "../../constants/sizes"
+import { View } from "../Themed"
 
 const width = sizes.screens.width
 const AnimatedLinearGradient = Animated.createAnimatedComponent(LinearGradient)
@@ -39,7 +39,7 @@ export const SkeletonView: React.FC<SkeletonViewProps> = React.memo(
                     backgroundColor || isDarkMode ? colors.gray.grey_08 : colors.gray.grey_02,
                 overflow: "hidden",
             }),
-            [backgroundColor, isDarkMode]
+            [backgroundColor, isDarkMode],
         )
 
         const animatedStyle = useAnimatedStyle(() => ({
@@ -61,5 +61,5 @@ export const SkeletonView: React.FC<SkeletonViewProps> = React.memo(
                 {children}
             </View>
         )
-    }
+    },
 )

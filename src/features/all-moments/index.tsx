@@ -3,12 +3,12 @@ import { FlatList, RefreshControl, ScrollView, useColorScheme } from "react-nati
 import { Text, View } from "../../components/Themed"
 import OfflineCard from "../../components/general/offline"
 import { Loading } from "../../components/loading"
+import ColorTheme, { colors } from "../../constants/colors"
+import fonts from "../../constants/fonts"
+import sizes from "../../constants/sizes"
 import PersistedContext from "../../contexts/Persisted"
 import LanguageContext from "../../contexts/Preferences/language"
 import NetworkContext from "../../contexts/network"
-import ColorTheme, { colors } from "../../layout/constants/colors"
-import fonts from "../../layout/constants/fonts"
-import sizes from "../../layout/constants/sizes"
 import api from "../../services/Api"
 import EndReached from "../list-memories/list-memories-all/components/end-reached"
 import RenderMoment from "./components/render-moments"
@@ -116,7 +116,7 @@ export default function ListAllMoments() {
             <View style={header_container}>
                 <Text style={header_text}>
                     {t(
-                        "You can view all the moments created and you can delete them if you want. They will be removed from the memories automatically."
+                        "You can view all the moments created and you can delete them if you want. They will be removed from the memories automatically.",
                     )}
                 </Text>
             </View>
@@ -148,7 +148,7 @@ export default function ListAllMoments() {
                 refreshControl={
                     <RefreshControl
                         progressBackgroundColor={String(
-                            isDarkMode ? colors.gray.grey_08 : colors.gray.grey_02
+                            isDarkMode ? colors.gray.grey_08 : colors.gray.grey_02,
                         )}
                         colors={[
                             String(isDarkMode ? colors.gray.grey_04 : colors.gray.grey_04),

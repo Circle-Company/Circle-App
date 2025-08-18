@@ -9,14 +9,14 @@ import Animated, {
     withRepeat,
     withTiming,
 } from "react-native-reanimated"
-import ColorTheme, { colors } from "../../layout/constants/colors"
+import ColorTheme, { colors } from "../../constants/colors"
 
 import React from "react"
 import { Loading } from "../../components/loading"
 import { Text } from "../../components/Themed"
 import config from "../../config"
-import fonts from "../../layout/constants/fonts"
-import sizes from "../../layout/constants/sizes"
+import fonts from "../../constants/fonts"
+import sizes from "../../constants/sizes"
 import { Vibrate } from "./useHapticFeedback"
 
 type AnimatedScrollViewProps = {
@@ -107,31 +107,28 @@ export function AnimatedVerticalScrollView({
                     if (!disableVibrate) Vibrate("clockTick")
                 },
             }),
-        [scrollPosition.value, pullDownPosition.value, isReadyToRefresh.value]
+        [scrollPosition.value, pullDownPosition.value, isReadyToRefresh.value],
     )
 
     const refreshIconStyles = useAnimatedStyle(() => {
         "worklet"
-        const pullRotation = interpolate(
-            pullDownPosition.value,
-            [0, 120],
-            [0, 360],
-            { extrapolateRight: "clamp" }
-        )
+        const pullRotation = interpolate(pullDownPosition.value, [0, 120], [0, 360], {
+            extrapolateRight: "clamp",
+        })
 
         return {
-            opacity: refreshing 
-                ? 0.8 
+            opacity: refreshing
+                ? 0.8
                 : interpolate(pullDownPosition.value, [0, 25, 120], [0.3, 0.6, 1], {
-                    extrapolateRight: "clamp",
-                }),
+                      extrapolateRight: "clamp",
+                  }),
             transform: [
                 {
                     scale: refreshing
                         ? 1
                         : interpolate(pullDownPosition.value, [0, 120], [0.7, 1], {
-                            extrapolateRight: "clamp",
-                        }),
+                              extrapolateRight: "clamp",
+                          }),
                 },
                 {
                     rotate: refreshing ? `${rotation.value}deg` : `${pullRotation}deg`,
@@ -162,7 +159,7 @@ export function AnimatedVerticalScrollView({
                     easing: Easing.bezier(0.4, 0, 0.2, 1),
                 }),
                 -1,
-                false
+                false,
             )
         } else {
             rotation.value = withTiming(0, {

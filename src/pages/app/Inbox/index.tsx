@@ -1,8 +1,8 @@
 import React from "react"
 import { StatusBar, useColorScheme } from "react-native"
 import { View } from "../../../components/Themed"
+import ColorTheme from "../../../constants/colors"
 import ListNotifcations from "../../../features/list-notifications"
-import ColorTheme from "../../../layout/constants/colors"
 
 export default function InboxScreen() {
     const isDarkMode = useColorScheme() === "dark"

@@ -1,8 +1,8 @@
+import WifiIcon from "@/assets/icons/svgs/wifi_slash.svg"
 import React from "react"
-import sizes from "../../../layout/constants/sizes"
-import ColorTheme from "../../../layout/constants/colors"
-import fonts from "../../../layout/constants/fonts"
-import WifiIcon from "../../../assets/icons/svgs/wifi_slash.svg"
+import ColorTheme from "../../../constants/colors"
+import fonts from "../../../constants/fonts"
+import sizes from "../../../constants/sizes"
 import { Text, View } from "../../Themed"
 
 export default function offline() {

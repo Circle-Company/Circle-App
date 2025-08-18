@@ -1,7 +1,7 @@
 import React from "react"
 import { Animated, Pressable } from "react-native"
-import ColorTheme from "../../layout/constants/colors"
-import sizes from "../../layout/constants/sizes"
+import ColorTheme from "../../constants/colors"
+import sizes from "../../constants/sizes"
 
 type HeaderButtonProps = {
     height?: number

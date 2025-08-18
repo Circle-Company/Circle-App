@@ -1,15 +1,14 @@
-import ColorTheme from "@/layout/constants/colors"
-import { FlatList } from "react-native"
 import React from "react"
+import { FlatList } from "react-native"
 import { Search } from "../../components/search"
-import sizes from "@/layout/constants/sizes"
 import { useSearchContext } from "../../components/search/search-context"
-interface SearchResult {}
+import ColorTheme from "../../constants/colors"
+import sizes from "../../constants/sizes"
 
 export default function ListSearch() {
     const [isLoading, setIsLoading] = React.useState(false)
     const { searchTerm, fetchData, isConnected } = useSearchContext()
-    const [searchResults, setSearchResults] = React.useState<SearchResult[]>([])
+    const [searchResults, setSearchResults] = React.useState<object[]>([])
 
     const listStyle: any = {
         marginTop: sizes.margins["2sm"],
@@ -34,10 +33,10 @@ export default function ListSearch() {
         fetchDataFromApi()
     }, [searchTerm, fetchData])
 
-    if (isConnected == false) return <Search.Offline />
-    if (searchTerm.length == 0) return null
+    if (isConnected === false) return <Search.Offline />
+    if (searchTerm.length === 0) return null
     if (isLoading) return <Search.LoadingCard />
-    if ((searchTerm && searchResults?.length == 0) || (undefined && !isLoading))
+    if ((searchTerm && searchResults?.length === 0) || (undefined && !isLoading))
         return <Search.EmptyListCard />
     else {
         return (

@@ -1,6 +1,14 @@
-import { View, ViewStyle } from "@/components/Themed"
+import messaging from "@react-native-firebase/messaging"
 import React, { useEffect, useState } from "react"
 import { StatusBar, useColorScheme } from "react-native"
+import { SwitchButton } from "../../../components/general/switch-button"
+import { View, ViewStyle } from "../../../components/Themed"
+import { colors } from "../../../constants/colors"
+import sizes from "../../../constants/sizes"
+import PersistedContext from "../../../contexts/Persisted"
+import LanguageContext from "../../../contexts/Preferences/language"
+import { ListPushNotificationsSettings } from "../../../features/list-push-notifications-settings"
+import { DisabledNotificationsCard } from "../../../features/list-push-notifications-settings/disabled-notifications-card"
 import {
     useDisableAddToMemoryMutation,
     useDisableFollowUserMutation,
@@ -13,15 +21,6 @@ import {
     useEnableNewMemoryMutation,
     useEnableViewUserMutation,
 } from "../../../state/queries/preferences-push-notifications"
-
-import { SwitchButton } from "@/components/general/switch-button"
-import PersistedContext from "@/contexts/Persisted"
-import LanguageContext from "@/contexts/Preferences/language"
-import { ListPushNotificationsSettings } from "@/features/list-push-notifications-settings"
-import { DisabledNotificationsCard } from "@/features/list-push-notifications-settings/disabled-notifications-card"
-import { colors } from "@/layout/constants/colors"
-import sizes from "@/layout/constants/sizes"
-import messaging from "@react-native-firebase/messaging"
 
 export default function SettingsPushNotifications() {
     const { session } = React.useContext(PersistedContext)

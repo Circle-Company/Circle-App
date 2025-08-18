@@ -1,15 +1,15 @@
-import ColorTheme, { colors } from "@/layout/constants/colors"
 import { Pressable, Text, View, useColorScheme } from "react-native"
+import ColorTheme, { colors } from "../../../constants/colors"
 
 import Icon from "@/assets/icons/svgs/@2.svg"
 import Verifyed from "@/assets/icons/svgs/check_circle_verify.svg"
-import PersistedContext from "@/contexts/Persisted"
-import LanguageContext from "@/contexts/Preferences/language"
-import { truncated } from "@/helpers/processText"
-import fonts from "@/layout/constants/fonts"
-import Sizes from "@/layout/constants/sizes"
 import { useNavigation } from "@react-navigation/native"
 import React from "react"
+import fonts from "../../../constants/fonts"
+import Sizes from "../../../constants/sizes"
+import PersistedContext from "../../../contexts/Persisted"
+import LanguageContext from "../../../contexts/Preferences/language"
+import { truncated } from "../../../helpers/processText"
 import { useUserShowContext } from "../user_show-context"
 import { UserUsernameProps } from "../user_show-types"
 
@@ -44,6 +44,7 @@ export default function UserShowUsername({
         textShadowColor: "#00000070",
         textShadowOffset: { width: 0.3, height: 0.7 },
         textShadowRadius: 4,
+        letterSpacing: -0.7,
     }
 
     const username_style: any = {
@@ -54,7 +55,7 @@ export default function UserShowUsername({
 
     const icon_style = {
         top: 2,
-        marginRight: 2 * scale,
+        marginRight: 1 * scale,
     }
 
     async function onUsernameAction() {
@@ -95,8 +96,8 @@ export default function UserShowUsername({
                             displayOnMoment
                                 ? colors.gray.white
                                 : isDarkMode
-                                    ? colors.yellow.yellow_04
-                                    : colors.yellow.yellow_05
+                                ? colors.yellow.yellow_04
+                                : colors.yellow.yellow_05,
                         )}
                         width={12 * scale}
                         height={12 * scale}

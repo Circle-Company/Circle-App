@@ -1,7 +1,7 @@
-import PersistedContext from "@/contexts/Persisted"
 import { useMutation } from "@tanstack/react-query"
 import React from "react"
 import { notify } from "react-native-notificated"
+import PersistedContext from "../../contexts/Persisted"
 import { apiRoutes } from "../../services/Api"
 
 export function useDisableHapticsMutation() {

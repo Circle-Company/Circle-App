@@ -11,7 +11,7 @@ type Follower = {
 }
 
 type FollowingsResponse = {
-    items: Array<Follower>
+    items: Follower[]
     nextPage?: number
 }
 

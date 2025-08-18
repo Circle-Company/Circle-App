@@ -1,11 +1,11 @@
 import React from "react"
 import { Animated, Pressable } from "react-native"
-import ColorTheme from "../../../layout/constants/colors"
-import fonts from "../../../layout/constants/fonts"
+import ColorTheme from "../../../constants/colors"
+import fonts from "../../../constants/fonts"
 import { Text } from "../../Themed"
 
-import ChevronRight from "../../../assets/icons/svgs/chevron_right.svg"
-import sizes from "../../../layout/constants/sizes"
+import ChevronRight from "@/assets/icons/svgs/chevron_right.svg"
+import sizes from "../../../constants/sizes"
 
 type ViewMorePuttonProps = {
     bounciness?: number

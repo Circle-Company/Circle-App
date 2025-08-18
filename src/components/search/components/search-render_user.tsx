@@ -1,16 +1,16 @@
 import { Animated, Pressable, Text, View, useColorScheme } from "react-native"
-import ColorTheme, { colors } from "../../../layout/constants/colors"
 import Reanimated, { FadeInDown } from "react-native-reanimated"
+import ColorTheme, { colors } from "../../../constants/colors"
 
-import LanguageContext from "../../../contexts/Preferences/language"
-import { Profile } from "../../profile"
-import React from "react"
-import { SearchRenderItemReciveDataObjectProps } from "../search-types"
-import { UserShow } from "../../user_show"
-import fonts from "../../../layout/constants/fonts"
-import { formatNumberWithDots } from "../../../helpers/numberConversor"
-import sizes from "../../../layout/constants/sizes"
 import { useNavigation } from "@react-navigation/native"
+import React from "react"
+import fonts from "../../../constants/fonts"
+import sizes from "../../../constants/sizes"
+import LanguageContext from "../../../contexts/Preferences/language"
+import { formatNumberWithDots } from "../../../helpers/numberConversor"
+import { Profile } from "../../profile"
+import { UserShow } from "../../user_show"
+import { SearchRenderItemReciveDataObjectProps } from "../search-types"
 
 export default function render_user({ user }: SearchRenderItemReciveDataObjectProps) {
     const bounciness = 8
@@ -119,7 +119,7 @@ export default function render_user({ user }: SearchRenderItemReciveDataObjectPr
                                     {user.statistic?.total_followers_num > 0 && (
                                         <Text style={total_followers_num_style}>
                                             {formatNumberWithDots(
-                                                user.statistic.total_followers_num
+                                                user.statistic.total_followers_num,
                                             )}
                                             {user.statistic.total_followers_num > 1
                                                 ? " " + t("followers")

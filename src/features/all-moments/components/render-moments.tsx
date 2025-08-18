@@ -4,7 +4,7 @@ import CheckCircle from "../../../assets/icons/svgs/check_circle.svg"
 import { View } from "../../../components/Themed"
 import { MidiaRender } from "../../../components/midia_render"
 import { Moment } from "../../../components/moment"
-import { colors } from "../../../layout/constants/colors"
+import { colors } from "../../../constants/colors"
 import AllMomentsContext from "../all_moments_context"
 
 type RenderMomentProps = {

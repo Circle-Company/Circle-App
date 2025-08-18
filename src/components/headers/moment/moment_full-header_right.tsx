@@ -1,6 +1,6 @@
 import React from "react"
 import { View } from "react-native"
-import sizes from "../../../layout/constants/sizes"
+import sizes from "../../../constants/sizes"
 import { Moment } from "../../moment"
 
 export default function MomentFullHeaderRight() {

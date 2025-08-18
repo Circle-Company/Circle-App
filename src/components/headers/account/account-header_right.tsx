@@ -1,9 +1,9 @@
+import Cog from "@/assets/icons/svgs/cog.svg"
 import { useNavigation } from "@react-navigation/native"
 import React from "react"
 import { View, ViewStyle } from "react-native"
-import Cog from "../../../assets/icons/svgs/cog.svg"
-import ColorTheme from "../../../layout/constants/colors"
-import sizes from "../../../layout/constants/sizes"
+import ColorTheme from "../../../constants/colors"
+import sizes from "../../../constants/sizes"
 import ButtonStandart from "../../buttons/button-standart"
 
 export default function AccountHeaderRight() {

@@ -1,4 +1,4 @@
-import create from "zustand"
+import { create } from "zustand"
 import { storage, storageKeys } from "../../store"
 import { AccountDataType } from "./types"
 const storageKey = storageKeys().account

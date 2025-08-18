@@ -1,10 +1,10 @@
-import { View, ViewStyle } from "@/components/Themed"
+import { View, ViewStyle } from "../../Themed"
 
-import { Loading } from "@/components/loading"
-import { colors } from "@/layout/constants/colors"
-import sizes from "@/layout/constants/sizes"
 import React from "react"
 import { useColorScheme } from "react-native"
+import { colors } from "../../../constants/colors"
+import sizes from "../../../constants/sizes"
+import { Loading } from "../../loading"
 
 export default function LoadingCard() {
     const isDarkMode = useColorScheme() === "dark"

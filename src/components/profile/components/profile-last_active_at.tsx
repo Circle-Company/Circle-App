@@ -1,10 +1,10 @@
+import SignalIcon from "@/assets/icons/svgs/dot_radiowaves_left_and_right.svg"
 import React from "react"
 import { Text, View } from "react-native"
-import SignalIcon from "../../../assets/icons/svgs/dot_radiowaves_left_and_right.svg"
+import ColorTheme from "../../../constants/colors"
+import fonts from "../../../constants/fonts"
+import sizes from "../../../constants/sizes"
 import { timeDifferenceConverter } from "../../../helpers/dateConversor"
-import ColorTheme from "../../../layout/constants/colors"
-import fonts from "../../../layout/constants/fonts"
-import sizes from "../../../layout/constants/sizes"
 import { useProfileContext } from "../profile-context"
 type DateProps = {
     color?: string

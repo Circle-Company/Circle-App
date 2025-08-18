@@ -2,10 +2,10 @@ import React from "react"
 import { StatusBar, useColorScheme } from "react-native"
 import { Text, View } from "../../../components/Themed"
 import config from "../../../config"
+import ColorTheme from "../../../constants/colors"
+import fonts from "../../../constants/fonts"
+import sizes from "../../../constants/sizes"
 import LanguageContext from "../../../contexts/Preferences/language"
-import ColorTheme from "../../../layout/constants/colors"
-import fonts from "../../../layout/constants/fonts"
-import sizes from "../../../layout/constants/sizes"
 
 export default function VersionScreen() {
     const { t } = React.useContext(LanguageContext)
@@ -66,7 +66,7 @@ export default function VersionScreen() {
                 <Text style={description_style}>
                     *
                     {t(
-                        "Keeping the API version up to date and carefully managing changes and updates is critical to ensuring the stability, security, and continued functionality of the application over time."
+                        "Keeping the API version up to date and carefully managing changes and updates is critical to ensuring the stability, security, and continued functionality of the application over time.",
                     )}{" "}
                 </Text>
             </View>
@@ -75,7 +75,7 @@ export default function VersionScreen() {
                 <Text style={[description_style, { top: -10 }]}>
                     *
                     {t(
-                        "Beta version, performance and features currently present do not represent the final release version."
+                        "Beta version, performance and features currently present do not represent the final release version.",
                     )}
                 </Text>
             </View>

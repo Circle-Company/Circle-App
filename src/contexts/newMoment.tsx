@@ -1,17 +1,17 @@
-import { ImagePickerResponse, launchImageLibrary } from "react-native-image-picker"
 import { PermissionsAndroid, Platform } from "react-native"
+import { ImagePickerResponse, launchImageLibrary } from "react-native-image-picker"
 
-import CheckIcon from "../assets/icons/svgs/check_circle.svg"
-import LanguageContext from "./Preferences/language"
-import { MemoryObjectProps } from "../components/memory/memory-types"
-import PersistedContext from "./Persisted"
-import RNFS from "react-native-fs"
-import React from "react"
-import UploadIcon from "../assets/icons/svgs/arrow_up.svg"
-import api from "../services/Api"
-import { colors } from "../layout/constants/colors"
+import UploadIcon from "@/assets/icons/svgs/arrow_up.svg"
+import CheckIcon from "@/assets/icons/svgs/check_circle.svg"
+import { MemoryObjectProps } from "@/components//memory/memory-types"
 import { useNavigation } from "@react-navigation/native"
+import React from "react"
+import RNFS from "react-native-fs"
 import { useNotifications } from "react-native-notificated"
+import { colors } from "../constants/colors"
+import api from "../services/Api"
+import PersistedContext from "./Persisted"
+import LanguageContext from "./Preferences/language"
 
 type NewMomentProviderProps = {
     children: React.ReactNode
@@ -26,10 +26,10 @@ type Image = {
 }
 
 export type Video = {
-    uri: string;
-    duration?: number;
-    fileSize?: number;
-    type?: string;
+    uri: string
+    duration?: number
+    fileSize?: number
+    type?: string
 }
 
 export type NewMomentContextsData = {
@@ -52,7 +52,7 @@ export type NewMomentContextsData = {
     getAllMemories: () => Promise<void>
     handleImagePickerResponse: () => Promise<void>
     handleVideoPickerResponse: (response: any) => Promise<void>
-    addToMemory: () => Promise<Object>
+    addToMemory: () => Promise<object>
     endSession: () => void
 }
 
@@ -125,7 +125,7 @@ export function Provider({ children }: NewMomentProviderProps) {
                             tags,
                         },
                     },
-                    { headers: { Authorization: session.account.jwtToken } }
+                    { headers: { Authorization: session.account.jwtToken } },
                 )
                 .then(function (response) {
                     setCreatedMoment(response.data)
@@ -171,7 +171,7 @@ export function Provider({ children }: NewMomentProviderProps) {
                                 tags,
                             },
                         },
-                        { headers: { Authorization: session.account.jwtToken } }
+                        { headers: { Authorization: session.account.jwtToken } },
                     )
                     .then(function (response) {
                         setCreatedMoment(response.data)
@@ -211,7 +211,7 @@ export function Provider({ children }: NewMomentProviderProps) {
                         memory_id: selectedMemory?.id,
                         moments_list: [{ id: createdMoment.id }],
                     },
-                    { headers: { Authorization: session.account.jwtToken } }
+                    { headers: { Authorization: session.account.jwtToken } },
                 )
                 .then(function (response) {
                     setTags([])
@@ -245,7 +245,7 @@ export function Provider({ children }: NewMomentProviderProps) {
                     mediaType: "photo",
                     selectionLimit: 1,
                 },
-                handleImagePickerResponse
+                handleImagePickerResponse,
             )
         })
     }
@@ -273,7 +273,7 @@ export function Provider({ children }: NewMomentProviderProps) {
                     mediaType: "video",
                     selectionLimit: 1,
                 },
-                handleVideoPickerResponse
+                handleVideoPickerResponse,
             )
         })
     }
@@ -314,7 +314,7 @@ export function Provider({ children }: NewMomentProviderProps) {
                 .post(
                     "memory/get-user-memories",
                     { user_id: session.user.id },
-                    { headers: { Authorization: session.account.jwtToken } }
+                    { headers: { Authorization: session.account.jwtToken } },
                 )
                 .then(function (response) {
                     return response.data

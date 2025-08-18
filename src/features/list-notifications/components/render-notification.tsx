@@ -4,7 +4,7 @@ import { MidiaRender } from "../../../components/midia_render"
 import { Notification } from "../../../components/notification"
 import { NotificationProps } from "../../../components/notification/notification-types"
 import { UserShow } from "../../../components/user_show"
-import sizes from "../../../layout/constants/sizes"
+import sizes from "../../../constants/sizes"
 
 type renderNotificationProps = {
     notification: NotificationProps

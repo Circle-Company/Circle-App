@@ -1,6 +1,7 @@
-import notifee, { AndroidImportance } from "@notifee/react-native"
+// import notifee, { AndroidImportance } from "@notifee/react-native"
 
 export async function onDisplayNotification() {
+    /** 
     // Request permissions (required for iOS)
     await notifee.requestPermission()
 
@@ -21,4 +22,5 @@ export async function onDisplayNotification() {
             importance: AndroidImportance.DEFAULT,
         },
     })
+        */
 }

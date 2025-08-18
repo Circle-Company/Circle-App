@@ -1,17 +1,17 @@
 import React from "react"
 import { TextStyle, View, ViewStyle } from "react-native"
+import ColorTheme from "../../../../constants/colors"
+import fonts from "../../../../constants/fonts"
 import LanguageContext from "../../../../contexts/Preferences/language"
 import BottomSheetContext from "../../../../contexts/bottomSheet"
 import NumberConversor from "../../../../helpers/numberConversor"
-import ColorTheme from "../../../../layout/constants/colors"
-import fonts from "../../../../layout/constants/fonts"
 import { Text } from "../../../Themed"
 import Button from "../../../buttons/button-standart"
-import { useProfileContext } from "../../profile-context"
+import { useProfileContext as UseProfileContext } from "../../profile-context"
 import { UserFollowersModal } from "../view-followers-modal"
 
-export default function statistics_followers() {
-    const { user } = useProfileContext()
+export default function StatisticsFollowers() {
+    const { user } = UseProfileContext()
     const { expand } = React.useContext(BottomSheetContext)
     const { t } = React.useContext(LanguageContext)
 

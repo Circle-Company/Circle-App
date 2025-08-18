@@ -1,13 +1,13 @@
+import ShareIcon from "@/assets/icons/svgs/arrow_shape_right.svg"
 import React from "react"
 import { View } from "react-native"
-import ColorTheme from "../../../layout/constants/colors"
-import { ProfileShareProps } from "../profile-types"
-import ShareIcon from "../../../assets/icons/svgs/arrow_shape_right.svg"
+import ColorTheme from "../../../constants/colors"
+import fonts from "../../../constants/fonts"
+import sizes from "../../../constants/sizes"
 import ButtonStandart from "../../buttons/button-standart"
-import { useProfileContext } from "../profile-context"
 import { Text } from "../../Themed"
-import sizes from "../../../layout/constants/sizes"
-import fonts from "../../../layout/constants/fonts"
+import { useProfileContext } from "../profile-context"
+import { ProfileShareProps } from "../profile-types"
 export default function share({
     color = String(ColorTheme().text),
     backgroundColor = String(ColorTheme().backgroundDisabled),

@@ -14,11 +14,11 @@ import SearchIcon from "../../../assets/icons/svgs/bolt.svg"
 import { Text, View } from "../../../components/Themed"
 import ButtonStandart from "../../../components/buttons/button-standart"
 import { Loading } from "../../../components/loading"
+import ColorTheme, { colors } from "../../../constants/colors"
+import fonts from "../../../constants/fonts"
+import sizes from "../../../constants/sizes"
 import FeedContext from "../../../contexts/Feed"
 import LanguageContext from "../../../contexts/Preferences/language"
-import ColorTheme, { colors } from "../../../layout/constants/colors"
-import fonts from "../../../layout/constants/fonts"
-import sizes from "../../../layout/constants/sizes"
 
 type RootStackParamList = {
     MomentNavigator: { screen: string }
@@ -167,7 +167,7 @@ export function EmptyList() {
                     <Text style={messageTextStyle}>{t("Capture Your Day")}</Text>
                     <Text style={subMessageTextStyle}>
                         {t(
-                            "No recommendations available right now. Why not share a special moment from your day instead?"
+                            "No recommendations available right now. Why not share a special moment from your day instead?",
                         )}
                     </Text>
                 </Animated.View>

@@ -1,8 +1,8 @@
-import { View } from "react-native"
 import React from "react"
-import sizes from "../../../../layout/constants/sizes"
-import IndividualNotificationContext from "../../notification-individual_context"
-import { NotificationProps } from "../../notification-types"
+import { View } from "react-native"
+import sizes from "../../../../constants/sizes"
+import IndividualNotificationContext from "../../../notification/notification-individual_context"
+import { NotificationProps } from "../../../notification/notification-types"
 
 type NotificationContainerProps = {
     children: React.ReactNode

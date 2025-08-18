@@ -1,9 +1,9 @@
+import WifiIcon from "@/assets/icons/svgs/wifi.svg"
+import WifiSlashIcon from "@/assets/icons/svgs/wifi_slash.svg"
 import NetInfo from "@react-native-community/netinfo"
 import React, { ReactNode, createContext, useContext, useEffect, useState } from "react"
 import { notify } from "react-native-notificated"
-import WifiIcon from "../assets/icons/svgs/wifi.svg"
-import WifiSlashIcon from "../assets/icons/svgs/wifi_slash.svg"
-import { colors } from "../layout/constants/colors"
+import { colors } from "../constants/colors"
 import LanguageContext from "./Preferences/language"
 
 type NetworkProviderProps = { children: ReactNode }
@@ -16,7 +16,7 @@ const NetworkContext = createContext<NetworkContextData>({} as NetworkContextDat
 
 export function Provider({ children }: NetworkProviderProps) {
     const [networkStatus, setNetworkStatus] = useState<"ONLINE" | "OFFLINE" | "RECONNECTING">(
-        "ONLINE"
+        "ONLINE",
     )
     const [isConnected, setIsConnected] = useState<boolean | null>(null)
     const [isInternetReachable, setIsInternetReachable] = useState<boolean | null>(null)

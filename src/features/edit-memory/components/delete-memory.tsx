@@ -1,14 +1,22 @@
-import { Animated, Easing, Keyboard, TextStyle, View, ViewStyle, useColorScheme } from "react-native"
+import {
+    Animated,
+    Easing,
+    Keyboard,
+    TextStyle,
+    View,
+    ViewStyle,
+    useColorScheme,
+} from "react-native"
 
 import { useNavigation } from "@react-navigation/native"
 import React from "react"
 import Icon from "../../../assets/icons/svgs/trash.svg"
 import ButtonStandart from "../../../components/buttons/button-standart"
 import { Text } from "../../../components/Themed"
+import { colors } from "../../../constants/colors"
+import fonts from "../../../constants/fonts"
+import sizes from "../../../constants/sizes"
 import LanguageContext from "../../../contexts/Preferences/language"
-import { colors } from "../../../layout/constants/colors"
-import fonts from "../../../layout/constants/fonts"
-import sizes from "../../../layout/constants/sizes"
 import EditMemoryContext from "../edit_memory_context"
 
 export default function DeleteMemory() {
@@ -86,7 +94,7 @@ export default function DeleteMemory() {
             <View style={styles.descriptionContainer}>
                 <Text style={styles.descriptionText}>
                     {t(
-                        "Are you sure you want to permanently delete this Memory? You won't be able to recover this later."
+                        "Are you sure you want to permanently delete this Memory? You won't be able to recover this later.",
                     )}
                 </Text>
             </View>
@@ -98,11 +106,11 @@ export default function DeleteMemory() {
                     backgroundColor={isDarkMode ? colors.red.red_09 : colors.red.red_05}
                 >
                     <Text style={styles.buttonText}>{t("Delete")}</Text>
-                    <Icon 
-                        style={styles.icon} 
-                        fill={isDarkMode ? colors.red.red_01 : colors.gray.white} 
-                        width={14} 
-                        height={14} 
+                    <Icon
+                        style={styles.icon}
+                        fill={isDarkMode ? colors.red.red_01 : colors.gray.white}
+                        width={14}
+                        height={14}
                     />
                 </ButtonStandart>
             </View>

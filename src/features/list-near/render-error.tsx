@@ -1,10 +1,10 @@
 import Animated, { FadeIn } from "react-native-reanimated"
-import { Text, TextStyle, ViewStyle } from "@/components/Themed"
+import { Text, TextStyle, ViewStyle } from "../../components/Themed"
 
-import ColorTheme from "@/layout/constants/colors"
-import fonts from "@/layout/constants/fonts"
-import sizes from "@/layout/constants/sizes"
 import { t } from "i18next"
+import ColorTheme from "../../constants/colors"
+import fonts from "../../constants/fonts"
+import sizes from "../../constants/sizes"
 
 export function RenderError() {
     const theme = ColorTheme()
@@ -26,7 +26,7 @@ export function RenderError() {
     }
 
     return (
-        <Animated.View 
+        <Animated.View
             entering={FadeIn.duration(500).delay(200).withInitialValues({ opacity: 0 })}
             style={containerStyle}
         >

@@ -1,8 +1,8 @@
 import { useColorScheme } from "react-native"
 import { View } from "../../../components/Themed"
 import { Skeleton } from "../../../components/skeleton"
-import { colors } from "../../../layout/constants/colors"
-import sizes from "../../../layout/constants/sizes"
+import { colors } from "../../../constants/colors"
+import sizes from "../../../constants/sizes"
 
 export function ListMemoriesAllSkeleton() {
     const isDarkMode = useColorScheme() === "dark"

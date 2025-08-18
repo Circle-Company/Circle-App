@@ -2,11 +2,11 @@ import { StatusBar, useColorScheme } from "react-native"
 import { View, ViewStyle } from "../../../components/Themed"
 
 import React from "react"
+import ColorTheme from "../../../constants/colors"
 import DeleteMemory from "../../../features/edit-memory/components/delete-memory"
 import ListMomentsWithoutInMemory from "../../../features/edit-memory/components/list-moments-without-in-memory"
 import TitleMemory from "../../../features/edit-memory/components/title-memory"
 import { EditMemoryProvider } from "../../../features/edit-memory/edit_memory_context"
-import ColorTheme from "../../../layout/constants/colors"
 
 export default function EditMemoryScreen() {
     const isDarkMode = useColorScheme() === "dark"
@@ -26,7 +26,6 @@ export default function EditMemoryScreen() {
                 <TitleMemory />
                 <ListMomentsWithoutInMemory />
                 <DeleteMemory />
-                
             </EditMemoryProvider>
         </View>
     )

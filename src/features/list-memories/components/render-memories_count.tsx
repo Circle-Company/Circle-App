@@ -2,9 +2,9 @@ import React from "react"
 import { TextStyle, View, ViewStyle } from "react-native"
 import MemoryIcon from "../../../assets/icons/svgs/memories.svg"
 import { Text } from "../../../components/Themed"
-import ColorTheme from "../../../layout/constants/colors"
-import fonts from "../../../layout/constants/fonts"
-import sizes from "../../../layout/constants/sizes"
+import ColorTheme from "../../../constants/colors"
+import fonts from "../../../constants/fonts"
+import sizes from "../../../constants/sizes"
 
 type RenderMemoriesCountProps = {
     count: number

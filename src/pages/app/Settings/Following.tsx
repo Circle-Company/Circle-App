@@ -1,9 +1,9 @@
-import { Search } from "@/components/search"
-import { AnimatedVerticalFlatlist } from "@/lib/hooks/useAnimatedFlatList"
 import React from "react"
 import { StatusBar, useColorScheme } from "react-native"
+import { Search } from "../../../components/search"
 import { Text, View } from "../../../components/Themed"
-import ColorTheme from "../../../layout/constants/colors"
+import ColorTheme from "../../../constants/colors"
+import { AnimatedVerticalFlatlist } from "../../../lib/hooks/useAnimatedFlatList"
 import { useFindAccountFollowingsQuery } from "../../../state/queries/find-followings"
 
 export default function FollowingScreen() {

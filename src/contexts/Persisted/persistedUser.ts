@@ -1,6 +1,6 @@
-import create from "zustand"
+import { create } from "zustand"
 import api from "../../services/Api"
-import { storage, storageKeys } from "@/store"
+import { storage, storageKeys } from "../../store"
 import { UserDataType } from "./types"
 const storageKey = storageKeys().user
 
@@ -72,7 +72,7 @@ export const useUserStore = create<UserState>((set) => ({
                         headers: {
                             Authorization: storage.getString(storageKeys().account.jwt.token),
                         },
-                    }
+                    },
                 )
                 .then(function (response) {
                     const user = response.data
@@ -92,12 +92,12 @@ export const useUserStore = create<UserState>((set) => ({
                     if (user.profile_picture.small_resolution)
                         storage.set(
                             storageKey.profile_picture.small,
-                            user.profile_picture.small_resolution
+                            user.profile_picture.small_resolution,
                         )
                     if (user.profile_picture.tiny_resolution)
                         storage.set(
                             storageKey.profile_picture.tiny,
-                            user.profile_picture.tiny_resolution
+                            user.profile_picture.tiny_resolution,
                         )
                     return response.data
                 })

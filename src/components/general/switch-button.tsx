@@ -6,7 +6,7 @@ import Animated, {
     useSharedValue,
     withSpring,
 } from "react-native-reanimated"
-import { colors } from "../../layout/constants/colors"
+import { colors } from "../../constants/colors"
 import { Vibrate } from "../../lib/hooks/useHapticFeedback"
 
 interface SwitchButtonProps {
@@ -52,7 +52,7 @@ export const SwitchButton: React.FC<SwitchButtonProps> = ({
                 [
                     isDarkMode ? colors.gray.grey_06 : colors.gray.grey_03,
                     isDarkMode ? colors.gray.white : colors.gray.black,
-                ]
+                ],
             ),
         }
     })
@@ -66,7 +66,7 @@ export const SwitchButton: React.FC<SwitchButtonProps> = ({
                 [
                     isDarkMode ? colors.gray.black : colors.gray.white,
                     isDarkMode ? colors.gray.black : colors.gray.white,
-                ]
+                ],
             ),
             width: withSpring(isEnabled.value ? 26 : 22, {
                 stiffness: 500,

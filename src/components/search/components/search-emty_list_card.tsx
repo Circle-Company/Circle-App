@@ -1,11 +1,11 @@
-import ColorTheme, { colors } from "@/layout/constants/colors"
-import { Text, TextStyle, View, ViewStyle } from "@/components/Themed"
+import ColorTheme, { colors } from "../../../constants/colors"
+import { Text, TextStyle, View, ViewStyle } from "../../Themed"
 
-import LanguageContext from "@/contexts/Preferences/language"
 import React from "react"
-import fonts from "@/layout/constants/fonts"
-import sizes from "@/layout/constants/sizes"
 import { useColorScheme } from "react-native"
+import fonts from "../../../constants/fonts"
+import sizes from "../../../constants/sizes"
+import LanguageContext from "../../../contexts/Preferences/language"
 
 export default function EmptyListCard() {
     const { t } = React.useContext(LanguageContext)

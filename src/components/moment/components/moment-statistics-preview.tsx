@@ -1,9 +1,9 @@
 import React from "react"
 import { FlatList, View } from "react-native"
+import ColorTheme from "../../../constants/colors"
+import fonts from "../../../constants/fonts"
+import sizes from "../../../constants/sizes"
 import LanguageContext from "../../../contexts/Preferences/language"
-import ColorTheme from "../../../layout/constants/colors"
-import fonts from "../../../layout/constants/fonts"
-import sizes from "../../../layout/constants/sizes"
 import { apiRoutes } from "../../../services/Api"
 import { Text } from "../../Themed"
 import { MomentDataReturnsProps, MomentOptionsProps } from "../context/types"
@@ -13,7 +13,7 @@ type StatisticsPreviewProps = {
     momentOptions: MomentOptionsProps
 }
 
-export function statisticsPreview({ momentOptions, momentData }: StatisticsPreviewProps) {
+export function StatisticsPreview({ momentOptions, momentData }: StatisticsPreviewProps) {
     const { t } = React.useContext(LanguageContext)
     const [likes, setLikes] = React.useState("--")
     const [views, setViews] = React.useState("--")

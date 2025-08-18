@@ -1,9 +1,9 @@
-import { View, ViewStyle } from "@/components/Themed"
 import { StatusBar, useColorScheme } from "react-native"
+import { View, ViewStyle } from "../../../components/Themed"
 
-import ListSettings from "@/features/list-settings"
-import ColorTheme from "@/layout/constants/colors"
 import React from "react"
+import ColorTheme from "../../../constants/colors"
+import ListSettings from "../../../features/list-settings"
 
 export default function SettingsScreen() {
     const isDarkMode = useColorScheme() === "dark"

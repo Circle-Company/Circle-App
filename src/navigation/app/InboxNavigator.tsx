@@ -1,10 +1,9 @@
-import HeaderLeft from "@/components/headers/inbox/inbox-header_left"
 import { createStackNavigator } from "@react-navigation/stack"
 import React from "react"
-import { useColorScheme } from "react-native"
+import HeaderLeft from "../../components/headers/inbox/inbox-header_left"
+import ColorTheme from "../../constants/colors"
+import Sizes from "../../constants/sizes"
 import LanguageContext from "../../contexts/Preferences/language"
-import ColorTheme from "../../layout/constants/colors"
-import Sizes from "../../layout/constants/sizes"
 import InboxScreen from "../../pages/app/Inbox"
 import { Interpolation as HorizontalRight } from "../transitions/horizontal-right"
 
@@ -16,8 +15,6 @@ export function InboxNavigator() {
         ...Sizes.headers,
         backgroundColor: ColorTheme().background,
     }
-
-    const isDarkMode = useColorScheme() === "dark"
 
     return (
         <InboxStack.Navigator

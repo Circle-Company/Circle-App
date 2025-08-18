@@ -1,11 +1,11 @@
-import { Text, View } from "@/components/Themed"
+import { Text, View } from "../../components/Themed"
 
-import NearContext from "@/contexts/near"
+import { t } from "i18next"
 import React from "react"
 import { ViewStyle } from "react-native"
-import fonts from "@/layout/constants/fonts"
-import sizes from "@/layout/constants/sizes"
-import { t } from "i18next"
+import fonts from "../../constants/fonts"
+import sizes from "../../constants/sizes"
+import NearContext from "../../contexts/near"
 
 export function RenderHeader() {
     const context = React.useContext(NearContext)
@@ -24,7 +24,7 @@ export function RenderHeader() {
 
     return (
         <View style={headerStyle}>
-            <Text style={{ fontSize: fonts.size.body * 1.1, fontFamily: fonts.family.Bold}}>
+            <Text style={{ fontSize: fonts.size.body * 1.1, fontFamily: fonts.family.Bold }}>
                 {t("Near to You Now")}
             </Text>
         </View>
