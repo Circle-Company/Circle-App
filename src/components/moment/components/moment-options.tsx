@@ -1,19 +1,19 @@
+import CheckIcon from "@/assets/icons/svgs/check_circle.svg"
 import React from "react"
 import { View } from "react-native"
 import { useNotifications } from "react-native-notificated"
-import CheckIcon from "../../../assets/icons/svgs/check_circle.svg"
+import ColorTheme, { colors } from "../../../constants/colors"
+import fonts from "../../../constants/fonts"
+import sizes from "../../../constants/sizes"
 import PersistedContext from "../../../contexts/Persisted"
 import LanguageContext from "../../../contexts/Preferences/language"
 import BottomSheetContext from "../../../contexts/bottomSheet"
-import ColorTheme, { colors } from "../../../layout/constants/colors"
-import fonts from "../../../layout/constants/fonts"
-import sizes from "../../../layout/constants/sizes"
 import api from "../../../services/Api"
 import { MemoryReciveDataProps } from "../../Memory/Memory-types"
 import { Text } from "../../Themed"
 import ButtonStandart from "../../buttons/button-standart"
 import { MomentDataReturnsProps, MomentOptionsProps } from "../context/types"
-import { statisticsPreview as StatisticsPreview } from "./moment-statistics-preview"
+import { StatisticsPreview } from "./moment-statistics-preview"
 
 type OptionsProps = {
     momentData: MomentDataReturnsProps
@@ -21,7 +21,7 @@ type OptionsProps = {
     memory: MemoryReciveDataProps
 }
 
-export default function options({ memory, momentData, momentOptions }: OptionsProps) {
+export default function Options({ memory, momentData, momentOptions }: OptionsProps) {
     const { collapse } = React.useContext(BottomSheetContext)
     const { t } = React.useContext(LanguageContext)
     const { notify } = useNotifications()
@@ -38,7 +38,7 @@ export default function options({ memory, momentData, momentOptions }: OptionsPr
                     moment_id: momentData.id,
                     user_id: session.user.id,
                 },
-                { headers: { Authorization: session.account.jwtToken } }
+                { headers: { Authorization: session.account.jwtToken } },
             )
             .then(() => {
                 notify("toast", {
@@ -104,7 +104,7 @@ export default function options({ memory, momentData, momentOptions }: OptionsPr
                 <Text style={[descriptionStyle, { fontSize: fonts.size.body * 0.56 }]}>
                     *
                     {t(
-                        "If the memory only has this moment and you remove it, the memory will be deleted."
+                        "If the memory only has this moment and you remove it, the memory will be deleted.",
                     )}
                 </Text>
             </View>

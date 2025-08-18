@@ -1,14 +1,14 @@
-import React, { useContext } from "react"
-import { View, Text, useColorScheme } from "react-native"
+import AddIcon from "@/assets/icons/svgs/moment.svg"
 import { useNavigation } from "@react-navigation/native"
-import sizes from "../../../layout/constants/sizes"
-import fonts from "../../../layout/constants/fonts"
+import React, { useContext } from "react"
+import { Text, useColorScheme, View } from "react-native"
+import { colors } from "../../../constants/colors"
+import fonts from "../../../constants/fonts"
+import sizes from "../../../constants/sizes"
 import NewMomentContext from "../../../contexts/newMoment"
-import ButtonStandart from "../../buttons/button-standart"
-import AddIcon from "../../../assets/icons/svgs/moment.svg"
-import { colors } from "../../../layout/constants/colors"
-import { Loading } from "../../loading"
 import LanguageContext from "../../../contexts/Preferences/language"
+import ButtonStandart from "../../buttons/button-standart"
+import { Loading } from "../../loading"
 
 export default function NewMomentInputDescriptionRight() {
     const { uploadMoment, tags } = useContext(NewMomentContext)

@@ -1,12 +1,12 @@
-import { InteractionProps, MomentProps } from "../types"
 import React, { useCallback, useState } from "react"
+import { InteractionProps, MomentProps } from "../types"
 
-import { ChunksManager } from "./chunks-mananger"
-import { MomentDataProps } from "@/components/moment/context/types"
-import PersistedContext from "@/contexts/Persisted"
-import api from "../../../services/Api"
-import { feedMock } from "../../../mocks/feedMock"
+import { MomentDataProps } from "../../../components/moment/context/types"
 import { useTimer } from "../../../lib/hooks/useTimer"
+import { feedMock } from "../../../mocks/feedMock"
+import api from "../../../services/Api"
+import PersistedContext from "../../Persisted"
+import { ChunksManager } from "./chunks-mananger"
 import { videoCacher } from "./video-cacher"
 
 // Debounce de tempo em ms para evitar requisições excessivas
@@ -18,7 +18,7 @@ export const useFeed = () => {
     const [loading, setLoading] = useState(false)
     const [scrollEnabled, setScrollEnabled] = useState(true)
     const [focusedChunkItem, setFocusedChunkItem] = useState<{ id: number; index: number } | null>(
-        null
+        null,
     )
     const [commentEnabled, setCommentEnabled] = useState<boolean>(false)
     const [focusedMoment, setFocusedMoment] = useState<MomentDataProps>({} as MomentDataProps)
@@ -59,7 +59,7 @@ export const useFeed = () => {
                         length: interactions.length,
                         data: interactions,
                     },
-                    { headers: { Authorization: session.account.jwtToken } }
+                    { headers: { Authorization: session.account.jwtToken } },
                 )
                 // setFeedData(response.data)
 
@@ -81,7 +81,7 @@ export const useFeed = () => {
                     videoCacher.clear()
                 } else if (addChunkOnList) {
                     const uniqueNewChunks = moments.filter(
-                        (moment) => !currentPostIds.includes(moment.id)
+                        (moment) => !currentPostIds.includes(moment.id),
                     )
 
                     setFeedData(updatedList.map((id) => moments.find((m) => m.id === id)!)) // Atualiza mantendo a ordem dos IDs
@@ -89,7 +89,6 @@ export const useFeed = () => {
                         ...prevChunkIds,
                         ...uniqueNewChunks.map((m) => m.id),
                     ])
-
                 }
 
                 setLastRequestTime(currentTime) // Atualiza o timestamp da última requisição
@@ -101,12 +100,12 @@ export const useFeed = () => {
                 setInteractions([]) // Limpa interações após a resposta
             }
         },
-        [feedData, interactions, session, lastRequestTime, period, resetTimer]
+        [feedData, interactions, session, lastRequestTime, period, resetTimer],
     )
 
     function next() {
         if (
-            Number(focusedChunkItem?.index?? + 1) < feedData.length &&
+            Number(focusedChunkItem?.index ?? +1) < feedData.length &&
             commentEnabled == false &&
             loading == false &&
             scrollEnabled

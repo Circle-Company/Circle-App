@@ -1,7 +1,7 @@
-import PersistedContext from "@/contexts/Persisted"
 import { useMutation } from "@tanstack/react-query"
-import { LanguagesCodesType } from "locales/LanguageTypes"
 import React from "react"
+import PersistedContext from "../../contexts/Persisted"
+import { LanguagesCodesType } from "../../locales/LanguageTypes"
 import { apiRoutes } from "../../services/Api"
 
 export function useSetAppLanguageMutation({ appLanguage }: { appLanguage: LanguagesCodesType }) {

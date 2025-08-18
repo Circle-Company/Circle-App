@@ -1,10 +1,10 @@
-import { FeedProviderProps } from "./types"
 import React from "react"
-import { useFeed } from "./functions/useFeed"
 import { useKeyboard } from "../../lib/hooks/useKeyboard"
+import { useFeed } from "./functions/useFeed"
+import { FeedProviderProps } from "./types"
 
 const FeedContext = React.createContext(
-    {} as ReturnType<typeof useFeed> & ReturnType<typeof useKeyboard>
+    {} as ReturnType<typeof useFeed> & ReturnType<typeof useKeyboard>,
 )
 
 export function Provider({ children }: FeedProviderProps) {

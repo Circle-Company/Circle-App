@@ -1,9 +1,9 @@
-import { CommentsContainerProps } from "../comments-types"
-import MomentContext from "../../moment/context"
 import React from "react"
 import { View } from "react-native"
+import MomentContext from "../../moment/context"
+import { CommentsContainerProps } from "../comments-types"
 
-export default function container({ children, focused }: CommentsContainerProps) {
+export default function Container({ children, focused }: CommentsContainerProps) {
     const { momentSize } = React.useContext(MomentContext)
 
     const container: any = {

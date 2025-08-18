@@ -1,8 +1,8 @@
 import React from "react"
 import { View } from "react-native"
+import sizes from "../../../../../constants/sizes"
 import { useSearchContext } from "../../../search-context"
 import { SearchLeftRootProps } from "../../../search-types"
-import sizes from "../../../../../layout/constants/sizes"
 
 export default function left_root({ children }: SearchLeftRootProps) {
     const { search } = useSearchContext()

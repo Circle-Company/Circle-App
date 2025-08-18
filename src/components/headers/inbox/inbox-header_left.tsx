@@ -1,8 +1,8 @@
+import Icon from "@/assets/icons/svgs/close_bold.svg"
 import { useNavigation } from "@react-navigation/native"
 import React from "react"
 import { View, ViewStyle } from "react-native"
-import Icon from "../../../assets/icons/svgs/close_bold.svg"
-import ColorTheme from "../../../layout/constants/colors"
+import ColorTheme from "../../../constants/colors"
 import HeaderButton from "../headerButton"
 
 export default function HeaderLeft() {

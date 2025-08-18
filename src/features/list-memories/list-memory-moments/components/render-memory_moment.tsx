@@ -2,9 +2,9 @@ import React from "react"
 import { Animated, View } from "react-native"
 import { Moment } from "../../../../components/moment"
 import { MomentDataProps } from "../../../../components/moment/context/types"
+import { colors } from "../../../../constants/colors"
+import sizes from "../../../../constants/sizes"
 import FeedContext from "../../../../contexts/Feed"
-import { colors } from "../../../../layout/constants/colors"
-import sizes from "../../../../layout/constants/sizes"
 
 type RenderMemoryMomenProps = {
     moment: MomentDataProps

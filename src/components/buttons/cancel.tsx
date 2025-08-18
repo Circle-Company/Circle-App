@@ -1,8 +1,8 @@
-import ColorTheme from "@/layout/constants/colors"
-import fonts from "@/layout/constants/fonts"
 import React from "react"
 import { Animated, Pressable } from "react-native"
-import sizes from "../../layout/constants/sizes"
+import ColorTheme from "../../constants/colors"
+import fonts from "../../constants/fonts"
+import sizes from "../../constants/sizes"
 import { Text } from "../Themed"
 
 type ButtonStandartProps = {

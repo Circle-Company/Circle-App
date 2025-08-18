@@ -1,13 +1,13 @@
 import { View, ViewStyle } from "react-native"
 
-import { BadgeIcon } from "@/components/general/badge-icon"
-import ButtonStandart from "../../buttons/button-standart"
-import ColorTheme from "../../../layout/constants/colors"
-import Icon from "../../../assets/icons/svgs/bell_fill.svg"
-import PersistedContext from "@/contexts/Persisted"
-import React from "react"
-import sizes from "../../../layout/constants/sizes"
+import Icon from "@/assets/icons/svgs/bell_fill.svg"
 import { useNavigation } from "@react-navigation/native"
+import React from "react"
+import ColorTheme from "../../../constants/colors"
+import sizes from "../../../constants/sizes"
+import PersistedContext from "../../../contexts/Persisted"
+import ButtonStandart from "../../buttons/button-standart"
+import { BadgeIcon } from "../../general/badge-icon"
 
 export default function AccountHeaderLeft() {
     const { session } = React.useContext(PersistedContext)

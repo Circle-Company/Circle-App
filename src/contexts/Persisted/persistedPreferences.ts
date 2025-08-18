@@ -1,7 +1,6 @@
-import { storage, storageKeys } from "../../store"
-
-import create from "zustand"
+import { create } from "zustand"
 import { apiRoutes } from "../../services/Api"
+import { storage, storageKeys } from "../../store"
 import { PreferencesDataStorageType } from "./types"
 
 const storageKey = storageKeys().preferences
@@ -181,7 +180,7 @@ export const usePreferencesStore = create<PreferencesState>((set) => ({
                 content: data.content,
                 pushNotifications: data.pushNotifications,
             })
-            
+
             if (data.language.appLanguage) {
                 storage.set(storageKey.appLanguage, data.language.appLanguage)
             }

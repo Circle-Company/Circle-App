@@ -1,4 +1,5 @@
-import { API_VERSION, APP_VERSION, DEBUG, LOG_DEBUG, LOG_LEVEL, MIXPANEL_KEY, NODE_ENV } from "@env"
+//@ts-ignore
+import { APP_VERSION, DEBUG, MIXPANEL_KEY, NODE_ENV } from "@env"
 import emails from "./emails"
 import metadata from "./metadata"
 
@@ -11,18 +12,15 @@ const environment = {
 }
 
 const api = {
-    API_VERSION: API_VERSION,
-    ENDPOINT: "192.168.15.12:3000",
+    ENDPOINT: "192.168.15.4:3000",
+    API_VERSION: "1.0.0",
 }
 
 const analytics = {
     MIXPANEL_KEY: MIXPANEL_KEY,
 }
 
-const log = {
-    LOG_LEVEL: LOG_LEVEL,
-    LOG_DEBUG: LOG_DEBUG,
-}
+const log = {}
 
 const required = {
     NODE_ENV: NODE_ENV,

@@ -1,4 +1,4 @@
-import create from "zustand"
+import { create } from "zustand"
 import api from "../../services/Api"
 import { storage, storageKeys } from "../../store"
 import { StatisticsDataType } from "./types"
@@ -42,7 +42,7 @@ export const useStatisticsStore = create<StatisticsState>((set) => ({
                         headers: {
                             Authorization: storage.getString(storageKeys().account.jwt.token),
                         },
-                    }
+                    },
                 )
                 .then(function (response) {
                     const statistics = response.data

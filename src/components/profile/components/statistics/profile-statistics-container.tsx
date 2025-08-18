@@ -1,10 +1,10 @@
-import ColorTheme from "@/layout/constants/colors"
-import sizes from "@/layout/constants/sizes"
 import React from "react"
 import { Animated, ViewStyle } from "react-native"
+import ColorTheme from "../../../../constants/colors"
+import sizes from "../../../../constants/sizes"
 import { ProfileStatisticsContainerProps } from "../../profile-types"
 
-export default function statistics_container({ children }: ProfileStatisticsContainerProps) {
+export default function StatisticsContainer({ children }: ProfileStatisticsContainerProps) {
     const animatedOpacity = React.useRef(new Animated.Value(0.2)).current
 
     function handleAnimation() {

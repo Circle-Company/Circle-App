@@ -34,10 +34,6 @@ export type ProfileNameProps = {
 export type ProfilePictureProps = {
     fromProfile?: boolean
 }
-export type ProfileDescriptionProps = {}
 export type ProfileStatisticsContainerProps = {
     children: React.ReactNode
 }
-export type ProfileStatisticsFollowersProps = {}
-export type ProfileStatisticsLikesProps = {}
-export type ProfileStatisticsViewsProps = {}

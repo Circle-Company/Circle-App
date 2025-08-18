@@ -1,16 +1,15 @@
-import { Animated, RefreshControl, useColorScheme } from "react-native"
+import { Image } from "expo-image"
 import React, { useCallback, useRef, useState } from "react"
-
-import { EmptyList } from "./components/render-empty_list"
-import FastImage from "react-native-fast-image"
-import FeedContext from "../../contexts/Feed"
+import { Animated, RefreshControl, useColorScheme } from "react-native"
 import { FlatList } from "react-native-gesture-handler"
 import { Loading } from "../../components/loading"
-import { MomentDataProps } from "@/components/moment/context/types"
+import { MomentDataProps } from "../../components/moment/context/types"
+import { colors } from "../../constants/colors"
+import sizes from "../../constants/sizes"
+import FeedContext from "../../contexts/Feed"
+import { videoCacher } from "../../contexts/Feed/functions/video-cacher"
 import RenderMomentFeed from "./components/feed/render-moment-feed"
-import { colors } from "../../layout/constants/colors"
-import sizes from "../../layout/constants/sizes"
-import { videoCacher } from "@/contexts/Feed/functions/video-cacher"
+import { EmptyList } from "./components/render-empty_list"
 
 type ViewToken = {
     item: any
@@ -18,7 +17,7 @@ type ViewToken = {
     index: number | null
     isViewable: boolean
     section?: any
-  }
+}
 
 const ListMoments = () => {
     const margin = 2
@@ -30,7 +29,7 @@ const ListMoments = () => {
         loading: loadingFeed,
     } = React.useContext(FeedContext)
     const [centerIndex, setCenterIndex] = useState<number | null>(0)
-    const [loading, setLoading] = React.useState(false)
+    const [loading] = React.useState(false)
     const [refreshing, setRefreshing] = React.useState(false)
     const isDarkMode = useColorScheme() === "dark"
     const flatListRef = useRef<FlatList | null>(null)
@@ -39,11 +38,11 @@ const ListMoments = () => {
         (event: any) => {
             const contentOffsetX = event.nativeEvent.contentOffset.x + 140
             const centerIndex = Math.floor(
-                (contentOffsetX + sizes.screens.width / 2) / (sizes.moment.standart.width + margin)
+                (contentOffsetX + sizes.screens.width / 2) / (sizes.moment.standart.width + margin),
             )
             setCenterIndex(centerIndex >= 0 ? centerIndex : 0)
         },
-        [setCenterIndex]
+        [setCenterIndex],
     )
 
     const container_0 = {
@@ -65,19 +64,19 @@ const ListMoments = () => {
 
     const onViewableItemsChanged = React.useRef(
         ({ viewableItems }: { viewableItems: ViewToken[] }) => {
-            viewableItems.forEach((token) => {
+            viewableItems.forEach(async (token) => {
                 const item = token.item as MomentDataProps
                 const url = item.midia.fullhd_resolution || item.midia.nhd_resolution
-      
+
                 if (url) {
-                    FastImage.preload([{ uri: url }])
+                    await Image.loadAsync(url)
                     videoCacher.preload({
                         id: Number(item.id),
                         url,
                     })
                 }
             })
-        }
+        },
     )
 
     const handleRefresh = async () => {
@@ -119,12 +118,11 @@ const ListMoments = () => {
                 onEndReached={async () => {
                     await reloadFeed()
                 }}
-                
                 onEndReachedThreshold={0}
                 refreshControl={
                     <RefreshControl
                         progressBackgroundColor={String(
-                            isDarkMode ? colors.gray.grey_08 : colors.gray.grey_02
+                            isDarkMode ? colors.gray.grey_08 : colors.gray.grey_02,
                         )}
                         colors={[
                             String(isDarkMode ? colors.gray.grey_04 : colors.gray.grey_04),
@@ -143,12 +141,16 @@ const ListMoments = () => {
                         index === 0
                             ? container_0
                             : index + 1 === feedData.length
-                                ? container_1
-                                : container
+                            ? container_1
+                            : container
 
                     return (
                         <Animated.View style={container_style} key={item.unique_id}>
-                            <RenderMomentFeed isFeed={true} momentData={item} isFocused={focusedItem} />
+                            <RenderMomentFeed
+                                isFeed={true}
+                                momentData={item}
+                                isFocused={focusedItem}
+                            />
                         </Animated.View>
                     )
                 }}

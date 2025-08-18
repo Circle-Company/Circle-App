@@ -1,8 +1,8 @@
 import React from "react"
 import { View } from "react-native"
+import sizes from "../../../../../constants/sizes"
 import { useSearchContext } from "../../../search-context"
 import { SearchRightRootProps } from "../../../search-types"
-import sizes from "../../../../../layout/constants/sizes"
 
 export default function right_root({ children }: SearchRightRootProps) {
     const { search } = useSearchContext()

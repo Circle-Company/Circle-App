@@ -1,12 +1,13 @@
+import Bolt from "@/assets/icons/svgs/bolt.svg"
+import Eye from "@/assets/icons/svgs/eye.svg"
+import Heart from "@/assets/icons/svgs/heart.svg"
+import User from "@/assets/icons/svgs/person.svg"
 import React from "react"
 import { View, useColorScheme } from "react-native"
-import Bolt from "../../../assets/icons/svgs/bolt.svg"
-import Eye from "../../../assets/icons/svgs/eye.svg"
-import Heart from "../../../assets/icons/svgs/heart.svg"
-import User from "../../../assets/icons/svgs/person.svg"
-import ColorTheme, { colors } from "../../../layout/constants/colors"
+import ColorTheme, { colors } from "../../../constants/colors"
 import { useIndividualNotificationContext } from "../notification-individual_context"
-export default function notification_seal() {
+
+export default function NotificationSeal() {
     const isDarkMode = useColorScheme() === "dark"
     const { notification } = useIndividualNotificationContext()
     const container: any = {

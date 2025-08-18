@@ -1,10 +1,10 @@
 import React from "react"
 import { StatusBar, useColorScheme } from "react-native"
 import { View } from "../../../components/Themed"
+import ColorTheme from "../../../constants/colors"
 import ListAllMoments from "../../../features/all-moments"
 import { AllMomentsProvider } from "../../../features/all-moments/all_moments_context"
 import DeleteMoments from "../../../features/all-moments/components/delete-moments"
-import ColorTheme from "../../../layout/constants/colors"
 export default function AllMomentsScreen() {
     const isDarkMode = useColorScheme() === "dark"
 

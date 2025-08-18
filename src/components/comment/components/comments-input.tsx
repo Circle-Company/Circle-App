@@ -1,18 +1,18 @@
 import { Animated, Keyboard, Pressable, Text, TextInput, View, useColorScheme } from "react-native"
-import ColorTheme, { colors } from "../../../layout/constants/colors"
+import ColorTheme, { colors } from "../../../constants/colors"
 
-import Arrowbottom from "../../../assets/icons/svgs/paper_plane.svg"
-import CheckIcon from "../../../assets/icons/svgs/check_circle.svg"
-import { CommentsInputProps } from "../comments-types"
-import FeedContext from "../../../contexts/Feed"
-import LanguageContext from "../../../contexts/Preferences/language"
-import PersistedContext from "../../../contexts/Persisted"
+import CheckIcon from "@/assets/icons/svgs/check_circle.svg"
+import Arrowbottom from "@/assets/icons/svgs/paper_plane.svg"
 import React from "react"
-import { UserShow } from "../../user_show"
-import api from "../../../services/Api"
-import fonts from "../../../layout/constants/fonts"
-import sizes from "../../../layout/constants/sizes"
 import { useNotifications } from "react-native-notificated"
+import fonts from "../../../constants/fonts"
+import sizes from "../../../constants/sizes"
+import FeedContext from "../../../contexts/Feed"
+import PersistedContext from "../../../contexts/Persisted"
+import LanguageContext from "../../../contexts/Preferences/language"
+import api from "../../../services/Api"
+import { UserShow } from "../../user_show"
+import { CommentsInputProps } from "../comments-types"
 
 export default function Input({
     preview = false,
@@ -101,7 +101,7 @@ export default function Input({
                     {
                         content: commentText,
                     },
-                    { headers: { Authorization: session.account.jwtToken } }
+                    { headers: { Authorization: session.account.jwtToken } },
                 )
                 .then(() => {
                     notify("toast", {
@@ -168,7 +168,7 @@ export default function Input({
                     style={[text, { color }]}
                     placeholder={placeholder}
                     placeholderTextColor={String(
-                        isDarkMode ? colors.gray.grey_05 : colors.transparent.black_50
+                        isDarkMode ? colors.gray.grey_05 : colors.transparent.black_50,
                     )}
                     numberOfLines={1}
                     onChangeText={(text) => setCommentText(text)}
@@ -201,7 +201,7 @@ export default function Input({
                                 ? isDarkMode
                                     ? colors.gray.grey_05
                                     : colors.gray.white
-                                : colors.gray.white
+                                : colors.gray.white,
                         )}
                         width={16}
                         height={16}

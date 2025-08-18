@@ -1,13 +1,13 @@
 import { Animated, View, useColorScheme } from "react-native"
 
-import FeedContext from "@/contexts/Feed"
-import { Moment } from "@/components/moment"
-import { MomentDataProps } from "@/components/moment/context/types"
 import React from "react"
-import RenderComment from "../comments/render-comment"
-import { UserShow } from "@/components/user_show"
-import sizes from "@/layout/constants/sizes"
 import { useKeyboardAnimation } from "react-native-keyboard-controller"
+import { Moment } from "../../../../components/moment"
+import { MomentDataProps } from "../../../../components/moment/context/types"
+import { UserShow } from "../../../../components/user_show"
+import sizes from "../../../../constants/sizes"
+import FeedContext from "../../../../contexts/Feed"
+import RenderComment from "../comments/render-comment"
 
 type renderMomentProps = {
     momentData: MomentDataProps
@@ -159,7 +159,7 @@ export default function RenderMoment({ momentData, isFocused, isFeed }: renderMo
                     <Moment.Root.Center>
                         <View style={{ marginBottom: sizes.margins["2sm"], width: "100%" }}>
                             <Moment.Description />
-                            <View style={{ flexDirection: "row", alignItems: "center"  }}>
+                            <View style={{ flexDirection: "row", alignItems: "center" }}>
                                 <View style={{ flex: 1 }}>
                                     <Moment.LikeButton isLiked={false} />
                                 </View>

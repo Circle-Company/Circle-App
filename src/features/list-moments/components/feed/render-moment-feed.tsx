@@ -1,16 +1,16 @@
 import { Animated, View, useColorScheme } from "react-native"
 
-import FeedContext from "@/contexts/Feed"
-import { LanguagesCodesType } from "@/locales/LanguageTypes"
-import { Moment } from "@/components/moment"
-import { MomentProps } from "@/contexts/Feed/types"
 import React from "react"
-import RenderCommentFeed from "./render-comment-feed"
-import ReportButton from "@/components/moment/components/moment-report-button"
-import { UserShow } from "@/components/user_show"
-import { colors } from "@/layout/constants/colors"
-import sizes from "@/layout/constants/sizes"
 import { useKeyboardAnimation } from "react-native-keyboard-controller"
+import { Moment } from "../../../../components/moment"
+import ReportButton from "../../../../components/moment/components/moment-report-button"
+import { UserShow } from "../../../../components/user_show"
+import { colors } from "../../../../constants/colors"
+import sizes from "../../../../constants/sizes"
+import FeedContext from "../../../../contexts/Feed"
+import { MomentProps } from "../../../../contexts/Feed/types"
+import { LanguagesCodesType } from "../../../../locales/LanguageTypes"
+import RenderCommentFeed from "./render-comment-feed"
 
 type renderMomentProps = {
     momentData: MomentProps
@@ -32,7 +32,7 @@ export default function RenderMomentFeed({ momentData, isFocused, isFeed }: rend
         user: {
             ...momentData.user,
             id: String(momentData.user.id),
-            you_follow: momentData.user.isFollowing
+            you_follow: momentData.user.isFollowing,
         },
         description: momentData.description,
         midia: momentData.midia,
@@ -41,12 +41,12 @@ export default function RenderMomentFeed({ momentData, isFocused, isFeed }: rend
             total_likes_num: momentData.likes_count,
             total_comments_num: momentData.comments_count,
             total_shares_num: 0,
-            total_views_num: 0
+            total_views_num: 0,
         },
         tags: [], // Tags não estão disponíveis no MomentProps
         language: "pt" as LanguagesCodesType, // Idioma padrão
         created_at: momentData.created_at,
-        is_liked: momentData.isLiked
+        is_liked: momentData.isLiked,
     }
 
     React.useEffect(() => {
@@ -185,7 +185,7 @@ export default function RenderMomentFeed({ momentData, isFocused, isFeed }: rend
                     <Moment.Root.Center>
                         <View style={{ marginBottom: sizes.margins["2sm"], width: "100%" }}>
                             <Moment.Description />
-                            <View style={{ flexDirection: "row", alignItems: "center"  }}>
+                            <View style={{ flexDirection: "row", alignItems: "center" }}>
                                 <View style={{ flex: 1 }}>
                                     <Moment.LikeButton isLiked={false} />
                                 </View>

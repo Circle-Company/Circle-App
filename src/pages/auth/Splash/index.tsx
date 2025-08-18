@@ -1,53 +1,57 @@
-import { Image, StatusBar, View } from "react-native"
-import ColorTheme, { colors } from "../../../layout/constants/colors"
-import { default as Fonts, default as fonts } from "../../../layout/constants/fonts"
-
+import Icon from "@/assets/icons/svgs/arrow_circle_right.svg"
+import LogoIcon from "@/assets/icons/svgs/circle-icon-logo.svg"
+import Button from "@/components/buttons/button-standart"
+import { LanguageSelector } from "@/components/language/selector"
+import { Text } from "@/components/Themed"
+import config from "@/config"
+import ColorTheme, { colors } from "@/constants/colors"
+import { default as Fonts, default as fonts } from "@/constants/fonts"
+import sizes from "@/constants/sizes"
 import { useNavigation } from "@react-navigation/native"
+import { LinearGradient } from "expo-linear-gradient"
 import React from "react"
-import LinearGradient from "react-native-linear-gradient"
-import Icon from "../../../assets/icons/svgs/arrow_circle_right.svg"
-import Button from "../../../components/buttons/button-standart"
-import { Text } from "../../../components/Themed"
-import config from "../../../config"
-import sizes from "../../../layout/constants/sizes"
+import { useTranslation } from "react-i18next"
+import { SafeAreaView, StatusBar, View, ViewStyle } from "react-native"
 
 export default function SplashScreen() {
     const navigation: any = useNavigation()
+    const { t } = useTranslation()
 
     const container: any = {
         flex: 1,
+        alignItems: "center",
         backgroundColor: ColorTheme().background,
     }
     const header: any = {
-        alignitems: "center",
+        top: 100,
+        alignItems: "center",
         alignSelf: "center",
         justifyContent: "center",
-        position: "absolute",
-        top: 70,
         color: colors.gray.white,
-        zIndex: 2,
+        zIndex: 1,
     }
-    const center: any = {
+    const langugageContainer: ViewStyle = {
+        marginTop: sizes.margins["1xl"],
+        width: sizes.screens.width,
+        height: sizes.headers.height * 0.5,
         alignItems: "center",
-        position: "absolute",
         justifyContent: "center",
-        bottom: 150,
-        left: -30,
-        zIndex: 2,
+        zIndex: 1,
     }
     const title: any = {
         alignSelf: "center",
         fontFamily: Fonts.family["Black-Italic"],
         fontSize: 48,
         color: colors.gray.white,
-        marginBottom: 10,
+        marginBottom: -5,
+        elevation: 10,
     }
     const slogan: any = {
         fontFamily: Fonts.family["Semibold-Italic"],
         alignSelf: "center",
         textAlign: "center",
-        fontSize: fonts.size.subheadline,
-        color: colors.gray.white,
+        fontSize: fonts.size.subheadline * 0.9,
+        color: colors.gray.grey_04,
     }
     const buttons: any = {
         alignItems: "center",
@@ -60,8 +64,8 @@ export default function SplashScreen() {
     const primaryActionContainer: any = {
         width: sizes.screens.width,
         height: sizes.headers.height,
-        marginTop: sizes.margins["1lg"],
-        marginBottom: sizes.margins["1xl"] * 0.95,
+        marginTop: sizes.margins["2sm"],
+        marginBottom: sizes.margins["1xxl"],
         alignItems: "center",
         justifyContent: "center",
     }
@@ -69,21 +73,14 @@ export default function SplashScreen() {
         fontSize: fonts.size.body * 1.2,
         fontFamily: fonts.family["Bold-Italic"],
         color: colors.gray.black,
-        marginRight: sizes.margins["2md"],
+        marginRight: sizes.margins["3sm"],
     }
 
     const secundaryActionText: any = {
-        fontSize: fonts.size.body,
-        fontFamily: fonts.family.Semibold,
-        color: colors.gray.white,
-    }
-
-    const inferior_gradient: any = {
-        width: sizes.window.width,
-        height: sizes.window.height / 1.8,
-        position: "absolute",
-        zIndex: 1,
-        bottom: 0,
+        fontSize: fonts.size.body * 0.9,
+        fontFamily: fonts.family["Semibold-Italic"],
+        color: colors.purple.purple_00,
+        textDecorationLine: "underline",
     }
 
     const superior_gradient: any = {
@@ -92,48 +89,96 @@ export default function SplashScreen() {
         position: "absolute",
         zIndex: 1,
         top: 0,
+        opacity: 0.55,
+    }
+
+    const inferior_gradient: any = {
+        width: sizes.window.width,
+        height: sizes.window.height / 2,
+        position: "absolute",
+        zIndex: 1,
+        bottom: 0,
+        opacity: 0,
+    }
+
+    const logoContainer: ViewStyle = {
+        marginBottom: sizes.margins["1md"],
+        width: 190,
+        height: 190,
+        borderRadius: 30,
+        alignItems: "center",
+        justifyContent: "center",
+        overflow: "hidden",
+    }
+    const iconGradient: any = {
+        width: 190,
+        height: 190,
+        position: "absolute",
+        zIndex: 0,
+        top: 0,
     }
 
     return (
-        <View style={container}>
-            <StatusBar translucent barStyle={"light-content"} backgroundColor={colors.gray.black} />
-            <Image
-                style={{ width: sizes.window.width, height: sizes.window.height, opacity: 0.9 }}
-                resizeMode="cover"
-                source={require("../../../assets/images/bg/bg4.jpg")}
+        <SafeAreaView style={container}>
+            <StatusBar barStyle={"light-content"} backgroundColor={colors.gray.black} />
+            <LinearGradient
+                renderToHardwareTextureAndroid
+                colors={["rgba(42, 42, 42, 1)", "#00000000"]}
+                style={superior_gradient}
             />
-            <LinearGradient colors={["#00000000", "#000000"]} style={inferior_gradient} />
-            <LinearGradient colors={["#000000", "#00000000"]} style={superior_gradient} />
+
+            <LinearGradient
+                renderToHardwareTextureAndroid
+                colors={["#00000000", colors.purple.purple_09]}
+                style={inferior_gradient}
+            />
+
+            <View style={langugageContainer}>
+                <LanguageSelector />
+            </View>
+
             <View style={header}>
-                <Text style={title}>{config.APPLICATION_SHORT_NAME}</Text>
+                <View style={logoContainer}>
+                    <LinearGradient
+                        renderToHardwareTextureAndroid
+                        colors={[colors.purple.purple_04, colors.purple.purple_08]}
+                        style={iconGradient}
+                    />
+                    <LogoIcon fill="#edddffff" width={100} height={100} />
+                </View>
+                <Text style={title}>{config.APPLICATION_NAME}</Text>
                 <Text style={slogan}>{config.APPLICATION_DESCRIPTION}</Text>
             </View>
-            <View style={center} />
 
             <View style={buttons}>
                 <Button
                     action={() => {
                         navigation.navigate("Auth-SignIn")
                     }}
+                    margins={false}
+                    style={{
+                        marginBottom: 0,
+                    }}
                     backgroundColor={"#00000000"}
                 >
-                    <Text style={secundaryActionText}>Already have a account</Text>
+                    <Text style={secundaryActionText}>{t("Sign In with Circle")}</Text>
                 </Button>
                 <View style={primaryActionContainer}>
                     <Button
                         action={() => {
                             navigation.navigate("Auth-SignUp-Username")
                         }}
+                        style={{ paddingHorizontal: sizes.paddings["1lg"] }}
+                        margins={false}
                         backgroundColor={colors.gray.white.toString()}
                         bounciness={10}
-                        width={300}
-                        height={70}
+                        height={60}
                     >
-                        <Text style={primaryActionText}>Create Account</Text>
+                        <Text style={primaryActionText}>{t("Create Account")}</Text>
                         <Icon width={26} height={26} fill={colors.gray.black.toString()} />
                     </Button>
                 </View>
             </View>
-        </View>
+        </SafeAreaView>
     )
 }

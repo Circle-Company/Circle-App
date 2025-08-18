@@ -1,3 +1,4 @@
+import { PanResponder, TextStyle, View, ViewStyle, useColorScheme } from "react-native"
 import Animated, {
     Easing,
     interpolate,
@@ -9,19 +10,18 @@ import Animated, {
     withSpring,
     withTiming,
 } from "react-native-reanimated"
-import ColorTheme, { colors } from "../../layout/constants/colors"
-import { PanResponder, TextStyle, View, ViewStyle, useColorScheme } from "react-native"
+import ColorTheme, { colors } from "../../constants/colors"
 
-import { Loading } from "../../components/loading"
 import React from "react"
+import { Loading } from "../../components/loading"
 import { Text } from "../../components/Themed"
-import { Vibrate } from "./useHapticFeedback"
 import config from "../../config"
-import fonts from "../../layout/constants/fonts"
-import sizes from "../../layout/constants/sizes"
+import fonts from "../../constants/fonts"
+import sizes from "../../constants/sizes"
+import { Vibrate } from "./useHapticFeedback"
 
 type AnimatedFlatlistProps<T> = {
-    data: Array<T>
+    data: T[]
     isLoading?: boolean
     skeleton?: React.ReactElement
     renderItem: ({ item, index }: { item: T; index: number }) => React.ReactElement
@@ -58,9 +58,7 @@ const DefaultEmptyComponent = () => {
 
     return (
         <View style={emptyContainerStyle}>
-            <Text style={emptyTextStyle}>
-                Nenhum item encontrado
-            </Text>
+            <Text style={emptyTextStyle}>Nenhum item encontrado</Text>
         </View>
     )
 }
@@ -85,7 +83,7 @@ const AnimatedListItem = React.memo(
                 index,
                 [0, 5], // Aplica o efeito nos primeiros 5 itens
                 [1, 0.1], // O primeiro item é mais afetado, o efeito diminui gradualmente
-                { extrapolateRight: "clamp" }
+                { extrapolateRight: "clamp" },
             )
 
             // Aplica a distorção vertical
@@ -105,7 +103,7 @@ const AnimatedListItem = React.memo(
         })
 
         return <Animated.View style={itemStyle}>{renderItem({ item, index })}</Animated.View>
-    }
+    },
 )
 
 AnimatedListItem.displayName = "AnimatedListItem"
@@ -251,7 +249,7 @@ export function AnimatedVerticalFlatlist<T>({
                     const resistance = 0.8 // Aumentado de 0.6 para 0.8 (mais suave)
                     const newPosition = Math.min(
                         maxDistance,
-                        Math.max(0, gestureState.dy * resistance)
+                        Math.max(0, gestureState.dy * resistance),
                     )
 
                     pullDownPosition.value = newPosition
@@ -268,7 +266,7 @@ export function AnimatedVerticalFlatlist<T>({
                     })
                 },
             }),
-        [scrollPosition.value, onPanRelease, isReadyToRefresh, pullDownPosition]
+        [scrollPosition.value, onPanRelease, isReadyToRefresh, pullDownPosition],
     )
 
     // Otimizar a animação do ícone de refresh
@@ -278,25 +276,25 @@ export function AnimatedVerticalFlatlist<T>({
             pullDownPosition.value,
             [0, REFRESH_THRESHOLD],
             [0, 360], // Reduzido de 720 para 360 (uma volta completa)
-            { extrapolateRight: "clamp" }
+            { extrapolateRight: "clamp" },
         )
 
         return {
             opacity: refreshing
                 ? 0.8
                 : interpolate(pullDownPosition.value, [0, 25, REFRESH_THRESHOLD], [0.3, 0.6, 1], {
-                    extrapolateRight: "clamp",
-                }),
+                      extrapolateRight: "clamp",
+                  }),
             transform: [
                 {
                     scale: refreshing
                         ? 1
                         : interpolate(
-                            pullDownPosition.value,
-                            [0, REFRESH_THRESHOLD],
-                            [0.7, 1], // Simplificado para ser mais direto
-                            { extrapolateRight: "clamp" }
-                        ),
+                              pullDownPosition.value,
+                              [0, REFRESH_THRESHOLD],
+                              [0.7, 1], // Simplificado para ser mais direto
+                              { extrapolateRight: "clamp" },
+                          ),
                 },
                 {
                     rotate: refreshing ? `${rotation.value}deg` : `${pullRotation}deg`,
@@ -314,7 +312,7 @@ export function AnimatedVerticalFlatlist<T>({
                     easing: Easing.bezier(0.4, 0, 0.2, 1),
                 }),
                 -1,
-                false
+                false,
             )
         } else {
             rotation.value = withTiming(0, {
@@ -348,7 +346,7 @@ export function AnimatedVerticalFlatlist<T>({
             pullDownPosition.value,
             [0, 50, 100, 150],
             [0, 5, 12, 20],
-            { extrapolateRight: "clamp" }
+            { extrapolateRight: "clamp" },
         )
         return {
             transform: [{ translateY: pullDownPosition.value }],
@@ -370,7 +368,7 @@ export function AnimatedVerticalFlatlist<T>({
                 elasticDistortion={elasticDistortion}
             />
         ),
-        [renderItem, elasticDistortion]
+        [renderItem, elasticDistortion],
     )
 
     const styles = {
@@ -422,18 +420,17 @@ export function AnimatedVerticalFlatlist<T>({
         } as ViewStyle,
 
         flatlist: {
-            backgroundColor: backgroundColor? backgroundColor : isDarkMode ? colors.gray.black : colors.gray.white,
+            backgroundColor: backgroundColor
+                ? backgroundColor
+                : isDarkMode
+                ? colors.gray.black
+                : colors.gray.white,
         } as ViewStyle,
     }
 
     return (
-        <View
-            pointerEvents={refreshing ? "none" : "auto"}
-            style={styles.container}
-        >
-            <Animated.View
-                style={[styles.refreshContainer, pullDownStyles]}
-            >
+        <View pointerEvents={refreshing ? "none" : "auto"} style={styles.container}>
+            <Animated.View style={[styles.refreshContainer, pullDownStyles]}>
                 <Animated.View style={refreshIconStyles}>
                     {CustomRefreshIcon ? (
                         <CustomRefreshIcon />
@@ -441,7 +438,13 @@ export function AnimatedVerticalFlatlist<T>({
                         <Text
                             style={[
                                 styles.refreshText,
-                                { opacity: interpolate(pullDownPosition.value, [0, REFRESH_THRESHOLD], [0.5, 1]) }
+                                {
+                                    opacity: interpolate(
+                                        pullDownPosition.value,
+                                        [0, REFRESH_THRESHOLD],
+                                        [0.5, 1],
+                                    ),
+                                },
                             ]}
                         >
                             {config.APPLICATION_SHORT_NAME}
@@ -456,9 +459,7 @@ export function AnimatedVerticalFlatlist<T>({
             >
                 {isLoading ? (
                     skeleton ? (
-                        <View style={styles.skeletonContainer}>
-                            {skeleton}
-                        </View>
+                        <View style={styles.skeletonContainer}>{skeleton}</View>
                     ) : null
                 ) : (
                     <Animated.FlatList

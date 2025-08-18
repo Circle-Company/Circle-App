@@ -1,12 +1,12 @@
+import * as LocalAuthentication from "expo-local-authentication"
 import React from "react"
 import { notify } from "react-native-notificated"
-import TouchID from "react-native-simple-biometrics"
 import CheckIcon from "../../assets/icons/svgs/check_circle.svg"
 import ErrorIcon from "../../assets/icons/svgs/exclamationmark_circle.svg"
+import { colors } from "../../constants/colors"
 import PersistedContext from "../../contexts/Persisted"
 import LanguageContext from "../../contexts/Preferences/language"
 import MemoryContext from "../../contexts/memory"
-import { colors } from "../../layout/constants/colors"
 import api from "../../services/Api"
 
 type EditMemoryProviderProps = {
@@ -38,7 +38,7 @@ export function EditMemoryProvider({ children }: EditMemoryProviderProps) {
     const { session } = React.useContext(PersistedContext)
     const { memory } = React.useContext(MemoryContext)
     const [title, setTitle] = React.useState(
-        memory.title ? memory.title : t("memory title") + "..."
+        memory.title ? memory.title : t("memory title") + "...",
     )
     const [selectedMoments, setSelectedMoments] = React.useState<Moment[]>([])
 
@@ -52,7 +52,7 @@ export function EditMemoryProvider({ children }: EditMemoryProviderProps) {
     function deleteMomentFromList(moment: Moment) {
         if (selectedMoments.length > 0)
             setSelectedMoments((prevSelectedMoments) =>
-                prevSelectedMoments.filter((m: Moment) => m.id !== moment.id)
+                prevSelectedMoments.filter((m: Moment) => m.id !== moment.id),
             )
     }
 
@@ -68,7 +68,7 @@ export function EditMemoryProvider({ children }: EditMemoryProviderProps) {
                         memory_id: memory.id,
                         moments_list: moments_ids_list,
                     },
-                    { headers: { Authorization: session.account.jwtToken } }
+                    { headers: { Authorization: session.account.jwtToken } },
                 )
                 .then(() => {
                     notify("toast", {
@@ -116,7 +116,7 @@ export function EditMemoryProvider({ children }: EditMemoryProviderProps) {
                         memory_id: memory.id,
                         title,
                     },
-                    { headers: { Authorization: session.account.jwtToken } }
+                    { headers: { Authorization: session.account.jwtToken } },
                 )
                 .then(() => {
                     notify("toast", {
@@ -155,10 +155,10 @@ export function EditMemoryProvider({ children }: EditMemoryProviderProps) {
 
     async function deleteMemory() {
         try {
-            const isAuthenticated = await TouchID.requestBioAuth(
-                t("Make sure it's you"),
-                t("You're deleting this memory")
-            )
+            const isAuthenticated = await LocalAuthentication.authenticateAsync({
+                biometricsSecurityLevel: "weak",
+                promptMessage: t("Delete Memory Confirmation"),
+            })
             if (isAuthenticated) {
                 await api
                     .post(
@@ -167,7 +167,7 @@ export function EditMemoryProvider({ children }: EditMemoryProviderProps) {
                             user_id: session.user.id,
                             memory_id: memory.id,
                         },
-                        { headers: { Authorization: session.account.jwtToken } }
+                        { headers: { Authorization: session.account.jwtToken } },
                     )
                     .then(() => {
                         notify("toast", {

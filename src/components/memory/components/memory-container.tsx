@@ -1,7 +1,7 @@
 import React from "react"
 import { View } from "react-native"
-import ColorTheme from "../../../layout/constants/colors"
-import sizes from "../../../layout/constants/sizes"
+import ColorTheme from "../../../constants/colors"
+import sizes from "../../../constants/sizes"
 import { MidiaRender } from "../../midia_render"
 import { MemoryContainerProps } from "../memory-types"
 

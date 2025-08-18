@@ -1,9 +1,9 @@
 // Filename: UsernameScreen.spec.tsx
 
-import AuthContext, { AuthContextsData } from "@/contexts/Auth"
 import { useNavigation } from "@react-navigation/native"
 import { act, fireEvent, render } from "@testing-library/react-native"
 import React from "react"
+import AuthContext, { AuthContextsData } from "../../../contexts/Auth"
 import UsernameScreen from "./Username"
 
 const mockedColorScheme = jest.fn()
@@ -36,7 +36,7 @@ const renderWithProvider = (contextOverrides = {}) => {
     const utils = render(
         <AuthContext.Provider value={contextValue}>
             <UsernameScreen />
-        </AuthContext.Provider>
+        </AuthContext.Provider>,
     )
 
     return { ...utils, contextValue }

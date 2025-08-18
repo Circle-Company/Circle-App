@@ -17,7 +17,7 @@ export type GeolocationContextsData = {
 
 // Contexto
 const GeolocationContext = React.createContext<GeolocationContextsData>(
-    {} as GeolocationContextsData
+    {} as GeolocationContextsData,
 )
 
 export function Provider({ children }: GeolocationProviderProps) {
@@ -61,7 +61,7 @@ export function Provider({ children }: GeolocationProviderProps) {
     }
 
     // Função para obter e atualizar a localização do usuário
-    const useUpdateUserLocation = async () => {
+    const UseUpdateUserLocation = async () => {
         const hasPermission = await requestLocationPermission()
         if (!hasPermission) throw new Error("Location permission is not granted")
 
@@ -84,7 +84,7 @@ export function Provider({ children }: GeolocationProviderProps) {
                     console.error("Error getting location:", error)
                     reject(error)
                 },
-                { enableHighAccuracy: true, timeout: 15000, maximumAge: 10000 }
+                { enableHighAccuracy: true, timeout: 15000, maximumAge: 10000 },
             )
         })
     }
@@ -93,7 +93,7 @@ export function Provider({ children }: GeolocationProviderProps) {
         if (!session.user.id) {
             throw new Error("User ID is not available")
         }
-        useUpdateUserLocation()
+        UseUpdateUserLocation()
     }
 
     // Inicia o intervalo para atualização a cada 5 minutos
@@ -104,14 +104,18 @@ export function Provider({ children }: GeolocationProviderProps) {
 
         intervalRef.current = setInterval(() => {
             console.log(
-                `⏰ Executando atualização periódica de localização (intervalo de ${LOCATION_UPDATE_INTERVAL / 60000} minutos)`
+                `⏰ Executando atualização periódica de localização (intervalo de ${
+                    LOCATION_UPDATE_INTERVAL / 60000
+                } minutos)`,
             )
             updateUserLocation().catch((error) => {
                 console.error("Error updating location in interval:", error)
             })
         }, LOCATION_UPDATE_INTERVAL)
         console.log(
-            `⏱️ Intervalo de atualização de localização iniciado: a cada ${LOCATION_UPDATE_INTERVAL / 60000} minutos`
+            `⏱️ Intervalo de atualização de localização iniciado: a cada ${
+                LOCATION_UPDATE_INTERVAL / 60000
+            } minutos`,
         )
     }
 
@@ -130,7 +134,7 @@ export function Provider({ children }: GeolocationProviderProps) {
             // Verifica se temos dados do usuário na memória
             if (session.user.id) {
                 console.log(
-                    `🔄 Iniciando serviço de localização para usuário ID: ${session.user.id}`
+                    `🔄 Iniciando serviço de localização para usuário ID: ${session.user.id}`,
                 )
                 try {
                     // Atualiza a localização imediatamente
@@ -143,7 +147,7 @@ export function Provider({ children }: GeolocationProviderProps) {
                 }
             } else {
                 console.log(
-                    "⚠️ Usuário não encontrado na memória, serviço de localização não iniciado"
+                    "⚠️ Usuário não encontrado na memória, serviço de localização não iniciado",
                 )
             }
         }

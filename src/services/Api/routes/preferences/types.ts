@@ -1,4 +1,4 @@
-import { LanguagesCodesType } from "locales/LanguageTypes"
+import { LanguagesCodesType } from "../../../../locales/LanguageTypes"
 
 export type GetUserPreferencesProps = {
     userId: string

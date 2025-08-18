@@ -1,14 +1,14 @@
+import MoreIcon from "@/assets/icons/svgs/ellipsis.svg"
 import React from "react"
-import MoreIcon from "../../../assets/icons/svgs/ellipsis.svg"
+import ColorTheme from "../../../constants/colors"
 import BottomSheetContext from "../../../contexts/bottomSheet"
 import MemoryContext from "../../../contexts/memory"
-import ColorTheme from "../../../layout/constants/colors"
 import ButtonStandart from "../../buttons/button-standart"
 import MomentContext from "../context"
 import { MomentDateProps } from "../moment-types"
 import Options from "./moment-options"
 
-export default function more({
+export default function More({
     color = String(ColorTheme().text),
     backgroundColor = String(ColorTheme().backgroundDisabled),
 }: MomentDateProps) {

@@ -1,8 +1,8 @@
+import CheckIcon from "@/assets/icons/svgs/check_circle.svg"
 import { useNavigation } from "@react-navigation/native"
 import React from "react"
 import { notify } from "react-native-notificated"
-import CheckIcon from "../assets/icons/svgs/check_circle.svg"
-import { colors } from "../layout/constants/colors"
+import { colors } from "../constants/colors"
 import api from "../services/Api"
 import PersistedContext from "./Persisted"
 
@@ -38,7 +38,7 @@ export type SelectMomentsContextsData = {
 }
 
 const SelectMomentsContext = React.createContext<SelectMomentsContextsData>(
-    {} as SelectMomentsContextsData
+    {} as SelectMomentsContextsData,
 )
 
 export function Provider({ children }: SelectMomentsProviderProps) {
@@ -73,7 +73,7 @@ export function Provider({ children }: SelectMomentsProviderProps) {
                 .post(
                     "/memory/create",
                     { user_id: session.user.id.toString(), title },
-                    { headers: { Authorization: session.account.jwtToken } }
+                    { headers: { Authorization: session.account.jwtToken } },
                 )
                 .then(function (response) {
                     notify("toast", {
@@ -111,7 +111,7 @@ export function Provider({ children }: SelectMomentsProviderProps) {
                 .post(
                     "/memory/add-moment",
                     { memory_id, moments_list: [...filtered_moments] },
-                    { headers: { Authorization: session.account.jwtToken } }
+                    { headers: { Authorization: session.account.jwtToken } },
                 )
                 .then(function (response) {
                     return response.data
@@ -136,7 +136,7 @@ export function Provider({ children }: SelectMomentsProviderProps) {
     async function deleteMomentFromList(moment: Moment) {
         if (selectedMoments.length > 0)
             setSelectedMoments((prevSelectedMoments) =>
-                prevSelectedMoments.filter((m: Moment) => m.id !== moment.id)
+                prevSelectedMoments.filter((m: Moment) => m.id !== moment.id),
             )
     }
 

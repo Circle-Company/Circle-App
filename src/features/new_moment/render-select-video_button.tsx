@@ -1,10 +1,10 @@
 import { Text, TextStyle, TouchableOpacity, ViewStyle } from "react-native"
 
-import NewMomentContext from "@/contexts/newMoment"
 import React from "react"
-import { colors } from "@/layout/constants/colors"
-import fonts from "@/layout/constants/fonts"
 import { launchImageLibrary } from "react-native-image-picker"
+import { colors } from "../../constants/colors"
+import fonts from "../../constants/fonts"
+import NewMomentContext from "../../contexts/newMoment"
 
 export default function RenderSelectVideoFromGalleryButton() {
     const { setSelectedVideo } = React.useContext(NewMomentContext)
@@ -21,7 +21,7 @@ export default function RenderSelectVideoFromGalleryButton() {
     const buttonTextStyle: TextStyle = {
         color: colors.gray.white,
         fontSize: 16,
-        fontFamily: fonts.family.Bold
+        fontFamily: fonts.family.Bold,
     }
 
     const selectVideo = async () => {

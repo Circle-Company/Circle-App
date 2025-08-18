@@ -1,12 +1,12 @@
-import ColorTheme, { colors } from "@/layout/constants/colors"
 import { Animated, Pressable, TextStyle, View, ViewStyle, useColorScheme } from "react-native"
 import Reanimated, { FadeInDown } from "react-native-reanimated"
+import ColorTheme, { colors } from "../../../constants/colors"
 
-import { Text } from "@/components/Themed"
-import { useDistanceFormatter } from "@/lib/hooks/useDistanceFormatter"
 import React from "react"
-import fonts from "../../../layout/constants/fonts"
-import sizes from "../../../layout/constants/sizes"
+import fonts from "../../../constants/fonts"
+import sizes from "../../../constants/sizes"
+import { useDistanceFormatter } from "../../../lib/hooks/useDistanceFormatter"
+import { Text } from "../../Themed"
 import { UserShow } from "../../user_show"
 import { RenderItemReciveDataObjectProps } from "../types"
 
@@ -15,11 +15,11 @@ export default function RenderUser({ user }: RenderItemReciveDataObjectProps) {
     const animationScale = 0.9
     const isDarkMode = useColorScheme() === "dark"
     const animatedScale = React.useRef(new Animated.Value(1)).current
-    
+
     React.useEffect(() => {
         animatedScale.setValue(1)
     }, [animatedScale, user])
-    
+
     const HandleButtonAnimation = () => {
         Animated.spring(animatedScale, {
             toValue: 1,
@@ -55,9 +55,9 @@ export default function RenderUser({ user }: RenderItemReciveDataObjectProps) {
         flexDirection: "row",
         alignSelf: "center",
         alignItems: "center",
-        backgroundColor: isDarkMode ? colors.gray.grey_09: colors.gray.grey_02,
+        backgroundColor: isDarkMode ? colors.gray.grey_09 : colors.gray.grey_02,
         borderRadius: sizes.borderRadius["1md"],
-        marginBottom: sizes.margins["2sm"]
+        marginBottom: sizes.margins["2sm"],
     }
     const container_left: ViewStyle = {
         alignItems: "center",
@@ -87,7 +87,7 @@ export default function RenderUser({ user }: RenderItemReciveDataObjectProps) {
         borderRadius: 100,
         alignItems: "center",
         justifyContent: "center",
-        flexDirection: "row"
+        flexDirection: "row",
     }
     const container_right: ViewStyle = {
         alignItems: "flex-end",
@@ -97,36 +97,37 @@ export default function RenderUser({ user }: RenderItemReciveDataObjectProps) {
 
     const animated_container: ViewStyle = {
         transform: [{ scale: animatedScale }],
-        flex: 1
+        flex: 1,
     }
 
     return (
         <Reanimated.View entering={FadeInDown.duration(100)} style={container}>
             <Animated.View style={animated_container}>
                 <Pressable onPressIn={HandlePressIn} onPressOut={HandlePressOut}>
-                    <UserShow.Root data={{
-                        ...user,
-                        profile_picture: {
-                            small_resolution: user.profile_picture.tiny_resolution || "",
-                            tiny_resolution: user.profile_picture.tiny_resolution || ""
-                        }
-                    }}>
+                    <UserShow.Root
+                        data={{
+                            ...user,
+                            profile_picture: {
+                                small_resolution: user.profile_picture.tiny_resolution || "",
+                                tiny_resolution: user.profile_picture.tiny_resolution || "",
+                            },
+                        }}
+                    >
                         <View style={container_left}>
                             <View style={inner_container_left}>
                                 <Text style={container_left_text}>
                                     {useDistanceFormatter(user.distance_km)}
                                 </Text>
-                            </View>                            
+                            </View>
                             <UserShow.ProfilePicture
                                 pictureDimensions={{ width: 40, height: 40 }}
                                 displayOnMoment={false}
                             />
-
                         </View>
                         <View style={container_center}>
                             <UserShow.Username
                                 margin={0}
-                                truncatedSize={user.follow_you ? user.verifyed ? 7 : 10 : 14}
+                                truncatedSize={user.follow_you ? (user.verifyed ? 7 : 10) : 14}
                                 fontSize={fonts.size.body}
                                 displayOnMoment={false}
                                 fontFamily={fonts.family.Bold}
@@ -136,7 +137,7 @@ export default function RenderUser({ user }: RenderItemReciveDataObjectProps) {
                                 style={{
                                     fontSize: fonts.size.body * 0.9,
                                     fontFamily: fonts.family.Semibold,
-                                    color: ColorTheme().textDisabled
+                                    color: ColorTheme().textDisabled,
                                 }}
                             >
                                 {user.name}

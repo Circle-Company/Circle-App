@@ -1,13 +1,13 @@
 import { Animated, ViewStyle } from "react-native"
 
 import AddIcon from "@/assets/icons/svgs/plus_circle-outline.svg"
-import ColorTheme from "@/layout/constants/colors"
-import { Comments } from "@/components/comment"
-import FeedContext from "@/contexts/Feed"
-import LanguageContext from "@/contexts/Preferences/language"
-import { MomentDataProps } from "@/components/moment/context/types"
 import React from "react"
-import ViewMorebutton from "@/components/buttons/view_more"
+import ViewMorebutton from "../../../../components/buttons/view_more"
+import { Comments } from "../../../../components/comment"
+import { MomentDataProps } from "../../../../components/moment/context/types"
+import ColorTheme from "../../../../constants/colors"
+import FeedContext from "../../../../contexts/Feed"
+import LanguageContext from "../../../../contexts/Preferences/language"
 
 type renderCommentProps = {
     moment: MomentDataProps
@@ -19,7 +19,7 @@ export default function RenderComment({ moment, focused }: renderCommentProps) {
     const { commentEnabled, setCommentEnabled, setKeyboardVisible, setFocusedMoment } =
         React.useContext(FeedContext)
     const [animatedOpacityValue] = React.useState(new Animated.Value(1))
-    
+
     React.useEffect(() => {
         if (focused) {
             Animated.timing(animatedOpacityValue, {

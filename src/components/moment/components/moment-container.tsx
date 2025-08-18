@@ -1,18 +1,18 @@
 import React, { useEffect } from "react"
 import Reanimated, { FadeIn, FadeOut } from "react-native-reanimated"
 
-import ColorTheme from "../../../layout/constants/colors"
-import DoubleTapPressable from "../../general/double-tap-pressable"
-import FeedContext from "../../../contexts/Feed"
-import MediaRenderVideo from "../../midia_render/components/midia_render-video"
-import { MidiaRender } from "../../midia_render"
-import { MomentContainerProps } from "../moment-types"
-import MomentContext from "../context"
-import MomentVideoSlider from "../components/moment-video-slider"
-import PersistedContext from "@/contexts/Persisted"
-import { UserShow } from "../../user_show"
 import { View } from "react-native"
-import { videoCacher } from "@/contexts/Feed/functions/video-cacher"
+import ColorTheme from "../../../constants/colors"
+import FeedContext from "../../../contexts/Feed"
+import { videoCacher } from "../../../contexts/Feed/functions/video-cacher"
+import PersistedContext from "../../../contexts/Persisted"
+import DoubleTapPressable from "../../general/double-tap-pressable"
+import { MidiaRender } from "../../midia_render"
+import MediaRenderVideo from "../../midia_render/components/midia_render-video"
+import { UserShow } from "../../user_show"
+import MomentContext from "../context"
+import { MomentContainerProps } from "../moment-types"
+import MomentVideoSlider from "./moment-video-slider"
 
 export default function Container({
     children,
@@ -58,7 +58,7 @@ export default function Container({
         zIndex: 1,
         transform: [{ scale: 3 }],
     }
-    
+
     const sliderContainerStyle = {
         position: "absolute" as const,
         bottom: 0,
@@ -68,8 +68,7 @@ export default function Container({
     }
 
     React.useEffect(() => {
-
-        if(momentData.midia.content_type !== "VIDEO") return
+        if (momentData.midia.content_type !== "VIDEO") return
         const url = momentData.midia.fullhd_resolution || momentData.midia.nhd_resolution
 
         if (!url) return
@@ -90,7 +89,7 @@ export default function Container({
     async function handleDoublePress() {
         if (momentData.user.id != session.user.id) momentUserActions.handleLikeButtonPressed({})
     }
-    
+
     function handleProgressChange(currentTime: number, duration: number) {
         momentVideo.setCurrentTime(currentTime)
         momentVideo.setDuration(duration)
@@ -100,14 +99,14 @@ export default function Container({
         // Agora sempre renderizamos o componente de vídeo, mas controlamos o estado através da prop isFocused
         return (
             <View style={{ width: momentSize.width, height: momentSize.height }}>
-                <MediaRenderVideo 
+                <MediaRenderVideo
                     uri={cachedVideoUri}
                     thumbnailUri={momentData.midia.nhd_thumbnail}
                     hasVideoCache={hasVideoCache}
                     autoPlay={!momentVideo.isPaused}
                     style={{
                         width: momentSize.width,
-                        height: momentSize.height
+                        height: momentSize.height,
                     }}
                     onVideoLoad={(duration) => {
                         console.log("Vídeo carregado com duração:", duration)
@@ -147,7 +146,6 @@ export default function Container({
         
 */
 
-
     return (
         <View style={container}>
             <View style={content_container}>
@@ -165,20 +163,20 @@ export default function Container({
                     </MidiaRender.Root>
                 </DoubleTapPressable>
             </View>
-            
+
             {/* Controles de vídeo (áudio e slider) */}
             {momentData.midia.content_type === "VIDEO" && isFocused && !commentEnabled && (
                 <>
                     <View style={sliderContainerStyle}>
-                        <MomentVideoSlider 
-                            width={momentSize.width * 0.90}
+                        <MomentVideoSlider
+                            width={momentSize.width * 0.9}
                             currentTime={momentVideo.currentTime}
                             duration={momentVideo.duration}
                         />
                     </View>
                 </>
             )}
-            
+
             {!commentEnabled ? (
                 isFocused ? (
                     children
@@ -195,11 +193,7 @@ export default function Container({
                                 pictureDimensions={{ width: 15, height: 15 }}
                             />
                         </View>
-                        <UserShow.Username
-                            scale={0.8}
-                            margin={0}
-                            truncatedSize={8}
-                        />
+                        <UserShow.Username scale={0.8} margin={0} truncatedSize={8} />
                     </UserShow.Root>
                 </Reanimated.View>
             )}

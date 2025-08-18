@@ -2,7 +2,7 @@ import React from "react"
 import { View } from "react-native"
 import { Memory } from "../../../components/memory"
 import { Moment } from "../../../components/moment"
-import sizes from "../../../layout/constants/sizes"
+import sizes from "../../../constants/sizes"
 
 export type MemoryMomentObjectProps = {
     id: string
@@ -13,7 +13,7 @@ export type MemoryMomentObjectProps = {
 }
 
 export type MemoryObjectProps = {
-    moments: Array<MemoryMomentObjectProps>
+    moments: MemoryMomentObjectProps[]
 }
 
 type RenderMemoryProps = {
@@ -46,7 +46,8 @@ export default function render_memory({ memory, scale = 1 }: RenderMemoryProps) 
         <View style={container}>
             <Memory.MainRoot data={memory}>
                 {memory.moments.map((moment, index) => {
-                    const container = (index == 0 && c0) || (index == 1 && c1) || (index == 2 && c2)
+                    const container =
+                        (index === 0 && c0) || (index === 1 && c1) || (index === 2 && c2)
                     return (
                         <Moment.Root.Main
                             key={moment.id}

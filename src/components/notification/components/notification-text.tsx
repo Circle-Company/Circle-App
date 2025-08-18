@@ -1,15 +1,15 @@
 import React from "react"
 import { View } from "react-native"
+import ColorTheme from "../../../constants/colors"
+import fonts from "../../../constants/fonts"
+import sizes from "../../../constants/sizes"
 import LanguageContext from "../../../contexts/Preferences/language"
 import { timeDifferenceConverter } from "../../../helpers/dateConversor"
-import ColorTheme from "../../../layout/constants/colors"
-import fonts from "../../../layout/constants/fonts"
-import sizes from "../../../layout/constants/sizes"
 import { Text } from "../../Themed"
 import { UserShow } from "../../user_show"
 import { useIndividualNotificationContext } from "../notification-individual_context"
 
-export default function notification_text() {
+export default function NotificationText() {
     const { notification } = useIndividualNotificationContext()
     const { t } = React.useContext(LanguageContext)
     const [text, setText] = React.useState<string>("")

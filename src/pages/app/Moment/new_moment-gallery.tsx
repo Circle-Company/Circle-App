@@ -1,7 +1,7 @@
 import React from "react"
 import { StatusBar, useColorScheme } from "react-native"
 import { Text, View } from "../../../components/Themed"
-import ColorTheme from "../../../layout/constants/colors"
+import ColorTheme from "../../../constants/colors"
 
 export default function NewMomentGalleryScreen() {
     const isDarkMode = useColorScheme() === "dark"

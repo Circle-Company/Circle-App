@@ -2,12 +2,12 @@ import React from "react"
 import { FlatList, RefreshControl, useColorScheme, View } from "react-native"
 import OfflineCard from "../../../components/general/offline"
 import { Loading } from "../../../components/loading"
+import { colors } from "../../../constants/colors"
+import sizes from "../../../constants/sizes"
 import MemoryContext from "../../../contexts/memory"
 import NetworkContext from "../../../contexts/network"
 import PersistedContext from "../../../contexts/Persisted"
 import LanguageContext from "../../../contexts/Preferences/language"
-import { colors } from "../../../layout/constants/colors"
-import sizes from "../../../layout/constants/sizes"
 import api from "../../../services/Api"
 import EndReached from "../list-memories-preview/components/end-reached"
 import { RenderMemoryMoment } from "./components/render-memory_moment"
@@ -32,11 +32,11 @@ export default function ListMemoryMoments() {
             const contentOffsetX = event.nativeEvent.contentOffset.x + 60
             const screenWidth = sizes.screens.width
             const centerIndex = Math.floor(
-                (contentOffsetX + screenWidth / 2) / (sizes.moment.small.width + margin)
+                (contentOffsetX + screenWidth / 2) / (sizes.moment.small.width + margin),
             )
             setCenterIndex(centerIndex >= 0 ? centerIndex : 0)
         },
-        [setCenterIndex]
+        [setCenterIndex],
     )
 
     React.useEffect(() => {
@@ -50,7 +50,7 @@ export default function ListMemoryMoments() {
                 {
                     memory_id: memory?.id,
                 },
-                { headers: { Authorization: session.account.jwtToken } }
+                { headers: { Authorization: session.account.jwtToken } },
             )
             .then(function (response) {
                 if (page == 1) setMemoryMoments(response.data.data)
@@ -148,7 +148,7 @@ export default function ListMemoryMoments() {
             refreshControl={
                 <RefreshControl
                     progressBackgroundColor={String(
-                        isDarkMode ? colors.gray.grey_08 : colors.gray.grey_02
+                        isDarkMode ? colors.gray.grey_08 : colors.gray.grey_02,
                     )}
                     colors={[
                         String(isDarkMode ? colors.gray.grey_04 : colors.gray.grey_04),
@@ -176,8 +176,8 @@ export default function ListMemoryMoments() {
                             index == 0
                                 ? container_0
                                 : container && index + 1 == memoryMoments.length
-                                    ? container_1
-                                    : container
+                                ? container_1
+                                : container
                         }
                     >
                         <RenderMemoryMoment focused={focused} moment={renderData} />

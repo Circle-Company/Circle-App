@@ -1,22 +1,22 @@
 import { Animated, Pressable, useColorScheme } from "react-native"
 
+import { useNavigation } from "@react-navigation/native"
+import React from "react"
+import { colors } from "../../../../constants/colors"
+import sizes from "../../../../constants/sizes"
+import ViewProfileContext from "../../../../contexts/viewProfile"
 import IndividualNotificationContext from "../../notification-individual_context"
 import { NotificationProps } from "../../notification-types"
-import React from "react"
-import ViewProfileContext from "@/contexts/viewProfile"
-import { colors } from "../../../../layout/constants/colors"
-import sizes from "../../../../layout/constants/sizes"
-import { useNavigation } from "@react-navigation/native"
 
 type NotificationContainerProps = {
     children: React.ReactNode
     notification: NotificationProps
 }
-export default function container_main({ children, notification }: NotificationContainerProps) {
+export default function ContainerMain({ children, notification }: NotificationContainerProps) {
     const bounciness = 12
     const animationScale = 0.9
 
-    const { setProfile } = React.useContext(ViewProfileContext)
+    const { userProfile } = React.useContext(ViewProfileContext)
     const isDarkMode = useColorScheme() === "dark"
 
     const navigation: any = useNavigation()
@@ -24,7 +24,7 @@ export default function container_main({ children, notification }: NotificationC
     const animatedScale = React.useRef(new Animated.Value(1)).current
     React.useEffect(() => {
         animatedScale.setValue(1)
-    }, [])
+    }, [animatedScale])
     const HandleButtonAnimation = () => {
         Animated.spring(animatedScale, {
             toValue: 1,
@@ -44,10 +44,10 @@ export default function container_main({ children, notification }: NotificationC
     }
 
     async function handlePress() {
-        if (notification.type == "FOLLOW-USER" || notification.type == "VIEW-USER") {
-            await setProfile(notification.sender_user.id)
+        if (notification.type === "FOLLOW-USER" || notification.type === "VIEW-USER") {
+            await userProfile(notification.sender_user.id)
             navigation.navigate("ProfileNavigator")
-        } else if (notification.type == "LIKE-MOMENT") {
+        } else if (notification.type === "LIKE-MOMENT") {
         }
     }
     const container: any = {

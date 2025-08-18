@@ -1,7 +1,7 @@
-import { Text } from "../../../components/Themed"
-import sizes from "../../../layout/constants/sizes"
-import fonts from "../../../layout/constants/fonts"
 import { View } from "react-native"
+import { Text } from "../../../components/Themed"
+import fonts from "../../../constants/fonts"
+import sizes from "../../../constants/sizes"
 
 type CustomToastProps = {
     title: string

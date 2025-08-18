@@ -1,7 +1,7 @@
 import React from "react"
 import { View } from "react-native"
+import sizes from "../../../../constants/sizes"
 import { MemoryHeaderProps } from "../../memory-types"
-import sizes from "../../../../layout/constants/sizes"
 
 export default function header({ children }: MemoryHeaderProps) {
     const container: any = {

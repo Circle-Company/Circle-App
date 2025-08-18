@@ -1,13 +1,13 @@
-import AccountContext from "@/contexts/account"
-import { AnimatedVerticalScrollView } from "@/lib/hooks/useAnimatedScrollView"
 import CircleIcon from "@/assets/icons/svgs/circle-spinner.svg"
-import ListMemories from "@/features/list-memories/list-memories-preview"
-import PersistedContext from "@/contexts/Persisted"
 import React from "react"
-import RenderProfile from "@/features/render-profile"
-import { RenderProfileSkeleton } from "@/features/render-profile/skeleton"
-import { View } from "@/components/Themed"
-import { colors } from "@/layout/constants/colors"
+import { View } from "../../../components/Themed"
+import { colors } from "../../../constants/colors"
+import AccountContext from "../../../contexts/account"
+import PersistedContext from "../../../contexts/Persisted"
+import ListMemories from "../../../features/list-memories/list-memories-preview"
+import RenderProfile from "../../../features/render-profile"
+import { RenderProfileSkeleton } from "../../../features/render-profile/skeleton"
+import { AnimatedVerticalScrollView } from "../../../lib/hooks/useAnimatedScrollView"
 
 export default function AccountScreen() {
     const { setRefreshing } = React.useContext(AccountContext)
@@ -41,7 +41,7 @@ export default function AccountScreen() {
             ...session.statistics,
         },
         you_follow: false,
-        follow_you: false
+        follow_you: false,
     }
 
     return (
@@ -57,10 +57,7 @@ export default function AccountScreen() {
                 )}
             >
                 {loading ? <RenderProfileSkeleton /> : <RenderProfile user={renderUser} />}
-                <ListMemories
-                    isAccountScreen={true}
-                    user={renderUser}
-                />
+                <ListMemories isAccountScreen={true} user={renderUser} />
             </AnimatedVerticalScrollView>
         </View>
     )

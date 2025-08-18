@@ -22,13 +22,7 @@
             "jsx": true
         }
     },
-    "plugins": [
-        "@typescript-eslint",
-        "react",
-        "react-native",
-        "jest",
-        "unused-imports"
-    ],
+    "plugins": ["@typescript-eslint", "react", "react-native", "jest", "unused-imports"],
     "rules": {
         "no-var": "error",
         "@typescript-eslint/ban-ts-comment": "off",
@@ -48,11 +42,14 @@
         "quotes": ["error", "double"],
         "semi": ["error", "never"],
         "no-unused-vars": "off",
-        "@typescript-eslint/no-unused-vars": ["warn", {
-            "argsIgnorePattern": "^_",
-            "varsIgnorePattern": "^_",
-            "caughtErrorsIgnorePattern": "^_"
-        }],
+        "@typescript-eslint/no-unused-vars": [
+            "warn",
+            {
+                "argsIgnorePattern": "^_",
+                "varsIgnorePattern": "^_",
+                "caughtErrorsIgnorePattern": "^_"
+            }
+        ],
         "unused-imports/no-unused-imports": "warn",
         "unused-imports/no-unused-vars": [
             "warn",

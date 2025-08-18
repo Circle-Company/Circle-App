@@ -9,7 +9,7 @@ import {
     ViewStyle as RNViewStyle,
 } from "react-native"
 
-import ColorTheme from "../layout/constants/colors"
+import ColorTheme from "../constants/colors"
 
 export type { RNTextStyle as TextStyle, RNViewStyle as ViewStyle }
 

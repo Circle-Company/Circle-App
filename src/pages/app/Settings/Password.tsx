@@ -1,16 +1,16 @@
+import Icon from "@/assets/icons/svgs/check_circle.svg"
 import { useNavigation } from "@react-navigation/native"
 import React from "react"
-import { StatusBar, useColorScheme } from "react-native"
-import Icon from "../../../assets/icons/svgs/check_circle.svg"
+import { StatusBar, TextStyle, useColorScheme, ViewStyle } from "react-native"
 import { Text, View } from "../../../components/Themed"
 import PasswordInput from "../../../components/auth/passwordInput"
 import ButtonStandart from "../../../components/buttons/button-standart"
+import ColorTheme, { colors } from "../../../constants/colors"
+import fonts from "../../../constants/fonts"
+import sizes from "../../../constants/sizes"
 import AuthContext from "../../../contexts/Auth"
 import PersistedContext from "../../../contexts/Persisted"
 import LanguageContext from "../../../contexts/Preferences/language"
-import ColorTheme, { colors } from "../../../layout/constants/colors"
-import fonts from "../../../layout/constants/fonts"
-import sizes from "../../../layout/constants/sizes"
 import api from "../../../services/Api"
 
 export default function PasswordScreen() {
@@ -20,35 +20,35 @@ export default function PasswordScreen() {
     const isDarkMode = useColorScheme() === "dark"
     const navigation = useNavigation()
 
-    const container = {
+    const container: ViewStyle = {
         alignItems: "center",
         flex: 1,
     }
 
-    const input_container = {
+    const input_container: ViewStyle = {
         alignItems: "center",
         paddingTop: sizes.paddings["1xxl"] * 0.6,
         paddingBottom: sizes.paddings["1xl"] * 0.8,
     }
 
-    const description = {
+    const description: TextStyle = {
         fontSize: fonts.size.body,
         fontFamily: fonts.family.Medium,
         color: ColorTheme().text,
         marginBottom: sizes.margins["1md"],
     }
 
-    const button_text = {
+    const button_text: TextStyle = {
         fontSize: fonts.size.body * 0.9,
         fontFamily: fonts.family.Semibold,
         color: signInputPassword
             ? colors.gray.white
             : isDarkMode
-                ? colors.gray.grey_04 + "90"
-                : colors.gray.grey_04 + "90",
+            ? colors.gray.grey_04 + "90"
+            : colors.gray.grey_04 + "90",
     }
 
-    const icon = {
+    const icon: ViewStyle = {
         marginLeft: sizes.margins["2sm"],
         top: 0.4,
     }
@@ -62,7 +62,7 @@ export default function PasswordScreen() {
                         user_id: session.user.id,
                         password_input: signInputPassword,
                     },
-                    { headers: { Authorization: session.account.jwtToken } }
+                    { headers: { Authorization: session.account.jwtToken } },
                 )
                 setSignInputPassword("")
                 navigation.goBack()
@@ -79,8 +79,8 @@ export default function PasswordScreen() {
                 barStyle={isDarkMode ? "light-content" : "dark-content"}
             />
             <View style={input_container}>
-                <Text style={description}>You can't get it back if you forget it.</Text>
-                <PasswordInput sign={false} />
+                <Text style={description}>{`You can't get it back if you forget it.`}</Text>
+                <PasswordInput type="signUp" />
             </View>
 
             <ButtonStandart
@@ -101,8 +101,8 @@ export default function PasswordScreen() {
                         signInputPassword
                             ? colors.gray.white
                             : isDarkMode
-                                ? colors.gray.grey_04 + "90"
-                                : colors.gray.grey_04 + "90"
+                            ? colors.gray.grey_04 + "90"
+                            : colors.gray.grey_04 + "90",
                     )}
                     width={17}
                     height={17}

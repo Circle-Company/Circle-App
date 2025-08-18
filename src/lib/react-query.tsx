@@ -1,62 +1,73 @@
-import AsyncStorage from "@react-native-async-storage/async-storage"
 import { createAsyncStoragePersister } from "@tanstack/query-async-storage-persister"
 import { focusManager, QueryClient } from "@tanstack/react-query"
 import {
     PersistQueryClientProvider,
     PersistQueryClientProviderProps,
 } from "@tanstack/react-query-persist-client"
-import React, { useRef, useState } from "react"
+import React, { useState } from "react"
 import { AppState, AppStateStatus } from "react-native"
+import { MMKV } from "react-native-mmkv"
 import PersistedContext from "../contexts/Persisted"
-// any query keys in this array will be persisted to AsyncStorage
+
+// Keys que serão persistidas
 export const labelersDetailedInfoQueryKeyRoot = "labelers-detailed-info"
 const STORED_CACHE_QUERY_KEY_ROOTS = [labelersDetailedInfoQueryKeyRoot]
 
+// Foco React Query baseado no estado do App
 focusManager.setEventListener((onFocus) => {
     const subscription = AppState.addEventListener("change", (status: AppStateStatus) => {
-        focusManager.setFocused(status === "active")
+        onFocus(status === "active")
     })
-
     return () => subscription.remove()
 })
 
+// Criação do QueryClient
 const createQueryClient = () =>
     new QueryClient({
         defaultOptions: {
             queries: {
-                // NOTE
-                // refetchOnWindowFocus breaks some UIs (like feeds)
-                // so we only selectively want to enable this
-                // -prf
                 refetchOnWindowFocus: false,
-                // Structural sharing between responses makes it impossible to rely on
-                // "first seen" timestamps on objects to determine if they're fresh.
-                // Disable this optimization so that we can rely on "first seen" timestamps.
                 structuralSharing: false,
-                // We don't want to retry queries by default, because in most cases we
-                // want to fail early and show a response to the user. There are
-                // exceptions, and those can be made on a per-query basis. For others, we
-                // should give users controls to retry.
                 retry: false,
             },
         },
     })
 
+// Opções de desidratação
 const dehydrateOptions: PersistQueryClientProviderProps["persistOptions"]["dehydrateOptions"] = {
-    shouldDehydrateMutation: (_: any) => false,
+    shouldDehydrateMutation: () => false,
     shouldDehydrateQuery: (query) => {
         return STORED_CACHE_QUERY_KEY_ROOTS.includes(String(query.queryKey[0]))
     },
 }
 
+// Instância do MMKV
+const mmkv = new MMKV()
+
+// Wrapper para MMKV compatível com AsyncStorage
+const mmkvAsyncStorage = {
+    getItem: async (key: string) => {
+        const value = mmkv.getString(key)
+        return value ?? null
+    },
+    setItem: async (key: string, value: string) => {
+        mmkv.set(key, value)
+    },
+    removeItem: async (key: string) => {
+        mmkv.delete(key)
+    },
+}
+
+// QueryProvider
 export function QueryProvider({ children }: { children: React.ReactNode }) {
     const { session } = React.useContext(PersistedContext)
+    const userId = session?.user?.id ?? "logged-out"
+
     return (
         <QueryProviderInner
-            // Enforce we never reuse cache between users.
-            // These two props MUST stay in sync.
-            key={session.user.id}
-            userId={session.user.id}
+            // força recriar cache ao trocar de usuário
+            key={userId}
+            userId={userId}
         >
             {children}
         </QueryProviderInner>
@@ -68,25 +79,21 @@ function QueryProviderInner({
     userId,
 }: {
     children: React.ReactNode
-    userId: number | undefined
+    userId: string | number
 }) {
-    const initialDid = useRef(userId)
-    if (userId !== initialDid.current) {
-        throw Error("Something is very wrong. Expected did to be stable due to key above.")
-    }
-    // We create the query client here so that it's scoped to a specific DID.
-    // Do not move the query client creation outside of this component.
-    const [queryClient, _setQueryClient] = useState(() => createQueryClient())
-    const [persistOptions, _setPersistOptions] = useState(() => {
+    const [queryClient] = useState(() => createQueryClient())
+
+    const [persistOptions] = useState(() => {
         const asyncPersister = createAsyncStoragePersister({
-            storage: AsyncStorage,
-            key: "queryClient-" + (userId ?? "logged-out"),
+            storage: mmkvAsyncStorage,
+            key: `queryClient-${userId}`,
         })
         return {
             persister: asyncPersister,
             dehydrateOptions,
         }
     })
+
     return (
         <PersistQueryClientProvider client={queryClient} persistOptions={persistOptions}>
             {children}

@@ -7,7 +7,7 @@ const videoSources = [
     "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4",
     "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4",
     "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerEscapes.mp4",
-    "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerJoyrides.mp4"
+    "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerJoyrides.mp4",
 ]
 
 // Descrições mais variadas
@@ -16,7 +16,7 @@ const descriptions = [
     "Explorando novos lugares ✨",
     "Mood de hoje 🔥",
     "Só sei que nada sei 🤔",
-    "Dias melhores virão ☀️"
+    "Dias melhores virão ☀️",
 ]
 
 export const singleMomentMock: MomentProps = {
@@ -28,16 +28,16 @@ export const singleMomentMock: MomentProps = {
         verifyed: true,
         profile_picture: {
             small_resolution: "https://randomuser.me/api/portraits/men/1.jpg",
-            tiny_resolution: "https://randomuser.me/api/portraits/men/1.jpg"
+            tiny_resolution: "https://randomuser.me/api/portraits/men/1.jpg",
         },
-        isFollowing: false
+        isFollowing: false,
     },
     description: "Meu primeiro moment! 🔥",
     midia: {
         content_type: "VIDEO",
         nhd_thumbnail: "https://randomuser.me/api/portraits/men/1.jpg",
         fullhd_resolution: videoSources[0],
-        nhd_resolution: videoSources[0]
+        nhd_resolution: videoSources[0],
     },
     comments_count: 5,
     lastComment: {
@@ -48,27 +48,27 @@ export const singleMomentMock: MomentProps = {
             verifyed: false,
             profile_picture: {
                 small_resolution: "https://randomuser.me/api/portraits/women/2.jpg",
-                tiny_resolution: "https://randomuser.me/api/portraits/women/2.jpg"
+                tiny_resolution: "https://randomuser.me/api/portraits/women/2.jpg",
             },
-            isFollowing: true
+            isFollowing: true,
         },
         content: "Muito legal! 👏 Adorei esse momento!",
         statistics: {
-            total_likes_num: 8
+            total_likes_num: 8,
         },
-        created_at: new Date(Date.now() - 300000).toISOString() // 5 minutos atrás
+        created_at: new Date(Date.now() - 300000).toISOString(), // 5 minutos atrás
     },
     likes_count: 42,
     isLiked: false,
     deleted: false,
-    created_at: new Date().toISOString()
+    created_at: new Date().toISOString(),
 }
 
 // Criar um array de diferentes momentos
 export const feedMock: MomentProps[] = [
     // Primeiro momento (original)
     singleMomentMock,
-    
+
     // Segundo momento (modificado)
     {
         ...singleMomentMock,
@@ -78,7 +78,7 @@ export const feedMock: MomentProps[] = [
             content_type: "VIDEO",
             nhd_thumbnail: "https://randomuser.me/api/portraits/women/2.jpg",
             fullhd_resolution: videoSources[1],
-            nhd_resolution: videoSources[1]
+            nhd_resolution: videoSources[1],
         },
         comments_count: 2,
         lastComment: {
@@ -89,20 +89,20 @@ export const feedMock: MomentProps[] = [
                 verifyed: true,
                 profile_picture: {
                     small_resolution: "https://randomuser.me/api/portraits/men/4.jpg",
-                    tiny_resolution: "https://randomuser.me/api/portraits/men/4.jpg"
+                    tiny_resolution: "https://randomuser.me/api/portraits/men/4.jpg",
                 },
-                isFollowing: false
+                isFollowing: false,
             },
             content: "Incrível! 🔥",
             statistics: {
-                total_likes_num: 8
+                total_likes_num: 8,
             },
-            created_at: new Date(Date.now() - 3600000).toISOString() // 1 hora atrás
+            created_at: new Date(Date.now() - 3600000).toISOString(), // 1 hora atrás
         },
         likes_count: 89,
-        isLiked: true
+        isLiked: true,
     },
-    
+
     // Terceiro momento (modificado)
     {
         ...singleMomentMock,
@@ -114,14 +114,14 @@ export const feedMock: MomentProps[] = [
             username: "anasilva",
             profile_picture: {
                 small_resolution: "https://randomuser.me/api/portraits/women/3.jpg",
-                tiny_resolution: "https://randomuser.me/api/portraits/women/3.jpg"
-            }
+                tiny_resolution: "https://randomuser.me/api/portraits/women/3.jpg",
+            },
         },
         midia: {
             content_type: "VIDEO",
             nhd_thumbnail: "https://randomuser.me/api/portraits/women/3.jpg",
             fullhd_resolution: videoSources[2],
-            nhd_resolution: videoSources[2]
+            nhd_resolution: videoSources[2],
         },
         comments_count: 1,
         lastComment: {
@@ -132,20 +132,20 @@ export const feedMock: MomentProps[] = [
                 verifyed: false,
                 profile_picture: {
                     small_resolution: "https://randomuser.me/api/portraits/women/5.jpg",
-                    tiny_resolution: "https://randomuser.me/api/portraits/women/5.jpg"
+                    tiny_resolution: "https://randomuser.me/api/portraits/women/5.jpg",
                 },
-                isFollowing: true
+                isFollowing: true,
             },
             content: "Adorei! ✨",
             statistics: {
-                total_likes_num: 5
+                total_likes_num: 5,
             },
-            created_at: new Date(Date.now() - 7200000).toISOString() // 2 horas atrás
+            created_at: new Date(Date.now() - 7200000).toISOString(), // 2 horas atrás
         },
         likes_count: 234,
-        isLiked: false
+        isLiked: false,
     },
-    
+
     // Quarto momento (sem comentários)
     {
         ...singleMomentMock,
@@ -158,21 +158,21 @@ export const feedMock: MomentProps[] = [
             verifyed: false,
             profile_picture: {
                 small_resolution: "https://randomuser.me/api/portraits/men/4.jpg",
-                tiny_resolution: "https://randomuser.me/api/portraits/men/4.jpg"
-            }
+                tiny_resolution: "https://randomuser.me/api/portraits/men/4.jpg",
+            },
         },
         midia: {
             content_type: "VIDEO",
             nhd_thumbnail: "https://randomuser.me/api/portraits/men/4.jpg",
             fullhd_resolution: videoSources[3],
-            nhd_resolution: videoSources[3]
+            nhd_resolution: videoSources[3],
         },
         comments_count: 0,
         lastComment: undefined,
         likes_count: 127,
-        isLiked: true
+        isLiked: true,
     },
-    
+
     // Quinto momento (modificado)
     {
         ...singleMomentMock,
@@ -184,14 +184,14 @@ export const feedMock: MomentProps[] = [
             username: "juliaferreira",
             profile_picture: {
                 small_resolution: "https://randomuser.me/api/portraits/women/5.jpg",
-                tiny_resolution: "https://randomuser.me/api/portraits/women/5.jpg"
-            }
+                tiny_resolution: "https://randomuser.me/api/portraits/women/5.jpg",
+            },
         },
         midia: {
             content_type: "VIDEO",
             nhd_thumbnail: "https://randomuser.me/api/portraits/women/5.jpg",
             fullhd_resolution: videoSources[4],
-            nhd_resolution: videoSources[4]
+            nhd_resolution: videoSources[4],
         },
         comments_count: 5,
         lastComment: {
@@ -202,24 +202,24 @@ export const feedMock: MomentProps[] = [
                 verifyed: true,
                 profile_picture: {
                     small_resolution: "https://randomuser.me/api/portraits/men/6.jpg",
-                    tiny_resolution: "https://randomuser.me/api/portraits/men/6.jpg"
+                    tiny_resolution: "https://randomuser.me/api/portraits/men/6.jpg",
                 },
-                isFollowing: false
+                isFollowing: false,
             },
             content: "Que momento incrível! 😍",
             statistics: {
-                total_likes_num: 12
+                total_likes_num: 12,
             },
-            created_at: new Date(Date.now() - 1800000).toISOString() // 30 minutos atrás
+            created_at: new Date(Date.now() - 1800000).toISOString(), // 30 minutos atrás
         },
         likes_count: 531,
-        isLiked: false
-    }
+        isLiked: false,
+    },
 ]
 
 // Para simular a resposta da API
 export const mockApiResponse = {
     data: feedMock,
     status: 200,
-    message: "Success"
-} 
+    message: "Success",
+}

@@ -1,8 +1,8 @@
 import React from "react"
 import { StatusBar, useColorScheme } from "react-native"
 import { Text, View } from "../../../components/Themed"
-import ColorTheme from "../../../layout/constants/colors"
-import Fonts from "../../../layout/constants/fonts"
+import ColorTheme from "../../../constants/colors"
+import Fonts from "../../../constants/fonts"
 
 export default function LoadingScreen() {
     const isDarkMode = useColorScheme() === "dark"

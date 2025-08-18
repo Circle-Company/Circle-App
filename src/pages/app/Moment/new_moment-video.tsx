@@ -1,30 +1,28 @@
-import { FlexAlignType, StyleSheet } from "react-native"
-
-import { CameraView } from "@/modules/camera/pages/main"
 import React from "react"
-import { View } from "@/components/Themed"
-import sizes from "@/layout/constants/sizes"
+import { FlexAlignType, StyleSheet } from "react-native"
+import { View } from "../../../components/Themed"
+import sizes from "../../../constants/sizes"
+import { CameraPage } from "../../../modules/camera/pages/camera"
 
 export interface Video {
-  uri: string;
-  duration?: number;
-  fileSize?: number;
-  type?: string;
+    uri: string
+    duration?: number
+    fileSize?: number
+    type?: string
 }
 
 export default function NewMomentVideoScreen() {
-
     const styles = StyleSheet.create({
         container: {
             alignItems: "center" as FlexAlignType,
             flex: 1,
             paddingTop: sizes.paddings["1sm"],
-        }
+        },
     })
 
     return (
         <View style={styles.container}>
-            <CameraView/>
+            <CameraPage props={undefined} />
         </View>
     )
 }

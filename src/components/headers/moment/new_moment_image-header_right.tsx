@@ -1,11 +1,11 @@
+import { useNavigation } from "@react-navigation/native"
 import React from "react"
 import { View } from "react-native"
-import { useNavigation } from "@react-navigation/native"
-import ViewMorebutton from "../../buttons/view_more"
-import sizes from "../../../layout/constants/sizes"
-import fonts from "../../../layout/constants/fonts"
+import fonts from "../../../constants/fonts"
+import sizes from "../../../constants/sizes"
 import NewMomentContext from "../../../contexts/newMoment"
 import LanguageContext from "../../../contexts/Preferences/language"
+import ViewMorebutton from "../../buttons/view_more"
 
 export default function NewMomentImageRight() {
     const { t } = React.useContext(LanguageContext)

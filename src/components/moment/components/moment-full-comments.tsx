@@ -1,10 +1,10 @@
+import Icon from "@/assets/icons/svgs/text_bubble.svg"
 import React from "react"
 import { Text, View } from "react-native"
-import Icon from "../../../assets/icons/svgs/text_bubble.svg"
+import ColorTheme from "../../../constants/colors"
+import fonts from "../../../constants/fonts"
+import sizes from "../../../constants/sizes"
 import { formatNumberWithDots } from "../../../helpers/numberConversor"
-import ColorTheme from "../../../layout/constants/colors"
-import fonts from "../../../layout/constants/fonts"
-import sizes from "../../../layout/constants/sizes"
 
 type MomentFullCommentsProps = {
     color?: string
@@ -26,7 +26,7 @@ export default function comments({
         fontFamily: fonts.family.Semibold,
         color,
     }
-    if (comments == 0) return null
+    if (comments === 0) return null
     else
         return (
             <View style={container}>

@@ -35,7 +35,7 @@ export type ViewProfileContextsData = {
 }
 
 const ViewProfileContext = React.createContext<ViewProfileContextsData>(
-    {} as ViewProfileContextsData
+    {} as ViewProfileContextsData,
 )
 
 export function Provider({ children }: ViewProfileProviderProps) {
@@ -55,7 +55,7 @@ export function Provider({ children }: ViewProfileProviderProps) {
                         headers: {
                             Authorization: session.account.jwtToken,
                         },
-                    }
+                    },
                 )
                 setUserProfile(response.data)
                 return response.data

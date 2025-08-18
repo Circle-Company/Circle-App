@@ -1,16 +1,17 @@
-import { StatusBar, useColorScheme } from "react-native"
-import { Text, View } from "../../../components/Themed"
-import ColorTheme, { colors } from "../../../layout/constants/colors"
-
+import NextIcon from "@/assets/icons/svgs/arrow_circle_right.svg"
+import UsernameInput from "@/components/auth/usernameInput"
+import ButtonStandart from "@/components/buttons/button-standart"
 import ButtonClose from "@/components/buttons/close"
+import { Text } from "@/components/Themed"
+import ColorTheme, { colors } from "@/constants/colors"
+import fonts from "@/constants/fonts"
+import sizes from "@/constants/sizes"
+import AuthContext from "@/contexts/Auth"
 import { useNavigation } from "@react-navigation/native"
+import { LinearGradient } from "expo-linear-gradient"
+import { t } from "i18next"
 import React from "react"
-import NextIcon from "../../../assets/icons/svgs/arrow_circle_right.svg"
-import UsernameInput from "../../../components/auth/usernameInput"
-import ButtonStandart from "../../../components/buttons/button-standart"
-import AuthContext from "../../../contexts/Auth"
-import fonts from "../../../layout/constants/fonts"
-import sizes from "../../../layout/constants/sizes"
+import { StatusBar, View, useColorScheme } from "react-native"
 
 export default function UsernameScreen() {
     const isDarkMode = useColorScheme() === "dark"
@@ -24,33 +25,57 @@ export default function UsernameScreen() {
     }
     const headerContainer: any = {
         width: sizes.screens.width,
-        height: sizes.headers.height,
+        height: sizes.headers.height * 0.7,
         flexDirection: "row",
         paddingHorizontal: sizes.paddings["1md"],
-        justifyContent: "flex-start",
+        justifyContent: "center",
         alignItems: "center",
         marginBottom: sizes.margins["1xl"] * 0.8,
+        backgroundColor: "transparent",
     }
     const headerTitle: any = {
-        fontSize: fonts.size.title2,
-        fontFamily: fonts.family.Bold,
+        fontSize: fonts.size.title3,
+        fontFamily: fonts.family["Black-Italic"],
+        alignSelf: "center",
+        marginLeft: -35,
+        backgroundColor: "transparent",
     }
 
     const input_container: any = {
         alignItems: "center",
         paddingBottom: sizes.paddings["1xl"] * 0.8,
+        backgroundColor: "transparent",
     }
 
     const description: any = {
-        fontSize: fonts.size.body,
-        fontFamily: fonts.family.Medium,
+        fontSize: fonts.size.title3,
+        fontFamily: fonts.family.Bold,
         color: ColorTheme().text,
-        marginBottom: sizes.margins["1md"],
+        marginBottom: sizes.margins["2sm"],
+        marginHorizontal: sizes.margins["1lg"],
+        textAlign: "center",
     }
 
+    const subDescription: any = {
+        fontSize: fonts.size.body,
+        fontFamily: fonts.family.Medium,
+        color: ColorTheme().text + 90,
+        marginBottom: sizes.margins["1xl"] * 1.2,
+    }
+
+    const inferior_gradient: any = {
+        width: sizes.window.width,
+        alignSelf: "flex-start",
+        flex: 1,
+        height: sizes.window.height - 500,
+        position: "absolute",
+        zIndex: 0,
+        top: -10,
+        opacity: 0.4,
+    }
     const button_text: any = {
         fontSize: fonts.size.body * 0.9,
-        fontFamily: fonts.family.Semibold,
+        fontFamily: fonts.family["Bold-Italic"],
         color: signInputUsername
             ? colors.gray.white
             : isDarkMode
@@ -77,18 +102,26 @@ export default function UsernameScreen() {
 
     return (
         <View style={container}>
-            <StatusBar backgroundColor={colors.gray.black} barStyle={"light-content"} />
+            <StatusBar backgroundColor={"transparent"} barStyle={"light-content"} />
+            <LinearGradient
+                renderToHardwareTextureAndroid
+                colors={["rgba(70, 70, 70, 1)", "#000000ff"]}
+                style={inferior_gradient}
+            />
             <View style={headerContainer} testID="header-container">
                 <ButtonClose />
-                <View style={{ flex: 1, marginLeft: sizes.margins["2sm"] }}>
+                <View style={{ flex: 1, alignSelf: "center" }}>
                     <Text style={headerTitle} testID="header-title">
-                        Sign Up
+                        {t("Step 1 of 3")}
                     </Text>
                 </View>
             </View>
 
             <View style={input_container} testID="input-container">
-                <Text style={description}>You can't change it later.</Text>
+                <Text style={description}>
+                    {t("Chose a name to be your identity in community")}
+                </Text>
+                <Text style={subDescription}>{t("You can't change it later.")}</Text>
                 <UsernameInput type="signUp" />
             </View>
             <ButtonStandart
@@ -96,20 +129,20 @@ export default function UsernameScreen() {
                 margins={false}
                 action={handlePress}
                 backgroundColor={
-                    signInputUsername
+                    signInputUsername.length > 0
                         ? ColorTheme().primary.toString()
-                        : ColorTheme().backgroundDisabled.toString()
+                        : ColorTheme().backgroundDisabled
                 }
             >
-                <Text style={button_text}>Next Step</Text>
+                <Text style={button_text}>{t("Next Step")}</Text>
                 <NextIcon
                     style={icon}
                     fill={String(
                         signInputUsername
                             ? colors.gray.white
                             : isDarkMode
-                            ? colors.gray.grey_04 + "90"
-                            : colors.gray.grey_04 + "90",
+                            ? colors.gray.grey_04 + 99
+                            : colors.gray.grey_04 + 99,
                     )}
                     width={17}
                     height={17}

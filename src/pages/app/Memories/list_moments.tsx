@@ -1,8 +1,8 @@
 import React from "react"
 import { StatusBar } from "react-native"
 import { View } from "../../../components/Themed"
+import { colors } from "../../../constants/colors"
 import ListMemoryMoments from "../../../features/list-memories/list-memory-moments"
-import { colors } from "../../../layout/constants/colors"
 
 export default function MemoriesListMomentsScreen() {
     const container = {

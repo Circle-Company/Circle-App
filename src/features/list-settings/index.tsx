@@ -1,8 +1,8 @@
 import { FlatList, ScrollView } from "react-native"
 
-import { SettignsSectionProps } from "@/components/settings/settings-types"
 import React from "react"
 import { Settings } from "../../components/settings"
+import { SettignsSectionProps } from "../../components/settings/settings-types"
 import PersistedContext from "../../contexts/Persisted"
 import LanguageContext from "../../contexts/Preferences/language"
 import { truncated } from "../../helpers/processText"
@@ -18,7 +18,7 @@ export default function ListSettings() {
         ? truncated({ text: session.user.description.replace(/(\r\n|\n|\r)/gm, " "), size: 18 })
         : t("add new description")
 
-    const ListData: Array<SettignsSectionProps> = [
+    const ListData: SettignsSectionProps[] = [
         {
             name: t("Public Profile"),
             content: [
@@ -151,13 +151,7 @@ export default function ListSettings() {
                 scrollEnabled={false}
                 keyExtractor={(item) => item.name}
                 renderItem={({ item, index }) => {
-                    return (
-                        <Settings.Section
-                            key={index}
-                            name={item.name}
-                            content={item.content}
-                        />
-                    )
+                    return <Settings.Section key={index} name={item.name} content={item.content} />
                 }}
                 ListFooterComponent={() => {
                     return <SettingsFooterComponent />

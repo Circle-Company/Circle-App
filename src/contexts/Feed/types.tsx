@@ -1,5 +1,5 @@
-import { LanguagesCodesType } from "locales/LanguageTypes"
-import { MomentUserActionsProps } from "@/components/moment/context/types"
+import { MomentUserActionsProps } from "../../components/moment/context/types"
+import { LanguagesCodesType } from "../../locales/LanguageTypes"
 import { TagProps } from "../newMoment"
 
 export interface ProfilePicture {
@@ -26,7 +26,7 @@ export interface Comment {
 }
 
 export interface Media {
-    content_type: "VIDEO" | "IMAGE" 
+    content_type: "VIDEO" | "IMAGE"
     nhd_thumbnail: string
     fullhd_resolution: string
     nhd_resolution: string

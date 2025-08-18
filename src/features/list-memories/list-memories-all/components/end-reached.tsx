@@ -1,9 +1,9 @@
-import { Text, TextStyle, ViewStyle } from "@/components/Themed"
+import { Text, TextStyle, ViewStyle } from "../../../../components/Themed"
 
-import ColorTheme from "@/layout/constants/colors"
-import fonts from "@/layout/constants/fonts"
-import sizes from "@/layout/constants/sizes"
 import { View } from "react-native"
+import ColorTheme from "../../../../constants/colors"
+import fonts from "../../../../constants/fonts"
+import sizes from "../../../../constants/sizes"
 
 export default function endReached({ text }: { text: string }) {
     const container: ViewStyle = {

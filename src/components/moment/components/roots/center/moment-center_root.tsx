@@ -1,7 +1,7 @@
-import { MomentCenterRootProps } from "../../../moment-types"
 import React from "react"
 import { View } from "react-native"
-import sizes from "../../../../../layout/constants/sizes"
+import sizes from "../../../../../constants/sizes"
+import { MomentCenterRootProps } from "../../../moment-types"
 
 export default function center_root({ children }: MomentCenterRootProps) {
     const container: any = {

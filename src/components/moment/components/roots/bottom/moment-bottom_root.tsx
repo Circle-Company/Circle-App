@@ -1,7 +1,7 @@
 import React from "react"
 import { View } from "react-native"
+import sizes from "../../../../../constants/sizes"
 import { MomentBottomRootProps } from "../../../moment-types"
-import sizes from "../../../../../layout/constants/sizes"
 
 export default function bottom_root({ children }: MomentBottomRootProps) {
     const container: any = {

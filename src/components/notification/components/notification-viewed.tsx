@@ -1,12 +1,10 @@
-import { View } from "react-native"
-import ColorTheme from "../../../layout/constants/colors"
-import { useIndividualNotificationContext } from "../notification-individual_context"
 import React from "react"
+import { View } from "react-native"
+import ColorTheme from "../../../constants/colors"
 type NotificationViewedProps = {
     viewed: boolean
 }
 export default function notification_viewed({ viewed }: NotificationViewedProps) {
-    const { notification } = useIndividualNotificationContext()
     const container: any = {
         width: 5,
         height: 16,

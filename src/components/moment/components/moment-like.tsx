@@ -1,18 +1,18 @@
 import { Animated, Pressable, TextStyle, View, ViewStyle } from "react-native"
-import ColorTheme, { colors } from "../../../layout/constants/colors"
+import ColorTheme, { colors } from "../../../constants/colors"
 
-import LikeIcon from "../../../assets/icons/svgs/heart.svg"
+import LikeIcon from "@/assets/icons/svgs/heart.svg"
+import PersistedContext from "../../../contexts/Persisted"
+import NumberConversor from "../../../helpers/numberConversor"
 import MomentContext from "../context"
 import { MomentLikeProps } from "../moment-types"
-import NumberConversor from "../../../helpers/numberConversor"
-import PersistedContext from "../../../contexts/Persisted"
 /* eslint-disable no-var */
 import React from "react"
-import { Text } from "../../Themed"
+import fonts from "../../../constants/fonts"
+import sizes from "../../../constants/sizes"
 import { Vibrate } from "../../../lib/hooks/useHapticFeedback"
 import api from "../../../services/Api"
-import fonts from "../../../layout/constants/fonts"
-import sizes from "../../../layout/constants/sizes"
+import { Text } from "../../Themed"
 
 export default function Like({
     isLiked,
@@ -23,7 +23,7 @@ export default function Like({
     const { session } = React.useContext(PersistedContext)
     const { momentData, momentUserActions, momentOptions } = React.useContext(MomentContext)
     const [likedPressed, setLikedPressed] = React.useState(
-        isLiked ? isLiked : momentUserActions.liked
+        isLiked ? isLiked : momentUserActions.liked,
     )
     var animatedScale = React.useRef(new Animated.Value(1)).current
     var animatedScaleIconPressed = React.useRef(new Animated.Value(1)).current
@@ -130,7 +130,7 @@ export default function Like({
                 headers: {
                     Authorization: session.account.jwtToken,
                 },
-            }
+            },
         )
     }
     async function onUnlikeAction() {
@@ -144,7 +144,7 @@ export default function Like({
                 headers: {
                     Authorization: session.account.jwtToken,
                 },
-            }
+            },
         )
     }
 
@@ -157,8 +157,8 @@ export default function Like({
             ? 0
             : 1 // Se está curtido, não soma se já estava curtido, senão soma 1
         : momentUserActions.initialLikedState
-            ? -1
-            : 0 // Se não está curtido, subtrai 1 se estava curtido, senão não muda
+        ? -1
+        : 0 // Se não está curtido, subtrai 1 se estava curtido, senão não muda
 
     // Número de likes que será exibido, considerando a interação do usuário
     const adjustedLikes = totalLikes + likeDifference

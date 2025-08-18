@@ -1,13 +1,13 @@
-import { FlatList } from "react-native"
-import MomentContext from "../../../components/moment/context"
 import React from "react"
+import { FlatList } from "react-native"
 import Tag from "../../../components/moment/components/moment-tag"
+import MomentContext from "../../../components/moment/context"
 import { View } from "../../../components/Themed"
-import sizes from "../../../layout/constants/sizes"
+import sizes from "../../../constants/sizes"
 
 export default function RenderTagsList() {
     const { momentData } = React.useContext(MomentContext)
-    
+
     React.useEffect(() => {
         async function fetch() {
             if (momentData.getTags) {

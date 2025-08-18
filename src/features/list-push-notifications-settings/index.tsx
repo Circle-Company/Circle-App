@@ -1,9 +1,9 @@
 import { View, useColorScheme } from "react-native"
 import { Text, TextStyle, ViewStyle } from "../../components/Themed"
-import ColorTheme, { colors } from "../../layout/constants/colors"
+import ColorTheme, { colors } from "../../constants/colors"
 
-import fonts from "../../layout/constants/fonts"
-import sizes from "../../layout/constants/sizes"
+import fonts from "../../constants/fonts"
+import sizes from "../../constants/sizes"
 
 interface ListPushNotificationsSettingsProps {
     title: string
