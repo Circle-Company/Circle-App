@@ -179,6 +179,109 @@ export type SessionDataType = {
     statistics: StatisticsState
 }
 
+export type DeviceMetadataType = {
+    deviceId: string
+    deviceName: string
+    platform: string
+    version: string
+    buildNumber: string
+    appVersion: string
+    systemVersion: string
+    brand: string
+    model: string
+    carrier: string
+    timezone: string
+    locale: string
+    isTablet: boolean
+    hasNotch: boolean
+    screenWidth: number
+    screenHeight: number
+    pixelDensity: number
+    fontScale: number
+    // Capacidade do dispositivo
+    totalMemory: number
+    usedMemory: number
+    availableMemory: number
+    totalDiskCapacity: number
+    freeDiskStorage: number
+    usedDiskStorage: number
+    batteryLevel: number
+    isLowPowerModeEnabled: boolean
+    cpuArchitecture: string
+    deviceType: string
+    maxMemory: number
+    lastUpdatedAt: string
+}
+
+export type DeviceMetadataState = {
+    deviceId: string
+    deviceName: string
+    platform: string
+    version: string
+    buildNumber: string
+    appVersion: string
+    systemVersion: string
+    brand: string
+    model: string
+    carrier: string
+    timezone: string
+    locale: string
+    isTablet: boolean
+    hasNotch: boolean
+    screenWidth: number
+    screenHeight: number
+    pixelDensity: number
+    fontScale: number
+    // Capacidade do dispositivo
+    totalMemory: number
+    usedMemory: number
+    availableMemory: number
+    totalDiskCapacity: number
+    freeDiskStorage: number
+    usedDiskStorage: number
+    batteryLevel: number
+    isLowPowerModeEnabled: boolean
+    cpuArchitecture: string
+    deviceType: string
+    maxMemory: number
+    lastUpdatedAt: string
+    setDeviceId: (value: string) => void
+    setDeviceName: (value: string) => void
+    setPlatform: (value: string) => void
+    setVersion: (value: string) => void
+    setBuildNumber: (value: string) => void
+    setAppVersion: (value: string) => void
+    setSystemVersion: (value: string) => void
+    setBrand: (value: string) => void
+    setModel: (value: string) => void
+    setCarrier: (value: string) => void
+    setTimezone: (value: string) => void
+    setLocale: (value: string) => void
+    setIsTablet: (value: boolean) => void
+    setHasNotch: (value: boolean) => void
+    setScreenWidth: (value: number) => void
+    setScreenHeight: (value: number) => void
+    setPixelDensity: (value: number) => void
+    setFontScale: (value: number) => void
+    setTotalMemory: (value: number) => void
+    setUsedMemory: (value: number) => void
+    setAvailableMemory: (value: number) => void
+    setTotalDiskCapacity: (value: number) => void
+    setFreeDiskStorage: (value: number) => void
+    setUsedDiskStorage: (value: number) => void
+    setBatteryLevel: (value: number) => void
+    setIsLowPowerModeEnabled: (value: boolean) => void
+    setCpuArchitecture: (value: string) => void
+    setDeviceType: (value: string) => void
+    setMaxMemory: (value: number) => void
+    setLastUpdatedAt: (value: string) => void
+    set: (value: DeviceMetadataType) => void
+    load: () => void
+    remove: () => void
+    updateAll: () => Promise<DeviceMetadataType | void>
+}
+
 export type DeviceDataType = {
     permissions: PermissionsState
+    metadata: DeviceMetadataState
 }
