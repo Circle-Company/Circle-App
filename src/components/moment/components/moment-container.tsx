@@ -1,10 +1,9 @@
-import React, { useEffect } from "react"
+import React, { useEffect, useCallback, useState } from "react"
 import Reanimated, { FadeIn, FadeOut } from "react-native-reanimated"
 
 import { View } from "react-native"
 import ColorTheme from "../../../constants/colors"
 import FeedContext from "../../../contexts/Feed"
-import { videoCacher } from "../../../contexts/Feed/functions/video-cacher"
 import PersistedContext from "../../../contexts/Persisted"
 import DoubleTapPressable from "../../general/double-tap-pressable"
 import { MidiaRender } from "../../midia_render"
@@ -22,9 +21,10 @@ export default function Container({
     const { momentData, momentUserActions, momentSize, momentOptions, momentVideo } =
         React.useContext(MomentContext)
     const { session } = React.useContext(PersistedContext)
-    const { commentEnabled } = React.useContext(FeedContext)
-    const [hasVideoCache, setHasVideoCache] = React.useState<boolean>(false)
-    const [cachedVideoUri, setCachedVideoUri] = React.useState<string | undefined>()
+    const { commentEnabled, loadVideoFromCache } = React.useContext(FeedContext)
+    const [hasVideoCache, setHasVideoCache] = useState<boolean>(false)
+    const [cachedVideoUri, setCachedVideoUri] = useState<string | undefined>()
+    const [isLoadingCache, setIsLoadingCache] = useState(false)
 
     // Atualizar o estado de pausa do vídeo quando muda o foco
     useEffect(() => {
@@ -67,24 +67,49 @@ export default function Container({
         zIndex: 10,
     }
 
-    React.useEffect(() => {
-        if (momentData.midia.content_type !== "VIDEO") return
-        const url = momentData.midia.fullhd_resolution || momentData.midia.nhd_resolution
+    // Função para carregar vídeo do cache otimizado
+    const loadVideoFromCacheOptimized = useCallback(async () => {
+        if (momentData.midia.content_type !== "VIDEO" || !loadVideoFromCache) return
 
-        if (!url) return
+        const originalUrl = momentData.midia.fullhd_resolution || momentData.midia.nhd_resolution
+        if (!originalUrl) return
 
-        videoCacher
-            .preload({ id: Number(momentData.id), url })
-            .then((localUri) => {
-                setCachedVideoUri(localUri)
-                setHasVideoCache(true)
-            })
-            .catch((err) => {
-                console.warn("Erro ao obter vídeo cacheado:", err)
-                setCachedVideoUri(url) // fallback se falhar
+        setIsLoadingCache(true)
+
+        try {
+            // Usar o sistema de cache do Feed
+            const cachedUrl = await loadVideoFromCache(Number(momentData.id))
+
+            if (cachedUrl) {
+                setCachedVideoUri(cachedUrl)
+                // Verificar se é uma URL local (cache) ou remota (fallback)
+                setHasVideoCache(cachedUrl.startsWith("file://"))
+                console.log(
+                    `Vídeo ${momentData.id} carregado: ${
+                        cachedUrl.startsWith("file://") ? "CACHE" : "REMOTO"
+                    }`,
+                )
+            } else {
+                // Fallback para URL original
+                setCachedVideoUri(originalUrl)
                 setHasVideoCache(false)
-            })
-    }, [momentData.id, momentData.midia])
+                console.log(`Fallback para URL original: ${momentData.id}`)
+            }
+        } catch (error) {
+            console.warn("Erro ao carregar vídeo do cache:", error)
+            setCachedVideoUri(originalUrl)
+            setHasVideoCache(false)
+        } finally {
+            setIsLoadingCache(false)
+        }
+    }, [momentData.id, momentData.midia, loadVideoFromCache])
+
+    // Carregar vídeo quando o componente montar ou quando ganhar foco
+    useEffect(() => {
+        if (isFocused && momentData.midia.content_type === "VIDEO") {
+            loadVideoFromCacheOptimized()
+        }
+    }, [isFocused, momentData.id, loadVideoFromCacheOptimized])
 
     async function handleDoublePress() {
         if (momentData.user.id != session.user.id) momentUserActions.handleLikeButtonPressed({})
@@ -103,17 +128,19 @@ export default function Container({
                     uri={cachedVideoUri}
                     thumbnailUri={momentData.midia.nhd_thumbnail}
                     hasVideoCache={hasVideoCache}
+                    isLoadingCache={isLoadingCache}
+                    momentId={Number(momentData.id)}
                     autoPlay={!momentVideo.isPaused}
                     style={{
                         width: momentSize.width,
                         height: momentSize.height,
                     }}
                     onVideoLoad={(duration) => {
-                        console.log("Vídeo carregado com duração:", duration)
+                        console.log(`Vídeo ${momentData.id} carregado com duração:`, duration)
                         momentVideo.setDuration(duration)
                     }}
                     onVideoEnd={() => {
-                        console.log("Vídeo terminou")
+                        console.log(`Vídeo ${momentData.id} terminou`)
                     }}
                     onProgressChange={handleProgressChange}
                     isFocused={isFocused}
