@@ -9,6 +9,7 @@ import { usePermissionsStore } from "./persistedPermissions"
 import { usePreferencesStore } from "./persistedPreferences"
 import { useStatisticsStore } from "./persistedStatistics"
 import { useUserStore } from "./persistedUser"
+import { useDeviceMetadataStore } from "./persistedDeviceMetadata"
 
 type PersistedProviderProps = { children: React.ReactNode }
 export type PersistedContextProps = {
@@ -27,6 +28,7 @@ export function Provider({ children }: PersistedProviderProps) {
     const sessionStatistics = useStatisticsStore()
     const sessionHistory = useHistoryStore()
     const devicePermissions = usePermissionsStore()
+    const deviceMetadata = useDeviceMetadataStore()
 
     React.useEffect(() => {
         if (sessionData.user) sessionUser.set(sessionData.user)
@@ -34,6 +36,13 @@ export function Provider({ children }: PersistedProviderProps) {
         if (sessionData.preferences) sessionPreferences.set(sessionData.preferences)
         if (sessionData.statistics) sessionStatistics.set(sessionData.statistics)
         if (sessionData.history) sessionHistory.set(sessionData.history)
+
+        // Atualizar metadados do dispositivo sempre que houver sessionData
+        if (sessionData.user || sessionData.account) {
+            deviceMetadata.updateAll().catch((error) => {
+                console.warn("Erro ao atualizar metadados durante sessionData:", error)
+            })
+        }
     }, [
         sessionData,
         signIn,
@@ -44,6 +53,7 @@ export function Provider({ children }: PersistedProviderProps) {
         sessionPreferences,
         sessionStatistics,
         sessionHistory,
+        deviceMetadata,
     ])
 
     async function refreshToken() {
@@ -84,6 +94,7 @@ export function Provider({ children }: PersistedProviderProps) {
         },
         device: {
             permissions: devicePermissions,
+            metadata: deviceMetadata,
         },
     }
 

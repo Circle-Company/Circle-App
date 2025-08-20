@@ -1,20 +1,21 @@
 import RNFS from "react-native-fs"
+import { calculeCacheMaxSize } from "@/contexts/Feed/helpers/calculeCacheMaxSize"
 
 const VIDEO_CACHE_DIR = `${RNFS.CachesDirectoryPath}/videos`
 
 type CacheEntry = {
-  id: number
-  localPath: string
-  originalUrl: string
+    id: number
+    localPath: string
+    originalUrl: string
 }
 
-export class VideoCacher {
+export class CacheManager {
     private cache: Map<number, CacheEntry> = new Map()
     private accessQueue: number[] = [] // mantém ordem de uso
     private maxCacheSize: number
 
-    constructor({ maxCacheSize = 10}: {maxCacheSize: number}) {
-        this.maxCacheSize = maxCacheSize
+    constructor() {
+        this.maxCacheSize = calculeCacheMaxSize()
         this.init()
     }
 
@@ -54,7 +55,7 @@ export class VideoCacher {
         }
     }
 
-    public async preload({id, url}: {id: number, url: string}): Promise<string> {
+    public async preload({ id, url }: { id: number; url: string }): Promise<string> {
         if (this.cache.has(id)) {
             this.markAsUsed(id)
             return this.cache.get(id)!.localPath
@@ -94,17 +95,63 @@ export class VideoCacher {
         return this.cache.has(id)
     }
 
+    public async remove(id: number) {
+        const entry = this.cache.get(id)
+        if (!entry) return
+
+        try {
+            await RNFS.unlink(entry.localPath.replace("file://", ""))
+        } catch (err) {
+            console.warn(`Erro ao remover vídeo [${id}]:`, err)
+        }
+
+        this.cache.delete(id)
+        const index = this.accessQueue.indexOf(id)
+        if (index !== -1) this.accessQueue.splice(index, 1)
+    }
+
     public clear() {
         this.cache.forEach(async (entry) => {
             try {
                 await RNFS.unlink(entry.localPath.replace("file://", ""))
-            } catch(error) {
+            } catch (error) {
                 console.log(error)
             }
         })
         this.cache.clear()
         this.accessQueue = []
     }
-}
 
-export const videoCacher = new VideoCacher({maxCacheSize: 10}) // exemplo: limite de 10 vídeos
+    /**
+     * Método apply para controle de cache similar ao ChunkManager
+     */
+    public async apply(command: "CLEAR" | "REMOVE", payload?: number | number[]): Promise<void> {
+        switch (command) {
+            case "CLEAR":
+                await this.clearCache()
+                break
+            case "REMOVE":
+                if (typeof payload === "number") {
+                    await this.remove(payload)
+                } else if (Array.isArray(payload)) {
+                    for (const id of payload) {
+                        await this.remove(id)
+                    }
+                }
+                break
+        }
+    }
+
+    private async clearCache() {
+        const entries = Array.from(this.cache.values())
+        for (const entry of entries) {
+            try {
+                await RNFS.unlink(entry.localPath.replace("file://", ""))
+            } catch (error) {
+                console.warn(`Erro ao limpar cache do vídeo [${entry.id}]:`, error)
+            }
+        }
+        this.cache.clear()
+        this.accessQueue = []
+    }
+}

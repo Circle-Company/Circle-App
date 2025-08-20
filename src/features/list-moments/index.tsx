@@ -1,13 +1,10 @@
-import { Image } from "expo-image"
 import React, { useCallback, useRef, useState } from "react"
 import { Animated, RefreshControl, useColorScheme } from "react-native"
 import { FlatList } from "react-native-gesture-handler"
-import { Loading } from "../../components/loading"
-import { MomentDataProps } from "../../components/moment/context/types"
-import { colors } from "../../constants/colors"
-import sizes from "../../constants/sizes"
-import FeedContext from "../../contexts/Feed"
-import { videoCacher } from "../../contexts/Feed/functions/video-cacher"
+import { Loading } from "@/components/loading"
+import { colors } from "@/constants/colors"
+import sizes from "@/constants/sizes"
+import FeedContext from "@/contexts/Feed"
 import RenderMomentFeed from "./components/feed/render-moment-feed"
 import { EmptyList } from "./components/render-empty_list"
 
@@ -27,6 +24,8 @@ const ListMoments = () => {
         feedData,
         reloadFeed,
         loading: loadingFeed,
+        loadVideoFromCache,
+        preloadNextVideo,
     } = React.useContext(FeedContext)
     const [centerIndex, setCenterIndex] = useState<number | null>(0)
     const [loading] = React.useState(false)
@@ -34,15 +33,47 @@ const ListMoments = () => {
     const isDarkMode = useColorScheme() === "dark"
     const flatListRef = useRef<FlatList | null>(null)
 
+    // Criar referência para onViewableItemsChanged
+    const onViewableItemsChanged = useRef(({ viewableItems }: { viewableItems: ViewToken[] }) => {
+        if (viewableItems.length > 0) {
+            const visibleItem = viewableItems[0]
+            if (visibleItem && visibleItem.index !== null) {
+                const momentId = visibleItem.item.id
+                const currentIndex = visibleItem.index
+
+                // Carregar vídeo do cache quando ficar visível
+                loadVideoFromCache?.(momentId)
+
+                // Fazer preload do próximo vídeo
+                preloadNextVideo?.(currentIndex)
+
+                console.log(`Momento focado: ${momentId}, índice: ${currentIndex}`)
+            }
+        }
+    })
+
     const handleScroll = useCallback(
         (event: any) => {
             const contentOffsetX = event.nativeEvent.contentOffset.x + 140
-            const centerIndex = Math.floor(
+            const newCenterIndex = Math.floor(
                 (contentOffsetX + sizes.screens.width / 2) / (sizes.moment.standart.width + margin),
             )
-            setCenterIndex(centerIndex >= 0 ? centerIndex : 0)
+            const validIndex = newCenterIndex >= 0 ? newCenterIndex : 0
+
+            // Só atualizar se o índice mudou
+            if (validIndex !== centerIndex && feedData[validIndex]) {
+                setCenterIndex(validIndex)
+
+                // Carregar vídeo do cache quando o usuário navegar manualmente
+                const moment = feedData[validIndex]
+                if (moment) {
+                    loadVideoFromCache?.(moment.id)
+                    // Fazer preload do próximo
+                    preloadNextVideo?.(validIndex)
+                }
+            }
         },
-        [setCenterIndex],
+        [setCenterIndex, centerIndex, feedData, loadVideoFromCache, preloadNextVideo],
     )
 
     const container_0 = {
@@ -61,23 +92,6 @@ const ListMoments = () => {
         viewAreaCoveragePercentThreshold: 10,
         waitForInteraction: false,
     }
-
-    const onViewableItemsChanged = React.useRef(
-        ({ viewableItems }: { viewableItems: ViewToken[] }) => {
-            viewableItems.forEach(async (token) => {
-                const item = token.item as MomentDataProps
-                const url = item.midia.fullhd_resolution || item.midia.nhd_resolution
-
-                if (url) {
-                    await Image.loadAsync(url)
-                    videoCacher.preload({
-                        id: Number(item.id),
-                        url,
-                    })
-                }
-            })
-        },
-    )
 
     const handleRefresh = async () => {
         if (flatListRef.current) flatListRef.current.scrollToOffset({ animated: false, offset: 0 })
@@ -110,7 +124,10 @@ const ListMoments = () => {
                 snapToInterval={sizes.moment.standart.width + margin}
                 onViewableItemsChanged={onViewableItemsChanged.current}
                 decelerationRate="fast"
-                maxToRenderPerBatch={3}
+                maxToRenderPerBatch={5} // Renderizar mais items para cache
+                initialNumToRender={3} // Renderizar 3 inicialmente
+                windowSize={7} // Manter 7 itens na memória
+                removeClippedSubviews={true} // Remover views não visíveis
                 keyExtractor={(moment: any) => moment.id.toString()}
                 disableIntervalMomentum={true}
                 onScroll={handleScroll}
