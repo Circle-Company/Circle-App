@@ -31,56 +31,56 @@ export const useAccountStore = create<AccountState>((set) => ({
     last_login_at: storage.getString(storageKey.last_login_at) || new Date().toString(),
 
     setCoordinates: (value: { latitude: number; longitude: number }) => {
-        if (typeof value === "object") {
+        if (value && value.latitude !== undefined && value.longitude !== undefined) {
             storage.set(storageKey.coordinates.latitude, value.latitude)
             storage.set(storageKey.coordinates.longitude, value.longitude)
             set({ coordinates: value })
         }
     },
     setUnreadNotificationsCount: (value: number) => {
-        if (typeof value === "number") {
+        if (value !== undefined && !isNaN(value)) {
             storage.set(storageKey.unreadNotificationsCount, value)
             set({ unreadNotificationsCount: value })
         }
     },
 
     setJwtToken: (value: string) => {
-        if (typeof value === "string") {
+        if (value !== undefined && value !== null) {
             storage.set(storageKey.jwt.token, value)
             set({ jwtToken: value })
         }
     },
 
     setJwtExpiration: (value: string) => {
-        if (typeof value === "string") {
+        if (value !== undefined && value !== null) {
             storage.set(storageKey.jwt.expiration, value)
             set({ jwtExpiration: value })
         }
     },
 
     setBlocked: (value: boolean) => {
-        if (typeof value === "boolean") {
+        if (value !== undefined && value !== null) {
             storage.set(storageKey.blocked, value)
             set({ blocked: value })
         }
     },
 
     setMuted: (value: boolean) => {
-        if (typeof value === "boolean") {
+        if (value !== undefined && value !== null) {
             storage.set(storageKey.muted, value)
             set({ muted: value })
         }
     },
 
     setLastActiveAt: (value: string) => {
-        if (typeof value === "string") {
+        if (value !== undefined && value !== null) {
             storage.set(storageKey.last_active_at, value)
             set({ last_active_at: value })
         }
     },
 
     setLastLoginAt: (value: string) => {
-        if (typeof value === "string") {
+        if (value !== undefined && value !== null) {
             storage.set(storageKey.last_login_at, value)
             set({ last_login_at: value })
         }
