@@ -23,6 +23,12 @@ export default defineConfig({
         testTransformMode: {
             web: [".ts", ".tsx"],
         },
+        pool: "forks",
+        poolOptions: {
+            forks: {
+                singleFork: true,
+            },
+        },
     },
     resolve: {
         alias: {

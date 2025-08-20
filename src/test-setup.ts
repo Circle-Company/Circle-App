@@ -89,6 +89,32 @@ vi.mock("@/store", () => ({
         delete: vi.fn(),
     },
     storageKeys: vi.fn(() => ({
+        user: {
+            id: "user.id",
+            name: "user.name",
+            username: "user.username",
+            description: "user.description",
+            verifyed: "user.verifyed",
+            profile_picture: {
+                small: "user.profile_picture.small",
+                tiny: "user.profile_picture.tiny",
+            },
+        },
+        account: {
+            coordinates: {
+                latitude: "account.coordinates.latitude",
+                longitude: "account.coordinates.longitude",
+            },
+            unreadNotificationsCount: "account.unreadNotificationsCount",
+            blocked: "account.blocked",
+            muted: "account.muted",
+            last_active_at: "account.last_active_at",
+            last_login_at: "account.last_login_at",
+            jwt: {
+                token: "account.jwt.token",
+                expiration: "account.jwt.expiration",
+            },
+        },
         deviceMetadata: {
             totalMemory: "totalMemory",
             availableMemory: "availableMemory",
@@ -102,11 +128,46 @@ vi.mock("@/store", () => ({
             fontScale: "fontScale",
             deviceType: "deviceType",
         },
+        statistics: {
+            total_followers: "statistics.total_followers",
+            total_likes: "statistics.total_likes",
+            total_views: "statistics.total_views",
+        },
+        preferences: {
+            primaryLanguage: "preferences.primaryLanguage",
+            appLanguage: "preferences.appLanguage",
+            autoplay: "preferences.autoplay",
+            haptics: "preferences.haptics",
+            translation: "preferences.translation",
+            translationLanguage: "preferences.translationLanguage",
+            muteAudio: "preferences.muteAudio",
+            likeMoment: "preferences.likeMoment",
+            newMemory: "preferences.newMemory",
+            addToMemory: "preferences.addToMemory",
+            followUser: "preferences.followUser",
+            viewUser: "preferences.viewUser",
+        },
+        history: {
+            search: "history.search",
+        },
+        permissions: {
+            postNotifications: "permissions.postNotifications",
+            firebaseMessaging: "permissions.firebaseMessaging",
+        },
     })),
 }))
 
-// Mock para @/services/Api
+// Mock para @/services/Api e services/Api/index
 vi.mock("@/services/Api", () => ({
+    default: {
+        post: vi.fn(),
+        get: vi.fn(),
+        put: vi.fn(),
+        delete: vi.fn(),
+    },
+}))
+
+vi.mock("@/services/Api/index", () => ({
     default: {
         post: vi.fn(),
         get: vi.fn(),
