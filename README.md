@@ -1,12 +1,3 @@
-<div align="center">
-  <a href="https://github.com/Circle-Company/Circle-App" target="_blank">
-    <picture>
-      <source media="(prefers-color-scheme: dark)" srcset="https://github.com/Circle-Company/.github/blob/017be356b03006489d7ae887a961f87f381dc681/profile/App%20Logo%20Dark.png">
-      <img alt="Circle Logo" src="https://github.com/Circle-Company/.github/blob/017be356b03006489d7ae887a961f87f381dc681/profile/App%20Logo%20Light.png" width="330"/>
-    </picture>
-  </a>
-</div>
-
 <h1 align="center">Circle App - Crie momentos e Compartilhe Memórias</h1>
 
 <div align="center">
@@ -26,17 +17,7 @@
 
 ## 📱 Sobre o Circle App
 
-O **Circle App** é uma rede social inovadora e open source que busca revolucionar a forma como compartilhamos nossos momentos. Nossa missão é criar uma plataforma **autêntica**, **intuitiva** e **divertida** para acompanhar amigos e família, onde compartilhar o dia a dia seja uma atividade leve e prazerosa.
-
-### 🌟 Diferenciais
-
--   ✨ **Interface inovadora** com foco na experiência do usuário
--   🔓 **100% Open Source** - transparência total
--   🎨 **Design moderno** com suporte a temas claro/escuro
--   🚀 **Performance otimizada** com React Native
--   🔒 **Segurança avançada** com autenticação JWT
-
----
+O **Circle App** é uma rede social inovadora e open source que busca revolucionar a forma como compartilhamos nossos momentos. Nossa missão é criar uma plataforma **autêntica**, **intuitiva** e **divertida** para acompanhar os amigos, onde compartilhar o dia a dia seja uma atividade leve e prazerosa.
 
 ## 🧠 Funcionalidades
 
@@ -164,10 +145,8 @@ npm run test:coverage
 yarn test:coverage
 ```
 
----
 
 ## 📁 Estrutura do Projeto
-
 ```
 Circle-App/
 ├── src/
@@ -185,23 +164,6 @@ Circle-App/
 └── __tests__/         # Testes automatizados
 ```
 
----
-
-## 🛣️ Roadmap
-
-| Etapa                               | Status                |
-| ----------------------------------- | --------------------- |
-| Notificações em tempo real          | ✅ Concluído          |
-| Lançamento beta na Play Store       | ✅ Concluído          |
-| Sistema de testes abrangente        | ✅ Concluído          |
-| Câmera interna do App               | ⚙️ Em Desenvolvimento |
-| Feed com sistema de recomendação    | ⚙️ Em Desenvolvimento |
-| Sistema de Pesquisa de Moments      | 🧠 Em planejamento    |
-| Compartilhamento externo de moments | 🔜 Em breve           |
-| Mensagens diretas                   | 💭 Futuro             |
-
----
-
 ## 🤝 Contribuindo
 
 Estamos sempre procurando novos colaboradores! Se você é desenvolvedor mobile, backend, designer ou simplesmente tem boas ideias, será muito bem-vindo! 💜
@@ -212,23 +174,12 @@ Estamos sempre procurando novos colaboradores! Se você é desenvolvedor mobile,
   </a>
 </div>
 
-### Como Contribuir
-
 1. **Fork** o projeto
 2. **Clone** seu fork: `git clone https://github.com/seu-usuario/Circle-App.git`
 3. **Crie uma branch**: `git checkout -b minha-feature`
 4. **Faça suas alterações** e commit: `git commit -m 'feat: adiciona nova feature'`
 5. **Push** para a branch: `git push origin minha-feature`
 6. **Abra um Pull Request** com uma descrição clara das mudanças
-
-### Diretrizes para Contribuição
-
--   📝 **Documentação**: Sempre documente suas mudanças
--   🧪 **Testes**: Adicione testes para novas funcionalidades
--   🎨 **Padrões**: Siga os padrões de código existentes
--   💬 **Comunicação**: Use mensagens de commit descritivas
-
----
 
 ## 🐛 Reportando Bugs
 
@@ -241,27 +192,9 @@ Encontrou um bug? Nos ajude a melhorar o app:
     - Screenshots (se aplicável)
     - Informações do dispositivo/sistema
 
----
-
 ## 📄 Licença
 
 Este projeto está sob a licença MIT. Veja o arquivo [LICENSE](LICENSE) para mais detalhes.
-
----
-
-## 📎 Links Úteis
-
--   🔗 [Repositório Principal](https://github.com/Circle-Company/Circle-App)
--   🧠 [Roadmap no GitHub Projects](https://github.com/Circle-Company/Circle-App/projects)
--   📱 [Download na Play Store](https://play.google.com/store/apps/details?id=com.circlecompany.circle)
--   🌐 [Site Oficial](https://circle-company.vercel.app/)
--   💬 [Discord da Comunidade](https://discord.gg/circle-app)
-
----
-
-## 🙏 Agradecimentos
-
-Agradecemos a todos os contribuidores que tornaram este projeto possível!
 
 <div align="center">
   <strong>Feito com ❤️ no Brasil</strong>
