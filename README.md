@@ -264,7 +264,5 @@ Este projeto está sob a licença MIT. Veja o arquivo [LICENSE](LICENSE) para ma
 Agradecemos a todos os contribuidores que tornaram este projeto possível!
 
 <div align="center">
-  <strong>Feito com ❤️ no Brasil 🇧🇷</strong>
-  <br>
-  <em>Porque acreditamos que tecnologia brasileira pode mudar o mundo</em>
+  <strong>Feito com ❤️ no Brasil</strong>
 </div>
