@@ -72,10 +72,10 @@ export function calculeCacheMaxSize() {
 
         switch (memoryTier) {
             case "high":
-                baseCacheSize = 120 // Tablets e dispositivos premium
+                baseCacheSize = 120 // Tablets e dispositivos super high-end
                 break
             case "medium-high":
-                baseCacheSize = 90 // Smartphones premium
+                baseCacheSize = 90 // Smartphones high-end
                 break
             case "medium":
                 baseCacheSize = 70 // Smartphones intermediários
