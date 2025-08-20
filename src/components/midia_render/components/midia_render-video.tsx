@@ -21,6 +21,8 @@ interface VideoPlayerProps {
     isFocused?: boolean
     width?: number
     height?: number
+    isLoadingCache?: boolean
+    momentId?: number
 }
 
 export default function MediaRenderVideo({
@@ -35,6 +37,8 @@ export default function MediaRenderVideo({
     isFocused = true,
     width,
     height,
+    isLoadingCache = false,
+    momentId,
 }: VideoPlayerProps) {
     const { momentSize } = React.useContext(MomentContext)
     // Se momentSize não existir, usa width/height das props
@@ -167,7 +171,12 @@ export default function MediaRenderVideo({
 
     // Handlers
     function handleLoad(data: OnLoadData) {
-        console.log("Video loaded successfully", data)
+        const cacheStatus = hasVideoCache ? "(CACHE)" : "(REMOTO)"
+        console.log(`Video loaded successfully ${cacheStatus}:`, {
+            momentId: momentId || "unknown",
+            duration: data.duration,
+            uri: uri?.substring(0, 50) + "...",
+        })
         setIsLoading(false)
         setVideoLoaded(true)
         setDuration(data.duration)
@@ -175,8 +184,8 @@ export default function MediaRenderVideo({
         // Reset retry counter on successful load
         retryCount.current = 0
 
-        // Só faz o fade da thumbnail se estiver em foco
-        if (isFocused) {
+        // Só faz o fade da thumbnail se estiver em foco e não estiver carregando cache
+        if (isFocused && !isLoadingCache) {
             fadeOutThumbnail()
         }
 
@@ -285,7 +294,9 @@ export default function MediaRenderVideo({
             <Animated.View
                 style={[
                     styles.thumbnailContainer,
-                    { opacity: isFocused ? (hasVideoCache ? 0 : fadeAnim) : 1 },
+                    {
+                        opacity: isFocused ? (hasVideoCache && !isLoadingCache ? 0 : fadeAnim) : 1,
+                    },
                 ]}
             >
                 <Image
