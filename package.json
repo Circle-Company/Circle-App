@@ -8,6 +8,9 @@
         "android": "expo run:android",
         "ios": "expo run:ios",
         "web": "expo start --web",
+        "web:dev": "webpack serve --mode development",
+        "web:build": "webpack --mode production",
+        "web:serve": "npm run web:build && npx serve dist",
         "lint": "expo lint",
         "pod-install": "cd ios && RCT_NEW_ARCH_ENABLED=1 bundle exec pod install"
     },

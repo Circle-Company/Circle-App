@@ -1,0 +1,10 @@
+[33mf60978a[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mimprove-feed-management-engine[m[33m, [m[1;31morigin/improve-feed-management-engine[m[33m)[m refactor: update import paths in Feed context to use absolute paths
+[33med40474[m add: constants file + fix debounce time
+[33maf574b8[m feat: implement ChunkManager class for managing feed item chunks with size limits and history tracking
+[33m02139d5[m feat: implement Fetcher class for fetching feed data
+[33m3293bf0[m feat: add mapper function for transforming moment data based on IDs
+[33m3ffd1c2[m feat: add ListUtils class for list management utilities
+[33m157f491[m feat: add calculeChunksMaxSize function for dynamic chunk sizing based on device performance metrics
+[33ma612b1d[m feat: add calculeCacheMaxSize function for dynamic cache sizing
+[33mdc82293[m feat: add DebounceGate class for request throttling
+[33me4e51a0[m feat: implement CacheManager for video caching
