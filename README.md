@@ -1,201 +1,183 @@
-<h1 align="center">Circle App - Crie momentos e Compartilhe Memórias</h1>
-
 <div align="center">
-  <a href="https://github.com/Circle-Company/Circle-App" target="_blank">
-    <img alt="Circle Banner" src="https://github.com/Circle-Company/.github/blob/eb5113ac18899f6e96f6e6791ef2a1e43091affe/profile/Circle%20App%20Presentation%20Banner.png" width="730"/>
-  </a>
+
+<img alt="Circle Banner" src="https://github.com/Circle-Company/.github/blob/eb5113ac18899f6e96f6e6791ef2a1e43091affe/profile/Circle%20App%20Presentation%20Banner.png" width="920"/>
+
+![React Native](https://img.shields.io/badge/React_Native-20232A?style=for-the-badge&logo=react&logoColor=61DAFB)
+![TypeScript](https://img.shields.io/badge/TypeScript-007ACC?style=for-the-badge&logo=typescript&logoColor=white)
+![Expo](https://img.shields.io/badge/Expo-1B1F23?style=for-the-badge&logo=expo&logoColor=white)
+![Firebase](https://img.shields.io/badge/Firebase-039BE5?style=for-the-badge&logo=Firebase&logoColor=white)
+
+![GitHub stars](https://img.shields.io/github/stars/Circle-Company/Circle-App?style=social)
+![GitHub forks](https://img.shields.io/github/forks/Circle-Company/Circle-App?style=social)
+![GitHub issues](https://img.shields.io/github/issues/Circle-Company/Circle-App)
+![GitHub license](https://img.shields.io/github/license/Circle-Company/Circle-App)
+
 </div>
 
-<div align="center">
-  <img alt="React Native" src="https://img.shields.io/badge/React_Native-20232A?style=for-the-badge&logo=react&logoColor=61DAFB">
-  <img alt="TypeScript" src="https://img.shields.io/badge/TypeScript-007ACC?style=for-the-badge&logo=typescript&logoColor=white">
-  <img alt="Expo" src="https://img.shields.io/badge/Expo-1B1F23?style=for-the-badge&logo=expo&logoColor=white">
-  <img alt="Firebase" src="https://img.shields.io/badge/Firebase-039BE5?style=for-the-badge&logo=Firebase&logoColor=white">
-</div>
+<br>
 
----
+# 📱 Circle App
 
-## 📱 Sobre o Circle App
+O **Circle App** é uma rede social **open source** que revoluciona como compartilhamos momentos. Uma plataforma **autêntica** e **intuitiva** para acompanhar amigos e família de forma leve e prazerosa.
 
-O **Circle App** é uma rede social inovadora e open source que busca revolucionar a forma como compartilhamos nossos momentos. Nossa missão é criar uma plataforma **autêntica**, **intuitiva** e **divertida** para acompanhar os amigos, onde compartilhar o dia a dia seja uma atividade leve e prazerosa.
+**✨ Diferenciais:** Interface moderna • Foco na autenticidade • Open source • Feito no Brasil 🇧🇷
 
-## 🧠 Funcionalidades
+### 🧠 Features Principais
 
--   📸 **Criar e editar momentos** com vídeo e texto
--   📂 **Organizar momentos** em memórias personalizadas
--   💬 **Interações sociais** como curtidas e comentários
--   📱 **Perfil público** com galeria de memórias
--   🔔 **Notificações em tempo real** via Firebase
--   🌍 **Suporte multilíngue** (Português, Inglês)
--   📊 **Estatísticas pessoais** de engajamento
--   🔍 **Sistema de busca** avançada com base em interações
+-   📸 **Momentos** - Criar e editar com vídeo e texto
+-   📂 **Memórias** - Organizar momentos em coleções temáticas
+-   💬 **Social** - Curtidas, comentários e interações
+-   📱 **Perfil** - Galeria personalizada de memórias
+-   🔔 **Notificações** - Push notifications em tempo real
+-   🌍 **Multilíngue** - Português e Inglês
 
----
+### Tecnologias
 
-## 🛠️ Tecnologias Utilizadas
+**Interface:** React Native, TypeScript, React Navigation, Moti  
+**Estado:** Zustand, TanStack Query, AsyncStorage  
+**Backend:** Firebase, Authentication, Push Notifications  
+**Testes:** Vitest, Testing Library  
+**Build:** EAS, Xcode, Android Studio
 
--   **Interface**: React Native + TypeScript
--   **Navegação**: React Navigation
--   **Estados/Armazenamento**: Zustand + TanStack Query
--   **Animações**: Expo + Moti (animações)
--   **Notificações**: Firebase (notificações, autenticação)
--   **Testes**: Vitest + Testing Library
--   **Build para Produção**: Expo Application Services (EAS)
+<br>
 
----
+# 🚀 Configuração do Ambiente
 
-## 🚀 Configuração do Ambiente
+### Requisitos
 
-### Pré-requisitos
-
-Antes de começar, certifique-se de ter instalado:
-
--   **Node.js** (versão 18 ou superior)
--   **npm** ou **yarn**
--   **Expo CLI**: `npm install -g @expo/cli`
--   **Git**
-
-Para desenvolvimento iOS (apenas macOS):
-
--   **Xcode** (versão mais recente)
--   **CocoaPods**: `sudo gem install cocoapods`
-
-Para desenvolvimento Android:
-
--   **Android Studio** com SDK configurado
--   **Java Development Kit (JDK)**
-
-### 📥 Instalação
-
-1. **Clone o repositório**
+**Básico:** Node.js v18+ • npm/yarn • Git • Expo CLI  
+**Development Build:** EAS CLI • Conta Expo • Dispositivo/Emulador
 
 ```bash
+npm install -g @expo/cli eas-cli
+```
+
+### Configuração por Plataforma
+
+<details>
+<summary><strong>🍎 iOS: Xcode + CocoaPods</strong></summary>
+
+```bash
+# Instalar dependências
+xcode-select --install
+sudo gem install cocoapods
+```
+
+**Requisitos:** macOS • Xcode (App Store) • iOS Simulator
+
+</details>
+
+<details>
+<summary><strong>🤖 Android: Android Studio + SDK</strong></summary>
+
+```bash
+# Configurar variáveis (adicionar ao ~/.bashrc)
+export ANDROID_HOME=$HOME/Library/Android/sdk
+export PATH=$PATH:$ANDROID_HOME/platform-tools
+```
+
+**Requisitos:** [Android Studio](https://developer.android.com/studio) • JDK 11+ • AVD configurado
+
+</details>
+
+### Instalação
+
+```bash
+# Clone e instale
 git clone https://github.com/Circle-Company/Circle-App.git
 cd Circle-App
-```
-
-2. **Instale as dependências**
-
-```bash
-# Usando npm
 npm install
 
-# Ou usando yarn
-yarn install
-```
-
-3. **Configure as dependências nativas (iOS)**
-
-```bash
+# iOS: Configure pods
 npm run pod-install
-# ou
-yarn pod-install
+
+# Configure EAS
+npx expo login
+eas build:configure
 ```
+<br>
 
----
+# 📱 Executando
 
-## 🎯 Executando o Projeto
-
-### Modo Desenvolvimento
+### Rodando Expo com **Development Build** (Não suporta o modo Expo GO)
 
 ```bash
-# Inicia o servidor de desenvolvimento
+# Criar build de desenvolvimento
+eas build --platform all --profile development
+
+# Executar
 npm start
-# ou
-yarn start
+# Pressione 's' para Development Build mode
 ```
-
-Após executar, você verá um QR code no terminal. Use o app **Expo Go** no seu dispositivo móvel para escanear e executar o app.
-
-### Executar em Dispositivos Específicos
+### Comandos por Plataforma
 
 ```bash
-# Android (dispositivo ou emulador)
-npm run android
-# ou
-yarn android
-
-# iOS (simulador - apenas macOS)
-npm run ios
-# ou
-yarn ios
-
-# Web (navegador)
-npm run web
-# ou
-yarn web
+npm run android    # Android
+npm run ios        # iOS
 ```
 
-### 🧪 Executando Testes
+### Executando Testes
 
 ```bash
-# Executar todos os testes
-npm test
-# ou
-yarn test
+# Testes
+npm test                    # Executar testes
+npm run test:coverage       # Com coverage
 
-# Executar testes com interface visual
-npm run test:ui
-# ou
-yarn test:ui
-
-# Executar testes com coverage
-npm run test:coverage
-# ou
-yarn test:coverage
+# Debug
+npx expo doctor             # Verificar problemas
+npx expo start --clear      # Limpar cache
 ```
 
+### Problemas Comuns
 
-## 📁 Estrutura do Projeto
-```
-Circle-App/
-├── src/
-│   ├── components/        # Componentes reutilizáveis
-│   ├── contexts/         # Context APIs (Auth, Persisted, etc.)
-│   ├── features/         # Features específicas do app
-│   ├── navigation/       # Configuração de navegação
-│   ├── pages/           # Telas/páginas do aplicativo
-│   ├── services/        # APIs e serviços externos
-│   ├── constants/       # Constantes (cores, fontes, etc.)
-│   └── types/           # Definições TypeScript
-├── assets/              # Imagens, fontes e recursos
-├── android/            # Código nativo Android
-├── ios/               # Código nativo iOS
-└── __tests__/         # Testes automatizados
+<details>
+<summary><strong>🐛 Cache/Bundle issues</strong></summary>
+
+```bash
+# Limpar caches e reinstalar
+npx expo start --clear
+rm -rf node_modules && npm install
 ```
 
-## 🤝 Contribuindo
+</details>
 
-Estamos sempre procurando novos colaboradores! Se você é desenvolvedor mobile, backend, designer ou simplesmente tem boas ideias, será muito bem-vindo! 💜
+<br>
 
-<div align="center">
-  <a href="https://github.com/Circle-Company/Circle-App" target="_blank">
-    <img alt="Procurando Contribuidores" src="https://github.com/tiagosavioli/tiagosavioli/blob/bf6bb095107d902c2fba9d4e65ac989c7389768b/Procurando%20por%20Contribu%C3%ADdores.png" width="730"/>
-  </a>
-</div>
+# Contribuindo
+
+Procuramos **desenvolvedores**, **designers** e **idealistas**! 💜
+
+### Como Contribuir
 
 1. **Fork** o projeto
-2. **Clone** seu fork: `git clone https://github.com/seu-usuario/Circle-App.git`
-3. **Crie uma branch**: `git checkout -b minha-feature`
-4. **Faça suas alterações** e commit: `git commit -m 'feat: adiciona nova feature'`
-5. **Push** para a branch: `git push origin minha-feature`
-6. **Abra um Pull Request** com uma descrição clara das mudanças
+2. **Clone** seu fork
+3. **Crie** uma branch: `git checkout -b minha-feature`
+4. **Faça** suas alterações
+5. **Abra** um Pull Request
 
-## 🐛 Reportando Bugs
+### Diretrizes
 
-Encontrou um bug? Nos ajude a melhorar o app:
+**📚 Documentação**, **🧪 Testes**, **🎨 Padrões**, **💬 Commits descritivos**
 
-1. Verifique se o bug já foi reportado nas [Issues](https://github.com/Circle-Company/Circle-App/issues)
-2. Se não, abra uma nova issue com:
-    - Descrição clara do problema
-    - Passos para reproduzir
-    - Screenshots (se aplicável)
-    - Informações do dispositivo/sistema
+### Reportando Bugs
 
-## 📄 Licença
+1. Verifique se já existe uma [issue similar](https://github.com/Circle-Company/Circle-App/issues)
+2. Crie uma nova issue com: descrição clara, passos para reproduzir, screenshots
 
-Este projeto está sob a licença MIT. Veja o arquivo [LICENSE](LICENSE) para mais detalhes.
+<br>
+
+# Licença
+
+**CIRCLE LICENCE** - Veja [LICENSE](LICENSE) para detalhes.
 
 <div align="center">
-  <strong>Feito com ❤️ no Brasil</strong>
+
+### 🇧🇷 **Feito com ❤️ no Brasil**
+
+[![GitHub](https://img.shields.io/badge/GitHub-100000?style=for-the-badge&logo=github&logoColor=white)](https://github.com/Circle-Company/Circle-App)
+[![Issues](https://img.shields.io/badge/Issues-FF6B6B?style=for-the-badge&logo=github&logoColor=white)](https://github.com/Circle-Company/Circle-App/issues)
+[![Pull Requests](https://img.shields.io/badge/Pull_Requests-4ECDC4?style=for-the-badge&logo=github&logoColor=white)](https://github.com/Circle-Company/Circle-App/pulls)
+
+**[⭐ Dê uma estrela se este projeto te ajudou!](https://github.com/Circle-Company/Circle-App)**
+
 </div>
