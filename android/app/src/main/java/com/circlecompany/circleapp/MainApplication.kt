@@ -1,4 +1,4 @@
-package com.tiago.savioli.circleappexpo
+package com.circlecompany.circleapp
 import com.facebook.react.common.assets.ReactFontManager
 
 import android.app.Application

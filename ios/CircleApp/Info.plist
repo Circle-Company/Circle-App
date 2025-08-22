@@ -28,7 +28,7 @@
         <key>CFBundleURLSchemes</key>
         <array>
           <string>circle</string>
-          <string>com.tiago.savioli.circleappexpo</string>
+          <string>com.circlecompany.circleapp</string>
         </array>
       </dict>
       <dict>

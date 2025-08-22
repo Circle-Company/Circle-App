@@ -1,4 +1,4 @@
-package com.tiago.savioli.circleappexpo
+package com.circlecompany.circleapp
 import expo.modules.splashscreen.SplashScreenManager
 
 import android.os.Build
