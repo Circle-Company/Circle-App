@@ -87,9 +87,9 @@ android {
     buildToolsVersion rootProject.ext.buildToolsVersion
     compileSdk rootProject.ext.compileSdkVersion
 
-    namespace 'com.tiago.savioli.circleappexpo'
+    namespace 'com.circlecompany.circleapp'
     defaultConfig {
-        applicationId 'com.tiago.savioli.circleappexpo'
+        applicationId 'com.circlecompany.circleapp'
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode 1

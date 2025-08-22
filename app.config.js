@@ -26,10 +26,10 @@ module.exports = function (_config) {
                     backgroundColor: "#1185FE",
                 },
                 googleServicesFile: "./google-services.json",
-                package: "com.tiago.savioli.circleappexpo",
+                package: "com.circlecompany.circleapp",
             },
             ios: {
-                bundleIdentifier: "com.tiago.savioli.circleappexpo",
+                bundleIdentifier: "com.circlecompany.circleapp",
             },
             web: { favicon: "./assets/favicon.png" },
             jsEngine: "jsc",
