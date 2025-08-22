@@ -1,21 +1,23 @@
+import { afterAll, beforeAll, beforeEach, describe, expect, it, vi } from "vitest"
+
 import { apiRoutes } from "../../services/Api"
 import { refreshJwtToken } from "./useRefreshJwtToken"
 
 // Mock dos módulos
-jest.mock("react-native", () => ({
+vi.mock("react-native", () => ({
     AppState: {
-        addEventListener: jest.fn(),
-        removeEventListener: jest.fn(),
+        addEventListener: vi.fn(),
+        removeEventListener: vi.fn(),
     },
 }))
 
-jest.mock("../../store", () => ({
+vi.mock("../../store", () => ({
     storage: {
-        set: jest.fn(),
-        getString: jest.fn(),
-        delete: jest.fn(),
+        set: vi.fn(),
+        getString: vi.fn(),
+        delete: vi.fn(),
     },
-    storageKeys: jest.fn(() => ({
+    storageKeys: vi.fn(() => ({
         account: {
             jwt: {
                 expiration: "account.jwt.expiration",
@@ -28,11 +30,11 @@ jest.mock("../../store", () => ({
     })),
 }))
 
-jest.useFakeTimers() // Ativar fake timers para simular tempo
-jest.mock("@/services/Api", () => ({
+vi.useFakeTimers() // Ativar fake timers para simular tempo
+vi.mock("@/services/Api", () => ({
     apiRoutes: {
         auth: {
-            refreshToken: jest.fn(() =>
+            refreshToken: vi.fn(() =>
                 Promise.resolve({ data: { jwtToken: "newToken", jwtExpiration: 9999999999 } }),
             ),
         },
@@ -40,27 +42,27 @@ jest.mock("@/services/Api", () => ({
 }))
 
 beforeAll(() => {
-    jest.useFakeTimers()
+    vi.useFakeTimers()
 })
 
 afterAll(() => {
-    jest.useRealTimers()
+    vi.useRealTimers()
 })
 
 describe("refreshJwtToken", () => {
     let sessionAccountMock: any
 
     beforeEach(() => {
-        jest.clearAllMocks()
-        jest.clearAllTimers()
+        vi.clearAllMocks()
+        vi.clearAllTimers()
         sessionAccountMock = {
-            setJwtToken: jest.fn(),
-            setJwtExpiration: jest.fn(),
+            setJwtToken: vi.fn(),
+            setJwtExpiration: vi.fn(),
         }
     })
 
     it("deve chamar a API de refreshToken e atualizar sessionAccount", async () => {
-        ;(apiRoutes.auth.refreshToken as jest.Mock).mockResolvedValueOnce({
+        ;(apiRoutes.auth.refreshToken as any).mockResolvedValueOnce({
             data: {
                 jwtToken: "novaJWT",
                 jwtExpiration: "9999999999",
