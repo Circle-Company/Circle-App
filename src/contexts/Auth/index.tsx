@@ -49,15 +49,30 @@ export function Provider({ children }: AuthProviderProps) {
         await api
             .post("/auth/sign-in", { username: signInputUsername, password: signInputPassword })
             .then((response) => {
-                storage.set("@circle:sessionId", response.data.session.user.id.toString())
-                setSessionData(response.data.session)
+                const data = response.data.session
+                setSessionData({
+                    user: data.user,
+                    account: data.account,
+                    preferences: data.preferences,
+                    statistics: data.statistics,
+                    history: data.history,
+                })
                 setRedirectTo("APP")
             })
             .finally(() => {
                 setLoading(false)
             })
             .catch((err) => {
-                setErrorMessage(err.response.data.message.split(". ")[0])
+                setSessionData({} as SessionDataType)
+                setLoading(false)
+                console.error("SignIn Error:", err)
+                if (err.response.status === 400) {
+                    setErrorMessage("Invalid username or password.")
+                } else if (err.response.status === 403) {
+                    setErrorMessage("Your account is not active.")
+                } else {
+                    setErrorMessage("An unexpected error occurred. Please try again later.")
+                }
             })
     }
 

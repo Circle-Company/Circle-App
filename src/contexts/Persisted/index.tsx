@@ -1,5 +1,3 @@
-import { DeviceDataType, SessionDataType } from "./types"
-
 import React from "react"
 import { refreshJwtToken } from "../../lib/hooks/useRefreshJwtToken"
 import AuthContext from "../Auth/index"
@@ -9,6 +7,7 @@ import { usePermissionsStore } from "./persistedPermissions"
 import { usePreferencesStore } from "./persistedPreferences"
 import { useStatisticsStore } from "./persistedStatistics"
 import { useUserStore } from "./persistedUser"
+import { DeviceDataType, SessionDataType } from "./types"
 
 type PersistedProviderProps = { children: React.ReactNode }
 export type PersistedContextProps = {
@@ -28,23 +27,17 @@ export function Provider({ children }: PersistedProviderProps) {
     const sessionHistory = useHistoryStore()
     const devicePermissions = usePermissionsStore()
 
+    // ✅ Persistir somente quando o usuário fizer login
     React.useEffect(() => {
-        if (sessionData.user) sessionUser.set(sessionData.user)
+        if (!sessionData?.user) return
+
+        sessionUser.set(sessionData.user)
+        console.warn("Persisting session data:", sessionData)
         if (sessionData.account) sessionAccount.set(sessionData.account)
         if (sessionData.preferences) sessionPreferences.set(sessionData.preferences)
         if (sessionData.statistics) sessionStatistics.set(sessionData.statistics)
         if (sessionData.history) sessionHistory.set(sessionData.history)
-    }, [
-        sessionData,
-        signIn,
-        signUp,
-        signOut,
-        sessionUser,
-        sessionAccount,
-        sessionPreferences,
-        sessionStatistics,
-        sessionHistory,
-    ])
+    }, [sessionData]) // só dispara quando o sessionData mudar
 
     async function refreshToken() {
         await refreshJwtToken(

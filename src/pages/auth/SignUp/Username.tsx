@@ -11,7 +11,7 @@ import { useNavigation } from "@react-navigation/native"
 import { LinearGradient } from "expo-linear-gradient"
 import { t } from "i18next"
 import React from "react"
-import { StatusBar, View, useColorScheme } from "react-native"
+import { StatusBar, TextStyle, View, ViewStyle, useColorScheme } from "react-native"
 
 export default function UsernameScreen() {
     const isDarkMode = useColorScheme() === "dark"
@@ -19,11 +19,11 @@ export default function UsernameScreen() {
         React.useContext(AuthContext)
     const navigation: any = useNavigation()
 
-    const container: any = {
+    const container: ViewStyle = {
         flex: 1,
         alignItems: "center",
     }
-    const headerContainer: any = {
+    const headerContainer: ViewStyle = {
         width: sizes.screens.width,
         height: sizes.headers.height * 0.7,
         flexDirection: "row",
@@ -33,7 +33,7 @@ export default function UsernameScreen() {
         marginBottom: sizes.margins["1xl"] * 0.8,
         backgroundColor: "transparent",
     }
-    const headerTitle: any = {
+    const headerTitle: TextStyle = {
         fontSize: fonts.size.title3,
         fontFamily: fonts.family["Black-Italic"],
         alignSelf: "center",
@@ -41,13 +41,13 @@ export default function UsernameScreen() {
         backgroundColor: "transparent",
     }
 
-    const input_container: any = {
+    const input_container: ViewStyle = {
         alignItems: "center",
         paddingBottom: sizes.paddings["1xl"] * 0.8,
         backgroundColor: "transparent",
     }
 
-    const description: any = {
+    const description: TextStyle = {
         fontSize: fonts.size.title3,
         fontFamily: fonts.family.Bold,
         color: ColorTheme().text,
@@ -56,14 +56,14 @@ export default function UsernameScreen() {
         textAlign: "center",
     }
 
-    const subDescription: any = {
+    const subDescription: TextStyle = {
         fontSize: fonts.size.body,
         fontFamily: fonts.family.Medium,
         color: ColorTheme().text + 90,
         marginBottom: sizes.margins["1xl"] * 1.2,
     }
 
-    const inferior_gradient: any = {
+    const inferior_gradient: ViewStyle = {
         width: sizes.window.width,
         alignSelf: "flex-start",
         flex: 1,
@@ -73,7 +73,7 @@ export default function UsernameScreen() {
         top: -10,
         opacity: 0.4,
     }
-    const button_text: any = {
+    const button_text: TextStyle = {
         fontSize: fonts.size.body * 0.9,
         fontFamily: fonts.family["Bold-Italic"],
         color: signInputUsername
