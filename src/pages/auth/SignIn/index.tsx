@@ -1,21 +1,24 @@
-import { StatusBar, StyleProp, TextStyle, ViewStyle, useColorScheme } from "react-native"
-import { Text, View } from "../../../components/Themed"
 import ColorTheme, { colors } from "../../../constants/colors"
+import { StatusBar, StyleProp, TextStyle, View, ViewStyle, useColorScheme } from "react-native"
 
-import Icon from "@/assets/icons/svgs/arrow_circle_right.svg"
-import React from "react"
-import PasswordInput from "../../../components/auth/passwordInput"
+import AuthContext from "../../../contexts/Auth"
 import AuthTermsText from "../../../components/auth/terms"
-import UsernameInput from "../../../components/auth/usernameInput"
-import ButtonStandart from "../../../components/buttons/button-standart"
 import ButtonClose from "../../../components/buttons/close"
+import ButtonStandart from "../../../components/buttons/button-standart"
+import Icon from "@/assets/icons/svgs/arrow_circle_right.svg"
+import { LinearGradient } from "expo-linear-gradient"
 import { Loading } from "../../../components/loading"
+import PasswordInput from "../../../components/auth/passwordInput"
+import React from "react"
+import { Text } from "../../../components/Themed"
+import UsernameInput from "../../../components/auth/usernameInput"
 import fonts from "../../../constants/fonts"
 import sizes from "../../../constants/sizes"
-import AuthContext from "../../../contexts/Auth"
+import { useTranslation } from "react-i18next"
 
 export default function SignInScreen() {
     const isDarkMode = useColorScheme() === "dark"
+    const { t } = useTranslation()
     const {
         signIn,
         setErrorMessage,
@@ -37,22 +40,53 @@ export default function SignInScreen() {
         alignItems: "center",
     }
 
-    const headerContainer: StyleProp<ViewStyle> = {
+    const headerContainer: ViewStyle = {
         width: sizes.screens.width,
-        height: sizes.headers.height,
+        height: sizes.headers.height * 0.7,
         flexDirection: "row",
         paddingHorizontal: sizes.paddings["1md"],
-        justifyContent: "flex-start",
+        justifyContent: "center",
         alignItems: "center",
         marginBottom: sizes.margins["1xl"] * 0.8,
+        backgroundColor: "transparent",
     }
-    const headerTitle: StyleProp<TextStyle> = {
-        fontSize: fonts.size.title2,
-        fontFamily: fonts.family.Bold,
+    const headerTitle: TextStyle = {
+        fontSize: fonts.size.title3,
+        fontFamily: fonts.family["Black-Italic"],
+        alignSelf: "center",
+        marginLeft: -35,
+        backgroundColor: "transparent",
     }
-    const input_container: StyleProp<ViewStyle> = {
+
+    const input_container: ViewStyle = {
         alignItems: "center",
         paddingBottom: sizes.paddings["1xl"] * 0.8,
+        backgroundColor: "transparent",
+    }
+    const description: TextStyle = {
+        fontSize: fonts.size.title3,
+        fontFamily: fonts.family.Bold,
+        color: ColorTheme().text,
+        marginBottom: sizes.margins["2sm"],
+        marginHorizontal: sizes.margins["1lg"],
+        textAlign: "center",
+    }
+
+    const subDescription: TextStyle = {
+        fontSize: fonts.size.body,
+        fontFamily: fonts.family.Medium,
+        color: ColorTheme().text + 90,
+        marginBottom: sizes.margins["1xl"] * 1.2,
+    }
+    const inferior_gradient: ViewStyle = {
+        width: sizes.window.width,
+        alignSelf: "flex-start",
+        flex: 1,
+        height: sizes.window.height - 500,
+        position: "absolute",
+        zIndex: 0,
+        top: -10,
+        opacity: 0.4,
     }
     const button_text = {
         fontSize: fonts.size.body * 0.9,
@@ -90,16 +124,25 @@ export default function SignInScreen() {
     return (
         <View style={container}>
             <StatusBar backgroundColor={colors.gray.black} barStyle={"light-content"} />
+            <LinearGradient
+                renderToHardwareTextureAndroid
+                colors={["rgba(70, 70, 70, 1)", "#000000ff"]}
+                style={inferior_gradient}
+            />
             <View style={headerContainer}>
                 <ButtonClose />
                 <View style={{ flex: 1, marginLeft: sizes.margins["2sm"] }}>
                     <Text style={headerTitle} testID="title">
-                        Sign In
+                        {t("Wellcome Back")}
                     </Text>
                 </View>
             </View>
 
             <View style={input_container} testID="inputs-container">
+                <Text style={description}>
+                    {t("Chose a name to be your identity in community")}
+                </Text>
+                <Text style={subDescription}>{t("You can't change it later.")}</Text>
                 <View style={{ marginBottom: sizes.margins["1md"] }}>
                     <UsernameInput type="signIn" />
                 </View>
