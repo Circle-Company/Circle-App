@@ -1,5 +1,6 @@
 //@ts-ignore
 import { APP_VERSION, DEBUG, MIXPANEL_KEY, NODE_ENV } from "@env"
+
 import emails from "./emails"
 import metadata from "./metadata"
 
@@ -16,15 +17,9 @@ const api = {
     API_VERSION: "1.0.0",
 }
 
-const analytics = {
-    MIXPANEL_KEY: MIXPANEL_KEY,
-}
-
-const log = {}
-
 const required = {
+    ...api,
     NODE_ENV: NODE_ENV,
-    MIXPANEL_KEY: MIXPANEL_KEY,
     APPLICATION_NAME: metadata.APPLICATION_NAME,
 }
 
@@ -48,7 +43,5 @@ Object.entries(required).map((entry) => {
 export default {
     ...api,
     ...environment,
-    ...log,
     ...options,
-    ...analytics,
 }
