@@ -153,10 +153,6 @@ Procuramos **desenvolvedores**, **designers** e **idealistas**! 💜
 4. **Faça** suas alterações
 5. **Abra** um Pull Request
 
-### Diretrizes
-
-**📚 Documentação**, **🧪 Testes**, **🎨 Padrões**, **💬 Commits descritivos**
-
 ### Reportando Bugs
 
 1. Verifique se já existe uma [issue similar](https://github.com/Circle-Company/Circle-App/issues)
