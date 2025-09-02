@@ -168,10 +168,6 @@ Procuramos **desenvolvedores**, **designers** e **idealistas**! 💜
 
 ### 🇧🇷 **Feito com ❤️ no Brasil**
 
-[![GitHub](https://img.shields.io/badge/GitHub-100000?style=for-the-badge&logo=github&logoColor=white)](https://github.com/Circle-Company/Circle-App)
-[![Issues](https://img.shields.io/badge/Issues-FF6B6B?style=for-the-badge&logo=github&logoColor=white)](https://github.com/Circle-Company/Circle-App/issues)
-[![Pull Requests](https://img.shields.io/badge/Pull_Requests-4ECDC4?style=for-the-badge&logo=github&logoColor=white)](https://github.com/Circle-Company/Circle-App/pulls)
-
 **[⭐ Dê uma estrela se este projeto te ajudou!](https://github.com/Circle-Company/Circle-App)**
 
 </div>
