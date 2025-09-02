@@ -5,6 +5,7 @@
 ![React Native](https://img.shields.io/badge/React_Native-20232A?style=for-the-badge&logo=react&logoColor=61DAFB)
 ![TypeScript](https://img.shields.io/badge/TypeScript-007ACC?style=for-the-badge&logo=typescript&logoColor=white)
 ![Expo](https://img.shields.io/badge/Expo-1B1F23?style=for-the-badge&logo=expo&logoColor=white)
+
 ![GitHub stars](https://img.shields.io/github/stars/Circle-Company/Circle-App?style=social)
 ![GitHub forks](https://img.shields.io/github/forks/Circle-Company/Circle-App?style=social)
 ![GitHub issues](https://img.shields.io/github/issues/Circle-Company/Circle-App)
