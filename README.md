@@ -18,8 +18,6 @@
 
 O **Circle App** é uma rede social **open source** que revoluciona como compartilhamos momentos. Uma plataforma **autêntica** e **intuitiva** para acompanhar amigos e família de forma leve e prazerosa.
 
-**✨ Diferenciais:** Interface moderna • Foco na autenticidade • Open source • Feito no Brasil 🇧🇷
-
 ### 🧠 Features Principais
 
 -   📸 **Momentos** - Criar e editar com vídeo e texto
@@ -30,12 +28,6 @@ O **Circle App** é uma rede social **open source** que revoluciona como compart
 -   🌍 **Multilíngue** - Português e Inglês
 
 ### Tecnologias
-
-**Interface:** React Native, TypeScript, React Navigation, Moti  
-**Estado:** Zustand, TanStack Query, AsyncStorage  
-**Backend:** Firebase, Authentication, Push Notifications  
-**Testes:** Vitest, Testing Library  
-**Build:** EAS, Xcode, Android Studio
 
 <br>
 
