@@ -1,67 +1,55 @@
 <div align="center">
 
-<img alt="Circle Banner" src="https://github.com/Circle-Company/.github/blob/eb5113ac18899f6e96f6e6791ef2a1e43091affe/profile/Circle%20App%20Presentation%20Banner.png" width="920"/>
+<img alt="Circle Banner" src="https://github.com/Circle-Company/.github/blob/8f4a401a696c9baae2c584cd53f7266094bcb259/profile/PRESENTATION-BANNER-V3.png" width="1080" height="920"/>
 
-![React Native](https://img.shields.io/badge/React_Native-20232A?style=for-the-badge&logo=react&logoColor=61DAFB)
-![TypeScript](https://img.shields.io/badge/TypeScript-007ACC?style=for-the-badge&logo=typescript&logoColor=white)
-![Expo](https://img.shields.io/badge/Expo-1B1F23?style=for-the-badge&logo=expo&logoColor=white)
-
-![GitHub stars](https://img.shields.io/github/stars/Circle-Company/Circle-App?style=social)
-![GitHub forks](https://img.shields.io/github/forks/Circle-Company/Circle-App?style=social)
-![GitHub issues](https://img.shields.io/github/issues/Circle-Company/Circle-App)
+[![GitHub stars](https://img.shields.io/github/stars/Circle-Company/Circle-App?style=social)](https://github.com/Circle-Company/Circle-App/stargazers)
+[![GitHub forks](https://img.shields.io/github/forks/Circle-Company/Circle-App?style=social)](https://github.com/Circle-Company/Circle-App/network/members)
+[![GitHub issues](https://img.shields.io/github/issues/Circle-Company/Circle-App)](https://github.com/Circle-Company/Circle-App/issues)
 
 </div>
 
-<br>
+# 💜 Nossa Missão
 
-# 📱 Circle App
+O **Circle App** é uma rede social **open source** que busca devolver autenticidade às conexões digitais.
+✨ Em vez de métricas vazias, valoriza histórias reais e a simplicidade de compartilhar momentos que realmente importam.
 
-O **Circle App** é uma rede social **open source** que revoluciona como compartilhamos momentos. Uma plataforma **autêntica** e **intuitiva** para acompanhar amigos e família de forma leve e prazerosa.
+Com um design **inovador**, **intuitivo** e pensado do zero, o Circle redefine a experiência social: mais leve, mais fluida e centrada em interações genuínas.
+Uma plataforma construída para expressar o que há de mais humano — de forma livre, criativa e transparente. 🌿
 
-### 🧠 Features Principais
 
--   📸 **Momentos** - Criar e editar com vídeo e texto
--   📂 **Memórias** - Organizar momentos em coleções temáticas
--   💬 **Social** - Curtidas, comentários e interações
--   📱 **Perfil** - Galeria personalizada de memórias
--   🔔 **Notificações** - Push notifications em tempo real
--   🌍 **Multilíngue** - Português e Inglês
+# ⚡️ Setup
 
-### Tecnologias
+### 📌 Requisitos
 
-<br>
-
-# 🚀 Configuração do Ambiente
-
-### Requisitos
-
-**Básico:** Node.js v18+ • npm/yarn • Git • Expo CLI  
-**Development Build:** EAS CLI • Conta Expo • Dispositivo/Emulador
+* **Básico:** Node.js v18+, npm ou yarn, Git, Expo CLI
+* **Development Build:** EAS CLI, conta Expo, dispositivo físico ou emulador
 
 ```bash
 npm install -g @expo/cli eas-cli
 ```
 
-### Configuração por Plataforma
+### 🍏 iOS
 
 <details>
-<summary><strong>🍎 iOS: Xcode + CocoaPods</strong></summary>
+<summary><strong>Instalação (Xcode + CocoaPods)</strong></summary>
 
 ```bash
-# Instalar dependências
+# Instalar dependências básicas
 xcode-select --install
 sudo gem install cocoapods
 ```
 
-**Requisitos:** macOS • Xcode (App Store) • iOS Simulator
+**Requisitos:** macOS • [Xcode (App Store)](https://apps.apple.com/br/app/xcode/id497799835) • iOS Simulator
 
 </details>
 
+### 🤖 Android
+
 <details>
-<summary><strong>🤖 Android: Android Studio + SDK</strong></summary>
+<summary><strong>Instalação (Android Studio + SDK)</strong></summary>
 
 ```bash
-# Configurar variáveis (adicionar ao ~/.bashrc)
+# Configurar variáveis (adicione ao ~/.bashrc ou ~/.zshrc)
 export ANDROID_HOME=$HOME/Library/Android/sdk
 export PATH=$PATH:$ANDROID_HOME/platform-tools
 ```
@@ -70,96 +58,103 @@ export PATH=$PATH:$ANDROID_HOME/platform-tools
 
 </details>
 
-### Instalação
+# 📦 Instalação do Projeto
 
 ```bash
-# Clone e instale
+# Clone o repositório
 git clone https://github.com/Circle-Company/Circle-App.git
 cd Circle-App
+
+# Instale as dependências
 npm install
 
-# iOS: Configure pods
+# iOS: instale os pods
 npm run pod-install
 
-# Configure EAS
+# Configure o EAS
 npx expo login
 eas build:configure
 ```
-<br>
 
-# 📱 Executando
+# 🚀 Executando o App
 
-### Rodando Expo com **Development Build** (Não suporta o modo Expo GO)
+### Development Build (recomendado)
+
+> ⚠️ O modo Expo GO **não é suportado**
 
 ```bash
 # Criar build de desenvolvimento
 eas build --platform all --profile development
 
-# Executar
+# Iniciar o servidor
 npm start
-# Pressione 's' para Development Build mode
+# Pressione 's' para entrar no Development Build mode
 ```
-### Comandos por Plataforma
+
+### Comandos Rápidos
 
 ```bash
 npm run android    # Android
 npm run ios        # iOS
 ```
 
-### Executando Testes
+# 🧪 Testes & Debug
 
 ```bash
-# Testes
-npm test                    # Executar testes
-npm run test:coverage       # Com coverage
+# Rodar testes
+npm test
 
-# Debug
-npx expo doctor             # Verificar problemas
-npx expo start --clear      # Limpar cache
+# Testes com coverage
+npm run test:coverage
+
+# Diagnóstico Expo
+npx expo doctor
+
+# Limpar cache
+npx expo start --clear
 ```
 
-### Problemas Comuns
+
+# 🛠 Problemas Comuns
 
 <details>
-<summary><strong>🐛 Cache/Bundle issues</strong></summary>
+<summary><strong>Cache / Bundle quebrado</strong></summary>
 
 ```bash
-# Limpar caches e reinstalar
+# Limpar caches e reinstalar pacotes
 npx expo start --clear
 rm -rf node_modules && npm install
 ```
 
 </details>
 
-<br>
+# 🤝 Contribuindo
 
-# Contribuindo
+Quer contribuir com o projeto? Siga o fluxo abaixo:
 
-Procuramos **desenvolvedores**, **designers** e **idealistas**! 💜
+1. Faça um **fork** do repositório
+2. **Clone** seu fork localmente
+3. Crie uma branch:
 
-### Como Contribuir
+   ```bash
+   git checkout -b minha-feature
+   ```
+4. Faça suas alterações
+5. Abra um **Pull Request**
 
-1. **Fork** o projeto
-2. **Clone** seu fork
-3. **Crie** uma branch: `git checkout -b minha-feature`
-4. **Faça** suas alterações
-5. **Abra** um Pull Request
+### 🐛 Reportar Bugs
 
-### Reportando Bugs
+1. Verifique se já existe uma [issue semelhante](https://github.com/Circle-Company/Circle-App/issues)
+2. Se não houver, crie uma nova issue descrevendo:
 
-1. Verifique se já existe uma [issue similar](https://github.com/Circle-Company/Circle-App/issues)
-2. Crie uma nova issue com: descrição clara, passos para reproduzir, screenshots
+   * Problema encontrado
+   * Passos para reproduzir
+   * Screenshots (se possível)
 
-<br>
-
-# Licença
-
-**CIRCLE LICENCE** - Veja [LICENSE](LICENSE) para detalhes.
+---
 
 <div align="center">
 
-### 🇧🇷 **Feito com ❤️ no Brasil**
-
-**[⭐ Dê uma estrela se este projeto te ajudou!](https://github.com/Circle-Company/Circle-App)**
+🇧🇷 **Feito com 💜 no Brasil**
 
 </div>
