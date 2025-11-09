@@ -1,15 +1,15 @@
-import CircleIcon from "@/assets/icons/svgs/circle-spinner.svg"
 import { RouteProp, useRoute } from "@react-navigation/native"
-import React from "react"
 import { View, ViewStyle } from "react-native"
+
+import { AnimatedVerticalScrollView } from "../../../lib/hooks/useAnimatedScrollView"
+import CircleIcon from "@/assets/icons/svgs/circle-spinner.svg"
 import ProfileHeader from "../../../components/headers/profile/profile-header"
-import { colors } from "../../../constants/colors"
-import sizes from "../../../constants/sizes"
-import ViewProfileContext from "../../../contexts/viewProfile"
-import ListMemories from "../../../features/list-memories/list-memories-preview"
+import React from "react"
 import RenderProfile from "../../../features/render-profile"
 import { RenderProfileSkeleton } from "../../../features/render-profile/skeleton"
-import { AnimatedVerticalScrollView } from "../../../lib/hooks/useAnimatedScrollView"
+import ViewProfileContext from "../../../contexts/viewProfile"
+import { colors } from "../../../constants/colors"
+import sizes from "../../../constants/sizes"
 
 type ProfileScreenRouteParams = {
     findedUserPk: string
@@ -75,7 +75,6 @@ export default function ProfileScreen() {
                     )}
                 >
                     <RenderProfile user={userData} />
-                    <ListMemories isAccountScreen={false} user={userData} />
                 </AnimatedVerticalScrollView>
             </View>
         )

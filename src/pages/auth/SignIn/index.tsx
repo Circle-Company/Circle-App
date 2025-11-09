@@ -106,17 +106,30 @@ export default function SignInScreen() {
     const errorContainer: StyleProp<ViewStyle> = {
         marginTop: -sizes.margins["2sm"],
         marginBottom: sizes.margins["1md"],
+        paddingHorizontal: sizes.paddings["1md"],
+        alignItems: "center",
     }
 
     const errorText: StyleProp<TextStyle> = {
         fontSize: fonts.size.body * 0.9,
         fontFamily: fonts.family.Medium,
         color: isDarkMode ? colors.red.red_05 : colors.red.red_05,
+        textAlign: "center",
+        marginBottom: sizes.margins["2sm"],
+    }
+
+    const errorActionText: StyleProp<TextStyle> = {
+        fontSize: fonts.size.footnote,
+        fontFamily: fonts.family.Regular,
+        color: isDarkMode ? colors.gray.grey_04 : colors.gray.grey_06,
+        textAlign: "center",
+        fontStyle: "italic",
     }
 
     function handlePress() {
         if (!loading && signInputUsername && signInputPassword) signIn()
     }
+
     React.useEffect(() => {
         setErrorMessage("")
     }, [])
@@ -152,7 +165,7 @@ export default function SignInScreen() {
             {errorMessage && (
                 <View testID="error-container" style={errorContainer}>
                     <Text testID="error-message" style={errorText}>
-                        Error: {errorMessage}
+                        {t(errorMessage)}
                     </Text>
                 </View>
             )}
@@ -175,13 +188,13 @@ export default function SignInScreen() {
                             backgroundColor: "#00000000",
                         }}
                     >
-                        <Text style={[button_text, { marginRight: 4 }]}>Loading</Text>
+                        <Text style={[button_text, { marginRight: 4 }]}>{t("Loading")}</Text>
                         <Loading.ActivityIndicator size={15} />
                     </View>
                 ) : (
                     <>
                         <Text style={button_text} testID="handle-submit-text">
-                            Enter Now
+                            {t("Enter Now")}
                         </Text>
                         <Icon
                             style={icon}
@@ -200,7 +213,7 @@ export default function SignInScreen() {
             </ButtonStandart>
 
             <View testID="auth-terms" style={{ marginTop: sizes.margins["1xl"] }}>
-                <AuthTermsText signText="Enter Now" />
+                <AuthTermsText signText={t("Enter Now")} />
             </View>
         </View>
     )

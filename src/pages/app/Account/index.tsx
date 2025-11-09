@@ -1,13 +1,12 @@
-import CircleIcon from "@/assets/icons/svgs/circle-spinner.svg"
-import React from "react"
-import { View } from "../../../components/Themed"
-import { colors } from "../../../constants/colors"
 import AccountContext from "../../../contexts/account"
+import { AnimatedVerticalScrollView } from "../../../lib/hooks/useAnimatedScrollView"
+import CircleIcon from "@/assets/icons/svgs/circle-spinner.svg"
 import PersistedContext from "../../../contexts/Persisted"
-import ListMemories from "../../../features/list-memories/list-memories-preview"
+import React from "react"
 import RenderProfile from "../../../features/render-profile"
 import { RenderProfileSkeleton } from "../../../features/render-profile/skeleton"
-import { AnimatedVerticalScrollView } from "../../../lib/hooks/useAnimatedScrollView"
+import { View } from "../../../components/Themed"
+import { colors } from "../../../constants/colors"
 
 export default function AccountScreen() {
     const { setRefreshing } = React.useContext(AccountContext)
@@ -16,7 +15,7 @@ export default function AccountScreen() {
 
     async function fetchData() {
         setLoading(true)
-        await session.user.get(Number(session.user.id))
+        await session.user.get(session.user.id)
         await session.statistics.get(session.user.id).finally(() => {
             setTimeout(() => {
                 setLoading(false)
@@ -57,7 +56,6 @@ export default function AccountScreen() {
                 )}
             >
                 {loading ? <RenderProfileSkeleton /> : <RenderProfile user={renderUser} />}
-                <ListMemories isAccountScreen={true} user={renderUser} />
             </AnimatedVerticalScrollView>
         </View>
     )
