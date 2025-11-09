@@ -1,25 +1,55 @@
-import { useFeed } from "@/contexts/Feed/useFeed"
-import { useMemo, useContext } from "react"
+import { useContext, useMemo } from "react"
+
 import PersistedContext from "@/contexts/Persisted"
 
-export function calculeCacheMaxSize() {
-    const { feedData } = useFeed()
+type DeviceMetadata = {
+    deviceId?: string
+    screenWidth?: number
+    screenHeight?: number
+    isTablet?: boolean
+    pixelDensity?: number
+    fontScale?: number
+    totalMemory?: number
+    availableMemory?: number
+}
+
+const DEFAULT_METADATA: Required<DeviceMetadata> = {
+    deviceId: "",
+    screenWidth: 0,
+    screenHeight: 0,
+    isTablet: false,
+    pixelDensity: 1,
+    fontScale: 1,
+    totalMemory: 0,
+    availableMemory: 0,
+}
+
+export function useCalculeCacheMaxSize(feedDataLength: number): number {
     const { device } = useContext(PersistedContext)
-    const { metadata } = device
+    const metadata = (device as any)?.metadata as DeviceMetadata | undefined
 
     return useMemo(() => {
+        if (!metadata) {
+            return 50
+        }
+
+        const safeMetadata: Required<DeviceMetadata> = {
+            ...DEFAULT_METADATA,
+            ...metadata,
+        }
+
         // Verificar se os metadados estão disponíveis
-        if (!metadata.deviceId) {
+        if (!safeMetadata.deviceId) {
             return 50 // Valor padrão se metadados não disponíveis
         }
 
         // Usar dados reais de memória se disponíveis, senão estimar
         const getDeviceMemoryTier = () => {
             // Se temos dados reais de memória, usar eles
-            if (metadata.totalMemory > 0) {
-                const totalMemoryGB = metadata.totalMemory / (1024 * 1024 * 1024)
+            if (safeMetadata.totalMemory > 0) {
+                const totalMemoryGB = safeMetadata.totalMemory / (1024 * 1024 * 1024)
                 const memoryAvailablePercentage =
-                    (metadata.availableMemory / metadata.totalMemory) * 100
+                    (safeMetadata.availableMemory / safeMetadata.totalMemory) * 100
 
                 // Classificar baseado na memória total
                 if (totalMemoryGB >= 8) {
@@ -34,13 +64,13 @@ export function calculeCacheMaxSize() {
             }
 
             // Fallback: estimar baseado nas características do dispositivo
-            const screenArea = metadata.screenWidth * metadata.screenHeight
+            const screenArea = safeMetadata.screenWidth * safeMetadata.screenHeight
             const isHighEndDevice =
-                metadata.isTablet ||
+                safeMetadata.isTablet ||
                 screenArea > 2400000 || // telas muito grandes (>1920x1250)
-                metadata.pixelDensity > 3
+                safeMetadata.pixelDensity > 3
 
-            if (metadata.isTablet) {
+            if (safeMetadata.isTablet) {
                 return "high" // Tablets geralmente têm 6GB+
             } else if (isHighEndDevice) {
                 return "medium-high" // Dispositivos premium (4-8GB)
@@ -55,15 +85,15 @@ export function calculeCacheMaxSize() {
         const deviceFactors = {
             // Dispositivos com tela maior podem ter cache maior
             screenFactor: Math.min(
-                (metadata.screenWidth * metadata.screenHeight) / (1920 * 1080),
+                (safeMetadata.screenWidth * safeMetadata.screenHeight) / (1920 * 1080),
                 2,
             ),
             // Tablets geralmente têm mais memória
-            tabletFactor: metadata.isTablet ? 1.5 : 1,
+            tabletFactor: safeMetadata.isTablet ? 1.5 : 1,
             // Densidade de pixels afeta o uso de memória (maior densidade = mais memória usada por imagem)
-            densityFactor: Math.max(0.7, 2.2 - metadata.pixelDensity),
+            densityFactor: Math.max(0.7, 2.2 - safeMetadata.pixelDensity),
             // Fator de escala da fonte pode indicar dispositivos com menos recursos
-            fontScaleFactor: metadata.fontScale > 1.3 ? 0.8 : 1, // usuários com fonte grande podem ter dispositivos mais antigos
+            fontScaleFactor: safeMetadata.fontScale > 1.3 ? 0.8 : 1, // usuários com fonte grande podem ter dispositivos mais antigos
         }
 
         // Tamanho base do cache baseado na capacidade real ou estimada
@@ -99,26 +129,16 @@ export function calculeCacheMaxSize() {
 
         // Log detalhado incluindo dados de capacidade
         const memoryInfo =
-            metadata.totalMemory > 0
-                ? `${Math.round(metadata.totalMemory / 1024 / 1024 / 1024)}GB RAM (${Math.round(
-                      (metadata.availableMemory / metadata.totalMemory) * 100,
+            safeMetadata.totalMemory > 0
+                ? `${Math.round(safeMetadata.totalMemory / 1024 / 1024 / 1024)}GB RAM (${Math.round(
+                      (safeMetadata.availableMemory / safeMetadata.totalMemory) * 100,
                   )}% livre)`
                 : "RAM estimada"
 
         console.log(
-            `Cache calculado: ${optimizedSize} items (Tier: ${memoryTier}, ${memoryInfo}, Tablet: ${metadata.isTablet}, Tela: ${metadata.screenWidth}x${metadata.screenHeight})`,
+            `Cache calculado: ${optimizedSize} items (Tier: ${memoryTier}, ${memoryInfo}, Tablet: ${safeMetadata.isTablet}, Tela: ${safeMetadata.screenWidth}x${safeMetadata.screenHeight})`,
         )
 
         return optimizedSize
-    }, [
-        metadata.deviceId,
-        metadata.isTablet,
-        metadata.screenWidth,
-        metadata.screenHeight,
-        metadata.pixelDensity,
-        metadata.fontScale,
-        metadata.totalMemory,
-        metadata.availableMemory,
-        feedData.length,
-    ])
+    }, [metadata, feedDataLength])
 }

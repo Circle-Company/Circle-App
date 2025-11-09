@@ -5,7 +5,7 @@ export class ListUtils {
      * @param newList New incoming items
      * @returns Array with only unique new items
      */
-    static getUniqueNewItems(baseList: number[], newList: number[]): number[] {
+    static getUniqueNewItems(baseList: string[], newList: string[]): string[] {
         const baseSet = new Set(baseList)
         return newList.filter((item) => !baseSet.has(item))
     }
@@ -16,7 +16,7 @@ export class ListUtils {
      * @param maxItems Maximum size allowed
      * @returns Trimmed list
      */
-    static limitListSize(list: number[], maxItems: number): number[] {
+    static limitListSize(list: string[], maxItems: number): string[] {
         return list.slice(-maxItems)
     }
 }

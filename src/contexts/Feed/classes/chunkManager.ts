@@ -2,14 +2,14 @@ import { calculeChunksMaxSize } from "@/contexts/Feed/helpers/calculeChunksMaxSi
 
 export class ChunkManager {
     private readonly maxListSize: number
-    private currentFeed: number[] = []
-    private history: number[][] = []
+    private currentFeed: string[] = []
+    private history: string[][] = []
 
     constructor() {
         this.maxListSize = calculeChunksMaxSize()
     }
 
-    private limitListSize(list: number[]): { updated: number[]; removedItems: number[] } {
+    private limitListSize(list: string[]): { updated: string[]; removedItems: string[] } {
         if (list.length <= this.maxListSize) {
             return { updated: list, removedItems: [] }
         }
@@ -19,11 +19,11 @@ export class ChunkManager {
         return { updated, removedItems }
     }
 
-    public apply(command: "ADD" | "RESET" | "REMOVE" | "APPEND_OLD", payload?: number[]) {
+    public apply(command: "ADD" | "RESET" | "REMOVE" | "APPEND_OLD", payload?: string[]) {
         this.saveState()
 
-        let updated: number[] = []
-        let removedItems: number[] = []
+        let updated: string[] = []
+        let removedItems: string[] = []
 
         switch (command) {
             case "RESET":

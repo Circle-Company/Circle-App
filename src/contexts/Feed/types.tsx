@@ -1,5 +1,5 @@
-import { MomentUserActionsProps } from "../../components/moment/context/types"
 import { LanguagesCodesType } from "../../locales/LanguageTypes"
+import { MomentUserActionsProps } from "../../components/moment/context/types"
 import { TagProps } from "../newMoment"
 
 export interface ProfilePicture {
@@ -8,7 +8,7 @@ export interface ProfilePicture {
 }
 
 export interface User {
-    id: number
+    id: string
     username: string
     verifyed: boolean
     profile_picture: ProfilePicture
@@ -16,7 +16,7 @@ export interface User {
 }
 
 export interface Comment {
-    id: number
+    id: string
     user: User
     content: string
     statistics: {
@@ -33,10 +33,10 @@ export interface Media {
 }
 
 export interface MomentProps {
-    id: number
+    id: string
     user: User
-    description: string
-    content_type: string
+    description?: string
+    content_type: "VIDEO" | "IMAGE"
     midia: Media
     comments_count: number
     lastComment?: Comment
@@ -44,6 +44,19 @@ export interface MomentProps {
     isLiked: boolean
     deleted: boolean
     created_at: string
+    media: string
+    thumbnail: string
+    duration: number
+    size: string
+    hasAudio: boolean
+    ageRestriction: boolean
+    contentWarning: boolean
+    metrics: {
+        totalViews: number
+        totalLikes: number
+        totalComments: number
+    }
+    publishedAt: string
 }
 
 export type InteractionProps = {

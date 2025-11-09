@@ -1,34 +1,37 @@
-import React, { useCallback, useState, useMemo } from "react"
-import PersistedContext from "@/contexts/Persisted"
-import { useTimer } from "@/lib/hooks/useTimer"
-import { feedMock } from "@/mocks/feedMock"
 import { InteractionProps, MomentProps } from "@/contexts/Feed/types"
-import { MomentDataProps } from "@/components/moment/context/types"
+import React, { useCallback, useMemo, useState } from "react"
+
 import { FeedOrchestrator } from "@/contexts/Feed/classes/orchestrator"
+import { MomentDataProps } from "@/components/moment/context/types"
+import PersistedContext from "@/contexts/Persisted"
+import { useCalculeCacheMaxSize } from "@/contexts/Feed/helpers/calculeCacheMaxSize"
+import { useTimer } from "@/lib/hooks/useTimer"
 
 export const useFeed = () => {
     const { session } = React.useContext(PersistedContext)
 
-    const [feedData, setFeedData] = useState<MomentProps[]>(feedMock)
+    const [feedData, setFeedData] = useState<MomentProps[]>([])
     const [loading, setLoading] = useState(false)
     const [scrollEnabled, setScrollEnabled] = useState(true)
-    const [focusedChunkItem, setFocusedChunkItem] = useState<{ id: number; index: number } | null>(
+    const [focusedChunkItem, setFocusedChunkItem] = useState<{ id: string; index: number } | null>(
         null,
     )
     const [commentEnabled, setCommentEnabled] = useState(false)
     const [focusedMoment, setFocusedMoment] = useState<MomentDataProps>({} as MomentDataProps)
-    const [currentChunk, setCurrentChunk] = useState<number[]>([])
+    const [currentChunk, setCurrentChunk] = useState<string[]>([])
     const [interactions, setInteractions] = useState<InteractionProps[]>([])
     const [period, setPeriod] = useState(0)
+    const [keyboardVisible, setKeyboardVisible] = useState(false)
 
     const [resetTimer] = useTimer(1000, () => setPeriod((prev) => prev + 1))
+    const maxCacheSize = useCalculeCacheMaxSize(feedData.length)
 
     // Criar instância do orchestrator com configurações
     const feedOrchestrator = useMemo(() => {
         if (!session.account.jwtToken) return null
 
-        return new FeedOrchestrator()
-    }, [session.account.jwtToken])
+        return new FeedOrchestrator(session.account.jwtToken, maxCacheSize)
+    }, [session.account.jwtToken, maxCacheSize])
 
     const fetch = useCallback(
         async (isReloading = false) => {
@@ -41,12 +44,16 @@ export const useFeed = () => {
             resetTimer()
 
             try {
-                const { newFeed, addedChunk } = await feedOrchestrator.fetch(
-                    period,
-                    interactions,
-                    feedData,
-                    isReloading,
-                )
+                const { newFeed, addedChunk } = await feedOrchestrator
+                    .fetch(feedData, isReloading)
+                    .then((response) => {
+                        console.log("🔍 Feed response:", response)
+                        return response
+                    })
+                    .catch((error) => {
+                        console.error("🔍 Error fetching feed:", error)
+                        return { newFeed: [], addedChunk: [] }
+                    })
 
                 setFeedData(newFeed)
                 setCurrentChunk(addedChunk)
@@ -61,7 +68,7 @@ export const useFeed = () => {
         [feedData, interactions, session.user, period, resetTimer, feedOrchestrator],
     )
 
-    function setFocusedChunkItemFunc({ id }: { id: number }) {
+    function setFocusedChunkItemFunc({ id }: { id: string }) {
         currentChunk.map((item, index) => {
             if (item === id) setFocusedChunkItem({ id, index })
         })
@@ -81,7 +88,7 @@ export const useFeed = () => {
     }
 
     const removeItemFromFeed = useCallback(
-        async (id: number) => {
+        async (id: string) => {
             if (!feedOrchestrator) return
 
             try {
@@ -104,14 +111,14 @@ export const useFeed = () => {
 
     // Função para carregar vídeo do cache (quando o usuário foca no vídeo)
     const loadVideoFromCache = useCallback(
-        async (momentId: number): Promise<string | null> => {
+        async (momentId: string): Promise<string | null> => {
             if (!feedOrchestrator) return null
 
             try {
                 const moment = feedData.find((m) => m.id === momentId)
                 if (!moment) return null
 
-                const videoUrl = (moment as any)?.videoUrl
+                const videoUrl = moment.media || moment.midia.fullhd_resolution
                 if (!videoUrl) return null
 
                 // Tentar carregar do cache primeiro
@@ -144,7 +151,7 @@ export const useFeed = () => {
             const nextMoment = feedData[nextIndex]
             if (!nextMoment) return
 
-            const videoUrl = (nextMoment as any)?.videoUrl
+            const videoUrl = nextMoment.media || nextMoment.midia.fullhd_resolution
             if (!videoUrl) return
 
             try {
@@ -179,6 +186,8 @@ export const useFeed = () => {
         setInteractions,
         setFocusedMoment,
         setScrollEnabled,
+        keyboardVisible,
+        setKeyboardVisible,
         next,
         previous,
         fetch,
