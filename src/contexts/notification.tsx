@@ -1,6 +1,3 @@
-import { storage, storageKeys } from "../store"
-
-import { getApp } from "@react-native-firebase/app"
 import {
     AuthorizationStatus,
     getMessaging,
@@ -10,13 +7,15 @@ import {
     requestPermission,
     setBackgroundMessageHandler,
 } from "@react-native-firebase/messaging"
+import { storage, storageKeys } from "../store"
 
-import React from "react"
-import { notify } from "react-native-notificated"
-import { Vibrate } from "../lib/hooks/useHapticFeedback"
-import { useRequestPermission } from "../lib/hooks/userRequestPermissions"
-import { notification } from "../lib/notifications"
 import PersistedContext from "./Persisted"
+import React from "react"
+import { Vibrate } from "../lib/hooks/useHapticFeedback"
+import { getApp } from "@react-native-firebase/app"
+import { notification } from "../lib/notifications"
+import { notify } from "react-native-notificated"
+import { useRequestPermission } from "../lib/hooks/userRequestPermissions"
 
 type NotificationProviderProps = { children: React.ReactNode }
 export type NotificationContextData = {}
@@ -48,8 +47,9 @@ export function Provider({ children }: NotificationProviderProps) {
         if (session?.user?.id && session?.account?.jwtToken) {
             const token = await getToken(messagingInstance)
             if (typeof token === "string" && token !== "") {
+                const userId = storage.getString(storageKeys().user.id) || ""
                 notification.registerPushToken({
-                    userId: Number(storage.getNumber(storageKeys().user.id)),
+                    userId,
                     token,
                 })
             }
@@ -72,8 +72,9 @@ export function Provider({ children }: NotificationProviderProps) {
             if (enableRequestToken) {
                 setTimeout(() => {
                     if (typeof token === "string" && token !== "") {
+                        const userId = storage.getString(storageKeys().user.id) || ""
                         notification.registerPushToken({
-                            userId: Number(storage.getNumber(storageKeys().user.id)),
+                            userId,
                             token,
                         })
                     }
