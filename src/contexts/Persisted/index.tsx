@@ -1,26 +1,51 @@
-import { DeviceDataType, SessionDataType } from "./types"
-import React, { useCallback, useEffect } from "react"
+import React, { useEffect } from "react"
 
-import AuthContext from "../Auth/index"
-import { refreshJwtToken } from "../../lib/hooks/useRefreshJwtToken"
+import type { AccountState } from "./persistedAccount"
+import type { HistoryState } from "./persistedHistory"
+import type { PermissionsState } from "./persistedPermissions"
+import type { PreferencesState } from "./persistedPreferences"
+import { SessionDataType } from "./types"
+import type { StatisticsState } from "./persistedStatistics"
+import type { UserState } from "./persistedUser"
 import { useAccountStore } from "./persistedAccount"
-import { useDeviceMetadataStore } from "./persistedDeviceMetadata"
 import { useHistoryStore } from "./persistedHistory"
 import { usePermissionsStore } from "./persistedPermissions"
 import { usePreferencesStore } from "./persistedPreferences"
 import { useStatisticsStore } from "./persistedStatistics"
 import { useUserStore } from "./persistedUser"
 
-type PersistedProviderProps = { children: React.ReactNode }
+type PersistedProviderProps = {
+    children: React.ReactNode
+    sessionData: SessionDataType | null
+    onSignOut?: () => void
+    checkIsSigned?: () => boolean
+}
+type PersistedSessionStores = {
+    user: UserState
+    account: AccountState
+    preferences: PreferencesState
+    statistics: StatisticsState
+    history: HistoryState
+}
+
+type PersistedDeviceStores = {
+    permissions: PermissionsState
+}
+
 export type PersistedContextProps = {
-    session: SessionDataType
-    device: DeviceDataType
+    session: PersistedSessionStores
+    device: PersistedDeviceStores
 }
 
 const PersistedContext = React.createContext<PersistedContextProps>({} as PersistedContextProps)
 
-export function Provider({ children }: PersistedProviderProps) {
-    const { sessionData, signOut, checkIsSigned, signIn, signUp } = React.useContext(AuthContext)
+export function Provider({
+    children,
+    sessionData,
+    onSignOut,
+    checkIsSigned,
+}: PersistedProviderProps) {
+    console.log("🔄 PersistedProvider inicializando...")
 
     const sessionUser = useUserStore()
     const sessionAccount = useAccountStore()
@@ -28,150 +53,38 @@ export function Provider({ children }: PersistedProviderProps) {
     const sessionStatistics = useStatisticsStore()
     const sessionHistory = useHistoryStore()
     const devicePermissions = usePermissionsStore()
-    const deviceMetadata = useDeviceMetadataStore()
 
-    // Função para sincronizar dados de sessão com as stores
-    const syncSessionData = useCallback(
-        async (session: SessionDataType) => {
-            try {
-                console.log("🔄 Sincronizando dados de sessão...")
+    // Sincronização simples quando há dados de sessão
+    useEffect(() => {
+        if (sessionData?.user?.id) {
+            sessionUser.set(sessionData.user)
 
-                // Sincronizar dados do usuário
-                if (session.user) {
-                    sessionUser.set(session.user)
-                    console.log("✅ Usuário sincronizado")
+            if (sessionData.account) {
+                const { coordinates, ...accountData } = sessionData.account
+                sessionAccount.set(accountData)
+
+                if (coordinates) {
+                    sessionAccount.setCoordinates(coordinates)
                 }
-
-                // Sincronizar dados da conta
-                if (session.account) {
-                    sessionAccount.set(session.account)
-                    console.log("✅ Conta sincronizada")
-                }
-
-                // Sincronizar preferências
-                if (session.preferences) {
-                    sessionPreferences.set(session.preferences)
-                    console.log("✅ Preferências sincronizadas")
-                }
-
-                // Sincronizar estatísticas
-                if (session.statistics) {
-                    sessionStatistics.set(session.statistics)
-                    console.log("✅ Estatísticas sincronizadas")
-                }
-
-                // Sincronizar histórico
-                if (session.history) {
-                    sessionHistory.set(session.history)
-                    console.log("✅ Histórico sincronizado")
-                }
-
-                // Atualizar metadados do dispositivo
-                try {
-                    await deviceMetadata.updateAll()
-                    console.log("✅ Metadados do dispositivo atualizados")
-                } catch (error) {
-                    console.warn("⚠️ Erro ao atualizar metadados:", error)
-                }
-
-                console.log("✅ Sincronização concluída com sucesso")
-            } catch (error) {
-                console.error("❌ Erro na sincronização:", error)
-                throw error
             }
-        },
-        [
-            sessionUser,
-            sessionAccount,
-            sessionPreferences,
-            sessionStatistics,
-            sessionHistory,
-            deviceMetadata,
-        ],
-    )
 
-    // Função para limpar todas as stores
-    const clearAllStores = useCallback(() => {
-        try {
-            console.log("🧹 Limpando todas as stores...")
+            if (sessionData.preferences) {
+                sessionPreferences.set(sessionData.preferences)
+            }
+        }
+    }, [sessionData])
 
+    // Limpeza simples quando não há autenticação
+    useEffect(() => {
+        if (checkIsSigned && !checkIsSigned()) {
+            console.log("🧹 Limpando stores - usuário não autenticado")
             sessionUser.remove()
             sessionAccount.remove()
             sessionPreferences.remove()
             sessionStatistics.remove()
             sessionHistory.remove()
-
-            console.log("✅ Stores limpas com sucesso")
-        } catch (error) {
-            console.error("❌ Erro ao limpar stores:", error)
         }
-    }, [sessionUser, sessionAccount, sessionPreferences, sessionStatistics, sessionHistory])
-
-    // Sincronizar dados quando sessionData mudar
-    useEffect(() => {
-        if (sessionData && sessionData.user && sessionData.account) {
-            syncSessionData(sessionData).catch((error) => {
-                console.error("❌ Falha na sincronização automática:", error)
-                // Em caso de falha na sincronização, fazer logout
-                signOut()
-            })
-        }
-    }, [sessionData, syncSessionData, signOut])
-
-    // Configurar permissões e refresh token na inicialização
-    useEffect(() => {
-        const initializeDevice = async () => {
-            try {
-                console.log("🚀 Inicializando dispositivo...")
-
-                // Configurar permissões padrão
-                devicePermissions.set({
-                    postNotifications: false,
-                    firebaseMessaging: false,
-                })
-
-                // Tentar fazer refresh do token se houver dados de usuário
-                if (sessionUser.id && sessionAccount.jwtToken) {
-                    try {
-                        await refreshJwtToken(
-                            { username: sessionUser.username, id: sessionUser.id },
-                            sessionAccount,
-                        )
-                        console.log("✅ Token atualizado com sucesso")
-                    } catch (error) {
-                        console.warn("⚠️ Erro ao atualizar token:", error)
-                        // Se não conseguir atualizar o token, verificar se ainda é válido
-                        if (!checkIsSigned()) {
-                            console.log("⚠️ Token inválido, fazendo logout")
-                            signOut()
-                        }
-                    }
-                }
-
-                console.log("✅ Dispositivo inicializado")
-            } catch (error) {
-                console.error("❌ Erro na inicialização do dispositivo:", error)
-            }
-        }
-
-        initializeDevice()
-    }, [
-        devicePermissions,
-        sessionUser.id,
-        sessionUser.username,
-        sessionAccount.jwtToken,
-        refreshJwtToken,
-        checkIsSigned,
-        signOut,
-    ])
-
-    // Limpar stores quando fizer logout
-    useEffect(() => {
-        const isSigned = checkIsSigned()
-        if (!isSigned) {
-            clearAllStores()
-        }
-    }, [signOut, checkIsSigned, clearAllStores])
+    }, [sessionData])
 
     const contextValue: PersistedContextProps = {
         session: {
@@ -183,7 +96,7 @@ export function Provider({ children }: PersistedProviderProps) {
         },
         device: {
             permissions: devicePermissions,
-            metadata: deviceMetadata,
+            //metadata: deviceMetadata,
         },
     }
 

@@ -1,7 +1,9 @@
-import { create } from "zustand"
-import api from "../../services/Api"
 import { storage, storageKeys } from "../../store"
+
 import { StatisticsDataType } from "./types"
+import api from "../../services/Api"
+import { create } from "zustand"
+
 const storageKey = storageKeys().statistics
 
 export interface StatisticsState extends StatisticsDataType {
@@ -69,9 +71,9 @@ export const useStatisticsStore = create<StatisticsState>((set) => ({
     },
     set: (value: StatisticsDataType) => {
         set({
-            total_followers_num: value.total_followers_num,
-            total_likes_num: value.total_likes_num,
-            total_views_num: value.total_views_num,
+            total_followers_num: value.total_followers_num ? value.total_followers_num : 0,
+            total_likes_num: value.total_likes_num ? value.total_likes_num : 0,
+            total_views_num: value.total_views_num ? value.total_views_num : 0,
         })
         storage.set(storageKey.total_followers, value.total_followers_num)
         storage.set(storageKey.total_likes, value.total_likes_num)

@@ -1,11 +1,21 @@
-import { create } from "zustand"
-import { apiRoutes } from "../../services/Api"
+import {
+    PreferencesContent,
+    PreferencesDataType,
+    PreferencesLanguage,
+    PreferencesPushNotifications,
+} from "./types"
 import { storage, storageKeys } from "../../store"
-import { PreferencesDataStorageType } from "./types"
+
+import { create } from "zustand"
 
 const storageKey = storageKeys().preferences
 
-export interface PreferencesState extends PreferencesDataStorageType {
+export interface PreferencesState {
+    appTimezone: number
+    timezoneCode: string
+    language: PreferencesLanguage
+    content: PreferencesContent
+    pushNotifications: PreferencesPushNotifications
     setAppLanguage: (value: string) => void
     setPrimaryLanguage: (value: string) => void
     setDisableAutoPlay: (value: boolean) => void
@@ -18,14 +28,14 @@ export interface PreferencesState extends PreferencesDataStorageType {
     setDisableAddToMemory: (value: boolean) => void
     setDisableFollowUser: (value: boolean) => void
     setDisableViewUser: (value: boolean) => void
-
-    get: (id: string) => Promise<void>
-    set: (value: PreferencesDataStorageType) => void
+    set: (value: PreferencesDataType) => void
     load: () => void
     remove: () => void
 }
 
 export const usePreferencesStore = create<PreferencesState>((set) => ({
+    appTimezone: storage.getNumber(storageKey.appTimezone || "") || 0,
+    timezoneCode: storage.getString(storageKey.timezoneCode || "") || "",
     language: {
         appLanguage: storage.getString(storageKey.appLanguage) || "en",
         translationLanguage: storage.getString(storageKey.translationLanguage) || "en",
@@ -156,80 +166,19 @@ export const usePreferencesStore = create<PreferencesState>((set) => ({
             },
         }))
     },
-
-    get: async (id: string) => {
-        try {
-            const response = await apiRoutes.preferences.pushNotification.getUserPreferences({
-                userId: id,
-            })
-
-            if (!response || !response.data) {
-                console.warn("Resposta da API de preferências está vazia ou inválida")
-                return
-            }
-
-            const { data } = response
-
-            if (!data.language || !data.content || !data.pushNotifications) {
-                console.warn("Estrutura de dados de preferências inválida:", data)
-                return
-            }
-
-            set({
-                language: data.language,
-                content: data.content,
-                pushNotifications: data.pushNotifications,
-            })
-
-            if (data.language.appLanguage) {
-                storage.set(storageKey.appLanguage, data.language.appLanguage)
-            }
-            if (data.language.translationLanguage) {
-                storage.set(storageKey.translationLanguage, data.language.translationLanguage)
-            }
-            if (data.content.disableHaptics !== undefined) {
-                storage.set(storageKey.haptics, data.content.disableHaptics)
-            }
-            if (data.content.disableAutoplay !== undefined) {
-                storage.set(storageKey.autoplay, data.content.disableAutoplay)
-            }
-            if (data.content.disableTranslation !== undefined) {
-                storage.set(storageKey.translation, data.content.disableTranslation)
-            }
-            if (data.content.muteAudio !== undefined) {
-                storage.set(storageKey.muteAudio, data.content.muteAudio)
-            }
-            if (data.pushNotifications.disableLikeMoment !== undefined) {
-                storage.set(storageKey.likeMoment, data.pushNotifications.disableLikeMoment)
-            }
-            if (data.pushNotifications.disableNewMemory !== undefined) {
-                storage.set(storageKey.newMemory, data.pushNotifications.disableNewMemory)
-            }
-            if (data.pushNotifications.disableAddToMemory !== undefined) {
-                storage.set(storageKey.addToMemory, data.pushNotifications.disableAddToMemory)
-            }
-            if (data.pushNotifications.disableFollowUser !== undefined) {
-                storage.set(storageKey.followUser, data.pushNotifications.disableFollowUser)
-            }
-            if (data.pushNotifications.disableViewUser !== undefined) {
-                storage.set(storageKey.viewUser, data.pushNotifications.disableViewUser)
-            }
-        } catch (error) {
-            console.error("Erro ao buscar preferências do usuário:", error)
-            console.log("Carregando preferências do storage local como fallback")
-        }
-    },
-
-    set: (value: PreferencesDataStorageType) => {
+    set: (value: PreferencesDataType) => {
         set({
+            appTimezone: value.appTimezone,
+            timezoneCode: value.timezoneCode,
             language: value.language,
             content: value.content,
             pushNotifications: value.pushNotifications,
         })
+
         storage.set(storageKey.appLanguage, value.language.appLanguage)
         storage.set(storageKey.translationLanguage, value.language.translationLanguage)
-        storage.set(storageKey.haptics, value.content.disableHaptics)
         storage.set(storageKey.autoplay, value.content.disableAutoplay)
+        storage.set(storageKey.haptics, value.content.disableHaptics)
         storage.set(storageKey.translation, value.content.disableTranslation)
         storage.set(storageKey.muteAudio, value.content.muteAudio)
         storage.set(storageKey.likeMoment, value.pushNotifications.disableLikeMoment)
@@ -237,9 +186,16 @@ export const usePreferencesStore = create<PreferencesState>((set) => ({
         storage.set(storageKey.addToMemory, value.pushNotifications.disableAddToMemory)
         storage.set(storageKey.followUser, value.pushNotifications.disableFollowUser)
         storage.set(storageKey.viewUser, value.pushNotifications.disableViewUser)
+        storage.set(storageKey.appTimezone || "@circle:preferences:timezone", value.appTimezone)
+        storage.set(
+            storageKey.timezoneCode || "@circle:preferences:timezoneCode",
+            value.timezoneCode,
+        )
     },
     load: () => {
         set({
+            appTimezone: storage.getNumber(storageKey.appTimezone || "") || 0,
+            timezoneCode: storage.getString(storageKey.timezoneCode || "") || "",
             language: {
                 appLanguage: storage.getString(storageKey.appLanguage) || "en",
                 translationLanguage: storage.getString(storageKey.translationLanguage) || "en",
@@ -272,8 +228,12 @@ export const usePreferencesStore = create<PreferencesState>((set) => ({
         storage.delete(storageKey.addToMemory)
         storage.delete(storageKey.followUser)
         storage.delete(storageKey.viewUser)
+        storage.delete(storageKey.appTimezone || "@circle:preferences:timezone")
+        storage.delete(storageKey.timezoneCode || "@circle:preferences:timezoneCode")
 
         set({
+            appTimezone: 0,
+            timezoneCode: "",
             language: {
                 appLanguage: "en",
                 translationLanguage: "en",
