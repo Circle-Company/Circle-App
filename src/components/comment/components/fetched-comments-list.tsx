@@ -2,19 +2,18 @@ import { FlatList, TextStyle, ViewStyle } from "react-native"
 import Reanimated, { FadeInUp } from "react-native-reanimated"
 import { Text, View } from "../../Themed"
 
+import BottomSheetContext from "../../../contexts/bottomSheet"
+import ButtonClose from "../../buttons/close"
+import { CommentObject } from "../comments-types"
+import LanguageContext from "../../../contexts/Preferences/language"
+import { Loading } from "../../loading"
+import NetworkContext from "../../../contexts/network"
+import OfflineCard from "../../general/offline"
+import PersistedContext from "../../../contexts/Persisted"
 import React from "react"
+import RenderComment from "./comments-render_comment"
 import fonts from "../../../constants/fonts"
 import sizes from "../../../constants/sizes"
-import BottomSheetContext from "../../../contexts/bottomSheet"
-import NetworkContext from "../../../contexts/network"
-import PersistedContext from "../../../contexts/Persisted"
-import LanguageContext from "../../../contexts/Preferences/language"
-import EndReached from "../../../features/list-memories/list-memories-preview/components/end-reached"
-import ButtonClose from "../../buttons/close"
-import OfflineCard from "../../general/offline"
-import { Loading } from "../../loading"
-import { CommentObject } from "../comments-types"
-import RenderComment from "./comments-render_comment"
 
 const MOCK_COMMENTS: CommentObject[] = [
     {
@@ -220,18 +219,11 @@ function FetchedCommentsList({
                 </Reanimated.View>
             )}
             ListFooterComponent={() => {
-                if (endReached)
-                    return (
-                        <EndReached
-                            width={sizes.moment.standart.width}
-                            text={
-                                allComments?.length == 0
-                                    ? t("No one has commented yet.")
-                                    : t("No more comments.")
-                            }
-                        />
-                    )
-                else
+                if (endReached) {
+                    if (allComments.length == 0)
+                        return <Text>{t("No one has commented yet.")}</Text>
+                    else return <Text>{t("No more comments.")}</Text>
+                } else
                     return (
                         <Loading.Container
                             width={sizes.moment.standart.width}

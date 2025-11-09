@@ -1,16 +1,16 @@
 import { NavigationProp, useNavigation } from "@react-navigation/native"
 import { Text, TextStyle, View, ViewStyle } from "react-native"
 
-import Camera from "@/assets/icons/svgs/camera.svg"
+import { BadgeIcon } from "../../general/badge-icon"
 import Bell from "@/assets/icons/svgs/tray.svg"
-import React from "react"
+import ButtonStandart from "../../buttons/button-standart"
+import Camera from "@/assets/icons/svgs/camera.svg"
 import ColorTheme from "../../../constants/colors"
+import LanguageContext from "../../../contexts/Preferences/language"
+import PersistedContext from "../../../contexts/Persisted"
+import React from "react"
 import fonts from "../../../constants/fonts"
 import sizes from "../../../constants/sizes"
-import PersistedContext from "../../../contexts/Persisted"
-import LanguageContext from "../../../contexts/Preferences/language"
-import ButtonStandart from "../../buttons/button-standart"
-import { BadgeIcon } from "../../general/badge-icon"
 
 export default function HeaderRightHome() {
     const { t } = React.useContext(LanguageContext)
@@ -20,16 +20,16 @@ export default function HeaderRightHome() {
 
     const container: ViewStyle = {
         flexDirection: "row",
-        marginRight: sizes.margins["3sm"],
+        marginRight: sizes.margins["1sm"],
     }
 
     const text: TextStyle = {
         fontSize: fonts.size.footnote,
-        fontFamily: fonts.family.Bold,
+        fontFamily: fonts.family["Bold-Italic"],
         color: ColorTheme().text,
     }
     const textContainer: ViewStyle = {
-        marginRight: sizes.margins["1sm"],
+        marginRight: sizes.margins["2sm"],
     }
     const buttonContainer: ViewStyle = {
         flexDirection: "row",
@@ -40,10 +40,6 @@ export default function HeaderRightHome() {
 
     async function onPressNewMoment() {
         navigation.navigate("CreateBottomTab")
-    }
-
-    async function onPressNotifications() {
-        navigation.navigate("InboxNavigator", { screen: "Inbox" })
     }
 
     return (
@@ -61,19 +57,6 @@ export default function HeaderRightHome() {
                     <Camera fill={String(ColorTheme().text)} width={16} height={16} />
                 </ButtonStandart>
             </View>
-            <ButtonStandart
-                style={{ paddingHorizontal: sizes.paddings["1sm"] }}
-                square={true}
-                action={onPressNotifications}
-                margins={false}
-                backgroundColor={String(ColorTheme().backgroundDisabled)}
-            >
-                <Bell fill={String(ColorTheme().text)} width={16} height={16} />
-                <BadgeIcon
-                    number={session.account.unreadNotificationsCount}
-                    style={{ top: -7, right: -10 }}
-                />
-            </ButtonStandart>
         </View>
     )
 }
