@@ -7,7 +7,7 @@ import { routes as notificationRoutes } from "./routes/notification"
 import { routes as preferencesRoutes } from "./routes/preferences"
 import { routes as userRoutes } from "./routes/user"
 
-const PATH = `http://${config.ENDPOINT}/v${config.API_VERSION}`
+const PATH = `http://${config.ENDPOINT}`
 const api = axios.create({ baseURL: PATH })
 
 export default api
