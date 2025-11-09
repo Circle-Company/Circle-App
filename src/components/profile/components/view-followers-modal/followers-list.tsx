@@ -1,15 +1,15 @@
-import React from "react"
-import { FlatList, View } from "react-native"
-import sizes from "../../../../constants/sizes"
-import PersistedContext from "../../../../contexts/Persisted"
-import LanguageContext from "../../../../contexts/Preferences/language"
+import { FlatList, Text, View } from "react-native"
+
 import BottomSheetContext from "../../../../contexts/bottomSheet"
-import EndReached from "../../../../features/list-notifications/end-reached"
-import api from "../../../../services/Api"
+import LanguageContext from "../../../../contexts/Preferences/language"
 import { Loading } from "../../../loading"
-import { UserShow } from "../../../user_show"
-import { userReciveDataProps } from "../../../user_show/user_show-types"
+import PersistedContext from "../../../../contexts/Persisted"
 import { ProfileReciveDataProps } from "../../profile-types"
+import React from "react"
+import { UserShow } from "../../../user_show"
+import api from "../../../../services/Api"
+import sizes from "../../../../constants/sizes"
+import { userReciveDataProps } from "../../../user_show/user_show-types"
 
 type FollowersListProps = {
     user: ProfileReciveDataProps
@@ -95,12 +95,7 @@ export function FollowersList({ user }: FollowersListProps) {
             }}
             ListFooterComponent={() => {
                 if (endReached)
-                    return (
-                        <EndReached
-                            width={width}
-                            text={t("The user has no more followers to display.")}
-                        />
-                    )
+                    return <Text>{t("The user has no more followers to display.")}</Text>
                 else
                     return (
                         <Loading.Container width={width} height={sizes.headers.height * 2}>

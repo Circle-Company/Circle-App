@@ -1,14 +1,14 @@
-import { Pressable, View, useColorScheme } from "react-native"
 import Animated, { FadeIn } from "react-native-reanimated"
 import ColorTheme, { colors } from "../../../constants/colors"
+import { Pressable, View, useColorScheme } from "react-native"
 
 import Icon from "@/assets/icons/svgs/@2.svg"
-import { useNavigation } from "@react-navigation/native"
 import { Image } from "expo-image"
 import React from "react"
-import sizes from "../../../constants/sizes"
-import { useUserShowContext } from "../user_show-context"
 import { UserProfilePictureProps } from "../user_show-types"
+import sizes from "../../../constants/sizes"
+import { useNavigation } from "@react-navigation/native"
+import { useUserShowContext } from "../user_show-context"
 
 export default function profile_picture({
     displayOnMoment = true,
@@ -24,11 +24,7 @@ export default function profile_picture({
         alignItems: "center",
         justifyContent: "center",
         borderRadius: +Number([Number(pictureDimensions.width) + Number(outlineSize)]) / 2,
-        backgroundColor: displayOnMoment
-            ? ColorTheme().blur_display_color
-            : isDarkMode
-            ? colors.gray.grey_07
-            : colors.gray.grey_02,
+        backgroundColor: colors.gray.grey_07,
         width: Number(pictureDimensions.width) + Number(outlineSize),
         height: Number(pictureDimensions.height) + Number(outlineSize),
         overflow: "hidden",

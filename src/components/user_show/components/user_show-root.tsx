@@ -1,9 +1,9 @@
-import React from "react"
-import { View } from "react-native"
 import PersistedContext from "../../../contexts/Persisted"
-import api from "../../../services/Api"
-import UserShowContext from "../user_show-context"
+import React from "react"
 import { UserRootProps } from "../user_show-types"
+import UserShowContext from "../user_show-context"
+import { View } from "react-native"
+import api from "../../../services/Api"
 
 export default function root({ children, data, executeBeforeClick }: UserRootProps) {
     const { session } = React.useContext(PersistedContext)
@@ -13,7 +13,7 @@ export default function root({ children, data, executeBeforeClick }: UserRootPro
         justifyContent: "center",
     }
 
-    const follow = async (followed_user_id: number) => {
+    const follow = async (followed_user_id: string) => {
         try {
             const response = await api
                 .post(
@@ -38,7 +38,7 @@ export default function root({ children, data, executeBeforeClick }: UserRootPro
             console.error(err)
         }
     }
-    const unfollow = async (followed_user_id: number) => {
+    const unfollow = async (followed_user_id: string) => {
         try {
             const response = await api
                 .post(

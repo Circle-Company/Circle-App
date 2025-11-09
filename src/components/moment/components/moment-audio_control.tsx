@@ -1,10 +1,10 @@
-import InactiveSoundIcon from "@/assets/icons/svgs/speaker_slash_fill.svg"
 import ActiveSoundIcon from "@/assets/icons/svgs/speaker_wave_2_fill.svg"
+import ButtonStandart from "../../buttons/button-standart"
+import InactiveSoundIcon from "@/assets/icons/svgs/speaker_slash_fill.svg"
+import PersistedContext from "../../../contexts/Persisted"
 import React from "react"
 import { colors } from "../../../constants/colors"
 import sizes from "../../../constants/sizes"
-import PersistedContext from "../../../contexts/Persisted"
-import ButtonStandart from "../../buttons/button-standart"
 
 export default function MomentAudioControl() {
     const { session } = React.useContext(PersistedContext)
@@ -21,8 +21,13 @@ export default function MomentAudioControl() {
     return (
         <ButtonStandart
             style={{
+                width: 46,
+                height: 46,
                 marginRight: sizes.margins["1sm"],
+                borderWidth: 2,
+                borderColor: colors.gray.grey_06,
             }}
+            borderRadius={23}
             square
             margins={false}
             action={handlePress}

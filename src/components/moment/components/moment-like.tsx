@@ -1,18 +1,18 @@
 import { Animated, Pressable, TextStyle, View, ViewStyle } from "react-native"
 import ColorTheme, { colors } from "../../../constants/colors"
 
-import LikeIcon from "@/assets/icons/svgs/heart.svg"
-import PersistedContext from "../../../contexts/Persisted"
-import NumberConversor from "../../../helpers/numberConversor"
+import LikeIcon from "@/assets/icons/svgs/heart_2.svg"
 import MomentContext from "../context"
 import { MomentLikeProps } from "../moment-types"
+import NumberConversor from "../../../helpers/numberConversor"
+import PersistedContext from "../../../contexts/Persisted"
 /* eslint-disable no-var */
 import React from "react"
-import fonts from "../../../constants/fonts"
-import sizes from "../../../constants/sizes"
+import { Text } from "../../Themed"
 import { Vibrate } from "../../../lib/hooks/useHapticFeedback"
 import api from "../../../services/Api"
-import { Text } from "../../Themed"
+import fonts from "../../../constants/fonts"
+import sizes from "../../../constants/sizes"
 
 export default function Like({
     isLiked,
@@ -21,7 +21,7 @@ export default function Like({
     margin = sizes.margins["1sm"],
 }: MomentLikeProps) {
     const { session } = React.useContext(PersistedContext)
-    const { momentData, momentUserActions, momentOptions } = React.useContext(MomentContext)
+    const { momentData, momentUserActions, momentOptions } = React.useContext(MomentContext) as any
     const [likedPressed, setLikedPressed] = React.useState(
         isLiked ? isLiked : momentUserActions.liked,
     )
@@ -68,10 +68,30 @@ export default function Like({
         }
     }, [momentUserActions.liked])
 
+    // Quantidade total de likes que vem do backend
+    const totalLikes = Number(momentData?.statistics?.total_likes_num || 0)
+
+    // Determina se um like foi adicionado ou removido em relação ao estado inicial
+    const likeDifference = momentUserActions.liked
+        ? momentUserActions.initialLikedState
+            ? 0
+            : 1 // Se está curtido, não soma se já estava curtido, senão soma 1
+        : momentUserActions.initialLikedState
+        ? -1
+        : 0 // Se não está curtido, subtrai 1 se estava curtido, senão não muda
+
+    // Número de likes que será exibido, considerando a interação do usuário
+    const adjustedLikes = totalLikes + likeDifference
+
+    // Converte para formato legível
+    const displayLikes = NumberConversor(adjustedLikes)
+
     const container: ViewStyle = {
-        minWidth: sizes.buttons.width / 4,
-        height: sizes.buttons.height / 2,
+        width: adjustedLikes > 0 ? 84 : 76,
+        height: 46,
         borderRadius: Number([sizes.buttons.width / 4]) / 2,
+        borderWidth: 2,
+        borderColor: colors.gray.grey_06,
         alignItems: "center",
         justifyContent: "center",
         flexDirection: "row",
@@ -81,7 +101,7 @@ export default function Like({
     }
     const like_text_pressed: TextStyle = {
         fontSize: fonts.size.body,
-        fontFamily: fonts.family.Bold,
+        fontFamily: fonts.family.Black,
         color: colors.gray.white,
         marginLeft: sizes.margins["1sm"],
     }
@@ -105,8 +125,8 @@ export default function Like({
         borderRadius: Number([sizes.buttons.width / 4]) / 2,
     }
     const animated_container = {
-        width: sizes.buttons.width / 4,
-        height: sizes.buttons.height / 2,
+        width: adjustedLikes > 0 ? 84 : 76,
+        height: 46,
         margin,
         transform: [{ scale: animatedScale }],
     }
@@ -148,24 +168,6 @@ export default function Like({
         )
     }
 
-    // Quantidade total de likes que vem do backend
-    const totalLikes = Number(momentData?.statistics?.total_likes_num || 0)
-
-    // Determina se um like foi adicionado ou removido em relação ao estado inicial
-    const likeDifference = momentUserActions.liked
-        ? momentUserActions.initialLikedState
-            ? 0
-            : 1 // Se está curtido, não soma se já estava curtido, senão soma 1
-        : momentUserActions.initialLikedState
-        ? -1
-        : 0 // Se não está curtido, subtrai 1 se estava curtido, senão não muda
-
-    // Número de likes que será exibido, considerando a interação do usuário
-    const adjustedLikes = totalLikes + likeDifference
-
-    // Converte para formato legível
-    const displayLikes = NumberConversor(adjustedLikes)
-
     const like_fill: string = String(colors.gray.white)
 
     if (!momentOptions.enableLikeButton) return null
@@ -193,7 +195,7 @@ export default function Like({
                     <View style={blur_container_background_color}>
                         <View style={container}>
                             <Animated.View style={icon_container}>
-                                <LikeIcon fill={like_fill} width={14} height={14} />
+                                <LikeIcon fill={like_fill} width={18} height={18} />
                             </Animated.View>
                             <Text style={likedPressed ? like_text_pressed : like_text}>
                                 {displayLikes}
@@ -210,7 +212,7 @@ export default function Like({
                     <View style={blur_container}>
                         <View style={container}>
                             <Animated.View style={icon_container}>
-                                <LikeIcon fill={like_fill} width={14} height={14} />
+                                <LikeIcon fill={like_fill} width={16} height={16} />
                             </Animated.View>
                             <Text style={likedPressed ? like_text_pressed : like_text}>
                                 {displayLikes}

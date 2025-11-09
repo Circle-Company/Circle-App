@@ -1,5 +1,5 @@
-import React, { useEffect, useRef } from "react"
 import { Animated, View, ViewStyle } from "react-native"
+import React, { useEffect, useRef } from "react"
 
 import { colors } from "../../../constants/colors"
 import sizes from "../../../constants/sizes"
@@ -50,20 +50,20 @@ export default function MomentVideoSlider({
     }
 
     const track: ViewStyle = {
-        borderRadius: 2,
+        borderRadius: 3,
         position: "absolute",
         width: "100%",
-        height: 4,
+        height: 3,
     }
 
     const backgroundTrack: ViewStyle = {
-        backgroundColor: colors.gray.grey_04,
-        height: 2,
-        opacity: 0.5,
+        backgroundColor: colors.gray.grey_05,
+        height: 3,
+        opacity: 0.7,
     }
 
     const progressTrack: ViewStyle = {
-        backgroundColor: colors.gray.grey_03,
+        backgroundColor: colors.gray.grey_04,
         height: 4,
         borderRadius: 3,
         left: 0,

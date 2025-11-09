@@ -1,18 +1,20 @@
+import * as LocalAuthentication from "expo-local-authentication"
+
+import ColorTheme, { colors } from "@/constants/colors"
+import { Pressable, TextStyle, View, ViewStyle, useColorScheme } from "react-native"
+
 import ChevronRight from "@/assets/icons/svgs/chevron_right.svg"
+import LanguageContext from "@/contexts/Preferences/language"
+import { NativeStackNavigationProp } from "@react-navigation/native-stack"
+import PersistedContext from "@/contexts/Persisted"
+import React from "react"
 import { SettingsiItemObjectProps } from "@/components/settings/settings-types"
 import { Text } from "@/components/Themed"
 import { UserShow } from "@/components/user_show"
-import { userReciveDataProps } from "@/components/user_show/user_show-types"
-import ColorTheme, { colors } from "@/constants/colors"
 import fonts from "@/constants/fonts"
 import sizes from "@/constants/sizes"
-import PersistedContext from "@/contexts/Persisted"
-import LanguageContext from "@/contexts/Preferences/language"
 import { useNavigation } from "@react-navigation/native"
-import { NativeStackNavigationProp } from "@react-navigation/native-stack"
-import * as LocalAuthentication from "expo-local-authentication"
-import React from "react"
-import { Pressable, TextStyle, View, ViewStyle, useColorScheme } from "react-native"
+import { userReciveDataProps } from "@/components/user_show/user_show-types"
 
 type SettingsNavigatorParamList = {
     SettingsNavigator: { screen: string }
@@ -37,12 +39,15 @@ export default function SettingsItem({
 
     const styles = {
         container: {
-            width: sizes.screens.width - sizes.paddings["1sm"] * 2,
-            marginHorizontal: sizes.paddings["1sm"],
+            width: sizes.screens.width - sizes.paddings["2sm"] * 2,
+            marginHorizontal: sizes.paddings["2sm"],
             height: sizes.sizes["3md"],
             alignItems: "center" as const,
             justifyContent: "flex-start" as const,
             flexDirection: "row" as const,
+            borderRadius: sizes.borderRadius["1sm"] * 1.4,
+            marginBottom: sizes.margins["1sm"],
+            backgroundColor: isDarkMode ? colors.gray.grey_09 : colors.gray.grey_01,
         } as ViewStyle,
         containerLeft: {
             paddingLeft: sizes.paddings["1sm"],
@@ -59,7 +64,9 @@ export default function SettingsItem({
         textStyle: {
             textAlign: "right" as const,
             fontSize: fonts.size.body,
+            opacity: 0.8,
             fontFamily: fonts.family.Semibold,
+            marginLeft: sizes.margins["2sm"] * 0.8,
         } as TextStyle,
         valueContainer: {
             flex: 1,
@@ -81,7 +88,7 @@ export default function SettingsItem({
         valueContainerImage: {
             flex: 1,
             alignItems: "flex-end" as const,
-            marginRight: 6,
+            marginRight: sizes.margins["1md"],
         } as ViewStyle,
     }
 
@@ -109,7 +116,13 @@ export default function SettingsItem({
                 {type === "IMAGE" ? (
                     <View style={styles.valueContainerImage}>
                         <UserShow.Root
-                            data={{ ...session.user, you_follow: false } as userReciveDataProps}
+                            data={
+                                {
+                                    ...session.user,
+                                    you_follow: false,
+                                    verifyed: false,
+                                } as unknown as userReciveDataProps
+                            }
                         >
                             <UserShow.ProfilePicture
                                 displayOnMoment={false}
