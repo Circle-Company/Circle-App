@@ -1,21 +1,22 @@
-import React from "react"
-import { useColorScheme } from "react-native"
-import { Text, View } from "../../components/Themed"
-import config from "../../config"
 import ColorTheme, { colors } from "../../constants/colors"
+import { Text, View } from "../../components/Themed"
+
+import LanguageContext from "../../contexts/Preferences/language"
+import React from "react"
+import config from "../../config"
 import fonts from "../../constants/fonts"
 import sizes from "../../constants/sizes"
-import LanguageContext from "../../contexts/Preferences/language"
+import { useColorScheme } from "react-native"
 
 export function SettingsFooterComponent() {
     const { t } = React.useContext(LanguageContext)
     const isDarkMode = useColorScheme() === "dark"
     const container: any = {
         width: sizes.screens.width,
-        height: sizes.headers.height * 1.3,
+        height: sizes.headers.height,
         alignItems: "center",
         justifyContent: "center",
-        borderTopWidth: 1,
+        marginBottom: sizes.margins["2md"],
         borderColor: isDarkMode ? colors.gray.grey_08 : colors.gray.grey_02,
     }
 

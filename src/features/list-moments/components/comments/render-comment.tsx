@@ -1,13 +1,13 @@
 import { Animated, ViewStyle } from "react-native"
 
 import AddIcon from "@/assets/icons/svgs/plus_circle-outline.svg"
-import React from "react"
-import ViewMorebutton from "../../../../components/buttons/view_more"
-import { Comments } from "../../../../components/comment"
-import { MomentDataProps } from "../../../../components/moment/context/types"
 import ColorTheme from "../../../../constants/colors"
+import { Comments } from "../../../../components/comment"
 import FeedContext from "../../../../contexts/Feed"
 import LanguageContext from "../../../../contexts/Preferences/language"
+import { MomentDataProps } from "../../../../components/moment/context/types"
+import React from "react"
+import ViewMorebutton from "../../../../components/buttons/view_more"
 
 type renderCommentProps = {
     moment: MomentDataProps
@@ -19,6 +19,7 @@ export default function RenderComment({ moment, focused }: renderCommentProps) {
     const { commentEnabled, setCommentEnabled, setKeyboardVisible, setFocusedMoment } =
         React.useContext(FeedContext)
     const [animatedOpacityValue] = React.useState(new Animated.Value(1))
+    const comments = Array.isArray(moment.comments) ? moment.comments : []
 
     React.useEffect(() => {
         if (focused) {
@@ -45,10 +46,14 @@ export default function RenderComment({ moment, focused }: renderCommentProps) {
     const iconStyle = { top: 0.6 }
 
     function handlePress() {
-        if (commentEnabled) setCommentEnabled(false)
-        else setCommentEnabled(true)
-        setKeyboardVisible(true)
-        setFocusedMoment(moment)
+        if (commentEnabled) {
+            setCommentEnabled(false)
+            setKeyboardVisible(false)
+        } else {
+            setCommentEnabled(true)
+            setKeyboardVisible(true)
+            setFocusedMoment(moment)
+        }
     }
 
     return (
@@ -79,7 +84,7 @@ export default function RenderComment({ moment, focused }: renderCommentProps) {
                 </Animated.View>
 
                 <Comments.CenterRoot>
-                    <Comments.ListComments />
+                    <Comments.ListComments comment={comments} />
                 </Comments.CenterRoot>
             </Comments.Container>
         </Comments.MainRoot>

@@ -1,12 +1,12 @@
 import { FlatList, ScrollView } from "react-native"
 
-import React from "react"
-import { Settings } from "../../components/settings"
-import { SettignsSectionProps } from "../../components/settings/settings-types"
-import PersistedContext from "../../contexts/Persisted"
 import LanguageContext from "../../contexts/Preferences/language"
-import { truncated } from "../../helpers/processText"
+import PersistedContext from "../../contexts/Persisted"
+import React from "react"
+import { SettignsSectionProps } from "../../components/settings/settings-types"
+import { Settings } from "../../components/settings"
 import { SettingsFooterComponent } from "./footer"
+import { truncated } from "../../helpers/processText"
 
 export default function ListSettings() {
     const { session } = React.useContext(PersistedContext)
@@ -51,14 +51,6 @@ export default function ListSettings() {
         {
             name: t("Account"),
             content: [
-                {
-                    name: t("Your Moments"),
-                    value: "",
-                    type: "TEXT",
-                    navigateTo: "Settings-All-Moments",
-                    navigator: "SettingsNavigator",
-                    secure: false,
-                },
                 {
                     name: t("Preferences"),
                     value: "",
@@ -109,14 +101,6 @@ export default function ListSettings() {
         {
             name: t("More"),
             content: [
-                {
-                    name: t("Open Source"),
-                    value: "",
-                    type: "TEXT",
-                    navigateTo: "Settings-Open-Source",
-                    navigator: "SettingsNavigator",
-                    secure: false,
-                },
                 {
                     name: t("Version"),
                     value: "",
