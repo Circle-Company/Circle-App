@@ -1,11 +1,12 @@
+import { StatisticsDataType, UserDataType } from "./Persisted/types"
+
+import BottomTabsContext from "./bottomTabs"
+import PersistedContext from "./Persisted"
 import React from "react"
 import api from "../services/Api"
-import PersistedContext from "./Persisted"
-import { StatisticsDataType, UserDataType } from "./Persisted/types"
-import BottomTabsContext from "./bottomTabs"
 
 export interface ProfileData extends UserDataType {
-    you_follow?: boolean
+    youFollow?: boolean
     statistics: StatisticsDataType
 }
 type ProfileProviderProps = { children: React.ReactNode }

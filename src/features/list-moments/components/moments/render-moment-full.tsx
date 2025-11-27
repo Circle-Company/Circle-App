@@ -65,7 +65,7 @@ const RenderMomentFull: React.FC<RenderMomentFullProps> = ({
                 setFromAccount(true)
                 return {
                     ...session.user,
-                    you_follow: false,
+                    youFollow: false,
                 }
             }
             setFromAccount(false)
@@ -74,7 +74,7 @@ const RenderMomentFull: React.FC<RenderMomentFullProps> = ({
         setFromAccount(true)
         return {
             ...session.user,
-            you_follow: false,
+            youFollow: false,
         }
     }, [momentData.user, session.user])
 
@@ -162,7 +162,7 @@ const RenderMomentFull: React.FC<RenderMomentFullProps> = ({
                                     <UserShow.Username />
                                     {!fromAccount && (
                                         <UserShow.FollowButton
-                                            isFollowing={Boolean(momentData.user.you_follow)}
+                                            isFollowing={Boolean(momentData.user.youFollow)}
                                             displayOnMoment={true}
                                         />
                                     )}

@@ -94,7 +94,7 @@ vi.mock("@/store", () => ({
             name: "user.name",
             username: "user.username",
             description: "user.description",
-            verifyed: "user.verifyed",
+            verified: "user.verified",
             profile_picture: {
                 small: "user.profile_picture.small",
                 tiny: "user.profile_picture.tiny",

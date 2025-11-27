@@ -1,15 +1,18 @@
 import React from "react"
-import { userReciveDataProps } from "../user_show/user_show-types"
 
 export type CommentObject = {
     id: string
-    user: userReciveDataProps
-    content: string
-    created_at: string
-    statistics: {
-        total_likes_num: number
+    user: {
+        id: string
+        username: string
+        profilePicture?: string
+        verified?: boolean
     }
-    is_liked: boolean
+    content: string
+    richContent?: string
+    totalLikes: number
+    isLiked: boolean
+    createdAt: string
 }
 
 export type CommentsReciveDataProps = Array<CommentObject>
@@ -51,5 +54,6 @@ export type CommentsInputProps = {
     autoFocus: boolean
 }
 export type CommentsListCommentsProps = {
-    preview: boolean
+    comment: CommentObject[]
+    hideZeroMessage?: boolean
 }

@@ -1,17 +1,18 @@
-import NextIcon from "@/assets/icons/svgs/arrow_circle_right.svg"
-import UsernameInput from "@/components/auth/usernameInput"
-import ButtonStandart from "@/components/buttons/button-standart"
-import ButtonClose from "@/components/buttons/close"
-import { Text } from "@/components/Themed"
 import ColorTheme, { colors } from "@/constants/colors"
+import { StatusBar, View, useColorScheme } from "react-native"
+
+import AuthContext from "@/contexts/Auth"
+import ButtonClose from "@/components/buttons/close"
+import ButtonStandart from "@/components/buttons/button-standart"
+import { LinearGradient } from "expo-linear-gradient"
+import NextIcon from "@/assets/icons/svgs/arrow_circle_right.svg"
+import React from "react"
+import { Text } from "@/components/Themed"
+import UsernameInput from "@/components/auth/usernameInput"
 import fonts from "@/constants/fonts"
 import sizes from "@/constants/sizes"
-import AuthContext from "@/contexts/Auth"
-import { useNavigation } from "@react-navigation/native"
-import { LinearGradient } from "expo-linear-gradient"
 import { t } from "i18next"
-import React from "react"
-import { StatusBar, View, useColorScheme } from "react-native"
+import { useNavigation } from "@react-navigation/native"
 
 export default function UsernameScreen() {
     const isDarkMode = useColorScheme() === "dark"
@@ -102,7 +103,7 @@ export default function UsernameScreen() {
 
     return (
         <View style={container}>
-            <StatusBar backgroundColor={"transparent"} barStyle={"light-content"} />
+            <StatusBar backgroundColor={colors.gray.black} barStyle={"light-content"} />
             <LinearGradient
                 renderToHardwareTextureAndroid
                 colors={["rgba(70, 70, 70, 1)", "#000000ff"]}

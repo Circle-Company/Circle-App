@@ -39,8 +39,8 @@ export default function AccountScreen() {
         statistics: {
             ...session.statistics,
         },
-        you_follow: false,
-        follow_you: false,
+        youFollow: false,
+        followYou: false,
     }
 
     return (

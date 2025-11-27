@@ -1,18 +1,19 @@
 import { Animated, Keyboard, Pressable, Text, TextInput, View, useColorScheme } from "react-native"
 import ColorTheme, { colors } from "../../../constants/colors"
 
-import CheckIcon from "@/assets/icons/svgs/check_circle.svg"
 import Arrowbottom from "@/assets/icons/svgs/paper_plane.svg"
+import CheckIcon from "@/assets/icons/svgs/check_circle.svg"
+import { CommentsInputProps } from "../comments-types"
+import FeedContext from "../../../contexts/Feed"
+import LanguageContext from "../../../contexts/Preferences/language"
+import PersistedContext from "../../../contexts/Persisted"
 import React from "react"
-import { useNotifications } from "react-native-notificated"
+import { UserShow } from "../../user_show"
+import api from "../../../services/Api"
 import fonts from "../../../constants/fonts"
 import sizes from "../../../constants/sizes"
-import FeedContext from "../../../contexts/Feed"
-import PersistedContext from "../../../contexts/Persisted"
-import LanguageContext from "../../../contexts/Preferences/language"
-import api from "../../../services/Api"
-import { UserShow } from "../../user_show"
-import { CommentsInputProps } from "../comments-types"
+import { useNotifications } from "react-native-notificated"
+import { userReciveDataProps } from "@/components/user_show/user_show-types"
 
 export default function Input({
     preview = false,
@@ -156,9 +157,10 @@ export default function Input({
         )
     return (
         <View style={[input_container, { paddingLeft: sizes.paddings["1sm"] * 0.2 }]}>
-            <UserShow.Root data={session.user}>
+            <UserShow.Root
+                data={{ ...session.user, verified: true, youFollow: false } as userReciveDataProps}
+            >
                 <UserShow.ProfilePicture
-                    disableAnalytics={true}
                     displayOnMoment={false}
                     pictureDimensions={{ width: 40, height: 40 }}
                 />

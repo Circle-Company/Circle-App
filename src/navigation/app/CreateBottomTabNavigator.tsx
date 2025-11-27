@@ -1,14 +1,13 @@
-import { Text, View, useColorScheme } from "react-native"
 import ColorTheme, { colors } from "../../constants/colors"
+import { Text, View, useColorScheme } from "react-native"
 
 import { CameraModule } from "@/modules/camera"
-import { createBottomTabNavigator } from "@react-navigation/bottom-tabs"
-import React from "react"
-import Moment from "../../assets/icons/svgs/bolt.svg"
 import Memory from "../../assets/icons/svgs/memory.svg"
+import Moment from "../../assets/icons/svgs/bolt.svg"
+import React from "react"
+import { createBottomTabNavigator } from "@react-navigation/bottom-tabs"
 import fonts from "../../constants/fonts"
 import sizes from "../../constants/sizes"
-import { MemoriesNavigator } from "./MemoriesNavigator"
 
 const BottomTab = createBottomTabNavigator()
 
@@ -81,33 +80,6 @@ export default function CreateBottomTabNavigator() {
                         ) : (
                             <View style={unfocusedTabStyle("left")}>
                                 <Moment fill={String(icon)} width={iconWidth} height={iconHeight} />
-                            </View>
-                        ),
-                }}
-            />
-            {/* Tela de Memories */}
-            <BottomTab.Screen
-                name="Memory"
-                component={MemoriesNavigator}
-                initialParams={{ screen: "NewMemorySelectMoments" }}
-                options={{
-                    tabBarIcon: ({ focused }) =>
-                        focused ? (
-                            <View style={focusedTabStyle(!!isDarkMode)}>
-                                <Text style={titleStyle}>Memory</Text>
-                                <Memory
-                                    fill={String(background)}
-                                    width={iconWidth - 2}
-                                    height={iconHeight - 2}
-                                />
-                            </View>
-                        ) : (
-                            <View style={unfocusedTabStyle("right")}>
-                                <Memory
-                                    fill={String(icon)}
-                                    width={iconWidth + 2}
-                                    height={iconHeight + 2}
-                                />
                             </View>
                         ),
                 }}

@@ -1,62 +1,24 @@
-import CheckIcon from "@/assets/icons/svgs/check_circle.svg"
-import React from "react"
-import { View } from "react-native"
-import { useNotifications } from "react-native-notificated"
 import ColorTheme, { colors } from "../../../constants/colors"
+import { MomentDataReturnsProps, MomentOptionsProps } from "../context/types"
+import { View, ViewStyle } from "react-native"
+
+import ButtonStandart from "../../buttons/button-standart"
+import LanguageContext from "../../../contexts/Preferences/language"
+import React from "react"
+import { StatisticsPreview } from "./moment-statistics-preview"
+import { Text } from "../../Themed"
 import fonts from "../../../constants/fonts"
 import sizes from "../../../constants/sizes"
-import PersistedContext from "../../../contexts/Persisted"
-import LanguageContext from "../../../contexts/Preferences/language"
-import BottomSheetContext from "../../../contexts/bottomSheet"
-import api from "../../../services/Api"
-import { MemoryReciveDataProps } from "../../Memory/Memory-types"
-import { Text } from "../../Themed"
-import ButtonStandart from "../../buttons/button-standart"
-import { MomentDataReturnsProps, MomentOptionsProps } from "../context/types"
-import { StatisticsPreview } from "./moment-statistics-preview"
 
 type OptionsProps = {
     momentData: MomentDataReturnsProps
     momentOptions: MomentOptionsProps
-    memory: MemoryReciveDataProps
 }
 
-export default function Options({ memory, momentData, momentOptions }: OptionsProps) {
-    const { collapse } = React.useContext(BottomSheetContext)
+export default function Options({ momentData, momentOptions }: OptionsProps) {
     const { t } = React.useContext(LanguageContext)
-    const { notify } = useNotifications()
-    const { session } = React.useContext(PersistedContext)
     const width =
         sizes.screens.width - (sizes.paddings["2sm"] * 2 + sizes.bottomSheet.marginHorizontal * 2)
-
-    async function handleDeleteFromMemoryPress() {
-        await api
-            .post(
-                "/memory/remove-moment",
-                {
-                    memory_id: memory.id,
-                    moment_id: momentData.id,
-                    user_id: session.user.id,
-                },
-                { headers: { Authorization: session.account.jwtToken } },
-            )
-            .then(() => {
-                notify("toast", {
-                    params: {
-                        description: t("Moment has been deleted with success"),
-                        title: t("Moment deleted"),
-                        icon: (
-                            <CheckIcon
-                                fill={colors.green.green_05.toString()}
-                                width={15}
-                                height={15}
-                            />
-                        ),
-                    },
-                })
-                collapse()
-            })
-    }
 
     const textStyle = {
         color: colors.red.red_05,
@@ -70,7 +32,7 @@ export default function Options({ memory, momentData, momentOptions }: OptionsPr
         fontFamily: fonts.family.Medium,
     }
 
-    const textsContainer = {
+    const textsContainer: ViewStyle = {
         alignItems: "center",
         justifyContent: "center",
         marginBottom: sizes.margins["1md"],
@@ -116,9 +78,9 @@ export default function Options({ memory, momentData, momentOptions }: OptionsPr
                 width={width}
                 borderRadius={10}
                 height={sizes.buttons.height / 1.5}
-                action={handleDeleteFromMemoryPress}
+                action={() => {}}
             >
-                <Text style={textStyle}>{`${t("Delete Moment from")} "${memory.title}"`}</Text>
+                <Text style={textStyle}>{`${t("Delete Moment from")}`}</Text>
             </ButtonStandart>
         </View>
     )

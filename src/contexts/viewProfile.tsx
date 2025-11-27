@@ -1,7 +1,8 @@
 import { UseQueryResult, useQuery } from "@tanstack/react-query"
+
+import PersistedContext from "./Persisted"
 import React from "react"
 import api from "../services/Api"
-import PersistedContext from "./Persisted"
 
 type ViewProfileProviderProps = {
     children: React.ReactNode
@@ -10,7 +11,7 @@ export type ProfileDataProps = {
     id: string
     username: string
     access_level: number
-    verifyed: boolean
+    verified: boolean
     deleted: boolean
     blocked: boolean
     muted: boolean
@@ -27,7 +28,7 @@ export type ProfileDataProps = {
         total_likes_num: number
         total_views_num: number
     }
-    you_follow: boolean
+    youFollow: boolean
 }
 export type ViewProfileContextsData = {
     userProfile: ProfileDataProps

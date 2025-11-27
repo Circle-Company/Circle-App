@@ -3,7 +3,7 @@ import React from "react"
 export type ProfileReciveDataProps = {
     id: number
     username: string
-    verifyed: boolean
+    verified: boolean
     name: string | null
     description: string | null
     profile_picture: {

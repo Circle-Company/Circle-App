@@ -39,7 +39,7 @@ vi.mock("../../store", () => ({
             name: "@circle:user:name",
             username: "@circle:user:username",
             description: "@circle:user:description",
-            verifyed: "@circle:user:verifyed",
+            verified: "@circle:user:verified",
             profile_picture: {
                 small: "@circle:user:profile_picture:small",
                 tiny: "@circle:user:profile_picture:tiny",
@@ -179,7 +179,7 @@ const mockSessionData = {
         name: "Test User",
         username: "testuser",
         description: "Test description",
-        verifyed: true,
+        verified: true,
         profile_picture: {
             small_resolution: "https://example.com/small.jpg",
             tiny_resolution: "https://example.com/tiny.jpg",

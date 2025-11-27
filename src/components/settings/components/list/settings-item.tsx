@@ -119,8 +119,8 @@ export default function SettingsItem({
                             data={
                                 {
                                     ...session.user,
-                                    you_follow: false,
-                                    verifyed: false,
+                                    youFollow: false,
+                                    verified: false,
                                 } as unknown as userReciveDataProps
                             }
                         >

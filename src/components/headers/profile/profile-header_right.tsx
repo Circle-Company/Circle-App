@@ -1,10 +1,10 @@
-import React from "react"
-import { View } from "react-native"
-import sizes from "../../../constants/sizes"
 import PersistedContext from "../../../contexts/Persisted"
-import ViewProfileContext from "../../../contexts/viewProfile"
+import React from "react"
 import { Skeleton } from "../../skeleton"
 import { UserShow } from "../../user_show"
+import { View } from "react-native"
+import ViewProfileContext from "../../../contexts/viewProfile"
+import sizes from "../../../constants/sizes"
 
 export default function ProfileHeaderRight() {
     const { session } = React.useContext(PersistedContext)
@@ -41,7 +41,7 @@ export default function ProfileHeaderRight() {
                             />
                         ) : (
                             <UserShow.FollowButton
-                                isFollowing={userProfile.you_follow}
+                                isFollowing={userProfile.youFollow}
                                 hideOnFollowing={false}
                                 displayOnMoment={false}
                             />

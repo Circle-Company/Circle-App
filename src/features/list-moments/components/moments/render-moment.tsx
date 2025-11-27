@@ -153,7 +153,7 @@ export default function RenderMoment({ momentData, isFocused, isFeed }: renderMo
                                 />
 
                                 <UserShow.FollowButton
-                                    isFollowing={momentData.user.you_follow}
+                                    isFollowing={momentData.user.youFollow}
                                     displayOnMoment={true}
                                 />
                             </UserShow.Root>

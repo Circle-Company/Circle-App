@@ -220,7 +220,7 @@ export const dark = {
     blur_button_color: colors.transparent.black_60,
     blur_display_color: colors.transparent.black_40,
 
-    verifyed: colors.yellow.yellow_04,
+    verified: colors.yellow.yellow_04,
 }
 
 export const light = {
@@ -263,7 +263,7 @@ export const light = {
     blur_button_color: colors.transparent.black_40,
     blur_display_color: colors.transparent.white_40,
 
-    verifyed: colors.yellow.yellow_04,
+    verified: colors.yellow.yellow_04,
 }
 
 export default function ColorTheme(): typeof dark | typeof light {

@@ -21,12 +21,12 @@ const MOCK_COMMENTS: CommentObject[] = [
         user: {
             id: "1",
             username: "johndoe",
-            verifyed: true,
+            verified: true,
             profile_picture: {
                 small_resolution: "https://picsum.photos/50/50",
                 tiny_resolution: "https://picsum.photos/30/30",
             },
-            you_follow: true,
+            youFollow: true,
         },
         content: "Que foto incrível! Adorei as cores e a composição. 📸✨",
         created_at: "2024-03-20T10:30:00Z",
@@ -40,12 +40,12 @@ const MOCK_COMMENTS: CommentObject[] = [
         user: {
             id: "2",
             username: "mariasilva",
-            verifyed: false,
+            verified: false,
             profile_picture: {
                 small_resolution: "https://picsum.photos/51/51",
                 tiny_resolution: "https://picsum.photos/31/31",
             },
-            you_follow: false,
+            youFollow: false,
         },
         content: "Esse lugar é maravilhoso! Onde fica? Quero muito conhecer! 🌎",
         created_at: "2024-03-20T11:15:00Z",
@@ -59,12 +59,12 @@ const MOCK_COMMENTS: CommentObject[] = [
         user: {
             id: "3",
             username: "photoexpert",
-            verifyed: true,
+            verified: true,
             profile_picture: {
                 small_resolution: "https://picsum.photos/52/52",
                 tiny_resolution: "https://picsum.photos/32/32",
             },
-            you_follow: true,
+            youFollow: true,
         },
         content: "A luz natural nessa foto está perfeita! Qual câmera você usou? 📷",
         created_at: "2024-03-20T12:00:00Z",
@@ -78,12 +78,12 @@ const MOCK_COMMENTS: CommentObject[] = [
         user: {
             id: "4",
             username: "travelgram",
-            verifyed: false,
+            verified: false,
             profile_picture: {
                 small_resolution: "https://picsum.photos/53/53",
                 tiny_resolution: "https://picsum.photos/33/33",
             },
-            you_follow: false,
+            youFollow: false,
         },
         content: "Mais um lugar para adicionar na minha lista de destinos! 🗺️✈️",
         created_at: "2024-03-20T13:45:00Z",

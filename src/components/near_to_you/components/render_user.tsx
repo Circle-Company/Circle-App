@@ -1,14 +1,14 @@
 import { Animated, Pressable, TextStyle, View, ViewStyle, useColorScheme } from "react-native"
-import Reanimated, { FadeInDown } from "react-native-reanimated"
 import ColorTheme, { colors } from "../../../constants/colors"
+import Reanimated, { FadeInDown } from "react-native-reanimated"
 
 import React from "react"
+import { RenderItemReciveDataObjectProps } from "../types"
+import { Text } from "../../Themed"
+import { UserShow } from "../../user_show"
 import fonts from "../../../constants/fonts"
 import sizes from "../../../constants/sizes"
 import { useDistanceFormatter } from "../../../lib/hooks/useDistanceFormatter"
-import { Text } from "../../Themed"
-import { UserShow } from "../../user_show"
-import { RenderItemReciveDataObjectProps } from "../types"
 
 export default function RenderUser({ user }: RenderItemReciveDataObjectProps) {
     const bounciness = 8
@@ -127,7 +127,7 @@ export default function RenderUser({ user }: RenderItemReciveDataObjectProps) {
                         <View style={container_center}>
                             <UserShow.Username
                                 margin={0}
-                                truncatedSize={user.follow_you ? (user.verifyed ? 7 : 10) : 14}
+                                truncatedSize={user.followYou ? (user.verified ? 7 : 10) : 14}
                                 fontSize={fonts.size.body}
                                 displayOnMoment={false}
                                 fontFamily={fonts.family.Bold}
@@ -145,8 +145,8 @@ export default function RenderUser({ user }: RenderItemReciveDataObjectProps) {
                         </View>
                         <View style={container_right}>
                             <UserShow.FollowButton
-                                followsYou={user.follow_you}
-                                isFollowing={user.you_follow}
+                                followsYou={user.followYou}
+                                isFollowing={user.youFollow}
                                 hideOnFollowing={true}
                                 displayOnMoment={false}
                             />

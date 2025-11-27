@@ -16,7 +16,7 @@ type FollowersListProps = {
 }
 
 interface userType extends userReciveDataProps {
-    you_follow: boolean
+    youFollow: boolean
 }
 
 export function FollowersList({ user }: FollowersListProps) {
@@ -87,7 +87,7 @@ export function FollowersList({ user }: FollowersListProps) {
                             <UserShow.Username displayOnMoment={false} />
                             <UserShow.FollowButton
                                 hideOnFollowing={true}
-                                isFollowing={item.you_follow}
+                                isFollowing={item.youFollow}
                             />
                         </UserShow.Root>
                     </View>
