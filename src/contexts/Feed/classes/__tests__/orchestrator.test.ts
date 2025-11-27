@@ -1,4 +1,7 @@
-import { describe, it, expect, vi, beforeEach } from "vitest"
+import { beforeEach, describe, expect, it, vi } from "vitest"
+
+// Importar após os mocks
+import { FeedOrchestrator } from "../orchestrator"
 
 // Mock todas as dependências primeiro
 vi.mock("../fetcher", () => ({
@@ -37,17 +40,14 @@ vi.mock("../../helpers/mapper", () => ({
     mapper: vi.fn().mockReturnValue([]),
 }))
 
-// Importar após os mocks
-import { FeedOrchestrator } from "../orchestrator"
-
 // Mock data para os testes
 const mockMoments = [
     {
-        id: 1,
+        id: "1",
         user: {
-            id: 1,
+            id: "1",
             username: "user1",
-            verifyed: false,
+            verified: false,
             profile_picture: { small_resolution: "", tiny_resolution: "" },
             isFollowing: false,
         },
@@ -64,6 +64,19 @@ const mockMoments = [
         isLiked: false,
         deleted: false,
         created_at: "2024-01-01T00:00:00Z",
+        media: "https://example.com/video-1.mp4",
+        thumbnail: "https://example.com/thumb-1.jpg",
+        duration: 10,
+        size: "1000",
+        hasAudio: false,
+        ageRestriction: false,
+        contentWarning: false,
+        metrics: {
+            totalViews: 0,
+            totalLikes: 0,
+            totalComments: 0,
+        },
+        publishedAt: "2024-01-01T00:00:00Z",
     },
 ]
 
@@ -94,7 +107,7 @@ describe("FeedOrchestrator", () => {
 
     beforeEach(() => {
         vi.clearAllMocks()
-        orchestrator = new FeedOrchestrator()
+        orchestrator = new FeedOrchestrator("test-token", 50)
     })
 
     describe("constructor", () => {
@@ -105,7 +118,7 @@ describe("FeedOrchestrator", () => {
 
     describe("fetch", () => {
         it("deve executar fetch básico sem erro", async () => {
-            const result = await orchestrator.fetch(0, mockInteractions, mockMoments)
+            const result = await orchestrator.fetch([])
 
             expect(result).toBeDefined()
             expect(result.newFeed).toBeDefined()
@@ -114,14 +127,8 @@ describe("FeedOrchestrator", () => {
             expect(Array.isArray(result.addedChunk)).toBe(true)
         })
 
-        it("deve lidar com period 0", async () => {
-            const result = await orchestrator.fetch(0, [], [])
-
-            expect(result).toBeDefined()
-        })
-
-        it("deve lidar com reload", async () => {
-            const result = await orchestrator.fetch(1, mockInteractions, mockMoments, true)
+        it("deve executar fetch com reload", async () => {
+            const result = await orchestrator.fetch([], true)
 
             expect(result).toBeDefined()
         })
@@ -129,7 +136,7 @@ describe("FeedOrchestrator", () => {
 
     describe("remove", () => {
         it("deve executar remove sem erro", async () => {
-            const result = await orchestrator.remove(1, mockMoments)
+            const result = await orchestrator.remove("1", mockMoments)
 
             expect(result).toBeDefined()
             expect(result.newFeed).toBeDefined()
@@ -139,7 +146,7 @@ describe("FeedOrchestrator", () => {
 
     describe("preloadSingle", () => {
         it("deve executar preloadSingle e retornar resultado", async () => {
-            const result = await orchestrator.preloadSingle(1, "https://example.com/video.mp4")
+            const result = await orchestrator.preloadSingle("1", "https://example.com/video.mp4")
 
             expect(typeof result === "string" || result === null).toBe(true)
         })
@@ -147,7 +154,7 @@ describe("FeedOrchestrator", () => {
 
     describe("getCached", () => {
         it("deve executar getCached e retornar resultado", async () => {
-            const result = await orchestrator.getCached(1)
+            const result = await orchestrator.getCached("1")
 
             expect(typeof result === "string" || result === null).toBe(true)
         })
@@ -155,7 +162,7 @@ describe("FeedOrchestrator", () => {
 
     describe("isVideoCached", () => {
         it("deve executar isVideoCached e retornar boolean", () => {
-            const result = orchestrator.isVideoCached(1)
+            const result = orchestrator.isVideoCached("1")
 
             expect(typeof result).toBe("boolean")
         })
@@ -170,43 +177,38 @@ describe("FeedOrchestrator", () => {
 
             // Não deve lançar erro
             expect(() => {
-                orchestrator.preload([1], momentsWithVideos as any)
+                orchestrator.preload(["1"], momentsWithVideos as any)
             }).not.toThrow()
         })
 
         it("deve lidar com momentos sem videoUrl", () => {
             // Não deve lançar erro
             expect(() => {
-                orchestrator.preload([1], mockMoments)
+                orchestrator.preload(["1"], mockMoments)
             }).not.toThrow()
         })
     })
 
     describe("cenários de integração", () => {
         it("deve executar fluxo completo sem erro", async () => {
-            // Fetch inicial
-            const fetchResult = await orchestrator.fetch(0, [], [])
+            const fetchResult = await orchestrator.fetch([])
             expect(fetchResult).toBeDefined()
 
-            // Preload
-            orchestrator.preload([1], mockMoments)
+            orchestrator.preload(["1"], mockMoments)
 
-            // Get cached
-            const cachedResult = await orchestrator.getCached(1)
+            const cachedResult = await orchestrator.getCached("1")
             expect(typeof cachedResult === "string" || cachedResult === null).toBe(true)
 
-            // Remove
-            const removeResult = await orchestrator.remove(1, mockMoments)
+            const removeResult = await orchestrator.remove("1", mockMoments)
             expect(removeResult).toBeDefined()
         })
 
         it("deve lidar com múltiplas operações sequenciais", async () => {
-            await orchestrator.fetch(0, [], [])
-            await orchestrator.fetch(1, mockInteractions, mockMoments)
-            await orchestrator.remove(1, mockMoments)
-            await orchestrator.preloadSingle(2, "https://example.com/video2.mp4")
+            await orchestrator.fetch([])
+            await orchestrator.fetch(mockMoments, true)
+            await orchestrator.remove("1", mockMoments)
+            await orchestrator.preloadSingle("2", "https://example.com/video2.mp4")
 
-            // Se chegou até aqui, todas as operações foram executadas sem erro
             expect(true).toBe(true)
         })
     })

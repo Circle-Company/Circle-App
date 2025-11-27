@@ -8,7 +8,7 @@ export type SearchRenderItemReciveDataObjectProps = {
         id: string
         username: string
         name: string | null
-        verifyed: boolean
+        verified: boolean
         profile_picture: {
             fullhd_resolution: string | null
             tiny_resolution: string | null
@@ -16,7 +16,7 @@ export type SearchRenderItemReciveDataObjectProps = {
         statistic: {
             total_followers_num: number
         }
-        you_follow: boolean
+        youFollow: boolean
     }
 }
 

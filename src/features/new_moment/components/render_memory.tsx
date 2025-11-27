@@ -2,12 +2,11 @@ import { Pressable, View, ViewStyle, useColorScheme } from "react-native"
 
 import CheckCircle from "@/assets/icons/svgs/check_circle.svg"
 import { MemoryObjectProps } from "@/components/memory/memory-types"
+import NewMomentContext from "../../../contexts/newMoment"
+import PersistedContext from "../../../contexts/Persisted"
 import React from "react"
 import { colors } from "../../../constants/colors"
 import fonts from "../../../constants/fonts"
-import NewMomentContext from "../../../contexts/newMoment"
-import PersistedContext from "../../../contexts/Persisted"
-import RenderMemory_ from "../../list-memories/components/render-memory"
 
 type RenderMemoryProps = {
     memory: MemoryObjectProps
@@ -95,18 +94,6 @@ export default function RenderMemory({ memory }: RenderMemoryProps) {
                     </View>
                 )}
             </Pressable>
-            <View style={ContainerStyle}>
-                <RenderMemory_
-                    user={{ ...session.user, you_follow: false }}
-                    memory={memory}
-                    pressable={false}
-                    scale={1}
-                    marginRight={40}
-                    textMarginTop={10}
-                    fontSize={fonts.size.body * 1.3}
-                    dinamicMargin={false}
-                />
-            </View>
         </View>
     )
 }

@@ -1,4 +1,3 @@
-import { PanResponder, TextStyle, View, ViewStyle, useColorScheme } from "react-native"
 import Animated, {
     Easing,
     interpolate,
@@ -11,14 +10,15 @@ import Animated, {
     withTiming,
 } from "react-native-reanimated"
 import ColorTheme, { colors } from "../../constants/colors"
+import { PanResponder, TextStyle, View, ViewStyle, useColorScheme } from "react-native"
 
-import React from "react"
 import { Loading } from "../../components/loading"
+import React from "react"
 import { Text } from "../../components/Themed"
+import { Vibrate } from "./useHapticFeedback"
 import config from "../../config"
 import fonts from "../../constants/fonts"
 import sizes from "../../constants/sizes"
-import { Vibrate } from "./useHapticFeedback"
 
 type AnimatedFlatlistProps<T> = {
     data: T[]
@@ -266,7 +266,8 @@ export function AnimatedVerticalFlatlist<T>({
                     })
                 },
             }),
-        [scrollPosition.value, onPanRelease, isReadyToRefresh, pullDownPosition],
+        // Não depender de `.value` aqui para evitar erro "Reanimated: reading from value"
+        [scrollPosition, onPanRelease, isReadyToRefresh, pullDownPosition],
     )
 
     // Otimizar a animação do ícone de refresh

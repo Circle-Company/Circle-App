@@ -6,12 +6,12 @@ export type RenderItemReciveDataObjectProps = {
         id: string
         username: string
         name: string | null
-        verifyed: boolean
+        verified: boolean
         profile_picture: {
             tiny_resolution: string | null
         }
-        you_follow: boolean
-        follow_you: boolean
+        youFollow: boolean
+        followYou: boolean
         distance_km: number
     }
 }

@@ -1,10 +1,10 @@
-import { useInfiniteQuery } from "@tanstack/react-query"
 import { apiRoutes } from "../../services/Api"
+import { useInfiniteQuery } from "@tanstack/react-query"
 
 type Follower = {
     id: string
     username: string
-    verifyed: boolean
+    verified: boolean
     profile_picture: { tiny_resolution: null | string }
     statistic: { total_followers_num: number }
     followed_at: string

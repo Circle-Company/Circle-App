@@ -1,7 +1,7 @@
-import React from "react"
 import { Notification } from ".."
-import { UserShow } from "../../user_show"
 import { NotificationProps } from "../notification-types"
+import React from "react"
+import { UserShow } from "../../user_show"
 
 type renderNotificationProps = {
     notification: NotificationProps
@@ -29,7 +29,7 @@ export default function render_notification({ notification }: renderNotification
                     <Notification.Preview />
                 ) : (
                     <UserShow.Root data={notification.sender_user}>
-                        <UserShow.FollowButton isFollowing={notification.you_follow} />
+                        <UserShow.FollowButton isFollowing={notification.youFollow} />
                     </UserShow.Root>
                 )}
             </Notification.Container.Right>

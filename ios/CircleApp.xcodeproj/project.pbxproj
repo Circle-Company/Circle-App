@@ -294,7 +294,7 @@
 					"-ObjC",
 					"-lc++",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = "com.tiago.savioli.circleappexpo";
+				PRODUCT_BUNDLE_IDENTIFIER = "com.circlecompany.circleapp";
 				PRODUCT_NAME = "CircleApp";
 				SWIFT_OBJC_BRIDGING_HEADER = "CircleApp/CircleApp-Bridging-Header.h";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
@@ -323,7 +323,7 @@
 					"-ObjC",
 					"-lc++",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = "com.tiago.savioli.circleappexpo";
+				PRODUCT_BUNDLE_IDENTIFIER = "com.circlecompany.circleapp";
 				PRODUCT_NAME = "CircleApp";
 				SWIFT_OBJC_BRIDGING_HEADER = "CircleApp/CircleApp-Bridging-Header.h";
 				SWIFT_VERSION = 5.0;

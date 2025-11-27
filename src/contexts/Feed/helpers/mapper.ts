@@ -2,7 +2,7 @@
 import { MomentProps } from "../types"
 
 export function mapper(
-    ids: number[],
+    ids: string[],
     moments: MomentProps[],
     fallback: MomentProps[],
 ): MomentProps[] {

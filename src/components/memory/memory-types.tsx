@@ -18,7 +18,7 @@ export type MemoryObjectProps = {
 }
 
 export interface MemoryUser extends Omit<userReciveDataProps, "isFollowing"> {
-    you_follow: boolean
+    youFollow: boolean
 }
 
 export type MemoryReciveDataProps = {

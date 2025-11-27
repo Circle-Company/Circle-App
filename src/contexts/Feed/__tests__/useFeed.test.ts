@@ -1,11 +1,11 @@
-import { describe, it, expect, vi, beforeEach } from "vitest"
+import { beforeEach, describe, expect, it, vi } from "vitest"
 
 // Mock básico das dependências
 vi.mock("@/contexts/Persisted", () => ({
     default: {
         session: {
             account: { jwtToken: "test-token" },
-            user: { id: 1, username: "testuser" },
+            user: { id: "1", username: "testuser" },
         },
     },
 }))
@@ -14,8 +14,8 @@ vi.mock("@/lib/hooks/useTimer", () => ({
     useTimer: vi.fn(() => [vi.fn()]),
 }))
 
-vi.mock("@/mocks/feedMock", () => ({
-    feedMock: [{ id: 1, description: "Test moment" }],
+vi.mock("@/contexts/Feed/helpers/calculeCacheMaxSize", () => ({
+    useCalculeCacheMaxSize: vi.fn(() => 50),
 }))
 
 const mockOrchestrator = {
@@ -36,7 +36,7 @@ vi.mock("react", async () => {
         useContext: vi.fn(() => ({
             session: {
                 account: { jwtToken: "test-token" },
-                user: { id: 1, username: "testuser" },
+                user: { id: "1", username: "testuser" },
             },
         })),
     }
@@ -74,22 +74,22 @@ describe("useFeed Hook", () => {
     it("deve ter orchestrator com métodos corretos", async () => {
         const orchestrator = mockOrchestrator
 
-        const fetchResult = await orchestrator.fetch(0, [], [], false)
+        const fetchResult = await orchestrator.fetch([], false)
         expect(fetchResult).toEqual({ newFeed: [], addedChunk: [] })
 
-        const removeResult = await orchestrator.remove(1, [])
+        const removeResult = await orchestrator.remove("id-1", [])
         expect(removeResult).toEqual({ newFeed: [], addedChunk: [] })
 
-        const cachedResult = await orchestrator.getCached(1)
+        const cachedResult = await orchestrator.getCached("id-1")
         expect(cachedResult).toBe("cached-url")
 
-        const preloadResult = await orchestrator.preloadSingle(1, "url")
+        const preloadResult = await orchestrator.preloadSingle("id-1", "url")
         expect(preloadResult).toBe("preloaded-url")
     })
 
     it("deve simular lógica de navegação", () => {
         const mockState = {
-            focusedChunkItem: { id: 1, index: 1 },
+            focusedChunkItem: { id: "id-1", index: 1 },
             feedDataLength: 3,
             commentEnabled: false,
             loading: false,
@@ -116,8 +116,8 @@ describe("useFeed Hook", () => {
     })
 
     it("deve simular setFocusedChunkItemFunc", () => {
-        const currentChunk = [1, 2, 3]
-        const targetId = 2
+        const currentChunk = ["id-1", "id-2", "id-3"]
+        const targetId = "id-2"
         let result = null
 
         currentChunk.forEach((item, index) => {
@@ -126,7 +126,7 @@ describe("useFeed Hook", () => {
             }
         })
 
-        expect(result).toEqual({ id: 2, index: 1 })
+        expect(result).toEqual({ id: "id-2", index: 1 })
     })
 
     it("deve lidar com erro no fetch", async () => {
@@ -134,7 +134,7 @@ describe("useFeed Hook", () => {
         mockOrchestrator.fetch.mockRejectedValueOnce(new Error("Fetch error"))
 
         try {
-            await mockOrchestrator.fetch(0, [], [], false)
+            await mockOrchestrator.fetch([], false)
         } catch (error) {
             console.error("Erro ao buscar feed:", error)
         }
@@ -165,6 +165,8 @@ describe("useFeed Hook", () => {
             "setInteractions",
             "setFocusedMoment",
             "setScrollEnabled",
+            "keyboardVisible",
+            "setKeyboardVisible",
             "next",
             "previous",
             "fetch",

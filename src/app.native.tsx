@@ -1,98 +1,148 @@
-import { DefaultTheme, NavigationContainer } from "@react-navigation/native"
 import * as React from "react"
-import { GestureHandlerRootView } from "react-native-gesture-handler"
-import { KeyboardProvider } from "react-native-keyboard-controller"
+import * as SplashScreen from "expo-splash-screen"
+
+import { DefaultTheme, NavigationContainer } from "@react-navigation/native"
 import { SafeAreaProvider, initialWindowMetrics } from "react-native-safe-area-context"
-import ColorTheme from "./constants/colors"
-import sizes from "@/constants/sizes"
+import { Text, TextInput } from "react-native"
+
 import { Provider as AccountProvider } from "./contexts/account"
 import { Provider as AuthProvider } from "./contexts/Auth"
 import { Provider as BottomSheetProvider } from "./contexts/bottomSheet"
 import { Provider as BottomTabsProvider } from "./contexts/bottomTabs"
+import ColorTheme from "./constants/colors"
 import { Provider as FeedProvider } from "./contexts/Feed"
+import Fonts from "@/constants/fonts"
 import { Provider as GeolocationProvider } from "./contexts/geolocation"
-import { Provider as MemoryProvider } from "./contexts/memory"
-import { Provider as NearProvider } from "./contexts/near"
+import { GestureHandlerRootView } from "react-native-gesture-handler"
+import { KeyboardProvider } from "react-native-keyboard-controller"
 import { Provider as NetworkProvider } from "./contexts/network"
 import { Provider as NewMomentProvider } from "./contexts/newMoment"
-import { Provider as NotificationProvider } from "./contexts/notification"
-import { Provider as PersistedProvider } from "./contexts/Persisted"
 import { Provider as PreferencesProvider } from "./contexts/Preferences"
 import { Provider as ProfileProvider } from "./contexts/profile"
+import { QueryProvider } from "./lib/react-query"
 import { Provider as RedirectProvider } from "./contexts/redirect"
+import Routes from "./routes"
 import { Provider as SelectMomentsProvider } from "./contexts/selectMoments"
+import StatusBar from "./components/StatusBar"
 import { Provider as ToastProvider } from "./contexts/Toast"
 import { Provider as ViewProfileProvider } from "./contexts/viewProfile"
-import { QueryProvider } from "./lib/react-query"
-import Routes from "./routes"
+import sizes from "@/constants/sizes"
+import { useEffect } from "react"
+import { useFonts } from "expo-font"
+
+SplashScreen.preventAutoHideAsync().catch(() => undefined)
+
+type TextComponent = typeof Text & { defaultProps?: { style?: any } }
+type TextInputComponent = typeof TextInput & { defaultProps?: { style?: any } }
 
 function InnerApp() {
-    const myTheme = {
-        ...DefaultTheme,
-        colors: {
-            ...DefaultTheme.colors,
-            background: ColorTheme().background.toString(),
-        },
-    }
+    console.log("🔄 InnerApp carregando...")
 
-    return (
-        <NotificationProvider>
+    try {
+        const myTheme = {
+            ...DefaultTheme,
+            colors: {
+                ...DefaultTheme.colors,
+                background: ColorTheme().background.toString(),
+            },
+        }
+
+        console.log("🎨 Tema configurado, renderizando providers...")
+
+        return (
             <BottomTabsProvider>
                 <AccountProvider>
                     <ProfileProvider>
                         <ViewProfileProvider>
                             <FeedProvider>
-                                <NearProvider>
-                                    <NavigationContainer theme={myTheme}>
-                                        <BottomSheetProvider>
-                                            <SelectMomentsProvider>
-                                                <MemoryProvider>
-                                                    <NewMomentProvider>
-                                                        <Routes />
-                                                    </NewMomentProvider>
-                                                </MemoryProvider>
-                                            </SelectMomentsProvider>
-                                        </BottomSheetProvider>
-                                    </NavigationContainer>
-                                </NearProvider>
+                                <NavigationContainer theme={myTheme}>
+                                    <BottomSheetProvider>
+                                        <SelectMomentsProvider>
+                                            <NewMomentProvider>
+                                                <Routes />
+                                            </NewMomentProvider>
+                                        </SelectMomentsProvider>
+                                    </BottomSheetProvider>
+                                </NavigationContainer>
                             </FeedProvider>
                         </ViewProfileProvider>
                     </ProfileProvider>
                 </AccountProvider>
             </BottomTabsProvider>
-        </NotificationProvider>
-    )
+        )
+    } catch (error) {
+        console.error("❌ Erro no InnerApp:", error)
+        throw error
+    }
 }
 
 function App() {
-    console.log("App.tsx carregou")
-    return (
-        <SafeAreaProvider initialMetrics={initialWindowMetrics}>
-            <GestureHandlerRootView
-                style={{ width: sizes.window.width, height: sizes.window.height }}
-            >
-                <KeyboardProvider enabled>
-                    <ToastProvider>
-                        <RedirectProvider>
-                            <AuthProvider>
-                                <PersistedProvider>
+    console.log("🚀 App.tsx carregou - Iniciando aplicação")
+
+    const [fontsLoaded, fontError] = useFonts(Fonts.files)
+
+    useEffect(() => {
+        if (fontsLoaded || fontError) {
+            SplashScreen.hideAsync().catch(() => undefined)
+
+            const defaultFontFamily = Fonts.family.Regular
+
+            const textComponent = Text as TextComponent
+            const textInputComponent = TextInput as TextInputComponent
+
+            if (textComponent.defaultProps == null) {
+                textComponent.defaultProps = {}
+            }
+
+            if (textInputComponent.defaultProps == null) {
+                textInputComponent.defaultProps = {}
+            }
+
+            textComponent.defaultProps.style = textComponent.defaultProps.style
+                ? [textComponent.defaultProps.style, { fontFamily: defaultFontFamily }]
+                : { fontFamily: defaultFontFamily }
+
+            textInputComponent.defaultProps.style = textInputComponent.defaultProps.style
+                ? [textInputComponent.defaultProps.style, { fontFamily: defaultFontFamily }]
+                : { fontFamily: defaultFontFamily }
+        }
+    }, [fontsLoaded, fontError])
+
+    if (!fontsLoaded && !fontError) {
+        return null
+    }
+
+    try {
+        return (
+            <SafeAreaProvider initialMetrics={initialWindowMetrics}>
+                <GestureHandlerRootView
+                    style={{ width: sizes.window.width, height: sizes.window.height }}
+                >
+                    <KeyboardProvider enabled>
+                        <ToastProvider>
+                            <RedirectProvider>
+                                <AuthProvider>
                                     <QueryProvider>
                                         <PreferencesProvider>
                                             <NetworkProvider>
                                                 <GeolocationProvider>
+                                                    <StatusBar />
                                                     <InnerApp />
                                                 </GeolocationProvider>
                                             </NetworkProvider>
                                         </PreferencesProvider>
                                     </QueryProvider>
-                                </PersistedProvider>
-                            </AuthProvider>
-                        </RedirectProvider>
-                    </ToastProvider>
-                </KeyboardProvider>
-            </GestureHandlerRootView>
-        </SafeAreaProvider>
-    )
+                                </AuthProvider>
+                            </RedirectProvider>
+                        </ToastProvider>
+                    </KeyboardProvider>
+                </GestureHandlerRootView>
+            </SafeAreaProvider>
+        )
+    } catch (error) {
+        console.error("❌ Erro crítico na inicialização da App:", error)
+        throw error
+    }
 }
 
 export default App

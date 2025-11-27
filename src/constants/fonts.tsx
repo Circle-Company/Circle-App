@@ -24,9 +24,20 @@ export default {
         Medium: "Inter-Medium",
         "Semibold-Italic": "Inter-SemiBoldItalic",
         Semibold: "Inter-SemiBold",
-        "Bold-Italic": "Inter-BlackItalic",
+        "Bold-Italic": "Inter-BoldItalic",
         Bold: "Inter-Bold",
         "Black-Italic": "Inter-ExtraBoldItalic",
         Black: "Inter-ExtraBold",
+    },
+
+    files: {
+        "Inter-Regular": require("../../assets/fonts/inter/Inter-Regular.otf"),
+        "Inter-Italic": require("../../assets/fonts/inter/Inter-Italic.otf"),
+        "Inter-SemiBold": require("../../assets/fonts/inter/Inter-SemiBold.otf"),
+        "Inter-SemiBoldItalic": require("../../assets/fonts/inter/Inter-SemiBoldItalic.otf"),
+        "Inter-Bold": require("../../assets/fonts/inter/Inter-Bold.otf"),
+        "Inter-BoldItalic": require("../../assets/fonts/inter/Inter-BoldItalic.otf"),
+        "Inter-ExtraBold": require("../../assets/fonts/inter/Inter-ExtraBold.otf"),
+        "Inter-ExtraBoldItalic": require("../../assets/fonts/inter/Inter-ExtraBoldItalic.otf"),
     },
 }

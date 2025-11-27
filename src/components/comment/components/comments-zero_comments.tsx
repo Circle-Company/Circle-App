@@ -1,14 +1,15 @@
-import PlusIcon from "@/assets/icons/svgs/plus_circle.svg"
-import React from "react"
-import { View, useColorScheme } from "react-native"
 import ColorTheme, { colors } from "../../../constants/colors"
-import fonts from "../../../constants/fonts"
-import sizes from "../../../constants/sizes"
+import { View, ViewStyle, useColorScheme } from "react-native"
+
+import ButtonStandart from "../../buttons/button-standart"
 import FeedContext from "../../../contexts/Feed"
 import LanguageContext from "../../../contexts/Preferences/language"
-import { Vibrate } from "../../../lib/hooks/useHapticFeedback"
+import PlusIcon from "@/assets/icons/svgs/plus_circle.svg"
+import React from "react"
 import { Text } from "../../Themed"
-import ButtonStandart from "../../buttons/button-standart"
+import { Vibrate } from "../../../lib/hooks/useHapticFeedback"
+import fonts from "../../../constants/fonts"
+import sizes from "../../../constants/sizes"
 export default function ZeroComments() {
     const { t } = React.useContext(LanguageContext)
     const { commentEnabled, setCommentEnabled, setKeyboardVisible, setScrollEnabled } =
@@ -26,7 +27,7 @@ export default function ZeroComments() {
         paddingTop: sizes.paddings["1sm"],
     }
 
-    const buttonContainer = {
+    const buttonContainer: ViewStyle = {
         alignSelf: "center",
         alignItems: "center",
         width: sizes.buttons.width * 0.5,

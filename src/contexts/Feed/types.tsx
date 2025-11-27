@@ -1,49 +1,62 @@
-import { MomentUserActionsProps } from "../../components/moment/context/types"
 import { LanguagesCodesType } from "../../locales/LanguageTypes"
+import { MomentUserActionsProps } from "../../components/moment/context/types"
+import React from "react"
 import { TagProps } from "../newMoment"
 
-export interface ProfilePicture {
-    small_resolution: string
-    tiny_resolution: string
-}
-
 export interface User {
-    id: number
+    id: string
     username: string
-    verifyed: boolean
-    profile_picture: ProfilePicture
+    verified: boolean
+    profilePicture: string
     isFollowing: boolean
 }
 
-export interface Comment {
-    id: number
-    user: User
-    content: string
-    statistics: {
-        total_likes_num: number
+export interface TopComment {
+    id: string
+    content?: string
+    richContent?: string
+    user: {
+        id: string
+        username: string
+        profilePicture?: string
+        verified?: boolean
+        isFollowing?: boolean
     }
-    created_at: string
+    sentiment?: string
+    likesCount: number
+    createdAt?: string
 }
-
-export interface Media {
-    content_type: "VIDEO" | "IMAGE"
-    nhd_thumbnail: string
-    fullhd_resolution: string
-    nhd_resolution: string
-}
-
 export interface MomentProps {
-    id: number
+    id: string
     user: User
-    description: string
-    content_type: string
-    midia: Media
+    description?: string
+    content_type: "IMAGE" | "VIDEO"
+    midia: {
+        content_type: "IMAGE" | "VIDEO"
+        nhd_thumbnail: string
+        fullhd_resolution: string
+        nhd_resolution: string
+    }
     comments_count: number
-    lastComment?: Comment
     likes_count: number
     isLiked: boolean
     deleted: boolean
     created_at: string
+    lastComment?: TopComment
+    media: string
+    thumbnail: string
+    topComment?: TopComment
+    duration: number
+    size: string
+    hasAudio: boolean
+    ageRestriction: boolean
+    contentWarning: boolean
+    metrics: {
+        totalViews: number
+        totalLikes: number
+        totalComments: number
+    }
+    publishedAt: string
 }
 
 export type InteractionProps = {

@@ -1,11 +1,11 @@
-import React, { useCallback, useEffect, useRef, useState } from "react"
 import { Animated, Image, StyleSheet, View } from "react-native"
+import React, { useCallback, useEffect, useRef, useState } from "react"
 import Video, { OnLoadData, OnProgressData } from "react-native-video"
 
-import { t } from "i18next"
-import PersistedContext from "../../../contexts/Persisted"
-import MomentContext from "../../moment/context"
 import MidiaRenderVideoError from "./midia_render-video_error"
+import MomentContext from "../../moment/context"
+import PersistedContext from "../../../contexts/Persisted"
+import { t } from "i18next"
 
 interface VideoPlayerProps {
     uri?: string
@@ -22,7 +22,7 @@ interface VideoPlayerProps {
     width?: number
     height?: number
     isLoadingCache?: boolean
-    momentId?: number
+    momentId?: string
 }
 
 export default function MediaRenderVideo({

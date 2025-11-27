@@ -1,14 +1,14 @@
-import { Pressable, View, useColorScheme } from "react-native"
 import Animated, { FadeIn } from "react-native-reanimated"
 import ColorTheme, { colors } from "../../../constants/colors"
+import { Pressable, View, useColorScheme } from "react-native"
 
 import Icon from "@/assets/icons/svgs/@2.svg"
-import { useNavigation } from "@react-navigation/native"
 import { Image } from "expo-image"
 import React from "react"
-import sizes from "../../../constants/sizes"
-import { useUserShowContext } from "../user_show-context"
 import { UserProfilePictureProps } from "../user_show-types"
+import sizes from "../../../constants/sizes"
+import { useNavigation } from "@react-navigation/native"
+import { useUserShowContext } from "../user_show-context"
 
 export default function profile_picture({
     displayOnMoment = true,
@@ -24,11 +24,7 @@ export default function profile_picture({
         alignItems: "center",
         justifyContent: "center",
         borderRadius: +Number([Number(pictureDimensions.width) + Number(outlineSize)]) / 2,
-        backgroundColor: displayOnMoment
-            ? ColorTheme().blur_display_color
-            : isDarkMode
-            ? colors.gray.grey_07
-            : colors.gray.grey_02,
+        backgroundColor: colors.gray.grey_07,
         width: Number(pictureDimensions.width) + Number(outlineSize),
         height: Number(pictureDimensions.height) + Number(outlineSize),
         overflow: "hidden",
@@ -49,12 +45,17 @@ export default function profile_picture({
     }
 
     React.useEffect(() => {
-        if (user.profile_picture?.small_resolution == undefined) {
-            setProfilePicture(String(user.profile_picture?.tiny_resolution))
+        // Suportar tanto profilePicture (string) quanto profile_picture (objeto)
+        if (user.profilePicture) {
+            setProfilePicture(String(user.profilePicture))
+        } else if (user.profile_picture?.small_resolution) {
+            setProfilePicture(String(user.profile_picture.small_resolution))
+        } else if (user.profile_picture?.tiny_resolution) {
+            setProfilePicture(String(user.profile_picture.tiny_resolution))
         } else {
-            setProfilePicture(String(user.profile_picture?.small_resolution))
+            setProfilePicture("")
         }
-    }, [])
+    }, [user])
 
     return (
         <Animated.View entering={FadeIn.duration(200)}>
@@ -73,18 +74,15 @@ export default function profile_picture({
                         left: Number(outlineSize) / 2,
                     }}
                 />
-                {!user.profile_picture?.tiny_resolution &&
-                    !user.profile_picture?.small_resolution && (
-                        <View style={iconContainer}>
-                            <Icon
-                                width={pictureDimensions.width * 0.5}
-                                height={pictureDimensions.height * 0.5}
-                                fill={
-                                    isDarkMode ? colors.gray.grey_05 + 90 : colors.gray.grey_04 + 50
-                                }
-                            />
-                        </View>
-                    )}
+                {!profilePicture && (
+                    <View style={iconContainer}>
+                        <Icon
+                            width={pictureDimensions.width * 0.5}
+                            height={pictureDimensions.height * 0.5}
+                            fill={isDarkMode ? colors.gray.grey_05 + 90 : colors.gray.grey_04 + 50}
+                        />
+                    </View>
+                )}
             </Pressable>
         </Animated.View>
     )

@@ -1,16 +1,19 @@
-import React from "react"
+import { SessionDataType, UserDataType } from "../../contexts/Persisted/types"
+
 import PersistedContext from "../../contexts/Persisted"
-import { UserDataType } from "../../contexts/Persisted/types"
+import React from "react"
+
 type SignInResponseProps = {
     accessToken: string
     user: UserDataType
 }
-export function SignIn(): Promise<SignInResponseProps> {
+
+export const createSignInResponse = (session: SessionDataType): SignInResponseProps => ({
+    accessToken: session.account.jwtToken,
+    user: session.user,
+})
+
+export function useSignInResponse(): SignInResponseProps {
     const { session } = React.useContext(PersistedContext)
-    return new Promise((resolve) => {
-        resolve({
-            accessToken: session.account.jwtToken,
-            user: session.user,
-        })
-    })
+    return React.useMemo(() => createSignInResponse(session), [session])
 }

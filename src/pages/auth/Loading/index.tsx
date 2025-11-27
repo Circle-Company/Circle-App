@@ -1,8 +1,9 @@
-import React from "react"
 import { StatusBar, useColorScheme } from "react-native"
 import { Text, View } from "../../../components/Themed"
+
 import ColorTheme from "../../../constants/colors"
 import Fonts from "../../../constants/fonts"
+import React from "react"
 
 export default function LoadingScreen() {
     const isDarkMode = useColorScheme() === "dark"
@@ -23,7 +24,11 @@ export default function LoadingScreen() {
 
     return (
         <View style={container}>
-            <StatusBar barStyle={isDarkMode ? "lght-content" : "dark-content"} />
+            <StatusBar
+                barStyle={"light-content"}
+                backgroundColor="transparent"
+                translucent={true}
+            />
             <Text style={title}>Circle</Text>
         </View>
     )

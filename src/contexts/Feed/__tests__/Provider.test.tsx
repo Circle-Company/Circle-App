@@ -1,4 +1,4 @@
-import { describe, it, expect } from "vitest"
+import { describe, expect, it } from "vitest"
 
 describe("Feed Provider", () => {
     describe("análise do código fonte", () => {
@@ -127,6 +127,7 @@ describe("Feed Provider", () => {
                 "currentChunk",
                 "interactions",
                 "focusedMoment",
+                "keyboardVisible",
             ]
 
             // Propriedades típicas do useKeyboard
@@ -153,6 +154,8 @@ describe("Feed Provider", () => {
                 "setInteractions",
                 "setFocusedMoment",
                 "setScrollEnabled",
+                "keyboardVisible",
+                "setKeyboardVisible",
                 "next",
                 "previous",
                 "fetch",

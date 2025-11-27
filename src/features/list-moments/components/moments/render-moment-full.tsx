@@ -1,19 +1,19 @@
 import { Animated, View, useColorScheme } from "react-native"
 import ColorTheme, { colors } from "../../../../constants/colors"
 
-import React from "react"
+import { AnimatedVerticalScrollView } from "../../../../lib/hooks/useAnimatedScrollView"
+import FeedContext from "../../../../contexts/Feed"
 import { Loading } from "../../../../components/loading"
 import { Moment } from "../../../../components/moment"
 import { MomentDataProps } from "../../../../components/moment/context/types"
+import PersistedContext from "../../../../contexts/Persisted"
+import React from "react"
+import RenderCommentFull from "../comments/render-comment-full"
 import { Text } from "../../../../components/Themed"
 import { UserShow } from "../../../../components/user_show"
-import { userReciveDataProps } from "../../../../components/user_show/user_show-types"
 import fonts from "../../../../constants/fonts"
 import sizes from "../../../../constants/sizes"
-import FeedContext from "../../../../contexts/Feed"
-import PersistedContext from "../../../../contexts/Persisted"
-import { AnimatedVerticalScrollView } from "../../../../lib/hooks/useAnimatedScrollView"
-import RenderCommentFull from "../comments/render-comment-full"
+import { userReciveDataProps } from "../../../../components/user_show/user_show-types"
 
 type RenderMomentFullProps = {
     momentData: MomentDataProps
@@ -44,7 +44,7 @@ const RenderMomentFull: React.FC<RenderMomentFullProps> = ({
     }, [fadeAnim])
 
     React.useEffect(() => {
-        setFocusedChunkItemFunc({ id: Number(momentData.id) })
+        setFocusedChunkItemFunc({ id: String(momentData.id) })
     }, [momentData.id, setFocusedChunkItemFunc])
 
     const imageOpacity = scrollY.interpolate({
@@ -65,7 +65,7 @@ const RenderMomentFull: React.FC<RenderMomentFullProps> = ({
                 setFromAccount(true)
                 return {
                     ...session.user,
-                    you_follow: false,
+                    youFollow: false,
                 }
             }
             setFromAccount(false)
@@ -74,7 +74,7 @@ const RenderMomentFull: React.FC<RenderMomentFullProps> = ({
         setFromAccount(true)
         return {
             ...session.user,
-            you_follow: false,
+            youFollow: false,
         }
     }, [momentData.user, session.user])
 
@@ -162,7 +162,7 @@ const RenderMomentFull: React.FC<RenderMomentFullProps> = ({
                                     <UserShow.Username />
                                     {!fromAccount && (
                                         <UserShow.FollowButton
-                                            isFollowing={Boolean(momentData.user.you_follow)}
+                                            isFollowing={Boolean(momentData.user.youFollow)}
                                             displayOnMoment={true}
                                         />
                                     )}

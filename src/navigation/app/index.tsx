@@ -1,16 +1,12 @@
 import { CardStyleInterpolators, createStackNavigator } from "@react-navigation/stack"
 import { ProfileNavigator, ProfileStackParamList } from "./ProfileNavigator"
 
-import React from "react"
-import ColorTheme from "../../constants/colors"
-import { Interpolation as HorizontalLeft } from "../transitions/horizontal-left"
-import { Interpolation as HorizontalRight } from "../transitions/horizontal-right"
 import BottomTabNavigator from "./BottomTabNavigator"
+import ColorTheme from "../../constants/colors"
 import CreateBottomTabNavigator from "./CreateBottomTabNavigator"
-import { ExploreScreenNavigator } from "./ExploreScreenNavigator"
-import { InboxNavigator } from "./InboxNavigator"
-import { MemoriesNavigator } from "./MemoriesNavigator"
+import { Interpolation as HorizontalRight } from "../transitions/horizontal-right"
 import { MomentNavigator } from "./MomentNavigator"
+import React from "react"
 import { SettingsNavigator } from "./SettingsNavigator"
 
 export default function AppNavigator() {
@@ -33,31 +29,10 @@ export default function AppNavigator() {
                 }}
             />
             <App.Screen
-                name="ExploreNavigator"
-                component={ExploreScreenNavigator}
-                options={{
-                    cardStyleInterpolator: HorizontalRight,
-                }}
-            />
-            <App.Screen
                 name="MomentNavigator"
                 component={MomentNavigator}
                 options={{
                     cardStyleInterpolator: CardStyleInterpolators.forNoAnimation,
-                }}
-            />
-            <App.Screen
-                name="MemoriesNavigator"
-                component={MemoriesNavigator}
-                options={{
-                    cardStyleInterpolator: HorizontalRight,
-                }}
-            />
-            <App.Screen
-                name="InboxNavigator"
-                component={InboxNavigator}
-                options={{
-                    cardStyleInterpolator: HorizontalLeft,
                 }}
             />
             <App.Screen

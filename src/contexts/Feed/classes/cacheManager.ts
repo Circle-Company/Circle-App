@@ -1,21 +1,20 @@
 import RNFS from "react-native-fs"
-import { calculeCacheMaxSize } from "@/contexts/Feed/helpers/calculeCacheMaxSize"
 
 const VIDEO_CACHE_DIR = `${RNFS.CachesDirectoryPath}/videos`
 
 type CacheEntry = {
-    id: number
+    id: string
     localPath: string
     originalUrl: string
 }
 
 export class CacheManager {
-    private cache: Map<number, CacheEntry> = new Map()
-    private accessQueue: number[] = [] // mantém ordem de uso
+    private cache: Map<string, CacheEntry> = new Map()
+    private accessQueue: string[] = [] // mantém ordem de uso
     private maxCacheSize: number
 
-    constructor() {
-        this.maxCacheSize = calculeCacheMaxSize()
+    constructor(maxCacheSize: number = 50) {
+        this.maxCacheSize = maxCacheSize
         this.init()
     }
 
@@ -30,7 +29,7 @@ export class CacheManager {
         }
     }
 
-    private markAsUsed(id: number) {
+    private markAsUsed(id: string) {
         const index = this.accessQueue.indexOf(id)
         if (index !== -1) {
             this.accessQueue.splice(index, 1)
@@ -55,7 +54,7 @@ export class CacheManager {
         }
     }
 
-    public async preload({ id, url }: { id: number; url: string }): Promise<string> {
+    public async preload({ id, url }: { id: string; url: string }): Promise<string> {
         if (this.cache.has(id)) {
             this.markAsUsed(id)
             return this.cache.get(id)!.localPath
@@ -85,17 +84,17 @@ export class CacheManager {
         return finalPath
     }
 
-    public get(id: number): string | undefined {
+    public get(id: string): string | undefined {
         const entry = this.cache.get(id)
         if (entry) this.markAsUsed(id)
         return entry?.localPath
     }
 
-    public has(id: number): boolean {
+    public has(id: string): boolean {
         return this.cache.has(id)
     }
 
-    public async remove(id: number) {
+    public async remove(id: string) {
         const entry = this.cache.get(id)
         if (!entry) return
 
@@ -125,13 +124,13 @@ export class CacheManager {
     /**
      * Método apply para controle de cache similar ao ChunkManager
      */
-    public async apply(command: "CLEAR" | "REMOVE", payload?: number | number[]): Promise<void> {
+    public async apply(command: "CLEAR" | "REMOVE", payload?: string | string[]): Promise<void> {
         switch (command) {
             case "CLEAR":
                 await this.clearCache()
                 break
             case "REMOVE":
-                if (typeof payload === "number") {
+                if (typeof payload === "string") {
                     await this.remove(payload)
                 } else if (Array.isArray(payload)) {
                     for (const id of payload) {

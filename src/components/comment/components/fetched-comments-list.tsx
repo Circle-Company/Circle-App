@@ -2,19 +2,18 @@ import { FlatList, TextStyle, ViewStyle } from "react-native"
 import Reanimated, { FadeInUp } from "react-native-reanimated"
 import { Text, View } from "../../Themed"
 
+import BottomSheetContext from "../../../contexts/bottomSheet"
+import ButtonClose from "../../buttons/close"
+import { CommentObject } from "../comments-types"
+import LanguageContext from "../../../contexts/Preferences/language"
+import { Loading } from "../../loading"
+import NetworkContext from "../../../contexts/network"
+import OfflineCard from "../../general/offline"
+import PersistedContext from "../../../contexts/Persisted"
 import React from "react"
+import RenderComment from "./comments-render_comment"
 import fonts from "../../../constants/fonts"
 import sizes from "../../../constants/sizes"
-import BottomSheetContext from "../../../contexts/bottomSheet"
-import NetworkContext from "../../../contexts/network"
-import PersistedContext from "../../../contexts/Persisted"
-import LanguageContext from "../../../contexts/Preferences/language"
-import EndReached from "../../../features/list-memories/list-memories-preview/components/end-reached"
-import ButtonClose from "../../buttons/close"
-import OfflineCard from "../../general/offline"
-import { Loading } from "../../loading"
-import { CommentObject } from "../comments-types"
-import RenderComment from "./comments-render_comment"
 
 const MOCK_COMMENTS: CommentObject[] = [
     {
@@ -22,12 +21,12 @@ const MOCK_COMMENTS: CommentObject[] = [
         user: {
             id: "1",
             username: "johndoe",
-            verifyed: true,
+            verified: true,
             profile_picture: {
                 small_resolution: "https://picsum.photos/50/50",
                 tiny_resolution: "https://picsum.photos/30/30",
             },
-            you_follow: true,
+            youFollow: true,
         },
         content: "Que foto incrível! Adorei as cores e a composição. 📸✨",
         created_at: "2024-03-20T10:30:00Z",
@@ -41,12 +40,12 @@ const MOCK_COMMENTS: CommentObject[] = [
         user: {
             id: "2",
             username: "mariasilva",
-            verifyed: false,
+            verified: false,
             profile_picture: {
                 small_resolution: "https://picsum.photos/51/51",
                 tiny_resolution: "https://picsum.photos/31/31",
             },
-            you_follow: false,
+            youFollow: false,
         },
         content: "Esse lugar é maravilhoso! Onde fica? Quero muito conhecer! 🌎",
         created_at: "2024-03-20T11:15:00Z",
@@ -60,12 +59,12 @@ const MOCK_COMMENTS: CommentObject[] = [
         user: {
             id: "3",
             username: "photoexpert",
-            verifyed: true,
+            verified: true,
             profile_picture: {
                 small_resolution: "https://picsum.photos/52/52",
                 tiny_resolution: "https://picsum.photos/32/32",
             },
-            you_follow: true,
+            youFollow: true,
         },
         content: "A luz natural nessa foto está perfeita! Qual câmera você usou? 📷",
         created_at: "2024-03-20T12:00:00Z",
@@ -79,12 +78,12 @@ const MOCK_COMMENTS: CommentObject[] = [
         user: {
             id: "4",
             username: "travelgram",
-            verifyed: false,
+            verified: false,
             profile_picture: {
                 small_resolution: "https://picsum.photos/53/53",
                 tiny_resolution: "https://picsum.photos/33/33",
             },
-            you_follow: false,
+            youFollow: false,
         },
         content: "Mais um lugar para adicionar na minha lista de destinos! 🗺️✈️",
         created_at: "2024-03-20T13:45:00Z",
@@ -220,18 +219,11 @@ function FetchedCommentsList({
                 </Reanimated.View>
             )}
             ListFooterComponent={() => {
-                if (endReached)
-                    return (
-                        <EndReached
-                            width={sizes.moment.standart.width}
-                            text={
-                                allComments?.length == 0
-                                    ? t("No one has commented yet.")
-                                    : t("No more comments.")
-                            }
-                        />
-                    )
-                else
+                if (endReached) {
+                    if (allComments.length == 0)
+                        return <Text>{t("No one has commented yet.")}</Text>
+                    else return <Text>{t("No more comments.")}</Text>
+                } else
                     return (
                         <Loading.Container
                             width={sizes.moment.standart.width}

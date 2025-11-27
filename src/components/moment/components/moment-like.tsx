@@ -1,18 +1,18 @@
 import { Animated, Pressable, TextStyle, View, ViewStyle } from "react-native"
 import ColorTheme, { colors } from "../../../constants/colors"
 
-import LikeIcon from "@/assets/icons/svgs/heart.svg"
-import PersistedContext from "../../../contexts/Persisted"
-import NumberConversor from "../../../helpers/numberConversor"
+import LikeIcon from "@/assets/icons/svgs/heart_2.svg"
+import LinearGradient from "react-native-linear-gradient"
 import MomentContext from "../context"
 import { MomentLikeProps } from "../moment-types"
+import NumberConversor from "../../../helpers/numberConversor"
+import PersistedContext from "../../../contexts/Persisted"
 /* eslint-disable no-var */
 import React from "react"
+import { Text } from "../../Themed"
+import { Vibrate } from "../../../lib/hooks/useHapticFeedback"
 import fonts from "../../../constants/fonts"
 import sizes from "../../../constants/sizes"
-import { Vibrate } from "../../../lib/hooks/useHapticFeedback"
-import api from "../../../services/Api"
-import { Text } from "../../Themed"
 
 export default function Like({
     isLiked,
@@ -21,9 +21,9 @@ export default function Like({
     margin = sizes.margins["1sm"],
 }: MomentLikeProps) {
     const { session } = React.useContext(PersistedContext)
-    const { momentData, momentUserActions, momentOptions } = React.useContext(MomentContext)
+    const { momentData, momentUserActions, momentOptions } = React.useContext(MomentContext) as any
     const [likedPressed, setLikedPressed] = React.useState(
-        isLiked ? isLiked : momentUserActions.liked,
+        isLiked ? isLiked : momentUserActions.like,
     )
     var animatedScale = React.useRef(new Animated.Value(1)).current
     var animatedScaleIconPressed = React.useRef(new Animated.Value(1)).current
@@ -59,19 +59,41 @@ export default function Like({
         }).start()
     }
     React.useEffect(() => {
-        if (momentUserActions.liked) {
+        if (momentUserActions.like) {
             setLikedPressed(true)
             HandleButtonAnimation()
         } else {
             setLikedPressed(false)
             HandleButtonAnimation()
         }
-    }, [momentUserActions.liked])
+    }, [momentUserActions.like])
+
+    // Quantidade total de likes que vem do backend
+    const totalLikes = Number(momentData?.statistics?.total_likes_num || 0)
+
+    // Determina se um like foi adicionado ou removido em relação ao estado inicial
+    const likeDifference = momentUserActions.like
+        ? momentUserActions.initialLikedState
+            ? 0
+            : 1 // Se está curtido, não soma se já estava curtido, senão soma 1
+        : momentUserActions.initialLikedState
+        ? -1
+        : 0 // Se não está curtido, subtrai 1 se estava curtido, senão não muda
+
+    // Número de likes que será exibido, considerando a interação do usuário
+    const adjustedLikes = totalLikes + likeDifference
+
+    // Converte para formato legível
+    const displayLikes = NumberConversor(adjustedLikes)
+    const buttonWidth = adjustedLikes > 0 ? 84 : 76
+    const borderWidth = 1
+    const borderRadiusValue = Number([sizes.buttons.width / 4]) / 2
+    const gradientColors = [colors.gray.grey_06, colors.gray.grey_08]
 
     const container: ViewStyle = {
-        minWidth: sizes.buttons.width / 4,
-        height: sizes.buttons.height / 2,
-        borderRadius: Number([sizes.buttons.width / 4]) / 2,
+        flex: 1,
+        height: "100%",
+        borderRadius: borderRadiusValue - borderWidth,
         alignItems: "center",
         justifyContent: "center",
         flexDirection: "row",
@@ -79,9 +101,20 @@ export default function Like({
         backgroundColor: "transparent",
         overflow: "hidden",
     }
+    const gradient_border: ViewStyle = {
+        flex: 1,
+        borderRadius: borderRadiusValue,
+        padding: borderWidth,
+        overflow: "hidden",
+    }
+    const blur_container_base: ViewStyle = {
+        flex: 1,
+        borderRadius: borderRadiusValue - borderWidth,
+        overflow: "hidden",
+    }
     const like_text_pressed: TextStyle = {
         fontSize: fonts.size.body,
-        fontFamily: fonts.family.Bold,
+        fontFamily: fonts.family.Black,
         color: colors.gray.white,
         marginLeft: sizes.margins["1sm"],
     }
@@ -91,22 +124,27 @@ export default function Like({
         color: colors.gray.white,
         marginLeft: sizes.margins["1sm"],
     }
-    const blur_container = {
+    const blur_container: ViewStyle = {
+        ...blur_container_base,
         backgroundColor: ColorTheme().blur_button_color,
     }
-    const blur_container_background_color = {
+    const blur_container_background_color: ViewStyle = {
+        ...blur_container_base,
         backgroundColor: backgroundColor,
     }
-    const blur_container_likePressed = {
+    const blur_container_likePressed: ViewStyle = {
+        ...blur_container_base,
         backgroundColor: ColorTheme().like,
     }
     const pressable_container: ViewStyle = {
         overflow: "hidden",
-        borderRadius: Number([sizes.buttons.width / 4]) / 2,
+        borderRadius: borderRadiusValue,
+        width: "100%",
+        height: "100%",
     }
-    const animated_container = {
-        width: sizes.buttons.width / 4,
-        height: sizes.buttons.height / 2,
+    const animated_container: ViewStyle = {
+        width: buttonWidth,
+        height: 46,
         margin,
         transform: [{ scale: animatedScale }],
     }
@@ -120,51 +158,23 @@ export default function Like({
     }
 
     async function onLikeAction() {
-        Vibrate("effectClick")
-        HandleButtonAnimation()
-        momentUserActions.handleLikeButtonPressed({ likedValue: true })
-        await api.post(
-            `/moments/${momentData.id}/like`,
-            {},
-            {
-                headers: {
-                    Authorization: session.account.jwtToken,
-                },
-            },
-        )
+        try {
+            Vibrate("effectClick")
+            HandleButtonAnimation()
+            momentUserActions.handleLikePressedWithServerSync({ likedValue: true })
+        } catch (error) {
+            console.error("Erro ao processar like:", error)
+        }
     }
     async function onUnlikeAction() {
-        Vibrate("effectTick")
-        HandleButtonAnimation()
-        momentUserActions.handleLikeButtonPressed({ likedValue: false })
-        await api.post(
-            `/moments/${momentData.id}/unlike`,
-            {},
-            {
-                headers: {
-                    Authorization: session.account.jwtToken,
-                },
-            },
-        )
+        try {
+            Vibrate("effectTick")
+            HandleButtonAnimation()
+            momentUserActions.handleLikePressedWithServerSync({ likedValue: false })
+        } catch (error) {
+            console.error("Erro ao processar unlike:", error)
+        }
     }
-
-    // Quantidade total de likes que vem do backend
-    const totalLikes = Number(momentData?.statistics?.total_likes_num || 0)
-
-    // Determina se um like foi adicionado ou removido em relação ao estado inicial
-    const likeDifference = momentUserActions.liked
-        ? momentUserActions.initialLikedState
-            ? 0
-            : 1 // Se está curtido, não soma se já estava curtido, senão soma 1
-        : momentUserActions.initialLikedState
-        ? -1
-        : 0 // Se não está curtido, subtrai 1 se estava curtido, senão não muda
-
-    // Número de likes que será exibido, considerando a interação do usuário
-    const adjustedLikes = totalLikes + likeDifference
-
-    // Converte para formato legível
-    const displayLikes = NumberConversor(adjustedLikes)
 
     const like_fill: string = String(colors.gray.white)
 
@@ -173,16 +183,23 @@ export default function Like({
         return (
             <Animated.View style={animated_container}>
                 <Pressable onPress={onUnlikeAction} style={pressable_container}>
-                    <View style={blur_container_likePressed}>
-                        <View style={container}>
-                            <Animated.View style={icon_container_pressed}>
-                                <LikeIcon fill={like_fill} width={20} height={20} />
-                            </Animated.View>
-                            <Text style={likedPressed ? like_text_pressed : like_text}>
-                                {displayLikes}
-                            </Text>
+                    <LinearGradient
+                        colors={gradientColors}
+                        start={{ x: 0.5, y: 0 }}
+                        end={{ x: 0.5, y: 1 }}
+                        style={gradient_border}
+                    >
+                        <View style={blur_container_likePressed}>
+                            <View style={container}>
+                                <Animated.View style={icon_container_pressed}>
+                                    <LikeIcon fill={like_fill} width={20} height={20} />
+                                </Animated.View>
+                                <Text style={likedPressed ? like_text_pressed : like_text}>
+                                    {displayLikes}
+                                </Text>
+                            </View>
                         </View>
-                    </View>
+                    </LinearGradient>
                 </Pressable>
             </Animated.View>
         )
@@ -190,16 +207,23 @@ export default function Like({
         return (
             <Animated.View style={animated_container}>
                 <Pressable onPress={onLikeAction} style={pressable_container}>
-                    <View style={blur_container_background_color}>
-                        <View style={container}>
-                            <Animated.View style={icon_container}>
-                                <LikeIcon fill={like_fill} width={14} height={14} />
-                            </Animated.View>
-                            <Text style={likedPressed ? like_text_pressed : like_text}>
-                                {displayLikes}
-                            </Text>
+                    <LinearGradient
+                        colors={gradientColors}
+                        start={{ x: 0.5, y: 0 }}
+                        end={{ x: 0.5, y: 1 }}
+                        style={gradient_border}
+                    >
+                        <View style={blur_container_background_color}>
+                            <View style={container}>
+                                <Animated.View style={icon_container}>
+                                    <LikeIcon fill={like_fill} width={18} height={18} />
+                                </Animated.View>
+                                <Text style={likedPressed ? like_text_pressed : like_text}>
+                                    {displayLikes}
+                                </Text>
+                            </View>
                         </View>
-                    </View>
+                    </LinearGradient>
                 </Pressable>
             </Animated.View>
         )
@@ -207,16 +231,23 @@ export default function Like({
         return (
             <Animated.View style={animated_container}>
                 <Pressable onPress={() => onLikeAction()} style={pressable_container}>
-                    <View style={blur_container}>
-                        <View style={container}>
-                            <Animated.View style={icon_container}>
-                                <LikeIcon fill={like_fill} width={14} height={14} />
-                            </Animated.View>
-                            <Text style={likedPressed ? like_text_pressed : like_text}>
-                                {displayLikes}
-                            </Text>
+                    <LinearGradient
+                        colors={gradientColors}
+                        start={{ x: 0.5, y: 0 }}
+                        end={{ x: 0.5, y: 1 }}
+                        style={gradient_border}
+                    >
+                        <View style={blur_container}>
+                            <View style={container}>
+                                <Animated.View style={icon_container}>
+                                    <LikeIcon fill={like_fill} width={16} height={16} />
+                                </Animated.View>
+                                <Text style={likedPressed ? like_text_pressed : like_text}>
+                                    {displayLikes}
+                                </Text>
+                            </View>
                         </View>
-                    </View>
+                    </LinearGradient>
                 </Pressable>
             </Animated.View>
         )

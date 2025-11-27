@@ -1,11 +1,11 @@
-import { FlatList, View, useColorScheme } from "react-native"
 import ColorTheme, { colors } from "../../../../constants/colors"
-import { Text, TextStyle, ViewStyle } from "../../../Themed"
+import { FlatList, View, useColorScheme } from "react-native"
 import { SettignsSectionProps, SettingsiItemObjectProps } from "../../settings-types"
+import { Text, TextStyle, ViewStyle } from "../../../Themed"
 
+import SettingsItem from "./settings-item"
 import fonts from "../../../../constants/fonts"
 import sizes from "../../../../constants/sizes"
-import SettingsItem from "./settings-item"
 
 export default function SettingsSection({ name, content }: SettignsSectionProps) {
     const isDarkMode = useColorScheme() === "dark"
@@ -18,17 +18,16 @@ export default function SettingsSection({ name, content }: SettignsSectionProps)
     const header_container: ViewStyle = {
         height: sizes.sizes["2md"],
         width: sizes.screens.width - sizes.paddings["1sm"],
-        marginHorizontal: sizes.paddings["1sm"] * 0.5,
+        marginBottom: sizes.margins["2sm"],
+        marginLeft: sizes.paddings["2sm"] * 1.3,
         paddingHorizontal: sizes.paddings["2sm"],
         alignItems: "flex-start",
         justifyContent: "center",
-        backgroundColor: isDarkMode ? colors.gray.grey_09 : colors.gray.grey_01,
-        borderRadius: sizes.borderRadius["1sm"],
     }
     const header_text: TextStyle = {
-        fontSize: fonts.size.caption1 * 1.05,
+        fontSize: fonts.size.body * 1.1,
         fontFamily: fonts.family.Semibold,
-        color: ColorTheme().primary,
+        color: ColorTheme().text,
     }
     const content_container: ViewStyle = {
         width: sizes.screens.width,

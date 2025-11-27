@@ -1,17 +1,17 @@
-import React from "react"
+import ColorTheme, { colors } from "../../constants/colors"
 import { FlatList, RefreshControl, ScrollView, useColorScheme } from "react-native"
 import { Text, View } from "../../components/Themed"
-import OfflineCard from "../../components/general/offline"
+
+import LanguageContext from "../../contexts/Preferences/language"
 import { Loading } from "../../components/loading"
-import ColorTheme, { colors } from "../../constants/colors"
+import NetworkContext from "../../contexts/network"
+import OfflineCard from "../../components/general/offline"
+import PersistedContext from "../../contexts/Persisted"
+import React from "react"
+import RenderMoment from "./components/render-moments"
+import api from "../../services/Api"
 import fonts from "../../constants/fonts"
 import sizes from "../../constants/sizes"
-import PersistedContext from "../../contexts/Persisted"
-import LanguageContext from "../../contexts/Preferences/language"
-import NetworkContext from "../../contexts/network"
-import api from "../../services/Api"
-import EndReached from "../list-memories/list-memories-all/components/end-reached"
-import RenderMoment from "./components/render-moments"
 
 export default function ListAllMoments() {
     const isDarkMode = useColorScheme() === "dark"
@@ -129,10 +129,6 @@ export default function ListAllMoments() {
                 numColumns={3}
                 renderItem={({ item }) => {
                     return <RenderMoment moment={item} />
-                }}
-                ListFooterComponent={() => {
-                    if (!loading || page >= totalPages) return null
-                    else if (endReached) return <EndReached text="No more Memories" />
                 }}
                 onEndReachedThreshold={0.1}
                 onEndReached={handleLoadMore}

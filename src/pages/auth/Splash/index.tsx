@@ -1,17 +1,18 @@
-import Icon from "@/assets/icons/svgs/arrow_circle_right.svg"
-import LogoIcon from "@/assets/icons/svgs/circle-icon-logo.svg"
-import Button from "@/components/buttons/button-standart"
-import { LanguageSelector } from "@/components/language/selector"
-import { Text } from "@/components/Themed"
-import config from "@/config"
 import ColorTheme, { colors } from "@/constants/colors"
 import { default as Fonts, default as fonts } from "@/constants/fonts"
+import { SafeAreaView, StatusBar, View, ViewStyle } from "react-native"
+
+import Button from "@/components/buttons/button-standart"
+import Icon from "@/assets/icons/svgs/arrow_circle_right.svg"
+import { LanguageSelector } from "@/components/language/selector"
+import { LinearGradient } from "expo-linear-gradient"
+import LogoIcon from "@/assets/icons/svgs/circle-icon-logo.svg"
+import React from "react"
+import { Text } from "@/components/Themed"
+import config from "@/config"
 import sizes from "@/constants/sizes"
 import { useNavigation } from "@react-navigation/native"
-import { LinearGradient } from "expo-linear-gradient"
-import React from "react"
 import { useTranslation } from "react-i18next"
-import { SafeAreaView, StatusBar, View, ViewStyle } from "react-native"
 
 export default function SplashScreen() {
     const navigation: any = useNavigation()
@@ -120,7 +121,7 @@ export default function SplashScreen() {
 
     return (
         <SafeAreaView style={container}>
-            <StatusBar barStyle={"light-content"} backgroundColor={colors.gray.black} />
+            <StatusBar barStyle={"light-content"} backgroundColor={""} />
             <LinearGradient
                 renderToHardwareTextureAndroid
                 colors={["rgba(42, 42, 42, 1)", "#00000000"]}
@@ -146,7 +147,7 @@ export default function SplashScreen() {
                     />
                     <LogoIcon fill="#edddffff" width={100} height={100} />
                 </View>
-                <Text style={title}>{config.APPLICATION_NAME}</Text>
+                <Text style={title}>{config.APPLICATION_NAME}aaaaa</Text>
                 <Text style={slogan}>{config.APPLICATION_DESCRIPTION}</Text>
             </View>
 

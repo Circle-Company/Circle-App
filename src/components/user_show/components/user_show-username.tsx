@@ -1,17 +1,17 @@
-import { Pressable, Text, View, useColorScheme } from "react-native"
 import ColorTheme, { colors } from "../../../constants/colors"
+import { Pressable, Text, View, useColorScheme } from "react-native"
 
 import Icon from "@/assets/icons/svgs/@2.svg"
-import Verifyed from "@/assets/icons/svgs/check_circle_verify.svg"
-import { useNavigation } from "@react-navigation/native"
-import React from "react"
-import fonts from "../../../constants/fonts"
-import Sizes from "../../../constants/sizes"
-import PersistedContext from "../../../contexts/Persisted"
 import LanguageContext from "../../../contexts/Preferences/language"
-import { truncated } from "../../../helpers/processText"
-import { useUserShowContext } from "../user_show-context"
+import PersistedContext from "../../../contexts/Persisted"
+import React from "react"
+import Sizes from "../../../constants/sizes"
 import { UserUsernameProps } from "../user_show-types"
+import Verifyed from "@/assets/icons/svgs/check_circle_verify.svg"
+import fonts from "../../../constants/fonts"
+import { truncated } from "../../../helpers/processText"
+import { useNavigation } from "@react-navigation/native"
+import { useUserShowContext } from "../user_show-context"
 
 export default function UserShowUsername({
     pressable = true,
@@ -82,7 +82,7 @@ export default function UserShowUsername({
             <Text style={displayOnMoment ? username_style_moment : username_style}>
                 {usernameText}
             </Text>
-            {user.verifyed && (
+            {user.verified && (
                 <View
                     style={{
                         alignItems: "center",

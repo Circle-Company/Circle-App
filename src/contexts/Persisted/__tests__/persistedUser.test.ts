@@ -1,4 +1,4 @@
-import { describe, it, expect, vi, beforeEach } from "vitest"
+import { beforeEach, describe, expect, it, vi } from "vitest"
 
 // Create a mock for the useUserStore hook
 const mockUserStore = {
@@ -6,7 +6,7 @@ const mockUserStore = {
     name: "",
     username: "",
     description: "",
-    verifyed: false,
+    verified: false,
     profile_picture: {
         small_resolution: "",
         tiny_resolution: "",
@@ -24,7 +24,7 @@ const mockUserStore = {
         mockUserStore.description = value
     }),
     setVerifyed: vi.fn((value: boolean) => {
-        mockUserStore.verifyed = value
+        mockUserStore.verified = value
     }),
     setProfilePicture: vi.fn((value: any) => {
         mockUserStore.profile_picture = value
@@ -37,7 +37,7 @@ const mockUserStore = {
         mockUserStore.name = ""
         mockUserStore.username = ""
         mockUserStore.description = ""
-        mockUserStore.verifyed = false
+        mockUserStore.verified = false
         mockUserStore.profile_picture = { small_resolution: "", tiny_resolution: "" }
     }),
 }
@@ -55,7 +55,7 @@ describe("persistedUser Store", () => {
         mockUserStore.name = ""
         mockUserStore.username = ""
         mockUserStore.description = ""
-        mockUserStore.verifyed = false
+        mockUserStore.verified = false
         mockUserStore.profile_picture = { small_resolution: "", tiny_resolution: "" }
     })
 
@@ -65,7 +65,7 @@ describe("persistedUser Store", () => {
             expect(mockUserStore.name).toBe("")
             expect(mockUserStore.username).toBe("")
             expect(mockUserStore.description).toBe("")
-            expect(mockUserStore.verifyed).toBe(false)
+            expect(mockUserStore.verified).toBe(false)
             expect(mockUserStore.profile_picture).toEqual({
                 small_resolution: "",
                 tiny_resolution: "",
@@ -107,7 +107,7 @@ describe("persistedUser Store", () => {
             mockUserStore.setVerifyed(true)
 
             expect(mockUserStore.setVerifyed).toHaveBeenCalledWith(true)
-            expect(mockUserStore.verifyed).toBe(true)
+            expect(mockUserStore.verified).toBe(true)
         })
 
         it("should update profile picture", () => {
@@ -130,7 +130,7 @@ describe("persistedUser Store", () => {
                 name: "Bulk User",
                 username: "bulkuser",
                 description: "Bulk description",
-                verifyed: true,
+                verified: true,
                 profile_picture: {
                     small_resolution: "bulk-small.jpg",
                     tiny_resolution: "bulk-tiny.jpg",
@@ -159,7 +159,7 @@ describe("persistedUser Store", () => {
             expect(mockUserStore.name).toBe("")
             expect(mockUserStore.username).toBe("")
             expect(mockUserStore.description).toBe("")
-            expect(mockUserStore.verifyed).toBe(false)
+            expect(mockUserStore.verified).toBe(false)
             expect(mockUserStore.profile_picture).toEqual({
                 small_resolution: "",
                 tiny_resolution: "",

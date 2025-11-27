@@ -3,12 +3,15 @@ import React from "react"
 export type userReciveDataProps = {
     id: string
     username: string
-    verifyed: boolean
-    profile_picture: {
-        small_resolution: string
-        tiny_resolution: string
+    verified: boolean
+    profilePicture: string
+    youFollow: boolean
+    followYou?: boolean
+    // Suporte para estrutura antiga (legacy)
+    profile_picture?: {
+        small_resolution?: string
+        tiny_resolution?: string
     }
-    you_follow: boolean
 }
 
 export type UserRootProps = {
@@ -48,7 +51,7 @@ export type UserPressableContainer = {
 export type actionsProps = {
     follow: () => void
     unfollow: () => void
-    view_profile: () => void
+    viewProfile: () => void
 }
 
 export type UserFollowButtonProps = {

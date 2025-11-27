@@ -1,9 +1,9 @@
-import React, { useEffect, useMemo } from "react"
 import { MomentContextsData, MomentProviderProps } from "./types"
+import React, { useEffect, useMemo } from "react"
 
-import sizes from "../../../constants/sizes"
 import FeedContext from "../../../contexts/Feed"
 import PersistedContext from "../../../contexts/Persisted"
+import sizes from "../../../constants/sizes"
 import { useMomentData } from "./momentData"
 import { useMomentOptions } from "./momentOptions"
 import { useMomentUserActions } from "./momentUserActions"
@@ -18,7 +18,7 @@ export function MomentProvider({
     momentData,
     momentSize = sizes.moment.standart,
 }: MomentProviderProps) {
-    const { feedData, setFocusedChunkItemFunc, currentChunkIds } = React.useContext(FeedContext)
+    const { feedData, setFocusedChunkItemFunc, currentChunk } = React.useContext(FeedContext)
     const { session } = React.useContext(PersistedContext)
     const momentDataStore = useMomentData()
     const momentUserActionsStore = useMomentUserActions(momentData.id)
@@ -75,12 +75,13 @@ export function MomentProvider({
 
     useEffect(() => {
         async function fetch() {
-            if (currentChunkIds.includes(Number(momentDataStore.id)) && feedData) {
+            const momentId = momentDataStore.id ? String(momentDataStore.id) : undefined
+            if (momentId && currentChunk.includes(momentId) && feedData) {
                 const getChunkInteractions = async () => {
                     const momentData = await momentDataStore.exportMomentData()
                     const interaction = momentUserActionsStore.exportMomentUserActions()
                     const chunkData = {
-                        id: Number(momentData.id),
+                        id: String(momentData.id),
                         userId: momentData.userId,
                         tags: momentData.tags,
                         duration: momentData.duration,
@@ -94,7 +95,7 @@ export function MomentProvider({
             }
         }
         fetch()
-    }, [currentChunkIds])
+    }, [currentChunk])
 
     const contextValue: any = useMemo(
         () => ({

@@ -1,19 +1,15 @@
 // feedOrchestrator.ts
-import { MomentProps, InteractionProps } from "@/contexts/Feed/types"
-import { Fetcher } from "@/contexts/Feed/classes/fetcher"
-import { DebounceGate } from "@/contexts/Feed/classes/debounceGate"
-import { mapper } from "@/contexts/Feed/helpers/mapper"
-import { ChunkManager } from "@/contexts/Feed/classes/chunkManager"
+import { InteractionProps, MomentProps } from "@/contexts/Feed/types"
+
 import { CacheManager } from "@/contexts/Feed/classes/cacheManager"
+import { ChunkManager } from "@/contexts/Feed/classes/chunkManager"
+import { DebounceGate } from "@/contexts/Feed/classes/debounceGate"
+import { Fetcher } from "@/contexts/Feed/classes/fetcher"
+import { mapper } from "@/contexts/Feed/helpers/mapper"
 
 export type FeedResponse = {
     newFeed: MomentProps[]
-    addedChunk: number[] // ids added or full new set on RESET
-}
-
-export type FeedOrchestratorOptions = {
-    jwtToken: string
-    debounceTime?: number
+    addedChunk: string[] // ids added or full new set on RESET
 }
 
 export class FeedOrchestrator {
@@ -22,36 +18,28 @@ export class FeedOrchestrator {
     private chunkManager: ChunkManager
     private cacheManager: CacheManager
 
-    constructor() {
-        this.fetcher = new Fetcher()
+    constructor(jwtToken: string, maxCacheSize: number = 50) {
+        this.fetcher = new Fetcher(jwtToken)
         this.debounceGate = new DebounceGate()
         this.chunkManager = new ChunkManager()
-        this.cacheManager = new CacheManager()
+        this.cacheManager = new CacheManager(maxCacheSize)
     }
 
     /**
      * Orquestra a lógica principal do feed.
      */
-    public async fetch(
-        period: number,
-        interactions: InteractionProps[],
-        currentFeed: MomentProps[],
-        isReloading = false,
-    ): Promise<FeedResponse> {
+    public async fetch(currentFeed: MomentProps[], isReloading = false): Promise<FeedResponse> {
+        console.log("🔍 Fetch feed function called...")
         if (!this.debounceGate.canProceed()) {
             return { newFeed: currentFeed, addedChunk: [] }
         }
         this.debounceGate.mark()
 
-        const moments = await this.fetcher.fetchChunk(period, interactions)
+        const moments = await this.fetcher.fetchChunk()
         const newChunkIds = moments.map((m) => m.id)
         const currentPostIds = currentFeed.map((m) => m.id)
         const uniqueNewIds = newChunkIds.filter((id) => !currentPostIds.includes(id))
 
-        if (period === 0) {
-            this.chunkManager.apply("RESET")
-            await this.cacheManager.apply("CLEAR")
-        }
         // caso reload -> substitui tudo
         if (isReloading) {
             const { updatedList } = this.chunkManager.apply("RESET", newChunkIds)
@@ -59,15 +47,6 @@ export class FeedOrchestrator {
             this.preload(updatedList, moments)
             const newFeed = mapper(updatedList, moments, currentFeed)
             return { newFeed, addedChunk: updatedList }
-        }
-
-        // primeiro carregamento (period === 0) ou feed vazio
-        if (period === 0 || currentFeed.length === 0) {
-            if (uniqueNewIds.length === 0) return { newFeed: currentFeed, addedChunk: [] }
-            const { updatedList } = this.chunkManager.apply("ADD", uniqueNewIds)
-            this.preload(uniqueNewIds, moments)
-            const newFeed = mapper(updatedList, moments, currentFeed)
-            return { newFeed, addedChunk: uniqueNewIds }
         }
 
         // caso geral: adiciona se houver novos moments
@@ -82,7 +61,7 @@ export class FeedOrchestrator {
         return { newFeed: currentFeed, addedChunk: [] }
     }
 
-    public async remove(id: number, currentFeed: MomentProps[]): Promise<FeedResponse> {
+    public async remove(id: string, currentFeed: MomentProps[]): Promise<FeedResponse> {
         const { updatedList } = this.chunkManager.apply("REMOVE", [id])
 
         try {
@@ -95,10 +74,10 @@ export class FeedOrchestrator {
         return { newFeed, addedChunk: [] }
     }
 
-    public preload(ids: number[], moments: MomentProps[]) {
+    public preload(ids: string[], moments: MomentProps[]) {
         for (const id of ids) {
             const m = moments.find((mm) => mm.id === id)
-            const url = (m as any)?.videoUrl
+            const url = m?.media || m?.midia?.fullhd_resolution
             if (!url) continue
             this.cacheManager.preload({ id, url }).catch((e) => {
                 console.warn("video preload failed", e)
@@ -109,7 +88,7 @@ export class FeedOrchestrator {
     /**
      * Fazer preload de um único vídeo
      */
-    public async preloadSingle(id: number, url: string): Promise<string | null> {
+    public async preloadSingle(id: string, url: string): Promise<string | null> {
         try {
             return await this.cacheManager.preload({ id, url })
         } catch (error) {
@@ -121,7 +100,7 @@ export class FeedOrchestrator {
     /**
      * Obter vídeo do cache se disponível
      */
-    public async getCached(id: number): Promise<string | null> {
+    public async getCached(id: string): Promise<string | null> {
         try {
             // Verificar se existe no cache
             if (this.cacheManager.has(id)) {
@@ -137,7 +116,7 @@ export class FeedOrchestrator {
     /**
      * Verificar se vídeo está em cache
      */
-    public isVideoCached(id: number): boolean {
+    public isVideoCached(id: string): boolean {
         return this.cacheManager.has(id)
     }
 }

@@ -1,0 +1,11 @@
+--- xcodebuild: WARNING: Using the first of multiple matching destinations:
+{ platform:iOS Simulator, arch:arm64, id:C440CDDB-21AF-4DA2-AFA7-C79F4851DD6C, OS:26.0, name:iPhone 17 Pro }
+{ platform:iOS Simulator, arch:x86_64, id:C440CDDB-21AF-4DA2-AFA7-C79F4851DD6C, OS:26.0, name:iPhone 17 Pro }
+** BUILD FAILED **
+
+
+The following build commands failed:
+	ScanDependencies /Users/tiagosavioli/Library/Developer/Xcode/DerivedData/CircleApp-fosmhvrcdzldwpchrlcducebqeon/Build/Intermediates.noindex/Pods.build/Debug-iphonesimulator/React-RuntimeApple.build/Objects-normal/arm64/React-RuntimeApple-dummy.o /Users/tiagosavioli/Projects/Circle-App-Expo/ios/Pods/Target\ Support\ Files/React-RuntimeApple/React-RuntimeApple-dummy.m normal arm64 objective-c com.apple.compilers.llvm.clang.1_0.compiler (in target 'React-RuntimeApple' from project 'Pods')
+	ScanDependencies /Users/tiagosavioli/Library/Developer/Xcode/DerivedData/CircleApp-fosmhvrcdzldwpchrlcducebqeon/Build/Intermediates.noindex/Pods.build/Debug-iphonesimulator/React-RCTRuntime.build/Objects-normal/arm64/React-RCTRuntime-dummy.o /Users/tiagosavioli/Projects/Circle-App-Expo/ios/Pods/Target\ Support\ Files/React-RCTRuntime/React-RCTRuntime-dummy.m normal arm64 objective-c com.apple.compilers.llvm.clang.1_0.compiler (in target 'React-RCTRuntime' from project 'Pods')
+	Building workspace CircleApp with scheme CircleApp and configuration Debug
+(3 failures)

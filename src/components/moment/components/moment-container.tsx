@@ -1,17 +1,17 @@
-import React, { useEffect, useCallback, useState } from "react"
+import React, { useCallback, useEffect, useState } from "react"
 import Reanimated, { FadeIn, FadeOut } from "react-native-reanimated"
 
-import { View } from "react-native"
 import ColorTheme from "../../../constants/colors"
-import FeedContext from "../../../contexts/Feed"
-import PersistedContext from "../../../contexts/Persisted"
 import DoubleTapPressable from "../../general/double-tap-pressable"
-import { MidiaRender } from "../../midia_render"
+import FeedContext from "../../../contexts/Feed"
 import MediaRenderVideo from "../../midia_render/components/midia_render-video"
-import { UserShow } from "../../user_show"
-import MomentContext from "../context"
+import { MidiaRender } from "../../midia_render"
 import { MomentContainerProps } from "../moment-types"
+import MomentContext from "../context"
 import MomentVideoSlider from "./moment-video-slider"
+import PersistedContext from "../../../contexts/Persisted"
+import { UserShow } from "../../user_show"
+import { View } from "react-native"
 
 export default function Container({
     children,
@@ -78,7 +78,7 @@ export default function Container({
 
         try {
             // Usar o sistema de cache do Feed
-            const cachedUrl = await loadVideoFromCache(Number(momentData.id))
+            const cachedUrl = await loadVideoFromCache(String(momentData.id))
 
             if (cachedUrl) {
                 setCachedVideoUri(cachedUrl)
@@ -129,7 +129,7 @@ export default function Container({
                     thumbnailUri={momentData.midia.nhd_thumbnail}
                     hasVideoCache={hasVideoCache}
                     isLoadingCache={isLoadingCache}
-                    momentId={Number(momentData.id)}
+                    momentId={String(momentData.id)}
                     autoPlay={!momentVideo.isPaused}
                     style={{
                         width: momentSize.width,

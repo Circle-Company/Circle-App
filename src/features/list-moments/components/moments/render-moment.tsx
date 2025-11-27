@@ -1,13 +1,14 @@
 import { Animated, View, useColorScheme } from "react-native"
 
-import React from "react"
-import { useKeyboardAnimation } from "react-native-keyboard-controller"
+import FeedContext from "../../../../contexts/Feed"
 import { Moment } from "../../../../components/moment"
 import { MomentDataProps } from "../../../../components/moment/context/types"
-import { UserShow } from "../../../../components/user_show"
-import sizes from "../../../../constants/sizes"
-import FeedContext from "../../../../contexts/Feed"
+import React from "react"
 import RenderComment from "../comments/render-comment"
+import { UserShow } from "../../../../components/user_show"
+import fonts from "@/constants/fonts"
+import sizes from "../../../../constants/sizes"
+import { useKeyboardAnimation } from "react-native-keyboard-controller"
 
 type renderMomentProps = {
     momentData: MomentDataProps
@@ -135,25 +136,28 @@ export default function RenderMoment({ momentData, isFocused, isFeed }: renderMo
                 <Moment.Container
                     contentRender={momentData.midia}
                     isFocused={isFocused}
-                    blurRadius={30}
+                    blurRadius={70}
                 >
                     <Moment.Root.Top>
                         <Moment.Root.TopLeft>
                             <UserShow.Root data={momentData.user}>
-                                <UserShow.ProfilePicture
-                                    pictureDimensions={{ width: 30, height: 30 }}
+                                <View style={{ marginLeft: sizes.margins["1md"] }}>
+                                    <UserShow.ProfilePicture
+                                        pictureDimensions={{ width: 30, height: 30 }}
+                                    />
+                                </View>
+
+                                <UserShow.Username
+                                    truncatedSize={15}
+                                    fontFamily={fonts.family["Bold-Italic"]}
                                 />
-                                <UserShow.Username truncatedSize={15} />
 
                                 <UserShow.FollowButton
-                                    isFollowing={momentData.user.you_follow}
+                                    isFollowing={momentData.user.youFollow}
                                     displayOnMoment={true}
                                 />
                             </UserShow.Root>
                         </Moment.Root.TopLeft>
-                        <Moment.Root.TopRight>
-                            <></>
-                        </Moment.Root.TopRight>
                     </Moment.Root.Top>
 
                     <Moment.Root.Center>

@@ -17,10 +17,10 @@ export type NotificationProps = {
     sender_user: {
         id: number
         username: string
-        verifyed: boolean
+        verified: boolean
         profile_picture: {
             tiny_resolution: string | null
         }
     }
-    you_follow: boolean
+    youFollow: boolean
 }
