@@ -1,19 +1,25 @@
+import { AccountState, useAccountStore } from "./persistedAccount"
 import { DeviceDataType, SessionDataType } from "./types"
+import { DeviceMetadataState, useDeviceMetadataStore } from "./persistedDeviceMetadata"
+import { HistoryState, useHistoryStore } from "./persistedHistory"
+import { PermissionsState, usePermissionsStore } from "./persistedPermissions"
+import { PreferencesState, usePreferencesStore } from "./persistedPreferences"
 import React, { useCallback, useEffect } from "react"
+import { StatisticsState, useStatisticsStore } from "./persistedStatistics"
+import { UserState, useUserStore } from "./persistedUser"
 
 import AuthContext from "../Auth/index"
 import { refreshJwtToken } from "../../lib/hooks/useRefreshJwtToken"
-import { useAccountStore } from "./persistedAccount"
-import { useDeviceMetadataStore } from "./persistedDeviceMetadata"
-import { useHistoryStore } from "./persistedHistory"
-import { usePermissionsStore } from "./persistedPermissions"
-import { usePreferencesStore } from "./persistedPreferences"
-import { useStatisticsStore } from "./persistedStatistics"
-import { useUserStore } from "./persistedUser"
 
 type PersistedProviderProps = { children: React.ReactNode }
 export type PersistedContextProps = {
-    session: SessionDataType
+    session: {
+        user: UserState
+        account: AccountState
+        preferences: PreferencesState
+        statistics: StatisticsState
+        history: HistoryState
+    }
     device: DeviceDataType
 }
 

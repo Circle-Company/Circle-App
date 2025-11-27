@@ -14,7 +14,6 @@ export interface AccountState extends AccountDataType {
     }
     set: (value: AccountDataType) => void
     setCoordinates: (value: { latitude: number; longitude: number }) => void
-    setUnreadNotificationsCount: (value: number) => void
     load: () => void
     remove: () => void
 }
@@ -34,7 +33,6 @@ const readFromStorage = (): AccountDataType & {
     jwtExpiration: storage.getString(accountKey.jwt.expiration) || "",
     blocked: storage.getBoolean(accountKey.blocked) || false,
     muted: storage.getBoolean(accountKey.muted) || false,
-    unreadNotificationsCount: storage.getNumber(accountKey.unreadNotificationsCount) || 0,
     ...readStatus(),
     last_active_at: storage.getString(accountKey.last_active_at) || "",
     last_login_at: storage.getString(accountKey.last_login_at) || "",
@@ -51,7 +49,6 @@ export const useAccountStore = create<AccountState>((set) => ({
         storage.set(accountKey.jwt.expiration, value.jwtExpiration)
         storage.set(accountKey.blocked, value.blocked)
         storage.set(accountKey.muted, value.muted)
-        storage.set(accountKey.unreadNotificationsCount, value.unreadNotificationsCount)
         storage.set(accountKey.last_active_at, value.last_active_at)
         storage.set(accountKey.last_login_at, value.last_login_at)
         storage.set(`${statusKeyPrefix}accesslevel`, value.accessLevel || "")
@@ -75,13 +72,6 @@ export const useAccountStore = create<AccountState>((set) => ({
             coordinates: { ...value },
         }))
     },
-    setUnreadNotificationsCount: (value: number) => {
-        storage.set(accountKey.unreadNotificationsCount, value)
-        set((state) => ({
-            ...state,
-            unreadNotificationsCount: value,
-        }))
-    },
     load: () => {
         set(readFromStorage())
     },
@@ -90,7 +80,6 @@ export const useAccountStore = create<AccountState>((set) => ({
         storage.delete(accountKey.jwt.expiration)
         storage.delete(accountKey.blocked)
         storage.delete(accountKey.muted)
-        storage.delete(accountKey.unreadNotificationsCount)
         storage.delete(accountKey.last_active_at)
         storage.delete(accountKey.last_login_at)
         storage.delete(accountKey.coordinates.latitude)
@@ -106,7 +95,6 @@ export const useAccountStore = create<AccountState>((set) => ({
             jwtExpiration: "",
             blocked: false,
             muted: false,
-            unreadNotificationsCount: 0,
             accessLevel: "",
             verified: false,
             deleted: false,

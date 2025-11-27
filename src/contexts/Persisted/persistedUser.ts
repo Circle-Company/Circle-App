@@ -22,7 +22,7 @@ const buildLegacyProfilePicture = (profilePicture: string | null): LegacyProfile
     tiny_resolution: profilePicture ?? "",
 })
 
-const emptyUser: UserState = {
+const emptyUser: Partial<UserState> = {
     id: "",
     username: "",
     name: "",
@@ -34,7 +34,7 @@ const emptyUser: UserState = {
     profile_picture: buildLegacyProfilePicture(null),
 }
 
-const readFromStorage = (): UserState => {
+const readFromStorage = (): Partial<UserState> => {
     const profilePicture = storage.getString(storageKey.profile_picture.small) || null
 
     return {
@@ -43,15 +43,15 @@ const readFromStorage = (): UserState => {
         name: storage.getString(storageKey.name) || "",
         description: storage.getString(storageKey.description) || "",
         richDescription: storage.getString(storageKey.description + ":rich") || "",
-        isVerified: storage.getBoolean(storageKey.verifyed) || false,
-        isActive: storage.getBoolean(storageKey.verifyed + ":active") || false,
+        isVerified: storage.getBoolean(storageKey.verified) || false,
+        isActive: storage.getBoolean(storageKey.verified + ":active") || false,
         profilePicture,
         profile_picture: buildLegacyProfilePicture(profilePicture),
     }
 }
 
 export const useUserStore = create<UserState>((set) => ({
-    ...readFromStorage(),
+    ...(readFromStorage() as UserState),
 
     set: (value: UserDataType) => {
         const profilePicture = value.profilePicture ?? null
@@ -61,8 +61,8 @@ export const useUserStore = create<UserState>((set) => ({
         storage.set(storageKey.name, value.name ?? "")
         storage.set(storageKey.description, value.description ?? "")
         storage.set(storageKey.description + ":rich", value.richDescription ?? "")
-        storage.set(storageKey.verifyed, value.isVerified ?? false)
-        storage.set(storageKey.verifyed + ":active", value.isActive ?? false)
+        storage.set(storageKey.verified, value.isVerified ?? false)
+        storage.set(storageKey.verified + ":active", value.isActive ?? false)
 
         if (profilePicture) {
             storage.set(storageKey.profile_picture.small, profilePicture)
@@ -91,8 +91,8 @@ export const useUserStore = create<UserState>((set) => ({
         storage.delete(storageKey.name)
         storage.delete(storageKey.description)
         storage.delete(storageKey.description + ":rich")
-        storage.delete(storageKey.verifyed)
-        storage.delete(storageKey.verifyed + ":active")
+        storage.delete(storageKey.verified)
+        storage.delete(storageKey.verified + ":active")
         storage.delete(storageKey.profile_picture.small)
 
         set(emptyUser)
