@@ -67,6 +67,8 @@ module.exports = function (_config) {
                             "./assets/fonts/inter/Inter-Italic.otf",
                             "./assets/fonts/inter/Inter-SemiBold.otf",
                             "./assets/fonts/inter/Inter-SemiBoldItalic.otf",
+                            "./assets/fonts/inter/Inter-Bold.otf",
+                            "./assets/fonts/inter/Inter-BoldItalic.otf",
                             "./assets/fonts/inter/Inter-ExtraBold.otf",
                             "./assets/fonts/inter/Inter-ExtraBoldItalic.otf",
                         ],
