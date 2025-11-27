@@ -1,4 +1,3 @@
-import { PanResponder, View, useColorScheme } from "react-native"
 import Animated, {
     Easing,
     interpolate,
@@ -10,14 +9,15 @@ import Animated, {
     withTiming,
 } from "react-native-reanimated"
 import ColorTheme, { colors } from "../../constants/colors"
+import { PanResponder, View, useColorScheme } from "react-native"
 
-import React from "react"
 import { Loading } from "../../components/loading"
+import React from "react"
 import { Text } from "../../components/Themed"
+import { Vibrate } from "./useHapticFeedback"
 import config from "../../config"
 import fonts from "../../constants/fonts"
 import sizes from "../../constants/sizes"
-import { Vibrate } from "./useHapticFeedback"
 
 type AnimatedScrollViewProps = {
     children: React.ReactNode
@@ -107,7 +107,9 @@ export function AnimatedVerticalScrollView({
                     if (!disableVibrate) Vibrate("clockTick")
                 },
             }),
-        [scrollPosition.value, pullDownPosition.value, isReadyToRefresh.value],
+        // Dependemos apenas das referências dos shared values e flags estáticas,
+        // nunca de `.value` diretamente para evitar erro do Reanimated.
+        [scrollPosition, pullDownPosition, isReadyToRefresh, disableVibrate, onRefresh],
     )
 
     const refreshIconStyles = useAnimatedStyle(() => {

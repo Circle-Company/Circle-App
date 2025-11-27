@@ -45,12 +45,17 @@ export default function profile_picture({
     }
 
     React.useEffect(() => {
-        if (user.profile_picture?.small_resolution == undefined) {
-            setProfilePicture(String(user.profile_picture?.tiny_resolution))
+        // Suportar tanto profilePicture (string) quanto profile_picture (objeto)
+        if (user.profilePicture) {
+            setProfilePicture(String(user.profilePicture))
+        } else if (user.profile_picture?.small_resolution) {
+            setProfilePicture(String(user.profile_picture.small_resolution))
+        } else if (user.profile_picture?.tiny_resolution) {
+            setProfilePicture(String(user.profile_picture.tiny_resolution))
         } else {
-            setProfilePicture(String(user.profile_picture?.small_resolution))
+            setProfilePicture("")
         }
-    }, [])
+    }, [user])
 
     return (
         <Animated.View entering={FadeIn.duration(200)}>
@@ -69,18 +74,15 @@ export default function profile_picture({
                         left: Number(outlineSize) / 2,
                     }}
                 />
-                {!user.profile_picture?.tiny_resolution &&
-                    !user.profile_picture?.small_resolution && (
-                        <View style={iconContainer}>
-                            <Icon
-                                width={pictureDimensions.width * 0.5}
-                                height={pictureDimensions.height * 0.5}
-                                fill={
-                                    isDarkMode ? colors.gray.grey_05 + 90 : colors.gray.grey_04 + 50
-                                }
-                            />
-                        </View>
-                    )}
+                {!profilePicture && (
+                    <View style={iconContainer}>
+                        <Icon
+                            width={pictureDimensions.width * 0.5}
+                            height={pictureDimensions.height * 0.5}
+                            fill={isDarkMode ? colors.gray.grey_05 + 90 : colors.gray.grey_04 + 50}
+                        />
+                    </View>
+                )}
             </Pressable>
         </Animated.View>
     )

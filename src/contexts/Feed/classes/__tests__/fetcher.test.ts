@@ -62,11 +62,8 @@ describe("Fetcher", () => {
                 user: {
                     id: "u1",
                     username: "tester",
-                    verifyed: false,
-                    profile_picture: {
-                        small_resolution: "http://example.com/avatar.jpg",
-                        tiny_resolution: "http://example.com/avatar.jpg",
-                    },
+                    verified: false,
+                    profilePicture: "http://example.com/avatar.jpg",
                     isFollowing: false,
                 },
                 description: "",

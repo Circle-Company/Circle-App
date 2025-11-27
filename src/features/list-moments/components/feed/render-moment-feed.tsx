@@ -1,155 +1,201 @@
-import { Animated, View, useColorScheme } from "react-native"
+import { View, useColorScheme } from "react-native"
 
-import React from "react"
-import { useKeyboardAnimation } from "react-native-keyboard-controller"
-import { Moment } from "../../../../components/moment"
-import ReportButton from "../../../../components/moment/components/moment-report-button"
-import { UserShow } from "../../../../components/user_show"
-import { colors } from "../../../../constants/colors"
-import sizes from "../../../../constants/sizes"
+import Animated, {
+    useAnimatedStyle,
+    useSharedValue,
+    withTiming,
+    withSpring,
+    interpolate,
+    useAnimatedReaction,
+    runOnJS,
+    type SharedValue,
+} from "react-native-reanimated"
 import FeedContext from "../../../../contexts/Feed"
-import { MomentProps } from "../../../../contexts/Feed/types"
 import { LanguagesCodesType } from "../../../../locales/LanguageTypes"
+import { Moment } from "../../../../components/moment"
+import { MomentProps } from "../../../../contexts/Feed/types"
+import React from "react"
 import RenderCommentFeed from "./render-comment-feed"
+import { UserShow } from "../../../../components/user_show"
+import fonts from "@/constants/fonts"
+import sizes from "../../../../constants/sizes"
+import { useKeyboard } from "../../../../lib/hooks/useKeyboard"
+import ZeroComments from "../../../../components/comment/components/comments-zero_comments"
+import { LinearGradient } from "expo-linear-gradient"
 
 type renderMomentProps = {
     momentData: MomentProps
     isFocused: boolean
     isFeed: boolean
+    focusProgress?: any // Opcional: pode ser AnimatedInterpolation do React Native ou SharedValue do Reanimated
+    scrollXShared?: SharedValue<number> // SharedValue do scrollX para interpolação
+    itemIndex?: number // Índice do item para calcular focusProgress
 }
 
-export default function RenderMomentFeed({ momentData, isFocused, isFeed }: renderMomentProps) {
-    const { height, progress } = useKeyboardAnimation()
-    const { commentEnabled } = React.useContext(FeedContext)
-    const [animatedValue] = React.useState(new Animated.Value(0))
-    const [commentValue] = React.useState(new Animated.Value(0))
-    const [opacityValue] = React.useState(new Animated.Value(1))
-    const isDarkMode = useColorScheme() === "dark"
+const BASE_OPACITY_OFF = 0.42
+const SCALE_OFF = 0.88 // Escala menor para momentos não focados
+const SCALE_ON = 1.0 // Escala de renderização base quando focado
 
-    // Adaptar MomentProps para MomentDataProps
+export default function RenderMomentFeed({
+    momentData,
+    isFocused,
+    isFeed,
+    focusProgress,
+    scrollXShared,
+    itemIndex,
+}: renderMomentProps) {
+    const { commentEnabled } = React.useContext(FeedContext)
+    const isDarkMode = useColorScheme() === "dark"
+    const { progress: keyboardProgress, height: keyboardHeight } = useKeyboard()
+
+    const commentShared = useSharedValue(commentEnabled ? 1 : 0)
+
+    React.useEffect(() => {
+        commentShared.value = withTiming(commentEnabled ? 1 : 0, {
+            duration: 250,
+        })
+    }, [commentEnabled, commentShared])
+
     const adaptedMomentData = {
         id: String(momentData.id),
         user: {
             ...momentData.user,
             id: String(momentData.user.id),
-            you_follow: momentData.user.isFollowing,
+            youFollow: momentData.user.isFollowing ?? false,
         },
-        description: momentData.description,
+        description: momentData.description ?? "",
         midia: momentData.midia,
-        comments: [], // Será preenchido pelo contexto se necessário
+        comments: [],
         statistics: {
-            total_likes_num: momentData.likes_count,
-            total_comments_num: momentData.comments_count,
+            total_likes_num: momentData.metrics.totalLikes ?? momentData.likes_count ?? 0,
+            total_comments_num: momentData.metrics.totalComments ?? momentData.comments_count ?? 0,
             total_shares_num: 0,
-            total_views_num: 0,
+            total_views_num: momentData.metrics.totalViews ?? 0,
         },
-        tags: [], // Tags não estão disponíveis no MomentProps
-        language: "pt" as LanguagesCodesType, // Idioma padrão
-        created_at: momentData.created_at,
+        tags: [],
+        language: "pt" as LanguagesCodesType,
+        created_at: momentData.created_at ?? momentData.publishedAt,
         is_liked: momentData.isLiked,
+        media: momentData.media,
+        thumbnail: momentData.thumbnail,
+        duration: momentData.duration,
+        size: momentData.size,
+        hasAudio: momentData.hasAudio,
+        ageRestriction: momentData.ageRestriction,
+        contentWarning: momentData.contentWarning,
+        metrics: momentData.metrics,
+        publishedAt: momentData.publishedAt,
     }
 
-    React.useEffect(() => {
-        if (isFocused) {
-            if (commentEnabled) {
-                Animated.timing(commentValue, {
-                    toValue: 1,
-                    duration: 200, // Adjust duration as needed
-                    useNativeDriver: true,
-                }).start()
-            } else {
-                Animated.timing(animatedValue, {
-                    toValue: 0,
-                    duration: 200, // Adjust duration as needed
-                    useNativeDriver: true,
-                }).start()
+    const dimmedOpacity = isDarkMode ? 0.2 : BASE_OPACITY_OFF
 
-                Animated.timing(commentValue, {
-                    toValue: 0,
-                    duration: 200, // Adjust duration as needed
-                    useNativeDriver: true,
-                }).start()
+    // Converter focusProgress (AnimatedInterpolation) para SharedValue
+    const focusProgressValue = useSharedValue(isFocused ? 1 : 0)
+
+    // Sincronizar focusProgress do React Native Animated com Reanimated SharedValue
+    useAnimatedReaction(
+        () => {
+            "worklet"
+            if (scrollXShared && itemIndex !== undefined) {
+                // Calcular diretamente do scrollX para máxima fluidez
+                const margin = -3
+                const itemFullWidth = sizes.moment.standart.width + margin + margin
+                const centerOffset = (sizes.screens.width - sizes.moment.standart.width) / 2
+                const focusPointX = sizes.screens.width - 200
+
+                const itemScrollPosition = itemIndex === 0 ? 0 : itemIndex * itemFullWidth
+                const itemCenterAtFocus =
+                    itemScrollPosition +
+                    sizes.moment.standart.width / 2 -
+                    focusPointX +
+                    (itemIndex === 0 ? centerOffset : 0)
+
+                const inputRange = [
+                    itemCenterAtFocus - itemFullWidth,
+                    itemCenterAtFocus,
+                    itemCenterAtFocus + itemFullWidth,
+                ]
+
+                // Interpolação fluida: [0, 1, 0] para escala e opacidade suaves
+                return interpolate(scrollXShared.value, inputRange, [0, 1, 0], "clamp")
             }
-        } else {
-            if (commentEnabled) {
-                Animated.timing(opacityValue, {
-                    toValue: 0,
-                    duration: 200, // Adjust duration as needed
-                    useNativeDriver: true,
-                }).start()
-            } else {
-                Animated.timing(opacityValue, {
-                    delay: 100,
-                    toValue: 1,
-                    duration: 200, // Adjust duration as needed
-                    useNativeDriver: true,
-                }).start()
-                Animated.timing(commentValue, {
-                    toValue: 0,
-                    duration: 200, // Adjust duration as needed
-                    useNativeDriver: true,
-                }).start()
-            }
-        }
-    }, [commentEnabled])
+            return isFocused ? 1 : 0
+        },
+        (result) => {
+            "worklet"
+            // Atualizar diretamente sem timing para máxima fluidez com o scroll
+            focusProgressValue.value = result
+        },
+        [itemIndex, scrollXShared],
+    )
 
+    // Fallback: sincronizar com isFocused se scrollXShared não estiver disponível
     React.useEffect(() => {
-        if (isFocused) {
-            Animated.timing(animatedValue, {
-                toValue: 0,
-                duration: 200, // Adjust duration as needed
-                useNativeDriver: true,
-            }).start()
-            Animated.timing(opacityValue, {
-                toValue: 1,
-                duration: 100, // Adjust duration as needed
-                useNativeDriver: true,
-            }).start()
-        } else {
-            Animated.timing(animatedValue, {
-                toValue: 0.043,
-                duration: 200, // Adjust duration as needed
-                useNativeDriver: true,
-            }).start()
-            Animated.timing(opacityValue, {
-                toValue: isDarkMode ? 0.4 : 0.55,
-                duration: 400, // Adjust duration as needed
-                useNativeDriver: true,
-            }).start()
+        if (!scrollXShared || itemIndex === undefined) {
+            focusProgressValue.value = withTiming(isFocused ? 1 : 0, {
+                duration: 220,
+            })
         }
-    }, [isFocused])
+    }, [scrollXShared, itemIndex, isFocused, focusProgressValue])
 
-    const translateY = progress.interpolate({
-        inputRange: [0, 1],
-        outputRange: [0, -175], // Adjust the value as needed
-    })
-    const scale = progress.interpolate({
-        inputRange: [0, 1],
-        outputRange: [1, 0.34], // Adjust the value as needed
-    })
+    // Animação do momento: ESCALA + OPACIDADE + TRANSLATEY
+    const animatedMomentStyle = useAnimatedStyle(() => {
+        "worklet"
 
-    const scale2 = animatedValue.interpolate({
-        inputRange: [0, 1],
-        outputRange: [1, 0.5], // Adjust the value as needed
-    })
+        // Opacidade baseada no foco
+        const baseOpacity = dimmedOpacity + (1 - dimmedOpacity) * focusProgressValue.value
 
-    const translateCommentsY = height.interpolate({
-        inputRange: [0, 1],
-        outputRange: [0, 1.08], // Adjust the value as needed
-    })
+        // Quando o input estiver ativo (commentEnabled), momentos não focados devem ter opacidade 0
+        // Momentos focados mantêm a opacidade base reduzida quando comentários estão ativos
+        let opacity = baseOpacity
+        if (commentShared.value > 0) {
+            // Se o momento está focado, reduzir opacidade um pouco
+            // Se o momento não está focado, opacidade vai para 0
+            opacity =
+                focusProgressValue.value > 0.5 ? baseOpacity * (1 - 0.15 * commentShared.value) : 0
+        }
 
-    const animated_container = {
-        opacity: opacityValue,
-        transform: [
-            { translateY: isFocused ? translateY : 0 },
-            { scale: commentEnabled ? scale : 1 },
-            { scale: scale2 },
-        ],
-    }
+        // Escala baseada no foco: interpola diretamente de SCALE_OFF (0.88) para SCALE_ON (1.0)
+        // Interpolação linear e fluida sem normalizações que causam piscadas
+        const focusScale = SCALE_OFF + (SCALE_ON - SCALE_OFF) * focusProgressValue.value
 
-    const animated_comment_container = {
-        transform: [{ translateY: isFocused ? translateCommentsY : 0 }],
-    }
+        // Redução de escala quando comentários estão habilitados (só para momentos focados)
+        // Aplicar apenas quando o momento está focado (focusProgressValue > 0.5)
+        const commentScale = focusProgressValue.value > 0.5 ? 1 - 0.06 * commentShared.value : 1
+
+        // Redução adicional de escala quando o teclado aparece (interpolação com progresso do teclado)
+        // Aplicar apenas quando o momento está focado (focusProgressValue > 0.5)
+        const keyboardScale =
+            focusProgressValue.value > 0.5
+                ? 1 - 0.65 * keyboardProgress.value * commentShared.value
+                : 1
+
+        // TranslateY quando teclado aparece (movendo para cima)
+        // Aplicar apenas quando o momento está focado (focusProgressValue > 0.5)
+        const translateY =
+            focusProgressValue.value > 0.5 ? -160 * keyboardProgress.value * commentShared.value : 0
+
+        // Escala final: garantir que quando focado sem comentários/teclado = 1.0 exato
+        const finalScale = focusScale * commentScale * keyboardScale
+
+        return {
+            opacity,
+            transform: [{ translateY }, { scale: finalScale }],
+        }
+    }, [dimmedOpacity])
+
+    // Animação dos comentários: APENAS OPACIDADE (SEM ESCALA E SEM TRANSLATEY)
+    const animatedCommentStyle = useAnimatedStyle(() => {
+        "worklet"
+
+        // Opacidade: desaparecer quando input estiver ativo
+        const opacity = commentShared.value > 0 ? 0 : 1
+
+        return {
+            opacity,
+        }
+    }, [])
+
     return (
         <Moment.Root.Main
             momentData={adaptedMomentData}
@@ -157,11 +203,12 @@ export default function RenderMomentFeed({ momentData, isFocused, isFeed }: rend
             isFocused={isFocused}
             momentSize={sizes.moment.standart}
         >
-            <Animated.View style={animated_container}>
+            {/* Momento com escala + opacidade + translateY */}
+            <Animated.View style={animatedMomentStyle}>
                 <Moment.Container
                     contentRender={momentData.midia}
                     isFocused={isFocused}
-                    blurRadius={30}
+                    blurRadius={120}
                 >
                     <Moment.Root.Top>
                         <Moment.Root.TopLeft>
@@ -169,21 +216,18 @@ export default function RenderMomentFeed({ momentData, isFocused, isFeed }: rend
                                 <UserShow.ProfilePicture
                                     pictureDimensions={{ width: 30, height: 30 }}
                                 />
-                                <UserShow.Username truncatedSize={15} />
-
-                                <UserShow.FollowButton
-                                    isFollowing={momentData.user.isFollowing}
-                                    displayOnMoment={true}
-                                />
+                                <UserShow.Username fontFamily={fonts.family["Bold-Italic"]} />
                             </UserShow.Root>
                         </Moment.Root.TopLeft>
                         <Moment.Root.TopRight>
-                            <ReportButton color={colors.gray.white} />
+                            <></>
                         </Moment.Root.TopRight>
                     </Moment.Root.Top>
 
                     <Moment.Root.Center>
-                        <View style={{ marginBottom: sizes.margins["2sm"], width: "100%" }}>
+                        <View
+                            style={{ marginBottom: sizes.margins["2sm"], width: "100%", zIndex: 1 }}
+                        >
                             <Moment.Description />
                             <View style={{ flexDirection: "row", alignItems: "center" }}>
                                 <View style={{ flex: 1 }}>
@@ -195,11 +239,36 @@ export default function RenderMomentFeed({ momentData, isFocused, isFeed }: rend
                             </View>
                         </View>
                     </Moment.Root.Center>
+                    <LinearGradient
+                        colors={[
+                            "rgba(255, 255, 255, 0.00)",
+                            "rgba(0, 0, 0, 0.1)",
+                            "rgba(0, 0, 0, 0.4)",
+                        ]}
+                        start={{ x: 0.5, y: 0 }}
+                        end={{ x: 0.5, y: 1 }}
+                        style={{
+                            position: "absolute",
+                            left: 0,
+                            right: 0,
+                            bottom: 0,
+                            width: sizes.moment.standart.width,
+                            height: sizes.moment.standart.height * 0.1,
+                            zIndex: 0,
+                        }}
+                    />
                 </Moment.Container>
             </Animated.View>
 
-            <Animated.View style={animated_comment_container}>
-                <RenderCommentFeed moment={momentData} focused={isFocused} />
+            {/* Comentários SEM escala, apenas opacidade (desaparecem quando input ativo) */}
+            <Animated.View style={[animatedCommentStyle, { marginTop: 3 }]}>
+                {momentData.topComment ? (
+                    <RenderCommentFeed moment={momentData} focused={isFocused} />
+                ) : (
+                    <View style={{ alignSelf: "center", marginTop: sizes.margins["2sm"] }}>
+                        <ZeroComments />
+                    </View>
+                )}
             </Animated.View>
         </Moment.Root.Main>
     )

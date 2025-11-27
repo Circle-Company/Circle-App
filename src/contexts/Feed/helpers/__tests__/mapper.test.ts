@@ -10,7 +10,7 @@ const mockMoments: MomentProps[] = [
         user: {
             id: "1",
             username: "user1",
-            verifyed: false,
+            verified: false,
             profile_picture: { small_resolution: "", tiny_resolution: "" },
             isFollowing: false,
         },
@@ -33,7 +33,7 @@ const mockMoments: MomentProps[] = [
         user: {
             id: "2",
             username: "user2",
-            verifyed: true,
+            verified: true,
             profile_picture: { small_resolution: "", tiny_resolution: "" },
             isFollowing: true,
         },
@@ -56,7 +56,7 @@ const mockMoments: MomentProps[] = [
         user: {
             id: "3",
             username: "user3",
-            verifyed: false,
+            verified: false,
             profile_picture: { small_resolution: "", tiny_resolution: "" },
             isFollowing: false,
         },
@@ -82,7 +82,7 @@ const fallbackMoments: MomentProps[] = [
         user: {
             id: "4",
             username: "user4",
-            verifyed: true,
+            verified: true,
             profile_picture: { small_resolution: "", tiny_resolution: "" },
             isFollowing: true,
         },
@@ -105,7 +105,7 @@ const fallbackMoments: MomentProps[] = [
         user: {
             id: "1",
             username: "user1_fallback",
-            verifyed: true,
+            verified: true,
             profile_picture: { small_resolution: "", tiny_resolution: "" },
             isFollowing: true,
         },

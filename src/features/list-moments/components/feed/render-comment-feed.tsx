@@ -2,19 +2,19 @@ import { Animated, Text, TextStyle, ViewStyle, useColorScheme } from "react-nati
 import ColorTheme, { colors } from "../../../../constants/colors"
 
 import AddIcon from "@/assets/icons/svgs/plus_circle-outline.svg"
-import React from "react"
+import BottomSheetContext from "../../../../contexts/bottomSheet"
 import ButtonStandart from "../../../../components/buttons/button-standart"
-import ViewMorebutton from "../../../../components/buttons/view_more"
-import { Comments } from "../../../../components/comment"
 import { CommentObject } from "../../../../components/comment/comments-types"
-import PreviewCommentsList from "../../../../components/comment/components/comments-list_comments"
+import { Comments } from "../../../../components/comment"
+import FeedContext from "../../../../contexts/Feed"
 import FetchedCommentsList from "../../../../components/comment/components/fetched-comments-list"
+import LanguageContext from "../../../../contexts/Preferences/language"
+import { MomentProps } from "../../../../contexts/Feed/types"
+import PreviewCommentsList from "../../../../components/comment/components/comments-list_comments"
+import React from "react"
+import ViewMorebutton from "../../../../components/buttons/view_more"
 import fonts from "../../../../constants/fonts"
 import sizes from "../../../../constants/sizes"
-import BottomSheetContext from "../../../../contexts/bottomSheet"
-import FeedContext from "../../../../contexts/Feed"
-import { MomentProps } from "../../../../contexts/Feed/types"
-import LanguageContext from "../../../../contexts/Preferences/language"
 
 type renderCommentFeedProps = {
     moment: MomentProps
@@ -111,25 +111,21 @@ export default function RenderCommentFeed({ moment, focused }: renderCommentFeed
     }
 
     // Adaptar os dados do feed para o formato esperado pelo componente Comments
-    const commentsData: CommentObject[] = moment.lastComment
+    const commentsData: CommentObject[] = moment.topComment
         ? [
               {
-                  id: moment.lastComment.id,
+                  id: moment.topComment.id,
                   user: {
-                      id: String(moment.lastComment.user.id),
-                      username: moment.lastComment.user.username,
-                      verifyed: moment.lastComment.user.verifyed,
-                      profile_picture: {
-                          small_resolution:
-                              moment.lastComment.user.profile_picture.small_resolution,
-                          tiny_resolution: moment.lastComment.user.profile_picture.tiny_resolution,
-                      },
-                      you_follow: moment.lastComment.user.isFollowing,
+                      id: String(moment.topComment.user.id),
+                      username: moment.topComment.user.username,
+                      profilePicture: moment.topComment.user.profilePicture,
+                      verified: moment.topComment.user.verified,
                   },
-                  content: moment.lastComment.content,
-                  created_at: moment.lastComment.created_at,
-                  statistics: moment.lastComment.statistics,
-                  is_liked: false,
+                  content: moment.topComment.content ?? "",
+                  richContent: moment.topComment.richContent,
+                  totalLikes: moment.topComment.likesCount ?? 0,
+                  isLiked: false,
+                  createdAt: moment.topComment.createdAt ?? "",
               },
           ]
         : []

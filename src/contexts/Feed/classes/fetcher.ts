@@ -1,6 +1,24 @@
 // feedApi.ts
-import { MomentProps } from "@/contexts/Feed/types"
+import { MomentProps, TopComment } from "@/contexts/Feed/types"
+
 import api from "@/services/Api"
+
+type BackendTopComment = {
+    id: string
+    content?: string
+    richContent?: string
+    user: {
+        id: string
+        username: string
+        profilePicture?: string | null
+        verified?: boolean
+        you_follow?: boolean
+    }
+    sentiment?: string
+    likesCount: number
+    createdAt?: string
+    created_at?: string
+}
 
 type BackendMoment = {
     id: string
@@ -21,6 +39,7 @@ type BackendMoment = {
         totalLikes: number
         totalComments: number
     }
+    topComment?: BackendTopComment
     publishedAt: string
 }
 
@@ -33,6 +52,33 @@ type FeedResponse = {
 export class Fetcher {
     constructor(private readonly jwtToken: string) {}
 
+    private transformTopComment(topComment?: BackendTopComment): TopComment | undefined {
+        if (!topComment) return undefined
+
+        const transformed: TopComment = {
+            id: topComment.id,
+            content: topComment.content,
+            richContent: topComment.richContent,
+            user: {
+                id: String(topComment.user.id),
+                username: topComment.user.username,
+                profilePicture: topComment.user.profilePicture ?? undefined,
+                verified: topComment.user.verified ?? false,
+                isFollowing: topComment.user.you_follow ?? false,
+            },
+            sentiment: topComment.sentiment,
+            likesCount: topComment.likesCount ?? 0,
+            createdAt: topComment.createdAt || topComment.created_at,
+        }
+
+        console.log("🔍 Transformando topComment:", {
+            original: topComment,
+            transformed,
+        })
+
+        return transformed
+    }
+
     private transformMoment(moment: BackendMoment): MomentProps {
         const metrics = moment.metrics ?? {
             totalViews: 0,
@@ -42,16 +88,13 @@ export class Fetcher {
 
         const profilePicture = moment.user.profilePicture ?? ""
 
-        return {
+        const transformed: MomentProps = {
             id: moment.id,
             user: {
                 id: moment.user.id,
                 username: moment.user.username,
-                verifyed: false,
-                profile_picture: {
-                    small_resolution: profilePicture,
-                    tiny_resolution: profilePicture,
-                },
+                verified: false,
+                profilePicture: profilePicture,
                 isFollowing: false,
             },
             description: "",
@@ -67,7 +110,7 @@ export class Fetcher {
             isLiked: false,
             deleted: false,
             created_at: moment.publishedAt,
-            lastComment: undefined,
+            lastComment: this.transformTopComment(moment.topComment),
             media: moment.media,
             thumbnail: moment.thumbnail,
             duration: moment.duration,
@@ -81,7 +124,19 @@ export class Fetcher {
                 totalComments: metrics.totalComments ?? 0,
             },
             publishedAt: moment.publishedAt,
+            topComment: this.transformTopComment(moment.topComment),
         }
+
+        if (moment.topComment) {
+            console.log("🔍 Transformando momento:", {
+                momentId: moment.id,
+                hasTopComment: !!moment.topComment,
+                originalTopComment: moment.topComment,
+                transformedTopComment: transformed.topComment,
+            })
+        }
+
+        return transformed
     }
 
     async fetchChunk(): Promise<MomentProps[]> {
@@ -91,6 +146,20 @@ export class Fetcher {
             })
 
             const data = response.data
+
+            // Log da resposta bruta do backend
+            console.log("🔍 Resposta bruta do backend:", {
+                success: data?.success,
+                total: data?.total,
+                momentsCount: data?.moments?.length,
+                firstMoment: data?.moments?.[0]
+                    ? {
+                          id: data.moments[0].id,
+                          hasTopComment: !!data.moments[0].topComment,
+                          topComment: data.moments[0].topComment,
+                      }
+                    : null,
+            })
 
             data.moments.map((moment) => {
                 moment.media = moment.media.replace(
@@ -108,7 +177,21 @@ export class Fetcher {
                 return []
             }
 
-            return data.moments.map((moment) => this.transformMoment(moment))
+            const transformedMoments = data.moments.map((moment) => this.transformMoment(moment))
+
+            // Log dos momentos transformados
+            console.log("🔍 Momentos transformados:", {
+                count: transformedMoments.length,
+                firstMoment: transformedMoments[0]
+                    ? {
+                          id: transformedMoments[0].id,
+                          hasTopComment: !!transformedMoments[0].topComment,
+                          topComment: transformedMoments[0].topComment,
+                      }
+                    : null,
+            })
+
+            return transformedMoments
         } catch (error) {
             console.error("🔍 Error fetching feed:", error)
             return []
