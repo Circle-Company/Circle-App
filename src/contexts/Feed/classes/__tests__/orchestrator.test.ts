@@ -47,7 +47,7 @@ const mockMoments = [
         user: {
             id: "1",
             username: "user1",
-            verifyed: false,
+            verified: false,
             profile_picture: { small_resolution: "", tiny_resolution: "" },
             isFollowing: false,
         },
