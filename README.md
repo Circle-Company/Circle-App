@@ -1,11 +1,9 @@
 <div align="center">
 
-<img alt="Circle Banner" src="https://github.com/Circle-Company/.github/blob/eb5113ac18899f6e96f6e6791ef2a1e43091affe/profile/Circle%20App%20Presentation%20Banner.png" width="920"/>
+<img alt="Circle Banner" src="https://github.com/Circle-Company/.github/blob/bec79f345b45f6a987ed557a1c7b67871eaeb426/profile/PRESENTATION-BANNER-V3.png" width="920"/>
 
 ![React Native](https://img.shields.io/badge/React_Native-20232A?style=for-the-badge&logo=react&logoColor=61DAFB)
-![TypeScript](https://img.shields.io/badge/TypeScript-007ACC?style=for-the-badge&logo=typescript&logoColor=white)
 ![Expo](https://img.shields.io/badge/Expo-1B1F23?style=for-the-badge&logo=expo&logoColor=white)
-![Firebase](https://img.shields.io/badge/Firebase-039BE5?style=for-the-badge&logo=Firebase&logoColor=white)
 
 ![GitHub stars](https://img.shields.io/github/stars/Circle-Company/Circle-App?style=social)
 ![GitHub forks](https://img.shields.io/github/forks/Circle-Company/Circle-App?style=social)
@@ -13,8 +11,6 @@
 ![GitHub license](https://img.shields.io/github/license/Circle-Company/Circle-App)
 
 </div>
-
-<br>
 
 # 📱 Circle App
 
