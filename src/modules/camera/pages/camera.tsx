@@ -61,6 +61,7 @@ export function CameraPage({ navigation }: Props): React.ReactElement {
 
     const [cameraPosition, setCameraPosition] = useState<"front" | "back">("back")
     const [enableNightMode, setEnableNightMode] = useState(false)
+    const [torch, setTorch] = useState<"off" | "on">("off")
 
     // camera device settings
     const [preferredDevice] = usePreferredCameraDevice()
@@ -252,6 +253,7 @@ export function CameraPage({ navigation }: Props): React.ReactElement {
                                 video={true}
                                 audio={microphone.hasPermission}
                                 enableLocation={location.hasPermission}
+                                torch={torch}
                             />
                         </TapGestureHandler>
                     </Reanimated.View>
@@ -292,6 +294,17 @@ export function CameraPage({ navigation }: Props): React.ReactElement {
                         <Text style={styles.text}>{`${targetFps}\nFPS`}</Text>
                     </PressableOpacity>
                 )}
+                <PressableOpacity
+                    style={styles.button}
+                    onPress={() => setTorch((t) => (t === "off" ? "on" : "off"))}
+                    disabledOpacity={0.4}
+                >
+                    <Ionicons
+                        name={torch === "on" ? "flash" : "flash-off"}
+                        color="white"
+                        size={24}
+                    />
+                </PressableOpacity>
                 {canToggleNightMode && (
                     <PressableOpacity
                         style={styles.button}
