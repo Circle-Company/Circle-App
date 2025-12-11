@@ -3,7 +3,7 @@ import InactiveSoundIcon from "@/assets/icons/svgs/speaker_slash_fill.svg"
 import LinearGradient from "react-native-linear-gradient"
 import PersistedContext from "../../../contexts/Persisted"
 import React from "react"
-import { Pressable, View, ViewStyle } from "react-native"
+import { Animated, Pressable, View, ViewStyle } from "react-native"
 import { colors } from "../../../constants/colors"
 import sizes from "../../../constants/sizes"
 
@@ -11,8 +11,24 @@ export default function MomentAudioControl() {
     const { session } = React.useContext(PersistedContext)
 
     const isMuted = session?.preferences?.content?.muteAudio || false
+    const animatedScale = React.useRef(new Animated.Value(1)).current
+
+    React.useEffect(() => {
+        animatedScale.setValue(1)
+    }, [])
+
+    const handleButtonAnimation = () => {
+        animatedScale.setValue(0.8)
+        Animated.spring(animatedScale, {
+            toValue: 1,
+            bounciness: 12,
+            speed: 10,
+            useNativeDriver: true,
+        }).start()
+    }
 
     const handlePress = () => {
+        handleButtonAnimation()
         // Atualizar a preferência global
         if (session?.preferences?.setMuteAudio) {
             session.preferences.setMuteAudio(!isMuted)
@@ -27,6 +43,7 @@ export default function MomentAudioControl() {
         width: 46,
         height: 46,
         marginRight: sizes.margins["1sm"],
+        transform: [{ scale: animatedScale }],
     }
 
     const pressable_container: ViewStyle = {
@@ -61,7 +78,7 @@ export default function MomentAudioControl() {
     }
 
     return (
-        <View style={animated_container}>
+        <Animated.View style={animated_container}>
             <Pressable onPress={handlePress} style={pressable_container}>
                 <LinearGradient
                     colors={gradientColors}
@@ -88,6 +105,6 @@ export default function MomentAudioControl() {
                     </View>
                 </LinearGradient>
             </Pressable>
-        </View>
+        </Animated.View>
     )
 }
