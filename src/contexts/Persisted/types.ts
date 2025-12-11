@@ -49,6 +49,7 @@ export type SessionSecurityInfo = {
 export type AccountDataType = {
     jwtToken: string
     jwtExpiration: string
+    refreshToken?: string
     blocked: boolean
     muted: boolean
     accessLevel: string

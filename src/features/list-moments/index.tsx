@@ -1,12 +1,14 @@
 import React, { useCallback, useRef, useState } from "react"
 import { Animated, RefreshControl, useColorScheme } from "react-native"
-import { FlatList } from "react-native-gesture-handler"
 import { Loading } from "@/components/loading"
 import { colors } from "@/constants/colors"
 import sizes from "@/constants/sizes"
 import FeedContext from "@/contexts/Feed"
 import RenderMomentFeed from "./components/feed/render-moment-feed"
 import { EmptyList } from "./components/render-empty_list"
+
+const ITEM_WIDTH = sizes.moment.standart.width
+const MARGIN = -20
 
 type ViewToken = {
     item: any
@@ -17,8 +19,6 @@ type ViewToken = {
 }
 
 const ListMoments = () => {
-    const margin = 2
-
     const {
         scrollEnabled: enableScrollFeed,
         feedData,
@@ -31,7 +31,8 @@ const ListMoments = () => {
     const [loading] = React.useState(false)
     const [refreshing, setRefreshing] = React.useState(false)
     const isDarkMode = useColorScheme() === "dark"
-    const flatListRef = useRef<FlatList | null>(null)
+    const flatListRef = useRef<Animated.FlatList<any> | null>(null)
+    const scrollX = useRef(new Animated.Value(0)).current
 
     // Criar referência para onViewableItemsChanged
     const onViewableItemsChanged = useRef(({ viewableItems }: { viewableItems: ViewToken[] }) => {
@@ -52,13 +53,16 @@ const ListMoments = () => {
         }
     })
 
-    const handleScroll = useCallback(
-        (event: any) => {
-            const contentOffsetX = event.nativeEvent.contentOffset.x + 140
-            const newCenterIndex = Math.floor(
-                (contentOffsetX + sizes.screens.width / 2) / (sizes.moment.standart.width + margin),
+    const handleScroll = Animated.event([{ nativeEvent: { contentOffset: { x: scrollX } } }], {
+        useNativeDriver: true,
+        listener: (event: any) => {
+            const contentOffsetX = event.nativeEvent.contentOffset.x
+            // Calcular o índice central considerando a margem inicial
+            const initialOffset = (sizes.screens.width - ITEM_WIDTH) / 2
+            const newCenterIndex = Math.round(
+                (contentOffsetX + initialOffset) / (ITEM_WIDTH + MARGIN),
             )
-            const validIndex = newCenterIndex >= 0 ? newCenterIndex : 0
+            const validIndex = Math.max(0, Math.min(newCenterIndex, feedData.length - 1))
 
             // Só atualizar se o índice mudou
             if (validIndex !== centerIndex && feedData[validIndex]) {
@@ -73,18 +77,20 @@ const ListMoments = () => {
                 }
             }
         },
-        [setCenterIndex, centerIndex, feedData, loadVideoFromCache, preloadNextVideo],
-    )
+    })
+
+    // Margem inicial para centralizar o primeiro item
+    const initialOffset = (sizes.screens.width - ITEM_WIDTH) / 2
 
     const container_0 = {
-        marginLeft: (sizes.screens.width - sizes.moment.standart.width) / 2 - margin,
-        marginRight: margin,
+        marginLeft: initialOffset,
+        marginRight: MARGIN,
     }
     const container = {
-        marginRight: margin,
+        marginRight: MARGIN,
     }
     const container_1 = {
-        marginRight: margin + (sizes.screens.width - sizes.moment.standart.width) / 2,
+        marginRight: initialOffset,
     }
 
     const viewabilityConfig = {
@@ -114,14 +120,14 @@ const ListMoments = () => {
 
     if (feedData.length > 0)
         return (
-            <FlatList
+            <Animated.FlatList
                 data={feedData}
                 horizontal
                 scrollEnabled={enableScrollFeed}
                 showsHorizontalScrollIndicator={false}
                 viewabilityConfig={viewabilityConfig}
                 scrollEventThrottle={16}
-                snapToInterval={sizes.moment.standart.width + margin}
+                snapToInterval={ITEM_WIDTH + MARGIN}
                 onViewableItemsChanged={onViewableItemsChanged.current}
                 decelerationRate="fast"
                 maxToRenderPerBatch={5} // Renderizar mais items para cache
@@ -132,6 +138,7 @@ const ListMoments = () => {
                 disableIntervalMomentum={true}
                 onScroll={handleScroll}
                 directionalLockEnabled={true}
+                contentOffset={{ x: 0, y: 0 }}
                 onEndReached={async () => {
                     await reloadFeed()
                 }}
@@ -158,11 +165,43 @@ const ListMoments = () => {
                         index === 0
                             ? container_0
                             : index + 1 === feedData.length
-                            ? container_1
-                            : container
+                              ? container_1
+                              : container
+
+                    // Calcular a posição do item no scroll para animações suaves
+                    const scrollPosition = index * (ITEM_WIDTH + MARGIN)
+
+                    const inputRange = [
+                        scrollPosition - (ITEM_WIDTH + MARGIN),
+                        scrollPosition,
+                        scrollPosition + (ITEM_WIDTH + MARGIN),
+                    ]
+
+                    // Interpolar a escala baseada no scroll
+                    const scale = scrollX.interpolate({
+                        inputRange,
+                        outputRange: [0.85, 1, 0.85],
+                        extrapolate: "clamp",
+                    })
+
+                    // Interpolar a opacidade
+                    const opacity = scrollX.interpolate({
+                        inputRange,
+                        outputRange: [0.7, 1, 0.7],
+                        extrapolate: "clamp",
+                    })
 
                     return (
-                        <Animated.View style={container_style} key={item.unique_id}>
+                        <Animated.View
+                            style={[
+                                container_style,
+                                {
+                                    transform: [{ scale }],
+                                    opacity,
+                                },
+                            ]}
+                            key={item.unique_id}
+                        >
                             <RenderMomentFeed
                                 isFeed={true}
                                 momentData={item}

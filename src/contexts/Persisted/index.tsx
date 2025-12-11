@@ -108,25 +108,50 @@ export function Provider({ children }: PersistedProviderProps) {
             sessionHistory.remove()
 
             console.log("✅ Stores limpas com sucesso")
+            console.log("🔍 Verificando se sessionUser.id foi zerado:", sessionUser.id)
         } catch (error) {
             console.error("❌ Erro ao limpar stores:", error)
         }
     }, [sessionUser, sessionAccount, sessionPreferences, sessionStatistics, sessionHistory])
 
-    // Sincronizar dados quando sessionData mudar
+    // Sincronizar dados quando sessionData mudar (controle para evitar loop)
+    const [hasSynced, setHasSynced] = React.useState(false)
+    const sessionDataRef = React.useRef<string>("")
+
     useEffect(() => {
-        if (sessionData && sessionData.user && sessionData.account) {
+        // Criar uma chave única para identificar se os dados mudaram
+        const sessionKey = sessionData
+            ? `${sessionData.user?.id}-${sessionData.account?.jwtToken?.substring(0, 20)}`
+            : ""
+
+        // Só sincroniza se houver sessionData E se for diferente da última sincronização
+        if (
+            sessionData &&
+            sessionData.user &&
+            sessionData.account &&
+            sessionKey !== sessionDataRef.current
+        ) {
+            console.log("🔄 Nova sessão detectada, sincronizando...")
+            sessionDataRef.current = sessionKey
+
             syncSessionData(sessionData).catch((error) => {
                 console.error("❌ Falha na sincronização automática:", error)
                 // Em caso de falha na sincronização, fazer logout
                 signOut()
             })
         }
-    }, [sessionData, syncSessionData, signOut])
+    }, [sessionData])
 
-    // Configurar permissões e refresh token na inicialização
+    // Configurar permissões e refresh token na inicialização (controle para evitar loop)
+    const [hasInitialized, setHasInitialized] = React.useState(false)
+
     useEffect(() => {
         const initializeDevice = async () => {
+            // Só inicializa uma vez
+            if (hasInitialized) {
+                return
+            }
+
             try {
                 console.log("🚀 Inicializando dispositivo...")
 
@@ -155,29 +180,37 @@ export function Provider({ children }: PersistedProviderProps) {
                 }
 
                 console.log("✅ Dispositivo inicializado")
+                setHasInitialized(true)
             } catch (error) {
                 console.error("❌ Erro na inicialização do dispositivo:", error)
             }
         }
 
         initializeDevice()
-    }, [
-        devicePermissions,
-        sessionUser.id,
-        sessionUser.username,
-        sessionAccount.jwtToken,
-        refreshJwtToken,
-        checkIsSigned,
-        signOut,
-    ])
+    }, []) // Array vazio para executar apenas uma vez ao montar
 
-    // Limpar stores quando fizer logout
+    // Limpar stores quando fizer logout (controle para evitar loop)
+    const [hasCleaned, setHasCleaned] = React.useState(false)
+
     useEffect(() => {
         const isSigned = checkIsSigned()
-        if (!isSigned) {
+        console.log(`🔍 [PersistedProvider] Verificando limpeza:`, {
+            isSigned,
+            sessionUserId: sessionUser.id,
+            hasCleaned,
+        })
+
+        if (!isSigned && sessionUser.id && !hasCleaned) {
+            console.log("🧹 [PersistedProvider] Iniciando limpeza de stores...")
             clearAllStores()
+            setHasCleaned(true)
+            console.log("✅ [PersistedProvider] Flag de limpeza marcado como true")
         }
-    }, [signOut, checkIsSigned, clearAllStores])
+        if (isSigned && hasCleaned) {
+            console.log("🔄 [PersistedProvider] Usuário logado, resetando flag de limpeza")
+            setHasCleaned(false) // Reset flag ao logar novamente
+        }
+    }, [sessionUser.id, checkIsSigned, clearAllStores, hasCleaned])
 
     const contextValue: PersistedContextProps = {
         session: {

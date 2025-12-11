@@ -15,7 +15,6 @@ export default function PreferencesScreen() {
             name: t("App"),
             content: [
                 {
-                    icon: <LanguageIcon width={20} height={20} fill={ColorTheme().text} />,
                     name: t("Language"),
                     value: atualAppLanguage.nativeName,
                     type: "TEXT" as const,
@@ -24,20 +23,10 @@ export default function PreferencesScreen() {
                     secure: false,
                 },
                 {
-                    icon: <HapticsIcon width={20} height={20} fill={ColorTheme().text} />,
                     name: t("Haptic Feedback"),
                     value: "",
                     type: "TEXT" as const,
                     navigateTo: "Settings-Preferences-Haptics",
-                    navigator: "SettingsNavigator",
-                    secure: false,
-                },
-                {
-                    icon: <NotificationIcon width={20} height={20} fill={ColorTheme().text} />,
-                    name: t("Notifications"),
-                    value: "",
-                    type: "TEXT" as const,
-                    navigateTo: "Settings-Preferences-PushNotifications",
                     navigator: "SettingsNavigator",
                     secure: false,
                 },

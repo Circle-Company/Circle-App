@@ -1,7 +1,8 @@
 import ColorTheme, { colors } from "@/constants/colors"
 import { default as Fonts, default as fonts } from "@/constants/fonts"
-import { SafeAreaView, StatusBar, View, ViewStyle } from "react-native"
-
+import { SafeAreaView, ViewStyle } from "react-native"
+import StatusBar from "../../../components/StatusBar"
+import { View } from "react-native"
 import Button from "@/components/buttons/button-standart"
 import Icon from "@/assets/icons/svgs/arrow_circle_right.svg"
 import { LanguageSelector } from "@/components/language/selector"

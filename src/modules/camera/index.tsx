@@ -29,9 +29,13 @@ export function CameraModule(): React.ReactElement | null {
                     statusBarStyle: "dark",
                     animationTypeForReplace: "push",
                 }}
-                initialRouteName={showPermissionsPage ? "PermissionsPage" : "CameraPage"}
+                initialRouteName={"CameraPage"}
             >
-                <Stack.Screen name="PermissionsPage" component={PermissionsPage} />
+                <Stack.Screen
+                    options={{ headerShown: false }}
+                    name="PermissionsPage"
+                    component={PermissionsPage}
+                />
                 <Stack.Screen
                     name="CameraPage"
                     component={CameraPage}

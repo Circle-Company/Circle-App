@@ -41,6 +41,8 @@ export function SettingsNavigator() {
                 component={SettingsScreen}
                 options={{
                     headerTitle: t("Settings"),
+                    headerTitleAlign: "center",
+                    headerTitleStyle: { fontWeight: "800", fontStyle: "italic" },
                     headerStyle: [
                         HeaderStyle,
                         { borderBottomWidth: 0, borderBottomColor: "transparent" },
@@ -56,6 +58,8 @@ export function SettingsNavigator() {
                 component={ProfilePictureScreen}
                 options={{
                     headerTitle: t("Add Profile Picture"),
+                    headerTitleAlign: "center",
+                    headerTitleStyle: { fontWeight: "800", fontStyle: "italic" },
                     headerStyle: HeaderStyle,
                     headerTintColor: String(ColorTheme().text),
                     cardStyle: { backgroundColor: String(ColorTheme().background) },
@@ -68,6 +72,8 @@ export function SettingsNavigator() {
                 component={SettingsDescriptionScreen}
                 options={{
                     headerTitle: t("Add Description"),
+                    headerTitleAlign: "center",
+                    headerTitleStyle: { fontWeight: "800", fontStyle: "italic" },
                     headerStyle: HeaderStyle,
                     headerTintColor: String(ColorTheme().text),
                     cardStyle: { backgroundColor: String(ColorTheme().background) },
@@ -80,6 +86,8 @@ export function SettingsNavigator() {
                 component={FollowingScreen}
                 options={{
                     headerTitle: t("Following"),
+                    headerTitleAlign: "center",
+                    headerTitleStyle: { fontWeight: "800", fontStyle: "italic" },
                     headerStyle: HeaderStyle,
                     headerTintColor: String(ColorTheme().text),
                     cardStyle: { backgroundColor: String(ColorTheme().background) },
@@ -92,6 +100,8 @@ export function SettingsNavigator() {
                 component={SettingsNameScreen}
                 options={{
                     headerTitle: t("Add Name"),
+                    headerTitleAlign: "center",
+                    headerTitleStyle: { fontWeight: "800", fontStyle: "italic" },
                     headerStyle: HeaderStyle,
                     headerTintColor: String(ColorTheme().text),
                     cardStyle: { backgroundColor: String(ColorTheme().background) },
@@ -104,6 +114,8 @@ export function SettingsNavigator() {
                 component={SettingsPasswordScreen}
                 options={{
                     headerTitle: t("Change Password"),
+                    headerTitleAlign: "center",
+                    headerTitleStyle: { fontWeight: "800", fontStyle: "italic" },
                     headerStyle: HeaderStyle,
                     headerTintColor: String(ColorTheme().text),
                     cardStyle: { backgroundColor: String(ColorTheme().background) },
@@ -116,6 +128,8 @@ export function SettingsNavigator() {
                 component={SettingsPrivacyPolicy}
                 options={{
                     headerTitle: t("Privacy Policy"),
+                    headerTitleAlign: "center",
+                    headerTitleStyle: { fontWeight: "800", fontStyle: "italic" },
                     headerStyle: HeaderStyle,
                     headerTintColor: String(ColorTheme().text),
                     cardStyle: { backgroundColor: String(ColorTheme().background) },
@@ -128,6 +142,8 @@ export function SettingsNavigator() {
                 component={SettingsTermsOfService}
                 options={{
                     headerTitle: t("Terms of Service"),
+                    headerTitleAlign: "center",
+                    headerTitleStyle: { fontWeight: "800", fontStyle: "italic" },
                     headerStyle: HeaderStyle,
                     headerTintColor: String(ColorTheme().text),
                     cardStyle: { backgroundColor: String(ColorTheme().background) },
@@ -140,6 +156,8 @@ export function SettingsNavigator() {
                 component={SettingsCommunityGuidelines}
                 options={{
                     headerTitle: t("Community Guidelines"),
+                    headerTitleAlign: "center",
+                    headerTitleStyle: { fontWeight: "800", fontStyle: "italic" },
                     headerStyle: HeaderStyle,
                     headerTintColor: String(ColorTheme().text),
                     cardStyle: { backgroundColor: String(ColorTheme().background) },
@@ -152,6 +170,8 @@ export function SettingsNavigator() {
                 component={SettingsPushNotifications}
                 options={{
                     headerTitle: t("Notifications"),
+                    headerTitleAlign: "center",
+                    headerTitleStyle: { fontWeight: "800", fontStyle: "italic" },
                     headerStyle: HeaderStyle,
                     headerTintColor: String(ColorTheme().text),
                     cardStyle: { backgroundColor: String(ColorTheme().background) },
@@ -164,6 +184,8 @@ export function SettingsNavigator() {
                 component={AllMomentsScreen}
                 options={{
                     headerTitle: t("All Moments"),
+                    headerTitleAlign: "center",
+                    headerTitleStyle: { fontWeight: "800", fontStyle: "italic" },
                     headerStyle: HeaderStyle,
                     headerTintColor: String(ColorTheme().text),
                     cardStyle: { backgroundColor: String(ColorTheme().background) },
@@ -176,6 +198,8 @@ export function SettingsNavigator() {
                 component={PreferencesScreen}
                 options={{
                     headerTitle: t("Preferences"),
+                    headerTitleAlign: "center",
+                    headerTitleStyle: { fontWeight: "800", fontStyle: "italic" },
                     headerStyle: HeaderStyle,
                     headerTintColor: String(ColorTheme().text),
                     cardStyle: { backgroundColor: String(ColorTheme().background) },
@@ -188,6 +212,8 @@ export function SettingsNavigator() {
                 component={LanguageScreen}
                 options={{
                     headerTitle: t("Language"),
+                    headerTitleAlign: "center",
+                    headerTitleStyle: { fontWeight: "800", fontStyle: "italic" },
                     headerStyle: HeaderStyle,
                     headerTintColor: String(ColorTheme().text),
                     cardStyle: { backgroundColor: String(ColorTheme().background) },
@@ -200,6 +226,8 @@ export function SettingsNavigator() {
                 component={ContentScreen}
                 options={{
                     headerTitle: t("Content"),
+                    headerTitleAlign: "center",
+                    headerTitleStyle: { fontWeight: "800", fontStyle: "italic" },
                     headerStyle: HeaderStyle,
                     headerTintColor: String(ColorTheme().text),
                     cardStyle: { backgroundColor: String(ColorTheme().background) },
@@ -213,6 +241,8 @@ export function SettingsNavigator() {
                 component={SettingsHapticFeedback}
                 options={{
                     headerTitle: t("Haptic Feedback"),
+                    headerTitleAlign: "center",
+                    headerTitleStyle: { fontWeight: "800", fontStyle: "italic" },
                     headerStyle: HeaderStyle,
                     headerTintColor: String(ColorTheme().text),
                     cardStyle: { backgroundColor: String(ColorTheme().background) },
@@ -225,6 +255,8 @@ export function SettingsNavigator() {
                 component={OpenSourceScreen}
                 options={{
                     headerTitle: t("Open Source"),
+                    headerTitleAlign: "center",
+                    headerTitleStyle: { fontWeight: "800", fontStyle: "italic" },
                     headerStyle: HeaderStyle,
                     headerTintColor: String(ColorTheme().text),
                     cardStyle: { backgroundColor: String(ColorTheme().background) },
@@ -237,6 +269,8 @@ export function SettingsNavigator() {
                 component={SupportScreen}
                 options={{
                     headerTitle: t("Support"),
+                    headerTitleAlign: "center",
+                    headerTitleStyle: { fontWeight: "800", fontStyle: "italic" },
                     headerStyle: HeaderStyle,
                     headerTintColor: String(ColorTheme().text),
                     cardStyle: { backgroundColor: String(ColorTheme().background) },
@@ -249,6 +283,8 @@ export function SettingsNavigator() {
                 component={VersionScreen}
                 options={{
                     headerTitle: t("Version"),
+                    headerTitleAlign: "center",
+                    headerTitleStyle: { fontWeight: "800", fontStyle: "italic" },
                     headerStyle: HeaderStyle,
                     headerTintColor: String(ColorTheme().text),
                     cardStyle: { backgroundColor: String(ColorTheme().background) },
@@ -261,6 +297,8 @@ export function SettingsNavigator() {
                 component={LogOutScreen}
                 options={{
                     headerTitle: t("Log Out"),
+                    headerTitleAlign: "center",
+                    headerTitleStyle: { fontWeight: "800", fontStyle: "italic" },
                     headerStyle: HeaderStyle,
                     headerTintColor: String(ColorTheme().text),
                     cardStyle: { backgroundColor: String(ColorTheme().background) },

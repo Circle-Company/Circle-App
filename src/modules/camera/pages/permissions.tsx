@@ -5,6 +5,7 @@ import type { CameraPermissionStatus } from "react-native-vision-camera"
 import { Camera } from "react-native-vision-camera"
 import { CONTENT_SPACING, SAFE_AREA_PADDING } from "../constants"
 import type { Routes } from "../routes"
+import { colors } from "@/constants/colors"
 
 type Props = NativeStackScreenProps<Routes, "PermissionsPage">
 export function PermissionsPage({ navigation }: Props): React.ReactElement {
@@ -75,7 +76,7 @@ const styles = StyleSheet.create({
     },
     container: {
         flex: 1,
-        backgroundColor: "white",
+        backgroundColor: colors.gray.black,
         ...SAFE_AREA_PADDING,
     },
     permissionsContainer: {

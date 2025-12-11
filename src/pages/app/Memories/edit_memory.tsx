@@ -1,4 +1,5 @@
-import { StatusBar, useColorScheme } from "react-native"
+import StatusBar from "../../../components/StatusBar"
+import { useColorScheme } from "react-native"
 import { View, ViewStyle } from "../../../components/Themed"
 
 import React from "react"

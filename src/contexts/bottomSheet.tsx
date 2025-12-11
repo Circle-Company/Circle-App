@@ -13,7 +13,7 @@ import React, {
     useRef,
     useState,
 } from "react"
-import { FlexAlignType, StatusBar, StyleSheet, useColorScheme, View, ViewStyle } from "react-native"
+import { FlexAlignType, StyleSheet, useColorScheme, View, ViewStyle } from "react-native"
 
 import { CustomBackdrop } from "../components/general/bottomSheet/backdrop"
 import { colors } from "../constants/colors"
@@ -58,17 +58,8 @@ export function Provider({ children }: BottomSheetProviderProps) {
         else bottomSheetRef.current?.close()
     }, [options])
 
-    // Alterar barra de status conforme backdrop
-    useEffect(() => {
-        if (options) {
-            StatusBar.setTranslucent(true)
-            StatusBar.setBackgroundColor(isDarkMode ? colors.gray.black : "#6f6f6f")
-            StatusBar.setBarStyle("light-content")
-        } else {
-            StatusBar.setBackgroundColor(isDarkMode ? colors.gray.black : colors.gray.white)
-            StatusBar.setBarStyle(isDarkMode ? "light-content" : "dark-content")
-        }
-    }, [options, isDarkMode])
+    // Antes: manipulava StatusBar nativa via métodos estáticos (removido para evitar conflitos)
+    // Caso precise alterar StatusBar, faça via props/contexto no componente customizado.
 
     const collapseBottomSheet = useCallback(() => setOptions(null), [])
 

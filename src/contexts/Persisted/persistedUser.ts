@@ -1,6 +1,6 @@
 import { SessionUser, UserDataType } from "./types"
 import { storage, storageKeys } from "../../store"
-
+import { textLib } from "../../shared/circle.text.library"
 import { create } from "zustand"
 
 const storageKey = storageKeys().user
@@ -59,7 +59,10 @@ export const useUserStore = create<UserState>((set) => ({
         storage.set(storageKey.id, value.id)
         storage.set(storageKey.username, value.username)
         storage.set(storageKey.name, value.name ?? "")
-        storage.set(storageKey.description, value.description ?? "")
+        storage.set(
+            storageKey.description,
+            textLib.rich.formatToNormal(value.description ?? "") ?? "",
+        )
         storage.set(storageKey.description + ":rich", value.richDescription ?? "")
         storage.set(storageKey.verified, value.isVerified ?? false)
         storage.set(storageKey.verified + ":active", value.isActive ?? false)
@@ -86,6 +89,7 @@ export const useUserStore = create<UserState>((set) => ({
         set(readFromStorage())
     },
     remove: () => {
+        console.log("🧹 [UserStore] Removendo dados do usuário...")
         storage.delete(storageKey.id)
         storage.delete(storageKey.username)
         storage.delete(storageKey.name)
@@ -96,5 +100,6 @@ export const useUserStore = create<UserState>((set) => ({
         storage.delete(storageKey.profile_picture.small)
 
         set(emptyUser)
+        console.log("✅ [UserStore] Dados do usuário removidos. Estado resetado para:", emptyUser)
     },
 }))

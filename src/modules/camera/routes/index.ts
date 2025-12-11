@@ -4,7 +4,7 @@ export type Routes = {
     CodeScannerPage: undefined
     MediaPage: {
         path: string
-        type: "video" | "photo"
+        type: "video"
     }
     Devices: undefined
 }
