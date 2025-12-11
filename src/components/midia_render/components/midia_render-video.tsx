@@ -51,12 +51,15 @@ export default function MediaRenderVideo({
     const [hasError, setHasError] = useState(false)
     const [currentTime, setCurrentTime] = useState(0)
     const [duration, setDuration] = useState(0)
-    const [fadeAnim] = useState(new Animated.Value(1))
+    const [thumbnailOpacity] = useState(new Animated.Value(1))
+    const [videoOpacity] = useState(new Animated.Value(1))
     const [videoLoaded, setVideoLoaded] = useState(false)
+    const [videoReadyToDisplay, setVideoReadyToDisplay] = useState(false)
     const [errorMessage, setErrorMessage] = useState("")
     const videoRef = useRef<Video>(null)
     const retryCount = useRef(0)
     const maxRetries = 2
+    const fadeTimeoutRef = useRef<NodeJS.Timeout | null>(null)
 
     // Usar a thumbnail ou a própria URL do vídeo como fallback para a thumbnail
     const thumbnailSource = thumbnailUri || uri
@@ -66,16 +69,19 @@ export default function MediaRenderVideo({
     const isMuted = session?.preferences?.content?.muteAudio || false
 
     // Declarações de funções auxiliares como useCallback para evitar problemas de dependências
-    const fadeOutThumbnail = useCallback(() => {
-        // Só faz fade da thumbnail se estiver focado
-        if (isFocused) {
-            Animated.timing(fadeAnim, {
-                toValue: 0,
-                duration: 600, // Tempo da transição (em milissegundos)
-                useNativeDriver: true, // Usa o driver nativo para melhor performance
-            }).start()
+    const hideThumbnail = useCallback(() => {
+        // Só esconde a thumbnail se estiver focado, vídeo carregado E pronto para exibir
+        if (isFocused && videoLoaded && videoReadyToDisplay) {
+            // Limpar timeout anterior se existir
+            if (fadeTimeoutRef.current) {
+                clearTimeout(fadeTimeoutRef.current)
+            }
+
+            // Esconder thumbnail instantaneamente - sem animação
+            thumbnailOpacity.setValue(0)
+            console.log('Thumbnail escondida instantaneamente')
         }
-    }, [fadeAnim, isFocused])
+    }, [thumbnailOpacity, isFocused, videoLoaded, videoReadyToDisplay])
 
     const resetVideoPosition = useCallback(() => {
         if (videoRef.current) {
@@ -86,25 +92,35 @@ export default function MediaRenderVideo({
     // Monitorar mudanças no estado de foco
     useEffect(() => {
         if (isFocused) {
-            // Quando volta ao foco, reinicia o vídeo do zero e faz o fade da thumbnail
-            if (videoLoaded) {
+            // Quando volta ao foco, reinicia o vídeo do zero
+            if (videoLoaded && videoReadyToDisplay) {
                 resetVideoPosition()
                 setIsPlaying(true)
-                fadeOutThumbnail()
+                // Aguarda um pouco para garantir que o vídeo está renderizando
+                fadeTimeoutRef.current = setTimeout(() => {
+                    hideThumbnail()
+                }, 200)
             }
         } else {
             // Quando perde o foco, pausa o vídeo e mostra a thumbnail imediatamente
             setIsPlaying(false)
+            setVideoReadyToDisplay(false)
+
+            // Limpar timeout se existir
+            if (fadeTimeoutRef.current) {
+                clearTimeout(fadeTimeoutRef.current)
+                fadeTimeoutRef.current = null
+            }
 
             // Garante que a thumbnail seja exibida imediatamente
-            fadeAnim.setValue(1)
+            thumbnailOpacity.setValue(1)
 
             // Para completamente o vídeo quando não está em foco
             if (videoRef.current) {
                 videoRef.current.seek(0)
             }
         }
-    }, [isFocused, videoLoaded, resetVideoPosition, fadeOutThumbnail, fadeAnim])
+    }, [isFocused, videoLoaded, videoReadyToDisplay, resetVideoPosition, hideThumbnail])
 
     // Efeito para notificar sobre mudanças no progresso
     useEffect(() => {
@@ -184,13 +200,20 @@ export default function MediaRenderVideo({
         // Reset retry counter on successful load
         retryCount.current = 0
 
-        // Só faz o fade da thumbnail se estiver em foco e não estiver carregando cache
-        if (isFocused && !isLoadingCache) {
-            fadeOutThumbnail()
-        }
-
         if (onVideoLoad) {
             onVideoLoad(data.duration)
+        }
+    }
+
+    function handleReadyForDisplay() {
+        console.log('Video ready for display')
+        setVideoReadyToDisplay(true)
+
+        // Aguarda o vídeo estar completamente renderizado antes de esconder a thumbnail
+        if (isFocused && !isLoadingCache) {
+            fadeTimeoutRef.current = setTimeout(() => {
+                hideThumbnail()
+            }, 500) // Delay para garantir que não pisca
         }
     }
 
@@ -270,24 +293,29 @@ export default function MediaRenderVideo({
 
     return (
         <View style={styles.container}>
-            {/* Vídeo - só renderiza quando está em foco para economizar recursos */}
-            {isFocused && (
-                <Video
-                    ref={videoRef}
-                    source={{ uri: uri || "" }}
-                    style={styles.video}
-                    resizeMode="cover"
-                    repeat={true}
-                    paused={!isPlaying}
-                    muted={isMuted}
-                    controls={false}
-                    onLoad={handleLoad}
-                    onProgress={handleProgress}
-                    onEnd={handleEnd}
-                    onError={handleError}
-                    ignoreSilentSwitch="ignore"
-                    playInBackground={false}
-                />
+            {/* Vídeo - sempre renderizado quando focado e URI válida, visível por baixo da thumbnail */}
+            {isFocused && uri && uri.length > 0 && (
+                <View style={StyleSheet.absoluteFill}>
+                    <Video
+                        ref={videoRef}
+                        source={{ uri: uri || "" }}
+                        style={styles.video}
+                        resizeMode="cover"
+                        repeat={true}
+                        paused={!isPlaying}
+                        muted={isMuted}
+                        controls={false}
+                        onLoad={handleLoad}
+                        onReadyForDisplay={handleReadyForDisplay}
+                        onProgress={handleProgress}
+                        onEnd={handleEnd}
+                        onError={handleError}
+                        ignoreSilentSwitch="ignore"
+                        playInBackground={false}
+                        posterResizeMode="cover"
+                        poster={thumbnailSource}
+                    />
+                </View>
             )}
 
             {/* Thumbnail com efeito de fade - sempre presente, opacidade controlada */}
@@ -295,9 +323,10 @@ export default function MediaRenderVideo({
                 style={[
                     styles.thumbnailContainer,
                     {
-                        opacity: isFocused ? (hasVideoCache && !isLoadingCache ? 0 : fadeAnim) : 1,
+                        opacity: thumbnailOpacity,
                     },
                 ]}
+                pointerEvents="none"
             >
                 <Image
                     source={{ uri: thumbnailSource }}

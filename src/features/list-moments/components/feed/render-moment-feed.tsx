@@ -33,8 +33,7 @@ type renderMomentProps = {
 }
 
 const BASE_OPACITY_OFF = 0.42
-const SCALE_OFF = 0.88 // Escala menor para momentos não focados
-const SCALE_ON = 1.0 // Escala de renderização base quando focado
+// Escala removida - agora é controlada 100% pela interpolação do scrollX no index.tsx
 
 export default function RenderMomentFeed({
     momentData,
@@ -155,10 +154,6 @@ export default function RenderMomentFeed({
                 focusProgressValue.value > 0.5 ? baseOpacity * (1 - 0.15 * commentShared.value) : 0
         }
 
-        // Escala baseada no foco: interpola diretamente de SCALE_OFF (0.88) para SCALE_ON (1.0)
-        // Interpolação linear e fluida sem normalizações que causam piscadas
-        const focusScale = SCALE_OFF + (SCALE_ON - SCALE_OFF) * focusProgressValue.value
-
         // Redução de escala quando comentários estão habilitados (só para momentos focados)
         // Aplicar apenas quando o momento está focado (focusProgressValue > 0.5)
         const commentScale = focusProgressValue.value > 0.5 ? 1 - 0.06 * commentShared.value : 1
@@ -175,8 +170,9 @@ export default function RenderMomentFeed({
         const translateY =
             focusProgressValue.value > 0.5 ? -160 * keyboardProgress.value * commentShared.value : 0
 
-        // Escala final: garantir que quando focado sem comentários/teclado = 1.0 exato
-        const finalScale = focusScale * commentScale * keyboardScale
+        // Escala final: apenas commentScale e keyboardScale
+        // A escala base é 100% controlada pelo scrollX no index.tsx
+        const finalScale = commentScale * keyboardScale
 
         return {
             opacity,

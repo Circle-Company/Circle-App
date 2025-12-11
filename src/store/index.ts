@@ -22,6 +22,7 @@ export function storageKeys() {
             jwt: {
                 expiration: baseKey + "account:jwt:expiration",
                 token: baseKey + "account:jwt:token",
+                refreshToken: baseKey + "account:jwt:refreshtoken",
             },
         },
         statistics: {

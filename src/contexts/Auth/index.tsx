@@ -86,6 +86,7 @@ function normalizeSessionPayload(payload: any): SessionDataType {
     const account = {
         jwtToken: payload.token ?? "",
         jwtExpiration: expiresAt,
+        refreshToken: payload.refreshToken ?? undefined,
         blocked: Boolean(status.blocked ?? false),
         muted: Boolean(status.muted ?? false),
         unreadNotificationsCount: 0,
@@ -177,6 +178,7 @@ const persistSessionData = (session: SessionDataType) => {
 
         safeSet(accountKey.jwt.token, session.account.jwtToken)
         safeSet(accountKey.jwt.expiration, session.account.jwtExpiration)
+        safeSet(accountKey.jwt.refreshToken, session.account.refreshToken ?? "")
         safeSet(accountKey.blocked, session.account.blocked)
         safeSet(accountKey.muted, session.account.muted)
         safeSet(accountKey.last_active_at, session.account.last_active_at)
@@ -231,26 +233,6 @@ export function Provider({ children }: AuthProviderProps) {
     const [loading, setLoading] = useState(false)
     const [errorMessage, setErrorMessage] = useState("")
 
-    useEffect(() => {
-        const token = sessionData?.account.jwtToken
-
-        if (token) {
-            api.defaults.headers.common.Authorization = `Bearer ${token}`
-        } else {
-            delete api.defaults.headers.common.Authorization
-        }
-    }, [sessionData?.account.jwtToken])
-
-    useEffect(() => {
-        if (sessionData?.account.jwtToken) return
-
-        const storedToken = storage.getString(storageKeys().account.jwt.token)
-
-        if (storedToken) {
-            api.defaults.headers.common.Authorization = `Bearer ${storedToken}`
-        }
-    }, [])
-
     const detectTimezoneHeader = (): string => {
         try {
             const offsetMinutes = new Date().getTimezoneOffset()
@@ -275,7 +257,7 @@ export function Provider({ children }: AuthProviderProps) {
 
         try {
             const response = await api.post(
-                "/signin",
+                "/auth/signin",
                 {
                     username: signInputUsername.trim(),
                     password: signInputPassword,
@@ -428,6 +410,23 @@ export function Provider({ children }: AuthProviderProps) {
             setErrorMessage("")
             delete api.defaults.headers.common.Authorization
             setRedirectTo("AUTH")
+            // Limpa stores persistidas do usuário
+            try {
+                const {
+                    useUserStore,
+                    useAccountStore,
+                    usePreferencesStore,
+                    useStatisticsStore,
+                    useHistoryStore,
+                } = require("../Persisted/persistedUser")
+                useUserStore().remove()
+                useAccountStore().remove()
+                usePreferencesStore().remove()
+                useStatisticsStore().remove()
+                useHistoryStore().remove()
+            } catch (e) {
+                console.warn("⚠️ Não foi possível limpar stores persistidas do usuário:", e)
+            }
             console.log("✅ Logout realizado com sucesso")
         } catch (error) {
             console.error("❌ Erro no logout:", error)

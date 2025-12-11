@@ -1,5 +1,5 @@
 import React from "react"
-import { StatusBar } from "react-native"
+import StatusBar from "../../../components/StatusBar"
 import { View } from "../../../components/Themed"
 import { colors } from "../../../constants/colors"
 import ListMemoryMoments from "../../../features/list-memories/list-memory-moments"
@@ -13,7 +13,7 @@ export default function MemoriesListMomentsScreen() {
 
     return (
         <View style={container}>
-            <StatusBar backgroundColor={String(colors.gray.black)} barStyle={"light-content"} />
+            <StatusBar backgroundColor={String(colors.gray.black)} barStyle="light-content" />
             <ListMemoryMoments />
         </View>
     )

@@ -16,7 +16,9 @@ config.transformer = {
 config.resolver = {
     ...config.resolver,
     assetExts: config.resolver.assetExts.filter((ext) => ext !== "svg"),
-    sourceExts: [...config.resolver.sourceExts, "svg"],
+    sourceExts: [...config.resolver.sourceExts, "svg", "cjs", "mjs"],
+    resolverMainFields: ["react-native", "browser", "main"],
+    unstable_enablePackageExports: true,
 }
 
 module.exports = config

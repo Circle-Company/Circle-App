@@ -1,6 +1,7 @@
 import { useIsFocused } from "@react-navigation/native"
 import React, { useEffect, useRef } from "react"
-import { Animated, Keyboard, StatusBar, useColorScheme, ViewStyle } from "react-native"
+import { Animated, Keyboard, useColorScheme, ViewStyle } from "react-native"
+import StatusBar from "../../../components/StatusBar"
 import { View } from "../../../components/Themed"
 import { Comments } from "../../../components/comment"
 import ColorTheme, { colors } from "../../../constants/colors"

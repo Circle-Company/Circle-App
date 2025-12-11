@@ -149,7 +149,7 @@ export default function Container({
         )
     }
 
-    /** 
+    /**
     async function handleSinglePress() {
         if (!commentEnabled && momentOptions.isFeed) {
             if (!fromFullMomentScreen && isFocused) {
@@ -170,7 +170,7 @@ export default function Container({
             navigation.navigate("MomentNavigator", { screen: "DetailScreen" })
         }
     }
-        
+
 */
 
     return (

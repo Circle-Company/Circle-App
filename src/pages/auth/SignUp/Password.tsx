@@ -76,8 +76,8 @@ export default function PasswordScreen() {
             signInputPassword && signInputPassword.length >= 4 && !loading
                 ? colors.gray.white
                 : isDarkMode
-                ? colors.gray.grey_04 + "90"
-                : colors.gray.grey_04 + "90",
+                  ? colors.gray.grey_04 + "90"
+                  : colors.gray.grey_04 + "90",
     }
 
     const icon: StyleProp<ViewStyle> = {
@@ -179,8 +179,8 @@ export default function PasswordScreen() {
                                 signInputPassword.length >= 4
                                     ? colors.gray.white
                                     : isDarkMode
-                                    ? colors.gray.grey_04 + 99
-                                    : colors.gray.grey_04 + 99,
+                                      ? colors.gray.grey_04 + 99
+                                      : colors.gray.grey_04 + 99,
                             )}
                             width={17}
                             height={17}

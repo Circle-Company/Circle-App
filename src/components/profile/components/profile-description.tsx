@@ -4,7 +4,7 @@ import fonts from "../../../constants/fonts"
 import sizes from "../../../constants/sizes"
 import { Text } from "../../Themed"
 import { useProfileContext } from "../profile-context"
-
+import { RichTextRenderer } from "../../../lib/hooks/useRichTextRenderer"
 export default function Description() {
     const { user } = useProfileContext()
 
@@ -45,7 +45,7 @@ export default function Description() {
 
     return (
         <Animated.View style={container}>
-            <Text style={description_style}>{user?.description}</Text>
+            <RichTextRenderer text={user?.description} style={description_style} />
         </Animated.View>
     )
 }
