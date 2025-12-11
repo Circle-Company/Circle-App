@@ -12,38 +12,23 @@ import {
     useDisableHapticsMutation,
     useEnableEnableMutation,
 } from "../../../state/queries/preferences-haptic-feedback"
+import sizes from "@/constants/sizes"
+import { ViewStyle } from "react-native"
 
 export default function SettingsHapticFeedback() {
     const { session } = React.useContext(PersistedContext)
     const { t } = React.useContext(LanguageContext)
     const isDarkMode = useColorScheme() === "dark"
     const preferencesState = session.preferences.content
-    const [notificationsEnabled, setNotificationsEnabled] = useState(true)
 
     const disableHapticsMutation = useDisableHapticsMutation()
     const enableHapticsMutation = useEnableEnableMutation()
 
-    useEffect(() => {
-        // Verificar se as notificações estão habilitadas
-        const checkNotificationPermission = async () => {
-            const hasPermission = await messaging().hasPermission()
-            setNotificationsEnabled(hasPermission === messaging.AuthorizationStatus.AUTHORIZED)
-        }
-
-        checkNotificationPermission()
-    }, [])
-
-    const container = {
+    const container: ViewStyle = {
         flex: 1,
+        paddingTop: sizes.margins["2sm"],
         alignItems: "center",
     }
-
-    if (!notificationsEnabled)
-        return (
-            <View style={[container, { justifyContent: "center", top: -60 }]}>
-                <DisabledNotificationsCard />
-            </View>
-        )
 
     return (
         <View style={container}>

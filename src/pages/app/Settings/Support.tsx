@@ -1,27 +1,28 @@
 import React from "react"
-import { Linking, Pressable, StatusBar, useColorScheme } from "react-native"
+import { Linking, Pressable, StatusBar, useColorScheme, ViewStyle } from "react-native"
 import { Text, View } from "../../../components/Themed"
 import config from "../../../config"
 import ColorTheme from "../../../constants/colors"
 import fonts from "../../../constants/fonts"
 import sizes from "../../../constants/sizes"
 import LanguageContext from "../../../contexts/Preferences/language"
+import { TextStyle } from "react-native"
 
 export default function SupportScreen() {
     const { t } = React.useContext(LanguageContext)
     const isDarkMode = useColorScheme() === "dark"
 
-    const container = {
+    const container: ViewStyle = {
         alignItems: "center",
         flex: 1,
     }
 
-    const description_container = {
+    const description_container: ViewStyle = {
         paddingHorizontal: sizes.paddings["1md"],
         paddingVertical: sizes.paddings["2sm"],
     }
 
-    const description_style = {
+    const description_style: TextStyle = {
         lineHeight: 12,
         marginBottom: sizes.margins["2sm"],
         fontSize: fonts.size.body * 0.8,
@@ -30,7 +31,7 @@ export default function SupportScreen() {
         textAlign: "justify",
     }
 
-    const link_style = {
+    const link_style: TextStyle = {
         textDecorationLine: "underline",
         fontFamily: fonts.family["Semibold-Italic"],
         color: ColorTheme().primary,
@@ -63,7 +64,7 @@ export default function SupportScreen() {
                 })}
             </View>
             <Pressable onPress={handlePress}>
-                <Text style={link_style}>suporte@circlecompany.com.br</Text>
+                <Text style={link_style}>{config.SUPPORT_URL}</Text>
             </Pressable>
         </View>
     )

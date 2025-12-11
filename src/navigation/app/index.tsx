@@ -3,11 +3,11 @@ import { ProfileNavigator, ProfileStackParamList } from "./ProfileNavigator"
 
 import BottomTabNavigator from "./BottomTabNavigator"
 import ColorTheme from "../../constants/colors"
-import CreateBottomTabNavigator from "./CreateBottomTabNavigator"
 import { Interpolation as HorizontalRight } from "../transitions/horizontal-right"
 import { MomentNavigator } from "./MomentNavigator"
 import React from "react"
 import { SettingsNavigator } from "./SettingsNavigator"
+import CameraModule from "@/modules/camera"
 
 export default function AppNavigator() {
     const App = createStackNavigator()
@@ -20,7 +20,7 @@ export default function AppNavigator() {
             }}
         >
             <App.Screen name="BottomTab" component={BottomTabNavigator} />
-            <App.Screen name="CreateBottomTab" component={CreateBottomTabNavigator} />
+            <App.Screen name="CreateBottomTab" component={CameraModule} />
             <App.Screen
                 name="SettingsNavigator"
                 component={SettingsNavigator}
