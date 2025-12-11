@@ -72,15 +72,8 @@ export default function UserShowUsername({
     const usernameText = displayYou ? (isMe ? t("You") : username) : username
     return (
         <Pressable onPress={async () => await onUsernameAction()} style={container}>
-            {displayYou ? (
-                isMe ? null : (
-                    <Icon style={icon_style} width={12 * scale} height={12 * scale} fill={color} />
-                )
-            ) : (
-                <Icon style={icon_style} width={12 * scale} height={12 * scale} fill={color} />
-            )}
             <Text style={displayOnMoment ? username_style_moment : username_style}>
-                {usernameText}
+                @{usernameText}
             </Text>
             {user.verified && (
                 <View
@@ -96,8 +89,8 @@ export default function UserShowUsername({
                             displayOnMoment
                                 ? colors.gray.white
                                 : isDarkMode
-                                ? colors.yellow.yellow_04
-                                : colors.yellow.yellow_05,
+                                  ? colors.yellow.yellow_04
+                                  : colors.yellow.yellow_05,
                         )}
                         width={12 * scale}
                         height={12 * scale}

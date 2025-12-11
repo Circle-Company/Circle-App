@@ -8,25 +8,30 @@ import { useCameraContext } from "../context"
 interface CameraVideoSliderProps {
     maxTime?: number // segundos, default 30
     width?: number
+    currentTime?: number // tempo atual do vídeo, opcional
 }
 
-function formatTime(sec: number) {
-    const s = Math.round(sec)
-    return `0:${s.toString().padStart(2, "0")}`
+function formatCurrentTime(sec: number): string {
+    // Formato: 0X (dois dígitos inteiros de 00 a 30)
+    const seconds = Math.floor(sec)
+    return seconds.toString().padStart(2, "0")
 }
 
 export default function CameraVideoSlider({
     maxTime = 30,
     width = sizes.moment.full.width,
+    currentTime,
 }: CameraVideoSliderProps) {
     const { recordingTime } = useCameraContext()
     const progressAnim = useRef(new Animated.Value(0)).current
 
+    // Use currentTime se fornecido, senão recordingTime do contexto
+    const sliderTime = typeof currentTime === "number" ? currentTime : recordingTime
+
     useEffect(() => {
-        console.log("CameraVideoSlider - recordingTime updated:", recordingTime)
         const calculateProgress = (): number => {
             if (maxTime <= 0) return 0
-            const progress = (recordingTime / maxTime) * 100
+            const progress = (sliderTime / maxTime) * 100
             return Math.min(100, Math.max(0, progress))
         }
 
@@ -38,11 +43,11 @@ export default function CameraVideoSlider({
             restDisplacementThreshold: 0.001,
             restSpeedThreshold: 0.001,
         }).start()
-    }, [recordingTime, maxTime, progressAnim])
+    }, [sliderTime, maxTime, progressAnim])
 
     const container: ViewStyle = {
         position: "absolute",
-        bottom: 32, // mais acima, dentro da imagem da câmera
+        bottom: 10, // mais acima, dentro da imagem da câmera
         left: "50%",
         transform: [{ translateX: -(width - sizes.margins["2md"] * 2) / 2 }],
         paddingHorizontal: sizes.margins["2md"],
@@ -89,7 +94,6 @@ export default function CameraVideoSlider({
         color: colors.gray.white,
         fontSize: 15,
         fontWeight: "bold",
-        letterSpacing: 0.5,
     }
 
     const progressWidth = progressAnim.interpolate({
@@ -100,10 +104,6 @@ export default function CameraVideoSlider({
 
     return (
         <View style={container}>
-            <View style={timeRow}>
-                <Text style={timeTextStyle}>{formatTime(recordingTime)}</Text>
-                <Text style={timeTextStyle}>{formatTime(maxTime)}</Text>
-            </View>
             <View style={sliderContainer}>
                 <View style={[track, backgroundTrack]} />
                 <Animated.View style={[progressTrack, { width: progressWidth }]} />

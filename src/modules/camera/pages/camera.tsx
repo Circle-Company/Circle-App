@@ -1,5 +1,4 @@
 import sizes from "@/constants/sizes"
-import { Ionicons } from "@expo/vector-icons"
 import { useIsFocused } from "@react-navigation/core"
 import type { NativeStackScreenProps } from "@react-navigation/native-stack"
 import * as React from "react"
@@ -17,7 +16,9 @@ import Reanimated, {
     interpolate,
     useAnimatedGestureHandler,
     useAnimatedProps,
+    useAnimatedStyle,
     useSharedValue,
+    withSpring,
 } from "react-native-reanimated"
 import type { CameraProps, CameraRuntimeError, VideoFile } from "react-native-vision-camera"
 import {
@@ -28,7 +29,6 @@ import {
     useMicrophonePermission,
 } from "react-native-vision-camera"
 import { CaptureButton } from "../components/CaptureButton"
-import { StatusBarBlurBackground } from "../components/StatusBarBlurBackground"
 import CameraVideoSlider from "../components/CameraVideoSlider"
 import {
     CONTENT_SPACING,
@@ -60,17 +60,18 @@ export function CameraPage({ navigation }: Props): React.ReactElement {
     const location = useLocationPermission()
     const zoom = useSharedValue(1)
     const isPressingButton = useSharedValue(false)
+    const rotateAnimation = useSharedValue(0)
     const MAX_RECORDING_TIME = 30 // segundos
     const recordingIntervalRef = useRef<NodeJS.Timeout | null>(null)
 
     // Camera context
-    const { isRecording, setIsRecording, setVideo, recordingTime, setRecordingTime } =
+    const { isRecording, setIsRecording, setVideo, setRecordingTime, setVideoBuffer } =
         useCameraContext()
     const { t } = React.useContext(LanguageContext)
 
     React.useEffect(() => {
         navigation.setOptions({
-            headerTitle: isRecording ? t("Gravando") : t("New Moment"),
+            headerTitle: isRecording ? t("Recording") : t("New Moment"),
         })
     }, [isRecording, t, navigation])
 
@@ -98,16 +99,10 @@ export function CameraPage({ navigation }: Props): React.ReactElement {
     const format = useCameraFormat(device, [
         { fps: targetFps },
         { videoAspectRatio: screenAspectRatio },
-        { videoResolution: "max" },
+        { videoResolution: { width: sizes.moment.full.width, height: sizes.moment.full.height } }, // Limita gravação ao tamanho do container da câmera
     ])
 
     const fps = Math.min(format?.maxFps ?? 1, targetFps)
-
-    const supports60Fps = useMemo(
-        () => device?.formats.some((f) => f.maxFps >= 60),
-        [device?.formats],
-    )
-    const canToggleNightMode = device?.supportsLowLightBoost ?? false
 
     //#region Animated Zoom
     const minZoom = device?.minZoom ?? 1
@@ -119,6 +114,12 @@ export function CameraPage({ navigation }: Props): React.ReactElement {
             zoom: z,
         }
     }, [maxZoom, minZoom, zoom])
+
+    const rotateIconStyle = useAnimatedStyle(() => {
+        return {
+            transform: [{ rotate: `${rotateAnimation.value}deg` }],
+        }
+    }, [rotateAnimation])
     //#endregion
 
     //#region Callbacks
@@ -136,7 +137,7 @@ export function CameraPage({ navigation }: Props): React.ReactElement {
         setIsCameraInitialized(true)
     }, [])
     const onMediaCaptured = useCallback(
-        (media: VideoFile, type: "video") => {
+        async (media: VideoFile, type: "video") => {
             console.log(`Media captured! ${JSON.stringify(media)}`)
             setIsRecording(false)
             setRecordingTime(0)
@@ -144,23 +145,53 @@ export function CameraPage({ navigation }: Props): React.ReactElement {
                 clearInterval(recordingIntervalRef.current)
                 recordingIntervalRef.current = null
             }
-            setVideo({
-                path: media.path,
+
+            // Aqui você pode adicionar lógica para manipulação manual do buffer se necessário.
+            let outputPath = media.path
+
+            console.log("Arquivo de vídeo gerado:", {
+                path: outputPath,
                 duration: media.duration,
                 size: media.size,
                 mimeType: media.mimeType,
+                width: sizes.moment.full.width,
+                height: sizes.moment.full.height,
+            })
+            setVideo({
+                path: outputPath,
+                duration: media.duration,
+                size: media.size,
+                mimeType: media.mimeType,
+                width: sizes.moment.full.width,
+                height: sizes.moment.full.height,
                 ...media,
             })
+            // Salva o buffer do vídeo no contexto (se disponível) e o tamanho do container
+            if (outputPath) {
+                setVideoBuffer(
+                    JSON.stringify({
+                        path: outputPath,
+                        width: sizes.moment.full.width,
+                        height: sizes.moment.full.height,
+                    }),
+                )
+            } else {
+                setVideoBuffer(null)
+            }
             navigation.navigate("MediaPage", {
-                path: media.path,
+                path: outputPath,
                 type: type,
             })
         },
-        [navigation, setIsRecording, setVideo, setRecordingTime],
+        [navigation, setIsRecording, setVideo, setRecordingTime, setVideoBuffer],
     )
     const onFlipCameraPressed = useCallback(() => {
         setCameraPosition((p) => (p === "back" ? "front" : "back"))
-    }, [])
+        rotateAnimation.value = withSpring(rotateAnimation.value + 180, {
+            damping: 15,
+            stiffness: 150,
+        })
+    }, [rotateAnimation])
 
     //#endregion
 
@@ -233,6 +264,10 @@ export function CameraPage({ navigation }: Props): React.ReactElement {
             context.startZoom = zoom.value
         },
         onActive: (event, context) => {
+            // block pinch-to-zoom while the capture button is pressed
+            if (isPressingButton.value) {
+                return
+            }
             // we're trying to map the scale gesture to a linear zoom here
             const startZoom = context.startZoom ?? 0
             const scale = interpolate(
@@ -348,7 +383,9 @@ export function CameraPage({ navigation }: Props): React.ReactElement {
                     onPress={onFlipCameraPressed}
                     disabledOpacity={0.4}
                 >
-                    <Ionicons name="camera-reverse" color="white" size={22} />
+                    <Reanimated.View style={rotateIconStyle}>
+                        <RotateIcon fill={colors.gray.white} width={22} height={22} />
+                    </Reanimated.View>
                 </PressableOpacity>
 
                 <CaptureButton
@@ -428,7 +465,7 @@ const styles = StyleSheet.create({
         alignItems: "center",
         justifyContent: "center",
         position: "absolute",
-        bottom: CONTENT_SPACING * 2,
+        bottom: CONTENT_SPACING * 3,
         left: 0,
         right: 0,
         zIndex: 10,

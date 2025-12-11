@@ -6,5 +6,8 @@ export type Routes = {
         path: string
         type: "video"
     }
-    Devices: undefined
+    MediaDescriptionPage: {
+        path: string
+        type: "video"
+    }
 }

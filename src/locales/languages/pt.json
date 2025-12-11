@@ -227,6 +227,7 @@
     "Settings": "Configurações",
     "Add Profile Picture": "Nova Foto de Perfil",
     "Add Description": "Nova Descrição",
+    "Add description": "Adicionar descrição",
     "Add Name": "Novo Nome",
     "Change Password": "Mudar Senha",
     "Push Notifications": "Notificações de Push",
@@ -245,6 +246,7 @@
 
     "We don't have any Moment to show": "Não temos nenhum Moment para mostrar",
     "Share a Moment": "Crie um Moment",
+    "Share moment": "Compartilhar",
 
     "Like on Moment": "Curtida",
     "Memory Creation": "Nova Memória",
@@ -253,6 +255,8 @@
     "Profile Visit": "Visita no Perfil",
     "Near to You Now": "Perto de Você Agora",
     "Reload Feed": "Recarregue o feed",
+    "See how it turned out": "Veja como ficou",
+    "Recording": "Gravando",
 
     "When your moment gets a like.": "Quando algum Moment seu receber uma curtida.",
     "When someone you follow posts a new Memory.": "Quando alguém que você segue postar uma nova Memória.",

@@ -6,7 +6,7 @@ import { GestureHandlerRootView } from "react-native-gesture-handler"
 import { Camera } from "react-native-vision-camera"
 import { CameraPage } from "./pages/camera"
 import { DevicesPage } from "./pages/devices"
-import { MediaPage } from "./pages/media"
+import { MediaPage } from "./pages/share"
 import { PermissionsPage } from "./pages/permissions"
 import type { Routes } from "./routes"
 import LanguageContext from "@/contexts/Preferences/language"
@@ -14,18 +14,14 @@ import sizes from "@/constants/sizes"
 import fonts from "@/constants/fonts"
 import SettingsHeaderLeft from "@/components/headers/settings/settings-header_left"
 import { CameraProvider, useCameraContext } from "./context"
+import HeaderLeft from "@/components/headers/camera/camera-header_left"
+import { MediaDescriptionPage } from "./pages/share.description"
 
 const Stack = createNativeStackNavigator<Routes>()
 
 export function CameraModule(): React.ReactElement | null {
     const cameraPermission = Camera.getCameraPermissionStatus()
     const microphonePermission = Camera.getMicrophonePermissionStatus()
-    // Hook to get isRecording from context
-    function getCameraHeaderTitle() {
-        const { isRecording } = useCameraContext()
-        const { t } = React.useContext(LanguageContext)
-        return isRecording ? t("Gravando") : t("New Moment")
-    }
 
     console.log(
         `Re-rendering Navigator. Camera: ${cameraPermission} | Microphone: ${microphonePermission}`,
@@ -50,9 +46,15 @@ export function CameraModule(): React.ReactElement | null {
                     initialRouteName={"CameraPage"}
                 >
                     <Stack.Screen
-                        options={{ headerShown: false }}
                         name="PermissionsPage"
                         component={PermissionsPage}
+                        options={{
+                            headerTitleAlign: "center",
+                            headerTitleStyle: { fontFamily: fonts.family["Bold-Italic"] },
+                            headerStyle: HeaderStyle,
+                            headerTintColor: String(ColorTheme().text),
+                            headerLeft: () => <HeaderLeft />,
+                        }}
                     />
                     <Stack.Screen
                         name="CameraPage"
@@ -62,7 +64,7 @@ export function CameraModule(): React.ReactElement | null {
                             headerTitleStyle: { fontFamily: fonts.family["Bold-Italic"] },
                             headerStyle: HeaderStyle,
                             headerTintColor: String(ColorTheme().text),
-                            headerLeft: () => <SettingsHeaderLeft />,
+                            headerLeft: () => <HeaderLeft />,
                         }}
                     />
                     <Stack.Screen
@@ -70,15 +72,26 @@ export function CameraModule(): React.ReactElement | null {
                         component={MediaPage}
                         options={{
                             animation: "none",
-                            headerShown: false,
-                            presentation: "transparentModal",
+                            headerTitle: t("All Ready"),
+                            headerTitleAlign: "center",
+                            headerTitleStyle: { fontFamily: fonts.family["Bold-Italic"] },
+                            headerStyle: HeaderStyle,
+                            headerTintColor: String(ColorTheme().text),
+                            headerLeft: () => <HeaderLeft />,
                         }}
                     />
+
                     <Stack.Screen
-                        name="Devices"
-                        component={DevicesPage}
+                        name="MediaDescriptionPage"
+                        component={MediaDescriptionPage}
                         options={{
-                            headerShown: false,
+                            animation: "none",
+                            headerTitle: t("Add description"),
+                            headerTitleAlign: "center",
+                            headerTitleStyle: { fontFamily: fonts.family["Bold-Italic"] },
+                            headerStyle: HeaderStyle,
+                            headerTintColor: String(ColorTheme().text),
+                            headerLeft: () => <HeaderLeft />,
                         }}
                     />
                 </Stack.Navigator>

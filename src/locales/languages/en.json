@@ -223,6 +223,7 @@
     "Settings": "Settings",
     "Add Profile Picture": "Add Profile Picture",
     "Add Description": "Add Description",
+    "Add description": "Add description",
     "Add Name": "Add Name",
     "Change Password": "Change Password",
     "Push Notifications": "Push Notifications",
@@ -240,6 +241,7 @@
 
     "We don't have any Moment to show": "No moments to display right now",
     "Share a Moment": "Share a Moment",
+    "Share moment": "Compartilhar moment",
     "Reload Feed": "Reload Feed",
     "Capture Your Day": "Capture Your Day",
     "No recommendations available right now. Why not share a special moment from your day instead?": "No recommendations available right now. Why not share a special moment from your day instead?",
@@ -250,6 +252,8 @@
     "New Follower": "New Follower",
     "Profile Visit": "Profile Visit",
     "Near to You Now": "Near to You Now",
+    "See how it turned out": "See how it turned out",
+    "Recording": "Recording",
 
     "When your moment gets a like.": "When your moment gets a like.",
     "When someone you follow posts a new Memory.": "When someone you follow posts a new Memory.",
