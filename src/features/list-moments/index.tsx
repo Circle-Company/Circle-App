@@ -168,13 +168,36 @@ const ListMoments = () => {
                               ? container_1
                               : container
 
+                    // Calcular a posição do item no scroll para animações suaves
+                    const scrollPosition = index * (ITEM_WIDTH + MARGIN)
+
+                    const inputRange = [
+                        scrollPosition - (ITEM_WIDTH + MARGIN),
+                        scrollPosition,
+                        scrollPosition + (ITEM_WIDTH + MARGIN),
+                    ]
+
+                    // Interpolar a escala baseada no scroll
+                    const scale = scrollX.interpolate({
+                        inputRange,
+                        outputRange: [0.85, 1, 0.85],
+                        extrapolate: "clamp",
+                    })
+
+                    // Interpolar a opacidade
+                    const opacity = scrollX.interpolate({
+                        inputRange,
+                        outputRange: [0.7, 1, 0.7],
+                        extrapolate: "clamp",
+                    })
+
                     return (
                         <Animated.View
                             style={[
                                 container_style,
                                 {
-                                    transform: [{ scale: focusedItem ? 1 : 0.85 }],
-                                    opacity: focusedItem ? 1 : 0.7,
+                                    transform: [{ scale }],
+                                    opacity,
                                 },
                             ]}
                             key={item.unique_id}
