@@ -148,7 +148,7 @@ export default function SplashScreen() {
                     />
                     <LogoIcon fill="#edddffff" width={100} height={100} />
                 </View>
-                <Text style={title}>{config.APPLICATION_NAME}aaaaa</Text>
+                <Text style={title}>{config.APPLICATION_NAME}</Text>
                 <Text style={slogan}>{config.APPLICATION_DESCRIPTION}</Text>
             </View>
 
