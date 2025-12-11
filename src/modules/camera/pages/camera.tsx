@@ -17,12 +17,7 @@ import Reanimated, {
     useAnimatedProps,
     useSharedValue,
 } from "react-native-reanimated"
-import type {
-    CameraProps,
-    CameraRuntimeError,
-    PhotoFile,
-    VideoFile,
-} from "react-native-vision-camera"
+import type { CameraProps, CameraRuntimeError, VideoFile } from "react-native-vision-camera"
 import {
     Camera,
     useCameraDevice,
@@ -66,8 +61,6 @@ export function CameraPage({ navigation }: Props): React.ReactElement {
     const isActive = isFocussed && isForeground
 
     const [cameraPosition, setCameraPosition] = useState<"front" | "back">("back")
-    const [enableHdr, setEnableHdr] = useState(false)
-    const [flash, setFlash] = useState<"off" | "on">("off")
     const [enableNightMode, setEnableNightMode] = useState(false)
 
     // camera device settings
@@ -86,14 +79,10 @@ export function CameraPage({ navigation }: Props): React.ReactElement {
         { fps: targetFps },
         { videoAspectRatio: screenAspectRatio },
         { videoResolution: "max" },
-        { photoAspectRatio: screenAspectRatio },
-        { photoResolution: "max" },
     ])
 
     const fps = Math.min(format?.maxFps ?? 1, targetFps)
 
-    const supportsFlash = device?.hasFlash ?? false
-    const supportsHdr = format?.supportsPhotoHdr
     const supports60Fps = useMemo(
         () => device?.formats.some((f) => f.maxFps >= 60),
         [device?.formats],
@@ -127,7 +116,7 @@ export function CameraPage({ navigation }: Props): React.ReactElement {
         setIsCameraInitialized(true)
     }, [])
     const onMediaCaptured = useCallback(
-        (media: PhotoFile | VideoFile, type: "photo" | "video") => {
+        (media: VideoFile, type: "video") => {
             console.log(`Media captured! ${JSON.stringify(media)}`)
             navigation.navigate("MediaPage", {
                 path: media.path,
@@ -139,9 +128,7 @@ export function CameraPage({ navigation }: Props): React.ReactElement {
     const onFlipCameraPressed = useCallback(() => {
         setCameraPosition((p) => (p === "back" ? "front" : "back"))
     }, [])
-    const onFlashPressed = useCallback(() => {
-        setFlash((f) => (f === "off" ? "on" : "off"))
-    }, [])
+
     //#endregion
 
     //#region Tap Gesture
@@ -199,7 +186,7 @@ export function CameraPage({ navigation }: Props): React.ReactElement {
     useEffect(() => {
         const f =
             format != null
-                ? `(${format.photoWidth}x${format.photoHeight} photo / ${format.videoWidth}x${format.videoHeight}@${format.maxFps} video @ ${fps}fps)`
+                ? `(${format.videoWidth}x${format.videoHeight}@${format.maxFps} video @ ${fps}fps)`
                 : undefined
         console.log(`Camera: ${device?.name} | Format: ${f}`)
     }, [device?.name, format, fps])
@@ -208,8 +195,7 @@ export function CameraPage({ navigation }: Props): React.ReactElement {
         location.requestPermission()
     }, [location])
 
-    const videoHdr = format?.supportsVideoHdr && enableHdr
-    const photoHdr = format?.supportsPhotoHdr && enableHdr && !videoHdr
+    const videoHdr = format?.supportsVideoHdr
 
     const cameraStyle: ViewStyle = {
         width: sizes.moment.full.width,
@@ -261,15 +247,12 @@ export function CameraPage({ navigation }: Props): React.ReactElement {
                                 }
                                 format={format}
                                 fps={fps}
-                                photoHdr={photoHdr}
                                 videoHdr={videoHdr}
-                                photoQualityBalance="quality"
                                 lowLightBoost={device.supportsLowLightBoost && enableNightMode}
                                 enableZoomGesture={false}
                                 animatedProps={cameraAnimatedProps}
                                 exposure={0}
                                 outputOrientation="device"
-                                photo={true}
                                 video={true}
                                 audio={microphone.hasPermission}
                                 enableLocation={location.hasPermission}
@@ -290,7 +273,7 @@ export function CameraPage({ navigation }: Props): React.ReactElement {
                 cameraZoom={zoom}
                 minZoom={minZoom}
                 maxZoom={maxZoom}
-                flash={supportsFlash ? flash : "off"}
+                flash="off"
                 enabled={isCameraInitialized && isActive}
                 setIsPressingButton={setIsPressingButton}
             />
@@ -305,34 +288,12 @@ export function CameraPage({ navigation }: Props): React.ReactElement {
                 >
                     <Ionicons name="camera-reverse" color="white" size={24} />
                 </PressableOpacity>
-                {supportsFlash && (
-                    <PressableOpacity
-                        style={styles.button}
-                        onPress={onFlashPressed}
-                        disabledOpacity={0.4}
-                    >
-                        <Ionicons
-                            name={flash === "on" ? "flash" : "flash-off"}
-                            color="white"
-                            size={24}
-                        />
-                    </PressableOpacity>
-                )}
                 {supports60Fps && (
                     <PressableOpacity
                         style={styles.button}
                         onPress={() => setTargetFps((t) => (t === 30 ? 60 : 30))}
                     >
                         <Text style={styles.text}>{`${targetFps}\nFPS`}</Text>
-                    </PressableOpacity>
-                )}
-                {supportsHdr && (
-                    <PressableOpacity style={styles.button} onPress={() => setEnableHdr((h) => !h)}>
-                        <MaterialIcon
-                            name={enableHdr ? "hdr-on" : "hdr-off"}
-                            color="white"
-                            size={24}
-                        />
                     </PressableOpacity>
                 )}
                 {canToggleNightMode && (
