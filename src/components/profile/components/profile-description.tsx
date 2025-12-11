@@ -1,9 +1,11 @@
 import React from "react"
-import { Animated } from "react-native"
+import { Animated, ViewStyle } from "react-native"
 import fonts from "../../../constants/fonts"
 import sizes from "../../../constants/sizes"
+import { colors } from "../../../constants/colors"
 import { Text } from "../../Themed"
 import { useProfileContext } from "../profile-context"
+import { textLib } from "@/shared/circle.text.library"
 import { RichTextRenderer } from "../../../lib/hooks/useRichTextRenderer"
 export default function Description() {
     const { user } = useProfileContext()
@@ -25,18 +27,16 @@ export default function Description() {
         handleAnimation()
     }, [])
 
-    const container: any = {
-        width: sizes.screens.width,
+    const container: ViewStyle = {
+        alignSelf: "center",
+        width: sizes.screens.width - sizes.paddings["1md"] * 2,
+        paddingVertical: sizes.paddings["2sm"],
+        borderRadius: sizes.paddings["1md"],
         paddingHorizontal: sizes.paddings["1md"],
         transform: [{ scale: animatedScale }],
         opacity: animatedOpacity,
-    }
-    const description_style: any = {
-        lineHeight: 18,
-        fontSize: fonts.size.body,
-        fontFamily: fonts.family.Medium,
-        flexDirection: "row",
-        textAlign: "center",
+        backgroundColor: colors.gray.grey_08,
+        alignItems: "center",
     }
 
     if (!user?.description) {
@@ -45,7 +45,7 @@ export default function Description() {
 
     return (
         <Animated.View style={container}>
-            <RichTextRenderer text={user?.description} style={description_style} />
+            <RichTextRenderer richText={textLib.rich.formatToUI(user.description)} />
         </Animated.View>
     )
 }
