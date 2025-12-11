@@ -38,6 +38,8 @@ interface Props extends ViewProps {
     enabled: boolean
 
     setIsPressingButton: (isPressingButton: boolean) => void
+    onRecordingStart?: () => void
+    onRecordingStop?: () => void
 }
 
 const CaptureButtonComponent: React.FC<Props> = ({
@@ -76,8 +78,9 @@ const CaptureButtonComponent: React.FC<Props> = ({
     const onStoppedRecording = React.useCallback(() => {
         isRecording.current = false
         cancelAnimation(recordingProgress)
+        if (props.onRecordingStop) props.onRecordingStop()
         console.log("stopped recording video!")
-    }, [recordingProgress])
+    }, [recordingProgress, props.onRecordingStop])
     const stopRecording = React.useCallback(async () => {
         try {
             if (camera.current == null) throw new Error("Camera ref is null!")
@@ -92,6 +95,7 @@ const CaptureButtonComponent: React.FC<Props> = ({
     const startRecording = React.useCallback(() => {
         try {
             if (camera.current == null) throw new Error("Camera ref is null!")
+            if (props.onRecordingStart) props.onRecordingStart()
 
             console.log("calling startRecording()...")
             camera.current.startRecording({
@@ -112,7 +116,7 @@ const CaptureButtonComponent: React.FC<Props> = ({
         } catch (e) {
             console.error("failed to start recording!", e, "camera")
         }
-    }, [camera, flash, onMediaCaptured, onStoppedRecording])
+    }, [camera, flash, onMediaCaptured, onStoppedRecording, props.onRecordingStart])
     //#endregion
 
     //#region Tap handler
