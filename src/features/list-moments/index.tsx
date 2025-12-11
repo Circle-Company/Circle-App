@@ -138,6 +138,7 @@ const ListMoments = () => {
                 disableIntervalMomentum={true}
                 onScroll={handleScroll}
                 directionalLockEnabled={true}
+                contentOffset={{ x: 0, y: 0 }}
                 onEndReached={async () => {
                     await reloadFeed()
                 }}
@@ -167,34 +168,13 @@ const ListMoments = () => {
                               ? container_1
                               : container
 
-                    // Calcular a posição do item no scroll - transição gradual e suave
-                    const inputRange = [
-                        Math.max(0, (index - 1) * (ITEM_WIDTH + MARGIN)),
-                        index * (ITEM_WIDTH + MARGIN),
-                        (index + 1) * (ITEM_WIDTH + MARGIN),
-                    ]
-
-                    // Interpolar a escala baseada no scroll - escala menor para itens não focados
-                    const scale = scrollX.interpolate({
-                        inputRange,
-                        outputRange: [0.85, 1, 0.85],
-                        extrapolate: "clamp",
-                    })
-
-                    // Interpolar a opacidade para dar mais destaque ao item central
-                    const opacity = scrollX.interpolate({
-                        inputRange,
-                        outputRange: [0.7, 1, 0.7],
-                        extrapolate: "clamp",
-                    })
-
                     return (
                         <Animated.View
                             style={[
                                 container_style,
                                 {
-                                    transform: [{ scale }],
-                                    opacity,
+                                    transform: [{ scale: focusedItem ? 1 : 0.85 }],
+                                    opacity: focusedItem ? 1 : 0.7,
                                 },
                             ]}
                             key={item.unique_id}
