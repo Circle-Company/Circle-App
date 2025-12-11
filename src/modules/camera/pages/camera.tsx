@@ -1,6 +1,5 @@
 import sizes from "@/constants/sizes"
 import { Ionicons } from "@expo/vector-icons"
-import MaterialIcon from "@expo/vector-icons/MaterialIcons"
 import { useIsFocused } from "@react-navigation/core"
 import type { NativeStackScreenProps } from "@react-navigation/native-stack"
 import * as React from "react"
@@ -195,8 +194,6 @@ export function CameraPage({ navigation }: Props): React.ReactElement {
         location.requestPermission()
     }, [location])
 
-    const videoHdr = format?.supportsVideoHdr
-
     const cameraStyle: ViewStyle = {
         width: sizes.moment.full.width,
         height: sizes.moment.full.height,
@@ -247,7 +244,6 @@ export function CameraPage({ navigation }: Props): React.ReactElement {
                                 }
                                 format={format}
                                 fps={fps}
-                                videoHdr={videoHdr}
                                 lowLightBoost={device.supportsLowLightBoost && enableNightMode}
                                 enableZoomGesture={false}
                                 animatedProps={cameraAnimatedProps}
