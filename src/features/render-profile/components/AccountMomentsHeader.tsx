@@ -9,9 +9,12 @@ type AccountMomentsHeaderProps = {
     dateFormatter: { toRelativeTime: (date: Date) => string }
 }
 
-export function AccountMomentsHeader({ totalMoments, lastUpdateDate     dateFormatter,
+export function AccountMomentsHeader({
+    totalMoments,
+    lastUpdateDate,
+    dateFormatter,
 }: AccountMomentsHeaderProps) {
-    
+    const { t } = React.useContext(LanguageContext)
     return (
         <View style={styles.headerContainer}>
             <Text style={styles.totalText}>
