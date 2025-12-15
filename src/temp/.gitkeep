@@ -1,0 +1,2 @@
+# This file ensures the temp directory is tracked by git
+# Video files captured by the camera will be temporarily stored here
