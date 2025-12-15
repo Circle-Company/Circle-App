@@ -4,6 +4,8 @@ export class ChunkManager {
     private readonly maxListSize: number
     private currentFeed: string[] = []
     private history: string[][] = []
+    private lastScrollDirection: "up" | "down" | null = null
+    private prefetchRange: number = 5 // número de itens para prefetch em cada direção
 
     constructor() {
         this.maxListSize = calculeChunksMaxSize()
@@ -58,5 +60,112 @@ export class ChunkManager {
     public rollback() {
         this.currentFeed = this.history.pop() ?? this.currentFeed
         return this.currentFeed
+    }
+
+    /**
+     * Obtém IDs vizinhos de um item específico para prefetch
+     * @param currentId ID do item atual
+     * @param range Número de itens antes e depois para retornar
+     */
+    public getNeighborIds(
+        currentId: string,
+        range: number = this.prefetchRange,
+    ): {
+        previous: string[]
+        next: string[]
+        all: string[]
+    } {
+        const currentIndex = this.currentFeed.indexOf(currentId)
+
+        if (currentIndex === -1) {
+            return { previous: [], next: [], all: [] }
+        }
+
+        const startIndex = Math.max(0, currentIndex - range)
+        const endIndex = Math.min(this.currentFeed.length, currentIndex + range + 1)
+
+        const previous = this.currentFeed.slice(startIndex, currentIndex)
+        const next = this.currentFeed.slice(currentIndex + 1, endIndex)
+        const all = [...previous, ...next]
+
+        return { previous, next, all }
+    }
+
+    /**
+     * Prediz os próximos itens baseado na direção de scroll
+     * @param currentId ID do item atual
+     * @param scrollDirection Direção do scroll
+     */
+    public predictNextItems(
+        currentId: string,
+        scrollDirection: "up" | "down" | null = null,
+    ): string[] {
+        const direction = scrollDirection || this.lastScrollDirection || "down"
+        this.lastScrollDirection = direction
+
+        const currentIndex = this.currentFeed.indexOf(currentId)
+        if (currentIndex === -1) return []
+
+        if (direction === "down") {
+            // Scrolling para baixo - pega os próximos itens
+            const endIndex = Math.min(
+                this.currentFeed.length,
+                currentIndex + this.prefetchRange * 2,
+            )
+            return this.currentFeed.slice(currentIndex + 1, endIndex)
+        } else {
+            // Scrolling para cima - pega os itens anteriores
+            const startIndex = Math.max(0, currentIndex - this.prefetchRange * 2)
+            return this.currentFeed.slice(startIndex, currentIndex).reverse()
+        }
+    }
+
+    /**
+     * Obtém todos os IDs do feed atual
+     */
+    public getAllIds(): string[] {
+        return [...this.currentFeed]
+    }
+
+    /**
+     * Obtém a posição de um ID no feed
+     */
+    public getPosition(id: string): number {
+        return this.currentFeed.indexOf(id)
+    }
+
+    /**
+     * Verifica se um ID existe no feed
+     */
+    public hasId(id: string): boolean {
+        return this.currentFeed.includes(id)
+    }
+
+    /**
+     * Obtém o primeiro conjunto de IDs para prefetch inicial
+     * @param count Número de itens para retornar
+     */
+    public getInitialPrefetchIds(count: number = this.prefetchRange * 2): string[] {
+        return this.currentFeed.slice(0, count)
+    }
+
+    /**
+     * Atualiza o range de prefetch
+     */
+    public setPrefetchRange(range: number) {
+        this.prefetchRange = range
+    }
+
+    /**
+     * Retorna estatísticas do chunk manager
+     */
+    public getStats() {
+        return {
+            totalItems: this.currentFeed.length,
+            maxSize: this.maxListSize,
+            historySize: this.history.length,
+            lastScrollDirection: this.lastScrollDirection,
+            prefetchRange: this.prefetchRange,
+        }
     }
 }
