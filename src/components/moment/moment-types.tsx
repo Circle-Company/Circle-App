@@ -34,6 +34,9 @@ export type MomentContainerProps = {
     opacity?: number
     isFocused?: boolean
     fromFullMomentScreen?: boolean
+    forceMute?: boolean
+    showSlider?: boolean
+    disableCache?: boolean
 }
 
 export type MomentLikeProps = {
