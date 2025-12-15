@@ -14,6 +14,7 @@ module.exports = function (_config) {
             runtimeVersion: { policy: "appVersion" },
             icon: "./assets/app-icons/ios_icon_default_light.png",
             userInterfaceStyle: "automatic",
+            orientation: "portrait",
             primaryColor: "#1083fe",
             androidStatusBar: { barStyle: "light-content" },
             androidNavigationBar: { barStyle: "light-content" },
