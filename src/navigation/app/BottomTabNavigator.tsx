@@ -11,7 +11,7 @@ import User from "../../assets/icons/svgs/@3.svg"
 import UserOutline from "../../assets/icons/svgs/@.svg"
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs"
 import sizes from "../../constants/sizes"
-import Linear
+import LinearGradient from "react-native-linear-gradient"
 
 const BottomTab = createBottomTabNavigator()
 
@@ -21,7 +21,10 @@ export default function BottomTabNavigator() {
     const iconHeight = 21
     const tabBarStyle = {
         ...sizes.bottomTab,
-        backgroundColor: ColorTheme().background,
+        backgroundColor: "transparent", // Torna a tab transparente
+        borderTopWidth: 0, // Remove linha superior
+        elevation: 0, // Remove sombra no Android
+        position: "absolute", // Permite conteúdo por baixo
     }
     return (
         <BottomTab.Navigator
@@ -30,6 +33,15 @@ export default function BottomTabNavigator() {
                 tabBarHideOnKeyboard: true,
                 headerShown: false,
                 tabBarStyle: tabBarStyle,
+                tabBarBackground: () => (
+                    <LinearGradient
+                        colors={["#000000", "transparent"]}
+                        start={{ x: 0.5, y: 0.7 }}
+                        end={{ x: 0.5, y: 0 }}
+                        style={{ flex: 1 }}
+                    />
+                ),
+                tabBarPressColor: "transparent", // Remove ripple effect
             }}
         >
             <BottomTab.Screen
