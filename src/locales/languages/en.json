@@ -33,6 +33,7 @@
     "Accept": "Accept",
     "By using the": "By using the",
     "you confirm that you agree and that you have read and understood our": "you confirm that you agree and that you have read and understood our",
+    "This description helps deliver your Moment to the Feed.": "This description helps deliver your Moment to the Feed.",
     "Just one small step to go...": "Just one small step to go...",
 
     "Your Moments": "Your Moments",
@@ -198,6 +199,7 @@
     "Tags": "Tags",
     "tag name": "tag name",
     "memory title": "memory title",
+    "updated": "updated",
 
     "add new name": "add new name",
     "add new description": "add new description",
@@ -232,6 +234,7 @@
     "Preferences": "Preferences",
     "Content": "Content",
     "Community Guidelines": "Community Guidelines",
+    "Wellcome Back": "Wellcome Back",
 
     "Are you sure you want to log out?": "Are you sure you want to log out?",
     "You will not be able to recover your account if you forget your password.": "You will not be able to recover your account if you forget your password.",
@@ -241,7 +244,8 @@
 
     "We don't have any Moment to show": "No moments to display right now",
     "Share a Moment": "Share a Moment",
-    "Share moment": "Compartilhar moment",
+    "Share moment": "Share moment",
+    "Sharing": "Sharing",
     "Reload Feed": "Reload Feed",
     "Capture Your Day": "Capture Your Day",
     "No recommendations available right now. Why not share a special moment from your day instead?": "No recommendations available right now. Why not share a special moment from your day instead?",
@@ -254,6 +258,7 @@
     "Near to You Now": "Near to You Now",
     "See how it turned out": "See how it turned out",
     "Recording": "Recording",
+    "Enter on Circle": "Enter on Circle",
 
     "When your moment gets a like.": "When your moment gets a like.",
     "When someone you follow posts a new Memory.": "When someone you follow posts a new Memory.",
@@ -303,5 +308,17 @@
     "If the memory only has this moment and you remove it, the memory will be deleted.": "If the memory only has this moment and you remove it, the memory will be deleted.",
 
     "If you have any questions or want to report something more serious, send an email to our support.": "If you have any questions or want to report something more serious, send an email to our support.",
-    "If you have found a bug, please help us by reporting it. Thanks!": "If you have found a bug, please help us by reporting it. Thanks!"
+    "If you have found a bug, please help us by reporting it. Thanks!": "If you have found a bug, please help us by reporting it. Thanks!",
+
+    "auth.errors.invalidCredentials": "Invalid username or password.",
+    "auth.errors.userNotFound": "We couldn't find an account with this username.",
+    "auth.errors.wrongPassword": "Incorrect password.",
+    "auth.errors.passwordRequired": "Password is required.",
+    "auth.errors.usernameRequired": "Username is required.",
+    "auth.errors.accountLocked": "Your account is locked. Please try again later or contact support.",
+    "auth.errors.accountDisabled": "Your account has been disabled.",
+    "auth.errors.tooManyRequests": "Too many attempts. Please wait a moment and try again.",
+    "auth.errors.network": "Network error. Check your internet connection and try again.",
+    "auth.errors.generic": "We couldn't complete the sign-in. Please try again.",
+    "auth.errors.unknown": "An unknown error occurred."
 }
