@@ -3,6 +3,7 @@ import sizes from "../../../constants/sizes"
 import PersistedContext from "../../../contexts/Persisted"
 import { View } from "../../Themed"
 import { UserShow } from "../../user_show"
+import fonts from "@/constants/fonts"
 export default function AccountHeaderCenter() {
     const { session } = React.useContext(PersistedContext)
 
@@ -10,7 +11,6 @@ export default function AccountHeaderCenter() {
         flex: 1,
         alignItems: "center",
         justifyContent: "center",
-        marginLeft: sizes.margins["1md"],
     }
     return (
         <View style={container}>
@@ -21,6 +21,7 @@ export default function AccountHeaderCenter() {
                     displayOnMoment={false}
                     scale={1.3}
                     margin={0}
+                    fontFamily={fonts.family["Black-Italic"]}
                 />
             </UserShow.Root>
         </View>

@@ -24,6 +24,7 @@ export function storageKeys() {
                 token: baseKey + "account:jwt:token",
                 refreshToken: baseKey + "account:jwt:refreshtoken",
             },
+            moments: baseKey + "account:moments",
         },
         statistics: {
             total_followers: baseKey + "statistics:totalfollowers",

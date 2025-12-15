@@ -34,6 +34,7 @@
     "Accept": "Aceito",
     "By using the": "Ao clicar em",
     "you confirm that you agree and that you have read and understood our": "você confirma e concorda que leu e entendeu nossa",
+    "This description helps deliver your Moment to the Feed.": "Descrição ajuda na entrega do seu Moment no Feed.",
     "Just one small step to go...": "Só falta um pequeno passo...",
 
     "Your Moments": "Seus Moments",
@@ -202,6 +203,7 @@
     "Tags": "Tags",
     "tag name": "nome da tag",
     "memory title": "título da memória",
+    "updated": "atualizado",
 
     "add new name": "adicionar nome",
     "add new description": "adicionar descrição",
@@ -227,6 +229,7 @@
     "Settings": "Configurações",
     "Add Profile Picture": "Nova Foto de Perfil",
     "Add Description": "Nova Descrição",
+    "Add description": "Adicionar descrição",
     "Add Name": "Novo Nome",
     "Change Password": "Mudar Senha",
     "Push Notifications": "Notificações de Push",
@@ -235,6 +238,7 @@
     "Preferences": "Preferências",
     "Content": "Conteúdo",
     "Community Guidelines": "Diretrizes da Comunidade",
+    "Wellcome Back": "Bem vindo de volta",
 
     "Are you sure you want to log out?": "Você tem certeza que deseja se deslogar?",
     "You will not be able to recover your account if you forget your password.": "Você não poderá recuperar sua conta se esquecer sua senha.",
@@ -245,6 +249,8 @@
 
     "We don't have any Moment to show": "Não temos nenhum Moment para mostrar",
     "Share a Moment": "Crie um Moment",
+    "Share moment": "Compartilhar",
+    "Sharing": "Compartilhando",
 
     "Like on Moment": "Curtida",
     "Memory Creation": "Nova Memória",
@@ -253,6 +259,9 @@
     "Profile Visit": "Visita no Perfil",
     "Near to You Now": "Perto de Você Agora",
     "Reload Feed": "Recarregue o feed",
+    "See how it turned out": "Veja como ficou",
+    "Recording": "Gravando",
+    "Enter on Circle": "Entrar no Circle",
 
     "When your moment gets a like.": "Quando algum Moment seu receber uma curtida.",
     "When someone you follow posts a new Memory.": "Quando alguém que você segue postar uma nova Memória.",
@@ -302,5 +311,16 @@
     "If the memory only has this moment and you remove it, the memory will be deleted.": "Se a memória só tiver esse Moment e você removê-lo, a memória será apagada.",
 
     "If you have any questions or want to report something more serious, send an email to our support.": "Caso haja alguma dúvida ou queira reportar algo mais sério, envie um email para o nosso suporte.",
-    "If you have found a bug, please help us by reporting it. Thanks!": "Se tive encontrado algum bug, nos ajude reportando. Obrigado!"
+    "If you have found a bug, please help us by reporting it. Thanks!": "Se tive encontrado algum bug, nos ajude reportando. Obrigado!",
+    "auth.errors.invalidCredentials": "Usuário ou senha inválidos.",
+    "auth.errors.userNotFound": "Não encontramos uma conta com esse nome de usuário.",
+    "auth.errors.wrongPassword": "Senha incorreta.",
+    "auth.errors.passwordRequired": "Senha é obrigatória.",
+    "auth.errors.usernameRequired": "Nome de usuário é obrigatório.",
+    "auth.errors.accountLocked": "Sua conta está bloqueada. Tente mais tarde ou contate o suporte.",
+    "auth.errors.accountDisabled": "Sua conta foi desativada.",
+    "auth.errors.tooManyRequests": "Muitas tentativas. Tente novamente mais tarde.",
+    "auth.errors.network": "Erro de rede. Verifique sua conexão e tente novamente.",
+    "auth.errors.generic": "Não foi possível fazer login. Tente novamente.",
+    "auth.errors.unknown": "Ocorreu um erro desconhecido."
 }

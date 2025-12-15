@@ -1,3 +1,7 @@
+import { AccountMoment } from "../../state/queries/account"
+
+export { AccountMoment }
+
 export type SessionUser = {
     id: string
     username: string
@@ -59,6 +63,7 @@ export type AccountDataType = {
     updatedAt: string
     last_active_at: string
     last_login_at: string
+    moments?: AccountMoment[]
 }
 
 export type PreferencesLanguage = {

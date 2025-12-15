@@ -15,8 +15,8 @@ export type FeedResponse = {
 export class FeedOrchestrator {
     private fetcher: Fetcher
     private debounceGate: DebounceGate
-    private chunkManager: ChunkManager
-    private cacheManager: CacheManager
+    public chunkManager: ChunkManager
+    public cacheManager: CacheManager
 
     constructor(jwtToken: string, maxCacheSize: number = 50) {
         this.fetcher = new Fetcher(jwtToken)

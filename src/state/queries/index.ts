@@ -14,3 +14,4 @@ export const STALE = {
 }
 
 export * from "./find-nearby-users"
+export * from "./account"

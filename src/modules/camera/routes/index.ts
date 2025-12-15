@@ -3,8 +3,9 @@ export type Routes = {
     CameraPage: undefined
     CodeScannerPage: undefined
     MediaPage: {
-        path: string
-        type: "video"
+        videoUri: string
+        duration?: number
+        width?: number
+        height?: number
     }
-    Devices: undefined
 }

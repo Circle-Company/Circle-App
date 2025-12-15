@@ -28,14 +28,14 @@ export default function AuthTermsText({ signText }: Props) {
     }
 
     const termsText: TextStyle = {
-        fontSize: fonts.size.body,
+        fontSize: fonts.size.body * 0.9,
         fontFamily: fonts.family.Medium,
-        color: ColorScheme().text,
+        color: colors.gray.grey_03,
         textAlign: "center",
     }
     const termsButton: any = {
         top: 4,
-        fontSize: fonts.size.body,
+        fontSize: fonts.size.body * 0.85,
         fontFamily: fonts.family["Medium-Italic"],
         color: ColorTheme().primaryAccent,
         textDecorationLine: "underline",

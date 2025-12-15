@@ -1,6 +1,6 @@
 import { storage, storageKeys } from "../../store"
 
-import { AccountDataType } from "./types"
+import { AccountDataType, AccountMoment } from "./types"
 import { create } from "zustand"
 
 const keys = storageKeys()
@@ -12,7 +12,11 @@ export interface AccountState extends AccountDataType {
         latitude: number
         longitude: number
     }
+    moments: AccountMoment[]
+    totalMoments?: number
     set: (value: AccountDataType) => void
+    setMoments: (value: AccountMoment[]) => void
+    setTotalMoments: (value: number) => void
     setCoordinates: (value: { latitude: number; longitude: number }) => void
     load: () => void
     remove: () => void
@@ -28,20 +32,38 @@ const readStatus = () => ({
 
 const readFromStorage = (): AccountDataType & {
     coordinates: { latitude: number; longitude: number }
-} => ({
-    jwtToken: storage.getString(accountKey.jwt.token) || "",
-    jwtExpiration: storage.getString(accountKey.jwt.expiration) || "",
-    refreshToken: storage.getString(accountKey.jwt.refreshToken) || undefined,
-    blocked: storage.getBoolean(accountKey.blocked) || false,
-    muted: storage.getBoolean(accountKey.muted) || false,
-    ...readStatus(),
-    last_active_at: storage.getString(accountKey.last_active_at) || "",
-    last_login_at: storage.getString(accountKey.last_login_at) || "",
-    coordinates: {
-        latitude: storage.getNumber(accountKey.coordinates.latitude) || 0,
-        longitude: storage.getNumber(accountKey.coordinates.longitude) || 0,
-    },
-})
+    moments: AccountMoment[]
+    totalMoments?: number
+} => {
+    const momentsJson = storage.getString(accountKey.moments)
+    const totalMoments = storage.getNumber("account.totalMoments")
+    let moments: AccountMoment[] = []
+
+    if (momentsJson) {
+        try {
+            moments = JSON.parse(momentsJson)
+        } catch (error) {
+            console.error("Error parsing moments from storage:", error)
+        }
+    }
+
+    return {
+        jwtToken: storage.getString(accountKey.jwt.token) || "",
+        jwtExpiration: storage.getString(accountKey.jwt.expiration) || "",
+        refreshToken: storage.getString(accountKey.jwt.refreshToken) || undefined,
+        blocked: storage.getBoolean(accountKey.blocked) || false,
+        muted: storage.getBoolean(accountKey.muted) || false,
+        ...readStatus(),
+        last_active_at: storage.getString(accountKey.last_active_at) || "",
+        last_login_at: storage.getString(accountKey.last_login_at) || "",
+        coordinates: {
+            latitude: storage.getNumber(accountKey.coordinates.latitude) || 0,
+            longitude: storage.getNumber(accountKey.coordinates.longitude) || 0,
+        },
+        moments,
+        totalMoments,
+    }
+}
 
 export const useAccountStore = create<AccountState>((set) => ({
     ...readFromStorage(),
@@ -72,6 +94,30 @@ export const useAccountStore = create<AccountState>((set) => ({
             last_login_at: value.last_login_at,
         }))
     },
+    setMoments: (value: AccountMoment[]) => {
+        try {
+            storage.set(accountKey.moments, JSON.stringify(value))
+            set((state) => ({
+                ...state,
+                moments: value,
+            }))
+            console.log(`✅ [AccountStore] ${value.length} moments salvos no storage`)
+        } catch (error) {
+            console.error("❌ [AccountStore] Erro ao salvar moments:", error)
+        }
+    },
+    setTotalMoments: (value: number) => {
+        try {
+            storage.set("account.totalMoments", value)
+            set((state) => ({
+                ...state,
+                totalMoments: value,
+            }))
+            console.log(`✅ [AccountStore] Total de ${value} moments salvos`)
+        } catch (error) {
+            console.error("❌ [AccountStore] Erro ao salvar totalMoments:", error)
+        }
+    },
     setCoordinates: (value: { latitude: number; longitude: number }) => {
         storage.set(accountKey.coordinates.latitude, value.latitude)
         storage.set(accountKey.coordinates.longitude, value.longitude)
@@ -94,6 +140,7 @@ export const useAccountStore = create<AccountState>((set) => ({
         storage.delete(accountKey.last_login_at)
         storage.delete(accountKey.coordinates.latitude)
         storage.delete(accountKey.coordinates.longitude)
+        storage.delete(accountKey.moments)
         storage.delete(`${statusKeyPrefix}accesslevel`)
         storage.delete(`${statusKeyPrefix}verified`)
         storage.delete(`${statusKeyPrefix}deleted`)
@@ -114,6 +161,7 @@ export const useAccountStore = create<AccountState>((set) => ({
             last_active_at: "",
             last_login_at: "",
             coordinates: { latitude: 0, longitude: 0 },
+            moments: [],
         }
 
         set(emptyState)

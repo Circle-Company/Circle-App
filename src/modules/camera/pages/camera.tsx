@@ -1,12 +1,13 @@
 import sizes from "@/constants/sizes"
-import { Ionicons } from "@expo/vector-icons"
-import MaterialIcon from "@expo/vector-icons/MaterialIcons"
 import { useIsFocused } from "@react-navigation/core"
 import type { NativeStackScreenProps } from "@react-navigation/native-stack"
 import * as React from "react"
-import { useCallback, useEffect, useMemo, useRef, useState } from "react"
+import { useCallback, useEffect, useRef, useState } from "react"
 import type { GestureResponderEvent, ViewStyle } from "react-native"
 import { StyleSheet, Text, View } from "react-native"
+import RotateIcon from "@/assets/icons/svgs/arrow.triangle.2.circlepath.svg"
+import FlashOnIcon from "@/assets/icons/svgs/flashlight.on.fill.svg"
+import FlashOffIcon from "@/assets/icons/svgs/flashlight.off.fill.svg"
 import type { PinchGestureHandlerGestureEvent } from "react-native-gesture-handler"
 import { PinchGestureHandler, TapGestureHandler } from "react-native-gesture-handler"
 import { PressableOpacity } from "react-native-pressable-opacity"
@@ -15,14 +16,11 @@ import Reanimated, {
     interpolate,
     useAnimatedGestureHandler,
     useAnimatedProps,
+    useAnimatedStyle,
     useSharedValue,
+    withSpring,
 } from "react-native-reanimated"
-import type {
-    CameraProps,
-    CameraRuntimeError,
-    PhotoFile,
-    VideoFile,
-} from "react-native-vision-camera"
+import type { CameraProps, CameraRuntimeError, VideoFile } from "react-native-vision-camera"
 import {
     Camera,
     useCameraDevice,
@@ -31,18 +29,15 @@ import {
     useMicrophonePermission,
 } from "react-native-vision-camera"
 import { CaptureButton } from "../components/CaptureButton"
-import { StatusBarBlurBackground } from "../components/StatusBarBlurBackground"
-import {
-    CONTENT_SPACING,
-    CONTROL_BUTTON_SIZE,
-    MAX_ZOOM_FACTOR,
-    SAFE_AREA_PADDING,
-    SCREEN_HEIGHT,
-    SCREEN_WIDTH,
-} from "../constants"
+import CameraVideoSlider from "../components/CameraVideoSlider"
+import { CONTENT_SPACING, MAX_ZOOM_FACTOR, SCREEN_HEIGHT, SCREEN_WIDTH } from "../constants"
 import { useIsForeground } from "../hooks/useIsForeground"
 import { usePreferredCameraDevice } from "../hooks/usePreferredCameraDevice"
 import type { Routes } from "../routes"
+import { useCameraContext } from "../context"
+import LanguageContext from "@/contexts/Preferences/language"
+import { colors } from "@/constants/colors"
+import RNFS from "react-native-fs"
 
 const ReanimatedCamera = Reanimated.createAnimatedComponent(Camera)
 Reanimated.addWhitelistedNativeProps({
@@ -50,6 +45,8 @@ Reanimated.addWhitelistedNativeProps({
 })
 
 const SCALE_FULL_ZOOM = 3
+const MAX_RECORDING_TIME = 30 // segundos
+const TARGET_FPS = 60
 
 type Props = NativeStackScreenProps<Routes, "CameraPage">
 export function CameraPage({ navigation }: Props): React.ReactElement {
@@ -59,16 +56,26 @@ export function CameraPage({ navigation }: Props): React.ReactElement {
     const location = useLocationPermission()
     const zoom = useSharedValue(1)
     const isPressingButton = useSharedValue(false)
+    const rotateAnimation = useSharedValue(0)
+    const recordingIntervalRef = useRef<NodeJS.Timeout | null>(null)
+
+    // Camera context
+    const { isRecording, setIsRecording, setVideo, setRecordingTime, setVideoBuffer } =
+        useCameraContext()
+    const { t } = React.useContext(LanguageContext)
+
+    React.useEffect(() => {
+        navigation.setOptions({
+            headerTitle: isRecording ? t("Recording") : t("New Moment"),
+        })
+    }, [isRecording, t, navigation])
 
     // check if camera page is active
     const isFocussed = useIsFocused()
     const isForeground = useIsForeground()
     const isActive = isFocussed && isForeground
-
     const [cameraPosition, setCameraPosition] = useState<"front" | "back">("back")
-    const [enableHdr, setEnableHdr] = useState(false)
-    const [flash, setFlash] = useState<"off" | "on">("off")
-    const [enableNightMode, setEnableNightMode] = useState(false)
+    const [torch, setTorch] = useState<"off" | "on">("off")
 
     // camera device settings
     const [preferredDevice] = usePreferredCameraDevice()
@@ -79,26 +86,14 @@ export function CameraPage({ navigation }: Props): React.ReactElement {
         device = preferredDevice
     }
 
-    const [targetFps, setTargetFps] = useState(60)
-
     const screenAspectRatio = SCREEN_HEIGHT / SCREEN_WIDTH
     const format = useCameraFormat(device, [
-        { fps: targetFps },
+        { fps: TARGET_FPS },
         { videoAspectRatio: screenAspectRatio },
-        { videoResolution: "max" },
-        { photoAspectRatio: screenAspectRatio },
-        { photoResolution: "max" },
+        { videoResolution: { width: sizes.moment.full.width, height: sizes.moment.full.height } }, // Limita gravação ao tamanho do container da câmera
     ])
 
-    const fps = Math.min(format?.maxFps ?? 1, targetFps)
-
-    const supportsFlash = device?.hasFlash ?? false
-    const supportsHdr = format?.supportsPhotoHdr
-    const supports60Fps = useMemo(
-        () => device?.formats.some((f) => f.maxFps >= 60),
-        [device?.formats],
-    )
-    const canToggleNightMode = device?.supportsLowLightBoost ?? false
+    const fps = Math.min(format?.maxFps ?? 1, TARGET_FPS)
 
     //#region Animated Zoom
     const minZoom = device?.minZoom ?? 1
@@ -110,6 +105,12 @@ export function CameraPage({ navigation }: Props): React.ReactElement {
             zoom: z,
         }
     }, [maxZoom, minZoom, zoom])
+
+    const rotateIconStyle = useAnimatedStyle(() => {
+        return {
+            transform: [{ rotate: `${rotateAnimation.value}deg` }],
+        }
+    }, [rotateAnimation])
     //#endregion
 
     //#region Callbacks
@@ -127,21 +128,115 @@ export function CameraPage({ navigation }: Props): React.ReactElement {
         setIsCameraInitialized(true)
     }, [])
     const onMediaCaptured = useCallback(
-        (media: PhotoFile | VideoFile, type: "photo" | "video") => {
+        async (media: VideoFile, type: "video") => {
             console.log(`Media captured! ${JSON.stringify(media)}`)
+            console.log("📹 Original path:", media.path)
+            setIsRecording(false)
+            setRecordingTime(0)
+            if (recordingIntervalRef.current) {
+                clearInterval(recordingIntervalRef.current)
+                recordingIntervalRef.current = null
+            }
+
+            // Caminho do vídeo capturado temporário
+            const tempPath = media.path
+
+            // Obter tamanho do arquivo
+            let fileSize = 0
+            const mimeType = "video/mp4" // Sempre MP4 agora
+
+            try {
+                const stat = await RNFS.stat(tempPath)
+                fileSize = stat.size
+                console.log("📊 Tamanho do arquivo:", fileSize, "bytes")
+            } catch (error) {
+                console.error("❌ Erro ao obter informações do arquivo:", error)
+            }
+
+            // Criar diretório temp se não existir
+            const tempDir = `${RNFS.DocumentDirectoryPath}/temp`
+
+            console.log("📁 Document directory:", RNFS.DocumentDirectoryPath)
+            console.log("📁 Temp directory:", tempDir)
+
+            try {
+                const dirExists = await RNFS.exists(tempDir)
+                if (!dirExists) {
+                    console.log("📁 Criando diretório temp...")
+                    await RNFS.mkdir(tempDir)
+                    console.log("✅ Diretório criado com sucesso!")
+                }
+            } catch (error) {
+                console.error("❌ Erro ao criar diretório temp:", error)
+            }
+
+            // Copiar vídeo para pasta temp com nome único
+            const timestamp = Date.now()
+            const fileName = `video_${timestamp}.mp4`
+            const finalPath = `${tempDir}/${fileName}`
+
+            console.log("📂 Copiando vídeo de:", tempPath)
+            console.log("📂 Para:", finalPath)
+
+            try {
+                await RNFS.copyFile(tempPath, finalPath)
+                console.log("✅ Vídeo copiado com sucesso!")
+
+                // Verificar se arquivo foi copiado
+                const copiedStat = await RNFS.stat(finalPath)
+                fileSize = copiedStat.size
+                console.log("✅ Arquivo verificado, tamanho:", fileSize, "bytes")
+            } catch (error) {
+                console.error("❌ Erro ao copiar vídeo:", error)
+                console.error("❌ Detalhes do erro:", JSON.stringify(error))
+            }
+
+            console.log("📹 Arquivo de vídeo salvo:", {
+                path: finalPath,
+                duration: media.duration,
+                size: fileSize,
+                mimeType: mimeType,
+                width: media.width,
+                height: media.height,
+            })
+
+            // Adicionar prefixo file:// ao path final se necessário
+            // FileSystem.documentDirectory pode já incluir file://
+            let fileUri = finalPath
+            if (!fileUri.startsWith("file://")) {
+                fileUri = `file://${fileUri}`
+            }
+
+            console.log("📹 URI final para exibição:", fileUri)
+
+            // Salvar dados no contexto
+            setVideo({
+                path: fileUri,
+                duration: media.duration,
+                size: fileSize,
+                mimeType: mimeType,
+                width: media.width,
+                height: media.height,
+            })
+
+            // Navegar passando o fileUri diretamente como parâmetro
             navigation.navigate("MediaPage", {
-                path: media.path,
-                type: type,
+                videoUri: fileUri,
+                duration: media.duration,
+                width: media.width,
+                height: media.height,
             })
         },
-        [navigation],
+        [navigation, setIsRecording, setVideo, setRecordingTime, setVideoBuffer],
     )
     const onFlipCameraPressed = useCallback(() => {
         setCameraPosition((p) => (p === "back" ? "front" : "back"))
-    }, [])
-    const onFlashPressed = useCallback(() => {
-        setFlash((f) => (f === "off" ? "on" : "off"))
-    }, [])
+        rotateAnimation.value = withSpring(rotateAnimation.value + 180, {
+            damping: 15,
+            stiffness: 150,
+        })
+    }, [rotateAnimation])
+
     //#endregion
 
     //#region Tap Gesture
@@ -167,6 +262,41 @@ export function CameraPage({ navigation }: Props): React.ReactElement {
     }, [zoom, device])
     //#endregion
 
+    // Timer para gravação
+    useEffect(() => {
+        if (isRecording) {
+            // Só reseta o tempo se não estiver gravando ainda
+            if (!recordingIntervalRef.current) {
+                setRecordingTime(0)
+            }
+            if (recordingIntervalRef.current) clearInterval(recordingIntervalRef.current)
+            recordingIntervalRef.current = setInterval(() => {
+                setRecordingTime((prev) => {
+                    if (prev + 0.1 >= MAX_RECORDING_TIME) {
+                        setIsRecording(false)
+                        if (camera.current) {
+                            camera.current.stopRecording()
+                        }
+                        return MAX_RECORDING_TIME
+                    }
+                    return prev + 0.1
+                })
+            }, 100)
+        } else {
+            if (recordingIntervalRef.current) {
+                clearInterval(recordingIntervalRef.current)
+                recordingIntervalRef.current = null
+            }
+            setRecordingTime(0)
+        }
+        return () => {
+            if (recordingIntervalRef.current) {
+                clearInterval(recordingIntervalRef.current)
+                recordingIntervalRef.current = null
+            }
+        }
+    }, [isRecording, camera, setRecordingTime, setIsRecording, MAX_RECORDING_TIME])
+
     //#region Pinch to Zoom Gesture
     // The gesture handler maps the linear pinch gesture (0 - 1) to an exponential curve since a camera's zoom
     // function does not appear linear to the user. (aka zoom 0.1 -> 0.2 does not look equal in difference as 0.8 -> 0.9)
@@ -178,6 +308,10 @@ export function CameraPage({ navigation }: Props): React.ReactElement {
             context.startZoom = zoom.value
         },
         onActive: (event, context) => {
+            // block pinch-to-zoom while the capture button is pressed
+            if (isPressingButton.value) {
+                return
+            }
             // we're trying to map the scale gesture to a linear zoom here
             const startZoom = context.startZoom ?? 0
             const scale = interpolate(
@@ -199,7 +333,7 @@ export function CameraPage({ navigation }: Props): React.ReactElement {
     useEffect(() => {
         const f =
             format != null
-                ? `(${format.photoWidth}x${format.photoHeight} photo / ${format.videoWidth}x${format.videoHeight}@${format.maxFps} video @ ${fps}fps)`
+                ? `(${format.videoWidth}x${format.videoHeight}@${format.maxFps} video @ ${fps}fps)`
                 : undefined
         console.log(`Camera: ${device?.name} | Format: ${f}`)
     }, [device?.name, format, fps])
@@ -207,9 +341,6 @@ export function CameraPage({ navigation }: Props): React.ReactElement {
     useEffect(() => {
         location.requestPermission()
     }, [location])
-
-    const videoHdr = format?.supportsVideoHdr && enableHdr
-    const photoHdr = format?.supportsPhotoHdr && enableHdr && !videoHdr
 
     const cameraStyle: ViewStyle = {
         width: sizes.moment.full.width,
@@ -220,6 +351,7 @@ export function CameraPage({ navigation }: Props): React.ReactElement {
         alignItems: "center",
         justifyContent: "center",
         alignSelf: "center",
+        position: "relative",
     }
 
     return (
@@ -246,33 +378,17 @@ export function CameraPage({ navigation }: Props): React.ReactElement {
                                 ref={camera}
                                 onInitialized={onInitialized}
                                 onError={onError}
-                                onStarted={() => console.log("Camera started!")}
-                                onStopped={() => console.log("Camera stopped!")}
-                                onPreviewStarted={() => console.log("Preview started!")}
-                                onPreviewStopped={() => console.log("Preview stopped!")}
-                                onOutputOrientationChanged={(o) =>
-                                    console.log(`Output orientation changed to ${o}!`)
-                                }
-                                onPreviewOrientationChanged={(o) =>
-                                    console.log(`Preview orientation changed to ${o}!`)
-                                }
-                                onUIRotationChanged={(degrees) =>
-                                    console.log(`UI Rotation changed: ${degrees}°`)
-                                }
                                 format={format}
                                 fps={fps}
-                                photoHdr={photoHdr}
-                                videoHdr={videoHdr}
-                                photoQualityBalance="quality"
-                                lowLightBoost={device.supportsLowLightBoost && enableNightMode}
+                                lowLightBoost={false}
                                 enableZoomGesture={false}
                                 animatedProps={cameraAnimatedProps}
                                 exposure={0}
                                 outputOrientation="device"
-                                photo={true}
                                 video={true}
                                 audio={microphone.hasPermission}
                                 enableLocation={location.hasPermission}
+                                torch={torch}
                             />
                         </TapGestureHandler>
                     </Reanimated.View>
@@ -283,76 +399,67 @@ export function CameraPage({ navigation }: Props): React.ReactElement {
                 </View>
             )}
 
-            <CaptureButton
-                style={styles.captureButton}
-                camera={camera}
-                onMediaCaptured={onMediaCaptured}
-                cameraZoom={zoom}
-                minZoom={minZoom}
-                maxZoom={maxZoom}
-                flash={supportsFlash ? flash : "off"}
-                enabled={isCameraInitialized && isActive}
-                setIsPressingButton={setIsPressingButton}
-            />
+            {isRecording && (
+                <View>
+                    <CameraVideoSlider
+                        maxTime={MAX_RECORDING_TIME}
+                        width={sizes.moment.full.width}
+                    />
+                </View>
+            )}
 
-            <StatusBarBlurBackground />
-
-            <View style={styles.rightButtonRow}>
+            <View style={styles.bottomBar}>
                 <PressableOpacity
-                    style={styles.button}
+                    style={styles.sideButton}
                     onPress={onFlipCameraPressed}
                     disabledOpacity={0.4}
                 >
-                    <Ionicons name="camera-reverse" color="white" size={24} />
+                    <Reanimated.View style={rotateIconStyle}>
+                        <RotateIcon fill={colors.gray.white} width={22} height={22} />
+                    </Reanimated.View>
                 </PressableOpacity>
-                {supportsFlash && (
-                    <PressableOpacity
-                        style={styles.button}
-                        onPress={onFlashPressed}
-                        disabledOpacity={0.4}
-                    >
-                        <Ionicons
-                            name={flash === "on" ? "flash" : "flash-off"}
-                            color="white"
-                            size={24}
-                        />
-                    </PressableOpacity>
-                )}
-                {supports60Fps && (
-                    <PressableOpacity
-                        style={styles.button}
-                        onPress={() => setTargetFps((t) => (t === 30 ? 60 : 30))}
-                    >
-                        <Text style={styles.text}>{`${targetFps}\nFPS`}</Text>
-                    </PressableOpacity>
-                )}
-                {supportsHdr && (
-                    <PressableOpacity style={styles.button} onPress={() => setEnableHdr((h) => !h)}>
-                        <MaterialIcon
-                            name={enableHdr ? "hdr-on" : "hdr-off"}
-                            color="white"
-                            size={24}
-                        />
-                    </PressableOpacity>
-                )}
-                {canToggleNightMode && (
-                    <PressableOpacity
-                        style={styles.button}
-                        onPress={() => setEnableNightMode(!enableNightMode)}
-                        disabledOpacity={0.4}
-                    >
-                        <Ionicons
-                            name={enableNightMode ? "moon" : "moon-outline"}
-                            color="white"
-                            size={24}
-                        />
-                    </PressableOpacity>
-                )}
+
+                <CaptureButton
+                    style={styles.captureButton}
+                    camera={camera}
+                    onMediaCaptured={onMediaCaptured}
+                    cameraZoom={zoom}
+                    minZoom={minZoom}
+                    maxZoom={maxZoom}
+                    flash="off"
+                    enabled={isCameraInitialized && isActive}
+                    setIsPressingButton={setIsPressingButton}
+                    onRecordingStart={() => setIsRecording(true)}
+                    onRecordingStop={() => setIsRecording(false)}
+                />
+
                 <PressableOpacity
-                    style={styles.button}
-                    onPress={() => navigation.navigate("Devices")}
+                    style={[
+                        styles.sideButton,
+                        torch === "on" && styles.sideButtonTorchOn,
+                        cameraPosition === "front" && { opacity: 0.4 },
+                    ]}
+                    onPress={() => {
+                        if (cameraPosition !== "front") {
+                            setTorch((t) => (t === "off" ? "on" : "off"))
+                        }
+                    }}
+                    disabledOpacity={0.4}
+                    disabled={cameraPosition === "front"}
                 >
-                    <Ionicons name="settings-outline" color="white" size={24} />
+                    {torch === "on" ? (
+                        <FlashOnIcon
+                            fill={cameraPosition === "front" ? "#888" : "white"}
+                            width={22}
+                            height={22}
+                        />
+                    ) : (
+                        <FlashOffIcon
+                            fill={cameraPosition === "front" ? "#888" : "white"}
+                            width={22}
+                            height={22}
+                        />
+                    )}
                 </PressableOpacity>
             </View>
         </View>
@@ -365,26 +472,34 @@ const styles = StyleSheet.create({
         backgroundColor: "black",
     },
     captureButton: {
-        position: "absolute",
+        width: 80,
+        height: 80,
         alignSelf: "center",
-        bottom: CONTENT_SPACING * 3,
+        justifyContent: "center",
+        alignItems: "center",
+        marginHorizontal: 24,
     },
-    button: {
-        marginBottom: CONTENT_SPACING,
-        width: CONTROL_BUTTON_SIZE,
-        height: CONTROL_BUTTON_SIZE,
-        borderRadius: CONTROL_BUTTON_SIZE / 2,
+    sideButton: {
+        width: 50,
+        height: 50,
+        borderRadius: 25,
         backgroundColor: "rgba(140, 140, 140, 0.3)",
         justifyContent: "center",
         alignItems: "center",
+        marginHorizontal: 8,
     },
-    rightButtonRow: {
-        alignSelf: "center",
-        position: "absolute",
-        right: SAFE_AREA_PADDING.paddingRight,
-        bottom: 150,
-        gap: 10,
+    sideButtonTorchOn: {
+        backgroundColor: colors.yellow.yellow_09 + 90,
+    },
+    bottomBar: {
         flexDirection: "row",
+        alignItems: "center",
+        justifyContent: "center",
+        position: "absolute",
+        bottom: CONTENT_SPACING * 3,
+        left: 0,
+        right: 0,
+        zIndex: 10,
     },
     text: {
         color: "white",

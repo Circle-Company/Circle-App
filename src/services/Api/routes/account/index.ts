@@ -2,6 +2,24 @@ import api from "../.."
 import { storage, storageKeys } from "../../../../store"
 import { UpdateCoordinatesProps } from "./types"
 
+async function getAccount(): Promise<any> {
+    const response = await api.get("/account", {
+        headers: {
+            Authorization: storage.getString(storageKeys().account.jwt.token) || "",
+        },
+    })
+    return response.data
+}
+
+async function getAccountMoments({ page, limit }: { page: number; limit: number }): Promise<any> {
+    const response = await api.get(`/account/moments?page=${page}&limit=${limit}`, {
+        headers: {
+            Authorization: storage.getString(storageKeys().account.jwt.token) || "",
+        },
+    })
+    return response.data
+}
+
 async function findFollowings({ page, limit }: { page: unknown; limit: unknown }): Promise<void> {
     const response = await api.get(`/account/list/followings?page=${page}&limit=${limit}`, {
         headers: {
@@ -25,7 +43,7 @@ async function updateCoordinates({ userId, coordinates }: UpdateCoordinatesProps
                 headers: {
                     Authorization: storage.getString(storageKeys().account.jwt.token) || "",
                 },
-            }
+            },
         )
         .catch((err) => {
             console.log(err)
@@ -33,6 +51,8 @@ async function updateCoordinates({ userId, coordinates }: UpdateCoordinatesProps
 }
 
 export const routes = {
+    getAccount,
+    getAccountMoments,
     findFollowings,
     updateCoordinates,
 }

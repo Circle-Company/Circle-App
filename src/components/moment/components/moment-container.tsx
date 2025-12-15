@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from "react"
+import React, { useCallback, useEffect, useState, useMemo } from "react"
 import Reanimated, { FadeIn, FadeOut } from "react-native-reanimated"
 
 import ColorTheme from "../../../constants/colors"
@@ -17,14 +17,21 @@ export default function Container({
     children,
     contentRender,
     isFocused = true,
-}: MomentContainerProps) {
+    onVideoEnd,
+    forceMute = false,
+    showSlider = true,
+    disableCache = false,
+}: MomentContainerProps & { onVideoEnd?: () => void }) {
     const { momentData, momentUserActions, momentSize, momentOptions, momentVideo } =
         React.useContext(MomentContext)
     const { session } = React.useContext(PersistedContext)
-    const { commentEnabled, loadVideoFromCache } = React.useContext(FeedContext)
+    const feedContext = React.useContext(FeedContext)
+    const { commentEnabled, loadVideoFromCache, cacheManager, chunkManager, moments } =
+        feedContext || {}
     const [hasVideoCache, setHasVideoCache] = useState<boolean>(false)
     const [cachedVideoUri, setCachedVideoUri] = useState<string | undefined>()
     const [isLoadingCache, setIsLoadingCache] = useState(false)
+    const [adjacentThumbnails, setAdjacentThumbnails] = useState<string[]>([])
 
     // Atualizar o estado de pausa do vídeo quando muda o foco
     useEffect(() => {
@@ -69,10 +76,17 @@ export default function Container({
 
     // Função para carregar vídeo do cache otimizado
     const loadVideoFromCacheOptimized = useCallback(async () => {
-        if (momentData.midia.content_type !== "VIDEO" || !loadVideoFromCache) return
+        if (momentData.midia.content_type !== "VIDEO") return
 
         const originalUrl = momentData.midia.fullhd_resolution || momentData.midia.nhd_resolution
         if (!originalUrl) return
+
+        // Se cache desabilitado, usar URL direta
+        if (disableCache || !loadVideoFromCache) {
+            setCachedVideoUri(originalUrl)
+            setHasVideoCache(false)
+            return
+        }
 
         setIsLoadingCache(true)
 
@@ -102,14 +116,77 @@ export default function Container({
         } finally {
             setIsLoadingCache(false)
         }
-    }, [momentData.id, momentData.midia, loadVideoFromCache])
+    }, [momentData.id, momentData.midia, loadVideoFromCache, disableCache])
 
-    // Carregar vídeo quando o componente montar ou quando ganhar foco
+    // Pré-carregar thumbnails e vídeos adjacentes
     useEffect(() => {
-        if (isFocused && momentData.midia.content_type === "VIDEO") {
+        if (disableCache || !cacheManager || !chunkManager || !moments) return
+
+        const currentId = String(momentData.id)
+        const neighbors = chunkManager.getNeighborIds(currentId, 3)
+
+        // Pré-carregar thumbnails dos vizinhos
+        const thumbnailUrls: string[] = []
+        const videoItems: Array<{ id: string; url: string }> = []
+        const thumbnailItems: Array<{ id: string; url: string }> = []
+
+        neighbors.all.forEach((neighborId) => {
+            const neighborMoment = moments.find((m) => String(m.id) === neighborId)
+            if (neighborMoment) {
+                const thumbnailUrl = neighborMoment.midia.nhd_thumbnail
+                if (thumbnailUrl) {
+                    thumbnailUrls.push(thumbnailUrl)
+                    thumbnailItems.push({ id: neighborId, url: thumbnailUrl })
+                }
+
+                // Pré-carregar vídeos próximos com baixa prioridade
+                if (neighborMoment.midia.content_type === "VIDEO") {
+                    const videoUrl =
+                        neighborMoment.midia.fullhd_resolution ||
+                        neighborMoment.midia.nhd_resolution
+                    if (videoUrl) {
+                        videoItems.push({ id: neighborId, url: videoUrl })
+                    }
+                }
+            }
+        })
+
+        setAdjacentThumbnails(thumbnailUrls)
+
+        // Pré-carregar thumbnails em lote (alta prioridade para os próximos 2, baixa para o resto)
+        if (thumbnailItems.length > 0) {
+            const highPriorityThumbnails = thumbnailItems.slice(0, 2)
+            const lowPriorityThumbnails = thumbnailItems.slice(2)
+
+            cacheManager.preloadThumbnailsBatch(highPriorityThumbnails, "high")
+            if (lowPriorityThumbnails.length > 0) {
+                cacheManager.preloadThumbnailsBatch(lowPriorityThumbnails, "low")
+            }
+        }
+
+        // Pré-carregar vídeos adjacentes com baixa prioridade (não bloqueia o atual)
+        if (videoItems.length > 0) {
+            cacheManager.preloadVideosBatch(videoItems, "low")
+        }
+    }, [momentData.id, cacheManager, chunkManager, moments])
+
+    // Carregar vídeo quando o componente montar (independente do foco para pré-carregar thumbnail)
+    useEffect(() => {
+        if (momentData.midia.content_type === "VIDEO") {
             loadVideoFromCacheOptimized()
         }
-    }, [isFocused, momentData.id, loadVideoFromCacheOptimized])
+    }, [momentData.id, loadVideoFromCacheOptimized])
+
+    // Pré-carregar thumbnail do momento atual com prioridade máxima
+    useEffect(() => {
+        if (!disableCache && cacheManager && momentData.midia.nhd_thumbnail) {
+            cacheManager.preloadThumbnail({
+                id: String(momentData.id),
+                url: momentData.midia.nhd_thumbnail,
+                priority: "high",
+            })
+        }
+    }, [momentData.id, momentData.midia.nhd_thumbnail, cacheManager, disableCache])
 
     async function handleDoublePress() {
         if (momentData.user.id != session.user.id) momentUserActions.handleLikeButtonPressed({})
@@ -121,7 +198,8 @@ export default function Container({
     }
 
     const renderVideoContent = () => {
-        // Agora sempre renderizamos o componente de vídeo, mas controlamos o estado através da prop isFocused
+        // Sempre renderiza o componente de vídeo para pré-carregar a thumbnail
+        // O componente interno controla a visibilidade através da prop isFocused
         return (
             <View style={{ width: momentSize.width, height: momentSize.height }}>
                 <MediaRenderVideo
@@ -141,9 +219,13 @@ export default function Container({
                     }}
                     onVideoEnd={() => {
                         console.log(`Vídeo ${momentData.id} terminou`)
+                        if (onVideoEnd) onVideoEnd()
                     }}
                     onProgressChange={handleProgressChange}
                     isFocused={isFocused}
+                    blurRadius={15}
+                    prefetchAdjacentThumbnails={adjacentThumbnails}
+                    forceMute={forceMute}
                 />
             </View>
         )
@@ -178,31 +260,26 @@ export default function Container({
             <View style={content_container}>
                 <DoubleTapPressable onDoubleTap={handleDoublePress}>
                     <MidiaRender.Root data={contentRender} content_sizes={momentSize}>
-                        {momentData.midia.content_type === "VIDEO" ? (
-                            renderVideoContent()
-                        ) : (
-                            <MidiaRender.RenderImage
-                                isFeed={momentOptions.isFeed}
-                                enableBlur={true}
-                                blur={!isFocused}
-                            />
-                        )}
+                        {renderVideoContent()}
                     </MidiaRender.Root>
                 </DoubleTapPressable>
             </View>
 
             {/* Controles de vídeo (áudio e slider) */}
-            {momentData.midia.content_type === "VIDEO" && isFocused && !commentEnabled && (
-                <>
-                    <View style={sliderContainerStyle}>
-                        <MomentVideoSlider
-                            width={momentSize.width * 0.9}
-                            currentTime={momentVideo.currentTime}
-                            duration={momentVideo.duration}
-                        />
-                    </View>
-                </>
-            )}
+            {momentData.midia.content_type === "VIDEO" &&
+                isFocused &&
+                !commentEnabled &&
+                showSlider && (
+                    <>
+                        <View style={sliderContainerStyle}>
+                            <MomentVideoSlider
+                                width={momentSize.width * 0.9}
+                                currentTime={momentVideo.currentTime}
+                                duration={momentVideo.duration}
+                            />
+                        </View>
+                    </>
+                )}
 
             {!commentEnabled ? (
                 isFocused ? (

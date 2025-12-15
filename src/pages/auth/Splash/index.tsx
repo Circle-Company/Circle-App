@@ -107,7 +107,7 @@ export default function SplashScreen() {
         marginBottom: sizes.margins["1md"],
         width: 190,
         height: 190,
-        borderRadius: 30,
+        borderRadius: 40,
         alignItems: "center",
         justifyContent: "center",
         overflow: "hidden",
@@ -148,7 +148,7 @@ export default function SplashScreen() {
                     />
                     <LogoIcon fill="#edddffff" width={100} height={100} />
                 </View>
-                <Text style={title}>{config.APPLICATION_NAME}aaaaa</Text>
+                <Text style={title}>{config.APPLICATION_NAME}</Text>
                 <Text style={slogan}>{config.APPLICATION_DESCRIPTION}</Text>
             </View>
 

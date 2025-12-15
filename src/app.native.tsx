@@ -19,6 +19,7 @@ import { Provider as NetworkProvider } from "./contexts/network"
 import { Provider as NewMomentProvider } from "./contexts/newMoment"
 import { Provider as PreferencesProvider } from "./contexts/Preferences"
 import { Provider as ProfileProvider } from "./contexts/profile"
+import { CameraProvider } from "./modules/camera/context"
 import { QueryProvider } from "./lib/react-query"
 import { Provider as RedirectProvider } from "./contexts/redirect"
 import Routes from "./routes"
@@ -126,8 +127,10 @@ function App() {
                                         <PreferencesProvider>
                                             <NetworkProvider>
                                                 <GeolocationProvider>
-                                                    <StatusBar />
-                                                    <InnerApp />
+                                                    <CameraProvider>
+                                                        <StatusBar />
+                                                        <InnerApp />
+                                                    </CameraProvider>
                                                 </GeolocationProvider>
                                             </NetworkProvider>
                                         </PreferencesProvider>

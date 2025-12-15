@@ -195,5 +195,9 @@ export const useFeed = () => {
         loadVideoFromCache,
         preloadNextVideo,
         reloadFeed: () => fetch(true),
+        // Expor cacheManager e chunkManager para prefetch otimizado
+        cacheManager: feedOrchestrator?.cacheManager,
+        chunkManager: feedOrchestrator?.chunkManager,
+        moments: feedData,
     }
 }
