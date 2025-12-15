@@ -8,6 +8,7 @@ import picture from "./components/profile-picture"
 import name from "./components/profile-name"
 import description from "./components/profile-description"
 import last_active_at from "./components/profile-last_active_at"
+import name_follow from "./components/profile-name-followers"
 export const Profile = {
     MainRoot: main_root,
     Statistics: {
@@ -19,6 +20,7 @@ export const Profile = {
     Picture: picture,
     ShareButton: share,
     Name: name,
+    NameFollow: name_follow,
     Description: description,
     LastActiveAt: last_active_at,
 }
