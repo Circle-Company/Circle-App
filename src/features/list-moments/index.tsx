@@ -1,5 +1,5 @@
 import React, { useCallback, useRef, useState } from "react"
-import { Animated, RefreshControl, useColorScheme } from "react-native"
+import { Animated, RefreshControl, useColorScheme, PixelRatio } from "react-native"
 import { Loading } from "@/components/loading"
 import { colors } from "@/constants/colors"
 import sizes from "@/constants/sizes"
@@ -8,7 +8,9 @@ import RenderMomentFeed from "./components/feed/render-moment-feed"
 import { EmptyList } from "./components/render-empty_list"
 
 const ITEM_WIDTH = sizes.moment.standart.width
-const MARGIN = -20
+const SPACING = -20
+const SNAP_INTERVAL = ITEM_WIDTH + SPACING
+const INITIAL_PADDING = (sizes.screens.width - ITEM_WIDTH) / 2
 
 type ViewToken = {
     item: any
@@ -57,41 +59,19 @@ const ListMoments = () => {
         useNativeDriver: true,
         listener: (event: any) => {
             const contentOffsetX = event.nativeEvent.contentOffset.x
-            // Calcular o índice central considerando a margem inicial
-            const initialOffset = (sizes.screens.width - ITEM_WIDTH) / 2
-            const newCenterIndex = Math.round(
-                (contentOffsetX + initialOffset) / (ITEM_WIDTH + MARGIN),
-            )
+            const newCenterIndex = Math.round(contentOffsetX / SNAP_INTERVAL)
             const validIndex = Math.max(0, Math.min(newCenterIndex, feedData.length - 1))
 
-            // Só atualizar se o índice mudou
             if (validIndex !== centerIndex && feedData[validIndex]) {
                 setCenterIndex(validIndex)
-
-                // Carregar vídeo do cache quando o usuário navegar manualmente
                 const moment = feedData[validIndex]
                 if (moment) {
                     loadVideoFromCache?.(moment.id)
-                    // Fazer preload do próximo
                     preloadNextVideo?.(validIndex)
                 }
             }
         },
     })
-
-    // Margem inicial para centralizar o primeiro item
-    const initialOffset = (sizes.screens.width - ITEM_WIDTH) / 2
-
-    const container_0 = {
-        marginLeft: initialOffset,
-        marginRight: MARGIN,
-    }
-    const container = {
-        marginRight: MARGIN,
-    }
-    const container_1 = {
-        marginRight: initialOffset,
-    }
 
     const viewabilityConfig = {
         minimumViewTime: 3000,
@@ -127,7 +107,14 @@ const ListMoments = () => {
                 showsHorizontalScrollIndicator={false}
                 viewabilityConfig={viewabilityConfig}
                 scrollEventThrottle={16}
-                snapToInterval={ITEM_WIDTH + MARGIN}
+                snapToInterval={SNAP_INTERVAL}
+                snapToAlignment="start"
+                contentContainerStyle={{ paddingHorizontal: INITIAL_PADDING }}
+                getItemLayout={(_, index) => ({
+                    length: SNAP_INTERVAL,
+                    offset: index * SNAP_INTERVAL,
+                    index,
+                })}
                 onViewableItemsChanged={onViewableItemsChanged.current}
                 decelerationRate="fast"
                 maxToRenderPerBatch={5} // Renderizar mais items para cache
@@ -161,45 +148,34 @@ const ListMoments = () => {
                 }}
                 renderItem={({ item, index }) => {
                     const focusedItem = index === centerIndex
-                    const container_style =
-                        index === 0
-                            ? container_0
-                            : index + 1 === feedData.length
-                              ? container_1
-                              : container
-
-                    // Calcular a posição do item no scroll para animações suaves
-                    const scrollPosition = index * (ITEM_WIDTH + MARGIN)
+                    const scrollPosition = index * SNAP_INTERVAL
 
                     const inputRange = [
-                        scrollPosition - (ITEM_WIDTH + MARGIN),
+                        scrollPosition - SNAP_INTERVAL,
                         scrollPosition,
-                        scrollPosition + (ITEM_WIDTH + MARGIN),
+                        scrollPosition + SNAP_INTERVAL,
                     ]
 
-                    // Interpolar a escala baseada no scroll
                     const scale = scrollX.interpolate({
                         inputRange,
                         outputRange: [0.85, 1, 0.85],
                         extrapolate: "clamp",
                     })
 
-                    // Interpolar a opacidade
                     const opacity = scrollX.interpolate({
                         inputRange,
-                        outputRange: [0.7, 1, 0.7],
+                        outputRange: [0.95, 1, 0.95],
                         extrapolate: "clamp",
                     })
 
                     return (
                         <Animated.View
-                            style={[
-                                container_style,
-                                {
-                                    transform: [{ scale }],
-                                    opacity,
-                                },
-                            ]}
+                            style={{
+                                width: ITEM_WIDTH,
+                                marginRight: SPACING,
+                                transform: [{ scale }],
+                                opacity,
+                            }}
                             key={item.unique_id}
                         >
                             <RenderMomentFeed
