@@ -29,6 +29,9 @@ type AnimatedScrollViewProps = {
     endRefreshAnimationDelay?: number
     showRefreshSpinner?: boolean
     CustomRefreshIcon?: React.ComponentType // Propriedade para customização do ícone de refresh
+    elasticEffect?: boolean // NOVO: controla o efeito elástico/bounce
+    onScrollChange?: (hasScrolled: boolean) => void // Callback quando scroll muda
+    scrollThreshold?: number // Threshold para considerar que houve scroll
 }
 
 export function AnimatedVerticalScrollView({
@@ -39,8 +42,11 @@ export function AnimatedVerticalScrollView({
     handleRefresh,
     endRefreshAnimationDelay = 200,
     onEndReachedThreshold,
-    showRefreshSpinner = true,
+    showRefreshSpinner = false,
     CustomRefreshIcon,
+    elasticEffect = true, // padrão: ativado
+    onScrollChange,
+    scrollThreshold = 10,
 }: AnimatedScrollViewProps) {
     const isDarkMode = useColorScheme() === "dark"
     const scrollPosition = useSharedValue(0)
@@ -60,6 +66,12 @@ export function AnimatedVerticalScrollView({
             gradientColors.value = {
                 startColor: `rgba(0, 0, 255, ${Math.min(1, event.contentOffset.y / 150)})`,
                 endColor: `rgba(0, 0, 0, ${Math.min(1, event.contentOffset.y / 150)})`,
+            }
+
+            // Notificar mudança de scroll se callback fornecido
+            if (onScrollChange) {
+                const hasScrolled = event.contentOffset.y > scrollThreshold
+                runOnJS(onScrollChange)(hasScrolled)
             }
         },
     })
@@ -211,6 +223,8 @@ export function AnimatedVerticalScrollView({
                     onScroll={scrollHandler}
                     scrollEventThrottle={16}
                     showsVerticalScrollIndicator={false}
+                    bounces={elasticEffect} // iOS
+                    overScrollMode={elasticEffect ? "always" : "never"} // Android
                     onScrollEndDrag={({ nativeEvent }) => {
                         if (
                             nativeEvent.layoutMeasurement.height + nativeEvent.contentOffset.y >=
