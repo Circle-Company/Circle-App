@@ -11,6 +11,7 @@ import User from "../../assets/icons/svgs/@3.svg"
 import UserOutline from "../../assets/icons/svgs/@.svg"
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs"
 import sizes from "../../constants/sizes"
+import Linear
 
 const BottomTab = createBottomTabNavigator()
 
