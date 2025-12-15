@@ -28,6 +28,7 @@ export default function PasswordInput({ type, onPasswordValidated }: PasswordInp
     const [statusMessage, setStatusMessage] = useState("")
     const [showStatusMessage, setShowStatusMessage] = useState(false)
     const [isVisible, setIsVisible] = useState(false)
+    const [focused, setFocused] = useState(false)
 
     const inputRef = useRef<TextInput>(null)
     const inputWidth = sizes.screens.width - sizes.paddings["1lg"] * 2
@@ -42,6 +43,7 @@ export default function PasswordInput({ type, onPasswordValidated }: PasswordInp
     const lockBounce = useRef(new Animated.Value(1)).current
 
     const handleFocus = () => {
+        setFocused(true)
         Animated.parallel([
             Animated.timing(scaleAnim, {
                 toValue: 1.03,
@@ -58,6 +60,7 @@ export default function PasswordInput({ type, onPasswordValidated }: PasswordInp
     }
 
     const handleBlur = () => {
+        setFocused(false)
         Animated.parallel([
             Animated.timing(scaleAnim, {
                 toValue: 1,
@@ -311,7 +314,10 @@ export default function PasswordInput({ type, onPasswordValidated }: PasswordInp
                             <Pressable
                                 testID="password-toggle-visibility"
                                 onPress={handleVisiblePressed}
-                                style={styles.visibleButtonContainer}
+                                style={[
+                                    styles.visibleButtonContainer,
+                                    { marginRight: focused ? 10 : 0 },
+                                ]}
                             >
                                 {!isVisible ? (
                                     <Eye fill={colors.gray.grey_04} width={14} height={14} />
@@ -319,17 +325,19 @@ export default function PasswordInput({ type, onPasswordValidated }: PasswordInp
                                     <EyeSlash fill={colors.gray.grey_04} width={14} height={14} />
                                 )}
                             </Pressable>
-                            <Pressable
-                                testID="password-toggle-clear"
-                                onPress={handleClearPressed}
-                                style={styles.closeButtonContainer}
-                            >
-                                <XIcon
-                                    fill={colors.gray.grey_04}
-                                    width={sizes.icons["1sm"].width * 0.7}
-                                    height={sizes.icons["1sm"].height * 0.7}
-                                />
-                            </Pressable>
+                            {focused && (
+                                <Pressable
+                                    testID="password-toggle-clear"
+                                    onPress={handleClearPressed}
+                                    style={styles.closeButtonContainer}
+                                >
+                                    <XIcon
+                                        fill={colors.gray.grey_03}
+                                        width={sizes.icons["1sm"].width * 0.7}
+                                        height={sizes.icons["1sm"].height * 0.7}
+                                    />
+                                </Pressable>
+                            )}
                         </>
                     )}
                 </Animated.View>

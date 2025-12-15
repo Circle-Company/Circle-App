@@ -34,7 +34,7 @@ export default function UsernameInput({ type }: UsernameInputProps) {
     const [statusMessage, setStatusMessage] = useState("")
     const [showStatusMessage, setShowStatusMessage] = useState(false)
     const [usernameIsValid, setUsernameIsValid] = useState(false)
-
+    const [focused, setFocused] = useState(false)
     const inputRef = useRef<TextInput>(null)
     const inputWidth = sizes.screens.width - sizes.paddings["1lg"] * 2
 
@@ -49,6 +49,7 @@ export default function UsernameInput({ type }: UsernameInputProps) {
 
     // Handlers para foco
     const handleFocus = () => {
+        setFocused(true)
         Animated.parallel([
             Animated.timing(scaleAnim, {
                 toValue: 1.03,
@@ -65,6 +66,7 @@ export default function UsernameInput({ type }: UsernameInputProps) {
     }
 
     const handleBlur = () => {
+        setFocused(false)
         Animated.parallel([
             Animated.timing(scaleAnim, {
                 toValue: 1,
@@ -298,14 +300,14 @@ export default function UsernameInput({ type }: UsernameInputProps) {
                     placeholderTextColor={String(ColorTheme().textDisabled + "99")}
                 />
                 <Animated.View style={{ flexDirection: "row", opacity: fadeIcons }}>
-                    {username && (
+                    {username && focused && (
                         <Pressable
                             onPress={handleClearPressed}
                             style={closeButtonContainer}
                             testID="username-toggle-clear"
                         >
                             <XIcon
-                                fill={colors.gray.grey_01.toString()}
+                                fill={colors.gray.grey_03}
                                 width={sizes.icons["1sm"].width * 0.7}
                                 height={sizes.icons["1sm"].height * 0.7}
                             />
