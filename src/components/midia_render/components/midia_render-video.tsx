@@ -23,6 +23,8 @@ interface VideoPlayerProps {
     height?: number
     isLoadingCache?: boolean
     momentId?: string
+    forceMute?: boolean
+    prefetchAdjacentThumbnails?: string[]
 }
 
 export default function MediaRenderVideo({
@@ -39,97 +41,80 @@ export default function MediaRenderVideo({
     height,
     isLoadingCache = false,
     momentId,
+    forceMute = false,
+    prefetchAdjacentThumbnails = [],
 }: VideoPlayerProps) {
     const { momentSize } = React.useContext(MomentContext)
-    // Se momentSize não existir, usa width/height das props
     const videoWidth = momentSize?.width ?? width ?? 200
     const videoHeight = momentSize?.height ?? height ?? 200
 
-    // Estados
-    const [isPlaying, setIsPlaying] = useState(autoPlay && isFocused)
-    const [isLoading, setIsLoading] = useState(true)
+    // Estados otimizados
+    const [isPlaying, setIsPlaying] = useState(false)
     const [hasError, setHasError] = useState(false)
     const [currentTime, setCurrentTime] = useState(0)
     const [duration, setDuration] = useState(0)
-    const [thumbnailOpacity] = useState(new Animated.Value(1))
-    const [videoOpacity] = useState(new Animated.Value(1))
-    const [videoLoaded, setVideoLoaded] = useState(false)
-    const [videoReadyToDisplay, setVideoReadyToDisplay] = useState(false)
+    const [showThumbnail, setShowThumbnail] = useState(true)
     const [errorMessage, setErrorMessage] = useState("")
     const videoRef = useRef<Video>(null)
     const retryCount = useRef(0)
     const maxRetries = 2
-    const fadeTimeoutRef = useRef<NodeJS.Timeout | null>(null)
+    const isVideoReadyRef = useRef(false)
 
-    // Usar a thumbnail ou a própria URL do vídeo como fallback para a thumbnail
     const thumbnailSource = thumbnailUri || uri
 
-    // Usar apenas o estado global do MomentContext
     const { session } = React.useContext(PersistedContext)
-    const isMuted = session?.preferences?.content?.muteAudio || false
+    const isMuted = forceMute ? true : session?.preferences?.content?.muteAudio || false
 
-    // Declarações de funções auxiliares como useCallback para evitar problemas de dependências
-    const hideThumbnail = useCallback(() => {
-        // Só esconde a thumbnail se estiver focado, vídeo carregado E pronto para exibir
-        if (isFocused && videoLoaded && videoReadyToDisplay) {
-            // Limpar timeout anterior se existir
-            if (fadeTimeoutRef.current) {
-                clearTimeout(fadeTimeoutRef.current)
-            }
-
-            // Esconder thumbnail instantaneamente - sem animação
-            thumbnailOpacity.setValue(0)
-            console.log('Thumbnail escondida instantaneamente')
-        }
-    }, [thumbnailOpacity, isFocused, videoLoaded, videoReadyToDisplay])
-
-    const resetVideoPosition = useCallback(() => {
-        if (videoRef.current) {
-            videoRef.current.seek(0)
-        }
-    }, [])
-
-    // Monitorar mudanças no estado de foco
+    // Pré-carregar thumbnails adjacentes usando Image.prefetch
     useEffect(() => {
-        if (isFocused) {
-            // Quando volta ao foco, reinicia o vídeo do zero
-            if (videoLoaded && videoReadyToDisplay) {
-                resetVideoPosition()
-                setIsPlaying(true)
-                // Aguarda um pouco para garantir que o vídeo está renderizando
-                fadeTimeoutRef.current = setTimeout(() => {
-                    hideThumbnail()
-                }, 200)
-            }
+        if (prefetchAdjacentThumbnails.length > 0) {
+            prefetchAdjacentThumbnails.forEach((thumbUrl) => {
+                if (thumbUrl) {
+                    Image.prefetch(thumbUrl).catch(() => {
+                        // Silenciar erros de prefetch
+                    })
+                }
+            })
+        }
+    }, [prefetchAdjacentThumbnails])
+
+    // Pré-carregar thumbnail atual com prioridade máxima
+    useEffect(() => {
+        if (thumbnailSource) {
+            Image.prefetch(thumbnailSource).catch(() => {
+                // Silenciar erros de prefetch
+            })
+        }
+    }, [thumbnailSource])
+
+    // Controle de play/pause baseado em foco e autoPlay
+    useEffect(() => {
+        if (isFocused && autoPlay && isVideoReadyRef.current) {
+            setIsPlaying(true)
         } else {
-            // Quando perde o foco, pausa o vídeo e mostra a thumbnail imediatamente
             setIsPlaying(false)
-            setVideoReadyToDisplay(false)
+        }
+    }, [isFocused, autoPlay])
 
-            // Limpar timeout se existir
-            if (fadeTimeoutRef.current) {
-                clearTimeout(fadeTimeoutRef.current)
-                fadeTimeoutRef.current = null
-            }
+    // Reset quando URI muda
+    useEffect(() => {
+        setShowThumbnail(true)
+        isVideoReadyRef.current = false
+        setHasError(false)
+        retryCount.current = 0
+    }, [uri])
 
-            // Garante que a thumbnail seja exibida imediatamente
-            thumbnailOpacity.setValue(1)
-
-            // Para completamente o vídeo quando não está em foco
+    // Reset quando perde foco
+    useEffect(() => {
+        if (!isFocused) {
+            setShowThumbnail(true)
+            isVideoReadyRef.current = false
             if (videoRef.current) {
                 videoRef.current.seek(0)
             }
         }
-    }, [isFocused, videoLoaded, videoReadyToDisplay, resetVideoPosition, hideThumbnail])
+    }, [isFocused])
 
-    // Efeito para notificar sobre mudanças no progresso
-    useEffect(() => {
-        if (onProgressChange && !isLoading && isFocused) {
-            onProgressChange(currentTime, duration)
-        }
-    }, [currentTime, duration, onProgressChange, isLoading, isFocused])
-
-    // Tentar reproduzir novamente após um erro
     const retryPlayback = useCallback(() => {
         if (retryCount.current < maxRetries) {
             console.log(
@@ -139,17 +124,19 @@ export default function MediaRenderVideo({
             )
             retryCount.current += 1
             setHasError(false)
-            setIsLoading(true)
+            setShowThumbnail(true)
+            isVideoReadyRef.current = false
 
-            // Pequeno atraso antes de tentar novamente
             setTimeout(() => {
                 if (videoRef.current) {
                     videoRef.current.seek(0)
-                    setIsPlaying(true)
+                    if (isFocused && autoPlay) {
+                        setIsPlaying(true)
+                    }
                 }
-            }, 1000)
+            }, 500)
         }
-    }, [])
+    }, [isFocused, autoPlay])
 
     const styles = StyleSheet.create({
         container: {
@@ -160,9 +147,8 @@ export default function MediaRenderVideo({
             overflow: "hidden",
             width: videoWidth,
         },
-        errorThumbnail: {
+        absoluteFill: {
             ...StyleSheet.absoluteFillObject,
-            zIndex: 3,
         },
         thumbnail: {
             bottom: 0,
@@ -173,11 +159,6 @@ export default function MediaRenderVideo({
             top: 0,
             width: "100%",
         },
-        thumbnailContainer: {
-            ...StyleSheet.absoluteFillObject,
-            backgroundColor: "transparent",
-            zIndex: isFocused ? 3 : 10, // Aumenta o zIndex quando não está focado
-        },
         video: {
             backgroundColor: "transparent",
             height: "100%",
@@ -185,19 +166,14 @@ export default function MediaRenderVideo({
         },
     })
 
-    // Handlers
+    // Handlers otimizados
     function handleLoad(data: OnLoadData) {
         const cacheStatus = hasVideoCache ? "(CACHE)" : "(REMOTO)"
-        console.log(`Video loaded successfully ${cacheStatus}:`, {
+        console.log(`Video loaded ${cacheStatus}:`, {
             momentId: momentId || "unknown",
             duration: data.duration,
-            uri: uri?.substring(0, 50) + "...",
         })
-        setIsLoading(false)
-        setVideoLoaded(true)
         setDuration(data.duration)
-
-        // Reset retry counter on successful load
         retryCount.current = 0
 
         if (onVideoLoad) {
@@ -206,34 +182,42 @@ export default function MediaRenderVideo({
     }
 
     function handleReadyForDisplay() {
-        console.log('Video ready for display')
-        setVideoReadyToDisplay(true)
+        console.log(`Video ready for display: ${momentId}`)
+        isVideoReadyRef.current = true
 
-        // Aguarda o vídeo estar completamente renderizado antes de esconder a thumbnail
-        if (isFocused && !isLoadingCache) {
-            fadeTimeoutRef.current = setTimeout(() => {
-                hideThumbnail()
-            }, 500) // Delay para garantir que não pisca
+        // Só esconder thumbnail se estiver focado
+        if (isFocused) {
+            // Pequeno delay para garantir que o primeiro frame está renderizado
+            setTimeout(() => {
+                setShowThumbnail(false)
+            }, 100)
+
+            // Garantir que está tocando se autoPlay estiver ativo
+            if (autoPlay) {
+                setIsPlaying(true)
+            }
         }
     }
 
     function handleProgress(data: OnProgressData) {
-        // Só atualiza o progresso se estiver em foco
         if (isFocused) {
             setCurrentTime(data.currentTime)
+            if (onProgressChange) {
+                onProgressChange(data.currentTime, duration)
+            }
         }
     }
 
     function handleError(error: unknown) {
         console.error("Video error:", error)
 
-        // Mensagem de erro mais específica
         let errorMsg = t("Erro ao carregar o vídeo")
 
         if (error && typeof error === "object" && "error" in error) {
-            const videoError = error as { error: { extra: number; what: number } }
+            const videoError = error as {
+                error: { extra: number; what: number }
+            }
 
-            // Erros específicos baseados nos códigos
             if (videoError.error.extra === -1005) {
                 errorMsg = t("Não foi possível acessar o vídeo. Verifique sua conexão.")
             }
@@ -241,64 +225,52 @@ export default function MediaRenderVideo({
 
         setErrorMessage(errorMsg)
         setHasError(true)
-        setIsLoading(false)
+        setShowThumbnail(true)
 
-        // Tentar novamente automaticamente se não excedeu o limite
         if (retryCount.current < maxRetries) {
             retryPlayback()
+        } else {
+            if (onVideoEnd) {
+                onVideoEnd()
+            }
         }
     }
 
     function handleEnd() {
         console.log("Video playback ended")
-        setIsPlaying(false)
+        // NÃO pausar! O repeat={true} faz o loop automaticamente
         if (onVideoEnd) {
             onVideoEnd()
         }
     }
 
-    // Renderização
-    if (hasError) {
-        if (isFocused) {
-            return (
-                <View style={styles.container}>
-                    <Animated.View style={styles.errorThumbnail}>
-                        <Image
-                            source={{ uri: thumbnailSource }}
-                            style={styles.thumbnail}
-                            resizeMode="cover"
-                            blurRadius={blurRadius}
-                        />
-                    </Animated.View>
-                    <MidiaRenderVideoError
-                        message={errorMessage}
-                        onRetry={retryCount.current < maxRetries ? retryPlayback : undefined}
-                    />
-                </View>
-            )
-        } else {
-            // Quando não está focado, mostra apenas a thumbnail sem mensagem de erro
-            return (
-                <View style={styles.container}>
-                    <Image
-                        source={{ uri: thumbnailSource }}
-                        style={styles.thumbnail}
-                        resizeMode="cover"
-                        blurRadius={blurRadius * 0.6}
-                    />
-                </View>
-            )
-        }
+    // Renderização com erro
+    if (hasError && isFocused) {
+        return (
+            <View style={styles.container}>
+                <Image
+                    source={{ uri: thumbnailSource }}
+                    style={styles.thumbnail}
+                    resizeMode="cover"
+                    blurRadius={blurRadius}
+                />
+                <MidiaRenderVideoError
+                    message={errorMessage}
+                    onRetry={retryCount.current < maxRetries ? retryPlayback : undefined}
+                />
+            </View>
+        )
     }
 
+    // Renderização normal
     return (
         <View style={styles.container}>
-            {/* Vídeo - sempre renderizado quando focado e URI válida, visível por baixo da thumbnail */}
-            {isFocused && uri && uri.length > 0 && (
-                <View style={StyleSheet.absoluteFill}>
+            {/* Vídeo - sempre renderizado quando há URI */}
+            {uri && uri.length > 0 && (
+                <View style={styles.absoluteFill}>
                     <Video
                         ref={videoRef}
-                        source={{ uri: uri || "" }}
+                        source={{ uri: uri }}
                         style={styles.video}
                         resizeMode="cover"
                         repeat={true}
@@ -314,27 +286,32 @@ export default function MediaRenderVideo({
                         playInBackground={false}
                         posterResizeMode="cover"
                         poster={thumbnailSource}
+                        bufferConfig={{
+                            minBufferMs: 2500,
+                            maxBufferMs: 5000,
+                            bufferForPlaybackMs: 1000,
+                            bufferForPlaybackAfterRebufferMs: 1500,
+                        }}
+                        maxBitRate={2000000}
+                        reportBandwidth={true}
                     />
                 </View>
             )}
 
-            {/* Thumbnail com efeito de fade - sempre presente, opacidade controlada */}
-            <Animated.View
-                style={[
-                    styles.thumbnailContainer,
-                    {
-                        opacity: thumbnailOpacity,
-                    },
-                ]}
-                pointerEvents="none"
-            >
-                <Image
-                    source={{ uri: thumbnailSource }}
-                    style={styles.thumbnail}
-                    resizeMode="cover"
-                    blurRadius={isFocused ? blurRadius : blurRadius * 0.6}
-                />
-            </Animated.View>
+            {/* Thumbnail - sempre visível até o vídeo estar pronto */}
+            {showThumbnail && (
+                <View style={[styles.absoluteFill, { zIndex: 10 }]} pointerEvents="none">
+                    <Image
+                        source={{ uri: thumbnailSource }}
+                        style={styles.thumbnail}
+                        resizeMode="cover"
+                        blurRadius={isFocused ? blurRadius : blurRadius * 0.6}
+                        fadeDuration={0}
+                        // Cache otimizado
+                        cache="force-cache"
+                    />
+                </View>
+            )}
         </View>
     )
 }
