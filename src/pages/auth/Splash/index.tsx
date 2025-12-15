@@ -107,7 +107,7 @@ export default function SplashScreen() {
         marginBottom: sizes.margins["1md"],
         width: 190,
         height: 190,
-        borderRadius: 30,
+        borderRadius: 40,
         alignItems: "center",
         justifyContent: "center",
         overflow: "hidden",

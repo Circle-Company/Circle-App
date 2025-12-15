@@ -89,18 +89,14 @@ export default function SignInScreen() {
         opacity: 0.4,
     }
     const button_text = {
-        fontSize: fonts.size.body * 0.9,
-        fontFamily: fonts.family.Semibold,
+        fontSize: fonts.size.body,
+        fontFamily: fonts.family["Black-Italic"],
         color:
             signInputUsername && signInputPassword && !loading
-                ? colors.gray.white
+                ? colors.gray.black
                 : isDarkMode
                   ? colors.gray.grey_04 + "90"
                   : colors.gray.grey_04 + "90",
-    }
-    const icon = {
-        marginLeft: sizes.margins["2sm"],
-        top: 0.4,
     }
 
     const errorContainer: StyleProp<ViewStyle> = {
@@ -125,6 +121,86 @@ export default function SignInScreen() {
         textAlign: "center",
         fontStyle: "italic",
     }
+
+    const authErrorKey = React.useMemo(() => {
+        if (!errorMessage) return null
+        const msg = String(errorMessage).toUpperCase()
+
+        // Invalid credentials (case-insensitive and common codes)
+        if (
+            (msg.includes("INVALID") && (msg.includes("PASSWORD") || msg.includes("CREDENTIAL"))) ||
+            msg.includes("INVALID_CREDENTIALS") ||
+            msg.includes("INVALID_LOGIN_CREDENTIALS") ||
+            msg.includes("UNAUTHORIZED") ||
+            msg.includes("401")
+        ) {
+            return "auth.errors.invalidCredentials"
+        }
+
+        // User not found
+        if (
+            (msg.includes("USER") && msg.includes("NOT") && msg.includes("FOUND")) ||
+            msg.includes("USER_NOT_FOUND")
+        ) {
+            return "auth.errors.userNotFound"
+        }
+
+        // Password/Username required
+        if (
+            (msg.includes("PASSWORD") && msg.includes("REQUIRED")) ||
+            msg.includes("PASSWORD_REQUIRED")
+        ) {
+            return "auth.errors.passwordRequired"
+        }
+        if (
+            ((msg.includes("USERNAME") || msg.includes("USER NAME")) && msg.includes("REQUIRED")) ||
+            msg.includes("USERNAME_REQUIRED")
+        ) {
+            return "auth.errors.usernameRequired"
+        }
+
+        // Account status
+        if (msg.includes("LOCK") || msg.includes("ACCOUNT_LOCKED")) {
+            return "auth.errors.accountLocked"
+        }
+        if (msg.includes("DISABLE") || msg.includes("ACCOUNT_DISABLED")) {
+            return "auth.errors.accountDisabled"
+        }
+
+        // Rate limit / too many requests
+        if (
+            msg.includes("TOO MANY") ||
+            msg.includes("TOO_MANY") ||
+            msg.includes("RATE LIMIT") ||
+            msg.includes("RATE_LIMIT") ||
+            msg.includes("TOO MANY REQUESTS") ||
+            msg.includes("429")
+        ) {
+            return "auth.errors.tooManyRequests"
+        }
+
+        // Network/connectivity
+        if (
+            msg.includes("NETWORK") ||
+            msg.includes("TIMEOUT") ||
+            msg.includes("OFFLINE") ||
+            msg.includes("ECONNABORTED") ||
+            msg.includes("REQUEST TIMEOUT") ||
+            msg.includes("REQUEST_TIMEOUT")
+        ) {
+            return "auth.errors.network"
+        }
+
+        return "auth.errors.generic"
+    }, [errorMessage])
+
+    const resolvedErrorText = React.useMemo(() => {
+        if (!errorMessage) return ""
+        const key = authErrorKey || "auth.errors.generic"
+        const translated = t(key)
+        // Fallback: if translation key is missing, show a generic localized title
+        return translated === key ? t("Error") : translated
+    }, [authErrorKey, errorMessage, t])
 
     function handlePress() {
         if (!loading && signInputUsername && signInputPassword) signIn()
@@ -152,10 +228,6 @@ export default function SignInScreen() {
             </View>
 
             <View style={input_container} testID="inputs-container">
-                <Text style={description}>
-                    {t("Chose a name to be your identity in community")}
-                </Text>
-                <Text style={subDescription}>{t("You can't change it later.")}</Text>
                 <View style={{ marginBottom: sizes.margins["1md"] }}>
                     <UsernameInput type="signIn" />
                 </View>
@@ -165,7 +237,7 @@ export default function SignInScreen() {
             {errorMessage && (
                 <View testID="error-container" style={errorContainer}>
                     <Text testID="error-message" style={errorText}>
-                        {t(errorMessage)}
+                        {resolvedErrorText}
                     </Text>
                 </View>
             )}
@@ -175,7 +247,7 @@ export default function SignInScreen() {
                 action={handlePress}
                 backgroundColor={
                     signInputPassword && signInputUsername && !loading
-                        ? ColorTheme().primary.toString()
+                        ? colors.gray.white
                         : ColorTheme().backgroundDisabled.toString()
                 }
             >
@@ -188,26 +260,27 @@ export default function SignInScreen() {
                             backgroundColor: "#00000000",
                         }}
                     >
-                        <Text style={[button_text, { marginRight: 4 }]}>{t("Loading")}</Text>
+                        <Text
+                            style={[
+                                button_text,
+                                {
+                                    marginRight: 4,
+                                    color:
+                                        signInputPassword && signInputUsername && !loading
+                                            ? colors.gray.black
+                                            : colors.gray.grey_05,
+                                },
+                            ]}
+                        >
+                            {t("Loading")}
+                        </Text>
                         <Loading.ActivityIndicator size={15} />
                     </View>
                 ) : (
                     <>
                         <Text style={button_text} testID="handle-submit-text">
-                            {t("Enter Now")}
+                            {t("Enter on Circle")}
                         </Text>
-                        <Icon
-                            style={icon}
-                            fill={String(
-                                signInputPassword && signInputUsername && !loading
-                                    ? colors.gray.white
-                                    : isDarkMode
-                                      ? colors.gray.grey_04 + "90"
-                                      : colors.gray.grey_04 + "90",
-                            )}
-                            width={17}
-                            height={17}
-                        />
                     </>
                 )}
             </ButtonStandart>
