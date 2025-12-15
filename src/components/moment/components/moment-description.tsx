@@ -49,7 +49,7 @@ export default function Description({ displayOnMoment = true }: MomentDescriptio
 
     return (
         <View style={container}>
-            <Text style={descriptionStyle}>{momentData.description}oieeeee</Text>
+            <Text style={descriptionStyle}>{momentData.description}</Text>
         </View>
     )
 }
