@@ -79,43 +79,31 @@ const CaptureButtonComponent: React.FC<Props> = ({
         isRecording.current = false
         cancelAnimation(recordingProgress)
         if (props.onRecordingStop) props.onRecordingStop()
-        console.log("stopped recording video!")
     }, [recordingProgress, props.onRecordingStop])
+
     const stopRecording = React.useCallback(async () => {
-        try {
-            if (camera.current == null) throw new Error("Camera ref is null!")
-
-            console.log("calling stopRecording()...")
-            await camera.current.stopRecording()
-            console.log("called stopRecording()!")
-        } catch (e) {
-            console.error("failed to stop recording!", e)
-        }
+        if (camera.current == null) throw new Error("Camera ref is null!")
+        await camera.current.stopRecording()
     }, [camera])
-    const startRecording = React.useCallback(() => {
-        try {
-            if (camera.current == null) throw new Error("Camera ref is null!")
-            if (props.onRecordingStart) props.onRecordingStart()
 
-            console.log("calling startRecording()...")
-            camera.current.startRecording({
-                flash: flash,
-                onRecordingError: (error) => {
-                    console.error("Recording failed!", error)
-                    onStoppedRecording()
-                },
-                onRecordingFinished: (video) => {
-                    console.log(`Recording successfully finished! ${video.path}`)
-                    onMediaCaptured(video, "video")
-                    onStoppedRecording()
-                },
-            })
-            // TODO: wait until startRecording returns to actually find out if the recording has successfully started
-            console.log("called startRecording()!")
-            isRecording.current = true
-        } catch (e) {
-            console.error("failed to start recording!", e, "camera")
-        }
+    const startRecording = React.useCallback(() => {
+        if (camera.current == null) throw new Error("Camera ref is null!")
+        if (props.onRecordingStart) props.onRecordingStart()
+
+        camera.current.startRecording({
+            fileType: "mp4",
+            flash: flash,
+            onRecordingError: (error) => {
+                console.error("Recording failed!", error)
+                onStoppedRecording()
+            },
+            onRecordingFinished: (video) => {
+                console.log(`Recording successfully finished! ${video.path}`)
+                onMediaCaptured(video, "video")
+                onStoppedRecording()
+            },
+        })
+        isRecording.current = true
     }, [camera, flash, onMediaCaptured, onStoppedRecording, props.onRecordingStart])
     //#endregion
 

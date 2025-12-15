@@ -80,20 +80,6 @@ export function CameraModule(): React.ReactElement | null {
                             headerLeft: () => <HeaderLeft />,
                         }}
                     />
-
-                    <Stack.Screen
-                        name="MediaDescriptionPage"
-                        component={MediaDescriptionPage}
-                        options={{
-                            animation: "none",
-                            headerTitle: t("Add description"),
-                            headerTitleAlign: "center",
-                            headerTitleStyle: { fontFamily: fonts.family["Bold-Italic"] },
-                            headerStyle: HeaderStyle,
-                            headerTintColor: String(ColorTheme().text),
-                            headerLeft: () => <HeaderLeft />,
-                        }}
-                    />
                 </Stack.Navigator>
             </GestureHandlerRootView>
         </CameraProvider>

@@ -1,26 +1,24 @@
-import IonIcon from "@expo/vector-icons/Ionicons"
+import UploadIcon from "@/assets/icons/svgs/arrow_up.svg"
 import { useIsFocused } from "@react-navigation/core"
 import type { NativeStackScreenProps } from "@react-navigation/native-stack"
 import React, { useCallback, useMemo, useState, useContext } from "react"
 import type { ImageLoadEventData, NativeSyntheticEvent } from "react-native"
 import { StyleSheet, View, Text, Keyboard, Animated, Easing } from "react-native"
-import { PressableOpacity } from "react-native-pressable-opacity"
 import type { OnLoadData, OnVideoErrorData } from "react-native-video"
 import Video from "react-native-video"
+import { useNotifications } from "react-native-notificated"
+import { CommonActions } from "@react-navigation/native"
 import sizes from "@/constants/sizes"
-import { StatusBarBlurBackground } from "../components/StatusBarBlurBackground"
 import { SAFE_AREA_PADDING } from "../constants"
 import { useIsForeground } from "../hooks/useIsForeground"
 import type { Routes } from "../routes"
 import { useCameraContext } from "../context"
 import CameraVideoSlider from "../components/CameraVideoSlider"
-import { colors } from "@/constants/colors"
+import ColorTheme, { colors } from "@/constants/colors"
 import fonts from "@/constants/fonts"
 import ButtonStandart from "@/components/buttons/button-standart"
 import LanguageContext from "@/contexts/Preferences/language"
 import { ViewStyle } from "react-native"
-import DescriptionInput from "../components/descriptionInput"
-import NewMomentContext from "@/contexts/newMoment"
 import { TextInput } from "react-native"
 
 type OnLoadImage = NativeSyntheticEvent<ImageLoadEventData>
@@ -29,16 +27,31 @@ const isVideoOnLoadEvent = (event: OnLoadData | OnLoadImage): event is OnLoadDat
 
 type Props = NativeStackScreenProps<Routes, "MediaPage">
 export function MediaPage({ navigation, route }: Props): React.ReactElement {
-    const { path, type } = route.params
-    const [hasMediaLoaded, setHasMediaLoaded] = useState(false)
+    const { description, setDescription, upload, uploadError, isUploading, reset, video } =
+        useCameraContext()
+    const [isVideoLoading, setIsVideoLoading] = useState(true)
+
+    // Get video URI from navigation params
+    const videoUri = route.params?.videoUri
+    const videoWidth = route.params?.width
+    const videoHeight = route.params?.height
+
+    // Log video path for debugging
+    React.useEffect(() => {
+        console.log("📹 MediaPage montado - Video URI (params):", videoUri)
+        console.log("📹 Video path (context):", video?.path)
+        console.log("📹 Video info completo:", video)
+        if (!videoUri && !video?.path) {
+            console.error("❌ ERRO: Nenhum URI de vídeo disponível!")
+        }
+    }, [videoUri, video])
     const isForeground = useIsForeground()
     const isScreenFocused = useIsFocused()
     const isVideoPaused = !isForeground || !isScreenFocused
     const [videoDuration, setVideoDuration] = useState(0)
     const [currentTime, setCurrentTime] = useState(0)
     const { t } = React.useContext(LanguageContext)
-    const [showDescriptionInput, setShowDescriptionInput] = useState(false)
-    const { description, setDescription } = useContext(NewMomentContext)
+    const { notify } = useNotifications()
 
     // Keyboard animation (linear): scale + translateY compensation to keep top anchored (same as share.description)
     const keyboardAnim = React.useRef(new Animated.Value(0)).current
@@ -155,12 +168,6 @@ export function MediaPage({ navigation, route }: Props): React.ReactElement {
         color: colors.gray.black,
     }
 
-    const description_text = {
-        fontSize: fonts.size.body * 0.9,
-        fontFamily: fonts.family["Semibold"],
-        color: colors.gray.grey_04,
-    }
-
     const buttonsContainer: ViewStyle = {
         marginVertical: sizes.margins["1md"] * 0.6,
         alignSelf: "center",
@@ -169,71 +176,92 @@ export function MediaPage({ navigation, route }: Props): React.ReactElement {
         gap: 5,
     }
 
-    const handlePress = () => {}
+    async function handlePress() {
+        if (isUploading) return
+
+        Keyboard.dismiss()
+        const result = await upload()
+
+        if (result.ok) {
+            notify("toast", {
+                params: {
+                    description: t("Moment Has been uploaded with success"),
+                    title: t("Moment Created"),
+                    icon: (
+                        <UploadIcon
+                            fill={colors.green.green_05.toString()}
+                            width={15}
+                            height={15}
+                        />
+                    ),
+                },
+            })
+
+            // Reset camera context
+            reset()
+
+            // Navigate to home (Moments tab)
+            navigation.dispatch(
+                CommonActions.reset({
+                    index: 0,
+                    routes: [{ name: "Moments" }],
+                }),
+            )
+        } else {
+            notify("tiny", {
+                params: {
+                    backgroundColor: colors.red.red_05.toString(),
+                    title: result.error,
+                    titleColor: colors.gray.white,
+                    icon: null,
+                },
+            })
+        }
+    }
     const onMediaLoad = useCallback((event: OnLoadData | OnLoadImage) => {
+        console.log("🎬 onMediaLoad chamado!")
+        setIsVideoLoading(false)
         if (isVideoOnLoadEvent(event)) {
             setVideoDuration(event.duration)
             setCurrentTime(0)
             console.log(
-                `Video loaded. Size: ${event.naturalSize.width}x${event.naturalSize.height} (${event.naturalSize.orientation}, ${event.duration} seconds)`,
+                `✅ Video carregado! Size: ${event.naturalSize.width}x${event.naturalSize.height} (${event.naturalSize.orientation}, ${event.duration} seconds)`,
             )
         } else {
             const source = event.nativeEvent.source
-            console.log(`Image loaded. Size: ${source.width}x${source.height}`)
+            console.log(`✅ Image carregada! Size: ${source.width}x${source.height}`)
         }
-    }, [])
-    const onMediaLoadEnd = useCallback(() => {
-        console.log("media has loaded.")
-        setHasMediaLoaded(true)
     }, [])
     const [videoError, setVideoError] = useState<string | null>(null)
 
-    const onMediaLoadError = useCallback((error: OnVideoErrorData) => {
-        console.error("Erro ao exibir vídeo:", error, source)
-        setVideoError(
-            "Não foi possível reproduzir o vídeo. O formato ou resolução pode ser incompatível.",
-        )
-    }, [])
-
-    // Usar buffer do contexto se disponível
-    const { videoBuffer } = useCameraContext()
-    const bufferData = useMemo(() => {
-        if (videoBuffer) {
-            try {
-                return JSON.parse(videoBuffer)
-            } catch {
-                return null
-            }
-        }
-        return null
-    }, [videoBuffer])
-
-    const source = useMemo(() => {
-        if (bufferData && bufferData.path) {
-            return { uri: `file://${bufferData.path}` }
-        }
-        return { uri: `file://${path}` }
-    }, [bufferData, path])
-
-    const videoStyle = useMemo(
-        () => ({
-            width: bufferData && bufferData.width ? bufferData.width : sizes.moment.full.width,
-            height: bufferData && bufferData.height ? bufferData.height : sizes.moment.full.height,
-            borderRadius: 25,
-            overflow: "hidden",
-        }),
-        [bufferData],
+    const onMediaLoadError = useCallback(
+        (error: OnVideoErrorData) => {
+            console.error("❌ Erro ao exibir vídeo:", error)
+            console.error("❌ Video URI com erro:", videoUri || video?.path)
+            setIsVideoLoading(false)
+            setVideoError(
+                "Não foi possível reproduzir o vídeo. O formato ou resolução pode ser incompatível.",
+            )
+        },
+        [videoUri, video?.path],
     )
 
-    const screenStyle = useMemo(() => ({ opacity: hasMediaLoaded ? 1 : 0 }), [hasMediaLoaded])
+    // Use videoUri from params, fallback to context
+    const displayUri = videoUri || video?.path
 
     return (
-        <View style={[styles.container, screenStyle]}>
+        <View style={styles.container}>
             <Animated.View style={[styles.cameraContainer, animatedScaleStyle]}>
-                {type === "video" && !videoError && (
+                {!displayUri ? (
+                    <View style={styles.cameraContainer}>
+                        <Text style={{ color: "white", fontSize: 16 }}>
+                            ❌ Nenhum vídeo encontrado
+                        </Text>
+                    </View>
+                ) : !videoError ? (
                     <>
                         <Video
-                            source={source}
+                            source={{ uri: displayUri }}
                             style={styles.cameraContainer}
                             paused={isVideoPaused}
                             resizeMode="cover"
@@ -241,7 +269,6 @@ export function MediaPage({ navigation, route }: Props): React.ReactElement {
                             controls={false}
                             playWhenInactive={true}
                             ignoreSilentSwitch="ignore"
-                            onReadyForDisplay={onMediaLoadEnd}
                             onLoad={onMediaLoad}
                             onError={onMediaLoadError}
                             onProgress={({ currentTime }) => setCurrentTime(currentTime)}
@@ -267,7 +294,7 @@ export function MediaPage({ navigation, route }: Props): React.ReactElement {
                                     numberOfLines={1}
                                     placeholder={t("Add description") + "..."}
                                     maxLength={100}
-                                    value={description}
+                                    value={description!}
                                     textAlignVertical="center"
                                     multiline={false}
                                     returnKeyType="done"
@@ -275,6 +302,8 @@ export function MediaPage({ navigation, route }: Props): React.ReactElement {
                                     autoCapitalize="none"
                                     textContentType="none"
                                     autoCorrect={false}
+                                    autoFocus={false}
+                                    selectionColor={ColorTheme().primary}
                                     onChangeText={(value) => setDescription(value)}
                                 />
                             </Animated.View>
@@ -285,8 +314,7 @@ export function MediaPage({ navigation, route }: Props): React.ReactElement {
                             currentTime={currentTime}
                         />
                     </>
-                )}
-                {videoError && (
+                ) : (
                     <View
                         style={[
                             styles.cameraContainer,
@@ -310,11 +338,17 @@ export function MediaPage({ navigation, route }: Props): React.ReactElement {
                     </View>
                 )}
             </Animated.View>
-            {showDescriptionInput && <DescriptionInput />}
             <View style={buttonsContainer}>
                 <Text style={styles.labelTitle}>
                     {t("This description helps deliver your Moment to the Feed.")}
                 </Text>
+                {uploadError && (
+                    <Text
+                        style={[styles.labelTitle, { color: colors.red.red_05, marginBottom: 10 }]}
+                    >
+                        {uploadError}
+                    </Text>
+                )}
                 <ButtonStandart
                     testID="handle-submit"
                     margins={false}
@@ -324,7 +358,7 @@ export function MediaPage({ navigation, route }: Props): React.ReactElement {
                     style={{ paddingHorizontal: 35, marginTop: 20 }}
                 >
                     <Text style={button_text} testID="handle-submit-text">
-                        {t("Share moment")}
+                        {isUploading ? t("Sharing...") : t("Share moment")}
                     </Text>
                 </ButtonStandart>
             </View>
@@ -354,10 +388,12 @@ const styles = StyleSheet.create({
         marginTop: 16,
     },
     labelTitle: {
+        marginTop: 10,
+        width: sizes.screens.width * 0.8,
+        alignSelf: "center",
         color: colors.gray.grey_04,
-        fontSize: fonts.size.body * 0.7,
+        fontSize: 10,
         textAlign: "center",
-        marginBottom: sizes.margins["1sm"],
     },
     cameraContainer: {
         width: sizes.moment.full.width * 0.95,
