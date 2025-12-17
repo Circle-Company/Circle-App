@@ -3,7 +3,7 @@ import EditIcon from "@/assets/icons/svgs/camera.svg"
 import { useNavigation } from "@react-navigation/native"
 import React from "react"
 import { Image, StatusBar, useColorScheme, View } from "react-native"
-import RNFS from "react-native-fs"
+import * as FileSystem from "expo-file-system"
 import { ImagePickerResponse, launchImageLibrary } from "react-native-image-picker"
 import ButtonStandart from "../../../components/buttons/button-standart"
 import { Loading } from "../../../components/loading"
@@ -83,7 +83,9 @@ export default function ProfilePictureScreen() {
     async function uploadMoment() {
         if (selectedImage) {
             const IMG = selectedImage.assets[0]
-            const imageBase64 = await RNFS.readFile(IMG.uri, "base64")
+            const imageBase64 = await FileSystem.readAsStringAsync(IMG.uri, {
+                encoding: FileSystem.EncodingType.Base64,
+            })
             await api
                 .put(
                     "/account/edit/profile-picture",

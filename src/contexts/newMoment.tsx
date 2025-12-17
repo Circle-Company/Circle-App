@@ -6,7 +6,7 @@ import CheckIcon from "@/assets/icons/svgs/check_circle.svg"
 import { MemoryObjectProps } from "@/components//memory/memory-types"
 import { useNavigation } from "@react-navigation/native"
 import React from "react"
-import RNFS from "react-native-fs"
+import * as FileSystem from "expo-file-system"
 import { useNotifications } from "react-native-notificated"
 import { colors } from "../constants/colors"
 import api from "../services/Api"
@@ -102,7 +102,9 @@ export function Provider({ children }: NewMomentProviderProps) {
     async function uploadMoment() {
         if (selectedImage) {
             const IMG = selectedImage.assets[0]
-            const imageBase64 = await RNFS.readFile(IMG.uri, "base64")
+            const imageBase64 = await FileSystem.readAsStringAsync(IMG.uri, {
+                encoding: FileSystem.EncodingType.Base64,
+            })
             await api
                 .post(
                     "/moment/create",

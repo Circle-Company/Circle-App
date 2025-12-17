@@ -37,7 +37,6 @@ import type { Routes } from "../routes"
 import { useCameraContext } from "../context"
 import LanguageContext from "@/contexts/Preferences/language"
 import { colors } from "@/constants/colors"
-import RNFS from "react-native-fs"
 
 const ReanimatedCamera = Reanimated.createAnimatedComponent(Camera)
 Reanimated.addWhitelistedNativeProps({
