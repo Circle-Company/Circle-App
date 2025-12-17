@@ -1,6 +1,5 @@
 import React from "react"
-import Geolocation, { GeoError } from "react-native-geolocation-service"
-import { PERMISSIONS, RESULTS, check, request } from "react-native-permissions"
+import * as Location from "expo-location"
 import { apiRoutes } from "../services/Api"
 import PersistedContext from "./Persisted"
 
@@ -28,14 +27,19 @@ export function Provider({ children }: GeolocationProviderProps) {
 
     // Função para solicitar permissão
     const requestLocationPermission = async (): Promise<boolean> => {
-        const permission = PERMISSIONS.ANDROID.ACCESS_FINE_LOCATION
-        const result = await check(permission)
+        try {
+            const { status: foregroundStatus } = await Location.requestForegroundPermissionsAsync()
 
-        if (result === RESULTS.DENIED) {
-            const requestResult = await request(permission)
-            return requestResult === RESULTS.GRANTED
+            if (foregroundStatus !== "granted") {
+                console.warn("Permissão de localização negada")
+                return false
+            }
+
+            return true
+        } catch (error) {
+            console.error("Erro ao solicitar permissão de localização:", error)
+            return false
         }
-        return result === RESULTS.GRANTED
     }
 
     // Função para atualizar a localização do usuário
@@ -65,35 +69,31 @@ export function Provider({ children }: GeolocationProviderProps) {
         const hasPermission = await requestLocationPermission()
         if (!hasPermission) throw new Error("Location permission is not granted")
 
-        return new Promise<void>((resolve, reject) => {
-            setIsUpdating(true)
-            Geolocation.getCurrentPosition(
-                async (position) => {
-                    const { latitude, longitude } = position.coords
-                    try {
-                        await updateUserCoordinates({ latitude, longitude })
-                        setIsUpdating(false)
-                        resolve()
-                    } catch (error) {
-                        setIsUpdating(false)
-                        reject(error)
-                    }
-                },
-                (error: GeoError) => {
-                    setIsUpdating(false)
-                    console.error("Error getting location:", error)
-                    reject(error)
-                },
-                { enableHighAccuracy: true, timeout: 15000, maximumAge: 10000 },
-            )
-        })
+        setIsUpdating(true)
+
+        try {
+            const location = await Location.getCurrentPositionAsync({
+                accuracy: Location.Accuracy.High,
+                timeInterval: 15000,
+                distanceInterval: 0,
+            })
+
+            const { latitude, longitude } = location.coords
+
+            await updateUserCoordinates({ latitude, longitude })
+            setIsUpdating(false)
+        } catch (error) {
+            setIsUpdating(false)
+            console.error("Error getting location:", error)
+            throw error
+        }
     }
 
     const updateUserLocation = async (): Promise<void> => {
         if (!session.user.id) {
             throw new Error("User ID is not available")
         }
-        UseUpdateUserLocation()
+        await UseUpdateUserLocation()
     }
 
     // Inicia o intervalo para atualização a cada 5 minutos
