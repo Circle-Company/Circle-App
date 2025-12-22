@@ -1,59 +1,57 @@
-import { NativeTabs, Icon, Label } from 'expo-router/unstable-native-tabs';
-import React from 'react';
-import { Platform, DynamicColorIOS } from 'react-native';
-import ColorTheme, { colors } from '@/constants/colors';
-import Fonts from '@/constants/fonts';
+import { NativeTabs, Icon, Label } from "expo-router/unstable-native-tabs"
+import React from "react"
+import { Platform, DynamicColorIOS } from "react-native"
+import ColorTheme, { colors } from "@/constants/colors"
+import Fonts from "@/constants/fonts"
+import LanguageContext from "@/contexts/Preferences/language"
 
 export default function TabsLayout() {
+    const { t } = React.useContext(LanguageContext)
     const tintColor = Platform.select({
         ios: DynamicColorIOS({
-            dark: 'white',
-            light: ColorTheme().primary,
+            dark: colors.purple.purple_04,
+            light: colors.purple.purple_05,
         }),
-        android: ColorTheme().primary,
-    });
+    })
 
     const labelColor = Platform.select({
         ios: DynamicColorIOS({
-            dark: 'white',
-            light: 'black',
+            dark: "white",
+            light: "black",
         }),
-        android: ColorTheme().text,
-    });
+    })
 
     return (
         <NativeTabs
             tintColor={tintColor}
             labelStyle={{
                 color: labelColor,
-                fontFamily: Fonts.family['Bold-Italic'],
+                fontFamily: Fonts.family["Bold-Italic"],
                 fontSize: Fonts.size.body * 0.9,
             }}
             minimizeBehavior="onScrollDown"
+            labelVisibilityMode="unlabeled"
+            titlePositionAdjustment={{ vertical: 10 }}
         >
-            <NativeTabs.Trigger name="moments">
-                <Label hidden />
-                <Icon
-                    sf={{ default: 'house', selected: 'house.fill' }}
-                    src={require('@/assets/icons/pngs/moments.png')}
-                />
+            <NativeTabs.Trigger
+                name="moments"
+                options={{
+                    backgroundColor: "#F2F",
+                }}
+            >
+                <Label selectedStyle={{ color: tintColor }}>{t("Moments")}</Label>
+                <Icon sf={{ default: "bolt", selected: "bolt.fill" }} />
             </NativeTabs.Trigger>
 
             <NativeTabs.Trigger name="create">
-                <Label hidden />
-                <Icon
-                    sf={{ default: 'camera', selected: 'camera.fill' }}
-                    src={require('@/assets/icons/pngs/camera.png')}
-                />
+                <Label selectedStyle={{ color: tintColor }}>{t("Create")}</Label>
+                <Icon sf={{ default: "camera", selected: "camera.fill" }} />
             </NativeTabs.Trigger>
 
             <NativeTabs.Trigger name="you">
-                <Label hidden />
-                <Icon
-                    sf={{ default: 'person', selected: 'person.fill' }}
-                    src={require('@/assets/icons/pngs/at.png')}
-                />
+                <Label selectedStyle={{ color: tintColor }}>{t("You")}</Label>
+                <Icon sf={{ default: "person.circle", selected: "person.circle.fill" }} />
             </NativeTabs.Trigger>
         </NativeTabs>
-    );
+    )
 }

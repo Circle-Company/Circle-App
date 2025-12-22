@@ -5,7 +5,7 @@
  * to Expo Router. It maps old navigation patterns to new Expo Router patterns.
  */
 
-import { router } from 'expo-router';
+import { router } from "expo-router"
 
 /**
  * Navigation helpers that mimic React Navigation API
@@ -18,9 +18,9 @@ export const navigation = {
      */
     navigate: (route: string, params?: Record<string, any>) => {
         if (params) {
-            router.push({ pathname: route as any, params });
+            router.push({ pathname: route as any, params })
         } else {
-            router.push(route as any);
+            router.push(route as any)
         }
     },
 
@@ -29,9 +29,9 @@ export const navigation = {
      */
     push: (route: string, params?: Record<string, any>) => {
         if (params) {
-            router.push({ pathname: route as any, params });
+            router.push({ pathname: route as any, params })
         } else {
-            router.push(route as any);
+            router.push(route as any)
         }
     },
 
@@ -39,7 +39,7 @@ export const navigation = {
      * Go back to the previous screen
      */
     goBack: () => {
-        router.back();
+        router.back()
     },
 
     /**
@@ -47,9 +47,9 @@ export const navigation = {
      */
     replace: (route: string, params?: Record<string, any>) => {
         if (params) {
-            router.replace({ pathname: route as any, params });
+            router.replace({ pathname: route as any, params })
         } else {
-            router.replace(route as any);
+            router.replace(route as any)
         }
     },
 
@@ -57,30 +57,30 @@ export const navigation = {
      * Dismiss modal screens
      */
     dismiss: (count?: number) => {
-        router.dismiss(count);
+        router.dismiss(count)
     },
 
     /**
      * Dismiss all screens and return to first screen
      */
     dismissAll: () => {
-        router.dismissAll();
+        router.dismissAll()
     },
 
     /**
      * Check if we can go back
      */
     canGoBack: () => {
-        return router.canGoBack();
+        return router.canGoBack()
     },
 
     /**
      * Check if we can dismiss
      */
     canDismiss: () => {
-        return router.canDismiss();
+        return router.canDismiss()
     },
-};
+}
 
 /**
  * Route mapping from old React Navigation routes to new Expo Router routes
@@ -88,31 +88,38 @@ export const navigation = {
 export const ROUTES = {
     // Auth routes
     AUTH: {
-        INIT: '/(auth)/init',
-        SIGN_IN: '/(auth)/sign-in',
-        SIGN_UP_USERNAME: '/(auth)/sign-up-username',
-        SIGN_UP_PASSWORD: '/(auth)/sign-up-password',
-        SIGN_UP_AGREE: '/(auth)/sign-up-agree',
-        PRIVACY_POLICY: '/(auth)/privacy-policy',
-        TERMS_OF_SERVICE: '/(auth)/terms-of-service',
-        COMMUNITY_GUIDELINES: '/(auth)/community-guidelines',
+        INIT: "/(auth)/init",
+        SIGN_IN: "/(auth)/sign-in",
+        SIGN_UP_USERNAME: "/(auth)/sign-up-username",
+        SIGN_UP_PASSWORD: "/(auth)/sign-up-password",
+        SIGN_UP_AGREE: "/(auth)/sign-up-agree",
+        PRIVACY_POLICY: "/(auth)/privacy-policy",
+        TERMS_OF_SERVICE: "/(auth)/terms-of-service",
+        COMMUNITY_GUIDELINES: "/(auth)/community-guidelines",
     },
 
     // Tab routes
     TABS: {
-        MOMENTS: '/(tabs)/moments',
-        CREATE: '/(tabs)/create',
-        YOU: '/(tabs)/you',
-        YOU_EDIT: '/(tabs)/you/edit',
+        MOMENTS: "/(tabs)/moments",
+        CREATE: "/(tabs)/create",
+        YOU: "/(tabs)/you",
+        YOU_EDIT: "/(tabs)/you/edit",
+    },
+
+    // Camera routes (inside create tab)
+    CAMERA: {
+        INDEX: "/(tabs)/create",
+        PERMISSIONS: "/(tabs)/create/permissions",
+        MEDIA: "/(tabs)/create/media",
     },
 
     // Moment routes
     MOMENT: {
         DETAIL: (id: string) => `/moment/${id}`,
-        NEW_GALLERY: '/moment/new-gallery',
-        NEW_IMAGE: '/moment/new-image',
-        NEW_CAMERA: '/moment/new-camera',
-        NEW_DESCRIPTION: '/moment/new-description',
+        NEW_GALLERY: "/moment/new-gallery",
+        NEW_IMAGE: "/moment/new-image",
+        NEW_CAMERA: "/moment/new-camera",
+        NEW_DESCRIPTION: "/moment/new-description",
     },
 
     // Profile routes
@@ -122,27 +129,27 @@ export const ROUTES = {
 
     // Settings routes
     SETTINGS: {
-        INDEX: '/settings',
-        PROFILE_PICTURE: '/settings/profile-picture',
-        DESCRIPTION: '/settings/description',
-        FOLLOWINGS: '/settings/followings',
-        NAME: '/settings/name',
-        PASSWORD: '/settings/password',
-        PRIVACY_POLICY: '/settings/privacy-policy',
-        TERMS_OF_SERVICE: '/settings/terms-of-service',
-        COMMUNITY_GUIDELINES: '/settings/community-guidelines',
-        PUSH_NOTIFICATIONS: '/settings/push-notifications',
-        ALL_MOMENTS: '/settings/all-moments',
-        PREFERENCES: '/settings/preferences',
-        LANGUAGE: '/settings/language',
-        CONTENT: '/settings/content',
-        HAPTICS: '/settings/haptics',
-        OPEN_SOURCE: '/settings/open-source',
-        SUPPORT: '/settings/support',
-        VERSION: '/settings/version',
-        LOG_OUT: '/settings/log-out',
+        INDEX: "/settings",
+        PROFILE_PICTURE: "/settings/profile-picture",
+        DESCRIPTION: "/settings/description",
+        FOLLOWINGS: "/settings/followings",
+        NAME: "/settings/name",
+        PASSWORD: "/settings/password",
+        PRIVACY_POLICY: "/settings/privacy-policy",
+        TERMS_OF_SERVICE: "/settings/terms-of-service",
+        COMMUNITY_GUIDELINES: "/settings/community-guidelines",
+        PUSH_NOTIFICATIONS: "/settings/push-notifications",
+        ALL_MOMENTS: "/settings/all-moments",
+        PREFERENCES: "/settings/preferences",
+        LANGUAGE: "/settings/language",
+        CONTENT: "/settings/content",
+        HAPTICS: "/settings/haptics",
+        OPEN_SOURCE: "/settings/open-source",
+        SUPPORT: "/settings/support",
+        VERSION: "/settings/version",
+        LOG_OUT: "/settings/log-out",
     },
-} as const;
+} as const
 
 /**
  * Legacy route name to new route mapping
@@ -150,74 +157,74 @@ export const ROUTES = {
  */
 export const LEGACY_ROUTE_MAP: Record<string, string> = {
     // Auth
-    'Init': ROUTES.AUTH.INIT,
-    'Auth-SignIn': ROUTES.AUTH.SIGN_IN,
-    'Auth-SignUp-Username': ROUTES.AUTH.SIGN_UP_USERNAME,
-    'Auth-SignUp-Password': ROUTES.AUTH.SIGN_UP_PASSWORD,
-    'Auth-SignUp-Agree': ROUTES.AUTH.SIGN_UP_AGREE,
-    'Auth-Privacy-Policy': ROUTES.AUTH.PRIVACY_POLICY,
-    'Auth-Terms-Of-Service': ROUTES.AUTH.TERMS_OF_SERVICE,
-    'Auth-Community-Guidelines': ROUTES.AUTH.COMMUNITY_GUIDELINES,
+    Init: ROUTES.AUTH.INIT,
+    "Auth-SignIn": ROUTES.AUTH.SIGN_IN,
+    "Auth-SignUp-Username": ROUTES.AUTH.SIGN_UP_USERNAME,
+    "Auth-SignUp-Password": ROUTES.AUTH.SIGN_UP_PASSWORD,
+    "Auth-SignUp-Agree": ROUTES.AUTH.SIGN_UP_AGREE,
+    "Auth-Privacy-Policy": ROUTES.AUTH.PRIVACY_POLICY,
+    "Auth-Terms-Of-Service": ROUTES.AUTH.TERMS_OF_SERVICE,
+    "Auth-Community-Guidelines": ROUTES.AUTH.COMMUNITY_GUIDELINES,
 
     // Tabs
-    'HomeScreen': ROUTES.TABS.MOMENTS,
-    'CreateBottomTab': ROUTES.TABS.CREATE,
-    'AccountScreen': ROUTES.TABS.YOU,
-    'EditAccountScreen': ROUTES.TABS.YOU_EDIT,
+    HomeScreen: ROUTES.TABS.MOMENTS,
+    CreateBottomTab: ROUTES.TABS.CREATE,
+    AccountScreen: ROUTES.TABS.YOU,
+    EditAccountScreen: ROUTES.TABS.YOU_EDIT,
 
     // Moments
-    'MomentFullScreen': '/moment/',
-    'NewMomentGalleryScreen': ROUTES.MOMENT.NEW_GALLERY,
-    'NewMomentImageScreen': ROUTES.MOMENT.NEW_IMAGE,
-    'NewMomentCameraModule': ROUTES.MOMENT.NEW_CAMERA,
-    'NewMomentDescription': ROUTES.MOMENT.NEW_DESCRIPTION,
+    MomentFullScreen: "/moment/",
+    NewMomentGalleryScreen: ROUTES.MOMENT.NEW_GALLERY,
+    NewMomentImageScreen: ROUTES.MOMENT.NEW_IMAGE,
+    NewMomentCameraModule: ROUTES.MOMENT.NEW_CAMERA,
+    NewMomentDescription: ROUTES.MOMENT.NEW_DESCRIPTION,
 
     // Profile
-    'Profile': '/profile/',
+    Profile: "/profile/",
 
     // Settings
-    'Settings': ROUTES.SETTINGS.INDEX,
-    'Settings-ProfilePicture': ROUTES.SETTINGS.PROFILE_PICTURE,
-    'Settings-Description': ROUTES.SETTINGS.DESCRIPTION,
-    'Settings-Followings': ROUTES.SETTINGS.FOLLOWINGS,
-    'Settings-Name': ROUTES.SETTINGS.NAME,
-    'Settings-Password': ROUTES.SETTINGS.PASSWORD,
-    'Settings-Privacy-Policy': ROUTES.SETTINGS.PRIVACY_POLICY,
-    'Settings-Terms-Of-Service': ROUTES.SETTINGS.TERMS_OF_SERVICE,
-    'Settings-Community-Guidelines': ROUTES.SETTINGS.COMMUNITY_GUIDELINES,
-    'Settings-Preferences-PushNotifications': ROUTES.SETTINGS.PUSH_NOTIFICATIONS,
-    'Settings-All-Moments': ROUTES.SETTINGS.ALL_MOMENTS,
-    'Settings-Preferences': ROUTES.SETTINGS.PREFERENCES,
-    'Settings-Preferences-Language': ROUTES.SETTINGS.LANGUAGE,
-    'Settings-Preferences-Content': ROUTES.SETTINGS.CONTENT,
-    'Settings-Preferences-Haptics': ROUTES.SETTINGS.HAPTICS,
-    'Settings-Open-Source': ROUTES.SETTINGS.OPEN_SOURCE,
-    'Settings-Support': ROUTES.SETTINGS.SUPPORT,
-    'Settings-Version': ROUTES.SETTINGS.VERSION,
-    'Settings-Log-Out': ROUTES.SETTINGS.LOG_OUT,
-};
+    Settings: ROUTES.SETTINGS.INDEX,
+    "Settings-ProfilePicture": ROUTES.SETTINGS.PROFILE_PICTURE,
+    "Settings-Description": ROUTES.SETTINGS.DESCRIPTION,
+    "Settings-Followings": ROUTES.SETTINGS.FOLLOWINGS,
+    "Settings-Name": ROUTES.SETTINGS.NAME,
+    "Settings-Password": ROUTES.SETTINGS.PASSWORD,
+    "Settings-Privacy-Policy": ROUTES.SETTINGS.PRIVACY_POLICY,
+    "Settings-Terms-Of-Service": ROUTES.SETTINGS.TERMS_OF_SERVICE,
+    "Settings-Community-Guidelines": ROUTES.SETTINGS.COMMUNITY_GUIDELINES,
+    "Settings-Preferences-PushNotifications": ROUTES.SETTINGS.PUSH_NOTIFICATIONS,
+    "Settings-All-Moments": ROUTES.SETTINGS.ALL_MOMENTS,
+    "Settings-Preferences": ROUTES.SETTINGS.PREFERENCES,
+    "Settings-Preferences-Language": ROUTES.SETTINGS.LANGUAGE,
+    "Settings-Preferences-Content": ROUTES.SETTINGS.CONTENT,
+    "Settings-Preferences-Haptics": ROUTES.SETTINGS.HAPTICS,
+    "Settings-Open-Source": ROUTES.SETTINGS.OPEN_SOURCE,
+    "Settings-Support": ROUTES.SETTINGS.SUPPORT,
+    "Settings-Version": ROUTES.SETTINGS.VERSION,
+    "Settings-Log-Out": ROUTES.SETTINGS.LOG_OUT,
+}
 
 /**
  * Convert legacy navigation call to new Expo Router format
  * @example navigateLegacy('Profile', { findedUserPk: '123' })
  */
 export function navigateLegacy(screenName: string, params?: Record<string, any>) {
-    let route = LEGACY_ROUTE_MAP[screenName] || screenName;
+    let route = LEGACY_ROUTE_MAP[screenName] || screenName
 
     // Handle dynamic routes
     if (params) {
-        if (screenName === 'Profile' && params.findedUserPk) {
-            route = ROUTES.PROFILE.USER(params.findedUserPk);
-        } else if (screenName === 'MomentFullScreen' && params.momentId) {
-            route = ROUTES.MOMENT.DETAIL(params.momentId);
+        if (screenName === "Profile" && params.findedUserPk) {
+            route = ROUTES.PROFILE.USER(params.findedUserPk)
+        } else if (screenName === "MomentFullScreen" && params.momentId) {
+            route = ROUTES.MOMENT.DETAIL(params.momentId)
         } else {
             // Pass remaining params
-            router.push({ pathname: route as any, params });
-            return;
+            router.push({ pathname: route as any, params })
+            return
         }
     }
 
-    router.push(route as any);
+    router.push(route as any)
 }
 
 /**
@@ -225,7 +232,7 @@ export function navigateLegacy(screenName: string, params?: Record<string, any>)
  * @example const nav = useNavigation()
  */
 export function useNavigationCompat() {
-    return navigation;
+    return navigation
 }
 
-export default navigation;
+export default navigation

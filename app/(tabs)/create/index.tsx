@@ -1,3 +1,3 @@
-import CameraModule from "@/modules/camera";
+import { CameraPage } from "@/modules/camera/pages/camera";
 
-export default CameraModule;
+export default CameraPage;
