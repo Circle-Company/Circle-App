@@ -43,6 +43,7 @@ module.exports = function (_config) {
             web: { favicon: "./assets/favicon.png" },
             jsEngine: "jsc",
             plugins: [
+                "expo-router",
                 "expo-video",
                 "expo-localization",
                 "expo-web-browser",
