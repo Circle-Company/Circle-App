@@ -3,6 +3,7 @@ import { useIsFocused } from "@react-navigation/core"
 import { useRouter, useLocalSearchParams } from "expo-router"
 import React, { useCallback, useMemo, useState, useContext, useRef } from "react"
 import type { ImageLoadEventData, NativeSyntheticEvent } from "react-native"
+import { SafeAreaView } from "react-native-safe-area-context"
 import { StyleSheet, View, Text, Keyboard, Animated, Easing } from "react-native"
 import { VideoView, useVideoPlayer } from "expo-video"
 import { useToast } from "@/contexts/Toast"
@@ -249,7 +250,7 @@ export function MediaPage(): React.ReactElement {
     const [videoError, setVideoError] = useState<string | null>(null)
 
     return (
-        <View style={styles.container}>
+        <SafeAreaView style={styles.container}>
             <Animated.View style={[styles.cameraContainer, animatedScaleStyle]}>
                 {!displayUri ? (
                     <View style={styles.cameraContainer}>
@@ -354,7 +355,7 @@ export function MediaPage(): React.ReactElement {
                     </Text>
                 </ButtonStandart>
             </View>
-        </View>
+        </SafeAreaView>
     )
 }
 

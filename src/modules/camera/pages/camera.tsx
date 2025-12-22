@@ -2,6 +2,7 @@ import sizes from "@/constants/sizes"
 import { useIsFocused } from "@react-navigation/core"
 import { Stack, useRouter } from "expo-router"
 import * as React from "react"
+import * as FileSystem from "expo-file-system"
 import { useCallback, useEffect, useRef, useState } from "react"
 import type { GestureResponderEvent, ViewStyle } from "react-native"
 import { StyleSheet, Text, View } from "react-native"
@@ -137,24 +138,26 @@ export function CameraPage(): React.ReactElement {
             const mimeType = "video/mp4" // Sempre MP4 agora
 
             try {
-                const stat = await RNFS.stat(tempPath)
-                fileSize = stat.size
-                console.log("📊 Tamanho do arquivo:", fileSize, "bytes")
+                const fileInfo = await FileSystem.getInfoAsync(tempPath)
+                if (fileInfo.exists && !fileInfo.isDirectory) {
+                    fileSize = fileInfo.size || 0
+                    console.log("📊 Tamanho do arquivo:", fileSize, "bytes")
+                }
             } catch (error) {
                 console.error("❌ Erro ao obter informações do arquivo:", error)
             }
 
             // Criar diretório temp se não existir
-            const tempDir = `${RNFS.DocumentDirectoryPath}/temp`
+            const tempDir = `${FileSystem.documentDirectory}temp`
 
-            console.log("📁 Document directory:", RNFS.DocumentDirectoryPath)
+            console.log("📁 Document directory:", FileSystem.documentDirectory)
             console.log("📁 Temp directory:", tempDir)
 
             try {
-                const dirExists = await RNFS.exists(tempDir)
-                if (!dirExists) {
+                const dirInfo = await FileSystem.getInfoAsync(tempDir)
+                if (!dirInfo.exists) {
                     console.log("📁 Criando diretório temp...")
-                    await RNFS.mkdir(tempDir)
+                    await FileSystem.makeDirectoryAsync(tempDir, { intermediates: true })
                     console.log("✅ Diretório criado com sucesso!")
                 }
             } catch (error) {
@@ -170,13 +173,18 @@ export function CameraPage(): React.ReactElement {
             console.log("📂 Para:", finalPath)
 
             try {
-                await RNFS.copyFile(tempPath, finalPath)
+                await FileSystem.copyAsync({
+                    from: tempPath,
+                    to: finalPath,
+                })
                 console.log("✅ Vídeo copiado com sucesso!")
 
                 // Verificar se arquivo foi copiado
-                const copiedStat = await RNFS.stat(finalPath)
-                fileSize = copiedStat.size
-                console.log("✅ Arquivo verificado, tamanho:", fileSize, "bytes")
+                const copiedInfo = await FileSystem.getInfoAsync(finalPath)
+                if (copiedInfo.exists && !copiedInfo.isDirectory) {
+                    fileSize = copiedInfo.size || fileSize
+                    console.log("✅ Arquivo verificado, tamanho:", fileSize, "bytes")
+                }
             } catch (error) {
                 console.error("❌ Erro ao copiar vídeo:", error)
                 console.error("❌ Detalhes do erro:", JSON.stringify(error))
@@ -353,6 +361,10 @@ export function CameraPage(): React.ReactElement {
             <Stack.Screen
                 options={{
                     headerTitle: isRecording ? t("Recording") : t("New Moment"),
+                    headerTitleStyle: {
+                        color: colors.gray.white,
+                        font,
+                    },
                 }}
             />
             <View style={styles.container}>

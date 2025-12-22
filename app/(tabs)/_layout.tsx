@@ -26,31 +26,24 @@ export default function TabsLayout() {
             tintColor={tintColor}
             labelStyle={{
                 color: labelColor,
-                fontFamily: Fonts.family["Bold-Italic"],
-                fontSize: Fonts.size.body * 0.9,
+                fontFamily: Fonts.family["Bold"],
+                fontSize: Fonts.size.body * 0.8,
             }}
             minimizeBehavior="onScrollDown"
-            labelVisibilityMode="unlabeled"
-            titlePositionAdjustment={{ vertical: 10 }}
         >
-            <NativeTabs.Trigger
-                name="moments"
-                options={{
-                    backgroundColor: "#F2F",
-                }}
-            >
+            <NativeTabs.Trigger name="moments" options={{}}>
                 <Label selectedStyle={{ color: tintColor }}>{t("Moments")}</Label>
-                <Icon sf={{ default: "bolt", selected: "bolt.fill" }} />
+                <Icon sf={{ default: "bolt.fill", selected: "bolt.fill" }} />
             </NativeTabs.Trigger>
 
             <NativeTabs.Trigger name="create">
                 <Label selectedStyle={{ color: tintColor }}>{t("Create")}</Label>
-                <Icon sf={{ default: "camera", selected: "camera.fill" }} />
+                <Icon sf={{ default: "plus.circle", selected: "plus.circle.fill" }} />
             </NativeTabs.Trigger>
 
             <NativeTabs.Trigger name="you">
                 <Label selectedStyle={{ color: tintColor }}>{t("You")}</Label>
-                <Icon sf={{ default: "person.circle", selected: "person.circle.fill" }} />
+                <Icon sf={{ default: "at", selected: "at" }} />
             </NativeTabs.Trigger>
         </NativeTabs>
     )
