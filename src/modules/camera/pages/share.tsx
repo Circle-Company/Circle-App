@@ -1,12 +1,11 @@
 import UploadIcon from "@/assets/icons/svgs/arrow_up.svg"
 import { useIsFocused } from "@react-navigation/core"
-import type { NativeStackScreenProps } from "@react-navigation/native-stack"
+import { useRouter, useLocalSearchParams } from "expo-router"
 import React, { useCallback, useMemo, useState, useContext, useRef } from "react"
 import type { ImageLoadEventData, NativeSyntheticEvent } from "react-native"
 import { StyleSheet, View, Text, Keyboard, Animated, Easing } from "react-native"
 import { VideoView, useVideoPlayer } from "expo-video"
 import { useToast } from "@/contexts/Toast"
-import { CommonActions } from "@react-navigation/native"
 import sizes from "@/constants/sizes"
 import { SAFE_AREA_PADDING } from "../constants"
 import { useIsForeground } from "../hooks/useIsForeground"
@@ -20,16 +19,22 @@ import LanguageContext from "@/contexts/Preferences/language"
 import { ViewStyle } from "react-native"
 import { TextInput } from "react-native"
 
-type Props = NativeStackScreenProps<Routes, "MediaPage">
-export function MediaPage({ navigation, route }: Props): React.ReactElement {
+export function MediaPage(): React.ReactElement {
+    const router = useRouter()
+    const params = useLocalSearchParams<{
+        videoUri?: string
+        duration?: string
+        width?: string
+        height?: string
+    }>()
     const { description, setDescription, upload, uploadError, isUploading, reset, video } =
         useCameraContext()
     const [isVideoLoading, setIsVideoLoading] = useState(true)
 
-    // Get video URI from navigation params
-    const videoUri = route.params?.videoUri
-    const videoWidth = route.params?.width
-    const videoHeight = route.params?.height
+    // Get video URI from route params
+    const videoUri = params?.videoUri
+    const videoWidth = params?.width ? parseInt(params.width, 10) : undefined
+    const videoHeight = params?.height ? parseInt(params.height, 10) : undefined
 
     // Log video path for debugging
     React.useEffect(() => {
@@ -231,12 +236,7 @@ export function MediaPage({ navigation, route }: Props): React.ReactElement {
             reset()
 
             // Navigate to home (Moments tab)
-            navigation.dispatch(
-                CommonActions.reset({
-                    index: 0,
-                    routes: [{ name: "Moments" }],
-                }),
-            )
+            router.replace("/(tabs)/moments")
         } else {
             toast.error(result.error, {
                 backgroundColor: colors.red.red_05.toString(),

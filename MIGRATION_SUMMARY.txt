@@ -1,0 +1,566 @@
+# Navigation Migration Summary
+
+Generated: 2025-12-22T14:30:21.421Z
+
+Total files scanned: 400
+Files needing updates: 47
+Total patterns found: 115
+
+════════════════════════════════════════════════════════════════════════════════
+
+Files requiring updates:
+
+
+src/components/auth/terms.spec.tsx (1 issue)
+  1. useNavigation import at line 2
+     Found: import { useNavigation } from "@react-navigation/native"
+     Replace with: import { useRouter } from 'expo-router'
+
+
+src/components/auth/terms.tsx (4 issues)
+  1. useNavigation import at line 1
+     Found: import { useNavigation } from "@react-navigation/native"
+     Replace with: import { useRouter } from 'expo-router'
+
+  2. navigation.navigate at line 52
+     Found: navigation.navigate(
+     Replace with: router.push(
+
+  3. navigation.navigate at line 61
+     Found: navigation.navigate(
+     Replace with: router.push(
+
+  4. navigation.navigate at line 70
+     Found: navigation.navigate(
+     Replace with: router.push(
+
+
+src/components/buttons/close.tsx (3 issues)
+  1. useNavigation import at line 2
+     Found: import { useNavigation } from "@react-navigation/native"
+     Replace with: import { useRouter } from 'expo-router'
+
+  2. useNavigation hook at line 22
+     Found: const navigation = useNavigation()
+     Replace with: const router = useRouter()
+
+  3. navigation.goBack at line 37
+     Found: navigation.goBack()
+     Replace with: router.back()
+
+
+src/components/buttons/large.tsx (3 issues)
+  1. useNavigation import at line 1
+     Found: import { useNavigation } from "@react-navigation/native"
+     Replace with: import { useRouter } from 'expo-router'
+
+  2. useNavigation hook at line 11
+     Found: const navigation = useNavigation()
+     Replace with: const router = useRouter()
+
+  3. navigation.navigate at line 56
+     Found: navigation.navigate(
+     Replace with: router.push(
+
+
+src/components/buttons/standart.tsx (3 issues)
+  1. useNavigation import at line 1
+     Found: import { useNavigation } from "@react-navigation/native"
+     Replace with: import { useRouter } from 'expo-router'
+
+  2. useNavigation hook at line 15
+     Found: const navigation = useNavigation()
+     Replace with: const router = useRouter()
+
+  3. navigation.navigate at line 36
+     Found: navigation.navigate(
+     Replace with: router.push(
+
+
+src/components/headers/HeaderBack.js (3 issues)
+  1. useNavigation import at line 10
+     Found: import { useNavigation } from "@react-navigation/native"
+     Replace with: import { useRouter } from 'expo-router'
+
+  2. useNavigation hook at line 17
+     Found: const navigation = useNavigation()
+     Replace with: const router = useRouter()
+
+  3. navigation.goBack at line 25
+     Found: navigation.goBack()
+     Replace with: router.back()
+
+
+src/components/headers/account/account-header_left.tsx (3 issues)
+  1. useNavigation import at line 4
+     Found: import { useNavigation } from "@react-navigation/native"
+     Replace with: import { useRouter } from 'expo-router'
+
+  2. useNavigation hook at line 14
+     Found: const navigation = useNavigation()
+     Replace with: const router = useRouter()
+
+  3. navigation.navigate at line 22
+     Found: navigation.navigate(
+     Replace with: router.push(
+
+
+src/components/headers/account/account-header_right.tsx (3 issues)
+  1. useNavigation import at line 2
+     Found: import { useNavigation } from "@react-navigation/native"
+     Replace with: import { useRouter } from 'expo-router'
+
+  2. useNavigation hook at line 10
+     Found: const navigation = useNavigation()
+     Replace with: const router = useRouter()
+
+  3. navigation.navigate at line 22
+     Found: navigation.navigate(
+     Replace with: router.push(
+
+
+src/components/headers/camera/camera-header_left.tsx (3 issues)
+  1. useNavigation import at line 2
+     Found: import { useNavigation } from "@react-navigation/native"
+     Replace with: import { useRouter } from 'expo-router'
+
+  2. useNavigation hook at line 9
+     Found: const navigation = useNavigation()
+     Replace with: const router = useRouter()
+
+  3. navigation.goBack at line 17
+     Found: navigation.goBack()
+     Replace with: router.back()
+
+
+src/components/headers/home/Right.tsx (1 issue)
+  1. navigation.navigate at line 44
+     Found: navigation.navigate(
+     Replace with: router.push(
+
+
+src/components/headers/inbox/inbox-header_left.tsx (3 issues)
+  1. useNavigation import at line 2
+     Found: import { useNavigation } from "@react-navigation/native"
+     Replace with: import { useRouter } from 'expo-router'
+
+  2. useNavigation hook at line 9
+     Found: const navigation = useNavigation()
+     Replace with: const router = useRouter()
+
+  3. navigation.goBack at line 18
+     Found: navigation.goBack()
+     Replace with: router.back()
+
+
+src/components/headers/memories/#.tsx (3 issues)
+  1. useNavigation import at line 2
+     Found: import { useNavigation } from "@react-navigation/native"
+     Replace with: import { useRouter } from 'expo-router'
+
+  2. useNavigation hook at line 9
+     Found: const navigation = useNavigation()
+     Replace with: const router = useRouter()
+
+  3. navigation.goBack at line 13
+     Found: navigation.goBack()
+     Replace with: router.back()
+
+
+src/components/headers/memories/memories-list_moments-header_left.tsx (3 issues)
+  1. useNavigation import at line 2
+     Found: import { useNavigation } from "@react-navigation/native"
+     Replace with: import { useRouter } from 'expo-router'
+
+  2. useNavigation hook at line 9
+     Found: const navigation = useNavigation()
+     Replace with: const router = useRouter()
+
+  3. navigation.goBack at line 19
+     Found: navigation.goBack()
+     Replace with: router.back()
+
+
+src/components/headers/memories/memories-list_moments-header_right.tsx (3 issues)
+  1. useNavigation import at line 1
+     Found: import { useNavigation } from "@react-navigation/native"
+     Replace with: import { useRouter } from 'expo-router'
+
+  2. useNavigation hook at line 15
+     Found: const navigation = useNavigation()
+     Replace with: const router = useRouter()
+
+  3. navigation.navigate at line 27
+     Found: navigation.navigate(
+     Replace with: router.push(
+
+
+src/components/headers/memory/memory-header_left.tsx (3 issues)
+  1. useNavigation import at line 2
+     Found: import { useNavigation } from "@react-navigation/native"
+     Replace with: import { useRouter } from 'expo-router'
+
+  2. useNavigation hook at line 9
+     Found: const navigation = useNavigation()
+     Replace with: const router = useRouter()
+
+  3. navigation.goBack at line 17
+     Found: navigation.goBack()
+     Replace with: router.back()
+
+
+src/components/headers/memory/memory-header_right.tsx (3 issues)
+  1. useNavigation import at line 1
+     Found: import { useNavigation } from "@react-navigation/native"
+     Replace with: import { useRouter } from 'expo-router'
+
+  2. useNavigation hook at line 13
+     Found: const navigation = useNavigation()
+     Replace with: const router = useRouter()
+
+  3. navigation.navigate at line 26
+     Found: navigation.navigate(
+     Replace with: router.push(
+
+
+src/components/headers/moment/moment_full-header_left.tsx (3 issues)
+  1. useNavigation import at line 2
+     Found: import { useNavigation } from "@react-navigation/native"
+     Replace with: import { useRouter } from 'expo-router'
+
+  2. useNavigation hook at line 9
+     Found: const navigation = useNavigation()
+     Replace with: const router = useRouter()
+
+  3. navigation.goBack at line 18
+     Found: navigation.goBack()
+     Replace with: router.back()
+
+
+src/components/headers/moment/new_moment_image-header_right.tsx (3 issues)
+  1. useNavigation import at line 1
+     Found: import { useNavigation } from "@react-navigation/native"
+     Replace with: import { useRouter } from 'expo-router'
+
+  2. useNavigation hook at line 14
+     Found: const navigation = useNavigation()
+     Replace with: const router = useRouter()
+
+  3. navigation.navigate at line 27
+     Found: navigation.navigate(
+     Replace with: router.push(
+
+
+src/components/headers/moment/new_moment_input_description-header_right.tsx (3 issues)
+  1. useNavigation import at line 2
+     Found: import { useNavigation } from "@react-navigation/native"
+     Replace with: import { useRouter } from 'expo-router'
+
+  2. useNavigation hook at line 20
+     Found: const navigation = useNavigation()
+     Replace with: const router = useRouter()
+
+  3. navigation.navigate at line 63
+     Found: navigation.navigate(
+     Replace with: router.push(
+
+
+src/components/headers/moment/new_moment_select_memory-header_right.tsx (3 issues)
+  1. useNavigation import at line 2
+     Found: import { useNavigation } from "@react-navigation/native"
+     Replace with: import { useRouter } from 'expo-router'
+
+  2. useNavigation hook at line 17
+     Found: const navigation = useNavigation()
+     Replace with: const router = useRouter()
+
+  3. navigation.navigate at line 58
+     Found: navigation.navigate(
+     Replace with: router.push(
+
+
+src/components/headers/profile/profile-header_left.tsx (3 issues)
+  1. useNavigation import at line 2
+     Found: import { useNavigation } from "@react-navigation/native"
+     Replace with: import { useRouter } from 'expo-router'
+
+  2. useNavigation hook at line 22
+     Found: const navigation = useNavigation()
+     Replace with: const router = useRouter()
+
+  3. navigation.goBack at line 30
+     Found: navigation.goBack()
+     Replace with: router.back()
+
+
+src/components/headers/settings/settings-header_left.tsx (3 issues)
+  1. useNavigation import at line 2
+     Found: import { useNavigation } from "@react-navigation/native"
+     Replace with: import { useRouter } from 'expo-router'
+
+  2. useNavigation hook at line 9
+     Found: const navigation = useNavigation()
+     Replace with: const router = useRouter()
+
+  3. navigation.goBack at line 17
+     Found: navigation.goBack()
+     Replace with: router.back()
+
+
+src/components/moment/components/moment-container.tsx (1 issue)
+  1. navigation.navigate at line 252
+     Found: navigation.navigate(
+     Replace with: router.push(
+
+
+src/components/near_to_you/components/render_user.tsx (1 issue)
+  1. navigation.navigate at line 34
+     Found: navigation.navigate(
+     Replace with: router.push(
+
+
+src/components/notification/components/containers/container-main.tsx (2 issues)
+  1. useNavigation import at line 3
+     Found: import { useNavigation } from "@react-navigation/native"
+     Replace with: import { useRouter } from 'expo-router'
+
+  2. navigation.navigate at line 49
+     Found: navigation.navigate(
+     Replace with: router.push(
+
+
+src/components/search/components/search-render_user.tsx (2 issues)
+  1. useNavigation import at line 5
+     Found: import { useNavigation } from "@react-navigation/native"
+     Replace with: import { useRouter } from 'expo-router'
+
+  2. navigation.navigate at line 36
+     Found: navigation.navigate(
+     Replace with: router.push(
+
+
+src/components/settings/components/list/settings-item.tsx (3 issues)
+  1. useNavigation import at line 16
+     Found: import { useNavigation } from "@react-navigation/native"
+     Replace with: import { useRouter } from 'expo-router'
+
+  2. navigation.navigate at line 102
+     Found: navigation.navigate(
+     Replace with: router.push(
+
+  3. navigation.navigate at line 105
+     Found: navigation.navigate(
+     Replace with: router.push(
+
+
+src/components/user_show/components/user_show-profile_picture.tsx (2 issues)
+  1. useNavigation import at line 10
+     Found: import { useNavigation } from "@react-navigation/native"
+     Replace with: import { useRouter } from 'expo-router'
+
+  2. navigation.navigate at line 40
+     Found: navigation.navigate(
+     Replace with: router.push(
+
+
+src/components/user_show/components/user_show-username.tsx (2 issues)
+  1. useNavigation import at line 13
+     Found: import { useNavigation } from "@react-navigation/native"
+     Replace with: import { useRouter } from 'expo-router'
+
+  2. navigation.navigate at line 64
+     Found: navigation.navigate(
+     Replace with: router.push(
+
+
+src/contexts/newMoment.tsx (3 issues)
+  1. useNavigation import at line 5
+     Found: import { useNavigation } from "@react-navigation/native"
+     Replace with: import { useRouter } from 'expo-router'
+
+  2. useNavigation hook at line 52
+     Found: const navigation = useNavigation()
+     Replace with: const router = useRouter()
+
+  3. navigation.navigate at line 216
+     Found: navigation.navigate(
+     Replace with: router.push(
+
+
+src/contexts/selectMoments.tsx (3 issues)
+  1. useNavigation import at line 2
+     Found: import { useNavigation } from "@react-navigation/native"
+     Replace with: import { useRouter } from 'expo-router'
+
+  2. useNavigation hook at line 52
+     Found: const navigation = useNavigation()
+     Replace with: const router = useRouter()
+
+  3. navigation.navigate at line 142
+     Found: navigation.navigate(
+     Replace with: router.push(
+
+
+src/features/list-moments/components/render-empty_list.tsx (2 issues)
+  1. useNavigation import at line 1
+     Found: import { useNavigation } from "@react-navigation/native"
+     Replace with: import { useRouter } from 'expo-router'
+
+  2. navigation.navigate at line 188
+     Found: navigation.navigate(
+     Replace with: router.push(
+
+
+src/features/new_moment/components/header_list.tsx (1 issue)
+  1. navigation.navigate at line 40
+     Found: navigation.navigate(
+     Replace with: router.push(
+
+
+src/lib/navigation.ts (2 issues)
+  1. navigation.navigate at line 16
+     Found: navigation.navigate(
+     Replace with: router.push(
+
+  2. navigation.navigate at line 17
+     Found: navigation.navigate(
+     Replace with: router.push(
+
+
+src/modules/camera/pages/camera.tsx (2 issues)
+  1. navigation.navigate at line 220
+     Found: navigation.navigate(
+     Replace with: router.push(
+
+  2. navigation.setOptions at line 65
+     Found: navigation.setOptions(
+     Replace with: // Use <Stack.Screen options={...} /> instead
+
+
+src/modules/camera/pages/devices.tsx (1 issue)
+  1. navigation.navigate at line 109
+     Found: navigation.navigate(
+     Replace with: router.push(
+
+
+src/modules/camera/pages/permissions.tsx (1 issue)
+  1. navigation.replace at line 37
+     Found: navigation.replace(
+     Replace with: router.replace(
+
+
+src/modules/camera/pages/share.tsx (3 issues)
+  1. route.params at line 30
+     Found: route.params
+     Replace with: params
+
+  2. route.params at line 31
+     Found: route.params
+     Replace with: params
+
+  3. route.params at line 32
+     Found: route.params
+     Replace with: params
+
+
+src/pages/app/Profile/index.tsx (1 issue)
+  1. route.params at line 26
+     Found: route.params
+     Replace with: params
+
+
+src/pages/app/Settings/Description.tsx (3 issues)
+  1. useNavigation import at line 2
+     Found: import { useNavigation } from "@react-navigation/native"
+     Replace with: import { useRouter } from 'expo-router'
+
+  2. useNavigation hook at line 26
+     Found: const navigation = useNavigation()
+     Replace with: const router = useRouter()
+
+  3. navigation.goBack at line 122
+     Found: navigation.goBack()
+     Replace with: router.back()
+
+
+src/pages/app/Settings/Name.tsx (3 issues)
+  1. useNavigation import at line 2
+     Found: import { useNavigation } from "@react-navigation/native"
+     Replace with: import { useRouter } from 'expo-router'
+
+  2. useNavigation hook at line 23
+     Found: const navigation = useNavigation()
+     Replace with: const router = useRouter()
+
+  3. navigation.goBack at line 120
+     Found: navigation.goBack()
+     Replace with: router.back()
+
+
+src/pages/app/Settings/Password.tsx (3 issues)
+  1. useNavigation import at line 2
+     Found: import { useNavigation } from "@react-navigation/native"
+     Replace with: import { useRouter } from 'expo-router'
+
+  2. useNavigation hook at line 21
+     Found: const navigation = useNavigation()
+     Replace with: const router = useRouter()
+
+  3. navigation.goBack at line 68
+     Found: navigation.goBack()
+     Replace with: router.back()
+
+
+src/pages/app/Settings/ProfilePicture.tsx (3 issues)
+  1. useNavigation import at line 3
+     Found: import { useNavigation } from "@react-navigation/native"
+     Replace with: import { useRouter } from 'expo-router'
+
+  2. useNavigation hook at line 22
+     Found: const navigation = useNavigation()
+     Replace with: const router = useRouter()
+
+  3. navigation.goBack at line 143
+     Found: navigation.goBack()
+     Replace with: router.back()
+
+
+src/pages/auth/SignUp/Password.tsx (2 issues)
+  1. useNavigation import at line 15
+     Found: import { useNavigation } from "@react-navigation/native"
+     Replace with: import { useRouter } from 'expo-router'
+
+  2. navigation.navigate at line 111
+     Found: navigation.navigate(
+     Replace with: router.push(
+
+
+src/pages/auth/SignUp/Username.tsx (2 issues)
+  1. useNavigation import at line 15
+     Found: import { useNavigation } from "@react-navigation/native"
+     Replace with: import { useRouter } from 'expo-router'
+
+  2. navigation.navigate at line 94
+     Found: navigation.navigate(
+     Replace with: router.push(
+
+
+src/pages/auth/SignUp/username.spec.tsx (1 issue)
+  1. useNavigation import at line 3
+     Found: import { useNavigation } from "@react-navigation/native"
+     Replace with: import { useRouter } from 'expo-router'
+
+
+src/pages/auth/Splash/index.tsx (3 issues)
+  1. useNavigation import at line 15
+     Found: import { useNavigation } from "@react-navigation/native"
+     Replace with: import { useRouter } from 'expo-router'
+
+  2. navigation.navigate at line 158
+     Found: navigation.navigate(
+     Replace with: router.push(
+
+  3. navigation.navigate at line 171
+     Found: navigation.navigate(
+     Replace with: router.push(
+
