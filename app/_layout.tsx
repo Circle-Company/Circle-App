@@ -92,7 +92,12 @@ function RootLayoutNav() {
         }
     }, [isInitializing, redirectTo, segments])
 
-    return <Slot />
+    return (
+        <>
+            <StatusBar barStyle="light-content" backgroundColor="#000" translucent={false} />
+            <Slot />
+        </>
+    )
 }
 
 export default function RootLayout() {
@@ -135,13 +140,6 @@ export default function RootLayout() {
                                                                         <BottomSheetProvider>
                                                                             <SelectMomentsProvider>
                                                                                 <NewMomentProvider>
-                                                                                    <StatusBar
-                                                                                        barStyle="light-content"
-                                                                                        backgroundColor="#000"
-                                                                                        translucent={
-                                                                                            false
-                                                                                        }
-                                                                                    />
                                                                                     <RootLayoutNav />
                                                                                 </NewMomentProvider>
                                                                             </SelectMomentsProvider>
