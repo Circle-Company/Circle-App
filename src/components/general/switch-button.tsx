@@ -1,5 +1,5 @@
 import React from "react"
-import { StyleSheet, TouchableWithoutFeedback, useColorScheme } from "react-native"
+import { StyleSheet, TouchableWithoutFeedback, useColorScheme, Platform } from "react-native"
 import Animated, {
     interpolateColor,
     useAnimatedStyle,
@@ -8,32 +8,31 @@ import Animated, {
 } from "react-native-reanimated"
 import { colors } from "../../constants/colors"
 import { Vibrate } from "../../lib/hooks/useHapticFeedback"
+import { Host, Switch } from "@expo/ui/swift-ui"
 
 interface SwitchButtonProps {
     onPressEnable: () => void
     onPressDisable: () => void
-    initialState?: boolean // Novo estado inicial
+    initialState?: boolean
 }
 
 export const SwitchButton: React.FC<SwitchButtonProps> = ({
     onPressEnable,
     onPressDisable,
-    initialState = false, // Valor padrão para o estado inicial
+    initialState = false,
 }) => {
-    const switchTranslateX = useSharedValue(initialState ? 23 : 3)
-    const isEnabled = useSharedValue(initialState)
     const isDarkMode = useColorScheme() === "dark"
 
-    const handlePress = () => {
-        if (isEnabled.value) {
-            Vibrate("impactLight")
-            switchTranslateX.value = withSpring(2, {
-                stiffness: 1000,
-                damping: 60,
-            })
-            isEnabled.value = false
-            onPressDisable()
-        } else {
+    // Animação (Android/others)
+    const switchTranslateX = useSharedValue(initialState ? 23 : 3)
+    const isEnabled = useSharedValue(initialState)
+
+    // Estado controlado para iOS SwiftUI Switch
+    const [checked, setChecked] = React.useState<boolean>(initialState)
+
+    // Função única de toggle
+    const toggle = (next: boolean) => {
+        if (next) {
             Vibrate("effectClick")
             switchTranslateX.value = withSpring(23, {
                 stiffness: 1000,
@@ -41,7 +40,20 @@ export const SwitchButton: React.FC<SwitchButtonProps> = ({
             })
             isEnabled.value = true
             onPressEnable()
+        } else {
+            Vibrate("impactLight")
+            switchTranslateX.value = withSpring(2, {
+                stiffness: 1000,
+                damping: 60,
+            })
+            isEnabled.value = false
+            onPressDisable()
         }
+        setChecked(next)
+    }
+
+    const handlePress = () => {
+        toggle(!isEnabled.value)
     }
 
     const animatedTrackStyle = useAnimatedStyle(() => {
@@ -79,6 +91,22 @@ export const SwitchButton: React.FC<SwitchButtonProps> = ({
         }
     })
 
+    // iOS: usar SwiftUI Switch controlado
+    if (Platform.OS === "ios") {
+        return (
+            <Host matchContents>
+                <Switch
+                    value={checked}
+                    onValueChange={(next: boolean) => toggle(next)}
+                    color={isDarkMode ? "#FFFFFF" : "#000000"}
+                    label=""
+                    variant="switch"
+                />
+            </Host>
+        )
+    }
+
+    // Android / Others: Touchable + Animated
     return (
         <TouchableWithoutFeedback onPress={handlePress}>
             <Animated.View style={[styles.track, animatedTrackStyle]}>

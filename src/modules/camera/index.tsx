@@ -1,5 +1,5 @@
 import ColorTheme, { colors } from "@/constants/colors"
-import { createNativeStackNavigator } from "@react-navigation/native-stack"
+import { createStackNavigator } from "@react-navigation/stack"
 import React from "react"
 import { StyleSheet } from "react-native"
 import { GestureHandlerRootView } from "react-native-gesture-handler"
@@ -15,9 +15,8 @@ import fonts from "@/constants/fonts"
 import SettingsHeaderLeft from "@/components/headers/settings/settings-header_left"
 import { CameraProvider, useCameraContext } from "./context"
 import HeaderLeft from "@/components/headers/camera/camera-header_left"
-import { MediaDescriptionPage } from "./pages/share.description"
 
-const Stack = createNativeStackNavigator<Routes>()
+const Stack = createStackNavigator<Routes>()
 
 export function CameraModule(): React.ReactElement | null {
     const cameraPermission = Camera.getCameraPermissionStatus()

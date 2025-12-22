@@ -1,12 +1,35 @@
-import { Image, StyleSheet, View } from "react-native"
+import { Image, StyleSheet, View, Pressable, Platform, ImageProps } from "react-native"
 import React, { useCallback, useEffect, useRef, useState } from "react"
 import { VideoView, useVideoPlayer } from "expo-video"
 import * as VideoThumbnails from "expo-video-thumbnails"
+import * as FileSystem from "expo-file-system"
 
 import MidiaRenderVideoError from "./midia_render-video_error"
 import MomentContext from "../../moment/context"
 import PersistedContext from "../../../contexts/Persisted"
-import { t } from "i18next"
+import LanguageContext from "@/contexts/Preferences/language"
+
+// Componente de imagem otimizado que desabilita análises do iOS
+const OptimizedImage = React.memo(
+    ({ style, ...props }: ImageProps) => {
+        return (
+            <Image
+                {...props}
+                style={style}
+                accessible={false}
+                accessibilityIgnoresInvertColors={true}
+                // @ts-ignore - propriedade não documentada do iOS para desabilitar VisionKit
+                enableLiveTextInteraction={false}
+            />
+        )
+    },
+    (prevProps, nextProps) => {
+        // Memoização customizada - só re-renderiza se a URI mudar
+        return (
+            prevProps.source === nextProps.source && prevProps.blurRadius === nextProps.blurRadius
+        )
+    },
+)
 
 interface VideoPlayerProps {
     uri?: string
@@ -45,6 +68,7 @@ export default function MediaRenderVideo({
     forceMute = false,
     prefetchAdjacentThumbnails = [],
 }: VideoPlayerProps) {
+    const { t } = React.useContext(LanguageContext)
     const { momentSize } = React.useContext(MomentContext)
     const videoWidth = momentSize?.width ?? width ?? 200
     const videoHeight = momentSize?.height ?? height ?? 200
@@ -58,15 +82,15 @@ export default function MediaRenderVideo({
     const maxRetries = 2
     const isVideoReadyRef = useRef(false)
     const progressIntervalRef = useRef<NodeJS.Timeout | null>(null)
+    const destroyedRef = useRef(false)
+    const attachedRef = useRef(false)
 
     const { session } = React.useContext(PersistedContext)
     const isMuted = forceMute ? true : session?.preferences?.content?.muteAudio || false
 
     // Configurar player do expo-video
-    const player = useVideoPlayer(uri || "", (player) => {
-        player.loop = true
-        player.muted = isMuted
-        player.volume = isMuted ? 0 : 1
+    const player = useVideoPlayer("", () => {
+        // Defer configuration until the player is attached (readyToPlay)
     })
 
     // Usar thumbnail fornecida ou gerar uma do vídeo
@@ -112,29 +136,93 @@ export default function MediaRenderVideo({
 
     // Controle de play/pause baseado em foco e autoPlay
     useEffect(() => {
-        if (isFocused && autoPlay && player) {
-            player.play()
-        } else if (player) {
-            player.pause()
+        if (!player) return
+        if (isFocused && autoPlay && isVideoReadyRef.current && attachedRef.current) {
+            try {
+                player.play()
+                setShowThumbnail(false)
+            } catch (e) {
+                // evita erro quando o objeto nativo ainda não está anexado
+            }
+        } else if (isVideoReadyRef.current && attachedRef.current) {
+            try {
+                player.pause()
+            } catch (e) {
+                // evita erro quando o objeto nativo ainda não está anexado
+            }
         }
     }, [isFocused, autoPlay, player])
+
+    // Garantir que, ao focar e o vídeo já estiver pronto, esconda a thumbnail
+    useEffect(() => {
+        if (isFocused && isVideoReadyRef.current) {
+            setShowThumbnail(false)
+        }
+    }, [isFocused])
 
     // Reset quando URI muda
     useEffect(() => {
         setShowThumbnail(true)
         isVideoReadyRef.current = false
+        attachedRef.current = false
         setHasError(false)
         retryCount.current = 0
         setGeneratedThumbnail(null)
     }, [uri])
 
+    // Trocar a fonte do player quando a URI mudar: validar local file antes de substituir
+    useEffect(() => {
+        let cancelled = false
+        async function validateAndReplace(nextUri?: string) {
+            if (!player) return
+            let safe = ""
+            if (nextUri && typeof nextUri === "string") {
+                if (nextUri.startsWith("file://")) {
+                    try {
+                        const info = await FileSystem.getInfoAsync(nextUri)
+                        if (info.exists && (info.size ?? 0) > 0) {
+                            safe = nextUri
+                        }
+                    } catch {
+                        safe = ""
+                    }
+                } else {
+                    // http/https ou outros esquemas: usar direto
+                    safe = nextUri
+                }
+            }
+            if (!cancelled) {
+                try {
+                    if (safe) {
+                        const anyPlayer = player as any
+                        if (typeof anyPlayer.replaceAsync === "function") {
+                            await anyPlayer.replaceAsync(safe)
+                        } else if (typeof anyPlayer.replace === "function") {
+                            anyPlayer.replace(safe)
+                        }
+                    }
+                } catch {}
+            }
+        }
+        validateAndReplace(uri)
+        return () => {
+            cancelled = true
+        }
+    }, [uri, player])
+
     // Reset quando perde foco
     useEffect(() => {
         if (!isFocused && player) {
             setShowThumbnail(true)
-            isVideoReadyRef.current = false
-            player.pause()
-            player.currentTime = 0
+            // não chame APIs se o nativo não estiver anexado
+            if (attachedRef.current) {
+                try {
+                    player.pause()
+                } catch (e) {}
+                try {
+                    player.currentTime = 0
+                } catch (e) {}
+            }
         }
     }, [isFocused, player])
 
@@ -157,24 +245,38 @@ export default function MediaRenderVideo({
                 }
 
                 isVideoReadyRef.current = true
+                try {
+                    player.loop = true
+                    player.muted = isMuted
+                    player.volume = isMuted ? 0 : 1
+                } catch (e) {}
+                attachedRef.current = true
 
                 // Esconder thumbnail quando vídeo estiver pronto
                 if (isFocused) {
                     setTimeout(() => {
                         setShowThumbnail(false)
-                    }, 100)
+                    }, 60)
 
-                    if (autoPlay) {
-                        player.play()
+                    if (autoPlay && attachedRef.current) {
+                        try {
+                            player.play()
+                        } catch (e) {
+                            // se falhar, será retomado pelo efeito de foco quando estiver pronto
+                        }
                     }
                 }
             } else if (status.status === "error") {
+                attachedRef.current = false
                 handleError(status.error)
             }
         })
 
-        // Listener para quando o vídeo terminar
+        // Listener para play/pause (esconde thumbnail ao iniciar)
         const playSub = player.addListener("playingChange", (isPlaying) => {
+            if (isPlaying && isVideoReadyRef.current) {
+                setShowThumbnail(false)
+            }
             if (!isPlaying && player.currentTime >= (player.duration || 0) - 0.1) {
                 console.log("Video playback ended")
                 if (onVideoEnd) {
@@ -192,13 +294,18 @@ export default function MediaRenderVideo({
     // Monitorar progresso do vídeo
     useEffect(() => {
         if (!player || !isFocused || !onProgressChange) return
+        if (!attachedRef.current) return
 
-        // Atualizar progresso a cada 100ms
+        // Atualizar progresso a cada 120ms
         progressIntervalRef.current = setInterval(() => {
-            if (player.currentTime !== undefined && player.duration !== undefined) {
+            if (
+                attachedRef.current &&
+                player.currentTime !== undefined &&
+                player.duration !== undefined
+            ) {
                 onProgressChange(player.currentTime, player.duration)
             }
-        }, 100)
+        }, 120)
 
         return () => {
             if (progressIntervalRef.current) {
@@ -209,9 +316,11 @@ export default function MediaRenderVideo({
 
     // Atualizar mute quando mudar
     useEffect(() => {
-        if (player) {
-            player.muted = isMuted
-            player.volume = isMuted ? 0 : 1
+        if (player && attachedRef.current) {
+            try {
+                player.muted = isMuted
+                player.volume = isMuted ? 0 : 1
+            } catch (e) {}
         }
     }, [isMuted, player])
 
@@ -226,13 +335,19 @@ export default function MediaRenderVideo({
             setHasError(false)
             setShowThumbnail(true)
             isVideoReadyRef.current = false
+            attachedRef.current = false
 
             setTimeout(() => {
-                if (player && isFocused && autoPlay) {
-                    player.currentTime = 0
-                    player.play()
+                if (destroyedRef.current) return
+                if (player && isFocused && autoPlay && attachedRef.current) {
+                    try {
+                        player.currentTime = 0
+                    } catch (e) {}
+                    try {
+                        player.play()
+                    } catch (e) {}
                 }
-            }, 500)
+            }, 400)
         }
     }, [player, isFocused, autoPlay])
 
@@ -266,8 +381,11 @@ export default function MediaRenderVideo({
     // Cleanup ao desmontar
     useEffect(() => {
         return () => {
-            if (player) {
-                player.pause()
+            destroyedRef.current = true
+            if (player && attachedRef.current) {
+                try {
+                    player.pause()
+                } catch (e) {}
             }
             if (progressIntervalRef.current) {
                 clearInterval(progressIntervalRef.current)
@@ -306,7 +424,7 @@ export default function MediaRenderVideo({
     if (hasError && isFocused) {
         return (
             <View style={styles.container}>
-                <Image
+                <OptimizedImage
                     source={{ uri: thumbnailSource }}
                     style={styles.thumbnail}
                     resizeMode="cover"
@@ -321,7 +439,37 @@ export default function MediaRenderVideo({
     }
 
     // Renderização normal
-    return (
+    return Platform.OS === "ios" ? (
+        <Pressable onLongPress={() => {}} delayLongPress={100000} style={styles.container}>
+            {/* Vídeo - sempre renderizado quando há URI */}
+            {uri && uri.length > 0 && player && (
+                <View style={styles.absoluteFill}>
+                    <VideoView
+                        player={player}
+                        style={styles.video}
+                        contentFit="cover"
+                        nativeControls={false}
+                        allowsFullscreen={false}
+                        allowsPictureInPicture={false}
+                        accessible={false}
+                    />
+                </View>
+            )}
+
+            {/* Thumbnail - sempre visível até o vídeo estar pronto */}
+            {showThumbnail && (
+                <View style={[styles.absoluteFill, { zIndex: 10 }]} pointerEvents="none">
+                    <OptimizedImage
+                        source={{ uri: thumbnailSource }}
+                        style={styles.thumbnail}
+                        resizeMode="cover"
+                        blurRadius={isFocused ? blurRadius : blurRadius * 0.6}
+                        fadeDuration={0}
+                    />
+                </View>
+            )}
+        </Pressable>
+    ) : (
         <View style={styles.container}>
             {/* Vídeo - sempre renderizado quando há URI */}
             {uri && uri.length > 0 && player && (
@@ -333,6 +481,7 @@ export default function MediaRenderVideo({
                         nativeControls={false}
                         allowsFullscreen={false}
                         allowsPictureInPicture={false}
+                        accessible={false}
                     />
                 </View>
             )}
@@ -340,7 +489,7 @@ export default function MediaRenderVideo({
             {/* Thumbnail - sempre visível até o vídeo estar pronto */}
             {showThumbnail && (
                 <View style={[styles.absoluteFill, { zIndex: 10 }]} pointerEvents="none">
-                    <Image
+                    <OptimizedImage
                         source={{ uri: thumbnailSource }}
                         style={styles.thumbnail}
                         resizeMode="cover"

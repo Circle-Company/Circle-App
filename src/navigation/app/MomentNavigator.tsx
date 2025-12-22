@@ -13,9 +13,7 @@ import MomentFullScreen from "../../pages/app/Moment/moment-full"
 import NewMomentDescription from "../../pages/app/Moment/new_moment-description"
 import NewMomentGalleryScreen from "../../pages/app/Moment/new_moment-gallery"
 import NewMomentImageScreen from "../../pages/app/Moment/new_moment-image"
-import NewMomentSelectMemory from "../../pages/app/Moment/new_moment-select_memory"
 import NewMomentVideoScreen from "../../pages/app/Moment/new_moment-video"
-import VideoTrimmerScreen from "../../pages/app/Moment/video-trimmer"
 import { Interpolation as Horizontal } from "../transitions/horizontal-right"
 
 const MomentStack = createStackNavigator()
@@ -87,19 +85,6 @@ export function MomentNavigator() {
                 }}
             />
             <MomentStack.Screen
-                name="VideoTrimmerScreen"
-                component={VideoTrimmerScreen}
-                options={{
-                    headerTitle: t("Cut Video"),
-                    headerStyle: [HeaderStyle],
-                    headerTitleStyle: { color: String(ColorTheme().text) },
-                    cardStyle: { backgroundColor: String(ColorTheme().background) },
-                    cardOverlayEnabled: true,
-                    cardStyleInterpolator: Horizontal,
-                    headerLeft: () => <MemoryHeaderLeft />,
-                }}
-            />
-            <MomentStack.Screen
                 name="NewMomentDescription"
                 component={NewMomentDescription}
                 options={{
@@ -111,20 +96,6 @@ export function MomentNavigator() {
                     cardStyleInterpolator: Horizontal,
                     headerLeft: () => <MemoryHeaderLeft />,
                     headerRight: () => <NewMomentInputDescriptionRight />,
-                }}
-            />
-            <MomentStack.Screen
-                name="NewMomentSelectMemory"
-                component={NewMomentSelectMemory}
-                options={{
-                    headerTitle: t("Add to Memory"),
-                    headerStyle: [HeaderStyle],
-                    headerTitleStyle: { color: String(ColorTheme().text) },
-                    cardStyle: { backgroundColor: String(ColorTheme().background) },
-                    cardOverlayEnabled: true,
-                    cardStyleInterpolator: Horizontal,
-                    headerLeft: () => <MemoryHeaderLeft />,
-                    headerRight: () => <NewMomentSelectMemoryRight />,
                 }}
             />
         </MomentStack.Navigator>

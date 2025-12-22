@@ -1,12 +1,11 @@
 import UploadIcon from "@/assets/icons/svgs/arrow_up.svg"
 import { useIsFocused } from "@react-navigation/core"
 import type { NativeStackScreenProps } from "@react-navigation/native-stack"
-import React, { useCallback, useMemo, useState, useContext } from "react"
+import React, { useCallback, useMemo, useState, useContext, useRef } from "react"
 import type { ImageLoadEventData, NativeSyntheticEvent } from "react-native"
 import { StyleSheet, View, Text, Keyboard, Animated, Easing } from "react-native"
-import type { OnLoadData, OnVideoErrorData } from "react-native-video"
-import Video from "react-native-video"
-import { useNotifications } from "react-native-notificated"
+import { VideoView, useVideoPlayer } from "expo-video"
+import { useToast } from "@/contexts/Toast"
 import { CommonActions } from "@react-navigation/native"
 import sizes from "@/constants/sizes"
 import { SAFE_AREA_PADDING } from "../constants"
@@ -20,10 +19,6 @@ import ButtonStandart from "@/components/buttons/button-standart"
 import LanguageContext from "@/contexts/Preferences/language"
 import { ViewStyle } from "react-native"
 import { TextInput } from "react-native"
-
-type OnLoadImage = NativeSyntheticEvent<ImageLoadEventData>
-const isVideoOnLoadEvent = (event: OnLoadData | OnLoadImage): event is OnLoadData =>
-    "duration" in event && "naturalSize" in event
 
 type Props = NativeStackScreenProps<Routes, "MediaPage">
 export function MediaPage({ navigation, route }: Props): React.ReactElement {
@@ -51,7 +46,51 @@ export function MediaPage({ navigation, route }: Props): React.ReactElement {
     const [videoDuration, setVideoDuration] = useState(0)
     const [currentTime, setCurrentTime] = useState(0)
     const { t } = React.useContext(LanguageContext)
-    const { notify } = useNotifications()
+    const toast = useToast()
+
+    // Use videoUri from params, fallback to context
+    const displayUri = videoUri || video?.path
+
+    // Setup expo-video player
+    const player = useVideoPlayer(displayUri || "", (player) => {
+        player.loop = true
+        player.play()
+    })
+
+    // Update play/pause based on foreground state
+    React.useEffect(() => {
+        if (player) {
+            if (isVideoPaused) {
+                player.pause()
+            } else {
+                player.play()
+            }
+        }
+    }, [isVideoPaused, player])
+
+    // Listen to player status
+    React.useEffect(() => {
+        if (!player) return
+
+        const subscription = player.addListener("statusChange", (status) => {
+            if (status.status === "readyToPlay") {
+                setIsVideoLoading(false)
+                setVideoDuration(status.duration)
+            } else if (status.status === "error") {
+                setIsVideoLoading(false)
+                setVideoError("Não foi possível reproduzir o vídeo.")
+            }
+        })
+
+        const timeSubscription = player.addListener("timeUpdate", (update) => {
+            setCurrentTime(update.currentTime)
+        })
+
+        return () => {
+            subscription.remove()
+            timeSubscription.remove()
+        }
+    }, [player])
 
     // Keyboard animation (linear): scale + translateY compensation to keep top anchored (same as share.description)
     const keyboardAnim = React.useRef(new Animated.Value(0)).current
@@ -183,18 +222,9 @@ export function MediaPage({ navigation, route }: Props): React.ReactElement {
         const result = await upload()
 
         if (result.ok) {
-            notify("toast", {
-                params: {
-                    description: t("Moment Has been uploaded with success"),
-                    title: t("Moment Created"),
-                    icon: (
-                        <UploadIcon
-                            fill={colors.green.green_05.toString()}
-                            width={15}
-                            height={15}
-                        />
-                    ),
-                },
+            toast.success(t("Moment Has been uploaded with success"), {
+                title: t("Moment Created"),
+                icon: <UploadIcon fill={colors.green.green_05.toString()} width={15} height={15} />,
             })
 
             // Reset camera context
@@ -208,46 +238,15 @@ export function MediaPage({ navigation, route }: Props): React.ReactElement {
                 }),
             )
         } else {
-            notify("tiny", {
-                params: {
-                    backgroundColor: colors.red.red_05.toString(),
-                    title: result.error,
-                    titleColor: colors.gray.white,
-                    icon: null,
-                },
+            toast.error(result.error, {
+                backgroundColor: colors.red.red_05.toString(),
+                duration: 1000,
+                position: "top",
             })
         }
     }
-    const onMediaLoad = useCallback((event: OnLoadData | OnLoadImage) => {
-        console.log("🎬 onMediaLoad chamado!")
-        setIsVideoLoading(false)
-        if (isVideoOnLoadEvent(event)) {
-            setVideoDuration(event.duration)
-            setCurrentTime(0)
-            console.log(
-                `✅ Video carregado! Size: ${event.naturalSize.width}x${event.naturalSize.height} (${event.naturalSize.orientation}, ${event.duration} seconds)`,
-            )
-        } else {
-            const source = event.nativeEvent.source
-            console.log(`✅ Image carregada! Size: ${source.width}x${source.height}`)
-        }
-    }, [])
+
     const [videoError, setVideoError] = useState<string | null>(null)
-
-    const onMediaLoadError = useCallback(
-        (error: OnVideoErrorData) => {
-            console.error("❌ Erro ao exibir vídeo:", error)
-            console.error("❌ Video URI com erro:", videoUri || video?.path)
-            setIsVideoLoading(false)
-            setVideoError(
-                "Não foi possível reproduzir o vídeo. O formato ou resolução pode ser incompatível.",
-            )
-        },
-        [videoUri, video?.path],
-    )
-
-    // Use videoUri from params, fallback to context
-    const displayUri = videoUri || video?.path
 
     return (
         <View style={styles.container}>
@@ -260,18 +259,11 @@ export function MediaPage({ navigation, route }: Props): React.ReactElement {
                     </View>
                 ) : !videoError ? (
                     <>
-                        <Video
-                            source={{ uri: displayUri }}
+                        <VideoView
+                            player={player}
                             style={styles.cameraContainer}
-                            paused={isVideoPaused}
-                            resizeMode="cover"
-                            repeat={true}
-                            controls={false}
-                            playWhenInactive={true}
-                            ignoreSilentSwitch="ignore"
-                            onLoad={onMediaLoad}
-                            onError={onMediaLoadError}
-                            onProgress={({ currentTime }) => setCurrentTime(currentTime)}
+                            contentFit="cover"
+                            nativeControls={false}
                         />
                         <View
                             style={{

@@ -13,10 +13,9 @@ export default function Picture({ fromProfile = false }: ProfilePictureProps) {
     const [profilePicture, setProfilePicture] = React.useState<string>("")
 
     const pictureDimensions = {
-        width: 130,
-        height: 130,
-        padding: 10,
-        borderRadius: 130 / 2,
+        width: 150,
+        height: 150,
+        borderRadius: 150 / 2,
     }
     const outlineSize: number = Number(Number(pictureDimensions.width) / 20)
 
@@ -24,8 +23,6 @@ export default function Picture({ fromProfile = false }: ProfilePictureProps) {
         alignItems: "center",
         justifyContent: "center",
         marginHorizontal: sizes.margins["1sm"],
-        borderRadius: +Number([Number(pictureDimensions.width) + Number(outlineSize)]) / 2,
-        backgroundColor: isDarkMode ? colors.gray.grey_06 : colors.gray.grey_02,
         width: Number(pictureDimensions.width) + Number(outlineSize),
         height: Number(pictureDimensions.height) + Number(outlineSize),
     }

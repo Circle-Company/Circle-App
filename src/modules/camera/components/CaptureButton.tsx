@@ -2,23 +2,20 @@ import ColorTheme, { colors } from "@/constants/colors"
 import React from "react"
 import type { ViewProps } from "react-native"
 import { StyleSheet, View } from "react-native"
-import type {
-    PanGestureHandlerGestureEvent,
-    TapGestureHandlerStateChangeEvent,
-} from "react-native-gesture-handler"
-import { PanGestureHandler, State, TapGestureHandler } from "react-native-gesture-handler"
+import type { TapGestureHandlerStateChangeEvent } from "react-native-gesture-handler"
+import { Gesture, GestureDetector, State, TapGestureHandler } from "react-native-gesture-handler"
 import Reanimated, {
     cancelAnimation,
     Easing,
     Extrapolate,
     interpolate,
-    useAnimatedGestureHandler,
     useAnimatedStyle,
     useSharedValue,
     withRepeat,
     withSpring,
     withTiming,
 } from "react-native-reanimated"
+import type { SharedValue } from "react-native-reanimated"
 import type { Camera, PhotoFile, VideoFile } from "react-native-vision-camera"
 import { CAPTURE_BUTTON_SIZE, SCREEN_HEIGHT, SCREEN_WIDTH } from "../constants"
 
@@ -31,7 +28,7 @@ interface Props extends ViewProps {
 
     minZoom: number
     maxZoom: number
-    cameraZoom: Reanimated.SharedValue<number>
+    cameraZoom: SharedValue<number>
 
     flash: "off" | "on"
 
@@ -178,28 +175,28 @@ const CaptureButtonComponent: React.FC<Props> = ({
     )
     //#endregion
     //#region Pan handler
-    //@ts-ignore
-    const panHandler = React.useRef<PanGestureHandler>()
-    const onPanGestureEvent = useAnimatedGestureHandler<
-        PanGestureHandlerGestureEvent,
-        { offsetY?: number; startY?: number }
-    >({
-        onStart: (event, context) => {
-            context.startY = event.absoluteY
-            const yForFullZoom = context.startY * 0.7
-            const offsetYForFullZoom = context.startY - yForFullZoom
+    const panStartY = useSharedValue(0)
+    const panOffsetY = useSharedValue(0)
+
+    const panGesture = Gesture.Pan()
+        .onBegin((event) => {
+            "worklet"
+            panStartY.value = event.absoluteY
+            const yForFullZoom = panStartY.value * 0.7
+            const offsetYForFullZoom = panStartY.value - yForFullZoom
 
             // extrapolate [0 ... 1] zoom -> [0 ... Y_FOR_FULL_ZOOM] finger position
-            context.offsetY = interpolate(
+            panOffsetY.value = interpolate(
                 cameraZoom.value,
                 [minZoom, maxZoom],
                 [0, offsetYForFullZoom],
                 Extrapolate.CLAMP,
             )
-        },
-        onActive: (event, context) => {
-            const offset = context.offsetY ?? 0
-            const startY = context.startY ?? SCREEN_HEIGHT
+        })
+        .onUpdate((event) => {
+            "worklet"
+            const offset = panOffsetY.value
+            const startY = panStartY.value || SCREEN_HEIGHT
             const yForFullZoom = startY * 0.7
 
             cameraZoom.value = interpolate(
@@ -208,8 +205,7 @@ const CaptureButtonComponent: React.FC<Props> = ({
                 [maxZoom, minZoom],
                 Extrapolate.CLAMP,
             )
-        },
-    })
+        })
     //#endregion
 
     const shadowStyle = useAnimatedStyle(
@@ -271,22 +267,14 @@ const CaptureButtonComponent: React.FC<Props> = ({
             onHandlerStateChange={onHandlerStateChanged}
             shouldCancelWhenOutside={false}
             maxDurationMs={99999999} // <-- this prevents the TapGestureHandler from going to State.FAILED when the user moves his finger outside of the child view (to zoom)
-            simultaneousHandlers={panHandler}
         >
             <Reanimated.View {...props} style={[buttonStyle, style]}>
-                <PanGestureHandler
-                    enabled={enabled}
-                    ref={panHandler}
-                    failOffsetX={[-SCREEN_WIDTH, SCREEN_WIDTH]}
-                    activeOffsetY={[-2, 2]}
-                    onGestureEvent={onPanGestureEvent}
-                    simultaneousHandlers={tapHandler}
-                >
+                <GestureDetector gesture={panGesture}>
                     <Reanimated.View style={styles.flex}>
                         <Reanimated.View style={[styles.shadow, shadowStyle]} />
                         <View style={styles.button} />
                     </Reanimated.View>
-                </PanGestureHandler>
+                </GestureDetector>
             </Reanimated.View>
         </TapGestureHandler>
     )

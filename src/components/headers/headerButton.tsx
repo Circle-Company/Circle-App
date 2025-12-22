@@ -38,15 +38,10 @@ export default function HeaderButton({
 
     const container: any = {
         width: square ? height : "auto",
-        flexDirection: "row",
         alignItems: "center",
         justifyContent: "center",
-        backgroundColor: color,
-        marginLeft: marginLeft ? sizes.margins["3sm"] : 0,
-        marginRight: marginRight ? sizes.margins["3sm"] : 0,
         height: height,
         borderRadius: height / 2,
-        paddingHorizontal: sizes.paddings["2sm"],
     }
 
     async function onPress() {

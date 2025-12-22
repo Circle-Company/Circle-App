@@ -1,8 +1,9 @@
-import { Animated, Pressable, TextStyle, View, ViewStyle } from "react-native"
+import { Animated, Pressable, TextStyle, View, ViewStyle, Platform } from "react-native"
 import ColorTheme, { colors } from "../../../constants/colors"
 
 import LikeIcon from "@/assets/icons/svgs/heart_2.svg"
 import LinearGradient from "react-native-linear-gradient"
+import BlurredBackground from "../../general/blurred-background"
 import MomentContext from "../context"
 import { MomentLikeProps } from "../moment-types"
 import NumberConversor from "../../../helpers/numberConversor"
@@ -13,6 +14,7 @@ import { Text } from "../../Themed"
 import { Vibrate } from "../../../lib/hooks/useHapticFeedback"
 import fonts from "../../../constants/fonts"
 import sizes from "../../../constants/sizes"
+import { isIOS } from "@/lib/platform/detection"
 
 export default function Like({
     isLiked,
@@ -77,8 +79,8 @@ export default function Like({
             ? 0
             : 1 // Se está curtido, não soma se já estava curtido, senão soma 1
         : momentUserActions.initialLikedState
-        ? -1
-        : 0 // Se não está curtido, subtrai 1 se estava curtido, senão não muda
+          ? -1
+          : 0 // Se não está curtido, subtrai 1 se estava curtido, senão não muda
 
     // Número de likes que será exibido, considerando a interação do usuário
     const adjustedLikes = totalLikes + likeDifference
@@ -88,7 +90,11 @@ export default function Like({
     const buttonWidth = adjustedLikes > 0 ? 84 : 76
     const borderWidth = 1
     const borderRadiusValue = Number([sizes.buttons.width / 4]) / 2
-    const gradientColors = [colors.gray.grey_06, colors.gray.grey_08]
+    const gradientColors = [
+        isIOS ? colors.gray.grey_04 + 50 : colors.gray.grey_06,
+        isIOS ? colors.gray.grey_05 + 10 : colors.gray.grey_08,
+    ]
+    const resolvedBackgroundColor = isIOS ? undefined : backgroundColor
 
     const container: ViewStyle = {
         flex: 1,
@@ -130,7 +136,7 @@ export default function Like({
     }
     const blur_container_background_color: ViewStyle = {
         ...blur_container_base,
-        backgroundColor: backgroundColor,
+        backgroundColor: resolvedBackgroundColor,
     }
     const blur_container_likePressed: ViewStyle = {
         ...blur_container_base,
@@ -147,10 +153,14 @@ export default function Like({
         height: 46,
         margin,
         transform: [{ scale: animatedScale }],
+        backfaceVisibility: "hidden",
+        shouldRasterizeIOS: true,
     }
     const icon_container = {
         transform: [{ scale: animatedScaleIcon }],
         paddingRight: 4,
+        backfaceVisibility: "hidden",
+        shouldRasterizeIOS: true,
     }
     const icon_container_pressed = {
         transform: [{ scale: animatedScaleIconPressed }],
@@ -186,10 +196,16 @@ export default function Like({
                     <LinearGradient
                         colors={gradientColors}
                         start={{ x: 0.5, y: 0 }}
-                        end={{ x: 0.5, y: 1 }}
+                        end={{ x: 0.5, y: isIOS ? 0.5 : 1 }}
                         style={gradient_border}
                     >
-                        <View style={blur_container_likePressed}>
+                        <BlurredBackground
+                            intensity={30}
+                            tint="systemMaterialDark"
+                            overlayColor={colors.red.red_05}
+                            radius={borderRadiusValue - borderWidth}
+                            style={[blur_container, { backgroundColor: "transparent" }]}
+                        >
                             <View style={container}>
                                 <Animated.View style={icon_container_pressed}>
                                     <LikeIcon fill={like_fill} width={20} height={20} />
@@ -198,12 +214,12 @@ export default function Like({
                                     {displayLikes}
                                 </Text>
                             </View>
-                        </View>
+                        </BlurredBackground>
                     </LinearGradient>
                 </Pressable>
             </Animated.View>
         )
-    } else if (backgroundColor) {
+    } else if (resolvedBackgroundColor) {
         return (
             <Animated.View style={animated_container}>
                 <Pressable onPress={onLikeAction} style={pressable_container}>
@@ -234,19 +250,40 @@ export default function Like({
                     <LinearGradient
                         colors={gradientColors}
                         start={{ x: 0.5, y: 0 }}
-                        end={{ x: 0.5, y: 1 }}
+                        end={{ x: 0.5, y: isIOS ? 0.5 : 1 }}
                         style={gradient_border}
                     >
-                        <View style={blur_container}>
-                            <View style={container}>
-                                <Animated.View style={icon_container}>
-                                    <LikeIcon fill={like_fill} width={16} height={16} />
-                                </Animated.View>
-                                <Text style={likedPressed ? like_text_pressed : like_text}>
-                                    {displayLikes}
-                                </Text>
+                        {Platform.OS === "ios" ? (
+                            <BlurredBackground
+                                intensity={30}
+                                tint="systemChromeMaterial"
+                                radius={borderRadiusValue - borderWidth}
+                                style={[
+                                    blur_container,
+                                    { position: "relative", backgroundColor: "transparent" },
+                                ]}
+                            >
+                                <View style={container}>
+                                    <Animated.View style={icon_container}>
+                                        <LikeIcon fill={like_fill} width={16} height={16} />
+                                    </Animated.View>
+                                    <Text style={likedPressed ? like_text_pressed : like_text}>
+                                        {displayLikes}
+                                    </Text>
+                                </View>
+                            </BlurredBackground>
+                        ) : (
+                            <View style={blur_container}>
+                                <View style={container}>
+                                    <Animated.View style={icon_container}>
+                                        <LikeIcon fill={like_fill} width={16} height={16} />
+                                    </Animated.View>
+                                    <Text style={likedPressed ? like_text_pressed : like_text}>
+                                        {displayLikes}
+                                    </Text>
+                                </View>
                             </View>
-                        </View>
+                        )}
                     </LinearGradient>
                 </Pressable>
             </Animated.View>

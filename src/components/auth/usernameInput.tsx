@@ -180,7 +180,7 @@ export default function UsernameInput({ type }: UsernameInputProps) {
     const inputContainer: ViewStyle = {
         width: inputWidth,
         height: sizes.headers.height * 0.7,
-        backgroundColor: isDarkMode ? colors.gray.grey_08 : colors.gray.grey_02 + "80",
+        backgroundColor: colors.gray.grey_08,
         borderRadius: sizes.headers.height / 2,
         paddingHorizontal: sizes.paddings["1md"],
         flexDirection: "row",
@@ -189,7 +189,7 @@ export default function UsernameInput({ type }: UsernameInputProps) {
         shadowOffset: { width: 0, height: 2 },
         shadowRadius: 10,
         borderWidth: username.length > 0 ? 2 : 0,
-        borderColor: ColorTheme().backgroundDisabled,
+        borderColor: colors.gray.grey_07,
     }
     const input: TextStyle = {
         marginLeft: 10,
@@ -208,7 +208,7 @@ export default function UsernameInput({ type }: UsernameInputProps) {
         borderRadius: sizes.sizes["1md"],
         paddingHorizontal: sizes.paddings["1sm"],
         paddingVertical: sizes.paddings["1sm"] * 0.3,
-        backgroundColor: ColorTheme().backgroundDisabled + "80",
+        backgroundColor: colors.gray.grey_07 + "80",
     }
     const charCounter: TextStyle = {
         fontSize: fonts.size.caption2,

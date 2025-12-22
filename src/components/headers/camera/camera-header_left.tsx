@@ -14,11 +14,7 @@ export default function HeaderLeft() {
 
     return (
         <View style={container}>
-            <HeaderButton
-                action={() => navigation.goBack()}
-                square
-                color={String(ColorTheme().backgroundDisabled)}
-            >
+            <HeaderButton action={() => navigation.goBack()}>
                 <Icon fill={String(ColorTheme().text)} width={13} height={13} />
             </HeaderButton>
         </View>

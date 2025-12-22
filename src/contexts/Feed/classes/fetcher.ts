@@ -1,4 +1,5 @@
 // feedApi.ts
+import config from "@/config"
 import { MomentProps, TopComment } from "@/contexts/Feed/types"
 
 import api from "@/services/Api"
@@ -162,14 +163,15 @@ export class Fetcher {
             })
 
             data.moments.map((moment) => {
-                moment.media = moment.media.replace(
-                    "http://10.15.0.235:3000",
-                    "http://192.168.15.17:3000",
-                )
-                moment.thumbnail = moment.thumbnail.replace(
-                    "http://10.15.0.235:3000",
-                    "http://192.168.15.17:3000",
-                )
+                const oldBases = ["http://10.15.0.235:3000", "http://10.168.15.17:3000"]
+                const newBase = "http://" + config.ENDPOINT
+                for (const base of oldBases) {
+                    if (moment.media.startsWith(base)) {
+                        moment.media = newBase + moment.media.slice(base.length)
+                        break
+                    }
+                }
+                moment.thumbnail = moment.thumbnail.replace("http://10.15.0.235:3000", newBase)
             })
 
             if (!data?.success || !Array.isArray(data.moments)) {

@@ -1,7 +1,7 @@
 import CheckIcon from "@/assets/icons/svgs/check_circle.svg"
 import { useNavigation } from "@react-navigation/native"
 import React from "react"
-import { notify } from "react-native-notificated"
+import { useToast } from "./Toast"
 import { colors } from "../constants/colors"
 import api from "../services/Api"
 import PersistedContext from "./Persisted"
@@ -43,6 +43,7 @@ const SelectMomentsContext = React.createContext<SelectMomentsContextsData>(
 
 export function Provider({ children }: SelectMomentsProviderProps) {
     const { session } = React.useContext(PersistedContext)
+    const toast = useToast()
     const [from, setFrom] = React.useState<From | "">("")
     const [allMoments, setAllMoments] = React.useState([])
     const [selectedMoments, setSelectedMoments] = React.useState<Moment[]>([])
@@ -76,18 +77,15 @@ export function Provider({ children }: SelectMomentsProviderProps) {
                     { headers: { Authorization: session.account.jwtToken } },
                 )
                 .then(function (response) {
-                    notify("toast", {
-                        params: {
-                            description: "Memory Has been created with success",
-                            title: "Memory Created",
-                            icon: (
-                                <CheckIcon
-                                    fill={colors.green.green_05.toString()}
-                                    width={15}
-                                    height={15}
-                                />
-                            ),
-                        },
+                    toast.success("Memory Has been created with success", {
+                        title: "Memory Created",
+                        icon: (
+                            <CheckIcon
+                                fill={colors.green.green_05.toString()}
+                                width={15}
+                                height={15}
+                            />
+                        ),
                     })
                     return response.data
                 })

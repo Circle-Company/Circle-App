@@ -35,7 +35,7 @@ export default function SettingsItem({
     const isDarkMode = useColorScheme() === "dark"
     const { session } = React.useContext(PersistedContext)
 
-    const iconFill = isDarkMode ? colors.gray.grey_06 : colors.gray.grey_03
+    const iconFill = colors.gray.grey_06
 
     const styles = {
         container: {
@@ -47,7 +47,7 @@ export default function SettingsItem({
             flexDirection: "row" as const,
             borderRadius: sizes.borderRadius["1sm"] * 1.4,
             marginBottom: sizes.margins["1sm"],
-            backgroundColor: isDarkMode ? colors.gray.grey_09 : colors.gray.grey_01,
+            backgroundColor: colors.gray.grey_09,
         } as ViewStyle,
         containerLeft: {
             paddingLeft: sizes.paddings["1sm"],

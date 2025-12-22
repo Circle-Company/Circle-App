@@ -4,7 +4,7 @@ import { useNavigation } from "@react-navigation/native"
 import React from "react"
 import { Image, StatusBar, useColorScheme, View } from "react-native"
 import * as FileSystem from "expo-file-system"
-import { ImagePickerResponse, launchImageLibrary } from "react-native-image-picker"
+import * as ImagePicker from "expo-image-picker"
 import ButtonStandart from "../../../components/buttons/button-standart"
 import { Loading } from "../../../components/loading"
 import { Text } from "../../../components/Themed"
@@ -111,34 +111,27 @@ export default function ProfilePictureScreen() {
         }
     }
 
-    const handleImagePickerResponse = async (response: ImagePickerResponse) => {
-        if (response.didCancel) {
-            console.log("User cancelled image picker")
-        } else if (response.errorCode) {
-            console.log("ImagePicker Error: ", response.errorMessage)
-        } else {
-            try {
-                // const convertedBase64 = await HEICtoJPEG(response.assets[0].base64)
-                setSelectedImage(response)
-                console.log("selectedimage --------------------", selectedImage)
-            } catch (error) {
-                console.log("Error converting HEIC to JPEG:", error)
-            }
-        }
-    }
-
-    async function handleLaunchImageLibrary() {
-        launchImageLibrary(
-            {
-                mediaType: "photo",
-                selectionLimit: 1,
-            },
-            handleImagePickerResponse,
-        )
-    }
-
+    // Função para selecionar imagem usando expo-image-picker
     async function handlePressImagePicker() {
-        await handleLaunchImageLibrary()
+        // Solicita permissão se necessário
+        const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync()
+        if (status !== "granted") {
+            alert("Permissão para acessar a galeria é necessária!")
+            return
+        }
+
+        const result = await ImagePicker.launchImageLibraryAsync({
+            mediaTypes: ImagePicker.MediaTypeOptions.Images,
+            allowsEditing: false,
+            quality: 1,
+            base64: false,
+        })
+
+        if (!result.canceled && result.assets && result.assets.length > 0) {
+            // Expo retorna um objeto diferente, adaptando para manter compatibilidade
+            setSelectedImage({ assets: result.assets })
+            console.log("selectedimage --------------------", result.assets)
+        }
     }
 
     async function handlePressUpload() {

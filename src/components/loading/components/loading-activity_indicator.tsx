@@ -3,12 +3,22 @@ import { MotiView } from "@motify/components"
 import React from "react"
 import ColorTheme from "../../../constants/colors"
 import { LoadingProps } from "../loading-types"
+import { isIOS } from "@/lib/platform/detection"
+import { CircularProgress, Host } from "@expo/ui/swift-ui"
 
 export default function activity_indicator({
     size = 30,
     duration = 1000,
     color = ColorTheme().textDisabled.toString() + "50",
+    progress = 0,
 }: LoadingProps) {
+    if (isIOS) {
+        return (
+            <Host style={{ width: 300 }}>
+                <CircularProgress progress={progress} color="blue" />
+            </Host>
+        )
+    }
     return (
         <MotiView
             from={{

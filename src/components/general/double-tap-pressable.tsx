@@ -1,4 +1,4 @@
-import { Pressable, PressableProps } from "react-native"
+import { Pressable, PressableProps, Platform } from "react-native"
 import React, { useRef } from "react"
 
 interface DoubleTapPressableProps extends PressableProps {
@@ -30,16 +30,23 @@ const DoubleTapPressable: React.FC<DoubleTapPressableProps> = ({
             lastTap.current = now
             tapTimeout.current = setTimeout(
                 () => {
-                    onSingleTap? onSingleTap() : null
+                    onSingleTap ? onSingleTap() : null
                     lastTap.current = null
                 },
-                delay ? delay : 300
+                delay ? delay : 300,
             ) // Adjust this delay as needed
         }
     }
 
     return (
-        <Pressable {...props} onPress={handlePress} style={props.style}>
+        <Pressable
+            {...props}
+            onPress={handlePress}
+            onLongPress={Platform.OS === "ios" ? () => {} : props.onLongPress}
+            delayLongPress={Platform.OS === "ios" ? 100000 : props.delayLongPress}
+            pointerEvents={Platform.OS === "ios" ? "box-only" : props.pointerEvents}
+            style={props.style}
+        >
             {props.children}
         </Pressable>
     )

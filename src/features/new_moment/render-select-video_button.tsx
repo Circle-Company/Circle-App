@@ -1,13 +1,33 @@
 import { Text, TextStyle, TouchableOpacity, ViewStyle } from "react-native"
 
 import React from "react"
-import { launchImageLibrary } from "react-native-image-picker"
+import * as ImagePicker from "expo-image-picker"
 import { colors } from "../../constants/colors"
 import fonts from "../../constants/fonts"
 import NewMomentContext from "../../contexts/newMoment"
 
 export default function RenderSelectVideoFromGalleryButton() {
     const { setSelectedVideo } = React.useContext(NewMomentContext)
+
+    // Função adaptada para usar expo-image-picker
+    const handleSelectVideo = async () => {
+        // Solicita permissão se necessário
+        const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync()
+        if (status !== "granted") {
+            alert("Permissão para acessar a galeria é necessária!")
+            return
+        }
+
+        const result = await ImagePicker.launchImageLibraryAsync({
+            mediaTypes: ImagePicker.MediaTypeOptions.Videos,
+            allowsEditing: false,
+            quality: 1,
+        })
+
+        if (!result.canceled && result.assets && result.assets.length > 0) {
+            setSelectedVideo(result.assets[0])
+        }
+    }
 
     const buttonStyle: ViewStyle = {
         alignItems: "center",

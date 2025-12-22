@@ -116,10 +116,9 @@ export default function SignInScreen() {
 
     const errorActionText: StyleProp<TextStyle> = {
         fontSize: fonts.size.footnote,
-        fontFamily: fonts.family.Regular,
+        fontFamily: fonts.family["Regular-Italic"],
         color: isDarkMode ? colors.gray.grey_04 : colors.gray.grey_06,
         textAlign: "center",
-        fontStyle: "italic",
     }
 
     const authErrorKey = React.useMemo(() => {

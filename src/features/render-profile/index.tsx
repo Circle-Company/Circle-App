@@ -17,11 +17,6 @@ type RenderProfileProps = {
 export default function RenderProfile({ user: propsUser }: RenderProfileProps) {
     const { session } = React.useContext(PersistedContext)
 
-    // Debug: Log profile picture value
-    React.useEffect(() => {
-        console.log("🖼️ ProfilePicture from session:", session.user.profilePicture)
-    }, [session.user.profilePicture])
-
     // Use data from PersistedContext (session) instead of props
     const user: ProfileReciveDataProps = propsUser || {
         id: parseInt(session.user.id || "0"),

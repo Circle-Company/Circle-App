@@ -1,6 +1,11 @@
 import { useEffect } from "react"
 import { Keyboard, KeyboardEvent, Platform } from "react-native"
-import { interpolate, SharedValue, useSharedValue, withTiming } from "react-native-reanimated"
+import {
+    interpolate as reanimatedInterpolate,
+    SharedValue,
+    useSharedValue,
+    withTiming,
+} from "react-native-reanimated"
 
 type InterpolatableSharedValue = SharedValue<number> & {
     interpolate: (inputRange: [number, number], outputRange: [number, number]) => number
@@ -11,7 +16,7 @@ function makeInterpolatable(value: SharedValue<number>): InterpolatableSharedVal
     return Object.assign(value, {
         interpolate(inputRange: [number, number], outputRange: [number, number]) {
             "worklet"
-            return interpolate(value.value, inputRange, outputRange)
+            return reanimatedInterpolate(value.value, inputRange, outputRange)
         },
     })
 }

@@ -1,11 +1,12 @@
 import { useMutation } from "@tanstack/react-query"
 import React from "react"
-import { notify } from "react-native-notificated"
+import { useToast } from "../../contexts/Toast"
 import PersistedContext from "../../contexts/Persisted"
 import { apiRoutes } from "../../services/Api"
 
 export function useDisableHapticsMutation() {
     const { session } = React.useContext(PersistedContext)
+    const toast = useToast()
     const mutation = useMutation({
         mutationFn: async () => {
             await apiRoutes.preferences.content.setHaptics({
@@ -16,21 +17,20 @@ export function useDisableHapticsMutation() {
         onSuccess: () => {
             session.preferences.setDisableHaptics(true)
         },
+        onError: (error: any) => {
+            toast.error(error.name || error.message || "An error occurred", {
+                position: "center",
+                duration: 3000,
+            })
+        },
     })
-
-    if (mutation.isError) {
-        notify("alert", {
-            params: {
-                message: mutation.error.name,
-            },
-        })
-    }
 
     return mutation
 }
 
 export function useEnableEnableMutation() {
     const { session } = React.useContext(PersistedContext)
+    const toast = useToast()
     const mutation = useMutation({
         mutationFn: async () => {
             await apiRoutes.preferences.content.setHaptics({
@@ -41,15 +41,13 @@ export function useEnableEnableMutation() {
         onSuccess: () => {
             session.preferences.setDisableHaptics(false)
         },
+        onError: (error: any) => {
+            toast.error(error.name || error.message || "An error occurred", {
+                position: "center",
+                duration: 3000,
+            })
+        },
     })
-
-    if (mutation.isError) {
-        notify("alert", {
-            params: {
-                message: mutation.error.name,
-            },
-        })
-    }
 
     return mutation
 }

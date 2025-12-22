@@ -3,7 +3,7 @@ import ColorTheme, { colors } from "../../../../constants/colors"
 
 import CheckIcon from "@/assets/icons/svgs/check_circle.svg"
 import React from "react"
-import { notify } from "react-native-notificated"
+import { useToast } from "../../../../contexts/Toast"
 import CancelButton from "../../../../components/buttons/cancel"
 import { MomentDataProps } from "../../../../components/moment/context/types"
 import { Text } from "../../../../components/Themed"
@@ -78,6 +78,7 @@ export function RenderReportModal({ moment }: { moment: MomentDataProps }) {
     const { t } = React.useContext(LanguageContext)
     const { collapse } = React.useContext(BottomSheetContext)
     const { session } = React.useContext(PersistedContext)
+    const toast = useToast()
     const isDarkMode = useColorScheme() === "dark"
     const width =
         sizes.screens.width - (sizes.paddings["2sm"] * 2 + sizes.bottomSheet.marginHorizontal * 2)
@@ -148,18 +149,15 @@ export function RenderReportModal({ moment }: { moment: MomentDataProps }) {
                     },
                 )
                 .then(() => {
-                    notify("toast", {
-                        params: {
-                            description: t("Report Has been sended with success"),
-                            title: t("Report Sended"),
-                            icon: (
-                                <CheckIcon
-                                    fill={colors.green.green_05.toString()}
-                                    width={15}
-                                    height={15}
-                                />
-                            ),
-                        },
+                    toast.success(t("Report Has been sended with success"), {
+                        title: t("Report Sended"),
+                        icon: (
+                            <CheckIcon
+                                fill={colors.green.green_05.toString()}
+                                width={15}
+                                height={15}
+                            />
+                        ),
                     })
                 })
                 .finally(() => {

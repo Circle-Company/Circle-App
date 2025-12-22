@@ -2,7 +2,7 @@ import WifiIcon from "@/assets/icons/svgs/wifi.svg"
 import WifiSlashIcon from "@/assets/icons/svgs/wifi_slash.svg"
 import NetInfo from "@react-native-community/netinfo"
 import React, { ReactNode, createContext, useContext, useEffect, useState } from "react"
-import { notify } from "react-native-notificated"
+import { useToast } from "./Toast"
 import { colors } from "../constants/colors"
 import LanguageContext from "./Preferences/language"
 
@@ -22,6 +22,7 @@ export function Provider({ children }: NetworkProviderProps) {
     const [isInternetReachable, setIsInternetReachable] = useState<boolean | null>(null)
     const [appStarted, setAppStarted] = useState<boolean>(true)
     const { t } = useContext(LanguageContext)
+    const toast = useToast()
 
     useEffect(() => {
         let previousState = isConnected
@@ -35,36 +36,32 @@ export function Provider({ children }: NetworkProviderProps) {
             if (previousState !== currentState) {
                 if (currentState === false) {
                     // Se desconectou, exibe "Offline"
-                    notify("tiny", {
-                        params: {
-                            title: t("You are Offline"),
-                            backgroundColor: colors.red.red_05,
-                            titleColor: colors.gray.white,
-                            icon: (
-                                <WifiSlashIcon
-                                    fill={colors.gray.white.toString()}
-                                    width={12}
-                                    height={12}
-                                />
-                            ),
-                        },
+                    toast.show({
+                        title: t("You are Offline"),
+                        type: "error",
+                        duration: 1000,
+                        position: "top",
+                        backgroundColor: colors.red.red_05,
+                        icon: (
+                            <WifiSlashIcon
+                                fill={colors.gray.white.toString()}
+                                width={12}
+                                height={12}
+                            />
+                        ),
                     })
                     setNetworkStatus("OFFLINE")
                 } else if (currentState === true && previousState === false) {
                     // Se reconectou, exibe "Online"
-                    notify("tiny", {
-                        params: {
-                            title: t("Connected to Internet"),
-                            backgroundColor: colors.green.green_05,
-                            titleColor: colors.gray.white,
-                            icon: (
-                                <WifiIcon
-                                    fill={colors.gray.white.toString()}
-                                    width={12}
-                                    height={12}
-                                />
-                            ),
-                        },
+                    toast.show({
+                        title: t("Connected to Internet"),
+                        type: "success",
+                        duration: 1000,
+                        position: "top",
+                        backgroundColor: colors.green.green_05,
+                        icon: (
+                            <WifiIcon fill={colors.gray.white.toString()} width={12} height={12} />
+                        ),
                     })
                     setNetworkStatus("ONLINE")
                 }
@@ -73,19 +70,19 @@ export function Provider({ children }: NetworkProviderProps) {
             if (previousIsInternetReachable !== currentIsInternetReachable) {
                 if (currentIsInternetReachable === true && previousIsInternetReachable === false) {
                     // Exibe "Reconnecting" apenas se houver mudança no estado de alcançabilidade da Internet
-                    notify("tiny", {
-                        params: {
-                            title: t("Reconnecting..."),
-                            backgroundColor: colors.yellow.yellow_05,
-                            titleColor: colors.gray.white,
-                            icon: (
-                                <WifiSlashIcon
-                                    fill={colors.gray.white.toString()}
-                                    width={12}
-                                    height={12}
-                                />
-                            ),
-                        },
+                    toast.show({
+                        title: t("Reconnecting..."),
+                        type: "warning",
+                        duration: 1000,
+                        position: "top",
+                        backgroundColor: colors.yellow.yellow_05,
+                        icon: (
+                            <WifiSlashIcon
+                                fill={colors.gray.white.toString()}
+                                width={12}
+                                height={12}
+                            />
+                        ),
                     })
                     setNetworkStatus("RECONNECTING")
                 }

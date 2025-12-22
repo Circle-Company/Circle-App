@@ -1,11 +1,12 @@
 import { useMutation } from "@tanstack/react-query"
 import React from "react"
-import { notify } from "react-native-notificated"
+import { useToast } from "../../contexts/Toast"
 import PersistedContext from "../../contexts/Persisted"
 import { apiRoutes } from "../../services/Api"
 
 export function useDisableLikeMomentMutation() {
     const { session } = React.useContext(PersistedContext)
+    const toast = useToast()
     const mutation = useMutation({
         mutationFn: async () => {
             await apiRoutes.preferences.pushNotification.setLikeMoment({
@@ -16,21 +17,20 @@ export function useDisableLikeMomentMutation() {
         onSuccess: () => {
             session.preferences.setDisableLikeMoment(true)
         },
+        onError: (error: any) => {
+            toast.error(error.name || error.message || "An error occurred", {
+                position: "center",
+                duration: 3000,
+            })
+        },
     })
-
-    if (mutation.isError) {
-        notify("alert", {
-            params: {
-                message: mutation.error.name,
-            },
-        })
-    }
 
     return mutation
 }
 
 export function useEnableLikeMomentMutation() {
     const { session } = React.useContext(PersistedContext)
+    const toast = useToast()
     const mutation = useMutation({
         mutationFn: async () => {
             await apiRoutes.preferences.pushNotification.setLikeMoment({
@@ -41,21 +41,20 @@ export function useEnableLikeMomentMutation() {
         onSuccess: () => {
             session.preferences.setDisableLikeMoment(false)
         },
+        onError: (error: any) => {
+            toast.error(error.name || error.message || "An error occurred", {
+                position: "center",
+                duration: 3000,
+            })
+        },
     })
-
-    if (mutation.isError) {
-        notify("alert", {
-            params: {
-                message: mutation.error.name,
-            },
-        })
-    }
 
     return mutation
 }
 
 export function useDisableNewMemoryMutation() {
     const { session } = React.useContext(PersistedContext)
+    const toast = useToast()
     const mutation = useMutation({
         mutationFn: async () => {
             await apiRoutes.preferences.pushNotification.setNewMemory({
@@ -66,20 +65,20 @@ export function useDisableNewMemoryMutation() {
         onSuccess: () => {
             session.preferences.setDisableNewMemory(true)
         },
+        onError: (error: any) => {
+            toast.error(error.name || error.message || "An error occurred", {
+                position: "center",
+                duration: 3000,
+            })
+        },
     })
-    if (mutation.isError) {
-        notify("alert", {
-            params: {
-                message: mutation.error.name,
-            },
-        })
-    }
 
     return mutation
 }
 
 export function useEnableNewMemoryMutation() {
     const { session } = React.useContext(PersistedContext)
+    const toast = useToast()
     const mutation = useMutation({
         mutationFn: async () => {
             await apiRoutes.preferences.pushNotification.setNewMemory({
@@ -90,21 +89,20 @@ export function useEnableNewMemoryMutation() {
         onSuccess: () => {
             session.preferences.setDisableNewMemory(false)
         },
+        onError: (error: any) => {
+            toast.error(error.name || error.message || "An error occurred", {
+                position: "center",
+                duration: 3000,
+            })
+        },
     })
-
-    if (mutation.isError) {
-        notify("alert", {
-            params: {
-                message: mutation.error.name,
-            },
-        })
-    }
 
     return mutation
 }
 
 export function useDisableAddToMemoryMutation() {
     const { session } = React.useContext(PersistedContext)
+    const toast = useToast()
     const mutation = useMutation({
         mutationFn: async () => {
             await apiRoutes.preferences.pushNotification.setAddToMemory({
@@ -115,21 +113,20 @@ export function useDisableAddToMemoryMutation() {
         onSuccess: () => {
             session.preferences.setDisableAddToMemory(true)
         },
+        onError: (error: any) => {
+            toast.error(error.name || error.message || "An error occurred", {
+                position: "center",
+                duration: 3000,
+            })
+        },
     })
-
-    if (mutation.isError) {
-        notify("alert", {
-            params: {
-                message: mutation.error.name,
-            },
-        })
-    }
 
     return mutation
 }
 
 export function useEnableAddToMemoryMutation() {
     const { session } = React.useContext(PersistedContext)
+    const toast = useToast()
     const mutation = useMutation({
         mutationFn: async () => {
             await apiRoutes.preferences.pushNotification.setAddToMemory({
@@ -140,21 +137,20 @@ export function useEnableAddToMemoryMutation() {
         onSuccess: () => {
             session.preferences.setDisableAddToMemory(false)
         },
+        onError: (error: any) => {
+            toast.error(error.name || error.message || "An error occurred", {
+                position: "center",
+                duration: 3000,
+            })
+        },
     })
-
-    if (mutation.isError) {
-        notify("alert", {
-            params: {
-                message: mutation.error.name,
-            },
-        })
-    }
 
     return mutation
 }
 
 export function useDisableFollowUserMutation() {
     const { session } = React.useContext(PersistedContext)
+    const toast = useToast()
     const mutation = useMutation({
         mutationFn: async () => {
             await apiRoutes.preferences.pushNotification.setFollowUser({
@@ -165,21 +161,20 @@ export function useDisableFollowUserMutation() {
         onSuccess: () => {
             session.preferences.setDisableFollowUser(true)
         },
+        onError: (error: any) => {
+            toast.error(error.name || error.message || "An error occurred", {
+                position: "center",
+                duration: 3000,
+            })
+        },
     })
-
-    if (mutation.isError) {
-        notify("alert", {
-            params: {
-                message: mutation.error.name,
-            },
-        })
-    }
 
     return mutation
 }
 
 export function useEnableFollowUserMutation() {
     const { session } = React.useContext(PersistedContext)
+    const toast = useToast()
     const mutation = useMutation({
         mutationFn: async () => {
             await apiRoutes.preferences.pushNotification.setFollowUser({
@@ -190,20 +185,20 @@ export function useEnableFollowUserMutation() {
         onSuccess: () => {
             session.preferences.setDisableFollowUser(false)
         },
+        onError: (error: any) => {
+            toast.error(error.name || error.message || "An error occurred", {
+                position: "center",
+                duration: 3000,
+            })
+        },
     })
-    if (mutation.isError) {
-        notify("alert", {
-            params: {
-                message: mutation.error.name,
-            },
-        })
-    }
 
     return mutation
 }
 
 export function useDisableViewUserMutation() {
     const { session } = React.useContext(PersistedContext)
+    const toast = useToast()
     const mutation = useMutation({
         mutationFn: async () => {
             await apiRoutes.preferences.pushNotification.setViewUser({
@@ -214,20 +209,20 @@ export function useDisableViewUserMutation() {
         onSuccess: () => {
             session.preferences.setDisableViewUser(true)
         },
+        onError: (error: any) => {
+            toast.error(error.message || error.name || "An error occurred", {
+                position: "center",
+                duration: 3000,
+            })
+        },
     })
-    if (mutation.isError) {
-        notify("alert", {
-            params: {
-                message: mutation.error.message,
-            },
-        })
-    }
 
     return mutation
 }
 
 export function useEnableViewUserMutation() {
     const { session } = React.useContext(PersistedContext)
+    const toast = useToast()
     const mutation = useMutation({
         mutationFn: async () => {
             await apiRoutes.preferences.pushNotification.setViewUser({
@@ -238,14 +233,13 @@ export function useEnableViewUserMutation() {
         onSuccess: () => {
             session.preferences.setDisableViewUser(false)
         },
+        onError: (error: any) => {
+            toast.error(error.name || error.message || "An error occurred", {
+                position: "center",
+                duration: 3000,
+            })
+        },
     })
-    if (mutation.isError) {
-        notify("alert", {
-            params: {
-                message: mutation.error.name,
-            },
-        })
-    }
 
     return mutation
 }
