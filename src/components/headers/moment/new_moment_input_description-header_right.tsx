@@ -1,5 +1,5 @@
 import AddIcon from "@/assets/icons/svgs/moment.svg"
-import { useNavigation } from "@react-navigation/native"
+import { useRouter } from "expo-router"
 import React, { useContext } from "react"
 import { Text, useColorScheme, View } from "react-native"
 import { colors } from "../../../constants/colors"
@@ -17,7 +17,7 @@ export default function NewMomentInputDescriptionRight() {
     const [enabled, setEnabled] = React.useState(false)
     const isDarkMode = useColorScheme() === "dark"
 
-    const navigation = useNavigation()
+    const router = useRouter()
 
     const container: any = {
         flexDirection: "row",
@@ -60,7 +60,7 @@ export default function NewMomentInputDescriptionRight() {
             await uploadMoment().then(function () {
                 setLoading(false)
             })
-            navigation.navigate("MomentNavigator", { screen: "NewMomentSelectMemory" })
+            router.push("/moment/new-select-memory")
         }
     }
 

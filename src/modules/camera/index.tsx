@@ -1,94 +1,22 @@
-import ColorTheme, { colors } from "@/constants/colors"
-import { createStackNavigator } from "@react-navigation/stack"
-import React from "react"
-import { StyleSheet } from "react-native"
-import { GestureHandlerRootView } from "react-native-gesture-handler"
-import { Camera } from "react-native-vision-camera"
+/**
+ * Camera Module
+ *
+ * This module has been migrated to Expo Router.
+ * The navigation is now handled in app/(tabs)/create/_layout.tsx
+ *
+ * This file re-exports the main components for convenience.
+ */
+
+export { CameraPage } from "./pages/camera"
+export { PermissionsPage } from "./pages/permissions"
+export { MediaPage } from "./pages/share"
+export { DevicesPage } from "./pages/devices"
+
+export { CameraProvider, useCameraContext } from "./context"
+
+export type { Routes, CameraRoutes } from "./routes"
+export { CAMERA_ROUTES } from "./routes"
+
+// Default export for backward compatibility with (tabs)/create
 import { CameraPage } from "./pages/camera"
-import { DevicesPage } from "./pages/devices"
-import { MediaPage } from "./pages/share"
-import { PermissionsPage } from "./pages/permissions"
-import type { Routes } from "./routes"
-import LanguageContext from "@/contexts/Preferences/language"
-import sizes from "@/constants/sizes"
-import fonts from "@/constants/fonts"
-import SettingsHeaderLeft from "@/components/headers/settings/settings-header_left"
-import { CameraProvider, useCameraContext } from "./context"
-import HeaderLeft from "@/components/headers/camera/camera-header_left"
-
-const Stack = createStackNavigator<Routes>()
-
-export function CameraModule(): React.ReactElement | null {
-    const cameraPermission = Camera.getCameraPermissionStatus()
-    const microphonePermission = Camera.getMicrophonePermissionStatus()
-
-    console.log(
-        `Re-rendering Navigator. Camera: ${cameraPermission} | Microphone: ${microphonePermission}`,
-    )
-
-    const showPermissionsPage =
-        cameraPermission !== "granted" || microphonePermission === "not-determined"
-
-    const { t } = React.useContext(LanguageContext)
-    const HeaderStyle = {
-        ...sizes.headers,
-        backgroundColor: ColorTheme().background,
-    }
-    return (
-        <CameraProvider>
-            <GestureHandlerRootView style={styles.root}>
-                <Stack.Navigator
-                    screenOptions={{
-                        statusBarStyle: "dark",
-                        animationTypeForReplace: "push",
-                    }}
-                    initialRouteName={"CameraPage"}
-                >
-                    <Stack.Screen
-                        name="PermissionsPage"
-                        component={PermissionsPage}
-                        options={{
-                            headerTitleAlign: "center",
-                            headerTitleStyle: { fontFamily: fonts.family["Bold-Italic"] },
-                            headerStyle: HeaderStyle,
-                            headerTintColor: String(ColorTheme().text),
-                            headerLeft: () => <HeaderLeft />,
-                        }}
-                    />
-                    <Stack.Screen
-                        name="CameraPage"
-                        component={CameraPage}
-                        options={{
-                            headerTitleAlign: "center",
-                            headerTitleStyle: { fontFamily: fonts.family["Bold-Italic"] },
-                            headerStyle: HeaderStyle,
-                            headerTintColor: String(ColorTheme().text),
-                            headerLeft: () => <HeaderLeft />,
-                        }}
-                    />
-                    <Stack.Screen
-                        name="MediaPage"
-                        component={MediaPage}
-                        options={{
-                            animation: "none",
-                            headerTitle: t("All Ready"),
-                            headerTitleAlign: "center",
-                            headerTitleStyle: { fontFamily: fonts.family["Bold-Italic"] },
-                            headerStyle: HeaderStyle,
-                            headerTintColor: String(ColorTheme().text),
-                            headerLeft: () => <HeaderLeft />,
-                        }}
-                    />
-                </Stack.Navigator>
-            </GestureHandlerRootView>
-        </CameraProvider>
-    )
-}
-
-export default CameraModule
-
-const styles = StyleSheet.create({
-    root: {
-        flex: 1,
-    },
-})
+export default CameraPage

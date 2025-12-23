@@ -1,10 +1,12 @@
 import sizes from "@/constants/sizes"
 import { useIsFocused } from "@react-navigation/core"
-import type { NativeStackScreenProps } from "@react-navigation/native-stack"
+import { Stack, useRouter } from "expo-router"
 import * as React from "react"
+import * as FileSystem from "expo-file-system"
 import { useCallback, useEffect, useRef, useState } from "react"
 import type { GestureResponderEvent, ViewStyle } from "react-native"
 import { StyleSheet, Text, View } from "react-native"
+import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context"
 import RotateIcon from "@/assets/icons/svgs/arrow.triangle.2.circlepath.svg"
 import FlashOnIcon from "@/assets/icons/svgs/flashlight.on.fill.svg"
 import FlashOffIcon from "@/assets/icons/svgs/flashlight.off.fill.svg"
@@ -35,6 +37,7 @@ import type { Routes } from "../routes"
 import { useCameraContext } from "../context"
 import LanguageContext from "@/contexts/Preferences/language"
 import { colors } from "@/constants/colors"
+import fonts from "@/constants/fonts"
 
 const ReanimatedCamera = Reanimated.createAnimatedComponent(Camera)
 Reanimated.addWhitelistedNativeProps({
@@ -45,8 +48,8 @@ const SCALE_FULL_ZOOM = 3
 const MAX_RECORDING_TIME = 30 // segundos
 const TARGET_FPS = 60
 
-type Props = NativeStackScreenProps<Routes, "CameraPage">
-export function CameraPage({ navigation }: Props): React.ReactElement {
+export function CameraPage(): React.ReactElement {
+    const router = useRouter()
     const camera: any = useRef<Camera>(null)
     const [isCameraInitialized, setIsCameraInitialized] = useState(false)
     const microphone = useMicrophonePermission()
@@ -55,17 +58,12 @@ export function CameraPage({ navigation }: Props): React.ReactElement {
     const isPressingButton = useSharedValue(false)
     const rotateAnimation = useSharedValue(0)
     const recordingIntervalRef = useRef<NodeJS.Timeout | null>(null)
+    const insets = useSafeAreaInsets()
 
     // Camera context
     const { isRecording, setIsRecording, setVideo, setRecordingTime, setVideoBuffer } =
         useCameraContext()
     const { t } = React.useContext(LanguageContext)
-
-    React.useEffect(() => {
-        navigation.setOptions({
-            headerTitle: isRecording ? t("Recording") : t("New Moment"),
-        })
-    }, [isRecording, t, navigation])
 
     // check if camera page is active
     const isFocussed = useIsFocused()
@@ -143,24 +141,26 @@ export function CameraPage({ navigation }: Props): React.ReactElement {
             const mimeType = "video/mp4" // Sempre MP4 agora
 
             try {
-                const stat = await RNFS.stat(tempPath)
-                fileSize = stat.size
-                console.log("📊 Tamanho do arquivo:", fileSize, "bytes")
+                const fileInfo = await FileSystem.getInfoAsync(tempPath)
+                if (fileInfo.exists && !fileInfo.isDirectory) {
+                    fileSize = fileInfo.size || 0
+                    console.log("📊 Tamanho do arquivo:", fileSize, "bytes")
+                }
             } catch (error) {
                 console.error("❌ Erro ao obter informações do arquivo:", error)
             }
 
             // Criar diretório temp se não existir
-            const tempDir = `${RNFS.DocumentDirectoryPath}/temp`
+            const tempDir = `${FileSystem.documentDirectory}temp`
 
-            console.log("📁 Document directory:", RNFS.DocumentDirectoryPath)
+            console.log("📁 Document directory:", FileSystem.documentDirectory)
             console.log("📁 Temp directory:", tempDir)
 
             try {
-                const dirExists = await RNFS.exists(tempDir)
-                if (!dirExists) {
+                const dirInfo = await FileSystem.getInfoAsync(tempDir)
+                if (!dirInfo.exists) {
                     console.log("📁 Criando diretório temp...")
-                    await RNFS.mkdir(tempDir)
+                    await FileSystem.makeDirectoryAsync(tempDir, { intermediates: true })
                     console.log("✅ Diretório criado com sucesso!")
                 }
             } catch (error) {
@@ -176,13 +176,18 @@ export function CameraPage({ navigation }: Props): React.ReactElement {
             console.log("📂 Para:", finalPath)
 
             try {
-                await RNFS.copyFile(tempPath, finalPath)
+                await FileSystem.copyAsync({
+                    from: tempPath,
+                    to: finalPath,
+                })
                 console.log("✅ Vídeo copiado com sucesso!")
 
                 // Verificar se arquivo foi copiado
-                const copiedStat = await RNFS.stat(finalPath)
-                fileSize = copiedStat.size
-                console.log("✅ Arquivo verificado, tamanho:", fileSize, "bytes")
+                const copiedInfo = await FileSystem.getInfoAsync(finalPath)
+                if (copiedInfo.exists && !copiedInfo.isDirectory) {
+                    fileSize = copiedInfo.size || fileSize
+                    console.log("✅ Arquivo verificado, tamanho:", fileSize, "bytes")
+                }
             } catch (error) {
                 console.error("❌ Erro ao copiar vídeo:", error)
                 console.error("❌ Detalhes do erro:", JSON.stringify(error))
@@ -217,14 +222,17 @@ export function CameraPage({ navigation }: Props): React.ReactElement {
             })
 
             // Navegar passando o fileUri diretamente como parâmetro
-            navigation.navigate("MediaPage", {
-                videoUri: fileUri,
-                duration: media.duration,
-                width: media.width,
-                height: media.height,
+            router.push({
+                pathname: "/(tabs)/create/media",
+                params: {
+                    videoUri: fileUri,
+                    duration: media.duration?.toString(),
+                    width: media.width?.toString(),
+                    height: media.height?.toString(),
+                },
             })
         },
-        [navigation, setIsRecording, setVideo, setRecordingTime, setVideoBuffer],
+        [router, setIsRecording, setVideo, setRecordingTime, setVideoBuffer],
     )
     const onFlipCameraPressed = useCallback(() => {
         setCameraPosition((p) => (p === "back" ? "front" : "back"))
@@ -352,114 +360,125 @@ export function CameraPage({ navigation }: Props): React.ReactElement {
     }
 
     return (
-        <View style={styles.container}>
-            {device != null ? (
-                <GestureDetector gesture={pinchGesture}>
-                    <Reanimated.View
-                        onTouchEnd={onFocusTap}
-                        style={[
-                            {
-                                alignItems: "center",
-                                justifyContent: "center",
-                                alignSelf: "center",
-                                borderRadius: 40,
-                                overflow: "hidden",
-                            },
-                        ]}
+        <SafeAreaView style={styles.container} edges={["top", "bottom"]}>
+            <Stack.Screen
+                options={{
+                    headerTitle: isRecording ? t("Recording") : t("New Moment"),
+                    headerTitleStyle: {
+                        color: colors.gray.white,
+                        fontFamily: fonts.family["Black-Italic"],
+                    },
+                }}
+            />
+            <View style={styles.container}>
+                {device != null ? (
+                    <GestureDetector gesture={pinchGesture}>
+                        <Reanimated.View
+                            onTouchEnd={onFocusTap}
+                            style={[
+                                {
+                                    alignItems: "center",
+                                    justifyContent: "center",
+                                    alignSelf: "center",
+                                    borderRadius: 40,
+                                    overflow: "hidden",
+                                },
+                            ]}
+                        >
+                            <TapGestureHandler onEnded={onDoubleTap} numberOfTaps={2}>
+                                <ReanimatedCamera
+                                    style={cameraStyle}
+                                    device={device}
+                                    isActive={isActive}
+                                    ref={camera}
+                                    onInitialized={onInitialized}
+                                    onError={onError}
+                                    format={format}
+                                    fps={fps}
+                                    lowLightBoost={false}
+                                    enableZoomGesture={false}
+                                    animatedProps={cameraAnimatedProps}
+                                    exposure={0}
+                                    outputOrientation="device"
+                                    video={true}
+                                    audio={microphone.hasPermission}
+                                    enableLocation={location.hasPermission}
+                                    torch={torch}
+                                />
+                            </TapGestureHandler>
+                        </Reanimated.View>
+                    </GestureDetector>
+                ) : (
+                    <View style={styles.emptyContainer}>
+                        <Text style={styles.text}>Your phone does not have a Camera.</Text>
+                    </View>
+                )}
+
+                {isRecording && (
+                    <View>
+                        <CameraVideoSlider
+                            maxTime={MAX_RECORDING_TIME}
+                            width={sizes.moment.full.width}
+                        />
+                    </View>
+                )}
+
+                <View style={[styles.bottomBar, { bottom: CONTENT_SPACING * 3 + insets.bottom }]}>
+                    <PressableOpacity
+                        style={styles.sideButton}
+                        onPress={onFlipCameraPressed}
+                        disabledOpacity={0.4}
                     >
-                        <TapGestureHandler onEnded={onDoubleTap} numberOfTaps={2}>
-                            <ReanimatedCamera
-                                style={cameraStyle}
-                                device={device}
-                                isActive={isActive}
-                                ref={camera}
-                                onInitialized={onInitialized}
-                                onError={onError}
-                                format={format}
-                                fps={fps}
-                                lowLightBoost={false}
-                                enableZoomGesture={false}
-                                animatedProps={cameraAnimatedProps}
-                                exposure={0}
-                                outputOrientation="device"
-                                video={true}
-                                audio={microphone.hasPermission}
-                                enableLocation={location.hasPermission}
-                                torch={torch}
-                            />
-                        </TapGestureHandler>
-                    </Reanimated.View>
-                </GestureDetector>
-            ) : (
-                <View style={styles.emptyContainer}>
-                    <Text style={styles.text}>Your phone does not have a Camera.</Text>
-                </View>
-            )}
+                        <Reanimated.View style={rotateIconStyle}>
+                            <RotateIcon fill={colors.gray.white} width={22} height={22} />
+                        </Reanimated.View>
+                    </PressableOpacity>
 
-            {isRecording && (
-                <View>
-                    <CameraVideoSlider
-                        maxTime={MAX_RECORDING_TIME}
-                        width={sizes.moment.full.width}
+                    <CaptureButton
+                        style={styles.captureButton}
+                        camera={camera}
+                        onMediaCaptured={onMediaCaptured}
+                        cameraZoom={zoom}
+                        minZoom={minZoom}
+                        maxZoom={maxZoom}
+                        flash="off"
+                        enabled={isCameraInitialized && isActive}
+                        setIsPressingButton={setIsPressingButton}
+                        onRecordingStart={() => setIsRecording(true)}
+                        onRecordingStop={() => setIsRecording(false)}
                     />
+
+                    <PressableOpacity
+                        style={[
+                            styles.sideButton,
+                            torch === "on" && styles.sideButtonTorchOn,
+                            cameraPosition === "front" && { opacity: 0.4 },
+                        ]}
+                        onPress={() => {
+                            if (cameraPosition !== "front") {
+                                setTorch((t) => (t === "off" ? "on" : "off"))
+                            }
+                        }}
+                        disabledOpacity={0.4}
+                        disabled={cameraPosition === "front"}
+                    >
+                        {torch === "on" ? (
+                            <FlashOnIcon
+                                fill={cameraPosition === "front" ? "#888" : "white"}
+                                width={22}
+                                height={22}
+                            />
+                        ) : (
+                            <FlashOffIcon
+                                fill={cameraPosition === "front" ? "#888" : "white"}
+                                width={22}
+                                height={22}
+                            />
+                        )}
+                    </PressableOpacity>
                 </View>
-            )}
-
-            <View style={styles.bottomBar}>
-                <PressableOpacity
-                    style={styles.sideButton}
-                    onPress={onFlipCameraPressed}
-                    disabledOpacity={0.4}
-                >
-                    <Reanimated.View style={rotateIconStyle}>
-                        <RotateIcon fill={colors.gray.white} width={22} height={22} />
-                    </Reanimated.View>
-                </PressableOpacity>
-
-                <CaptureButton
-                    style={styles.captureButton}
-                    camera={camera}
-                    onMediaCaptured={onMediaCaptured}
-                    cameraZoom={zoom}
-                    minZoom={minZoom}
-                    maxZoom={maxZoom}
-                    flash="off"
-                    enabled={isCameraInitialized && isActive}
-                    setIsPressingButton={setIsPressingButton}
-                    onRecordingStart={() => setIsRecording(true)}
-                    onRecordingStop={() => setIsRecording(false)}
-                />
-
-                <PressableOpacity
-                    style={[
-                        styles.sideButton,
-                        torch === "on" && styles.sideButtonTorchOn,
-                        cameraPosition === "front" && { opacity: 0.4 },
-                    ]}
-                    onPress={() => {
-                        if (cameraPosition !== "front") {
-                            setTorch((t) => (t === "off" ? "on" : "off"))
-                        }
-                    }}
-                    disabledOpacity={0.4}
-                    disabled={cameraPosition === "front"}
-                >
-                    {torch === "on" ? (
-                        <FlashOnIcon
-                            fill={cameraPosition === "front" ? "#888" : "white"}
-                            width={22}
-                            height={22}
-                        />
-                    ) : (
-                        <FlashOffIcon
-                            fill={cameraPosition === "front" ? "#888" : "white"}
-                            width={22}
-                            height={22}
-                        />
-                    )}
-                </PressableOpacity>
             </View>
-        </View>
+        </SafeAreaView>
     )
 }
 

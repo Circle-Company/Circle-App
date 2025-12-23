@@ -98,7 +98,7 @@ export const SwitchButton: React.FC<SwitchButtonProps> = ({
                 <Switch
                     value={checked}
                     onValueChange={(next: boolean) => toggle(next)}
-                    color={isDarkMode ? "#FFFFFF" : "#000000"}
+                    color={colors.purple.purple_05}
                     label=""
                     variant="switch"
                 />

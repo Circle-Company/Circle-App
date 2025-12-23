@@ -104,7 +104,7 @@ export default function AccountScreen() {
     }, [momentsData])
 
     return (
-        <ScrollView>
+        <ScrollView style={{ backgroundColor: "#000" }}>
             <AnimatedVerticalScrollView
                 elasticEffect={true}
                 onEndReachedThreshold={0.1}

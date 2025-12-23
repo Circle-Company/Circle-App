@@ -12,12 +12,13 @@ import React from "react"
 import { Text } from "@/components/Themed"
 import fonts from "@/constants/fonts"
 import sizes from "@/constants/sizes"
-import { useNavigation } from "@react-navigation/native"
+import { useRouter } from "expo-router"
+import { SafeAreaView } from "react-native-safe-area-context"
 import { useTranslation } from "react-i18next"
 
 export default function PasswordScreen() {
     const isDarkMode = useColorScheme() === "dark"
-    const navigation: any = useNavigation()
+    const router = useRouter()
     const { t } = useTranslation()
     const { setErrorMessage, signInputPassword, errorMessage, loading } =
         React.useContext(AuthContext)
@@ -28,6 +29,7 @@ export default function PasswordScreen() {
     }
 
     const headerContainer: any = {
+        marginTop: sizes.margins["2sm"],
         width: sizes.screens.width,
         height: sizes.headers.height * 0.7,
         flexDirection: "row",
@@ -108,7 +110,7 @@ export default function PasswordScreen() {
 
     function handlePress() {
         if (signInputPassword && signInputPassword.length >= 4) {
-            navigation.navigate("Auth-SignUp-Agree")
+            router.push("/(auth)/sign-up-agree")
         }
     }
 
@@ -117,7 +119,7 @@ export default function PasswordScreen() {
     }, [])
 
     return (
-        <View style={container}>
+        <SafeAreaView style={container} edges={["top", "bottom"]}>
             <StatusBar backgroundColor={colors.gray.black} barStyle={"light-content"} />
             <LinearGradient
                 renderToHardwareTextureAndroid
@@ -188,6 +190,6 @@ export default function PasswordScreen() {
                     </>
                 )}
             </ButtonStandart>
-        </View>
+        </SafeAreaView>
     )
 }

@@ -176,11 +176,13 @@ export default function UsernameInput({ type }: UsernameInputProps) {
         width: sizes.screens.width,
         alignItems: "center",
         backgroundColor: "transparent",
+        maxWidth: sizes.screens.width * 0.8,
     }
     const inputContainer: ViewStyle = {
         width: inputWidth,
         height: sizes.headers.height * 0.7,
         backgroundColor: colors.gray.grey_08,
+        maxWidth: sizes.screens.width * 0.8,
         borderRadius: sizes.headers.height / 2,
         paddingHorizontal: sizes.paddings["1md"],
         flexDirection: "row",

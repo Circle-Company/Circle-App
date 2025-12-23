@@ -1,6 +1,6 @@
 import ColorTheme, { colors } from "@/constants/colors"
 import { default as Fonts, default as fonts } from "@/constants/fonts"
-import { SafeAreaView, ViewStyle } from "react-native"
+import { ViewStyle } from "react-native"
 import StatusBar from "../../../components/StatusBar"
 import { View } from "react-native"
 import Button from "@/components/buttons/button-standart"
@@ -8,21 +8,23 @@ import Icon from "@/assets/icons/svgs/arrow_circle_right.svg"
 import { LanguageSelector } from "@/components/language/selector"
 import { LinearGradient } from "expo-linear-gradient"
 import LogoIcon from "@/assets/icons/svgs/circle-icon-logo.svg"
-import React from "react"
 import { Text } from "@/components/Themed"
 import config from "@/config"
 import sizes from "@/constants/sizes"
-import { useNavigation } from "@react-navigation/native"
+import { useRouter } from "expo-router"
 import { useTranslation } from "react-i18next"
+import { SafeAreaInsetsContext, useSafeAreaInsets } from "react-native-safe-area-context"
 
 export default function SplashScreen() {
-    const navigation: any = useNavigation()
+    const router = useRouter()
     const { t } = useTranslation()
+    const insets = useSafeAreaInsets()
 
     const container: any = {
         flex: 1,
+        height: "100%",
         alignItems: "center",
-        backgroundColor: ColorTheme().background,
+        backgroundColor: colors.gray.black,
     }
     const header: any = {
         top: 100,
@@ -121,8 +123,8 @@ export default function SplashScreen() {
     }
 
     return (
-        <SafeAreaView style={container}>
-            <StatusBar barStyle={"light-content"} backgroundColor={""} />
+        <View style={container}>
+            <StatusBar barStyle={"light-content"} translucent backgroundColor={"transparent"} />
             <LinearGradient
                 renderToHardwareTextureAndroid
                 colors={["rgba(42, 42, 42, 1)", "#00000000"]}
@@ -134,53 +136,55 @@ export default function SplashScreen() {
                 colors={["#00000000", colors.purple.purple_09]}
                 style={inferior_gradient}
             />
+            <SafeAreaInsetsContext value={insets}>
+                <View style={{ paddingVertical: sizes.paddings["1md"], flex: 1 }}>
+                    <View style={langugageContainer}>
+                        <LanguageSelector />
+                    </View>
+                    <View style={header}>
+                        <View style={logoContainer}>
+                            <LinearGradient
+                                renderToHardwareTextureAndroid
+                                colors={[colors.purple.purple_04, colors.purple.purple_08]}
+                                style={iconGradient}
+                            />
+                            <LogoIcon fill="#edddffff" width={100} height={100} />
+                        </View>
+                        <Text style={title}>{config.APPLICATION_NAME}</Text>
+                        <Text style={slogan}>{config.APPLICATION_DESCRIPTION}</Text>
+                    </View>
 
-            <View style={langugageContainer}>
-                <LanguageSelector />
-            </View>
-
-            <View style={header}>
-                <View style={logoContainer}>
-                    <LinearGradient
-                        renderToHardwareTextureAndroid
-                        colors={[colors.purple.purple_04, colors.purple.purple_08]}
-                        style={iconGradient}
-                    />
-                    <LogoIcon fill="#edddffff" width={100} height={100} />
+                    <View style={[buttons, { bottom: insets.bottom }]}>
+                        <Button
+                            action={() => {
+                                router.push("/(auth)/sign-in")
+                            }}
+                            margins={false}
+                            style={{
+                                marginBottom: 0,
+                            }}
+                            backgroundColor={"#00000000"}
+                        >
+                            <Text style={secundaryActionText}>{t("Sign In with Circle")}</Text>
+                        </Button>
+                        <View style={primaryActionContainer}>
+                            <Button
+                                action={() => {
+                                    router.push("/(auth)/sign-up-username")
+                                }}
+                                style={{ paddingHorizontal: sizes.paddings["1lg"] }}
+                                margins={false}
+                                backgroundColor={colors.gray.white.toString()}
+                                bounciness={10}
+                                height={60}
+                            >
+                                <Text style={primaryActionText}>{t("Create Account")}</Text>
+                                <Icon width={26} height={26} fill={colors.gray.black.toString()} />
+                            </Button>
+                        </View>
+                    </View>
                 </View>
-                <Text style={title}>{config.APPLICATION_NAME}</Text>
-                <Text style={slogan}>{config.APPLICATION_DESCRIPTION}</Text>
-            </View>
-
-            <View style={buttons}>
-                <Button
-                    action={() => {
-                        navigation.navigate("Auth-SignIn")
-                    }}
-                    margins={false}
-                    style={{
-                        marginBottom: 0,
-                    }}
-                    backgroundColor={"#00000000"}
-                >
-                    <Text style={secundaryActionText}>{t("Sign In with Circle")}</Text>
-                </Button>
-                <View style={primaryActionContainer}>
-                    <Button
-                        action={() => {
-                            navigation.navigate("Auth-SignUp-Username")
-                        }}
-                        style={{ paddingHorizontal: sizes.paddings["1lg"] }}
-                        margins={false}
-                        backgroundColor={colors.gray.white.toString()}
-                        bounciness={10}
-                        height={60}
-                    >
-                        <Text style={primaryActionText}>{t("Create Account")}</Text>
-                        <Icon width={26} height={26} fill={colors.gray.black.toString()} />
-                    </Button>
-                </View>
-            </View>
-        </SafeAreaView>
+            </SafeAreaInsetsContext>
+        </View>
     )
 }

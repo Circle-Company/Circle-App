@@ -1,4 +1,4 @@
-import { NavigationProp, useNavigation } from "@react-navigation/native"
+import { useRouter } from "expo-router"
 import { Text, TextStyle, View, ViewStyle, Platform } from "react-native"
 
 import { BadgeIcon } from "../../general/badge-icon"
@@ -16,7 +16,7 @@ export default function HeaderRightHome() {
     const { t } = React.useContext(LanguageContext)
     const { session } = React.useContext(PersistedContext)
 
-    const navigation: NavigationProp<any> = useNavigation()
+    const router = useRouter()
 
     const container: ViewStyle = {
         flexDirection: "row",
@@ -41,7 +41,7 @@ export default function HeaderRightHome() {
     }
 
     async function onPressNewMoment() {
-        navigation.navigate("CreateBottomTab")
+        router.push("/(tabs)/create")
     }
 
     return (

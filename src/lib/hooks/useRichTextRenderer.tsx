@@ -1,10 +1,8 @@
-import { Linking, Pressable, Text, TextStyle, View, ViewStyle } from "react-native"
-
-import ColorTheme from "../../constants/colors"
-import PersistedContext from "@/contexts/Persisted"
 import React from "react"
-import { UserShow } from "../../components/user_show"
+import { Linking, Text, View, TextStyle, ViewStyle } from "react-native"
 import fonts from "../../constants/fonts"
+import ColorTheme from "../../constants/colors"
+import { UserShow } from "../../components/user_show"
 import { userReciveDataProps } from "../../components/user_show/user_show-types"
 
 export type RichTextUIEntity = {
@@ -20,309 +18,113 @@ export type RichTextUIFormat = {
     entities: RichTextUIEntity[]
 }
 
-export type UseRichTextRendererProps = {
+type Props = {
     richText: RichTextUIFormat
-    userMapping?: Record<string, userReciveDataProps> // Mapeamento de user ID para dados do usuário
-    // Estilos para texto normal
+    userMapping?: Record<string, userReciveDataProps>
     textStyle?: TextStyle
-    fontSize?: number
-    fontFamily?: string
-    color?: string
-    // Estilos para mentions (nome de usuário)
-    mentionStyle?: TextStyle
-    mentionFontSize?: number
-    mentionFontFamily?: string
-    mentionColor?: string
-    // Estilos para hashtags
-    hashtagStyle?: TextStyle
-    hashtagFontSize?: number
-    hashtagFontFamily?: string
-    hashtagColor?: string
-    // Estilos para links
-    linkStyle?: TextStyle
-    linkFontSize?: number
-    linkFontFamily?: string
-    linkColor?: string
-    // Outras props
-    displayOnMoment?: boolean
+    containerStyle?: ViewStyle
 }
 
-export function useRichTextRenderer({
-    richText,
-    userMapping = {},
-    // Texto normal
-    textStyle,
-    fontSize = fonts.size.body,
-    fontFamily = fonts.family.Regular,
-    color = ColorTheme().text,
-    // Mentions
-    mentionStyle,
-    mentionFontSize,
-    mentionFontFamily,
-    mentionColor,
-    // Hashtags
-    hashtagStyle,
-    hashtagFontSize,
-    hashtagFontFamily,
-    hashtagColor,
-    // Links
-    linkStyle,
-    linkFontSize,
-    linkFontFamily,
-    linkColor,
-    // Outras
-    displayOnMoment = false,
-}: UseRichTextRendererProps) {
-    const { session } = React.useContext(PersistedContext)
-    const defaultTextStyle: TextStyle = {
-        fontSize,
-        fontFamily,
-        color,
+const stripProtocol = (url: string) => url.replace(/^https?:\/\//i, "")
+
+const softWrap = (text: string) => text.replace(/([\/\.\-_?#=&])/g, "$1\u200B")
+
+export function RichTextRenderer({ richText, userMapping = {}, textStyle, containerStyle }: Props) {
+    if (!richText?.text) return null
+
+    // 🔒 estilo base RESOLVIDO (sempre existe)
+    const baseTextStyle: TextStyle = {
+        fontFamily: fonts.family.Regular,
+        fontSize: fonts.size.body,
+        color: ColorTheme().text,
         ...textStyle,
     }
 
-    const defaultMentionStyle: TextStyle = {
-        fontSize: mentionFontSize ?? fontSize,
-        fontFamily: mentionFontFamily ?? fonts.family.Bold,
-        color: mentionColor ?? color,
-        ...mentionStyle,
+    const blocks: React.ReactNode[] = []
+    let cursor = 0
+
+    const entities = [...(richText.entities ?? [])].sort((a, b) => a.start - b.start)
+
+    const pushText = (value: string) => {
+        if (!value) return
+        blocks.push(
+            <Text key={`text-${blocks.length}`} style={baseTextStyle}>
+                {value}
+            </Text>,
+        )
     }
 
-    const defaultHashtagStyle: TextStyle = {
-        fontSize: hashtagFontSize ?? fontSize,
-        fontFamily: hashtagFontFamily ?? fontFamily,
-        color: hashtagColor ?? color,
-        ...hashtagStyle,
-    }
-
-    const defaultLinkStyle: TextStyle = {
-        fontSize: linkFontSize ?? fontSize,
-        fontFamily: linkFontFamily ?? fonts.family["Semibold-Italic"],
-        color: linkColor ?? ColorTheme().primary,
-        textDecorationLine: "underline",
-        ...linkStyle,
-    }
-
-    const handleLinkPress = React.useCallback((url: string) => {
-        Linking.openURL(url).catch((err) => {
-            console.error("Erro ao abrir URL:", err)
-        })
-    }, [])
-
-    // Armazenar em memória os IDs dos usernames mencionados
-    const mentionedUserIdsRef = React.useRef<Set<string>>(new Set())
-
-    // Extrair e armazenar IDs das mentions quando o richText mudar
-    React.useEffect(() => {
-        if (richText?.entities) {
-            const userIds = new Set<string>()
-            richText.entities.forEach((entity) => {
-                if (entity.type === "mention" && entity.id) {
-                    userIds.add(String(entity.id))
-                }
-            })
-            mentionedUserIdsRef.current = userIds
-        }
-    }, [richText])
-
-    const renderComponents = React.useMemo(() => {
-        if (!richText?.entities || richText.entities.length === 0) {
-            return [
-                <Text key="text-only" style={defaultTextStyle}>
-                    {richText?.text || ""}
-                </Text>,
-            ]
+    entities.forEach((entity, index) => {
+        // texto antes da entidade
+        if (entity.type !== "text" && entity.start > cursor) {
+            pushText(richText.text.slice(cursor, entity.start))
         }
 
-        const components: React.ReactElement[] = []
-        let lastIndex = 0
-        let textBuffer = ""
+        switch (entity.type) {
+            case "text":
+                pushText(entity.text)
+                break
 
-        // Ordenar entidades por posição inicial
-        const sortedEntities = [...richText.entities].sort((a, b) => a.start - b.start)
-
-        const flushTextBuffer = () => {
-            if (textBuffer) {
-                components.push(
-                    <Text key={`text-${components.length}`} style={defaultTextStyle}>
-                        {textBuffer}
+            case "url":
+                blocks.push(
+                    <Text
+                        key={`url-${index}`}
+                        style={[
+                            baseTextStyle,
+                            {
+                                color: ColorTheme().primary,
+                                textDecorationLine: "underline",
+                            },
+                        ]}
+                        onPress={() => Linking.openURL(entity.text)}
+                    >
+                        {softWrap(stripProtocol(entity.text))}
                     </Text>,
                 )
-                textBuffer = ""
+                break
+
+            case "hashtag":
+                blocks.push(
+                    <Text
+                        key={`hashtag-${index}`}
+                        style={[baseTextStyle, { fontFamily: fonts.family.Bold }]}
+                    >
+                        #{entity.text}
+                    </Text>,
+                )
+                break
+
+            case "mention": {
+                const id = String(entity.id)
+                const data = userMapping[id] ?? {
+                    id,
+                    username: entity.text,
+                    verified: false,
+                    profilePicture: "",
+                    youFollow: false,
+                }
+
+                blocks.push(
+                    <View key={`mention-${index}`} style={{ marginHorizontal: 2 }}>
+                        <UserShow.Root data={data}>
+                            <UserShow.Username
+                                fontSize={baseTextStyle.fontSize}
+                                color={String(baseTextStyle.color)}
+                                pressable
+                            />
+                        </UserShow.Root>
+                    </View>,
+                )
+                break
             }
         }
 
-        sortedEntities.forEach((entity, index) => {
-            // Adicionar texto antes da entidade ao buffer
-            if (entity.start > lastIndex) {
-                textBuffer += richText.text.substring(lastIndex, entity.start)
-            }
+        cursor = entity.end
+    })
 
-            // Renderizar a entidade
-            switch (entity.type) {
-                case "mention": {
-                    // Flush buffer antes de adicionar componente interativo
-                    flushTextBuffer()
-
-                    const entityId = entity.id
-                    const hasId = !!entityId
-
-                    if (hasId && entityId) {
-                        // Se tiver ID, buscar no userMapping ou criar dados básicos
-                        const entityIdString = String(entityId)
-                        const entityUsernameString = String(entity.text)
-                        let userData: userReciveDataProps | undefined = userMapping[entityIdString]
-
-                        // Se não encontrar no userMapping, tentar como número
-                        if (!userData && !isNaN(Number(entityIdString))) {
-                            userData = userMapping[Number(entityIdString)]
-                        }
-
-                        // Se ainda não tiver dados, criar dados básicos a partir do ID e texto
-                        if (!userData) {
-                            userData = {
-                                id: entityIdString,
-                                username: entityUsernameString,
-                                verified: false,
-                                profilePicture: "",
-                                youFollow: false,
-                            }
-                        } else {
-                            // Garantir que o username esteja presente mesmo quando vem do userMapping
-                            // Se o userMapping não tiver username, usar o texto da entidade
-                            if (!userData.username) {
-                                userData = {
-                                    ...userData,
-                                    username: entityUsernameString,
-                                }
-                            }
-                        }
-
-                        // Renderizar mention com UserShow (clicável)
-                        components.push(
-                            <UserShow.Root key={`mention-${index}-${entityId}`} data={userData}>
-                                <UserShow.Username
-                                    displayOnMoment={displayOnMoment}
-                                    fontSize={defaultMentionStyle.fontSize ?? fontSize}
-                                    fontFamily={defaultMentionStyle.fontFamily}
-                                    color={String(defaultMentionStyle.color || color)}
-                                    margin={0}
-                                    pressable={true}
-                                    displayYou={true}
-                                />
-                            </UserShow.Root>,
-                        )
-                    } else {
-                        // Fallback: renderizar como texto se não tiver ID
-                        components.push(
-                            <Text
-                                key={`mention-${index}-${entity.text}`}
-                                style={defaultMentionStyle}
-                            >
-                                @{entity.text}
-                            </Text>,
-                        )
-                    }
-                    break
-                }
-
-                case "url": {
-                    // Flush buffer antes de adicionar componente interativo
-                    flushTextBuffer()
-
-                    components.push(
-                        <Pressable
-                            key={`url-${index}`}
-                            onPress={() => handleLinkPress(entity.text)}
-                        >
-                            <Text style={defaultLinkStyle}>{entity.text}</Text>
-                        </Pressable>,
-                    )
-                    break
-                }
-
-                case "hashtag": {
-                    // Flush buffer antes de adicionar hashtag com estilo específico
-                    flushTextBuffer()
-                    components.push(
-                        <Text key={`hashtag-${index}`} style={defaultHashtagStyle}>
-                            #{entity.text}
-                        </Text>,
-                    )
-                    break
-                }
-
-                case "text": {
-                    textBuffer += entity.text
-                    break
-                }
-
-                default: {
-                    // Fallback para tipos desconhecidos
-                    textBuffer += entity.text
-                }
-            }
-
-            lastIndex = entity.end
-        })
-
-        // Adicionar texto restante após a última entidade
-        if (lastIndex < richText.text.length) {
-            textBuffer += richText.text.substring(lastIndex)
-        }
-
-        // Flush buffer final
-        flushTextBuffer()
-
-        return components
-    }, [
-        richText,
-        userMapping,
-        defaultTextStyle,
-        defaultLinkStyle,
-        defaultMentionStyle,
-        defaultHashtagStyle,
-        displayOnMoment,
-        fontSize,
-        handleLinkPress,
-    ])
-
-    return renderComponents
-}
-
-// Hook para obter apenas os IDs mencionados (útil para buscar dados dos usuários)
-export function useMentionedUserIds(richText: RichTextUIFormat): string[] {
-    const [mentionedIds, setMentionedIds] = React.useState<string[]>([])
-
-    React.useEffect(() => {
-        if (richText?.entities) {
-            const userIds: string[] = []
-            richText.entities.forEach((entity) => {
-                if (entity.type === "mention" && entity.id && !userIds.includes(entity.id)) {
-                    userIds.push(entity.id)
-                }
-            })
-            setMentionedIds(userIds)
-        } else {
-            setMentionedIds([])
-        }
-    }, [richText])
-
-    return mentionedIds
-}
-
-// Componente wrapper para facilitar o uso
-export type RichTextRendererProps = UseRichTextRendererProps & {
-    containerStyle?: ViewStyle
-    textContainerStyle?: TextStyle
-}
-
-export function RichTextRenderer({
-    containerStyle,
-    textContainerStyle,
-    ...hookProps
-}: RichTextRendererProps) {
-    const components = useRichTextRenderer(hookProps)
+    if (cursor < richText.text.length) {
+        pushText(richText.text.slice(cursor))
+    }
 
     return (
         <View
@@ -335,7 +137,7 @@ export function RichTextRenderer({
                 containerStyle,
             ]}
         >
-            {components}
+            {blocks}
         </View>
     )
 }

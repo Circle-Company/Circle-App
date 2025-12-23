@@ -5,7 +5,7 @@ import { Pressable, TextStyle, View, ViewStyle, useColorScheme } from "react-nat
 
 import ChevronRight from "@/assets/icons/svgs/chevron_right.svg"
 import LanguageContext from "@/contexts/Preferences/language"
-import { NativeStackNavigationProp } from "@react-navigation/native-stack"
+import { navigateLegacy } from "@/lib/navigation"
 import PersistedContext from "@/contexts/Persisted"
 import React from "react"
 import { SettingsiItemObjectProps } from "@/components/settings/settings-types"
@@ -13,14 +13,14 @@ import { Text } from "@/components/Themed"
 import { UserShow } from "@/components/user_show"
 import fonts from "@/constants/fonts"
 import sizes from "@/constants/sizes"
-import { useNavigation } from "@react-navigation/native"
+// migrated: removed useNavigation import
 import { userReciveDataProps } from "@/components/user_show/user_show-types"
 
-type SettingsNavigatorParamList = {
-    SettingsNavigator: { screen: string }
-}
-
-type NavigationProp = NativeStackNavigationProp<SettingsNavigatorParamList>
+// migrated: removed legacy navigator types
+//
+//
+//
+//
 
 export default function SettingsItem({
     name,
@@ -30,7 +30,7 @@ export default function SettingsItem({
     navigateTo,
     secure,
 }: SettingsiItemObjectProps) {
-    const navigation = useNavigation<NavigationProp>()
+    // migrated: removed legacy navigation variable
     const { t } = React.useContext(LanguageContext)
     const isDarkMode = useColorScheme() === "dark"
     const { session } = React.useContext(PersistedContext)
@@ -99,10 +99,10 @@ export default function SettingsItem({
                 promptMessage: t("You're changing your password"),
             })
             if (isAuthenticated) {
-                navigation.navigate("SettingsNavigator", { screen: navigateTo })
+                navigateLegacy(navigateTo)
             }
         } else {
-            navigation.navigate("SettingsNavigator", { screen: navigateTo })
+            navigateLegacy(navigateTo)
         }
     }
 

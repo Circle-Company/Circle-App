@@ -1,4 +1,4 @@
-import { useNavigation } from "@react-navigation/native"
+import { useRouter } from "expo-router"
 import React from "react"
 import { View } from "react-native"
 import fonts from "../../../constants/fonts"
@@ -11,7 +11,7 @@ export default function NewMomentImageRight() {
     const { t } = React.useContext(LanguageContext)
     const { selectedImage } = React.useContext(NewMomentContext)
 
-    const navigation = useNavigation()
+    const router = useRouter()
 
     const container: any = {
         flexDirection: "row",
@@ -23,9 +23,7 @@ export default function NewMomentImageRight() {
         <View style={container}>
             <ViewMorebutton
                 action={() => {
-                    selectedImage
-                        ? navigation.navigate("MomentNavigator", { screen: "NewMomentDescription" })
-                        : null
+                    selectedImage ? router.push("/moment/new-description") : null
                 }}
                 text={t("Next")}
                 scale={1.2}

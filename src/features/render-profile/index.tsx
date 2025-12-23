@@ -9,6 +9,7 @@ import { AccountMomentsHeader } from "@/features/render-profile/components/Accou
 import { DateFormatter } from "circle-text-library"
 import LanguageContext from "@/contexts/Preferences/language"
 import { LanguageType } from "@/locales/LanguageTypes"
+import { iOSMajorVersion } from "@/lib/platform/detection"
 
 type RenderProfileProps = {
     user?: ProfileReciveDataProps
@@ -36,7 +37,7 @@ export default function RenderProfile({ user: propsUser }: RenderProfileProps) {
     }
 
     const top_container: ViewStyle = {
-        paddingTop: sizes.paddings["2sm"],
+        paddingTop: iOSMajorVersion! >= 26 ? 0 : sizes.paddings["2sm"],
         alignItems: "center",
     }
     const name_container: ViewStyle = {

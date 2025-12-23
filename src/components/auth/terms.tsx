@@ -1,4 +1,4 @@
-import { useNavigation } from "@react-navigation/native"
+import { useRouter } from "expo-router"
 import React from "react"
 import { useTranslation } from "react-i18next"
 import { TextStyle, TouchableOpacity, useColorScheme, ViewProps } from "react-native"
@@ -12,7 +12,7 @@ type Props = ViewProps & {
 }
 
 export default function AuthTermsText({ signText }: Props) {
-    const navigation: any = useNavigation()
+    const router = useRouter()
     const { t } = useTranslation()
 
     const container: TextStyle = {
@@ -21,6 +21,7 @@ export default function AuthTermsText({ signText }: Props) {
         paddingVertical: sizes.paddings["2sm"],
         backgroundColor: colors.gray.grey_09,
         borderRadius: sizes.borderRadius["1md"],
+        maxWidth: sizes.screens.width * 0.8,
         alignItems: "center",
         justifyContent: "center",
         textAlign: "center",
@@ -49,7 +50,7 @@ export default function AuthTermsText({ signText }: Props) {
                 <TouchableOpacity
                     testID="handle-privacy-policy"
                     onPress={() => {
-                        navigation.navigate("Auth-Privacy-Policy")
+                        router.push("/(auth)/privacy-policy")
                     }}
                 >
                     <Text style={termsButton}>{t("Privacy Policy")}</Text>
@@ -58,7 +59,7 @@ export default function AuthTermsText({ signText }: Props) {
                 <TouchableOpacity
                     testID="handle-terms-of-service"
                     onPress={() => {
-                        navigation.navigate("Auth-Terms-Of-Service")
+                        router.push("/(auth)/terms-of-service")
                     }}
                 >
                     <Text style={termsButton}>{t("Terms of Service")}</Text>
@@ -67,7 +68,7 @@ export default function AuthTermsText({ signText }: Props) {
                 <TouchableOpacity
                     testID="handle-community-guidelines"
                     onPress={() => {
-                        navigation.navigate("Auth-Community-Guidelines")
+                        router.push("/(auth)/community-guidelines")
                     }}
                 >
                     <Text style={termsButton}>{t("Community Guidelines")}</Text>

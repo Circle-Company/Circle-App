@@ -1,12 +1,12 @@
 import ArrowLeft from "@/assets/icons/svgs/arrow_left.svg"
-import { useNavigation } from "@react-navigation/native"
+import { useRouter } from "expo-router"
 import React from "react"
 import { View } from "react-native"
 import ColorTheme from "../../../constants/colors"
 import HeaderButton from "../headerButton"
 
 export default function SettingsHeaderLeft() {
-    const navigation = useNavigation()
+    const router = useRouter()
 
     const container: any = {
         flexDirection: "row",
@@ -14,7 +14,7 @@ export default function SettingsHeaderLeft() {
 
     return (
         <View style={container}>
-            <HeaderButton action={() => navigation.goBack()} marginLeft square>
+            <HeaderButton action={() => router.back()} marginLeft square>
                 <ArrowLeft fill={String(ColorTheme().text)} width={18} height={18} />
             </HeaderButton>
         </View>

@@ -168,6 +168,7 @@ export default function PasswordInput({ type, onPasswordValidated }: PasswordInp
             width: sizes.screens.width,
             alignItems: "center",
             backgroundColor: "transparent",
+            maxWidth: sizes.screens.width * 0.8,
         },
         inputContainer: {
             width: inputWidth,
@@ -176,6 +177,7 @@ export default function PasswordInput({ type, onPasswordValidated }: PasswordInp
             borderRadius: sizes.headers.height / 2,
             paddingHorizontal: sizes.paddings["1md"],
             flexDirection: "row",
+            maxWidth: sizes.screens.width * 0.8,
             alignItems: "center",
             justifyContent: "center",
             shadowColor: "#000",
