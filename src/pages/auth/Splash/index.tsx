@@ -54,6 +54,7 @@ export default function SplashScreen() {
         fontFamily: Fonts.family["Semibold-Italic"],
         alignSelf: "center",
         textAlign: "center",
+        marginTop: sizes.margins["1md"],
         fontSize: fonts.size.subheadline * 0.9,
         color: colors.gray.grey_04,
     }
@@ -75,7 +76,7 @@ export default function SplashScreen() {
     }
     const primaryActionText: any = {
         fontSize: fonts.size.body * 1.2,
-        fontFamily: fonts.family["Bold-Italic"],
+        fontFamily: fonts.family["Black-Italic"],
         color: colors.gray.black,
         marginRight: sizes.margins["3sm"],
     }
@@ -151,7 +152,7 @@ export default function SplashScreen() {
                             <LogoIcon fill="#edddffff" width={100} height={100} />
                         </View>
                         <Text style={title}>{config.APPLICATION_NAME}</Text>
-                        <Text style={slogan}>{config.APPLICATION_DESCRIPTION}</Text>
+                        <Text style={slogan}>{t(config.APPLICATION_DESCRIPTION)}</Text>
                     </View>
 
                     <View style={[buttons, { bottom: insets.bottom }]}>

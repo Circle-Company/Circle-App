@@ -110,24 +110,48 @@ export default function UsernameInput({ type }: UsernameInputProps) {
             return false
         }
 
-        // Se formato válido, dispara verificação de disponibilidade
-        setStatusMessage(t("Checking availability..."))
+        // Limpa estado anterior antes de consultar a API
         setIsUsernameAvailable(false)
         setUsernameIsValid(false)
         setSignInputUsername("")
 
         try {
-            const response = await api.post("/auth/username-already-in-use", { username: value })
-            // Atualiza os estados de acordo com a resposta
-            setSignInputUsername(value)
-            setUsernameIsValid(true)
-            setIsUsernameAvailable(response.data.enable_to_use)
-            setStatusMessage(t(response.data.message))
-            return response.data.enable_to_use
-        } catch {
-            setStatusMessage(t("Error verifying username."))
-            setIsUsernameAvailable(false)
+            const response = await api.get(`/auth/username-availability/${value}`)
+            const data = response?.data ?? {}
+
+            // API nova: 200 { success: true, available: boolean }
+            if (response.status === 200 && data?.success === true) {
+                const available = Boolean(data.available)
+                setUsernameIsValid(true)
+                setIsUsernameAvailable(available)
+
+                if (available) {
+                    setSignInputUsername(value)
+                    setStatusMessage(t("Available to use"))
+                    return true
+                } else {
+                    setStatusMessage(t("This username is already in use."))
+                    return false
+                }
+            }
+
+            // Fallback genérico caso 200 sem success ou payload inesperado
             setUsernameIsValid(false)
+            setIsUsernameAvailable(false)
+            setStatusMessage(t("Error verifying username."))
+            return false
+        } catch (err: any) {
+            // API nova: 500 { success: false, error: "The username '...' is already in use" }
+            const serverMsg =
+                err?.response?.data?.error || err?.message || t("Error verifying username.")
+
+            // Para mensagens "em uso", mantemos formato válido porém indisponível
+            const isInUse =
+                typeof serverMsg === "string" && serverMsg.toLowerCase().includes("already in use")
+
+            setUsernameIsValid(isInUse ? true : false)
+            setIsUsernameAvailable(false)
+            setStatusMessage(serverMsg)
             return false
         }
     }
