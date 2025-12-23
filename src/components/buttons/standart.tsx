@@ -1,4 +1,4 @@
-import { useNavigation } from "@react-navigation/native"
+import { useRouter } from "expo-router"
 import React from "react"
 import { TouchableOpacity, useColorScheme } from "react-native"
 import ColorTheme from "../../constants/colors"
@@ -12,7 +12,7 @@ type buttonStandart = {
 }
 
 export default function ButtonStandart({ navigateTo, title }: buttonStandart) {
-    const navigation = useNavigation()
+    const router = useRouter()
     const isDarkMode = useColorScheme() === "dark"
 
     //width : 155
@@ -33,7 +33,7 @@ export default function ButtonStandart({ navigateTo, title }: buttonStandart) {
         <TouchableOpacity
             style={container}
             onPress={() => {
-                navigation.navigate(navigateTo)
+                router.push(navigateTo)
             }}
         >
             <Text style={text}>{title}</Text>

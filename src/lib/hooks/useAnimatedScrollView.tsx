@@ -217,7 +217,7 @@ export function AnimatedVerticalScrollView({
                     ) : isIOS ? (
                         <View style={{ transform: [{ scale: 1.4 }] }}>
                             <ActivityIndicator
-                                size="small"
+                                size="large"
                                 color={colors.gray.grey_03}
                                 animating={true}
                             />

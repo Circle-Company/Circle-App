@@ -53,10 +53,6 @@ export default function HomeScreen() {
 
     return (
         <View style={container}>
-            <StatusBar
-                backgroundColor={String(ColorTheme().background)}
-                barStyle={isDarkMode ? "light-content" : "dark-content"}
-            />
             <ListMoments />
             {commentEnabled && (
                 <Animated.View ref={bottomContainerRef} style={bottomContainer}>

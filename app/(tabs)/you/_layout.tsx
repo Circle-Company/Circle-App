@@ -1,56 +1,73 @@
-import { Stack } from "expo-router"
+import { Stack, useRouter } from "expo-router"
 import React from "react"
-import { Platform } from "react-native"
-import ColorTheme, { colors } from "@/constants/colors"
+import { Pressable } from "react-native"
+import { colors } from "@/constants/colors"
 import Fonts from "@/constants/fonts"
-import sizes from "@/constants/sizes"
 import LanguageContext from "@/contexts/Preferences/language"
 import PersistedContext from "@/contexts/Persisted"
-import AccountHeaderRight from "@/components/headers/account/account-header_right"
+import { iOSMajorVersion } from "@/lib/platform/detection"
+import Cog from "@/assets/icons/svgs/cog.svg"
 
 export default function YouLayout() {
     const { session } = React.useContext(PersistedContext)
     const { t } = React.useContext(LanguageContext)
+    const router = useRouter()
 
-    const HeaderStyle = {
-        borderBottomWidth: 0,
-        backgroundColor: colors.gray.black,
-    }
+    const backgroundColor = colors.gray.black
 
     return (
         <Stack
             screenOptions={{
+                contentStyle: {
+                    backgroundColor,
+                },
                 statusBarAnimation: "fade",
                 statusBarStyle: "light",
+                headerTransparent: false,
+                headerBlurEffect: "systemUltraThinMaterialDark",
+                headerStyle: {
+                    backgroundColor: colors.gray.black,
+                },
+
+                headerTintColor: colors.gray.white,
             }}
         >
             <Stack.Screen
                 name="index"
                 options={{
-                    headerStyle: HeaderStyle,
+                    headerTitleAlign: "center",
                     headerTitleStyle: {
                         fontFamily: Fonts.family["Black-Italic"],
                         fontSize: Fonts.size.title2 * 0.9,
+                        color: colors.gray.white,
                     },
-                    headerTitleAlign: "center",
-                    headerBlurEffect: "dark",
-                    headerRight: AccountHeaderRight,
-                    headerTintColor: colors.gray.white,
-                    headerTitle: "@" + session?.user?.username || "",
+                    headerRight: () => (
+                        <Pressable
+                            onPress={() => router.push("/settings")}
+                            hitSlop={8}
+                            style={{
+                                paddingHorizontal: 8,
+                                alignItems: "center",
+                                justifyContent: "center",
+                            }}
+                        >
+                            <Cog fill={String(colors.gray.white)} width={20} height={20} />
+                        </Pressable>
+                    ),
+                    headerTitle: session?.user?.username ? `@${session.user.username}` : "",
                 }}
             />
+
             <Stack.Screen
                 name="edit"
                 options={{
                     headerTitle: t("Edit"),
                     headerTitleAlign: "left",
-                    headerTransparent: false,
                     headerTitleStyle: {
                         fontFamily: Fonts.family["Black-Italic"],
                         fontSize: Fonts.size.title2,
+                        color: colors.gray.white,
                     },
-                    headerTintColor: String(ColorTheme().text),
-                    headerStyle: HeaderStyle,
                 }}
             />
         </Stack>

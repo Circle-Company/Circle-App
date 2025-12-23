@@ -1,5 +1,6 @@
 import ColorTheme, { colors } from "@/constants/colors"
 import { StatusBar, View, useColorScheme } from "react-native"
+import { SafeAreaView } from "react-native-safe-area-context"
 
 import AuthContext from "@/contexts/Auth"
 import ButtonClose from "@/components/buttons/close"
@@ -12,13 +13,13 @@ import UsernameInput from "@/components/auth/usernameInput"
 import fonts from "@/constants/fonts"
 import sizes from "@/constants/sizes"
 import { t } from "i18next"
-import { useNavigation } from "@react-navigation/native"
+import { useRouter } from "expo-router"
 
 export default function UsernameScreen() {
     const isDarkMode = useColorScheme() === "dark"
     const { signInputUsername, setErrorMessage, setSignInputPassword, setSignInputUsername } =
         React.useContext(AuthContext)
-    const navigation: any = useNavigation()
+    const router = useRouter()
 
     const container: any = {
         flex: 1,
@@ -31,6 +32,7 @@ export default function UsernameScreen() {
         paddingHorizontal: sizes.paddings["1md"],
         justifyContent: "center",
         alignItems: "center",
+        marginTop: sizes.margins["2sm"],
         marginBottom: sizes.margins["1xl"] * 0.8,
         backgroundColor: "transparent",
     }
@@ -91,7 +93,7 @@ export default function UsernameScreen() {
 
     function handlePress() {
         if (signInputUsername) {
-            navigation.navigate("Auth-SignUp-Password")
+            router.push("/(auth)/sign-up-password")
         }
     }
 
@@ -102,7 +104,7 @@ export default function UsernameScreen() {
     }, [])
 
     return (
-        <View style={container}>
+        <SafeAreaView style={container} edges={["top", "bottom"]}>
             <StatusBar backgroundColor={colors.gray.black} barStyle={"light-content"} />
             <LinearGradient
                 renderToHardwareTextureAndroid
@@ -149,6 +151,6 @@ export default function UsernameScreen() {
                     height={17}
                 />
             </ButtonStandart>
-        </View>
+        </SafeAreaView>
     )
 }

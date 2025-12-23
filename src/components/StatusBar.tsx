@@ -22,7 +22,7 @@ export const StatusBar: React.FC<StatusBarProps> = ({
     const defaultBarStyle = isDarkMode ? "light-content" : "dark-content"
 
     return Platform.OS === "ios" ? (
-        <RNStatusBar barStyle="light-content" />
+        <RNStatusBar barStyle={barStyle || defaultBarStyle} />
     ) : (
         <RNStatusBar
             backgroundColor={backgroundColor || defaultBackgroundColor}

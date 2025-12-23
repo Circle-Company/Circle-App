@@ -6,6 +6,7 @@ import * as FileSystem from "expo-file-system"
 import { useCallback, useEffect, useRef, useState } from "react"
 import type { GestureResponderEvent, ViewStyle } from "react-native"
 import { StyleSheet, Text, View } from "react-native"
+import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context"
 import RotateIcon from "@/assets/icons/svgs/arrow.triangle.2.circlepath.svg"
 import FlashOnIcon from "@/assets/icons/svgs/flashlight.on.fill.svg"
 import FlashOffIcon from "@/assets/icons/svgs/flashlight.off.fill.svg"
@@ -36,6 +37,7 @@ import type { Routes } from "../routes"
 import { useCameraContext } from "../context"
 import LanguageContext from "@/contexts/Preferences/language"
 import { colors } from "@/constants/colors"
+import fonts from "@/constants/fonts"
 
 const ReanimatedCamera = Reanimated.createAnimatedComponent(Camera)
 Reanimated.addWhitelistedNativeProps({
@@ -56,6 +58,7 @@ export function CameraPage(): React.ReactElement {
     const isPressingButton = useSharedValue(false)
     const rotateAnimation = useSharedValue(0)
     const recordingIntervalRef = useRef<NodeJS.Timeout | null>(null)
+    const insets = useSafeAreaInsets()
 
     // Camera context
     const { isRecording, setIsRecording, setVideo, setRecordingTime, setVideoBuffer } =
@@ -357,13 +360,13 @@ export function CameraPage(): React.ReactElement {
     }
 
     return (
-        <>
+        <SafeAreaView style={styles.container} edges={["top", "bottom"]}>
             <Stack.Screen
                 options={{
                     headerTitle: isRecording ? t("Recording") : t("New Moment"),
                     headerTitleStyle: {
                         color: colors.gray.white,
-                        font,
+                        fontFamily: fonts.family["Black-Italic"],
                     },
                 }}
             />
@@ -420,7 +423,7 @@ export function CameraPage(): React.ReactElement {
                     </View>
                 )}
 
-                <View style={styles.bottomBar}>
+                <View style={[styles.bottomBar, { bottom: CONTENT_SPACING * 3 + insets.bottom }]}>
                     <PressableOpacity
                         style={styles.sideButton}
                         onPress={onFlipCameraPressed}
@@ -475,7 +478,7 @@ export function CameraPage(): React.ReactElement {
                     </PressableOpacity>
                 </View>
             </View>
-        </>
+        </SafeAreaView>
     )
 }
 

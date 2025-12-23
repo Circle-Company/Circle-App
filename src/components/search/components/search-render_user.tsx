@@ -2,7 +2,7 @@ import { Animated, Pressable, Text, View, useColorScheme } from "react-native"
 import Reanimated, { FadeInDown } from "react-native-reanimated"
 import ColorTheme, { colors } from "../../../constants/colors"
 
-import { useNavigation } from "@react-navigation/native"
+import { useRouter } from "expo-router"
 import React from "react"
 import fonts from "../../../constants/fonts"
 import sizes from "../../../constants/sizes"
@@ -17,7 +17,7 @@ export default function render_user({ user }: SearchRenderItemReciveDataObjectPr
     const animationScale = 0.9
 
     const { t } = React.useContext(LanguageContext)
-    const navigation: any = useNavigation()
+    const router = useRouter()
     const isDarkMode = useColorScheme() === "dark"
     const animatedScale = React.useRef(new Animated.Value(1)).current
     React.useEffect(() => {
@@ -33,10 +33,7 @@ export default function render_user({ user }: SearchRenderItemReciveDataObjectPr
     }
     const HandlePressOut = () => {
         HandleButtonAnimation()
-        navigation.navigate("ProfileNavigator", {
-            screen: "Profile",
-            params: { findedUserPk: user.id },
-        })
+        router.push(`/profile/${user.id}`)
     }
 
     const HandlePressIn = () => {

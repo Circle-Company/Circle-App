@@ -71,23 +71,25 @@ function RootLayoutNav() {
 
         const inAuthGroup = segments[0] === "(auth)"
         const inTabsGroup = segments[0] === "(tabs)"
+        const atRoot = segments.length === 0
         const isAuthenticated = redirectTo === "APP"
 
         console.log("📍 Navigation state:", {
             segments,
             inAuthGroup,
             inTabsGroup,
+            atRoot,
             isAuthenticated,
             redirectTo,
         })
 
-        if (isAuthenticated && inAuthGroup) {
-            // User is authenticated but in auth screens, redirect to app
-            console.log("🔄 Redirecting authenticated user to app")
+        if (isAuthenticated && (inAuthGroup || atRoot)) {
+            // Authenticated and either in auth screens or at root → go to default tab
+            console.log("🔄 Redirecting authenticated user to app (/(tabs)/moments)")
             router.replace("/(tabs)/moments")
         } else if (!isAuthenticated && !inAuthGroup) {
-            // User is not authenticated but not in auth screens, redirect to auth
-            console.log("🔄 Redirecting unauthenticated user to auth")
+            // Not authenticated and not in auth screens → go to auth
+            console.log("🔄 Redirecting unauthenticated user to auth (/(auth)/init)")
             router.replace("/(auth)/init")
         }
     }, [isInitializing, redirectTo, segments])

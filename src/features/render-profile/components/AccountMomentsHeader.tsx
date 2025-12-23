@@ -2,6 +2,7 @@ import React from "react"
 import { View, Text, StyleSheet } from "react-native"
 import { colors } from "@/constants/colors"
 import LanguageContext from "@/contexts/Preferences/language"
+import sizes from "@/constants/sizes"
 
 type AccountMomentsHeaderProps = {
     totalMoments: number
@@ -28,10 +29,13 @@ export function AccountMomentsHeader({
 const styles = StyleSheet.create({
     headerContainer: {
         paddingHorizontal: 10,
+        paddingTop: sizes.margins["1lg"],
         paddingBottom: 8,
+        alignItems: "center",
+        justifyContent: "center",
     },
     totalText: {
-        color: colors.gray.grey_06,
+        color: colors.gray.grey_04,
         fontSize: 14,
         fontWeight: "600",
     },

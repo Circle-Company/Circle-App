@@ -1,6 +1,6 @@
 import { Animated, Pressable, useColorScheme } from "react-native"
 
-import { useNavigation } from "@react-navigation/native"
+import { useRouter } from "expo-router"
 import React from "react"
 import { colors } from "../../../../constants/colors"
 import sizes from "../../../../constants/sizes"
@@ -19,7 +19,7 @@ export default function ContainerMain({ children, notification }: NotificationCo
     const { userProfile } = React.useContext(ViewProfileContext)
     const isDarkMode = useColorScheme() === "dark"
 
-    const navigation: any = useNavigation()
+    const router = useRouter()
 
     const animatedScale = React.useRef(new Animated.Value(1)).current
     React.useEffect(() => {
@@ -46,7 +46,7 @@ export default function ContainerMain({ children, notification }: NotificationCo
     async function handlePress() {
         if (notification.type === "FOLLOW-USER" || notification.type === "VIEW-USER") {
             await userProfile(notification.sender_user.id)
-            navigation.navigate("ProfileNavigator")
+            router.push(`/profile/${notification.sender_user.id}`)
         } else if (notification.type === "LIKE-MOMENT") {
         }
     }

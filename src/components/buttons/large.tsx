@@ -1,4 +1,4 @@
-import { useNavigation } from "@react-navigation/native"
+import { useRouter } from "expo-router"
 import React, { useEffect, useRef } from "react"
 import { Animated, Pressable, Text, View } from "react-native"
 import ColorTheme from "../../constants/colors"
@@ -8,7 +8,7 @@ import Sizes from "../../constants/sizes"
 import ArrowRight from "@/assets/icons/svgs/arrow_right.svg"
 
 export default function Buttonlarge(props: any) {
-    const navigation = useNavigation()
+    const router = useRouter()
     const animatedScale = useRef(new Animated.Value(0)).current
 
     useEffect(() => {
@@ -53,7 +53,7 @@ export default function Buttonlarge(props: any) {
         <View style={container}>
             <Pressable
                 onPress={() => {
-                    handleButtonPress(), navigation.navigate(props.navigateTo)
+                    ;(handleButtonPress(), router.push(props.navigateTo))
                 }}
             >
                 <Animated.View style={[buttonContainer, { transform: [{ scale: animatedScale }] }]}>

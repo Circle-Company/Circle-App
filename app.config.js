@@ -13,7 +13,7 @@ module.exports = function (_config) {
             owner: "tiago.savioli",
             runtimeVersion: { policy: "appVersion" },
             icon: "./assets/app-icons/ios_icon_default_light.png",
-            userInterfaceStyle: "automatic",
+            userInterfaceStyle: "dark",
             orientation: "portrait",
             primaryColor: "#1083fe",
             androidStatusBar: { barStyle: "light-content" },
@@ -33,6 +33,7 @@ module.exports = function (_config) {
                 bundleIdentifier: "com.circlecompany.circleapp",
                 icon: "./assets/app-icons/circleIOS.icon",
                 infoPlist: {
+                    userInterfaceStyle: "dark",
                     UIApplicationSupportsIndirectInputEvents: true,
                     // Desabilitar análises automáticas de imagem do iOS
                     VKCImageAnalysisDisabled: true,

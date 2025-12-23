@@ -33,6 +33,7 @@ export default function AgreeScreen() {
         paddingHorizontal: sizes.paddings["1md"],
         justifyContent: "center",
         alignItems: "center",
+        marginTop: sizes.margins["2sm"],
         marginBottom: sizes.margins["1xl"] * 0.8,
         backgroundColor: "transparent",
     }

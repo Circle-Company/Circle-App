@@ -1,7 +1,7 @@
 import { View, ViewStyle } from "react-native"
 
 import Icon from "@/assets/icons/svgs/bell_fill.svg"
-import { useNavigation } from "@react-navigation/native"
+import { useRouter } from "expo-router"
 import React from "react"
 import ColorTheme from "../../../constants/colors"
 import sizes from "../../../constants/sizes"
@@ -11,7 +11,7 @@ import { BadgeIcon } from "../../general/badge-icon"
 
 export default function AccountHeaderLeft() {
     const { session } = React.useContext(PersistedContext)
-    const navigation = useNavigation()
+    const router = useRouter()
 
     const container: ViewStyle = {
         flexDirection: "row",
@@ -19,7 +19,7 @@ export default function AccountHeaderLeft() {
     }
 
     function handlePress() {
-        navigation.navigate("InboxNavigator", { screen: "Inbox" })
+        router.push("/inbox")
     }
 
     return (

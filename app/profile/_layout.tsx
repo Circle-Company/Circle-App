@@ -1,11 +1,13 @@
-import { Stack } from 'expo-router';
-import React from 'react';
-import ColorTheme from '@/constants/colors';
+import { Stack } from "expo-router"
+import React from "react"
+import ColorTheme from "@/constants/colors"
 
 export default function ProfileLayout() {
     return (
         <Stack
             screenOptions={{
+                statusBarStyle: "light",
+                headerShadowVisible: false,
                 contentStyle: {
                     backgroundColor: String(ColorTheme().background),
                 },
@@ -18,5 +20,5 @@ export default function ProfileLayout() {
                 }}
             />
         </Stack>
-    );
+    )
 }

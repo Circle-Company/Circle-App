@@ -6,7 +6,8 @@ import sizes from "@/constants/sizes"
 import LanguageContext from "@/contexts/Preferences/language"
 import HeaderLeft from "@/components/headers/camera/camera-header_left"
 import { GestureHandlerRootView } from "react-native-gesture-handler"
-import { StyleSheet } from "react-native"
+import { StyleSheet, Platform, View } from "react-native"
+import { BlurView } from "expo-blur"
 import { CameraProvider } from "@/modules/camera/context"
 
 export default function CameraLayout() {
@@ -20,13 +21,46 @@ export default function CameraLayout() {
     return (
         <CameraProvider>
             <GestureHandlerRootView style={styles.root}>
+                {Platform.OS === "ios" &&
+                (typeof Platform.Version === "string"
+                    ? parseFloat(Platform.Version as any)
+                    : (Platform.Version as number)) < 18 ? (
+                    <BlurView intensity={24} tint="dark" style={StyleSheet.absoluteFill} />
+                ) : (
+                    <View
+                        style={[
+                            StyleSheet.absoluteFill,
+                            { backgroundColor: String(ColorTheme().background) },
+                        ]}
+                    />
+                )}
                 <Stack
                     screenOptions={{
-                        statusBarStyle: "dark",
+                        statusBarStyle: "light",
                         animationTypeForReplace: "pop",
                         headerTitleAlign: "center",
                         headerTitleStyle: { fontFamily: fonts.family["Bold-Italic"] },
                         headerStyle: HeaderStyle,
+                        headerTransparent: true,
+                        headerBackground: () =>
+                            Platform.OS === "ios" &&
+                            (typeof Platform.Version === "string"
+                                ? parseFloat(Platform.Version as any)
+                                : (Platform.Version as number)) < 18 ? (
+                                <BlurView
+                                    intensity={24}
+                                    tint="dark"
+                                    style={StyleSheet.absoluteFill}
+                                />
+                            ) : (
+                                <View
+                                    style={[
+                                        StyleSheet.absoluteFill,
+                                        { backgroundColor: String(ColorTheme().background) },
+                                    ]}
+                                />
+                            ),
+                        headerShadowVisible: false,
                         headerTintColor: String(ColorTheme().text),
                     }}
                 >

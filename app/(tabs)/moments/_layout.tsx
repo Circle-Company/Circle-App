@@ -20,7 +20,6 @@ export default function MomentsLayout() {
             screenOptions={{
                 contentStyle: {
                     backgroundColor: colors.gray.black,
-                    marginTop: sizes.margins["2sm"],
                 },
             }}
         >

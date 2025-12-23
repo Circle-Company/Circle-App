@@ -1,5 +1,6 @@
 import ColorTheme, { colors } from "../../../constants/colors"
 import { StatusBar, StyleProp, TextStyle, View, ViewStyle, useColorScheme } from "react-native"
+import { SafeAreaView } from "react-native-safe-area-context"
 
 import AuthContext from "../../../contexts/Auth"
 import AuthTermsText from "../../../components/auth/terms"
@@ -47,6 +48,7 @@ export default function SignInScreen() {
         paddingHorizontal: sizes.paddings["1md"],
         justifyContent: "center",
         alignItems: "center",
+        marginTop: sizes.margins["2sm"],
         marginBottom: sizes.margins["1xl"] * 0.8,
         backgroundColor: "transparent",
     }
@@ -60,6 +62,7 @@ export default function SignInScreen() {
 
     const input_container: ViewStyle = {
         alignItems: "center",
+        maxWidth: sizes.screens.width * 0.4,
         paddingBottom: sizes.paddings["1xl"] * 0.8,
         backgroundColor: "transparent",
     }
@@ -210,7 +213,7 @@ export default function SignInScreen() {
     }, [])
 
     return (
-        <View style={container}>
+        <SafeAreaView style={container} edges={["top", "bottom"]}>
             <StatusBar backgroundColor={colors.gray.black} barStyle={"light-content"} />
             <LinearGradient
                 renderToHardwareTextureAndroid
@@ -287,6 +290,6 @@ export default function SignInScreen() {
             <View testID="auth-terms" style={{ marginTop: sizes.margins["1xl"] }}>
                 <AuthTermsText signText={t("Enter Now")} />
             </View>
-        </View>
+        </SafeAreaView>
     )
 }
