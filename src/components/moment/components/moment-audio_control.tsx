@@ -3,9 +3,10 @@ import InactiveSoundIcon from "@/assets/icons/svgs/speaker_slash_fill.svg"
 import LinearGradient from "react-native-linear-gradient"
 import PersistedContext from "../../../contexts/Persisted"
 import React from "react"
-import { Animated, Pressable, View, ViewStyle } from "react-native"
+import { Animated, Pressable, View, ViewStyle, Platform } from "react-native"
 import { colors } from "../../../constants/colors"
 import sizes from "../../../constants/sizes"
+import BlurredBackground from "../../general/blurred-background"
 
 export default function MomentAudioControl() {
     const { session } = React.useContext(PersistedContext)
@@ -37,7 +38,10 @@ export default function MomentAudioControl() {
 
     const borderWidth = 1
     const borderRadiusValue = 23
-    const gradientColors = [colors.gray.grey_06, colors.gray.grey_08]
+    const gradientColors = [
+        Platform.OS === "ios" ? colors.gray.grey_04 + "50" : colors.gray.grey_06,
+        Platform.OS === "ios" ? colors.gray.grey_05 + "10" : colors.gray.grey_08,
+    ]
 
     const animated_container: ViewStyle = {
         width: 46,
@@ -86,23 +90,48 @@ export default function MomentAudioControl() {
                     end={{ x: 0.5, y: 1 }}
                     style={gradient_border}
                 >
-                    <View style={blur_container}>
-                        <View style={container}>
-                            {isMuted ? (
-                                <InactiveSoundIcon
-                                    fill={colors.gray.white}
-                                    width={sizes.icons["2sm"].width}
-                                    height={sizes.icons["2sm"].height}
-                                />
-                            ) : (
-                                <ActiveSoundIcon
-                                    fill={colors.gray.white}
-                                    width={sizes.icons["2sm"].width}
-                                    height={sizes.icons["2sm"].height}
-                                />
-                            )}
+                    {Platform.OS === "ios" ? (
+                        <BlurredBackground
+                            intensity={30}
+                            tint="systemMaterialDark"
+                            radius={borderRadiusValue - borderWidth}
+                            style={[blur_container, { backgroundColor: "transparent" }]}
+                        >
+                            <View style={container}>
+                                {isMuted ? (
+                                    <InactiveSoundIcon
+                                        fill={colors.gray.white}
+                                        width={sizes.icons["2sm"].width}
+                                        height={sizes.icons["2sm"].height}
+                                    />
+                                ) : (
+                                    <ActiveSoundIcon
+                                        fill={colors.gray.white}
+                                        width={sizes.icons["2sm"].width}
+                                        height={sizes.icons["2sm"].height}
+                                    />
+                                )}
+                            </View>
+                        </BlurredBackground>
+                    ) : (
+                        <View style={blur_container}>
+                            <View style={container}>
+                                {isMuted ? (
+                                    <InactiveSoundIcon
+                                        fill={colors.gray.white}
+                                        width={sizes.icons["2sm"].width}
+                                        height={sizes.icons["2sm"].height}
+                                    />
+                                ) : (
+                                    <ActiveSoundIcon
+                                        fill={colors.gray.white}
+                                        width={sizes.icons["2sm"].width}
+                                        height={sizes.icons["2sm"].height}
+                                    />
+                                )}
+                            </View>
                         </View>
-                    </View>
+                    )}
                 </LinearGradient>
             </Pressable>
         </Animated.View>

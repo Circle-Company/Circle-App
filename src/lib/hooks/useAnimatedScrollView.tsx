@@ -9,7 +9,7 @@ import Animated, {
     withTiming,
 } from "react-native-reanimated"
 import ColorTheme, { colors } from "../../constants/colors"
-import { PanResponder, View, useColorScheme } from "react-native"
+import { PanResponder, View, useColorScheme, ActivityIndicator } from "react-native"
 
 import { Loading } from "../../components/loading"
 import React from "react"
@@ -18,6 +18,7 @@ import { Vibrate } from "./useHapticFeedback"
 import config from "../../config"
 import fonts from "../../constants/fonts"
 import sizes from "../../constants/sizes"
+import { isIOS } from "../platform/detection"
 
 type AnimatedScrollViewProps = {
     children: React.ReactNode
@@ -32,6 +33,7 @@ type AnimatedScrollViewProps = {
     elasticEffect?: boolean // NOVO: controla o efeito elástico/bounce
     onScrollChange?: (hasScrolled: boolean) => void // Callback quando scroll muda
     scrollThreshold?: number // Threshold para considerar que houve scroll
+    scrollY?: Animated.SharedValue<number> // NOVO: permite passar o shared value do scroll
 }
 
 export function AnimatedVerticalScrollView({
@@ -47,9 +49,10 @@ export function AnimatedVerticalScrollView({
     elasticEffect = true, // padrão: ativado
     onScrollChange,
     scrollThreshold = 10,
+    scrollY,
 }: AnimatedScrollViewProps) {
     const isDarkMode = useColorScheme() === "dark"
-    const scrollPosition = useSharedValue(0)
+    const scrollPosition = scrollY ?? useSharedValue(0)
     const pullDownPosition = useSharedValue(0)
     const isReadyToRefresh = useSharedValue(false)
     const [refreshing, setRefreshing] = React.useState(false)
@@ -130,6 +133,9 @@ export function AnimatedVerticalScrollView({
             extrapolateRight: "clamp",
         })
 
+        // Para iOS com ActivityIndicator nativo, não aplicar rotação manual
+        const shouldApplyRotation = !isIOS || CustomRefreshIcon
+
         return {
             opacity: refreshing
                 ? 0.8
@@ -144,9 +150,13 @@ export function AnimatedVerticalScrollView({
                               extrapolateRight: "clamp",
                           }),
                 },
-                {
-                    rotate: refreshing ? `${rotation.value}deg` : `${pullRotation}deg`,
-                },
+                ...(shouldApplyRotation
+                    ? [
+                          {
+                              rotate: refreshing ? `${rotation.value}deg` : `${pullRotation}deg`,
+                          },
+                      ]
+                    : []),
             ],
         }
     })
@@ -187,7 +197,7 @@ export function AnimatedVerticalScrollView({
         <View
             pointerEvents={refreshing ? "none" : "auto"}
             style={{
-                backgroundColor: ColorTheme().backgroundDisabled + "70",
+                backgroundColor: isIOS ? colors.gray.black : colors.gray.grey_08,
             }}
         >
             <Animated.View
@@ -204,6 +214,14 @@ export function AnimatedVerticalScrollView({
                 <Animated.View style={refreshIconStyles}>
                     {CustomRefreshIcon ? (
                         <CustomRefreshIcon />
+                    ) : isIOS ? (
+                        <View style={{ transform: [{ scale: 1.4 }] }}>
+                            <ActivityIndicator
+                                size="small"
+                                color={colors.gray.grey_03}
+                                animating={true}
+                            />
+                        </View>
                     ) : (
                         <Text
                             style={{
@@ -240,15 +258,15 @@ export function AnimatedVerticalScrollView({
                 </Animated.ScrollView>
             </Animated.View>
 
-            {refreshing && showRefreshSpinner && (
+            {refreshing && showRefreshSpinner && !isIOS && (
                 <Animated.View
                     style={[
                         {
-                            backgroundColor: isDarkMode ? colors.gray.grey_09 : colors.gray.grey_01,
+                            backgroundColor: colors.gray.grey_09,
                             padding: sizes.paddings["1md"],
                             borderRadius: sizes.borderRadius["1xxl"],
                             borderWidth: 2,
-                            borderColor: isDarkMode ? colors.gray.grey_08 : colors.gray.grey_02,
+                            borderColor: colors.gray.grey_08,
                             position: "absolute",
                             top: "40%",
                             left: sizes.screens.width / 2 - 38,

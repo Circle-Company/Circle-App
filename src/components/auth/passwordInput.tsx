@@ -172,7 +172,7 @@ export default function PasswordInput({ type, onPasswordValidated }: PasswordInp
         inputContainer: {
             width: inputWidth,
             height: sizes.headers.height * 0.7,
-            backgroundColor: isDarkMode ? colors.gray.grey_08 : colors.gray.grey_02 + "80",
+            backgroundColor: colors.gray.grey_08,
             borderRadius: sizes.headers.height / 2,
             paddingHorizontal: sizes.paddings["1md"],
             flexDirection: "row",
@@ -182,7 +182,7 @@ export default function PasswordInput({ type, onPasswordValidated }: PasswordInp
             shadowOffset: { width: 0, height: 2 },
             shadowRadius: 10,
             borderWidth: password.length > 0 ? 2 : 0,
-            borderColor: ColorTheme().backgroundDisabled,
+            borderColor: colors.gray.grey_07,
         },
         input: {
             marginLeft: 10,
@@ -203,7 +203,7 @@ export default function PasswordInput({ type, onPasswordValidated }: PasswordInp
             borderRadius: sizes.sizes["1md"],
             paddingHorizontal: sizes.paddings["1sm"],
             paddingVertical: sizes.paddings["1sm"] * 0.3,
-            backgroundColor: ColorTheme().backgroundDisabled + "80",
+            backgroundColor: colors.gray.grey_07 + 80,
         },
         charCounter: {
             fontSize: fonts.size.caption2,

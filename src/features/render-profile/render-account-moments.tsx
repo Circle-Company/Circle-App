@@ -66,25 +66,6 @@ export function AccountMoments({ moments, totalMoments }: AccountMomentsProps) {
     const [visibleMomentIds, setVisibleMomentIds] = React.useState<Set<string>>(new Set())
     const flatListRef = React.useRef<FlatList>(null)
 
-    // Mapear LanguageType para DateFormatLocale (apenas valores aceitos pelo DateFormatter)
-    function getDateLocale(language: LanguageType): "pt" | "en" {
-        // Faz cast para string para evitar erro TS2367
-        if (String(language) === "pt") return "pt"
-        return "en"
-    }
-
-    // DateFormatter que reage às mudanças de idioma
-    const dateFormatter = React.useMemo(
-        () =>
-            new DateFormatter({
-                useApproximateTime: true,
-                usePrefix: true,
-                useSuffix: true,
-                locale: getDateLocale(atualAppLanguage),
-            }),
-        [atualAppLanguage],
-    )
-
     if (!moments || moments.length === 0) {
         return (
             <View style={styles.emptyContainer}>

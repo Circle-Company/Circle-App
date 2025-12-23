@@ -1,7 +1,7 @@
 import { CardStyleInterpolators, createStackNavigator } from "@react-navigation/stack"
 import { ProfileNavigator, ProfileStackParamList } from "./ProfileNavigator"
 
-import BottomTabNavigator from "./BottomTabNavigator"
+import { BottomTabs } from "./BottomTabNavigator"
 import ColorTheme from "../../constants/colors"
 import { Interpolation as HorizontalRight } from "../transitions/horizontal-right"
 import { MomentNavigator } from "./MomentNavigator"
@@ -19,7 +19,7 @@ export default function AppNavigator() {
                 cardStyle: { backgroundColor: String(ColorTheme().background) },
             }}
         >
-            <App.Screen name="BottomTab" component={BottomTabNavigator} />
+            <App.Screen name="BottomTab" component={BottomTabs} />
             <App.Screen name="CreateBottomTab" component={CameraModule} />
             <App.Screen
                 name="SettingsNavigator"

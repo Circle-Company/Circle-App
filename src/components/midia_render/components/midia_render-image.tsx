@@ -1,6 +1,6 @@
 import { Image } from "expo-image"
 import React, { useState } from "react"
-import { Animated } from "react-native"
+import { Animated, Pressable, Platform } from "react-native"
 import ColorTheme from "../../../constants/colors"
 import { useMidiaRenderContext } from "../midia_render-context"
 
@@ -49,12 +49,20 @@ export default function RenderImage({
 
     if (isFeed) {
         return (
-            <Image
-                source={{ uri: midia?.fullhd_resolution?.toString() }}
+            <Pressable
+                onLongPress={() => {}}
+                delayLongPress={100000}
+                disabled={Platform.OS !== "ios"}
                 style={image}
-                resizeMode="cover"
-                blurRadius={blur ? blurRadius : 0}
-            />
+            >
+                <Image
+                    source={{ uri: midia?.fullhd_resolution?.toString() }}
+                    style={[image, { pointerEvents: "none" }]}
+                    resizeMode="cover"
+                    blurRadius={blur ? blurRadius : 0}
+                    accessible={false}
+                />
+            </Pressable>
         )
     }
 
@@ -71,6 +79,7 @@ export default function RenderImage({
                     recyclingKey={`${midia.fullhd_resolution}-`}
                     blurRadius={blurRadius}
                     contentFit="cover"
+                    accessible={false}
                 />
             </Animated.View>
             {!blur && (
@@ -89,6 +98,7 @@ export default function RenderImage({
                     onLoadEnd={() => {
                         removeBlur()
                     }}
+                    accessible={false}
                 />
             )}
         </>

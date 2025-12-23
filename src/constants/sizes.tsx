@@ -110,6 +110,12 @@ const inputs = {
 
 const momentAspectRatio = 1.566
 
+// Responsiveness factors (scale moment.standart by screen width)
+const BASE_DESIGN_WIDTH = 375
+const MOMENT_BASE_WIDTH = 355
+const AJUST_FACTOR = 0.95
+const screenScale = (WindowWidth / BASE_DESIGN_WIDTH) * AJUST_FACTOR
+
 const moment = {
     aspectRatio: momentAspectRatio,
     micro: {
@@ -125,18 +131,18 @@ const moment = {
         height: momentAspectRatio * 182,
         paddingTop: 2,
         padding: 5,
-        borderRadius: 34,
+        borderRadius: 40,
     },
     small: {
         width: 283,
         height: momentAspectRatio * 283,
         paddingTop: 2,
         padding: 5,
-        borderRadius: 30,
+        borderRadius: 40,
     },
     standart: {
-        width: 355,
-        height: momentAspectRatio * 355,
+        width: MOMENT_BASE_WIDTH * screenScale,
+        height: momentAspectRatio * (MOMENT_BASE_WIDTH * screenScale),
         padding: 5,
         paddingTop: 5,
         borderRadius: 40,

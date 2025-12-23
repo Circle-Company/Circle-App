@@ -1,8 +1,9 @@
-import { Animated, View, ViewStyle } from "react-native"
+import { Animated, View, ViewStyle, Platform } from "react-native"
 import React, { useEffect, useRef } from "react"
 
 import { colors } from "../../../constants/colors"
 import sizes from "../../../constants/sizes"
+import BlurredBackground from "../../general/blurred-background"
 
 interface VideoSliderProps {
     currentTime: number
@@ -79,14 +80,25 @@ export default function MomentVideoSlider({
 
     return (
         <View style={container}>
-            {/* Slider estático */}
-            <View style={sliderContainer}>
-                {/* Trilha de fundo */}
-                <View style={[track, backgroundTrack]} />
-
-                {/* Progresso */}
-                <Animated.View style={[progressTrack, { width: progressWidth }]} />
-            </View>
+            {Platform.OS === "ios" ? (
+                <BlurredBackground
+                    intensity={30}
+                    tint="systemMaterialDark"
+                    overlayColor={`${colors.gray.grey_07}80`}
+                    radius={6}
+                    style={{ borderRadius: 6 }}
+                >
+                    <View style={sliderContainer}>
+                        <View style={[track, backgroundTrack]} />
+                        <Animated.View style={[progressTrack, { width: progressWidth }]} />
+                    </View>
+                </BlurredBackground>
+            ) : (
+                <View style={sliderContainer}>
+                    <View style={[track, backgroundTrack]} />
+                    <Animated.View style={[progressTrack, { width: progressWidth }]} />
+                </View>
+            )}
         </View>
     )
 }

@@ -14,13 +14,12 @@ type Props = ViewProps & {
 export default function AuthTermsText({ signText }: Props) {
     const navigation: any = useNavigation()
     const { t } = useTranslation()
-    const isDarkMode = useColorScheme() === "dark"
 
     const container: TextStyle = {
         width: sizes.screens.width - 20 * 2,
         paddingHorizontal: sizes.paddings["1md"],
         paddingVertical: sizes.paddings["2sm"],
-        backgroundColor: isDarkMode ? colors.gray.grey_09 : colors.gray.grey_01,
+        backgroundColor: colors.gray.grey_09,
         borderRadius: sizes.borderRadius["1md"],
         alignItems: "center",
         justifyContent: "center",

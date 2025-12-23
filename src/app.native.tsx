@@ -3,7 +3,7 @@ import * as SplashScreen from "expo-splash-screen"
 
 import { DefaultTheme, NavigationContainer } from "@react-navigation/native"
 import { SafeAreaProvider, initialWindowMetrics } from "react-native-safe-area-context"
-import { Text, TextInput } from "react-native"
+import { Text, TextInput, useColorScheme } from "react-native"
 
 import { Provider as AccountProvider } from "./contexts/account"
 import { Provider as AuthProvider } from "./contexts/Auth"
@@ -40,13 +40,19 @@ function InnerApp() {
     console.log("🔄 InnerApp carregando...")
 
     try {
-        const myTheme = {
-            ...DefaultTheme,
-            colors: {
-                ...DefaultTheme.colors,
-                background: ColorTheme().background.toString(),
-            },
-        }
+        const scheme = useColorScheme()
+        const themeColors = ColorTheme()
+        const myTheme = React.useMemo(
+            () => ({
+                ...DefaultTheme,
+                colors: {
+                    ...DefaultTheme.colors,
+                    background: themeColors.background.toString(),
+                    card: themeColors.background.toString(),
+                },
+            }),
+            [scheme, themeColors.background],
+        )
 
         console.log("🎨 Tema configurado, renderizando providers...")
 
@@ -56,7 +62,7 @@ function InnerApp() {
                     <ProfileProvider>
                         <ViewProfileProvider>
                             <FeedProvider>
-                                <NavigationContainer theme={myTheme}>
+                                <NavigationContainer key={scheme || "default"} theme={myTheme}>
                                     <BottomSheetProvider>
                                         <SelectMomentsProvider>
                                             <NewMomentProvider>
@@ -85,27 +91,6 @@ function App() {
     useEffect(() => {
         if (fontsLoaded || fontError) {
             SplashScreen.hideAsync().catch(() => undefined)
-
-            const defaultFontFamily = Fonts.family.Regular
-
-            const textComponent = Text as TextComponent
-            const textInputComponent = TextInput as TextInputComponent
-
-            if (textComponent.defaultProps == null) {
-                textComponent.defaultProps = {}
-            }
-
-            if (textInputComponent.defaultProps == null) {
-                textInputComponent.defaultProps = {}
-            }
-
-            textComponent.defaultProps.style = textComponent.defaultProps.style
-                ? [textComponent.defaultProps.style, { fontFamily: defaultFontFamily }]
-                : { fontFamily: defaultFontFamily }
-
-            textInputComponent.defaultProps.style = textInputComponent.defaultProps.style
-                ? [textInputComponent.defaultProps.style, { fontFamily: defaultFontFamily }]
-                : { fontFamily: defaultFontFamily }
         }
     }, [fontsLoaded, fontError])
 
@@ -117,7 +102,11 @@ function App() {
         return (
             <SafeAreaProvider initialMetrics={initialWindowMetrics}>
                 <GestureHandlerRootView
-                    style={{ width: sizes.window.width, height: sizes.window.height }}
+                    style={{
+                        width: sizes.window.width,
+                        height: sizes.window.height,
+                        backgroundColor: "#000",
+                    }}
                 >
                     <KeyboardProvider enabled>
                         <ToastProvider>
@@ -128,7 +117,11 @@ function App() {
                                             <NetworkProvider>
                                                 <GeolocationProvider>
                                                     <CameraProvider>
-                                                        <StatusBar />
+                                                        <StatusBar
+                                                            barStyle="light-content"
+                                                            backgroundColor="#000"
+                                                            translucent={false}
+                                                        />
                                                         <InnerApp />
                                                     </CameraProvider>
                                                 </GeolocationProvider>

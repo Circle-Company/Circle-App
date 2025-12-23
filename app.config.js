@@ -31,6 +31,14 @@ module.exports = function (_config) {
             },
             ios: {
                 bundleIdentifier: "com.circlecompany.circleapp",
+                icon: "./assets/app-icons/circleIOS.icon",
+                infoPlist: {
+                    UIApplicationSupportsIndirectInputEvents: true,
+                    // Desabilitar análises automáticas de imagem do iOS
+                    VKCImageAnalysisDisabled: true,
+                    // Desabilitar Live Text (seleção de texto em imagens)
+                    UISupportsLiveText: false,
+                },
             },
             web: { favicon: "./assets/favicon.png" },
             jsEngine: "jsc",

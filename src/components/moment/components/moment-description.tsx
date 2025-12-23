@@ -49,7 +49,9 @@ export default function Description({ displayOnMoment = true }: MomentDescriptio
 
     return (
         <View style={container}>
-            <Text style={descriptionStyle}>{momentData.description}</Text>
+            <Text style={descriptionStyle} selectable={false}>
+                {momentData.description}
+            </Text>
         </View>
     )
 }

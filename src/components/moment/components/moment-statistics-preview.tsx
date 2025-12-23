@@ -82,10 +82,14 @@ export function StatisticsPreview({ momentOptions, momentData }: StatisticsPrevi
                             ]}
                         >
                             <View style={titleContainer}>
-                                <Text style={title}>{item.title}</Text>
+                                <Text style={title} selectable={false}>
+                                    {item.title}
+                                </Text>
                             </View>
                             <View>
-                                <Text style={value}>{item.value}</Text>
+                                <Text style={value} selectable={false}>
+                                    {item.value}
+                                </Text>
                             </View>
                         </View>
                     )

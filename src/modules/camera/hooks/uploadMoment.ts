@@ -1,7 +1,7 @@
 import api from "@/services/Api"
 import DeviceInfo from "react-native-device-info"
 import { Dimensions, PixelRatio } from "react-native"
-import RNFS from "react-native-fs"
+import * as FileSystem from "expo-file-system"
 
 export interface uploadMomentInterface {
     description: string | null
@@ -19,14 +19,18 @@ export async function uploadMoment(props: uploadMomentInterface) {
     const scale = PixelRatio.get()
     const screenResolution = `${Math.round(dpW * scale)}x${Math.round(dpH * scale)}`
 
-    // Remove file:// prefix se existir
-    const cleanPath = props.videoPath.replace("file://", "")
+    // Garantir URI com prefixo file://
+    const fileUri = props.videoPath.startsWith("file://")
+        ? props.videoPath
+        : `file://${props.videoPath}`
 
     console.log("🔄 Convertendo vídeo para base64 em uploadMoment...")
-    console.log("Path do vídeo:", cleanPath)
+    console.log("Path do vídeo:", fileUri)
 
-    // Converter vídeo para base64 usando react-native-fs
-    const base64Video = await RNFS.readFile(cleanPath, "base64")
+    // Converter vídeo para base64 usando expo-file-system
+    const base64Video = await FileSystem.readAsStringAsync(fileUri, {
+        encoding: FileSystem.EncodingType.Base64,
+    })
 
     console.log("✅ Vídeo convertido para base64! Tamanho:", base64Video.length)
 

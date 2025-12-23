@@ -8,13 +8,11 @@ import { StyleSheet, Text, View } from "react-native"
 import RotateIcon from "@/assets/icons/svgs/arrow.triangle.2.circlepath.svg"
 import FlashOnIcon from "@/assets/icons/svgs/flashlight.on.fill.svg"
 import FlashOffIcon from "@/assets/icons/svgs/flashlight.off.fill.svg"
-import type { PinchGestureHandlerGestureEvent } from "react-native-gesture-handler"
-import { PinchGestureHandler, TapGestureHandler } from "react-native-gesture-handler"
+import { Gesture, GestureDetector, TapGestureHandler } from "react-native-gesture-handler"
 import { PressableOpacity } from "react-native-pressable-opacity"
 import Reanimated, {
     Extrapolate,
     interpolate,
-    useAnimatedGestureHandler,
     useAnimatedProps,
     useAnimatedStyle,
     useSharedValue,
@@ -37,7 +35,6 @@ import type { Routes } from "../routes"
 import { useCameraContext } from "../context"
 import LanguageContext from "@/contexts/Preferences/language"
 import { colors } from "@/constants/colors"
-import RNFS from "react-native-fs"
 
 const ReanimatedCamera = Reanimated.createAnimatedComponent(Camera)
 Reanimated.addWhitelistedNativeProps({
@@ -300,20 +297,21 @@ export function CameraPage({ navigation }: Props): React.ReactElement {
     //#region Pinch to Zoom Gesture
     // The gesture handler maps the linear pinch gesture (0 - 1) to an exponential curve since a camera's zoom
     // function does not appear linear to the user. (aka zoom 0.1 -> 0.2 does not look equal in difference as 0.8 -> 0.9)
-    const onPinchGesture = useAnimatedGestureHandler<
-        PinchGestureHandlerGestureEvent,
-        { startZoom?: number }
-    >({
-        onStart: (_, context) => {
-            context.startZoom = zoom.value
-        },
-        onActive: (event, context) => {
+    const startZoomRef = useSharedValue(0)
+
+    const pinchGesture = Gesture.Pinch()
+        .onBegin(() => {
+            "worklet"
+            startZoomRef.value = zoom.value
+        })
+        .onUpdate((event) => {
+            "worklet"
             // block pinch-to-zoom while the capture button is pressed
             if (isPressingButton.value) {
                 return
             }
             // we're trying to map the scale gesture to a linear zoom here
-            const startZoom = context.startZoom ?? 0
+            const startZoom = startZoomRef.value
             const scale = interpolate(
                 event.scale,
                 [1 - 1 / SCALE_FULL_ZOOM, 1, SCALE_FULL_ZOOM],
@@ -326,8 +324,7 @@ export function CameraPage({ navigation }: Props): React.ReactElement {
                 [minZoom, startZoom, maxZoom],
                 Extrapolate.CLAMP,
             )
-        },
-    })
+        })
     //#endregion
 
     useEffect(() => {
@@ -357,7 +354,7 @@ export function CameraPage({ navigation }: Props): React.ReactElement {
     return (
         <View style={styles.container}>
             {device != null ? (
-                <PinchGestureHandler onGestureEvent={onPinchGesture} enabled={isActive}>
+                <GestureDetector gesture={pinchGesture}>
                     <Reanimated.View
                         onTouchEnd={onFocusTap}
                         style={[
@@ -392,7 +389,7 @@ export function CameraPage({ navigation }: Props): React.ReactElement {
                             />
                         </TapGestureHandler>
                     </Reanimated.View>
-                </PinchGestureHandler>
+                </GestureDetector>
             ) : (
                 <View style={styles.emptyContainer}>
                     <Text style={styles.text}>Your phone does not have a Camera.</Text>

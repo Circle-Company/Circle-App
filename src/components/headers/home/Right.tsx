@@ -1,5 +1,5 @@
 import { NavigationProp, useNavigation } from "@react-navigation/native"
-import { Text, TextStyle, View, ViewStyle } from "react-native"
+import { Text, TextStyle, View, ViewStyle, Platform } from "react-native"
 
 import { BadgeIcon } from "../../general/badge-icon"
 import Bell from "@/assets/icons/svgs/tray.svg"
@@ -25,7 +25,9 @@ export default function HeaderRightHome() {
 
     const text: TextStyle = {
         fontSize: fonts.size.footnote,
-        fontFamily: fonts.family["Bold-Italic"],
+        fontFamily:
+            Platform.OS === "ios" ? fonts.family["Variable-Italic"] : fonts.family["Bold-Italic"],
+        fontWeight: Platform.OS === "ios" ? "700" : undefined,
         color: ColorTheme().text,
     }
     const textContainer: ViewStyle = {

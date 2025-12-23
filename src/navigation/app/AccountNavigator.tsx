@@ -1,43 +1,57 @@
-import { createStackNavigator } from "@react-navigation/stack"
+import { createNativeStackNavigator } from "@react-navigation/native-stack"
 import React from "react"
+import { Platform } from "react-native"
 import AccountHeaderCenter from "../../components/headers/account/account-header_center"
 import AccountHeaderRight from "../../components/headers/account/account-header_right"
-import ColorTheme from "../../constants/colors"
+import ColorTheme, { colors } from "../../constants/colors"
 import Fonts from "../../constants/fonts"
 import Sizes from "../../constants/sizes"
 import LanguageContext from "../../contexts/Preferences/language"
+import PersistedContext from "@/contexts/Persisted"
 import AccountScreen from "../../pages/app/Account"
 import { Interpolation as Horizontal } from "../transitions/horizontal-right"
+import sizes from "../../constants/sizes"
+import { border, onLongPressGesture } from "@expo/ui/swift-ui/modifiers"
+import { BorderlessButton } from "react-native-gesture-handler"
 
-const AccountScreenStack = createStackNavigator()
+const AccountScreenStack = createNativeStackNavigator()
 
 export function AccountScreenNavigator() {
+    const { session } = React.useContext(PersistedContext)
     const { t } = React.useContext(LanguageContext)
     const HeaderStyle = {
-        ...Sizes.headers,
+        BorderBottomWidth: 0,
         backgroundColor: ColorTheme().background,
     }
 
     return (
         <AccountScreenStack.Navigator
             screenOptions={{
-                cardStyleInterpolator: Horizontal,
+                statusBarAnimation: "fade",
+                statusBarStyle: "light",
             }}
         >
             <AccountScreenStack.Screen
                 name="AccountScreen"
                 component={AccountScreen}
                 options={{
-                    headerTitleStyle: { display: "none" },
                     headerStyle: HeaderStyle,
-                    cardStyle: {
-                        backgroundColor: String(ColorTheme().background),
+                    scrollEdgeEffects: {
+                        bottom: "hard",
+                        top: true,
+                        left: true,
+                        right: true,
+                    },
+                    headerTitleStyle: {
+                        fontFamily: Fonts.family["Black-Italic"],
+                        fontSize: Fonts.size.title2 * 0.9,
                     },
                     headerTitleAlign: "center",
-                    cardOverlayEnabled: true,
-                    headerLeft: () => <AccountHeaderCenter />,
-                    headerTitle: undefined,
-                    headerRight: () => <AccountHeaderRight />,
+                    headerBlurEffect: "dark",
+                    sheetExpandsWhenScrolledToEdge: true,
+                    headerRight: AccountHeaderRight,
+                    headerTintColor: colors.gray.white,
+                    headerTitle: "@" + session.user.username,
                 }}
             />
             <AccountScreenStack.Screen
@@ -53,10 +67,6 @@ export function AccountScreenNavigator() {
                     },
                     headerTintColor: String(ColorTheme().text),
                     headerStyle: HeaderStyle,
-                    cardStyle: {
-                        backgroundColor: String(ColorTheme().background),
-                    },
-                    cardOverlayEnabled: true,
                 }}
             />
         </AccountScreenStack.Navigator>

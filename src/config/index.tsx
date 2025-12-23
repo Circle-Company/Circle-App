@@ -13,7 +13,7 @@ const environment = {
 }
 
 const api = {
-    ENDPOINT: "192.168.15.17:3000",
+    ENDPOINT: "192.168.0.11:3000",
     API_VERSION: "1.0.0",
 }
 

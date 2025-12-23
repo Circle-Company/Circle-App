@@ -1,119 +1,71 @@
 import { AccountScreenNavigator } from "./AccountNavigator"
-import ColorTheme from "../../constants/colors"
+import ColorTheme, { colors } from "../../constants/colors"
 import Fonts from "../../constants/fonts"
 import { HomeScreenNavigator } from "./HomeScreenNavigator"
-import LanguageContext from "../../contexts/Preferences/language"
-import Moment from "../../assets/icons/svgs/moments.svg"
-import MomentOutline from "../../assets/icons/svgs/moments-outline.svg"
 import React from "react"
-import { Text } from "react-native"
-import User from "../../assets/icons/svgs/@3.svg"
-import UserOutline from "../../assets/icons/svgs/@.svg"
-import { createBottomTabNavigator } from "@react-navigation/bottom-tabs"
-import sizes from "../../constants/sizes"
-import LinearGradient from "react-native-linear-gradient"
+import fonts from "../../constants/fonts"
+import CameraModule from "@/modules/camera"
+import PersistedContext from "@/contexts/Persisted"
 
-const BottomTab = createBottomTabNavigator()
+import { createNativeBottomTabNavigator } from "@react-navigation/bottom-tabs/unstable"
 
-export default function BottomTabNavigator() {
-    const { t } = React.useContext(LanguageContext)
-    const iconWidth = 21
-    const iconHeight = 21
-    const tabBarStyle = {
-        ...sizes.bottomTab,
-        backgroundColor: "transparent", // Torna a tab transparente
-        borderTopWidth: 0, // Remove linha superior
-        elevation: 0, // Remove sombra no Android
-        position: "absolute", // Permite conteúdo por baixo
-    }
+const Tab = createNativeBottomTabNavigator()
+
+export function BottomTabs() {
+    //const { session } = React.useContext(PersistedContext)
     return (
-        <BottomTab.Navigator
-            initialRouteName="Moments"
+        <Tab.Navigator
             screenOptions={{
-                tabBarHideOnKeyboard: true,
                 headerShown: false,
-                tabBarStyle: tabBarStyle,
-                tabBarBackground: () => (
-                    <LinearGradient
-                        colors={["#000000", "transparent"]}
-                        start={{ x: 0.5, y: 0.7 }}
-                        end={{ x: 0.5, y: 0 }}
-                        style={{ flex: 1 }}
-                    />
-                ),
-                tabBarPressColor: "transparent", // Remove ripple effect
+                tabBarLabelVisibilityMode: "unlabeled",
+                tabBarActiveTintColor: ColorTheme().primary,
+                tabBarInactiveTintColor: ColorTheme().text,
+                tabBarActiveIndicatorColor: colors.purple.purple_05 + "",
+                tabBarBlurEffect: "dark",
+                headerBlurEffect: "dark",
+                tabBarLabelStyle: {
+                    fontFamily: Fonts.family["Bold-Italic"],
+                    fontSize: fonts.size.body * 0.9,
+                },
             }}
         >
-            <BottomTab.Screen
+            <Tab.Screen
                 name="Moments"
                 component={HomeScreenNavigator}
                 options={{
-                    title: t("Moments"),
-                    tabBarActiveTintColor: ColorTheme().text, // cor do texto quando ativo
-                    tabBarInactiveTintColor: ColorTheme().icon, // cor do texto quando inativo
-                    tabBarLabel: ({ focused, color }) => (
-                        <Text
-                            style={{
-                                fontFamily: focused ? Fonts.family.Black : Fonts.family.Semibold,
-                                fontSize: 10,
-                                color,
-                            }}
-                        >
-                            {t("Moments")}
-                        </Text>
-                    ),
-                    tabBarIcon: ({ focused }) =>
-                        focused ? (
-                            <Moment
-                                fill={String(ColorTheme().text)}
-                                width={iconWidth}
-                                height={iconHeight}
-                            />
-                        ) : (
-                            <MomentOutline
-                                fill={String(ColorTheme().icon)}
-                                width={iconWidth}
-                                height={iconHeight}
-                            />
-                        ),
+                    tabBarIcon: {
+                        templateSource: require("../../assets/icons/pngs/moments.png"),
+                    } as any,
+                    tabBarControllerMode: "tabbar",
+                    headerBlurEffect: "dark",
+                    tabBarLabelVisibilityMode: "unlabeled",
+                    tabBarMinimizeBehavior: "never",
                 }}
             />
-            <BottomTab.Screen
+            <Tab.Screen
+                name="Create"
+                component={CameraModule}
+                options={{
+                    tabBarIcon: {
+                        templateSource: require("../../assets/icons/pngs/moments.png"),
+                    } as any,
+                    tabBarControllerMode: "sidebar",
+                    tabBarLabelVisibilityMode: "unlabeled",
+                    tabBarMinimizeBehavior: "never",
+                }}
+            />
+            <Tab.Screen
                 name="You"
                 component={AccountScreenNavigator}
                 options={{
-                    title: t("You"),
-                    tabBarActiveTintColor: ColorTheme().text, // cor do texto quando ativo
-                    tabBarInactiveTintColor: ColorTheme().icon, // cor do texto quando inativo
-                    tabBarLabel: ({ focused, color }) => (
-                        <Text
-                            style={{
-                                fontFamily: focused ? Fonts.family.Black : Fonts.family.Semibold,
-                                fontSize: 10,
-                                color,
-                            }}
-                        >
-                            {t("You")}
-                        </Text>
-                    ),
-                    tabBarIcon: ({ focused }) =>
-                        focused ? (
-                            <User
-                                fill={String(ColorTheme().text)}
-                                width={iconWidth - 1.7}
-                                height={iconHeight - 1.7}
-                            />
-                        ) : (
-                            <>
-                                <UserOutline
-                                    fill={String(ColorTheme().icon)}
-                                    width={iconWidth}
-                                    height={iconHeight}
-                                />
-                            </>
-                        ),
+                    tabBarIcon: {
+                        templateSource: require("../../assets/icons/pngs/moments.png"),
+                    } as any,
+                    tabBarControllerMode: "tabbar",
+                    tabBarMinimizeBehavior: "onScrollDown",
+                    tabBarLabelVisibilityMode: "unlabeled",
                 }}
             />
-        </BottomTab.Navigator>
+        </Tab.Navigator>
     )
 }

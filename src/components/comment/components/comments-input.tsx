@@ -12,7 +12,7 @@ import { UserShow } from "../../user_show"
 import api from "../../../services/Api"
 import fonts from "../../../constants/fonts"
 import sizes from "../../../constants/sizes"
-import { useNotifications } from "react-native-notificated"
+import { useToast } from "../../../contexts/Toast"
 import { userReciveDataProps } from "@/components/user_show/user_show-types"
 
 export default function Input({
@@ -27,7 +27,7 @@ export default function Input({
     const { session } = React.useContext(PersistedContext)
     const [commentText, setCommentText] = React.useState<string>("")
     const isDarkMode = useColorScheme() === "dark"
-    const { notify } = useNotifications()
+    const toast = useToast()
 
     const animatedScale = React.useRef(new Animated.Value(0)).current
 
@@ -105,18 +105,15 @@ export default function Input({
                     { headers: { Authorization: session.account.jwtToken } },
                 )
                 .then(() => {
-                    notify("toast", {
-                        params: {
-                            description: t("Comment Has been sended with success"),
-                            title: t("Comment Sended"),
-                            icon: (
-                                <CheckIcon
-                                    fill={colors.green.green_05.toString()}
-                                    width={15}
-                                    height={15}
-                                />
-                            ),
-                        },
+                    toast.success(t("Comment Has been sended with success"), {
+                        title: t("Comment Sended"),
+                        icon: (
+                            <CheckIcon
+                                fill={colors.green.green_05.toString()}
+                                width={15}
+                                height={15}
+                            />
+                        ),
                     })
                 })
     }

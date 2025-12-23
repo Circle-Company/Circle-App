@@ -1,0 +1,16 @@
+diff --git a/node_modules/react-native-screens/src/fabric/bottom-tabs/BottomTabsAccessoryContentNativeComponent.ts b/node_modules/react-native-screens/src/fabric/bottom-tabs/BottomTabsAccessoryContentNativeComponent.ts
+index 1234567..abcdefg 100644
+--- a/node_modules/react-native-screens/src/fabric/bottom-tabs/BottomTabsAccessoryContentNativeComponent.ts
++++ b/node_modules/react-native-screens/src/fabric/bottom-tabs/BottomTabsAccessoryContentNativeComponent.ts
+@@ -3,10 +3,8 @@
+ import { codegenNativeComponent } from 'react-native';
+ import type { CodegenTypes as CT, ViewProps } from 'react-native';
+ 
+-type BottomAccessoryEnvironment = 'regular' | 'inline';
+-
+ export interface NativeProps extends ViewProps {
+-  environment?: CT.WithDefault<BottomAccessoryEnvironment, 'regular'>;
++  environment?: CT.WithDefault<CT.Int32, 0>;
+ }
+ 
+ export default codegenNativeComponent<NativeProps>(

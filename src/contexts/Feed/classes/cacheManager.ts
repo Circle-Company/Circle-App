@@ -1,8 +1,8 @@
-import RNFS from "react-native-fs"
+import * as FileSystem from "expo-file-system/legacy"
 import { Image } from "react-native"
 
-const VIDEO_CACHE_DIR = `${RNFS.CachesDirectoryPath}/videos`
-const THUMBNAIL_CACHE_DIR = `${RNFS.CachesDirectoryPath}/thumbnails`
+const VIDEO_CACHE_DIR = `${FileSystem.cacheDirectory}videos`
+const THUMBNAIL_CACHE_DIR = `${FileSystem.cacheDirectory}thumbnails`
 
 type CacheEntry = {
     id: string
@@ -43,14 +43,14 @@ export class CacheManager {
 
     private async init() {
         try {
-            const videoExists = await RNFS.exists(VIDEO_CACHE_DIR)
-            if (!videoExists) {
-                await RNFS.mkdir(VIDEO_CACHE_DIR)
+            const videoInfo = await FileSystem.getInfoAsync(VIDEO_CACHE_DIR)
+            if (!videoInfo.exists) {
+                await FileSystem.makeDirectoryAsync(VIDEO_CACHE_DIR, { intermediates: true })
             }
 
-            const thumbnailExists = await RNFS.exists(THUMBNAIL_CACHE_DIR)
-            if (!thumbnailExists) {
-                await RNFS.mkdir(THUMBNAIL_CACHE_DIR)
+            const thumbnailInfo = await FileSystem.getInfoAsync(THUMBNAIL_CACHE_DIR)
+            if (!thumbnailInfo.exists) {
+                await FileSystem.makeDirectoryAsync(THUMBNAIL_CACHE_DIR, { intermediates: true })
             }
 
             // Carregar cache existente na inicialização
@@ -66,22 +66,22 @@ export class CacheManager {
     private async loadExistingCache() {
         try {
             // Carregar vídeos existentes
-            const videoFiles = await RNFS.readDir(VIDEO_CACHE_DIR)
-            for (const file of videoFiles) {
-                if (file.name.endsWith(".mp4")) {
-                    const id = file.name.replace(".mp4", "")
-                    const localPath = `file://${file.path}`
+            const videoFiles = await FileSystem.readDirectoryAsync(VIDEO_CACHE_DIR)
+            for (const name of videoFiles) {
+                if (name.endsWith(".mp4")) {
+                    const id = name.replace(".mp4", "")
+                    const localPath = `${VIDEO_CACHE_DIR}/${name}`
                     this.videoCache.set(id, { id, localPath, originalUrl: "" })
                     this.accessQueue.push(id)
                 }
             }
 
             // Carregar thumbnails existentes
-            const thumbnailFiles = await RNFS.readDir(THUMBNAIL_CACHE_DIR)
-            for (const file of thumbnailFiles) {
-                if (file.name.endsWith(".jpg") || file.name.endsWith(".png")) {
-                    const id = file.name.replace(/\.(jpg|png)$/, "")
-                    const localPath = `file://${file.path}`
+            const thumbnailFiles = await FileSystem.readDirectoryAsync(THUMBNAIL_CACHE_DIR)
+            for (const name of thumbnailFiles) {
+                if (name.endsWith(".jpg") || name.endsWith(".png")) {
+                    const id = name.replace(/\.(jpg|png)$/, "")
+                    const localPath = `${THUMBNAIL_CACHE_DIR}/${name}`
                     this.thumbnailCache.set(id, { id, localPath, originalUrl: "" })
                     this.thumbnailAccessQueue.push(id)
                 }
@@ -122,7 +122,7 @@ export class CacheManager {
                 const entry = cache.get(oldestId)
                 if (entry) {
                     try {
-                        await RNFS.unlink(entry.localPath.replace("file://", ""))
+                        await FileSystem.deleteAsync(entry.localPath, { idempotent: true })
                     } catch (err) {
                         console.warn(`Erro ao remover ${type} [${oldestId}]:`, err)
                     }
@@ -201,9 +201,9 @@ export class CacheManager {
             return
         }
 
-        const fileExists = await RNFS.exists(task.localPath)
-        if (fileExists) {
-            const finalPath = `file://${task.localPath}`
+        const fileInfo = await FileSystem.getInfoAsync(task.localPath)
+        if (fileInfo.exists) {
+            const finalPath = task.localPath
             cache.set(task.id, { id: task.id, localPath: finalPath, originalUrl: task.url })
             this.markAsUsed(task.id, task.type)
             return
@@ -212,13 +212,9 @@ export class CacheManager {
         await this.evictIfNeeded(task.type)
 
         try {
-            await RNFS.downloadFile({
-                fromUrl: task.url,
-                toFile: task.localPath,
-                progressDivider: 10,
-            }).promise
+            await FileSystem.downloadAsync(task.url, task.localPath)
 
-            const finalPath = `file://${task.localPath}`
+            const finalPath = task.localPath
             cache.set(task.id, { id: task.id, localPath: finalPath, originalUrl: task.url })
             this.markAsUsed(task.id, task.type)
 
@@ -239,10 +235,10 @@ export class CacheManager {
         }
 
         const localPath = `${VIDEO_CACHE_DIR}/${id}.mp4`
-        const fileExists = await RNFS.exists(localPath)
+        const fileInfo = await FileSystem.getInfoAsync(localPath)
 
-        if (fileExists) {
-            const finalPath = `file://${localPath}`
+        if (fileInfo.exists) {
+            const finalPath = localPath
             this.videoCache.set(id, { id, localPath: finalPath, originalUrl: url })
             this.markAsUsed(id, "video")
             return finalPath
@@ -279,10 +275,10 @@ export class CacheManager {
 
         const extension = url.includes(".png") ? "png" : "jpg"
         const localPath = `${THUMBNAIL_CACHE_DIR}/${id}.${extension}`
-        const fileExists = await RNFS.exists(localPath)
+        const fileInfo = await FileSystem.getInfoAsync(localPath)
 
-        if (fileExists) {
-            const finalPath = `file://${localPath}`
+        if (fileInfo.exists) {
+            const finalPath = localPath
             this.thumbnailCache.set(id, { id, localPath: finalPath, originalUrl: url })
             this.markAsUsed(id, "thumbnail")
             return finalPath
@@ -364,7 +360,7 @@ export class CacheManager {
         if (!entry) return
 
         try {
-            await RNFS.unlink(entry.localPath.replace("file://", ""))
+            await FileSystem.deleteAsync(entry.localPath, { idempotent: true })
         } catch (err) {
             console.warn(`Erro ao remover vídeo [${id}]:`, err)
         }
@@ -379,7 +375,7 @@ export class CacheManager {
         if (!entry) return
 
         try {
-            await RNFS.unlink(entry.localPath.replace("file://", ""))
+            await FileSystem.deleteAsync(entry.localPath, { idempotent: true })
         } catch (err) {
             console.warn(`Erro ao remover thumbnail [${id}]:`, err)
         }
@@ -393,7 +389,7 @@ export class CacheManager {
     public clear() {
         this.videoCache.forEach(async (entry) => {
             try {
-                await RNFS.unlink(entry.localPath.replace("file://", ""))
+                await FileSystem.deleteAsync(entry.localPath, { idempotent: true })
             } catch (error) {
                 console.log(error)
             }
@@ -403,7 +399,7 @@ export class CacheManager {
 
         this.thumbnailCache.forEach(async (entry) => {
             try {
-                await RNFS.unlink(entry.localPath.replace("file://", ""))
+                await FileSystem.deleteAsync(entry.localPath, { idempotent: true })
             } catch (error) {
                 console.log(error)
             }
@@ -439,7 +435,7 @@ export class CacheManager {
         const videoEntries = Array.from(this.videoCache.values())
         for (const entry of videoEntries) {
             try {
-                await RNFS.unlink(entry.localPath.replace("file://", ""))
+                await FileSystem.deleteAsync(entry.localPath, { idempotent: true })
             } catch (error) {
                 console.warn(`Erro ao limpar cache do vídeo [${entry.id}]:`, error)
             }
@@ -450,7 +446,7 @@ export class CacheManager {
         const thumbnailEntries = Array.from(this.thumbnailCache.values())
         for (const entry of thumbnailEntries) {
             try {
-                await RNFS.unlink(entry.localPath.replace("file://", ""))
+                await FileSystem.deleteAsync(entry.localPath, { idempotent: true })
             } catch (error) {
                 console.warn(`Erro ao limpar cache da thumbnail [${entry.id}]:`, error)
             }

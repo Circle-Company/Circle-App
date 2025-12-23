@@ -1,4 +1,4 @@
-import { StatusBar as RNStatusBar, useColorScheme } from "react-native"
+import { StatusBar as RNStatusBar, useColorScheme, Platform } from "react-native"
 
 import ColorTheme from "@/constants/colors"
 import React from "react"
@@ -21,7 +21,9 @@ export const StatusBar: React.FC<StatusBarProps> = ({
     const defaultBackgroundColor = isDarkMode ? colors.background : colors.backgroundAccent
     const defaultBarStyle = isDarkMode ? "light-content" : "dark-content"
 
-    return (
+    return Platform.OS === "ios" ? (
+        <RNStatusBar barStyle="light-content" />
+    ) : (
         <RNStatusBar
             backgroundColor={backgroundColor || defaultBackgroundColor}
             barStyle={barStyle || defaultBarStyle}

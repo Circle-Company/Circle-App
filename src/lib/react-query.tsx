@@ -6,7 +6,7 @@ import {
 } from "@tanstack/react-query-persist-client"
 import React, { useState } from "react"
 import { AppState, AppStateStatus } from "react-native"
-import { MMKV } from "react-native-mmkv"
+import { storage } from "../store"
 import PersistedContext from "../contexts/Persisted"
 
 // Keys que serão persistidas
@@ -41,8 +41,8 @@ const dehydrateOptions: PersistQueryClientProviderProps["persistOptions"]["dehyd
     },
 }
 
-// Instância do MMKV
-const mmkv = new MMKV()
+// Instância do MMKV (compartilhada via src/store/index.ts)
+const mmkv = storage
 
 // Wrapper para MMKV compatível com AsyncStorage
 const mmkvAsyncStorage = {

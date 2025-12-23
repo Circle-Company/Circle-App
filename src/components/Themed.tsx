@@ -16,7 +16,7 @@ export type { RNTextStyle as TextStyle, RNViewStyle as ViewStyle }
 export function Text(props: RNTextProps) {
     const { style, ...otherProps } = props
 
-    return <DefaultText style={[{ color: ColorTheme().text }, style]} {...otherProps} />
+    return <DefaultText {...otherProps} style={[{ color: ColorTheme().text }, style]} />
 }
 
 export function View(props: RNViewProps) {

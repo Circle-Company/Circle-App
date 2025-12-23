@@ -1,6 +1,6 @@
 import * as LocalAuthentication from "expo-local-authentication"
 import React from "react"
-import { notify } from "react-native-notificated"
+import { useToast } from "../../contexts/Toast"
 import CheckIcon from "../../assets/icons/svgs/check_circle.svg"
 import ErrorIcon from "../../assets/icons/svgs/exclamationmark_circle.svg"
 import { colors } from "../../constants/colors"
@@ -31,6 +31,7 @@ const AllMomentsContext = React.createContext<AllMomentsContextsData>({} as AllM
 export function AllMomentsProvider({ children }: AllMomentsProviderProps) {
     const { session } = React.useContext(PersistedContext)
     const { t } = React.useContext(LanguageContext)
+    const toast = useToast()
     const [selectedMoments, setSelectedMoments] = React.useState<Moment[]>([])
 
     async function deleteMoments() {
@@ -50,34 +51,28 @@ export function AllMomentsProvider({ children }: AllMomentsProviderProps) {
                         { headers: { Authorization: session.account.jwtToken } },
                     )
                     .then(() => {
-                        notify("toast", {
-                            params: {
-                                description: t("Moments has been deleted with success"),
-                                title: t("Moments Deleted"),
-                                icon: (
-                                    <CheckIcon
-                                        fill={colors.green.green_05.toString()}
-                                        width={15}
-                                        height={15}
-                                    />
-                                ),
-                            },
-                        }),
-                            setSelectedMoments([])
+                        toast.success(t("Moments has been deleted with success"), {
+                            title: t("Moments Deleted"),
+                            icon: (
+                                <CheckIcon
+                                    fill={colors.green.green_05.toString()}
+                                    width={15}
+                                    height={15}
+                                />
+                            ),
+                        })
+                        setSelectedMoments([])
                     })
                     .catch(() => {
-                        notify("toast", {
-                            params: {
-                                description: t("We can't delete your Moments"),
-                                title: t("Error"),
-                                icon: (
-                                    <ErrorIcon
-                                        fill={colors.red.red_05.toString()}
-                                        width={15}
-                                        height={15}
-                                    />
-                                ),
-                            },
+                        toast.error(t("We can't delete your Moments"), {
+                            title: t("Error"),
+                            icon: (
+                                <ErrorIcon
+                                    fill={colors.red.red_05.toString()}
+                                    width={15}
+                                    height={15}
+                                />
+                            ),
                         })
                     })
             } else setSelectedMoments([])

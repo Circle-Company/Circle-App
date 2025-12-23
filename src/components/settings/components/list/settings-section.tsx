@@ -25,9 +25,9 @@ export default function SettingsSection({ name, content }: SettignsSectionProps)
         justifyContent: "center",
     }
     const header_text: TextStyle = {
-        fontSize: fonts.size.body * 1.1,
-        fontFamily: fonts.family.Semibold,
-        color: ColorTheme().text,
+        fontSize: fonts.size.body * 1.2,
+        fontFamily: fonts.family.Bold,
+        color: colors.gray.white,
     }
     const content_container: ViewStyle = {
         width: sizes.screens.width,

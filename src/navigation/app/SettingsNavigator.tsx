@@ -1,9 +1,11 @@
 import { createStackNavigator } from "@react-navigation/stack"
 import React from "react"
+import { Platform } from "react-native"
 import SettingsHeaderLeft from "../../components/headers/settings/settings-header_left"
 import ColorTheme from "../../constants/colors"
 import Sizes from "../../constants/sizes"
 import LanguageContext from "../../contexts/Preferences/language"
+import Fonts from "../../constants/fonts"
 import SettingsScreen from "../../pages/app/Settings"
 import AllMomentsScreen from "../../pages/app/Settings/AllMoments"
 import SettingsCommunityGuidelines from "../../pages/app/Settings/CommunityGuidelines"
@@ -30,23 +32,31 @@ const SettingsStack = createStackNavigator()
 export function SettingsNavigator() {
     const { t } = React.useContext(LanguageContext)
     const HeaderStyle = {
-        ...Sizes.headers,
         backgroundColor: ColorTheme().background,
+        ...(Platform.OS === "ios" ? { shadowOpacity: 0, borderBottomWidth: 0 } : { elevation: 0 }),
     }
 
     return (
-        <SettingsStack.Navigator screenOptions={{ cardStyleInterpolator: Horizontal }}>
+        <SettingsStack.Navigator
+            screenOptions={{
+                cardStyleInterpolator: Horizontal,
+                contentStyle: { backgroundColor: String(ColorTheme().background) },
+                headerShadowVisible: false,
+            }}
+        >
             <SettingsStack.Screen
                 name="Settings"
                 component={SettingsScreen}
                 options={{
                     headerTitle: t("Settings"),
                     headerTitleAlign: "center",
-                    headerTitleStyle: { fontWeight: "800", fontStyle: "italic" },
+                    headerTitleStyle: { fontFamily: Fonts.family["Black-Italic"] },
                     headerStyle: [
                         HeaderStyle,
                         { borderBottomWidth: 0, borderBottomColor: "transparent" },
                     ],
+
+                    headerShadowVisible: false,
                     headerTintColor: String(ColorTheme().text),
                     cardStyle: { backgroundColor: String(ColorTheme().background) },
                     cardOverlayEnabled: true,
@@ -59,8 +69,9 @@ export function SettingsNavigator() {
                 options={{
                     headerTitle: t("Add Profile Picture"),
                     headerTitleAlign: "center",
-                    headerTitleStyle: { fontWeight: "800", fontStyle: "italic" },
+                    headerTitleStyle: { fontFamily: Fonts.family["Black-Italic"] },
                     headerStyle: HeaderStyle,
+                    headerShadowVisible: false,
                     headerTintColor: String(ColorTheme().text),
                     cardStyle: { backgroundColor: String(ColorTheme().background) },
                     cardOverlayEnabled: true,
@@ -73,8 +84,9 @@ export function SettingsNavigator() {
                 options={{
                     headerTitle: t("Add Description"),
                     headerTitleAlign: "center",
-                    headerTitleStyle: { fontWeight: "800", fontStyle: "italic" },
+                    headerTitleStyle: { fontFamily: Fonts.family["Black-Italic"] },
                     headerStyle: HeaderStyle,
+                    headerShadowVisible: false,
                     headerTintColor: String(ColorTheme().text),
                     cardStyle: { backgroundColor: String(ColorTheme().background) },
                     cardOverlayEnabled: true,
@@ -87,8 +99,9 @@ export function SettingsNavigator() {
                 options={{
                     headerTitle: t("Following"),
                     headerTitleAlign: "center",
-                    headerTitleStyle: { fontWeight: "800", fontStyle: "italic" },
+                    headerTitleStyle: { fontFamily: Fonts.family["Black-Italic"] },
                     headerStyle: HeaderStyle,
+                    headerShadowVisible: false,
                     headerTintColor: String(ColorTheme().text),
                     cardStyle: { backgroundColor: String(ColorTheme().background) },
                     cardOverlayEnabled: true,
@@ -101,8 +114,9 @@ export function SettingsNavigator() {
                 options={{
                     headerTitle: t("Add Name"),
                     headerTitleAlign: "center",
-                    headerTitleStyle: { fontWeight: "800", fontStyle: "italic" },
+                    headerTitleStyle: { fontFamily: Fonts.family["Black-Italic"] },
                     headerStyle: HeaderStyle,
+                    headerShadowVisible: false,
                     headerTintColor: String(ColorTheme().text),
                     cardStyle: { backgroundColor: String(ColorTheme().background) },
                     cardOverlayEnabled: true,
@@ -115,8 +129,10 @@ export function SettingsNavigator() {
                 options={{
                     headerTitle: t("Change Password"),
                     headerTitleAlign: "center",
-                    headerTitleStyle: { fontWeight: "800", fontStyle: "italic" },
+                    headerTitleStyle: { fontFamily: Fonts.family["Black-Italic"] },
                     headerStyle: HeaderStyle,
+                    headerStatusBarHeight: Platform.OS === "ios" ? 0 : undefined,
+                    headerShadowVisible: false,
                     headerTintColor: String(ColorTheme().text),
                     cardStyle: { backgroundColor: String(ColorTheme().background) },
                     cardOverlayEnabled: true,
@@ -129,8 +145,9 @@ export function SettingsNavigator() {
                 options={{
                     headerTitle: t("Privacy Policy"),
                     headerTitleAlign: "center",
-                    headerTitleStyle: { fontWeight: "800", fontStyle: "italic" },
+                    headerTitleStyle: { fontFamily: Fonts.family["Black-Italic"] },
                     headerStyle: HeaderStyle,
+                    headerShadowVisible: false,
                     headerTintColor: String(ColorTheme().text),
                     cardStyle: { backgroundColor: String(ColorTheme().background) },
                     cardOverlayEnabled: true,
@@ -143,8 +160,9 @@ export function SettingsNavigator() {
                 options={{
                     headerTitle: t("Terms of Service"),
                     headerTitleAlign: "center",
-                    headerTitleStyle: { fontWeight: "800", fontStyle: "italic" },
+                    headerTitleStyle: { fontFamily: Fonts.family["Black-Italic"] },
                     headerStyle: HeaderStyle,
+                    headerShadowVisible: false,
                     headerTintColor: String(ColorTheme().text),
                     cardStyle: { backgroundColor: String(ColorTheme().background) },
                     cardOverlayEnabled: true,
@@ -157,8 +175,9 @@ export function SettingsNavigator() {
                 options={{
                     headerTitle: t("Community Guidelines"),
                     headerTitleAlign: "center",
-                    headerTitleStyle: { fontWeight: "800", fontStyle: "italic" },
+                    headerTitleStyle: { fontFamily: Fonts.family["Black-Italic"] },
                     headerStyle: HeaderStyle,
+                    headerShadowVisible: false,
                     headerTintColor: String(ColorTheme().text),
                     cardStyle: { backgroundColor: String(ColorTheme().background) },
                     cardOverlayEnabled: true,
@@ -171,8 +190,10 @@ export function SettingsNavigator() {
                 options={{
                     headerTitle: t("Notifications"),
                     headerTitleAlign: "center",
-                    headerTitleStyle: { fontWeight: "800", fontStyle: "italic" },
+                    headerTitleStyle: { fontFamily: Fonts.family["Black-Italic"] },
                     headerStyle: HeaderStyle,
+                    headerStatusBarHeight: Platform.OS === "ios" ? 0 : undefined,
+                    headerShadowVisible: false,
                     headerTintColor: String(ColorTheme().text),
                     cardStyle: { backgroundColor: String(ColorTheme().background) },
                     cardOverlayEnabled: true,
@@ -185,8 +206,9 @@ export function SettingsNavigator() {
                 options={{
                     headerTitle: t("All Moments"),
                     headerTitleAlign: "center",
-                    headerTitleStyle: { fontWeight: "800", fontStyle: "italic" },
+                    headerTitleStyle: { fontFamily: Fonts.family["Black-Italic"] },
                     headerStyle: HeaderStyle,
+                    headerShadowVisible: false,
                     headerTintColor: String(ColorTheme().text),
                     cardStyle: { backgroundColor: String(ColorTheme().background) },
                     cardOverlayEnabled: true,
@@ -199,8 +221,9 @@ export function SettingsNavigator() {
                 options={{
                     headerTitle: t("Preferences"),
                     headerTitleAlign: "center",
-                    headerTitleStyle: { fontWeight: "800", fontStyle: "italic" },
+                    headerTitleStyle: { fontFamily: Fonts.family["Black-Italic"] },
                     headerStyle: HeaderStyle,
+                    headerShadowVisible: false,
                     headerTintColor: String(ColorTheme().text),
                     cardStyle: { backgroundColor: String(ColorTheme().background) },
                     cardOverlayEnabled: true,
@@ -213,8 +236,9 @@ export function SettingsNavigator() {
                 options={{
                     headerTitle: t("Language"),
                     headerTitleAlign: "center",
-                    headerTitleStyle: { fontWeight: "800", fontStyle: "italic" },
+                    headerTitleStyle: { fontFamily: Fonts.family["Black-Italic"] },
                     headerStyle: HeaderStyle,
+                    headerShadowVisible: false,
                     headerTintColor: String(ColorTheme().text),
                     cardStyle: { backgroundColor: String(ColorTheme().background) },
                     cardOverlayEnabled: true,
@@ -227,8 +251,9 @@ export function SettingsNavigator() {
                 options={{
                     headerTitle: t("Content"),
                     headerTitleAlign: "center",
-                    headerTitleStyle: { fontWeight: "800", fontStyle: "italic" },
+                    headerTitleStyle: { fontFamily: Fonts.family["Black-Italic"] },
                     headerStyle: HeaderStyle,
+                    headerShadowVisible: false,
                     headerTintColor: String(ColorTheme().text),
                     cardStyle: { backgroundColor: String(ColorTheme().background) },
                     cardOverlayEnabled: true,
@@ -242,8 +267,10 @@ export function SettingsNavigator() {
                 options={{
                     headerTitle: t("Haptic Feedback"),
                     headerTitleAlign: "center",
-                    headerTitleStyle: { fontWeight: "800", fontStyle: "italic" },
+                    headerTitleStyle: { fontFamily: Fonts.family["Black-Italic"] },
                     headerStyle: HeaderStyle,
+                    headerStatusBarHeight: Platform.OS === "ios" ? 0 : undefined,
+                    headerShadowVisible: false,
                     headerTintColor: String(ColorTheme().text),
                     cardStyle: { backgroundColor: String(ColorTheme().background) },
                     cardOverlayEnabled: true,
@@ -256,8 +283,9 @@ export function SettingsNavigator() {
                 options={{
                     headerTitle: t("Open Source"),
                     headerTitleAlign: "center",
-                    headerTitleStyle: { fontWeight: "800", fontStyle: "italic" },
+                    headerTitleStyle: { fontFamily: Fonts.family["Black-Italic"] },
                     headerStyle: HeaderStyle,
+                    headerShadowVisible: false,
                     headerTintColor: String(ColorTheme().text),
                     cardStyle: { backgroundColor: String(ColorTheme().background) },
                     cardOverlayEnabled: true,
@@ -270,8 +298,9 @@ export function SettingsNavigator() {
                 options={{
                     headerTitle: t("Support"),
                     headerTitleAlign: "center",
-                    headerTitleStyle: { fontWeight: "800", fontStyle: "italic" },
+                    headerTitleStyle: { fontFamily: Fonts.family["Black-Italic"] },
                     headerStyle: HeaderStyle,
+                    headerShadowVisible: false,
                     headerTintColor: String(ColorTheme().text),
                     cardStyle: { backgroundColor: String(ColorTheme().background) },
                     cardOverlayEnabled: true,
@@ -284,8 +313,9 @@ export function SettingsNavigator() {
                 options={{
                     headerTitle: t("Version"),
                     headerTitleAlign: "center",
-                    headerTitleStyle: { fontWeight: "800", fontStyle: "italic" },
+                    headerTitleStyle: { fontFamily: Fonts.family["Black-Italic"] },
                     headerStyle: HeaderStyle,
+                    headerShadowVisible: false,
                     headerTintColor: String(ColorTheme().text),
                     cardStyle: { backgroundColor: String(ColorTheme().background) },
                     cardOverlayEnabled: true,
@@ -298,8 +328,9 @@ export function SettingsNavigator() {
                 options={{
                     headerTitle: t("Log Out"),
                     headerTitleAlign: "center",
-                    headerTitleStyle: { fontWeight: "800", fontStyle: "italic" },
+                    headerTitleStyle: { fontFamily: Fonts.family["Black-Italic"] },
                     headerStyle: HeaderStyle,
+                    headerShadowVisible: false,
                     headerTintColor: String(ColorTheme().text),
                     cardStyle: { backgroundColor: String(ColorTheme().background) },
                     cardOverlayEnabled: true,
