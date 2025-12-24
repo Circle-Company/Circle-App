@@ -116,6 +116,7 @@ export default function UsernameInput({ type }: UsernameInputProps) {
         setSignInputUsername("")
 
         try {
+            setStatusMessage(t("Checking availability..."))
             const response = await api.get(`/auth/username-availability/${value}`)
             const data = response?.data ?? {}
 
@@ -127,10 +128,10 @@ export default function UsernameInput({ type }: UsernameInputProps) {
 
                 if (available) {
                     setSignInputUsername(value)
-                    setStatusMessage(t("Available to use"))
+                    setStatusMessage(t("This username is available for use."))
                     return true
                 } else {
-                    setStatusMessage(t("This username is already in use."))
+                    setStatusMessage(t("This username is already in use, try another."))
                     return false
                 }
             }
@@ -151,7 +152,11 @@ export default function UsernameInput({ type }: UsernameInputProps) {
 
             setUsernameIsValid(isInUse ? true : false)
             setIsUsernameAvailable(false)
-            setStatusMessage(serverMsg)
+            setStatusMessage(
+                isInUse
+                    ? t("This username is already in use, try another.")
+                    : t("Error verifying username."),
+            )
             return false
         }
     }

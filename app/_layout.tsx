@@ -96,7 +96,6 @@ function RootLayoutNav() {
 
     return (
         <>
-            <StatusBar barStyle="light-content" backgroundColor="#000" translucent={false} />
             <Slot />
         </>
     )

@@ -1,13 +1,26 @@
 import { Dimensions, Platform } from "react-native"
-import { PERMISSIONS, RESULTS, check, request } from "react-native-permissions"
-import React, { useEffect, useState } from "react"
-import { storage, storageKeys } from "../../store"
 
+import React, { useState } from "react"
+import { storage, storageKeys } from "../../store"
+import { router } from "expo-router"
+import { useUserStore } from "../Persisted/persistedUser"
+import { useAccountStore } from "../Persisted/persistedAccount"
+import { usePreferencesStore } from "../Persisted/persistedPreferences"
+import { useStatisticsStore } from "../Persisted/persistedStatistics"
+import { useHistoryStore } from "../Persisted/persistedHistory"
 import DeviceInfo from "react-native-device-info"
 import { Provider as PersistedProvider } from "../Persisted"
 import { RedirectContext } from "../redirect"
 import { SessionDataType } from "../Persisted/types"
 import api from "../../services/Api"
+import { getIosIdForVendorAsync, getAndroidId } from "expo-application"
+import {
+    modelName as deviceModelName,
+    totalMemory as deviceTotalMemory,
+    osVersion as deviceOsVersion,
+} from "expo-device"
+import { getIpAddressAsync } from "expo-network"
+import { getLocales } from "expo-localization"
 
 type AuthProviderProps = { children: React.ReactNode }
 
@@ -291,6 +304,7 @@ export function Provider({ children }: AuthProviderProps) {
             setSessionData(normalizedSession)
             persistSessionData(normalizedSession)
             setRedirectTo("APP")
+            router.replace("/moments")
 
             console.log("✅ Login realizado com sucesso")
         } catch (error: any) {
@@ -324,50 +338,25 @@ export function Provider({ children }: AuthProviderProps) {
         setLoading(true)
 
         try {
-            const [deviceId, deviceName, totalDiskCapacity, macAddress, ipAddress] =
-                await Promise.all([
-                    DeviceInfo.getUniqueId().catch(() => "unknown"),
-                    DeviceInfo.getDeviceName().catch(() => "unknown"),
-                    DeviceInfo.getTotalDiskCapacity()
-                        .then((capacity) => capacity?.toString() || "unknown")
-                        .catch(() => "unknown"),
-                    DeviceInfo.getMacAddress().catch(() => "00:00:00:00:00:00"),
-                    DeviceInfo.getIpAddress().catch(() => "127.0.0.1"),
-                ])
-
-            const osVersion = DeviceInfo.getSystemVersion()
-            const hasNotch = DeviceInfo.hasNotch()
-            const screenResolution = Dimensions.get("screen")
-
-            const signData = {
-                username: signInputUsername.trim(),
-                password: signInputPassword,
-                metadata: {
-                    device_id: deviceId,
-                    device_type: Platform.OS === "android" ? "android" : "ios",
-                    device_name: deviceName,
-                    device_token: deviceId,
-                    os_language: "pt-BR",
-                    os_version: osVersion,
-                    total_device_memory: totalDiskCapacity,
-                    screen_resolution_width: screenResolution.width,
-                    screen_resolution_height: screenResolution.height,
-                    has_notch: hasNotch,
-                    unique_id: deviceId,
+            const response = await api.post(
+                "/auth/signup",
+                {
+                    username: signInputUsername.trim(),
+                    password: signInputPassword,
                 },
-                location_info: {
-                    ip_address: ipAddress || "127.0.0.1",
-                    mac_address: macAddress || "00:00:00:00:00:00",
-                    country: "BR",
-                    state: "SP",
-                    city: "São Paulo",
-                    zone: "America/Sao_Paulo",
+                {
+                    headers: {
+                        "terms-accepted": "true",
+                        "forwarded-for": await DeviceInfo.getIpAddress(),
+                        "machine-id": await DeviceInfo.getUniqueId(),
+                        timezone: detectTimezoneHeader(),
+                        latitude: 0,
+                        longitude: 0,
+                        device: "mobile",
+                        "Content-Type": "application/json",
+                    },
                 },
-            }
-
-            console.log("📤 Enviando dados de cadastro:", JSON.stringify(signData, null, 2))
-
-            const response = await api.post("/auth/sign-up", signData)
+            )
             if (!response.data || !response.data.session) {
                 throw new Error("Resposta inválida do servidor")
             }
@@ -383,6 +372,7 @@ export function Provider({ children }: AuthProviderProps) {
             setSessionData(normalizedSession)
             persistSessionData(normalizedSession)
             setRedirectTo("APP")
+            router.replace("/moments")
 
             console.log("✅ Conta criada com sucesso")
         } catch (error: any) {
@@ -412,13 +402,6 @@ export function Provider({ children }: AuthProviderProps) {
             setRedirectTo("AUTH")
             // Limpa stores persistidas do usuário
             try {
-                const {
-                    useUserStore,
-                    useAccountStore,
-                    usePreferencesStore,
-                    useStatisticsStore,
-                    useHistoryStore,
-                } = require("../Persisted/persistedUser")
                 useUserStore().remove()
                 useAccountStore().remove()
                 usePreferencesStore().remove()

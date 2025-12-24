@@ -11,6 +11,7 @@ import LanguageContext from "../../../contexts/Preferences/language"
 import BottomTabsContext from "../../../contexts/bottomTabs"
 import ListMoments from "../../../features/list-moments"
 import { useKeyboard } from "../../../lib/hooks/useKeyboard"
+import { KeyboardAvoidingView, Platform } from "react-native"
 
 export default function HomeScreen() {
     const isDarkMode = useColorScheme() === "dark"
@@ -19,16 +20,6 @@ export default function HomeScreen() {
     const { commentEnabled, setCommentEnabled, keyboardIsVisible } = React.useContext(FeedContext)
     const { height } = useKeyboard()
     const isFocused = useIsFocused()
-
-    const bottomContainerRef = useRef(null)
-    useEffect(() => {
-        const keyboardDidHideListener = Keyboard.addListener("keyboardDidHide", () => {
-            setCommentEnabled(false)
-        })
-        return () => {
-            keyboardDidHideListener.remove()
-        }
-    }, [])
 
     React.useEffect(() => {
         setCurrentTab("Home")
@@ -39,23 +30,16 @@ export default function HomeScreen() {
         flex: 1,
     }
 
-    const bottomContainer: ViewStyle = {
-        bottom: 0,
-        paddingVertical: sizes.paddings["1sm"] * 0.4,
-        paddingHorizontal: sizes.paddings["2sm"] * 0.8,
-        width: sizes.screens.width,
-        borderTopWidth: sizes.borders["1md"] * 0.7,
-        borderColor: isDarkMode ? colors.transparent.white_10 : colors.transparent.black_10,
-        backgroundColor: ColorTheme().background,
-        //@ts-ignore
-        transform: [{ translateY: height }],
-    }
-
     return (
-        <View style={container}>
-            <ListMoments />
-            {commentEnabled && (
-                <Animated.View ref={bottomContainerRef} style={bottomContainer}>
+        <KeyboardAvoidingView
+            style={{ flex: 1 }}
+            behavior={Platform.OS === "ios" ? "padding" : undefined}
+            keyboardVerticalOffset={sizes.screens.height * 0.14} // ajuste se tiver header/tabbar
+        >
+            <View style={{ flex: 1 }}>
+                <ListMoments />
+
+                {commentEnabled && (
                     <Comments.Input
                         preview={false}
                         placeholder={t("Send Comment")}
@@ -65,10 +49,10 @@ export default function HomeScreen() {
                         backgroundColor={String(
                             isDarkMode ? colors.gray.grey_09 : colors.gray.grey_01,
                         )}
-                        autoFocus={!!keyboardIsVisible}
+                        autoFocus
                     />
-                </Animated.View>
-            )}
-        </View>
+                )}
+            </View>
+        </KeyboardAvoidingView>
     )
 }

@@ -14,8 +14,8 @@ export default function activity_indicator({
 }: LoadingProps) {
     if (isIOS) {
         return (
-            <Host style={{ width: 300 }}>
-                <CircularProgress progress={progress} color="blue" />
+            <Host style={{ width: size, height: size }}>
+                <CircularProgress progress={progress} color={color} />
             </Host>
         )
     }

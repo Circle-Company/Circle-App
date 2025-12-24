@@ -24,7 +24,7 @@ export default function YouLayout() {
                 statusBarAnimation: "fade",
                 statusBarStyle: "light",
                 headerTransparent: false,
-                headerBlurEffect: "systemUltraThinMaterialDark",
+                headerShadowVisible: false,
                 headerStyle: {
                     backgroundColor: colors.gray.black,
                 },

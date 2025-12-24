@@ -356,7 +356,7 @@ function createConversorConfig(): CircleTextProps["conversorConfig"] {
 function createDateConfig(): CircleTextProps["dateFormatterConfig"] {
     return {
         style: "full",
-        locale: "pt",
+        locale: storage.getString(storageKeys().preferences.appLanguage) as any,
         usePrefix: true,
         useSuffix: true,
         capitalize: true,

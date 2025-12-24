@@ -12,7 +12,6 @@ module.exports = function (_config) {
             scheme: "circle",
             owner: "tiago.savioli",
             runtimeVersion: { policy: "appVersion" },
-            icon: "./assets/app-icons/ios_icon_default_light.png",
             userInterfaceStyle: "dark",
             orientation: "portrait",
             primaryColor: "#1083fe",
@@ -31,7 +30,7 @@ module.exports = function (_config) {
             },
             ios: {
                 bundleIdentifier: "com.circlecompany.circleapp",
-                icon: "./assets/app-icons/circleIOS.icon",
+                icon: "./assets/app-icons/circle-ios.icon",
                 infoPlist: {
                     userInterfaceStyle: "dark",
                     UIApplicationSupportsIndirectInputEvents: true,

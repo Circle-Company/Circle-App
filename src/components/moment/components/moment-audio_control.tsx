@@ -7,6 +7,9 @@ import { Animated, Pressable, View, ViewStyle, Platform } from "react-native"
 import { colors } from "../../../constants/colors"
 import sizes from "../../../constants/sizes"
 import BlurredBackground from "../../general/blurred-background"
+import { iOSMajorVersion } from "@/lib/platform/detection"
+import { Button, Host, Text } from "@expo/ui/swift-ui"
+import { VectorIcon } from "expo-router/unstable-native-tabs"
 
 export default function MomentAudioControl() {
     const { session } = React.useContext(PersistedContext)
@@ -81,59 +84,101 @@ export default function MomentAudioControl() {
         overflow: "hidden",
     }
 
-    return (
-        <Animated.View style={animated_container}>
-            <Pressable onPress={handlePress} style={pressable_container}>
-                <LinearGradient
-                    colors={gradientColors}
-                    start={{ x: 0.5, y: 0 }}
-                    end={{ x: 0.5, y: 1 }}
-                    style={gradient_border}
+    if (iOSMajorVersion! >= 26) {
+        return (
+            <Host matchContents>
+                <Button
+                    onPress={handlePress}
+                    variant="glass"
+                    modifiers={[
+                        {
+                            $type: "frame",
+                            width: 46,
+                            height: 46,
+                        },
+                        {
+                            $type: "background",
+                            material: "systemUltraThinMaterialDark",
+                            shape: "circle",
+                        },
+                    ]}
                 >
-                    {Platform.OS === "ios" ? (
-                        <BlurredBackground
-                            intensity={30}
-                            tint="systemMaterialDark"
-                            radius={borderRadiusValue - borderWidth}
-                            style={[blur_container, { backgroundColor: "transparent" }]}
-                        >
-                            <View style={container}>
-                                {isMuted ? (
-                                    <InactiveSoundIcon
-                                        fill={colors.gray.white}
-                                        width={sizes.icons["2sm"].width}
-                                        height={sizes.icons["2sm"].height}
-                                    />
-                                ) : (
-                                    <ActiveSoundIcon
-                                        fill={colors.gray.white}
-                                        width={sizes.icons["2sm"].width}
-                                        height={sizes.icons["2sm"].height}
-                                    />
-                                )}
+                    <View
+                        key={isMuted ? "muted" : "unmuted"}
+                        style={{ alignItems: "center", justifyContent: "center" }}
+                    >
+                        {isMuted ? (
+                            <InactiveSoundIcon
+                                fill={colors.gray.white + 80}
+                                width={sizes.icons["2sm"].width}
+                                height={sizes.icons["2sm"].height}
+                            />
+                        ) : (
+                            <ActiveSoundIcon
+                                fill={colors.gray.white + 80}
+                                width={sizes.icons["2sm"].width}
+                                height={sizes.icons["2sm"].height}
+                            />
+                        )}
+                    </View>
+                </Button>
+            </Host>
+        )
+    } else {
+        return (
+            <Animated.View style={animated_container}>
+                <Pressable onPress={handlePress} style={pressable_container}>
+                    <LinearGradient
+                        colors={gradientColors}
+                        start={{ x: 0.5, y: 0 }}
+                        end={{ x: 0.5, y: 1 }}
+                        style={gradient_border}
+                    >
+                        {Platform.OS === "ios" ? (
+                            <BlurredBackground
+                                intensity={30}
+                                tint="systemMaterialDark"
+                                radius={borderRadiusValue - borderWidth}
+                                style={[blur_container, { backgroundColor: "transparent" }]}
+                            >
+                                <View style={container}>
+                                    {isMuted ? (
+                                        <InactiveSoundIcon
+                                            fill={colors.gray.white}
+                                            width={sizes.icons["2sm"].width}
+                                            height={sizes.icons["2sm"].height}
+                                        />
+                                    ) : (
+                                        <ActiveSoundIcon
+                                            fill={colors.gray.white}
+                                            width={sizes.icons["2sm"].width}
+                                            height={sizes.icons["2sm"].height}
+                                        />
+                                    )}
+                                </View>
+                            </BlurredBackground>
+                        ) : (
+                            <View style={blur_container}>
+                                <View style={container}>
+                                    {isMuted ? (
+                                        <InactiveSoundIcon
+                                            fill={colors.gray.white}
+                                            width={sizes.icons["2sm"].width}
+                                            height={sizes.icons["2sm"].height}
+                                        />
+                                    ) : (
+                                        <ActiveSoundIcon
+                                            fill={colors.gray.white}
+                                            width={sizes.icons["2sm"].width}
+                                            height={sizes.icons["2sm"].height}
+                                        />
+                                    )}
+                                </View>
                             </View>
-                        </BlurredBackground>
-                    ) : (
-                        <View style={blur_container}>
-                            <View style={container}>
-                                {isMuted ? (
-                                    <InactiveSoundIcon
-                                        fill={colors.gray.white}
-                                        width={sizes.icons["2sm"].width}
-                                        height={sizes.icons["2sm"].height}
-                                    />
-                                ) : (
-                                    <ActiveSoundIcon
-                                        fill={colors.gray.white}
-                                        width={sizes.icons["2sm"].width}
-                                        height={sizes.icons["2sm"].height}
-                                    />
-                                )}
-                            </View>
-                        </View>
-                    )}
-                </LinearGradient>
-            </Pressable>
-        </Animated.View>
-    )
+                        )}
+                    </LinearGradient>
+                </Pressable>
+            </Animated.View>
+        )
+    }
 }

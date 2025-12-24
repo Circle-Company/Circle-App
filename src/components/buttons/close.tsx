@@ -1,8 +1,11 @@
 import Close from "@/assets/icons/svgs/close.svg"
-import { useNavigation } from "@react-navigation/native"
+import { useRouter } from "expo-router"
 import React from "react"
-import { TouchableOpacity } from "react-native"
-import ColorTheme from "../../constants/colors"
+import { Platform, TouchableOpacity } from "react-native"
+import ColorTheme, { colors } from "../../constants/colors"
+import { Host, Button as SwiftButton } from "@expo/ui/swift-ui"
+import { isIOS } from "@/lib/platform/detection"
+import { Pressable } from "react-native"
 
 type ButtonCloseProps = {
     transparent?: boolean
@@ -19,7 +22,7 @@ export default function ButtonClose({
     testID,
     onPress,
 }: ButtonCloseProps) {
-    const navigation = useNavigation()
+    const router = useRouter()
     const container: any = {
         backgroundColor: transparent == true ? "#12121D30" : backgroundColor,
         width: 35,
@@ -31,14 +34,14 @@ export default function ButtonClose({
     }
 
     return (
-        <TouchableOpacity
-            style={container}
+        <Pressable
             onPress={() => {
-                onPress ? onPress() : navigation.goBack()
+                onPress ? onPress() : router.back()
             }}
+            style={container}
             testID={testID}
         >
             <Close fill={iconColor} width={12} height={12} />
-        </TouchableOpacity>
+        </Pressable>
     )
 }

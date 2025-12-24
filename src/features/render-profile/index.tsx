@@ -42,7 +42,7 @@ export default function RenderProfile({ user: propsUser }: RenderProfileProps) {
     }
     const name_container: ViewStyle = {
         paddingTop: sizes.paddings["2md"],
-        paddingBottom: sizes.paddings["1sm"],
+        paddingBottom: user.name ? sizes.paddings["1sm"] : 0,
     }
 
     // Idioma e tradução
@@ -67,12 +67,14 @@ export default function RenderProfile({ user: propsUser }: RenderProfileProps) {
     return (
         <Profile.MainRoot data={user}>
             <View style={top_container}>
-                <Profile.Picture fromProfile={true} />
-                <View style={name_container}>
-                    <Profile.NameFollow scale={0.75} />
-                </View>
+                <Profile.Picture fromProfile={true} hasOutline={false} />
+                {user.name && (
+                    <View style={name_container}>
+                        <Profile.NameFollow scale={0.75} />
+                    </View>
+                )}
             </View>
-            <Profile.Description />
+            {user.description && <Profile.Description />}
             {session.account.totalMoments !== undefined && moments.length > 0 && (
                 <AccountMomentsHeader
                     totalMoments={session.account.totalMoments}

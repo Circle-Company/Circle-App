@@ -1,6 +1,6 @@
 import Animated, { FadeIn } from "react-native-reanimated"
 import ColorTheme, { colors } from "../../../constants/colors"
-import { Pressable, View, useColorScheme } from "react-native"
+import { BackHandler, Pressable, View, useColorScheme } from "react-native"
 
 import Icon from "@/assets/icons/svgs/@2.svg"
 import { Image } from "expo-image"
@@ -33,6 +33,7 @@ export default function profile_picture({
     const iconContainer: any = {
         alignSelf: "center",
         justifyContent: "center",
+        backgroundColor: colors.gray.grey_07,
     }
 
     const [profilePicture, setProfilePicture] = React.useState<string>("")

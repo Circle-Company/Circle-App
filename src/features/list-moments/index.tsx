@@ -6,6 +6,7 @@ import sizes from "@/constants/sizes"
 import FeedContext from "@/contexts/Feed"
 import RenderMomentFeed from "./components/feed/render-moment-feed"
 import { EmptyList } from "./components/render-empty_list"
+import { Pressable } from "react-native"
 
 const ITEM_WIDTH = sizes.moment.standart.width
 const SPACING = -20
@@ -34,6 +35,7 @@ const ListMoments = () => {
     const [refreshing, setRefreshing] = React.useState(false)
     const isDarkMode = useColorScheme() === "dark"
     const flatListRef = useRef<Animated.FlatList<any> | null>(null)
+    const { setCommentEnabled } = React.useContext(FeedContext)
     const scrollX = useRef(new Animated.Value(0)).current
 
     // Criar referência para onViewableItemsChanged
@@ -67,6 +69,7 @@ const ListMoments = () => {
                 const moment = feedData[validIndex]
                 if (moment) {
                     loadVideoFromCache?.(moment.id)
+                    setCommentEnabled(false)
                     preloadNextVideo?.(validIndex)
                 }
             }
@@ -176,7 +179,7 @@ const ListMoments = () => {
                                 transform: [{ scale }],
                                 opacity,
                             }}
-                            key={item.unique_id}
+                            key={item.id}
                         >
                             <RenderMomentFeed
                                 isFeed={true}

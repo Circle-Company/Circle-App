@@ -73,7 +73,7 @@ export default function PasswordScreen() {
 
     const button_text: StyleProp<TextStyle> = {
         fontSize: fonts.size.body * 0.9,
-        fontFamily: fonts.family["Bold-Italic"],
+        fontFamily: fonts.family["Black-Italic"],
         color:
             signInputPassword && signInputPassword.length >= 4 && !loading
                 ? colors.gray.white

@@ -10,19 +10,23 @@ import { Text } from "../../Themed"
 import { Vibrate } from "../../../lib/hooks/useHapticFeedback"
 import fonts from "../../../constants/fonts"
 import sizes from "../../../constants/sizes"
+import MomentContext from "@/components/moment/context"
+import { textLib } from "@/shared/circle.text.library"
+import { truncated } from "@/helpers/processText"
 export default function ZeroComments() {
     const { t } = React.useContext(LanguageContext)
     const { commentEnabled, setCommentEnabled, setKeyboardVisible, setScrollEnabled } =
         React.useContext(FeedContext)
+    const { momentData } = React.useContext(MomentContext)
     const isDarkMode = useColorScheme() === "dark"
     const container: any = {
-        width: sizes.screens.width * 0.7,
-        flex: 1,
+        maxWidth: sizes.screens.width,
         borderRadius: sizes.borderRadius["1md"] * 1.2,
         backgroundColor: isDarkMode ? colors.gray.grey_08 : colors.gray.grey_02,
         alignSelf: "center",
         alignItems: "center",
         justifyContent: "center",
+        paddingHorizontal: sizes.paddings["1md"],
         paddingBottom: sizes.paddings["2sm"],
         paddingTop: sizes.paddings["1sm"],
     }
@@ -30,18 +34,17 @@ export default function ZeroComments() {
     const buttonContainer: ViewStyle = {
         alignSelf: "center",
         alignItems: "center",
-        width: sizes.buttons.width * 0.5,
+        maxWidth: sizes.buttons.width * 0.8,
         height: sizes.buttons.height * 0.5,
         borderRadius: sizes.borderRadius["1md"],
         overflow: "hidden",
-        backgroundColor: isDarkMode ? colors.gray.grey_06 : colors.gray.grey_03,
+        backgroundColor: colors.gray.white,
     }
 
     const buttonTitle: any = {
-        top: -1,
-        fontFamily: fonts.family.Bold,
-        fontSize: fonts.size.body * 0.9,
-        marginRight: sizes.margins["1sm"],
+        fontFamily: fonts.family["Black-Italic"],
+        fontSize: fonts.size.body * 1.1,
+        color: colors.gray.black,
     }
     function handlePress() {
         if (commentEnabled) {
@@ -66,19 +69,27 @@ export default function ZeroComments() {
                         alignSelf: "center",
                     }}
                 >
-                    <Text
-                        style={{ fontSize: fonts.size.caption1, color: ColorTheme().textDisabled }}
-                    >
-                        {t("This Moment has no comments.")}
-                    </Text>
+                    {momentData.created_at && (
+                        <Text
+                            style={{
+                                fontSize: fonts.size.caption1,
+                                color: ColorTheme().textDisabled,
+                            }}
+                        >
+                            {t("Shared")}{" "}
+                            {textLib.date
+                                .toRelativeTime(new Date(momentData.created_at))
+                                .toLowerCase()}
+                        </Text>
+                    )}
                     <Text
                         style={{
-                            fontFamily: fonts.family.Semibold,
+                            fontFamily: fonts.family.Bold,
 
                             fontSize: fonts.size.subheadline * 0.85,
                         }}
                     >
-                        {t("Be the first to comment.")}
+                        {t("It seems like nobody has commented yet")} 🥲
                     </Text>
                 </View>
 
@@ -91,13 +102,13 @@ export default function ZeroComments() {
                     bounciness={2}
                     style={buttonContainer}
                 >
-                    <Text style={buttonTitle}>{t("Add Comment")}</Text>
-                    <PlusIcon
-                        style={{ top: -0.5 }}
-                        width={16}
-                        height={16}
-                        fill={ColorTheme().text}
-                    />
+                    <Text style={buttonTitle}>
+                        {t("React to")} @
+                        {textLib.conversor.sliceWithDots({
+                            text: momentData.user.username,
+                            size: 10,
+                        })}
+                    </Text>
                 </ButtonStandart>
             </View>
         )

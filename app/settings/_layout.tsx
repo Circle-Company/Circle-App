@@ -12,8 +12,7 @@ export default function SettingsLayout() {
     const router = useRouter()
 
     const HeaderStyle = {
-        backgroundColor: ColorTheme().background,
-        ...(Platform.OS === "ios" ? { shadowOpacity: 0, borderBottomWidth: 0 } : { elevation: 0 }),
+        backgroundColor: "transparent",
     }
 
     const defaultOptions = {
@@ -31,7 +30,7 @@ export default function SettingsLayout() {
                 tintColor={colors.gray.white}
                 displayMode="default"
                 pressColor={colors.purple.purple_05}
-                onPress={() => router.back()}
+                onPress={() => router.dismiss()}
             />
         ),
     }

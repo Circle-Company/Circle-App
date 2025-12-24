@@ -14,10 +14,6 @@ export default function SettingsScreen() {
     }
     return (
         <View style={container}>
-            <StatusBar
-                backgroundColor={String(ColorTheme().background)}
-                barStyle={isDarkMode ? "light-content" : "dark-content"}
-            />
             <ListSettings />
         </View>
     )

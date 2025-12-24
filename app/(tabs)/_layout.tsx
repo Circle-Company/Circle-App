@@ -20,13 +20,6 @@ export default function TabsLayout() {
         }),
     })
 
-    const labelColor = Platform.select({
-        ios: DynamicColorIOS({
-            dark: "white",
-            light: iOSMajorVersion && iOSMajorVersion >= 26 ? "black" : "white",
-        }),
-    })
-
     return (
         <View style={{ flex: 1, backgroundColor: "#000" }}>
             <NativeTabs
@@ -43,7 +36,7 @@ export default function TabsLayout() {
                 }
                 blurEffect={
                     Platform.OS === "ios" && iOSMajorVersion && iOSMajorVersion < 26
-                        ? "dark"
+                        ? "systemMaterialDark"
                         : undefined
                 }
                 minimizeBehavior="onScrollDown"

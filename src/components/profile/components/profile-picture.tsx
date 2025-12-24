@@ -6,8 +6,9 @@ import { colors } from "../../../constants/colors"
 import sizes from "../../../constants/sizes"
 import { useProfileContext } from "../profile-context"
 import { ProfilePictureProps } from "../profile-types"
+import { background } from "@expo/ui/swift-ui/modifiers"
 
-export default function Picture({ fromProfile = false }: ProfilePictureProps) {
+export default function Picture({ fromProfile = false, hasOutline = true }: ProfilePictureProps) {
     const { user } = useProfileContext()
     const isDarkMode = useColorScheme() === "dark"
     const [profilePicture, setProfilePicture] = React.useState<string>("")
@@ -17,7 +18,7 @@ export default function Picture({ fromProfile = false }: ProfilePictureProps) {
         height: 150,
         borderRadius: 150 / 2,
     }
-    const outlineSize: number = Number(Number(pictureDimensions.width) / 20)
+    const outlineSize: number = hasOutline ? Number(Number(pictureDimensions.width) / 20) : 0
 
     const container: any = {
         alignItems: "center",
@@ -25,6 +26,8 @@ export default function Picture({ fromProfile = false }: ProfilePictureProps) {
         marginHorizontal: sizes.margins["1sm"],
         width: Number(pictureDimensions.width) + Number(outlineSize),
         height: Number(pictureDimensions.height) + Number(outlineSize),
+        backgroundColor: colors.gray.grey_08,
+        borderRadius: (Number(pictureDimensions.width) + Number(outlineSize)) / 2,
     }
 
     const iconContainer: any = {

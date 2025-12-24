@@ -167,8 +167,7 @@ export default function RenderMomentFeed({
 
         // TranslateY quando teclado aparece (movendo para cima)
         // Aplicar apenas quando o momento está focado (focusProgressValue > 0.5)
-        const translateY =
-            focusProgressValue.value > 0.5 ? -160 * keyboardProgress.value * commentShared.value : 0
+        const translateY = focusProgressValue.value > 0.5 ? -160 * commentShared.value : 0
 
         // Escala final: apenas commentScale e keyboardScale
         // A escala base é 100% controlada pelo scrollX no index.tsx
@@ -236,11 +235,7 @@ export default function RenderMomentFeed({
                         </View>
                     </Moment.Root.Center>
                     <LinearGradient
-                        colors={[
-                            "rgba(255, 255, 255, 0.00)",
-                            "rgba(0, 0, 0, 0.1)",
-                            "rgba(0, 0, 0, 0.4)",
-                        ]}
+                        colors={["rgba(0, 0, 0, 0.00)", "rgba(0, 0, 0, 0.4)"]}
                         start={{ x: 0.5, y: 0 }}
                         end={{ x: 0.5, y: 1 }}
                         style={{

@@ -33,6 +33,7 @@ export type ProfileNameProps = {
 }
 export type ProfilePictureProps = {
     fromProfile?: boolean
+    hasOutline?: boolean
 }
 export type ProfileStatisticsContainerProps = {
     children: React.ReactNode

@@ -23,7 +23,7 @@ export default function Input({
     autoFocus = false,
 }: CommentsInputProps) {
     const { t } = React.useContext(LanguageContext)
-    const { focusedMoment } = React.useContext(FeedContext)
+    const { focusedMoment, setCommentEnabled } = React.useContext(FeedContext)
     const { session } = React.useContext(PersistedContext)
     const [commentText, setCommentText] = React.useState<string>("")
     const isDarkMode = useColorScheme() === "dark"
@@ -96,26 +96,30 @@ export default function Input({
 
     async function sendComment() {
         if (commentText)
-            await api
-                .post(
-                    `/moments/${focusedMoment.id}/comments/create`,
-                    {
-                        content: commentText,
-                    },
-                    { headers: { Authorization: session.account.jwtToken } },
-                )
-                .then(() => {
-                    toast.success(t("Comment Has been sended with success"), {
-                        title: t("Comment Sended"),
-                        icon: (
-                            <CheckIcon
-                                fill={colors.green.green_05.toString()}
-                                width={15}
-                                height={15}
-                            />
-                        ),
-                    })
+            toast.success(t("Comment Has been sended with success"), {
+                title: t("Comment Sended"),
+                icon: <CheckIcon fill={colors.green.green_05.toString()} width={15} height={15} />,
+            })
+        await api
+            .post(
+                `/moments/${focusedMoment.id}/comments/create`,
+                {
+                    content: commentText,
+                },
+                { headers: { Authorization: session.account.jwtToken } },
+            )
+            .then(() => {
+                toast.success(t("Comment Has been sended with success"), {
+                    title: t("Comment Sended"),
+                    icon: (
+                        <CheckIcon fill={colors.green.green_05.toString()} width={15} height={15} />
+                    ),
                 })
+            })
+            .finally(() => {
+                setCommentText("")
+                setCommentEnabled(false)
+            })
     }
 
     if (preview)

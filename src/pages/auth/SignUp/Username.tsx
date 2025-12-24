@@ -78,7 +78,7 @@ export default function UsernameScreen() {
     }
     const button_text: any = {
         fontSize: fonts.size.body * 0.9,
-        fontFamily: fonts.family["Bold-Italic"],
+        fontFamily: fonts.family["Black-Italic"],
         color: signInputUsername
             ? colors.gray.white
             : isDarkMode

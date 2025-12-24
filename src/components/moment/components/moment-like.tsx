@@ -202,7 +202,6 @@ export default function Like({
                         <BlurredBackground
                             intensity={30}
                             tint="systemMaterialDark"
-                            overlayColor={colors.red.red_05}
                             radius={borderRadiusValue - borderWidth}
                             style={[blur_container, { backgroundColor: "transparent" }]}
                         >

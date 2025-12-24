@@ -21,6 +21,15 @@ export default function MomentsLayout() {
                 contentStyle: {
                     backgroundColor: colors.gray.black,
                 },
+                statusBarAnimation: "fade",
+                statusBarStyle: "light",
+                headerTransparent: false,
+                headerShadowVisible: false,
+                headerStyle: {
+                    backgroundColor: colors.gray.black,
+                },
+
+                headerTintColor: colors.gray.white,
             }}
         >
             <Stack.Screen
