@@ -1,3 +1,4 @@
+import { colors } from "@/constants/colors"
 import React, {
     forwardRef,
     useCallback,
@@ -121,6 +122,7 @@ const Input = forwardRef<InputRef, InputProps>(
                     value={currentValue}
                     onChangeText={handleChangeText}
                     style={[styles.input, style]}
+                    selectionColor={colors.purple.purple_04}
                     {...rest}
                 />
             </View>

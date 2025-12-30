@@ -13,11 +13,11 @@ import sizes from "../../../constants/sizes"
 import MomentContext from "@/components/moment/context"
 import { textLib } from "@/shared/circle.text.library"
 import { truncated } from "@/helpers/processText"
-export default function ZeroComments() {
+import { Moment as MomentProps } from "@/contexts/Feed/types"
+export default function ZeroComments({ moment }: { moment: MomentProps }) {
     const { t } = React.useContext(LanguageContext)
     const { commentEnabled, setCommentEnabled, setKeyboardVisible, setScrollEnabled } =
         React.useContext(FeedContext)
-    const { momentData } = React.useContext(MomentContext)
     const isDarkMode = useColorScheme() === "dark"
     const container: any = {
         maxWidth: sizes.screens.width,
@@ -34,8 +34,8 @@ export default function ZeroComments() {
     const buttonContainer: ViewStyle = {
         alignSelf: "center",
         alignItems: "center",
-        maxWidth: sizes.buttons.width * 0.8,
-        height: sizes.buttons.height * 0.5,
+        maxWidth: sizes.buttons.width * 0.7,
+        height: sizes.buttons.height * 0.4,
         borderRadius: sizes.borderRadius["1md"],
         overflow: "hidden",
         backgroundColor: colors.gray.white,
@@ -43,7 +43,7 @@ export default function ZeroComments() {
 
     const buttonTitle: any = {
         fontFamily: fonts.family["Black-Italic"],
-        fontSize: fonts.size.body * 1.1,
+        fontSize: fonts.size.body * 1,
         color: colors.gray.black,
     }
     function handlePress() {
@@ -58,6 +58,9 @@ export default function ZeroComments() {
         }
     }
 
+    console.log("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA")
+    console.log(moment)
+
     if (commentEnabled) return null
     else
         return (
@@ -69,7 +72,7 @@ export default function ZeroComments() {
                         alignSelf: "center",
                     }}
                 >
-                    {momentData.created_at && (
+                    {moment.publishedAt && (
                         <Text
                             style={{
                                 fontSize: fonts.size.caption1,
@@ -78,7 +81,7 @@ export default function ZeroComments() {
                         >
                             {t("Shared")}{" "}
                             {textLib.date
-                                .toRelativeTime(new Date(momentData.created_at))
+                                .toRelativeTime(new Date(moment.publishedAt))
                                 .toLowerCase()}
                         </Text>
                     )}
@@ -105,7 +108,7 @@ export default function ZeroComments() {
                     <Text style={buttonTitle}>
                         {t("React to")} @
                         {textLib.conversor.sliceWithDots({
-                            text: momentData.user.username,
+                            text: moment.user.username,
                             size: 10,
                         })}
                     </Text>

@@ -29,7 +29,7 @@ export default function Description() {
 
     const container: ViewStyle = {
         alignSelf: "center",
-        width: sizes.screens.width - sizes.paddings["1md"] * 2,
+        width: sizes.screens.width - sizes.paddings["1xl"] * 2,
         paddingVertical: sizes.paddings["2sm"],
         borderRadius: sizes.paddings["1md"],
         paddingHorizontal: sizes.paddings["1md"],

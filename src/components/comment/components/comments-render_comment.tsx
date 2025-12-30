@@ -12,15 +12,13 @@ import { UserShow } from "../../user_show"
 import { CommentsRenderCommentProps } from "../comments-types"
 
 export default function RenderComment({ comment, preview, index }: CommentsRenderCommentProps) {
-    const { session } = React.useContext(PersistedContext)
     const isDarkMode = useColorScheme() === "dark"
-    const [like, setLike] = React.useState(comment.is_liked)
 
     // Verificar se o MomentContext está disponível
-    let momentUserActions: any = null
+    let actions: any = null
     try {
         const momentContext = React.useContext(MomentContext)
-        momentUserActions = momentContext?.momentUserActions
+        actions = momentContext?.actions
     } catch (error) {
         // MomentContext não está disponível, funcionalidade de like será limitada
     }
@@ -71,13 +69,13 @@ export default function RenderComment({ comment, preview, index }: CommentsRende
     const likeLabel = likesNum == 1 ? "like" : "likes"
 
     async function handleLikePress() {
-        if (!momentUserActions) {
+        if (!actions) {
             console.log("Não é possível curtir comentário sem MomentContext")
             return
         }
 
         if (like) {
-            momentUserActions.setLikeComment(false)
+            actions.setLikeComment(false)
             setLike(false)
             Vibrate("effectTick")
             await api
@@ -88,7 +86,7 @@ export default function RenderComment({ comment, preview, index }: CommentsRende
                 )
                 .catch((error) => console.log(error))
         } else {
-            momentUserActions.setLikeComment(true)
+            actions.setLikeComment(true)
             setLike(true)
             Vibrate("effectClick")
             await api
@@ -127,7 +125,7 @@ export default function RenderComment({ comment, preview, index }: CommentsRende
                     <Text style={date_style}>•</Text>
                     <Text style={date_style}>
                         {timeDifferenceConverter({
-                            date: String(comment.created_at),
+                            date: String(comment.createdAt),
                             small: false,
                         })}
                     </Text>

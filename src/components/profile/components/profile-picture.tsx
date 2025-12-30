@@ -2,11 +2,10 @@ import Icon from "@/assets/icons/svgs/@2.svg"
 import { Image } from "expo-image"
 import React from "react"
 import { Animated, Pressable, View, useColorScheme } from "react-native"
-import { colors } from "../../../constants/colors"
-import sizes from "../../../constants/sizes"
+import { colors } from "@/constants/colors"
+import sizes from "@/constants/sizes"
 import { useProfileContext } from "../profile-context"
 import { ProfilePictureProps } from "../profile-types"
-import { background } from "@expo/ui/swift-ui/modifiers"
 
 export default function Picture({ fromProfile = false, hasOutline = true }: ProfilePictureProps) {
     const { user } = useProfileContext()
@@ -61,13 +60,7 @@ export default function Picture({ fromProfile = false, hasOutline = true }: Prof
     }, [])
 
     React.useEffect(() => {
-        const { tiny_resolution, small_resolution } = user?.profile_picture || {}
-
-        if (fromProfile) {
-            setProfilePicture(small_resolution || tiny_resolution || "")
-        } else {
-            setProfilePicture(tiny_resolution || small_resolution || "")
-        }
+        setProfilePicture(profilePicture)
     }, [fromProfile, user])
 
     const animatedContainer: any = {
@@ -92,18 +85,15 @@ export default function Picture({ fromProfile = false, hasOutline = true }: Prof
                         left: Number(outlineSize) / 2,
                     }}
                 />
-                {!user?.profile_picture?.tiny_resolution &&
-                    !user?.profile_picture?.small_resolution && (
-                        <View style={iconContainer}>
-                            <Icon
-                                width={pictureDimensions.width * 0.5}
-                                height={pictureDimensions.height * 0.5}
-                                fill={
-                                    isDarkMode ? colors.gray.grey_04 + 90 : colors.gray.grey_04 + 50
-                                }
-                            />
-                        </View>
-                    )}
+                {!user?.profilePicture && (
+                    <View style={iconContainer}>
+                        <Icon
+                            width={pictureDimensions.width * 0.5}
+                            height={pictureDimensions.height * 0.5}
+                            fill={isDarkMode ? colors.gray.grey_04 + 90 : colors.gray.grey_04 + 50}
+                        />
+                    </View>
+                )}
             </Pressable>
         </Animated.View>
     )

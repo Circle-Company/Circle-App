@@ -25,8 +25,7 @@ export default function HeaderRightHome() {
 
     const text: TextStyle = {
         fontSize: fonts.size.footnote,
-        fontFamily:
-            Platform.OS === "ios" ? fonts.family["Variable-Italic"] : fonts.family["Bold-Italic"],
+        fontFamily: fonts.family["Black-Italic"],
         fontWeight: Platform.OS === "ios" ? "700" : undefined,
         color: ColorTheme().text,
     }

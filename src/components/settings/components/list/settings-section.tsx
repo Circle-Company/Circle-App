@@ -6,6 +6,8 @@ import { Text, TextStyle, ViewStyle } from "../../../Themed"
 import SettingsItem from "./settings-item"
 import fonts from "../../../../constants/fonts"
 import sizes from "../../../../constants/sizes"
+import { isIOS } from "@/lib/platform/detection"
+import { Host, List, Label } from "@expo/ui/swift-ui"
 
 export default function SettingsSection({ name, content }: SettignsSectionProps) {
     const isDarkMode = useColorScheme() === "dark"

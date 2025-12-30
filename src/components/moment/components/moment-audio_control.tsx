@@ -88,6 +88,7 @@ export default function MomentAudioControl() {
         return (
             <Host matchContents>
                 <Button
+                    key={isMuted ? "muted" : "unmuted"}
                     onPress={handlePress}
                     variant="glass"
                     modifiers={[
@@ -103,24 +104,19 @@ export default function MomentAudioControl() {
                         },
                     ]}
                 >
-                    <View
-                        key={isMuted ? "muted" : "unmuted"}
-                        style={{ alignItems: "center", justifyContent: "center" }}
-                    >
-                        {isMuted ? (
-                            <InactiveSoundIcon
-                                fill={colors.gray.white + 80}
-                                width={sizes.icons["2sm"].width}
-                                height={sizes.icons["2sm"].height}
-                            />
-                        ) : (
-                            <ActiveSoundIcon
-                                fill={colors.gray.white + 80}
-                                width={sizes.icons["2sm"].width}
-                                height={sizes.icons["2sm"].height}
-                            />
-                        )}
-                    </View>
+                    {isMuted ? (
+                        <InactiveSoundIcon
+                            fill={colors.gray.white + 80}
+                            width={sizes.icons["2sm"].width}
+                            height={sizes.icons["2sm"].height}
+                        />
+                    ) : (
+                        <ActiveSoundIcon
+                            fill={colors.gray.white + 80}
+                            width={sizes.icons["2sm"].width}
+                            height={sizes.icons["2sm"].height}
+                        />
+                    )}
                 </Button>
             </Host>
         )

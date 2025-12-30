@@ -88,7 +88,7 @@ export default function SettingsItem({
         valueContainerImage: {
             flex: 1,
             alignItems: "flex-end" as const,
-            marginRight: sizes.margins["1md"],
+            marginRight: sizes.margins["1sm"] * 1.1,
         } as ViewStyle,
     }
 
@@ -125,6 +125,7 @@ export default function SettingsItem({
                             }
                         >
                             <UserShow.ProfilePicture
+                                disableAction={true}
                                 displayOnMoment={false}
                                 pictureDimensions={{ width: 22, height: 22 }}
                             />

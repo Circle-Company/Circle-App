@@ -14,101 +14,25 @@ import React from "react"
 import RenderComment from "./comments-render_comment"
 import fonts from "../../../constants/fonts"
 import sizes from "../../../constants/sizes"
-
-const MOCK_COMMENTS: CommentObject[] = [
-    {
-        id: "1",
-        user: {
-            id: "1",
-            username: "johndoe",
-            verified: true,
-            profile_picture: {
-                small_resolution: "https://picsum.photos/50/50",
-                tiny_resolution: "https://picsum.photos/30/30",
-            },
-            youFollow: true,
-        },
-        content: "Que foto incrível! Adorei as cores e a composição. 📸✨",
-        created_at: "2024-03-20T10:30:00Z",
-        statistics: {
-            total_likes_num: 15,
-        },
-        is_liked: true,
-    },
-    {
-        id: "2",
-        user: {
-            id: "2",
-            username: "mariasilva",
-            verified: false,
-            profile_picture: {
-                small_resolution: "https://picsum.photos/51/51",
-                tiny_resolution: "https://picsum.photos/31/31",
-            },
-            youFollow: false,
-        },
-        content: "Esse lugar é maravilhoso! Onde fica? Quero muito conhecer! 🌎",
-        created_at: "2024-03-20T11:15:00Z",
-        statistics: {
-            total_likes_num: 8,
-        },
-        is_liked: false,
-    },
-    {
-        id: "3",
-        user: {
-            id: "3",
-            username: "photoexpert",
-            verified: true,
-            profile_picture: {
-                small_resolution: "https://picsum.photos/52/52",
-                tiny_resolution: "https://picsum.photos/32/32",
-            },
-            youFollow: true,
-        },
-        content: "A luz natural nessa foto está perfeita! Qual câmera você usou? 📷",
-        created_at: "2024-03-20T12:00:00Z",
-        statistics: {
-            total_likes_num: 25,
-        },
-        is_liked: true,
-    },
-    {
-        id: "4",
-        user: {
-            id: "4",
-            username: "travelgram",
-            verified: false,
-            profile_picture: {
-                small_resolution: "https://picsum.photos/53/53",
-                tiny_resolution: "https://picsum.photos/33/33",
-            },
-            youFollow: false,
-        },
-        content: "Mais um lugar para adicionar na minha lista de destinos! 🗺️✈️",
-        created_at: "2024-03-20T13:45:00Z",
-        statistics: {
-            total_likes_num: 12,
-        },
-        is_liked: false,
-    },
-]
+import MomentContext from "@/components/moment/context"
+import api from "@/services/Api"
 
 function FetchedCommentsList({
-    totalCommentsNum,
+    totalComments,
     momentId,
 }: {
-    totalCommentsNum: number
+    totalComments: number
     momentId: string | number
 }) {
     const { t } = React.useContext(LanguageContext)
     const { session } = React.useContext(PersistedContext)
     const { networkStats } = React.useContext(NetworkContext)
+    const { data } = React.useContext(MomentContext)
     const { collapse } = React.useContext(BottomSheetContext)
     const [page, setPage] = React.useState<number>(1)
     const [loading, setLoading] = React.useState<boolean>(false)
     const [endReached, setEndReached] = React.useState<boolean>(false)
-    const [allComments, setAllComments] = React.useState<CommentObject[]>(MOCK_COMMENTS)
+    const [allComments, setAllComments] = React.useState<CommentObject[]>([] as CommentObject[])
     const pageSize = 4
 
     const titleContainer: ViewStyle = {
@@ -136,15 +60,14 @@ function FetchedCommentsList({
     }
 
     async function fetchData() {
-        // Temporariamente comentado para usar dados mock
-        /*if (!momentId) {
+        if (!momentId) {
             return
         }
         await api
             .get(`/moments/${momentId}/comments?page=${page}&pageSize=${pageSize}`, {
                 headers: { Authorization: session.account.jwtToken },
             })
-            .then(function (response) {
+            .then(function (response: any) {
                 if (page === 1) setAllComments(response.data.comments)
                 else {
                     setAllComments([...allComments, ...response.data.comments])
@@ -153,20 +76,16 @@ function FetchedCommentsList({
                 }
                 setPage(page + 1)
             })
-            .catch(function (error) {
-                console.log(error)
-            })*/
     }
 
     React.useEffect(() => {
-        // Temporariamente desabilitado para usar dados mock
-        /*if (momentId) {
+        if (momentId) {
             setLoading(true)
             if (momentId && momentId !== "0")
                 fetchData().finally(() => {
                     setLoading(false)
                 })
-        }*/
+        }
     }, [momentId])
 
     React.useEffect(() => {
@@ -204,7 +123,7 @@ function FetchedCommentsList({
                 <View style={titleContainer}>
                     <View style={{ flex: 1 }}>
                         <Text style={title}>
-                            {totalCommentsNum} {t("Comments")}
+                            {data.metrics.totalComments} {t("Comments")}
                         </Text>
                     </View>
                     <ButtonClose onPress={collapse} />

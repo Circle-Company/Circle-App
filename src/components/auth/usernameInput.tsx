@@ -326,7 +326,7 @@ export default function UsernameInput({ type }: UsernameInputProps) {
                     maxLength={20}
                     style={input}
                     autoFocus={type === "signUp" ? true : false}
-                    selectionColor={ColorTheme().primary}
+                    selectionColor={colors.purple.purple_04}
                     placeholder={type === "signUp" ? t("user.name") : t("Username")}
                     placeholderTextColor={String(ColorTheme().textDisabled + "99")}
                 />

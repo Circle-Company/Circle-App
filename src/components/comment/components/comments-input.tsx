@@ -14,6 +14,7 @@ import fonts from "../../../constants/fonts"
 import sizes from "../../../constants/sizes"
 import { useToast } from "../../../contexts/Toast"
 import { userReciveDataProps } from "@/components/user_show/user_show-types"
+import MomentContext from "@/components/moment/context"
 
 export default function Input({
     preview = false,
@@ -23,6 +24,7 @@ export default function Input({
     autoFocus = false,
 }: CommentsInputProps) {
     const { t } = React.useContext(LanguageContext)
+    const { actions } = React.useContext(MomentContext)
     const { focusedMoment, setCommentEnabled } = React.useContext(FeedContext)
     const { session } = React.useContext(PersistedContext)
     const [commentText, setCommentText] = React.useState<string>("")
@@ -100,14 +102,12 @@ export default function Input({
                 title: t("Comment Sended"),
                 icon: <CheckIcon fill={colors.green.green_05.toString()} width={15} height={15} />,
             })
-        await api
-            .post(
-                `/moments/${focusedMoment.id}/comments/create`,
-                {
-                    content: commentText,
-                },
-                { headers: { Authorization: session.account.jwtToken } },
-            )
+        actions
+            .registerInteraction("COMMENT", {
+                content: commentText,
+                mentions: undefined,
+                parentId: undefined,
+            })
             .then(() => {
                 toast.success(t("Comment Has been sended with success"), {
                     title: t("Comment Sended"),
@@ -173,6 +173,7 @@ export default function Input({
                     placeholderTextColor={String(
                         isDarkMode ? colors.gray.grey_05 : colors.transparent.black_50,
                     )}
+                    selectionColor={colors.purple.purple_04}
                     numberOfLines={1}
                     onChangeText={(text) => setCommentText(text)}
                     autoFocus={autoFocus}

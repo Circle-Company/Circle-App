@@ -4,10 +4,10 @@ import React, { useEffect, useMemo } from "react"
 import FeedContext from "../../../contexts/Feed"
 import PersistedContext from "../../../contexts/Persisted"
 import sizes from "../../../constants/sizes"
-import { useMomentData } from "./momentData"
-import { useMomentOptions } from "./momentOptions"
-import { useMomentUserActions } from "./momentUserActions"
-import { useMomentVideo } from "./momentVideo"
+import { useData } from "./moment.data"
+import { useOptions } from "./moment.options"
+import { useActions } from "./moment.actions"
+import { useVideo } from "./moment.video"
 
 const MomentContext = React.createContext<MomentContextsData>({} as MomentContextsData)
 
@@ -15,79 +15,68 @@ export function MomentProvider({
     children,
     isFeed,
     isFocused,
-    momentData,
-    momentSize = sizes.moment.standart,
+    data,
+    size = sizes.moment.standart,
+    shadow,
 }: MomentProviderProps) {
     const { feedData, setFocusedChunkItemFunc, currentChunk } = React.useContext(FeedContext)
     const { session } = React.useContext(PersistedContext)
-    const momentDataStore = useMomentData()
-    const momentUserActionsStore = useMomentUserActions(momentData.id)
-    const momentOptionsStore = useMomentOptions()
-    const momentVideoStore = useMomentVideo()
-    const isMe = momentData.user?.id ? session.user.id === momentData.user.id : true
+
+    const DataStore = useData()
+    const ActionsStore = useActions(data.id)
+    const OptionsStore = useOptions()
+    const VideoStore = useVideo()
+
+    const isMe = data.user?.id ? session.user.id === data.user.id : true
 
     useEffect(() => {
-        momentDataStore.setMomentData(momentData)
-    }, [momentData])
+        DataStore.set(data)
+    }, [data])
 
     useEffect(() => {
-        momentUserActionsStore.setMomentUserActions({
-            like: false,
-            initialLikedState: momentData.is_liked,
-            share: false,
-            click: false,
+        ActionsStore.set({
+            like: data.isLiked!,
             comment: false,
-            likeComment: false,
-            showLessOften: false,
-            report: false,
-            partialView: false,
-            completeView: false,
+            watch: 0,
+            initialLikedState: isFeed ? false : data.isLiked!,
         })
-        momentOptionsStore.setMomentOptions({
+        OptionsStore.set({
             isFeed: isFeed,
             isFocused: isFocused,
+            enableLike: !isMe,
+            enableComment: true,
+            enableWatch: true,
             enableReport: true,
-            enableLikeButton: !isMe,
-            enableAnalyticsView: isMe,
-            enableModeration: !isMe,
-            enableStoreActions: isMe,
-            enableTranslation: true,
         })
     }, [isFeed, isFocused, isMe])
 
     // Inicializar o vídeo apenas uma vez
     useEffect(() => {
         const globalMuteAudio = session?.preferences?.content?.muteAudio || false
-        momentVideoStore.setMomentVideo({
+        VideoStore.set({
             currentTime: 0,
             duration: 0,
             isPaused: !isFocused,
             isMuted: globalMuteAudio,
+            shadow,
         })
     }, [isFocused])
 
     useEffect(() => {
         const globalMuteAudio = session?.preferences?.content?.muteAudio || false
-        if (momentVideoStore?.setIsMuted) {
-            momentVideoStore.setIsMuted(globalMuteAudio)
+        if (VideoStore?.setIsMuted) {
+            VideoStore.setIsMuted(globalMuteAudio)
         }
     }, [session?.preferences?.content?.muteAudio])
 
     useEffect(() => {
         async function fetch() {
-            const momentId = momentDataStore.id ? String(momentDataStore.id) : undefined
-            if (momentId && currentChunk.includes(momentId) && feedData) {
+            if (data.id && currentChunk.includes(data.id) && feedData) {
                 const getChunkInteractions = async () => {
-                    const momentData = await momentDataStore.exportMomentData()
-                    const interaction = momentUserActionsStore.exportMomentUserActions()
                     const chunkData = {
-                        id: String(momentData.id),
-                        userId: momentData.userId,
-                        tags: momentData.tags,
-                        duration: momentData.duration,
-                        type: momentData.type,
-                        language: momentData.language,
-                        interaction,
+                        id: String(data.id),
+                        userId: data.user.id,
+                        duration: data.duration,
                     }
                     setFocusedChunkItemFunc(chunkData)
                 }
@@ -99,13 +88,13 @@ export function MomentProvider({
 
     const contextValue: any = useMemo(
         () => ({
-            momentOptions: momentOptionsStore,
-            momentSize: momentSize,
-            momentData: momentDataStore,
-            momentUserActions: momentUserActionsStore,
-            momentVideo: momentVideoStore,
+            size,
+            data: DataStore,
+            actions: ActionsStore,
+            options: OptionsStore,
+            video: VideoStore,
         }),
-        [momentOptionsStore, momentSize, momentDataStore, momentUserActionsStore, momentVideoStore],
+        [size, DataStore, ActionsStore, OptionsStore, VideoStore],
     )
 
     return <MomentContext.Provider value={contextValue}>{children}</MomentContext.Provider>

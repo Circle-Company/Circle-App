@@ -19,7 +19,7 @@ export default function Name({
     const { user } = UseProfileContext()
     const { t } = React.useContext(LanguageContext)
 
-    const followsNum = user.statistics.total_followers_num
+    const followsNum = user?.metrics?.totalFollowers ?? 0
     const animatedOpacity = React.useRef(new Animated.Value(0.2)).current
 
     function handleAnimation() {

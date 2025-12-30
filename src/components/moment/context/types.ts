@@ -1,53 +1,58 @@
-import { LanguagesCodesType } from "../../../locales/LanguageTypes"
-import { CommentsReciveDataProps } from "../../comment/comments-types"
-import { userReciveDataProps } from "../../user_show/user_show-types"
-import { MomentOptionsState } from "./momentOptions"
-import { MomentVideoState } from "./momentVideo"
+import { CommentObject, CommentsReciveDataProps } from "../../comment/comments-types"
+import { MomentOptionsState } from "./moment.options"
+import { MomentVideoState } from "./moment.video"
+import { MomentActionsState } from "./moment.actions"
 
-export type MomentMidiaProps = {
-    content_type: "IMAGE" | "VIDEO"
-    fullhd_resolution?: string
-    nhd_resolution?: string
-    nhd_thumbnail?: string
-}
-
-export type MomentStatisticsProps = {
-    total_likes_num: number
-    total_shares_num: number
-    total_views_num: number
-    total_comments_num: number
-}
-
-export type TagProps = {
-    id: number
-    title: string
+export type MomentMetricsProps = {
+    totalViews: number
+    totalLikes: number
+    totalComments: number
 }
 
 export type MomentOptionsProps = {
     enableReport: boolean
-    enableLikeButton: boolean
-    enableAnalyticsView: boolean
-    enableStoreActions: boolean
-    enableTranslation: boolean
-    enableModeration: boolean
+    enableLike: boolean
+    enableComment: boolean
+    enableWatch: boolean
     isFeed: boolean
     isFocused: boolean
 }
 
-export type MomentUserActionsProps = {
+export type actionsProps = {
     like: boolean
-    share: boolean
-    click: boolean
+    watch: number
     comment: boolean
-    likeComment: boolean
-    showLessOften: boolean
-    report: boolean
     initialLikedState: boolean
-    partialView?: boolean
-    completeView?: boolean
 }
 
-export type MomentSizeProps = {
+export type InteractionPayloadMap = {
+    LIKE: { momentId: string; authorizationToken: string }
+    UNLIKE: { momentId: string; authorizationToken: string }
+    WATCH: { momentId: string; authorizationToken: string; watchTime: number }
+    COMMENT: {
+        momentId: string
+        authorizationToken: string
+        content: string
+        mentions?: string[]
+        parentId?: string
+    }
+    EXCLUDE: { momentId: string; authorizationToken: string }
+}
+
+export type InteractionPayload<T extends "LIKE" | "UNLIKE" | "WATCH" | "COMMENT" | "EXCLUDE"> =
+    T extends "LIKE"
+        ? InteractionPayloadMap["LIKE"]
+        : T extends "UNLIKE"
+          ? InteractionPayloadMap["UNLIKE"]
+          : T extends "WATCH"
+            ? InteractionPayloadMap["WATCH"]
+            : T extends "COMMENT"
+              ? InteractionPayloadMap["COMMENT"]
+              : T extends "EXCLUDE"
+                ? InteractionPayloadMap["EXCLUDE"]
+                : never
+
+export interface sizeProps {
     width: number
     height: number
     paddingTop?: number
@@ -59,99 +64,56 @@ export type MomentSizeProps = {
     borderBottomRightRadius?: number
 }
 
-export type MomentVideoProps = {
+export interface MomentVideoProps {
     currentTime: number
     duration: number
     isPaused: boolean
     isMuted: boolean
+    shadow?: {
+        top?: boolean
+        bottom?: boolean
+    }
 }
 
-export type MomentDataProps = {
+export interface dataProps {
     id: string
-    user: userReciveDataProps
-    description: string
-    midia: MomentMidiaProps
-    comments: CommentsReciveDataProps
-    statistics: MomentStatisticsProps
-    tags: TagProps[]
-    language: LanguagesCodesType
-    created_at: string
-    is_liked: boolean
-}
-
-export type ExportMomentDataProps = {
-    id: string
-    userId: string
-    tags: TagProps[]
-    type: "IMAGE" | "VIDEO"
-    language: LanguagesCodesType
+    user: {
+        id: string
+        username: string
+        profilePicture: string
+    }
+    media: string
+    thumbnail: string
     duration: number
+    size: string
+    hasAudio: boolean
+    description: string
+    ageRestriction: boolean
+    contentWarning: boolean
+    metrics: MomentMetricsProps
+    publishedAt: string
+    topComment?: CommentObject
+    isLiked?: boolean
 }
 
-export type MomentDataReturnsProps = {
-    id: string
-    user: userReciveDataProps
-    description: string
-    midia: MomentMidiaProps
+export interface dataReturnsProps extends dataProps {
     comments: CommentsReciveDataProps
-    statistics: MomentStatisticsProps
-    tags: TagProps[]
-    language: LanguagesCodesType
-    created_at: string
     getComments: ({ page, pageSize }: { page: number; pageSize: number }) => Promise<void>
-    getStatistics: () => Promise<void>
-    getTags: () => Promise<void>
 }
 
 export type MomentProviderProps = {
     isFeed: boolean
     isFocused: boolean
-    momentSize?: MomentSizeProps
-    momentData: MomentDataProps
+    size?: sizeProps
+    data: dataProps
+    shadow?: MomentVideoProps["shadow"]
     children: React.ReactNode
 }
 
-export type MomentUserActionsReturnsProps = {
-    like: boolean
-    share: boolean
-    click: boolean
-    comment: boolean
-    likeComment: boolean
-    showLessOften: boolean
-    report: boolean
-    initialLikedState: boolean
-    shortView?: boolean
-    longView?: boolean
-    lastError?: string | null
-    isLoading?: boolean
-
-    setShared: React.Dispatch<React.SetStateAction<boolean>>
-    setClickIntoMoment: React.Dispatch<React.SetStateAction<boolean>>
-    setWatchTime: React.Dispatch<React.SetStateAction<number>>
-    setClickProfile: React.Dispatch<React.SetStateAction<boolean>>
-    setCommented: React.Dispatch<React.SetStateAction<boolean>>
-    setLikeComment: React.Dispatch<React.SetStateAction<boolean>>
-    setSkipped: React.Dispatch<React.SetStateAction<boolean>>
-    setShowLessOften: React.Dispatch<React.SetStateAction<boolean>>
-    setReported: React.Dispatch<React.SetStateAction<boolean>>
-    setInitialLikedState: React.Dispatch<React.SetStateAction<boolean>>
-    setShortView: React.Dispatch<React.SetStateAction<boolean>>
-    setLongView: React.Dispatch<React.SetStateAction<boolean>>
-
-    setMomentUserActions: (momentUserActions: MomentUserActionsProps) => void
-    injectInteractionsToList: () => void
-    handleLikeButtonPressed: ({ likedValue }: { likedValue?: boolean }) => void
-    sendInteractionToServer: (interactionType: string, data?: any) => Promise<void>
-    resetViewState: () => void
-    handleShortView: () => void
-    handleLongView: () => void
-    updateWatchTime: (newWatchTime: number) => void
-}
-
 export type MomentContextsData = {
-    momentData: MomentDataReturnsProps
-    momentSize: MomentSizeProps
-    momentOptions: MomentOptionsState
-    momentUserActions: MomentUserActionsReturnsProps
-    momentVideo: MomentVideoState
+    data: dataReturnsProps
+    size: sizeProps
+    options: MomentOptionsState
+    actions: MomentActionsState
+    video: MomentVideoState
 }

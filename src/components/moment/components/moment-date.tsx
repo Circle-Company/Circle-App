@@ -15,7 +15,7 @@ export default function Date({
     backgroundColor,
     small = false,
 }: MomentDateProps) {
-    const { momentData } = React.useContext(MomentContext)
+    const { data } = React.useContext(MomentContext)
 
     const container: any = {
         borderRadius: (sizes.sizes["2md"] * 0.9) / 2,
@@ -31,11 +31,11 @@ export default function Date({
         color,
     }
 
-    if (momentData.created_at === null) {
+    if (data.publishedAt === null) {
         return null
     }
 
-    const date = timeDifferenceConverter({ date: String(momentData.created_at), small })
+    const date = timeDifferenceConverter({ date: String(data.publishedAt), small })
 
     return (
         <View style={container}>

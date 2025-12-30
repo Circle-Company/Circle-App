@@ -7,35 +7,30 @@ export interface MomentVideoState extends MomentVideoProps {
     setIsPaused: React.Dispatch<React.SetStateAction<boolean>>
     setIsMuted: React.Dispatch<React.SetStateAction<boolean>>
     togglePlay: () => void
-    setMomentVideo: (momentVideo: MomentVideoProps) => void
-    exportMomentVideo: () => MomentVideoProps
+    set: (video: MomentVideoProps) => void
 }
 
-export function useMomentVideo(): MomentVideoState {
+export function useVideo(): MomentVideoState {
     const [currentTime, setCurrentTime] = React.useState<number>(0)
     const [duration, setDuration] = React.useState<number>(0)
     const [isPaused, setIsPaused] = React.useState<boolean>(false)
     const [isMuted, setIsMuted] = React.useState<boolean>(false)
+    const [shadow, setShadow] = React.useState<MomentVideoProps["shadow"]>({
+        bottom: true,
+        top: true,
+    })
 
     function togglePlay() {
-        setIsPaused(prev => !prev)
+        setIsPaused((prev) => !prev)
     }
 
-    function exportMomentVideo(): MomentVideoProps {
-        return {
-            currentTime,
-            duration,
-            isPaused,
-            isMuted,
-        }
-    }
-
-    function setMomentVideo(momentVideo: MomentVideoProps) {
-        setCurrentTime(momentVideo.currentTime)
-        setDuration(momentVideo.duration)
-        setIsPaused(momentVideo.isPaused)
-        if (momentVideo.isMuted !== undefined) {
-            setIsMuted(momentVideo.isMuted)
+    function set(video: MomentVideoProps) {
+        setCurrentTime(video.currentTime)
+        setDuration(video.duration)
+        setIsPaused(video.isPaused)
+        setShadow(video.shadow)
+        if (video.isMuted !== undefined) {
+            setIsMuted(video.isMuted)
         }
     }
 
@@ -49,7 +44,7 @@ export function useMomentVideo(): MomentVideoState {
         setIsPaused,
         setIsMuted,
         togglePlay,
-        setMomentVideo,
-        exportMomentVideo
+        shadow,
+        set,
     }
-} 
+}

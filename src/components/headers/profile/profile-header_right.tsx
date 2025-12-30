@@ -3,30 +3,30 @@ import React from "react"
 import { Skeleton } from "../../skeleton"
 import { UserShow } from "../../user_show"
 import { View } from "react-native"
-import ViewProfileContext from "../../../contexts/viewProfile"
 import sizes from "../../../constants/sizes"
+import ProfileContext from "@/contexts/profile"
 
 export default function ProfileHeaderRight() {
     const { session } = React.useContext(PersistedContext)
-    const { userProfile } = React.useContext(ViewProfileContext)
+    const { user } = React.useContext(ProfileContext)
     const [isLoading, setIsLoading] = React.useState(true)
 
     React.useEffect(() => {
-        setIsLoading(true),
+        ;(setIsLoading(true),
             setTimeout(() => {
                 setIsLoading(false)
-            }, 400)
+            }, 400))
     }, [])
     const container: any = {
         flexDirection: "row",
         alignItems: "center",
     }
-    if (session.user.id == userProfile.id) return null
+    if (session.user.id == user.id) return null
     else
         return (
             <View style={container}>
                 <View style={{ marginRight: sizes.margins["3sm"] }}>
-                    <UserShow.Root data={userProfile}>
+                    <UserShow.Root data={user}>
                         {isLoading ? (
                             <Skeleton.View
                                 delay={0}

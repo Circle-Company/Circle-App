@@ -1,7 +1,7 @@
 import { act, fireEvent, render } from "@testing-library/react-native"
 import React from "react"
-import AuthContext from "../../contexts/Auth"
-import UsernameInput from "./usernameInput"
+import AuthContext from "../../../contexts/Auth"
+import UsernameInput from "../usernameInput"
 
 type MockAuthContextProps = {
     setSignInputUsername: jest.Mock

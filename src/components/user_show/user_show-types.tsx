@@ -3,15 +3,10 @@ import React from "react"
 export type userReciveDataProps = {
     id: string
     username: string
-    verified: boolean
+    verified?: boolean
     profilePicture: string
-    youFollow: boolean
+    youFollow?: boolean
     followYou?: boolean
-    // Suporte para estrutura antiga (legacy)
-    profile_picture?: {
-        small_resolution?: string
-        tiny_resolution?: string
-    }
 }
 
 export type UserRootProps = {
@@ -40,6 +35,7 @@ export type UserProfilePictureProps = {
     }
     displayOnMoment?: boolean
     isLoading?: boolean
+    disableAction?: boolean
     onClickAction?: () => void
 }
 

@@ -3,8 +3,10 @@ import { View } from "react-native"
 import LinearGradient from "react-native-linear-gradient"
 import MidiaRenderContext from "../midia_render-context"
 import { MidiaRenderMainRootProps } from "../midia_render-types"
+import MomentContext from "@/components/moment/context"
 
 export default function root({ children, data, content_sizes }: MidiaRenderMainRootProps) {
+    const { video } = React.useContext(MomentContext)
     const container: any = {
         width: content_sizes.width,
         height: content_sizes.height,
@@ -27,8 +29,12 @@ export default function root({ children, data, content_sizes }: MidiaRenderMainR
     }
     return (
         <MidiaRenderContext.Provider value={{ midia: data, content_sizes: content_sizes }}>
-            <LinearGradient colors={["#00000060", "#00000000"]} style={superior_gradient} />
-            <LinearGradient colors={["#00000000", "#00000040"]} style={inferior_gradient} />
+            {video.overlayShadow?.hideTop == false && (
+                <LinearGradient colors={["#00000060", "#00000000"]} style={superior_gradient} />
+            )}
+            {video.overlayShadow?.hideBottom == false && (
+                <LinearGradient colors={["#00000000", "#00000040"]} style={inferior_gradient} />
+            )}
             <View style={container}>{children}</View>
         </MidiaRenderContext.Provider>
     )

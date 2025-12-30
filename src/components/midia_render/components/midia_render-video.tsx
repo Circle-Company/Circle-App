@@ -1,4 +1,4 @@
-import { Image, StyleSheet, View, Pressable, Platform, ImageProps } from "react-native"
+import { Image, StyleSheet, View, Platform, ImageProps } from "react-native"
 import React, { useCallback, useEffect, useRef, useState } from "react"
 import { VideoView, useVideoPlayer } from "expo-video"
 import * as VideoThumbnails from "expo-video-thumbnails"
@@ -69,9 +69,9 @@ export default function MediaRenderVideo({
     prefetchAdjacentThumbnails = [],
 }: VideoPlayerProps) {
     const { t } = React.useContext(LanguageContext)
-    const { momentSize } = React.useContext(MomentContext)
-    const videoWidth = momentSize?.width ?? width ?? 200
-    const videoHeight = momentSize?.height ?? height ?? 200
+    const { size } = React.useContext(MomentContext)
+    const videoWidth = size?.width ?? width ?? 200
+    const videoHeight = size?.height ?? height ?? 200
 
     // Estados otimizados
     const [hasError, setHasError] = useState(false)
@@ -440,7 +440,7 @@ export default function MediaRenderVideo({
 
     // Renderização normal
     return Platform.OS === "ios" ? (
-        <Pressable onLongPress={() => {}} delayLongPress={100000} style={styles.container}>
+        <View style={styles.container}>
             {/* Vídeo - sempre renderizado quando há URI */}
             {uri && uri.length > 0 && player && (
                 <View style={styles.absoluteFill}>
@@ -468,7 +468,7 @@ export default function MediaRenderVideo({
                     />
                 </View>
             )}
-        </Pressable>
+        </View>
     ) : (
         <View style={styles.container}>
             {/* Vídeo - sempre renderizado quando há URI */}

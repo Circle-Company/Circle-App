@@ -4,20 +4,20 @@ import React from "react"
 import { View, ViewStyle } from "react-native"
 import ColorTheme from "../../../constants/colors"
 import sizes from "../../../constants/sizes"
-import ViewProfileContext from "../../../contexts/viewProfile"
 import { Skeleton } from "../../skeleton"
 import { UserShow } from "../../user_show"
 import HeaderButton from "../headerButton"
+import ProfileContext from "@/contexts/profile"
 
 export default function ProfileHeaderLeft() {
-    const { userProfile } = React.useContext(ViewProfileContext)
+    const { user } = React.useContext(ProfileContext)
     const [isLoading, setIsLoading] = React.useState(true)
 
     React.useEffect(() => {
-        setIsLoading(true),
+        ;(setIsLoading(true),
             setTimeout(() => {
                 setIsLoading(false)
-            }, 400)
+            }, 400))
     }, [])
     const navigation = useNavigation()
 
@@ -31,7 +31,7 @@ export default function ProfileHeaderLeft() {
                 <More fill={String(ColorTheme().text)} width={18} height={18} />
             </HeaderButton>
             <View style={{ marginLeft: sizes.margins["2sm"] }}>
-                <UserShow.Root data={userProfile}>
+                <UserShow.Root data={user}>
                     {isLoading ? (
                         <Skeleton.View
                             delay={0}

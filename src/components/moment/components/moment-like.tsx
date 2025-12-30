@@ -23,10 +23,8 @@ export default function Like({
     margin = sizes.margins["1sm"],
 }: MomentLikeProps) {
     const { session } = React.useContext(PersistedContext)
-    const { momentData, momentUserActions, momentOptions } = React.useContext(MomentContext) as any
-    const [likedPressed, setLikedPressed] = React.useState(
-        isLiked ? isLiked : momentUserActions.like,
-    )
+    const { data, actions, options } = React.useContext(MomentContext)
+    const [likedPressed, setLikedPressed] = React.useState(isLiked ? isLiked : actions.like)
     var animatedScale = React.useRef(new Animated.Value(1)).current
     var animatedScaleIconPressed = React.useRef(new Animated.Value(1)).current
     var animatedScaleIcon = React.useRef(new Animated.Value(1)).current
@@ -61,24 +59,24 @@ export default function Like({
         }).start()
     }
     React.useEffect(() => {
-        if (momentUserActions.like) {
+        if (actions.like) {
             setLikedPressed(true)
             HandleButtonAnimation()
         } else {
             setLikedPressed(false)
             HandleButtonAnimation()
         }
-    }, [momentUserActions.like])
+    }, [actions.like])
 
     // Quantidade total de likes que vem do backend
-    const totalLikes = Number(momentData?.statistics?.total_likes_num || 0)
+    const totalLikes = data?.metrics?.totalLikes ?? 0
 
     // Determina se um like foi adicionado ou removido em relação ao estado inicial
-    const likeDifference = momentUserActions.like
-        ? momentUserActions.initialLikedState
+    const likeDifference = actions.like
+        ? actions.initialLikedState
             ? 0
             : 1 // Se está curtido, não soma se já estava curtido, senão soma 1
-        : momentUserActions.initialLikedState
+        : actions.initialLikedState
           ? -1
           : 0 // Se não está curtido, subtrai 1 se estava curtido, senão não muda
 
@@ -138,10 +136,6 @@ export default function Like({
         ...blur_container_base,
         backgroundColor: resolvedBackgroundColor,
     }
-    const blur_container_likePressed: ViewStyle = {
-        ...blur_container_base,
-        backgroundColor: ColorTheme().like,
-    }
     const pressable_container: ViewStyle = {
         overflow: "hidden",
         borderRadius: borderRadiusValue,
@@ -154,15 +148,13 @@ export default function Like({
         margin,
         transform: [{ scale: animatedScale }],
         backfaceVisibility: "hidden",
-        shouldRasterizeIOS: true,
     }
-    const icon_container = {
+    const icon_container: ViewStyle = {
         transform: [{ scale: animatedScaleIcon }],
         paddingRight: 4,
         backfaceVisibility: "hidden",
-        shouldRasterizeIOS: true,
     }
-    const icon_container_pressed = {
+    const icon_container_pressed: ViewStyle = {
         transform: [{ scale: animatedScaleIconPressed }],
         paddingRight: 4,
     }
@@ -171,7 +163,10 @@ export default function Like({
         try {
             Vibrate("effectClick")
             HandleButtonAnimation()
-            momentUserActions.handleLikePressedWithServerSync({ likedValue: true })
+            actions.registerInteraction("LIKE", {
+                momentId: data.id,
+                authorizationToken: session.account.jwtToken,
+            })
         } catch (error) {
             console.error("Erro ao processar like:", error)
         }
@@ -180,7 +175,10 @@ export default function Like({
         try {
             Vibrate("effectTick")
             HandleButtonAnimation()
-            momentUserActions.handleLikePressedWithServerSync({ likedValue: false })
+            actions.registerInteraction("UNLIKE", {
+                momentId: data.id,
+                authorizationToken: session.account.jwtToken,
+            })
         } catch (error) {
             console.error("Erro ao processar unlike:", error)
         }
@@ -188,7 +186,7 @@ export default function Like({
 
     const like_fill: string = String(colors.gray.white)
 
-    if (!momentOptions.enableLikeButton) return null
+    if (!options.enableLike) return null
     else if (likedPressed) {
         return (
             <Animated.View style={animated_container}>

@@ -1,7 +1,7 @@
 import { act, fireEvent, render } from "@testing-library/react-native"
 import React from "react"
-import AuthContext from "../../contexts/Auth"
-import PasswordInput from "./passwordInput"
+import AuthContext from "../../../contexts/Auth"
+import PasswordInput from "../passwordInput"
 
 type MockAuthContextProps = {
     setSignInputPassword: jest.Mock
