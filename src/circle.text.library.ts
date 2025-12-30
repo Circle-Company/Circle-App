@@ -1,7 +1,6 @@
 import { CircleTextProps, TextLibrary, Timezone, TimezoneCode } from "circle-text-library"
-import { storage, storageKeys } from "../store"
-
-import { userRules } from "../config/userRules"
+import { storage, storageKeys } from "@/store"
+import { userRules } from "@/config/userRules"
 
 // Função para converter regras do user.rules.ts para o formato ValidationConfig
 function createValidationConfig(): CircleTextProps["validationRules"] {
