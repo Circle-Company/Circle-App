@@ -5,62 +5,50 @@ import AccountContext from "@/contexts/account"
 import PersistedContext from "@/contexts/Persisted"
 
 import { AnimatedVerticalScrollView } from "@/lib/hooks/useAnimatedScrollView"
-import { RenderProfileSkeleton } from "@/features/render-profile/skeleton"
-import { useAccountQuery, useAccountMomentsQuery } from "@/state/queries"
-import RenderProfile from "@/features/render-profile"
-import { colors } from "@/constants/colors"
+import { RenderProfileSkeleton } from "@/features/profile/profile.skeleton"
+
+import RenderProfile from "@/features/profile"
+
 import { View } from "@/components/Themed"
 import sizes from "@/constants/sizes"
 
 export default function AccountScreen() {
-    const { setRefreshing } = React.useContext(AccountContext)
+    const { account, moments, isLoadingAccount, isLoadingMoments, getAccount, getMoments } =
+        React.useContext(AccountContext)
     const { session } = React.useContext(PersistedContext)
     const [currentPage, setCurrentPage] = useState(1)
     const [hasMoreMoments, setHasMoreMoments] = useState(true)
     const [showGradient, setShowGradient] = useState(false)
 
-    // TanStack Query hooks
-    const {
-        data: accountData,
-        isLoading: isLoadingAccount,
-        refetch: refetchAccount,
-        isFetching: isFetchingAccount,
-    } = useAccountQuery(session.account.jwtToken, {
-        enabled: !!session.account.jwtToken,
-        refetchOnMount: true,
-    })
-
-    const {
-        data: momentsData,
-        isLoading: isLoadingMoments,
-        refetch: refetchMoments,
-    } = useAccountMomentsQuery(session.account.jwtToken, currentPage, 20, {
-        enabled: !!session.account.jwtToken,
-        refetchOnMount: true,
-    })
+    const pageSize = 20
 
     const loading = isLoadingAccount || isLoadingMoments
 
+    useEffect(() => {
+        // Initialize data on mount
+        getAccount()
+        getMoments({ page: 1, limit: pageSize })
+    }, [])
+
     const handleRefresh = async () => {
-        setRefreshing(true)
         try {
             // Reset to first page when refreshing
             setCurrentPage(1)
             setHasMoreMoments(true)
-            await Promise.all([refetchAccount(), refetchMoments()])
+            await getAccount()
+            await getMoments({ page: 1, limit: pageSize })
         } catch (error) {
             console.error("Error refreshing account data:", error)
-        } finally {
-            setRefreshing(false)
         }
     }
 
     const handleLoadMore = async () => {
-        if (momentsData && !isLoadingMoments && hasMoreMoments) {
-            const { pagination } = momentsData
-            if (pagination.page < pagination.totalPages) {
-                console.log(`📄 Loading page ${currentPage + 1}`)
-                setCurrentPage((prev) => prev + 1)
+        if (!isLoadingMoments && hasMoreMoments) {
+            const nextPage = currentPage + 1
+            const list = await getMoments({ page: nextPage, limit: pageSize })
+            if (list && list.length > 0) {
+                console.log(`📄 Loaded page ${nextPage}`)
+                setCurrentPage(nextPage)
             } else {
                 console.log("📭 No more moments to load")
                 setHasMoreMoments(false)
@@ -68,41 +56,45 @@ export default function AccountScreen() {
         }
     }
 
-    // Update persisted context when query data arrives
+    // Sync Persisted session when context data changes
     useEffect(() => {
-        if (accountData) {
-            console.log("✅ Account data loaded, updating session:", accountData)
-
-            // Update user data
+        if (account) {
             session.user.set({
-                id: accountData.id,
-                username: accountData.username,
-                name: accountData.name,
-                description: accountData.description,
-                richDescription: accountData.description,
-                isVerified: accountData.status.verified,
-                profilePicture: accountData.profilePicture,
+                id: account.id,
+                username: account.username,
+                name: account.name,
+                description: account.description,
+                richDescription: account.description,
+                isVerified: account.status.verified,
+                profilePicture: account.profilePicture,
             })
 
-            // Update statistics
             session.metrics.set({
-                totalFollowers: accountData.metrics.totalFollowers ?? 0,
-                totalFollowing: accountData.metrics.totalFollowing ?? 0,
-                totalLikesReceived: accountData.metrics.totalLikesReceived,
-                totalViewsReceived: accountData.metrics.totalViewsReceived,
-                followerGrowthRate30d: accountData.metrics.followerGrowthRate30d ?? 0,
-                engagementGrowthRate30d: accountData.metrics.engagementGrowthRate30d ?? 0,
-                interactionsGrowthRate30d: accountData.metrics.interactionsGrowthRate30d ?? 0,
+                totalFollowers: account.metrics.totalFollowers ?? 0,
+                totalFollowing: account.metrics.totalFollowing ?? 0,
+                totalLikesReceived: account.metrics.totalLikesReceived ?? 0,
+                totalViewsReceived: account.metrics.totalViewsReceived ?? 0,
+                followerGrowthRate30d: account.metrics.followerGrowthRate30d ?? 0,
+                engagementGrowthRate30d: account.metrics.engagementGrowthRate30d ?? 0,
+                interactionsGrowthRate30d: account.metrics.interactionsGrowthRate30d ?? 0,
             })
+            if (typeof account.metrics.totalMomentsCreated === "number") {
+                session.account.setTotalMoments(account.metrics.totalMomentsCreated)
+            }
         }
-    }, [accountData])
+    }, [account])
 
     useEffect(() => {
-        if (momentsData) {
-            session.account.setMoments(momentsData.moments)
-            session.account.setTotalMoments(momentsData.pagination.total)
+        if (moments) {
+            session.account.setMoments(moments)
+            if (
+                typeof session.account.totalMoments !== "number" ||
+                session.account.totalMoments === 0
+            ) {
+                session.account.setTotalMoments(moments.length)
+            }
         }
-    }, [momentsData])
+    }, [moments])
 
     return (
         <ScrollView style={{ backgroundColor: "#000" }}>
