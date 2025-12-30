@@ -1,10 +1,10 @@
 import { Stack, useRouter } from "expo-router"
 import React from "react"
-import { Platform } from "react-native"
+
 import ColorTheme, { colors } from "@/constants/colors"
 import Fonts from "@/constants/fonts"
 import LanguageContext from "@/contexts/Preferences/language"
-import SettingsHeaderLeft from "@/components/headers/settings/settings-header_left"
+
 import { HeaderBackButton } from "@react-navigation/elements"
 
 export default function SettingsLayout() {
@@ -30,7 +30,7 @@ export default function SettingsLayout() {
                 tintColor={colors.gray.white}
                 displayMode="default"
                 pressColor={colors.purple.purple_05}
-                onPress={() => router.dismiss()}
+                onPress={() => router.back()}
             />
         ),
     }
@@ -51,6 +51,14 @@ export default function SettingsLayout() {
                 options={{
                     ...defaultOptions,
                     headerTitle: t("Settings"),
+                    headerLeft: () => (
+                        <HeaderBackButton
+                            tintColor={colors.gray.white}
+                            displayMode="default"
+                            pressColor={colors.purple.purple_05}
+                            onPress={() => router.back()}
+                        />
+                    ),
                 }}
             />
             <Stack.Screen
@@ -58,6 +66,14 @@ export default function SettingsLayout() {
                 options={{
                     ...defaultOptions,
                     headerTitle: t("Add Profile Picture"),
+                    headerLeft: () => (
+                        <HeaderBackButton
+                            tintColor={colors.gray.white}
+                            displayMode="default"
+                            pressColor={colors.purple.purple_05}
+                            onPress={() => router.back()}
+                        />
+                    ),
                 }}
             />
             <Stack.Screen
@@ -65,6 +81,14 @@ export default function SettingsLayout() {
                 options={{
                     ...defaultOptions,
                     headerTitle: t("Add Description"),
+                    headerLeft: () => (
+                        <HeaderBackButton
+                            tintColor={colors.gray.white}
+                            displayMode="default"
+                            pressColor={colors.purple.purple_05}
+                            onPress={() => router.back()}
+                        />
+                    ),
                 }}
             />
             <Stack.Screen
@@ -72,6 +96,14 @@ export default function SettingsLayout() {
                 options={{
                     ...defaultOptions,
                     headerTitle: t("Following"),
+                    headerLeft: () => (
+                        <HeaderBackButton
+                            tintColor={colors.gray.white}
+                            displayMode="default"
+                            pressColor={colors.purple.purple_05}
+                            onPress={() => router.back()}
+                        />
+                    ),
                 }}
             />
             <Stack.Screen
@@ -79,6 +111,14 @@ export default function SettingsLayout() {
                 options={{
                     ...defaultOptions,
                     headerTitle: t("Name"),
+                    headerLeft: () => (
+                        <HeaderBackButton
+                            tintColor={colors.gray.white}
+                            displayMode="default"
+                            pressColor={colors.purple.purple_05}
+                            onPress={() => router.back()}
+                        />
+                    ),
                 }}
             />
             <Stack.Screen
@@ -86,6 +126,14 @@ export default function SettingsLayout() {
                 options={{
                     ...defaultOptions,
                     headerTitle: t("Password"),
+                    headerLeft: () => (
+                        <HeaderBackButton
+                            tintColor={colors.gray.white}
+                            displayMode="default"
+                            pressColor={colors.purple.purple_05}
+                            onPress={() => router.back()}
+                        />
+                    ),
                 }}
             />
             <Stack.Screen
@@ -93,6 +141,14 @@ export default function SettingsLayout() {
                 options={{
                     ...defaultOptions,
                     headerTitle: t("Privacy Policy"),
+                    headerLeft: () => (
+                        <HeaderBackButton
+                            tintColor={colors.gray.white}
+                            displayMode="default"
+                            pressColor={colors.purple.purple_05}
+                            onPress={() => router.back()}
+                        />
+                    ),
                 }}
             />
             <Stack.Screen
@@ -100,6 +156,14 @@ export default function SettingsLayout() {
                 options={{
                     ...defaultOptions,
                     headerTitle: t("Terms of Service"),
+                    headerLeft: () => (
+                        <HeaderBackButton
+                            tintColor={colors.gray.white}
+                            displayMode="default"
+                            pressColor={colors.purple.purple_05}
+                            onPress={() => router.back()}
+                        />
+                    ),
                 }}
             />
             <Stack.Screen
@@ -107,6 +171,14 @@ export default function SettingsLayout() {
                 options={{
                     ...defaultOptions,
                     headerTitle: t("Community Guidelines"),
+                    headerLeft: () => (
+                        <HeaderBackButton
+                            tintColor={colors.gray.white}
+                            displayMode="default"
+                            pressColor={colors.purple.purple_05}
+                            onPress={() => router.back()}
+                        />
+                    ),
                 }}
             />
             <Stack.Screen
@@ -114,6 +186,14 @@ export default function SettingsLayout() {
                 options={{
                     ...defaultOptions,
                     headerTitle: t("Push Notifications"),
+                    headerLeft: () => (
+                        <HeaderBackButton
+                            tintColor={colors.gray.white}
+                            displayMode="default"
+                            pressColor={colors.purple.purple_05}
+                            onPress={() => router.back()}
+                        />
+                    ),
                 }}
             />
             <Stack.Screen
@@ -121,6 +201,14 @@ export default function SettingsLayout() {
                 options={{
                     ...defaultOptions,
                     headerTitle: t("All Moments"),
+                    headerLeft: () => (
+                        <HeaderBackButton
+                            tintColor={colors.gray.white}
+                            displayMode="default"
+                            pressColor={colors.purple.purple_05}
+                            onPress={() => router.back()}
+                        />
+                    ),
                 }}
             />
             <Stack.Screen
@@ -128,6 +216,14 @@ export default function SettingsLayout() {
                 options={{
                     ...defaultOptions,
                     headerTitle: t("Preferences"),
+                    headerLeft: () => (
+                        <HeaderBackButton
+                            tintColor={colors.gray.white}
+                            displayMode="default"
+                            pressColor={colors.purple.purple_05}
+                            onPress={() => router.back()}
+                        />
+                    ),
                 }}
             />
             <Stack.Screen
@@ -135,6 +231,14 @@ export default function SettingsLayout() {
                 options={{
                     ...defaultOptions,
                     headerTitle: t("Language"),
+                    headerLeft: () => (
+                        <HeaderBackButton
+                            tintColor={colors.gray.white}
+                            displayMode="default"
+                            pressColor={colors.purple.purple_05}
+                            onPress={() => router.back()}
+                        />
+                    ),
                 }}
             />
             <Stack.Screen
@@ -142,6 +246,14 @@ export default function SettingsLayout() {
                 options={{
                     ...defaultOptions,
                     headerTitle: t("Content"),
+                    headerLeft: () => (
+                        <HeaderBackButton
+                            tintColor={colors.gray.white}
+                            displayMode="default"
+                            pressColor={colors.purple.purple_05}
+                            onPress={() => router.back()}
+                        />
+                    ),
                 }}
             />
             <Stack.Screen
@@ -149,6 +261,14 @@ export default function SettingsLayout() {
                 options={{
                     ...defaultOptions,
                     headerTitle: t("Haptic Feedback"),
+                    headerLeft: () => (
+                        <HeaderBackButton
+                            tintColor={colors.gray.white}
+                            displayMode="default"
+                            pressColor={colors.purple.purple_05}
+                            onPress={() => router.back()}
+                        />
+                    ),
                 }}
             />
             <Stack.Screen
@@ -156,6 +276,14 @@ export default function SettingsLayout() {
                 options={{
                     ...defaultOptions,
                     headerTitle: t("Open Source"),
+                    headerLeft: () => (
+                        <HeaderBackButton
+                            tintColor={colors.gray.white}
+                            displayMode="default"
+                            pressColor={colors.purple.purple_05}
+                            onPress={() => router.back()}
+                        />
+                    ),
                 }}
             />
             <Stack.Screen
@@ -163,6 +291,14 @@ export default function SettingsLayout() {
                 options={{
                     ...defaultOptions,
                     headerTitle: t("Support"),
+                    headerLeft: () => (
+                        <HeaderBackButton
+                            tintColor={colors.gray.white}
+                            displayMode="default"
+                            pressColor={colors.purple.purple_05}
+                            onPress={() => router.back()}
+                        />
+                    ),
                 }}
             />
             <Stack.Screen
@@ -170,6 +306,14 @@ export default function SettingsLayout() {
                 options={{
                     ...defaultOptions,
                     headerTitle: t("Version"),
+                    headerLeft: () => (
+                        <HeaderBackButton
+                            tintColor={colors.gray.white}
+                            displayMode="default"
+                            pressColor={colors.purple.purple_05}
+                            onPress={() => router.back()}
+                        />
+                    ),
                 }}
             />
             <Stack.Screen
@@ -177,6 +321,14 @@ export default function SettingsLayout() {
                 options={{
                     ...defaultOptions,
                     headerTitle: t("Log Out"),
+                    headerLeft: () => (
+                        <HeaderBackButton
+                            tintColor={colors.gray.white}
+                            displayMode="default"
+                            pressColor={colors.purple.purple_05}
+                            onPress={() => router.back()}
+                        />
+                    ),
                 }}
             />
         </Stack>

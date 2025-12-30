@@ -28,8 +28,9 @@ export default function YouLayout() {
                 headerStyle: {
                     backgroundColor: colors.gray.black,
                 },
-
                 headerTintColor: colors.gray.white,
+                animation: "slide_from_right",
+                presentation: "card",
             }}
         >
             <Stack.Screen

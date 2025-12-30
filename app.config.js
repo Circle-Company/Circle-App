@@ -38,6 +38,7 @@ module.exports = function (_config) {
                     VKCImageAnalysisDisabled: true,
                     // Desabilitar Live Text (seleção de texto em imagens)
                     UISupportsLiveText: false,
+                    UIViewControllerBasedStatusBarAppearance: true,
                 },
             },
             web: { favicon: "./assets/favicon.png" },

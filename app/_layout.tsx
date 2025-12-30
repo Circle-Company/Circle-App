@@ -10,20 +10,16 @@ import { useFonts } from "expo-font"
 import { Provider as AccountProvider } from "@/contexts/account"
 import AuthContext, { Provider as AuthProvider } from "@/contexts/Auth"
 import { Provider as BottomSheetProvider } from "@/contexts/bottomSheet"
-import { Provider as BottomTabsProvider } from "@/contexts/bottomTabs"
 import { Provider as FeedProvider } from "@/contexts/Feed"
 import { Provider as GeolocationProvider } from "@/contexts/geolocation"
 import { Provider as NetworkProvider } from "@/contexts/network"
 import { Provider as NewMomentProvider } from "@/contexts/newMoment"
 import { Provider as PreferencesProvider } from "@/contexts/Preferences"
 import { Provider as ProfileProvider } from "@/contexts/profile"
-import { CameraProvider } from "@/modules/camera/context"
+import { CameraProvider } from "../modules/camera/context"
 import { QueryProvider } from "@/lib/react-query"
 import { Provider as RedirectProvider, RedirectContext } from "@/contexts/redirect"
-import { Provider as SelectMomentsProvider } from "@/contexts/selectMoments"
-import StatusBar from "@/components/StatusBar"
 import { Provider as ToastProvider } from "@/contexts/Toast"
-import { Provider as ViewProfileProvider } from "@/contexts/viewProfile"
 import Fonts from "@/constants/fonts"
 import sizes from "@/constants/sizes"
 
@@ -36,24 +32,17 @@ function RootLayoutNav() {
     const segments = useSegments()
     const router = useRouter()
     const [isInitializing, setIsInitializing] = useState(true)
+    const scheme = useColorScheme()
 
     // Check authentication and handle routing
     useEffect(() => {
         const checkAuthentication = async () => {
             try {
-                console.log("🔍 Verificando autenticação...")
-
                 const authenticated = checkIsSigned()
 
-                if (authenticated) {
-                    console.log("✅ Usuário autenticado")
-                    setRedirectTo("APP")
-                } else {
-                    console.log("❌ Usuário não autenticado")
-                    setRedirectTo("AUTH")
-                }
+                if (authenticated) setRedirectTo("APP")
+                else setRedirectTo("AUTH")
             } catch (error) {
-                console.error("❌ Erro ao verificar autenticação:", error)
                 setRedirectTo("AUTH")
             } finally {
                 setIsInitializing(false)
@@ -69,9 +58,10 @@ function RootLayoutNav() {
             return
         }
 
-        const inAuthGroup = segments[0] === "(auth)"
-        const inTabsGroup = segments[0] === "(tabs)"
         const atRoot = segments.length === 0
+        const firstSegment = atRoot ? null : segments[0]
+        const inAuthGroup = firstSegment === "(auth)"
+        const inTabsGroup = firstSegment === "(tabs)"
         const isAuthenticated = redirectTo === "APP"
 
         console.log("📍 Navigation state:", {
@@ -94,11 +84,7 @@ function RootLayoutNav() {
         }
     }, [isInitializing, redirectTo, segments])
 
-    return (
-        <>
-            <Slot />
-        </>
-    )
+    return <Slot />
 }
 
 export default function RootLayout() {
@@ -133,23 +119,17 @@ export default function RootLayout() {
                                         <NetworkProvider>
                                             <GeolocationProvider>
                                                 <CameraProvider>
-                                                    <BottomTabsProvider>
-                                                        <AccountProvider>
-                                                            <ProfileProvider>
-                                                                <ViewProfileProvider>
-                                                                    <FeedProvider>
-                                                                        <BottomSheetProvider>
-                                                                            <SelectMomentsProvider>
-                                                                                <NewMomentProvider>
-                                                                                    <RootLayoutNav />
-                                                                                </NewMomentProvider>
-                                                                            </SelectMomentsProvider>
-                                                                        </BottomSheetProvider>
-                                                                    </FeedProvider>
-                                                                </ViewProfileProvider>
-                                                            </ProfileProvider>
-                                                        </AccountProvider>
-                                                    </BottomTabsProvider>
+                                                    <AccountProvider>
+                                                        <ProfileProvider>
+                                                            <FeedProvider>
+                                                                <BottomSheetProvider>
+                                                                    <NewMomentProvider>
+                                                                        <RootLayoutNav />
+                                                                    </NewMomentProvider>
+                                                                </BottomSheetProvider>
+                                                            </FeedProvider>
+                                                        </ProfileProvider>
+                                                    </AccountProvider>
                                                 </CameraProvider>
                                             </GeolocationProvider>
                                         </NetworkProvider>

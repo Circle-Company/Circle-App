@@ -38,6 +38,7 @@ export default function MomentsLayout() {
                     headerTitle: config.APPLICATION_NAME,
                     headerTitleAlign: "center",
                     headerTransparent: false,
+                    animation: "slide_from_right",
                     headerTitleStyle: {
                         fontFamily: Fonts.family["Black-Italic"],
                         fontSize: Fonts.size.title2 * 0.9,
