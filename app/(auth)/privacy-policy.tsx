@@ -1,3 +1,3 @@
-import SettingsPrivacyPolicy from "@/pages/app/Settings/PrivacyPolicy";
+import SettingsPrivacyPolicy from "@/pages/app/Settings/terms.privacy"
 
-export default SettingsPrivacyPolicy;
+export default SettingsPrivacyPolicy

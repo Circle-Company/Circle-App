@@ -1,3 +1,3 @@
-import SettingsPushNotifications from "@/pages/app/Settings/PushNotifications";
+import { IosSettings as SettingsPushNotifications } from "@/components/settings/ios.settings"
 
-export default SettingsPushNotifications;
+export default SettingsPushNotifications

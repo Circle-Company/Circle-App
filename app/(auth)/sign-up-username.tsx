@@ -1,3 +1,3 @@
-import UsernameScreen from "@/pages/auth/SignUp/Username";
+import UsernameScreen from "@/pages/auth/SignUp/Username"
 
-export default UsernameScreen;
+export default UsernameScreen

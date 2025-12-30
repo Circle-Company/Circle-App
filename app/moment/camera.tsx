@@ -2,7 +2,7 @@ import React from "react"
 import { FlexAlignType, StyleSheet } from "react-native"
 import { View } from "@/components/Themed"
 import sizes from "@/constants/sizes"
-import { CameraPage } from "@/modules/camera/pages/camera"
+import { CameraPage } from "../../modules/camera/pages/camera"
 
 export interface Video {
     uri: string

@@ -1,3 +1,3 @@
-import ProfileScreen from "@/pages/app/Profile";
+import ProfileScreen from "@/features/profile"
 
-export default ProfileScreen;
+export default ProfileScreen

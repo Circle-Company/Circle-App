@@ -3,7 +3,7 @@ import React from "react"
 import { Platform, DynamicColorIOS } from "react-native"
 import ColorTheme, { colors } from "@/constants/colors"
 import Fonts from "@/constants/fonts"
-import LanguageContext from "@/contexts/Preferences/language"
+import LanguageContext from "@/contexts/language"
 import { View } from "react-native"
 import { iOSMajorVersion } from "@/lib/platform/detection"
 

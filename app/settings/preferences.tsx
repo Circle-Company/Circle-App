@@ -1,3 +1,3 @@
-import PreferencesScreen from "@/pages/app/Settings/Preferences";
+import PreferencesScreen from "@/pages/app/Settings/preferences"
 
-export default PreferencesScreen;
+export default PreferencesScreen

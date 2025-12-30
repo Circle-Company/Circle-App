@@ -5,8 +5,8 @@ import { Comments } from "@/components/comment"
 import { colors } from "@/constants/colors"
 import sizes from "@/constants/sizes"
 import FeedContext from "@/contexts/Feed"
-import LanguageContext from "@/contexts/Preferences/language"
-import ListMoments from "@/features/list-moments"
+import LanguageContext from "@/contexts/language"
+import ListMoments from "@/features/moments"
 import { KeyboardAvoidingView, Platform } from "react-native"
 
 export default function HomeScreen() {

@@ -1,3 +1,3 @@
-import LanguageScreen from "@/pages/app/Settings/Preferences/Language";
+import LanguageScreen from "@/pages/app/Settings/preferences.language"
 
-export default LanguageScreen;
+export default LanguageScreen

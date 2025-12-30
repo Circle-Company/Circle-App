@@ -1,3 +1,3 @@
-import VersionScreen from "@/pages/app/Settings/Version";
+import VersionScreen from "@/pages/app/Settings/more.version"
 
-export default VersionScreen;
+export default VersionScreen

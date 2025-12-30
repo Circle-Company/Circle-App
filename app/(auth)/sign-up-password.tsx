@@ -1,3 +1,3 @@
-import PasswordScreen from "@/pages/auth/SignUp/Password";
+import PasswordScreen from "@/pages/auth/SignUp/Password"
 
-export default PasswordScreen;
+export default PasswordScreen

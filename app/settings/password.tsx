@@ -1,3 +1,3 @@
-import SettingsPasswordScreen from "@/pages/app/Settings/Password";
+import SettingsPasswordScreen from "@/pages/app/Settings/password"
 
-export default SettingsPasswordScreen;
+export default SettingsPasswordScreen

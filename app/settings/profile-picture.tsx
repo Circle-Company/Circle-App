@@ -1,3 +1,3 @@
-import ProfilePictureScreen from "@/pages/app/Settings/ProfilePicture";
+import ProfilePictureScreen from "@/pages/app/Settings/public.profile.picture"
 
-export default ProfilePictureScreen;
+export default ProfilePictureScreen

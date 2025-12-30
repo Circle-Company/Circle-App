@@ -1,3 +1,3 @@
-import LoginScreen from "@/pages/auth/SignIn";
+import LoginScreen from "@/pages/auth/SignIn/index"
 
-export default LoginScreen;
+export default LoginScreen

@@ -1,3 +1,3 @@
-import LogOutScreen from "@/pages/app/Settings/LogOut";
+import LogOutScreen from "@/pages/app/Settings/log.out"
 
-export default LogOutScreen;
+export default LogOutScreen

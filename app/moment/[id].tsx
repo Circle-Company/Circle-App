@@ -1,3 +1,3 @@
-import MomentFullScreen from "@/pages/app/Moment/moment-full";
+import MomentFullScreen from "@/features/moments/moment"
 
-export default MomentFullScreen;
+export default MomentFullScreen

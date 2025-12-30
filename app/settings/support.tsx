@@ -1,3 +1,3 @@
-import SupportScreen from "@/pages/app/Settings/Support";
+import SupportScreen from "@/pages/app/Settings/more.support"
 
-export default SupportScreen;
+export default SupportScreen

@@ -1,3 +1,3 @@
-import SettingsHapticFeedback from "@/pages/app/Settings/HapticFeedback";
+import SettingsHapticFeedback from "@/pages/app/Settings/preferences.haptic"
 
-export default SettingsHapticFeedback;
+export default SettingsHapticFeedback

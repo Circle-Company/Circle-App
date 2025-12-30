@@ -1,3 +1,3 @@
-import AgreeScreen from "@/pages/auth/SignUp/Agree";
+import AgreeScreen from "@/pages/auth/SignUp/Agree"
 
-export default AgreeScreen;
+export default AgreeScreen

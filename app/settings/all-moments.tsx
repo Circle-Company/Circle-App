@@ -1,3 +1,3 @@
-import AllMomentsScreen from "@/pages/app/Settings/AllMoments";
+import AllMomentsScreen from "@/features/account/account.moments"
 
-export default AllMomentsScreen;
+export default AllMomentsScreen

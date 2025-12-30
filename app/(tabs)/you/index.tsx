@@ -1,3 +1,3 @@
-import AccountScreen from "@/pages/app/Account";
+import AccountScreen from "@/pages/app/Account/index"
 
-export default AccountScreen;
+export default AccountScreen

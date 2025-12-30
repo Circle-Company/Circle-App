@@ -1,3 +1,3 @@
-import { CameraPage } from "@/modules/camera/pages/camera";
+import { CameraPage } from "../../../modules/camera/pages/camera"
 
-export default CameraPage;
+export default CameraPage
