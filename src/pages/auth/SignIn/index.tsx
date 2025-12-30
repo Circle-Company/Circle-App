@@ -1,12 +1,10 @@
 import ColorTheme, { colors } from "../../../constants/colors"
-import { StatusBar, StyleProp, TextStyle, View, ViewStyle, useColorScheme } from "react-native"
+import { StyleProp, TextStyle, View, ViewStyle, useColorScheme } from "react-native"
 import { SafeAreaView } from "react-native-safe-area-context"
-
 import AuthContext from "../../../contexts/Auth"
 import AuthTermsText from "../../../components/auth/terms"
 import ButtonClose from "../../../components/buttons/close"
 import ButtonStandart from "../../../components/buttons/button-standart"
-import Icon from "@/assets/icons/svgs/arrow_circle_right.svg"
 import { LinearGradient } from "expo-linear-gradient"
 import { Loading } from "../../../components/loading"
 import PasswordInput from "../../../components/auth/passwordInput"
@@ -62,7 +60,6 @@ export default function SignInScreen() {
 
     const input_container: ViewStyle = {
         alignItems: "center",
-        maxWidth: sizes.screens.width * 0.4,
         paddingBottom: sizes.paddings["1xl"] * 0.8,
         backgroundColor: "transparent",
     }
@@ -214,7 +211,6 @@ export default function SignInScreen() {
 
     return (
         <SafeAreaView style={container} edges={["top", "bottom"]}>
-            <StatusBar backgroundColor={colors.gray.black} barStyle={"light-content"} />
             <LinearGradient
                 renderToHardwareTextureAndroid
                 colors={["rgba(70, 70, 70, 1)", "#000000ff"]}

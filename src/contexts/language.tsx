@@ -1,11 +1,11 @@
-import { LanguageType, LanguagesCodesType, LanguagesListType } from "../../locales/LanguageTypes"
-import i18n, { languageResources } from "../../locales/i18n"
+import { LanguageType, LanguagesCodesType, LanguagesListType } from "@/locales/LanguageTypes"
+import i18n, { languageResources } from "@/locales/i18n"
 
 import React from "react"
 import { useTranslation } from "react-i18next"
-import { languagesList } from "../../locales/languagesList"
-import { useSetAppLanguageMutation } from "../../state/queries/preferences-language"
-import PersistedContext from "../Persisted"
+import { languagesList } from "@/locales/languagesList"
+import { useSetAppLanguageMutation } from "@/queries/preferences.language"
+import PersistedContext from "./Persisted"
 
 type LanguageProviderProps = { children: React.ReactNode }
 type languageContextData = {

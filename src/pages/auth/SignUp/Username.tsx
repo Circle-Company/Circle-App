@@ -1,7 +1,6 @@
 import ColorTheme, { colors } from "@/constants/colors"
-import { StatusBar, View, useColorScheme } from "react-native"
+import { View, useColorScheme } from "react-native"
 import { SafeAreaView } from "react-native-safe-area-context"
-
 import AuthContext from "@/contexts/Auth"
 import ButtonClose from "@/components/buttons/close"
 import ButtonStandart from "@/components/buttons/button-standart"
@@ -105,7 +104,6 @@ export default function UsernameScreen() {
 
     return (
         <SafeAreaView style={container} edges={["top", "bottom"]}>
-            <StatusBar backgroundColor={colors.gray.black} barStyle={"light-content"} />
             <LinearGradient
                 renderToHardwareTextureAndroid
                 colors={["rgba(70, 70, 70, 1)", "#000000ff"]}

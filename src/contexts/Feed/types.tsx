@@ -1,7 +1,5 @@
-import { LanguagesCodesType } from "../../locales/LanguageTypes"
-import { MomentUserActionsProps } from "../../components/moment/context/types"
 import React from "react"
-import { TagProps } from "../newMoment"
+import { CommentObject } from "@/components/comment/comments-types"
 
 export interface User {
     id: string
@@ -18,37 +16,27 @@ export interface TopComment {
     user: {
         id: string
         username: string
-        profilePicture?: string
+        profilePicture: string
         verified?: boolean
-        isFollowing?: boolean
+        you_follow?: boolean
     }
-    sentiment?: string
-    likesCount: number
-    createdAt?: string
+    sentiment: string
+    createdAt: string
 }
-export interface MomentProps {
+
+export interface Moment {
     id: string
-    user: User
-    description?: string
-    content_type: "IMAGE" | "VIDEO"
-    midia: {
-        content_type: "IMAGE" | "VIDEO"
-        nhd_thumbnail: string
-        fullhd_resolution: string
-        nhd_resolution: string
+    user: {
+        id: string
+        username: string
+        profilePicture: string
     }
-    comments_count: number
-    likes_count: number
-    isLiked: boolean
-    deleted: boolean
-    created_at: string
-    lastComment?: TopComment
     media: string
     thumbnail: string
-    topComment?: TopComment
     duration: number
     size: string
     hasAudio: boolean
+    description: string
     ageRestriction: boolean
     contentWarning: boolean
     metrics: {
@@ -56,16 +44,15 @@ export interface MomentProps {
         totalLikes: number
         totalComments: number
     }
+    topComment?: CommentObject
+    isLiked?: boolean
     publishedAt: string
 }
 
-export type InteractionProps = {
-    id: number
-    tags: TagProps[]
-    duration: number
-    type: "IMAGE" | "VIDEO"
-    language: LanguagesCodesType
-    interaction: MomentUserActionsProps
+export type FeedResponse = {
+    success: boolean
+    moments: Moment[]
+    total: number
 }
 
 export type FeedProviderProps = {

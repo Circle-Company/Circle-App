@@ -1,15 +1,10 @@
-import { AccountState, useAccountStore } from "./persistedAccount"
-import { DeviceDataType, SessionDataType } from "./types"
-import { DeviceMetadataState, useDeviceMetadataStore } from "./persistedDeviceMetadata"
-import { HistoryState, useHistoryStore } from "./persistedHistory"
-import { PermissionsState, usePermissionsStore } from "./persistedPermissions"
-import { PreferencesState, usePreferencesStore } from "./persistedPreferences"
 import React, { useCallback, useEffect } from "react"
-import { StatisticsState, useStatisticsStore } from "./persistedStatistics"
-import { UserState, useUserStore } from "./persistedUser"
+import AuthContext from "../auth"
 
-import AuthContext from "../Auth/index"
-import { refreshJwtToken } from "../../lib/hooks/useRefreshJwtToken"
+import { AccountState, useAccountStore } from "./persist.account"
+import { PreferencesState, usePreferencesStore } from "./persist.preferences"
+import { MetricsState, useMetricsStore } from "./persist.metrics"
+import { UserState, useUserStore } from "./persist.user"
 
 type PersistedProviderProps = { children: React.ReactNode }
 export type PersistedContextProps = {
@@ -17,213 +12,187 @@ export type PersistedContextProps = {
         user: UserState
         account: AccountState
         preferences: PreferencesState
-        statistics: StatisticsState
-        history: HistoryState
+        metrics: MetricsState
     }
-    device: DeviceDataType
+    injectAuthSession: (session: any) => Promise<void>
 }
 
 const PersistedContext = React.createContext<PersistedContextProps>({} as PersistedContextProps)
 
 export function Provider({ children }: PersistedProviderProps) {
-    const { sessionData, signOut, checkIsSigned, signIn, signUp } = React.useContext(AuthContext)
+    const { sessionData, signOut, checkIsSigned } = React.useContext(AuthContext)
 
     const sessionUser = useUserStore()
     const sessionAccount = useAccountStore()
     const sessionPreferences = usePreferencesStore()
-    const sessionStatistics = useStatisticsStore()
-    const sessionHistory = useHistoryStore()
-    const devicePermissions = usePermissionsStore()
-    const deviceMetadata = useDeviceMetadataStore()
+    const sessionMetrics = useMetricsStore()
 
-    // Função para sincronizar dados de sessão com as stores
+    // Normaliza e persiste os dados de sessão nas stores
     const syncSessionData = useCallback(
-        async (session: SessionDataType) => {
+        async (session: any) => {
             try {
-                console.log("🔄 Sincronizando dados de sessão...")
-
-                // Sincronizar dados do usuário
-                if (session.user) {
-                    sessionUser.set(session.user)
-                    console.log("✅ Usuário sincronizado")
+                // User
+                if (session?.user) {
+                    const status = session?.status ?? {}
+                    const u = session.user
+                    sessionUser.set({
+                        id: u.id,
+                        username: u.username,
+                        name: u.name ?? "",
+                        description: u.description ?? "",
+                        richDescription: "",
+                        isVerified: Boolean(status.verified),
+                        isActive: !Boolean(status.deleted) && !Boolean(status.blocked),
+                        profilePicture: u.profilePicture ?? null,
+                    })
                 }
 
-                // Sincronizar dados da conta
-                if (session.account) {
-                    sessionAccount.set(session.account)
-                    console.log("✅ Conta sincronizada")
+                // Account (JWT e termos)
+                if (session?.token || session?.refreshToken || session?.status) {
+                    const status = session?.status ?? {}
+                    const terms = session?.terms ?? {}
+                    sessionAccount.set({
+                        jwtToken: session?.token ?? "",
+                        jwtExpiration: "",
+                        refreshToken: session?.refreshToken,
+                        blocked: Boolean(status.blocked),
+                        accessLevel: String(status.accessLevel || ""),
+                        verified: Boolean(status.verified),
+                        deleted: Boolean(status.deleted),
+                        terms: {
+                            agreed: Boolean(terms.termsAndConditionsAgreed ?? false),
+                            version: String(terms.termsAndConditionsAgreedVersion ?? ""),
+                            agreedAt: String(terms.termsAndConditionsAgreedAt ?? ""),
+                        },
+                    })
                 }
 
-                // Sincronizar preferências
-                if (session.preferences) {
-                    sessionPreferences.set(session.preferences)
-                    console.log("✅ Preferências sincronizadas")
+                // Preferences (app e notificações)
+                if (session?.preferences?.app) {
+                    const app = session.preferences.app
+
+                    sessionPreferences.set({
+                        appTimezone: Number(app.timezone ?? 0),
+                        timezoneCode: String(app.timezoneCode ?? ""),
+                        language: {
+                            appLanguage: String(app.language ?? "en"),
+                            translationLanguage: String(app.language ?? "en"),
+                        },
+                        content: {
+                            disableAutoplay: !Boolean(app.enableAutoplayFeed),
+                            disableHaptics: !Boolean(app.enableHapticFeedback),
+                            disableTranslation: false,
+                            muteAudio: false,
+                        },
+                        pushNotifications: {},
+                    })
                 }
 
-                // Sincronizar estatísticas
-                if (session.statistics) {
-                    sessionStatistics.set(session.statistics)
-                    console.log("✅ Estatísticas sincronizadas")
+                // Metrics
+                if (session?.metrics) {
+                    const m = session.metrics
+                    sessionMetrics.set({
+                        totalFollowers: Number(m.totalFollowers ?? 0),
+                        totalFollowing: Number(m.totalFollowing ?? 0),
+                        totalLikesReceived: Number(m.totalLikesReceived ?? 0),
+                        totalViewsReceived: Number(m.totalViewsReceived ?? 0),
+                        followerGrowthRate30d: Number(m.followerGrowthRate30d ?? 0),
+                        engagementGrowthRate30d: Number(m.engagementGrowthRate30d ?? 0),
+                        interactionsGrowthRate30d: Number(m.interactionsGrowthRate30d ?? 0),
+                    })
                 }
-
-                // Sincronizar histórico
-                if (session.history) {
-                    sessionHistory.set(session.history)
-                    console.log("✅ Histórico sincronizado")
-                }
-
-                // Atualizar metadados do dispositivo
-                try {
-                    await deviceMetadata.updateAll()
-                    console.log("✅ Metadados do dispositivo atualizados")
-                } catch (error) {
-                    console.warn("⚠️ Erro ao atualizar metadados:", error)
-                }
-
-                console.log("✅ Sincronização concluída com sucesso")
             } catch (error) {
                 console.error("❌ Erro na sincronização:", error)
                 throw error
             }
         },
-        [
-            sessionUser,
-            sessionAccount,
-            sessionPreferences,
-            sessionStatistics,
-            sessionHistory,
-            deviceMetadata,
-        ],
+        [sessionUser, sessionAccount, sessionPreferences, sessionMetrics],
     )
 
-    // Função para limpar todas as stores
+    // Limpa todas as stores (logout ou sessão inválida)
     const clearAllStores = useCallback(() => {
         try {
-            console.log("🧹 Limpando todas as stores...")
-
             sessionUser.remove()
             sessionAccount.remove()
             sessionPreferences.remove()
-            sessionStatistics.remove()
-            sessionHistory.remove()
-
-            console.log("✅ Stores limpas com sucesso")
-            console.log("🔍 Verificando se sessionUser.id foi zerado:", sessionUser.id)
+            sessionMetrics.remove()
         } catch (error) {
             console.error("❌ Erro ao limpar stores:", error)
         }
-    }, [sessionUser, sessionAccount, sessionPreferences, sessionStatistics, sessionHistory])
+    }, [sessionUser, sessionAccount, sessionPreferences, sessionMetrics])
 
     // Sincronizar dados quando sessionData mudar (controle para evitar loop)
-    const [hasSynced, setHasSynced] = React.useState(false)
     const sessionDataRef = React.useRef<string>("")
 
     useEffect(() => {
-        // Criar uma chave única para identificar se os dados mudaram
+        // Chave de sincronização baseada em user.id + token
         const sessionKey = sessionData
-            ? `${sessionData.user?.id}-${sessionData.account?.jwtToken?.substring(0, 20)}`
+            ? `${(sessionData as any)?.user?.id}-${(sessionData as any)?.token?.substring(0, 20)}`
             : ""
 
-        // Só sincroniza se houver sessionData E se for diferente da última sincronização
-        if (
-            sessionData &&
-            sessionData.user &&
-            sessionData.account &&
-            sessionKey !== sessionDataRef.current
-        ) {
-            console.log("🔄 Nova sessão detectada, sincronizando...")
+        // Evita sincronizações redundantes
+        if (sessionData && (sessionData as any)?.user && sessionKey !== sessionDataRef.current) {
             sessionDataRef.current = sessionKey
 
-            syncSessionData(sessionData).catch((error) => {
-                console.error("❌ Falha na sincronização automática:", error)
-                // Em caso de falha na sincronização, fazer logout
+            syncSessionData(sessionData).catch(() => {
                 signOut()
             })
         }
     }, [sessionData])
 
-    // Configurar permissões e refresh token na inicialização (controle para evitar loop)
-    const [hasInitialized, setHasInitialized] = React.useState(false)
-
-    useEffect(() => {
-        const initializeDevice = async () => {
-            // Só inicializa uma vez
-            if (hasInitialized) {
-                return
-            }
-
-            try {
-                console.log("🚀 Inicializando dispositivo...")
-
-                // Configurar permissões padrão
-                devicePermissions.set({
-                    postNotifications: false,
-                    firebaseMessaging: false,
-                })
-
-                // Tentar fazer refresh do token se houver dados de usuário
-                if (sessionUser.id && sessionAccount.jwtToken) {
-                    try {
-                        await refreshJwtToken(
-                            { username: sessionUser.username, id: sessionUser.id },
-                            sessionAccount,
-                        )
-                        console.log("✅ Token atualizado com sucesso")
-                    } catch (error) {
-                        console.warn("⚠️ Erro ao atualizar token:", error)
-                        // Se não conseguir atualizar o token, verificar se ainda é válido
-                        if (!checkIsSigned()) {
-                            console.log("⚠️ Token inválido, fazendo logout")
-                            signOut()
-                        }
-                    }
-                }
-
-                console.log("✅ Dispositivo inicializado")
-                setHasInitialized(true)
-            } catch (error) {
-                console.error("❌ Erro na inicialização do dispositivo:", error)
-            }
-        }
-
-        initializeDevice()
-    }, []) // Array vazio para executar apenas uma vez ao montar
-
-    // Limpar stores quando fizer logout (controle para evitar loop)
+    // Garante limpeza das stores quando o usuário sai
     const [hasCleaned, setHasCleaned] = React.useState(false)
 
     useEffect(() => {
         const isSigned = checkIsSigned()
-        console.log(`🔍 [PersistedProvider] Verificando limpeza:`, {
-            isSigned,
-            sessionUserId: sessionUser.id,
-            hasCleaned,
-        })
 
         if (!isSigned && sessionUser.id && !hasCleaned) {
-            console.log("🧹 [PersistedProvider] Iniciando limpeza de stores...")
             clearAllStores()
             setHasCleaned(true)
-            console.log("✅ [PersistedProvider] Flag de limpeza marcado como true")
         }
         if (isSigned && hasCleaned) {
-            console.log("🔄 [PersistedProvider] Usuário logado, resetando flag de limpeza")
-            setHasCleaned(false) // Reset flag ao logar novamente
+            setHasCleaned(false)
         }
     }, [sessionUser.id, checkIsSigned, clearAllStores, hasCleaned])
+
+    const injectAuthSession = useCallback(
+        async (payload: any) => {
+            // Normaliza o payload de autenticação (quando for o formato bruto)
+            const raw = payload && (payload as any).session ? (payload as any).session : null
+
+            const normalized = raw
+                ? {
+                      user: raw.user ?? {},
+                      token: raw.token ?? "",
+                      refreshToken: raw.refreshToken,
+                      status: raw.status ?? {},
+                      preferences: {
+                          app: {
+                              language: raw.preferences?.app?.language,
+                              timezone: raw.preferences?.app?.timezone,
+                              timezoneCode: raw.preferences?.app?.timezoneCode,
+                              enableAutoplayFeed: raw.preferences?.app?.enableAutoplayFeed,
+                              enableHapticFeedback: raw.preferences?.app?.enableHapticFeedback,
+                          },
+                      },
+                      metrics: raw.metrics ?? {},
+                      terms: raw.terms ?? {},
+                  }
+                : payload
+
+            await syncSessionData(normalized)
+        },
+        [syncSessionData],
+    )
 
     const contextValue: PersistedContextProps = {
         session: {
             user: sessionUser,
             account: sessionAccount,
             preferences: sessionPreferences,
-            statistics: sessionStatistics,
-            history: sessionHistory,
+            metrics: sessionMetrics,
         },
-        device: {
-            permissions: devicePermissions,
-            metadata: deviceMetadata,
-        },
+        injectAuthSession,
     }
 
     return <PersistedContext.Provider value={contextValue}>{children}</PersistedContext.Provider>

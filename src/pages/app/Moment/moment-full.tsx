@@ -49,7 +49,7 @@ export default function MomentFullScreen() {
                 barStyle={"light-content"}
             />
             <RenderMomentFull
-                momentData={focusedMoment}
+                data={focusedMoment}
                 isFocused={true}
                 fromFeed={true}
                 fromAccount={false}

@@ -1,7 +1,7 @@
 import Icon from "@/assets/icons/svgs/check_circle.svg"
 import { useNavigation } from "@react-navigation/native"
 import React from "react"
-import { Keyboard, StatusBar, TextInput, useColorScheme } from "react-native"
+import { Keyboard, useColorScheme, ViewStyle } from "react-native"
 import { Text, View } from "../../../components/Themed"
 import ButtonStandart from "../../../components/buttons/button-standart"
 import ColorTheme, { colors } from "../../../constants/colors"
@@ -10,6 +10,9 @@ import sizes from "../../../constants/sizes"
 import PersistedContext from "../../../contexts/Persisted"
 import LanguageContext from "../../../contexts/Preferences/language"
 import api from "../../../services/Api"
+import Input from "@/components/general/input"
+import { TextStyle } from "react-native"
+import { textLib } from "@/shared/circle.text.library"
 
 export default function DescriptionScreen() {
     const { t } = React.useContext(LanguageContext)
@@ -25,15 +28,21 @@ export default function DescriptionScreen() {
     const input_width = sizes.screens.width
     const navigation = useNavigation()
 
-    const container = {
+    const descriptionCanBeEdited = React.useMemo(() => {
+        return (
+            description !== session.user.description &&
+            description.length <= maxLength &&
+            description.length > 0
+        )
+    }, [description, session.user.description])
+
+    const container: ViewStyle = {
         alignItems: "center",
         flex: 1,
     }
 
-    const input_container = {
+    const input_container: ViewStyle = {
         width: input_width,
-        borderBottomWidth: sizes.borders["1md"],
-        borderColor: ColorTheme().backgroundDisabled,
         paddingVertical: sizes.paddings["1sm"],
         paddingHorizontal: sizes.paddings["1md"] * 0.7,
         alignItems: "flex-start",
@@ -41,49 +50,42 @@ export default function DescriptionScreen() {
         justifyContent: "flex-start",
     }
 
-    const input_style = {
+    const input_style: TextStyle = {
         top: 2,
-        alignSelf: "flex-start",
-        fontFamily: fonts.family.Semibold,
+        fontFamily: fonts.family.Medium,
         width: input_width - sizes.paddings["1md"] * 0.7 * 2,
+        borderRadius: sizes.borderRadius["1md"],
+        paddingVertical: sizes.paddings["2sm"],
+        paddingHorizontal: sizes.paddings["1md"],
+        minHeight: sizes.screens.height * 0.1,
+        maxHeight: sizes.screens.height * 0.4,
     }
-    const bottom_style = {
+    const bottom_style: ViewStyle = {
         width: sizes.screens.width,
-        height: sizes.headers.height * 0.8,
+        marginTop: sizes.margins["1sm"],
         alignItems: "center",
         justifyContent: "center",
         flexDirection: "row",
-        borderBottomWidth: sizes.borders["1md"],
-        borderColor: ColorTheme().backgroundDisabled,
-        paddingHorizontal: sizes.paddings["1md"] * 0.7,
+        paddingHorizontal: sizes.paddings["1md"],
     }
 
-    const counter = {
+    const counter: TextStyle = {
         fontSize: fonts.size.caption1,
         color: maxLength == description.length ? ColorTheme().error : ColorTheme().textDisabled,
     }
 
-    const legend_style = {
+    const legend_style: TextStyle = {
         alignSelf: "center",
-        fontSize: fonts.size.caption2,
+        fontSize: fonts.size.caption1,
         fontFamily: fonts.family.Medium,
         color: ColorTheme().textDisabled,
         flex: 1,
     }
 
-    const button_text = {
-        fontSize: fonts.size.body * 0.9,
-        fontFamily: fonts.family.Semibold,
-        color: description
-            ? colors.gray.white
-            : isDarkMode
-            ? colors.gray.grey_04 + "90"
-            : colors.gray.grey_04 + "90",
-    }
-
-    const icon = {
-        marginLeft: sizes.margins["2sm"],
-        top: 0.4,
+    const button_text: TextStyle = {
+        fontSize: fonts.size.body,
+        fontFamily: fonts.family["Black-Italic"],
+        color: descriptionCanBeEdited ? colors.gray.black : colors.gray.grey_04 + "90",
     }
 
     React.useEffect(() => {
@@ -105,19 +107,22 @@ export default function DescriptionScreen() {
     }
 
     async function handlePress() {
-        if (description) {
+        if (descriptionCanBeEdited) {
             try {
                 await api
                     .put(
-                        "/account/edit/description",
+                        "/account/description",
                         {
-                            user_id: session.user.id,
-                            description,
+                            description: textLib.rich.formatToEnriched(description),
                         },
                         { headers: { Authorization: session.account.jwtToken } },
                     )
                     .finally(() => {
-                        session.user.get(session.user.id)
+                        session.user.set({
+                            ...session.user,
+                            description,
+                            richDescription: textLib.rich.formatToEnriched(description),
+                        })
                         setDescription("")
                         navigation.goBack()
                     })
@@ -129,13 +134,9 @@ export default function DescriptionScreen() {
 
     return (
         <View style={container}>
-            <StatusBar
-                backgroundColor={String(ColorTheme().background)}
-                barStyle={isDarkMode ? "light-content" : "dark-content"}
-            />
             <View style={{ paddingBottom: sizes.paddings["2md"] }}>
                 <View style={input_container}>
-                    <TextInput
+                    <Input
                         value={description}
                         textAlignVertical="top"
                         multiline={true}
@@ -143,6 +144,7 @@ export default function DescriptionScreen() {
                         keyboardType="twitter"
                         onChangeText={handleInputChange}
                         maxLength={300}
+                        autoFocus={true}
                         numberOfLines={5}
                         style={input_style}
                         placeholder={t("say something about you") + "..."}
@@ -161,28 +163,16 @@ export default function DescriptionScreen() {
 
             <ButtonStandart
                 margins={false}
-                width={sizes.buttons.width / 3.5}
                 height={40}
                 action={handlePress}
+                style={{ minWidth: sizes.buttons.width * 0.3 }}
                 backgroundColor={
-                    description
-                        ? ColorTheme().primary.toString()
+                    descriptionCanBeEdited
+                        ? colors.gray.white
                         : ColorTheme().backgroundDisabled.toString()
                 }
             >
-                <Text style={button_text}>{t("Done")}</Text>
-                <Icon
-                    style={icon}
-                    fill={String(
-                        description
-                            ? colors.gray.white
-                            : isDarkMode
-                            ? colors.gray.grey_04 + "90"
-                            : colors.gray.grey_04 + "90",
-                    )}
-                    width={17}
-                    height={17}
-                />
+                <Text style={button_text}>{t("Update")}</Text>
             </ButtonStandart>
         </View>
     )

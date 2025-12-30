@@ -4,7 +4,7 @@ import NetInfo from "@react-native-community/netinfo"
 import React, { ReactNode, createContext, useContext, useEffect, useState } from "react"
 import { useToast } from "./Toast"
 import { colors } from "../constants/colors"
-import LanguageContext from "./Preferences/language"
+import LanguageContext from "./language"
 
 type NetworkProviderProps = { children: ReactNode }
 

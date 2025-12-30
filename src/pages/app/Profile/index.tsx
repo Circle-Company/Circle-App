@@ -7,9 +7,9 @@ import ProfileHeader from "../../../components/headers/profile/profile-header"
 import React from "react"
 import RenderProfile from "../../../features/render-profile"
 import { RenderProfileSkeleton } from "../../../features/render-profile/skeleton"
-import ViewProfileContext from "../../../contexts/viewProfile"
 import { colors } from "../../../constants/colors"
 import sizes from "../../../constants/sizes"
+import ProfileContext from "@/contexts/profile"
 
 type ProfileScreenRouteParams = {
     findedUserPk: string
@@ -18,13 +18,28 @@ type ProfileScreenRouteParams = {
 type ProfileScreenRouteProp = RouteProp<{ Profile: ProfileScreenRouteParams }, "Profile">
 
 export default function ProfileScreen() {
-    const { useUserProfile } = React.useContext(ViewProfileContext)
+    const { getUser, user } = React.useContext(ProfileContext)
+    const [isLoading, setIsLoading] = React.useState(true)
     const route = useRoute<ProfileScreenRouteProp>()
+
+    async function handleGetProfile() {
+        await getUser(route.params.findedUserPk)
+            .then(() => {
+                setIsLoading(false)
+            })
+            .catch((error) => {
+                console.error("Erro ao buscar perfil:", error)
+                setIsLoading(false)
+            })
+            .finally(() => {
+                setIsLoading(false)
+            })
+    }
     // Se não existir o parâmetro, pode exibir uma mensagem de erro ou redirecionar
 
-    const { data, isLoading, isRefetching, refetch, isFetched } = useUserProfile(
-        route.params.findedUserPk,
-    )
+    React.useEffect(() => {
+        handleGetProfile()
+    }, [route.params.findedUserPk])
 
     const container: ViewStyle = {
         top: 0,
@@ -32,19 +47,15 @@ export default function ProfileScreen() {
         overflow: "hidden" as const,
     }
 
-    React.useEffect(() => {
-        refetch
-    }, [])
-
     const handleRefresh = async () => {
         try {
-            await refetch()
+            await handleGetProfile()
         } catch (error) {
             console.error("Erro ao atualizar o perfil:", error)
         }
     }
 
-    if (isLoading || !isFetched || !data) {
+    if (isLoading || !user) {
         return (
             <View style={container}>
                 <ProfileHeader />
@@ -52,15 +63,6 @@ export default function ProfileScreen() {
             </View>
         )
     } else {
-        // Garantir que o profile_picture tem o formato correto
-        const userData = {
-            ...data,
-            profile_picture: {
-                ...data.profile_picture,
-                small_resolution: data.profile_picture.tiny_resolution,
-            },
-        }
-
         return (
             <View style={container}>
                 <ProfileHeader />
@@ -74,7 +76,7 @@ export default function ProfileScreen() {
                         <CircleIcon width={26} height={26} fill={colors.gray.grey_06} />
                     )}
                 >
-                    <RenderProfile user={userData} />
+                    <RenderProfile user={user as any} />
                 </AnimatedVerticalScrollView>
             </View>
         )

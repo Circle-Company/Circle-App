@@ -1,7 +1,5 @@
 import ColorTheme, { colors } from "@/constants/colors"
 import { StyleProp, TextStyle, View, ViewStyle, useColorScheme } from "react-native"
-import StatusBar from "../../../components/StatusBar"
-
 import AuthContext from "@/contexts/Auth"
 import AuthTermsText from "@/components/auth/terms"
 import ButtonClose from "@/components/buttons/close"
@@ -113,7 +111,6 @@ export default function AgreeScreen() {
 
     return (
         <View style={container}>
-            <StatusBar backgroundColor={colors.gray.black} barStyle="light-content" />
             <LinearGradient
                 renderToHardwareTextureAndroid
                 colors={["rgba(70, 70, 70, 1)", "#000000ff"]}

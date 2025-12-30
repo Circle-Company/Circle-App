@@ -1,5 +1,5 @@
 // feedOrchestrator.ts
-import { InteractionProps, MomentProps } from "@/contexts/Feed/types"
+import { Moment } from "@/contexts/Feed/types"
 
 import { CacheManager } from "@/contexts/Feed/classes/cacheManager"
 import { ChunkManager } from "@/contexts/Feed/classes/chunkManager"
@@ -8,7 +8,7 @@ import { Fetcher } from "@/contexts/Feed/classes/fetcher"
 import { mapper } from "@/contexts/Feed/helpers/mapper"
 
 export type FeedResponse = {
-    newFeed: MomentProps[]
+    newFeed: Moment[]
     addedChunk: string[] // ids added or full new set on RESET
 }
 
@@ -28,7 +28,7 @@ export class FeedOrchestrator {
     /**
      * Orquestra a lógica principal do feed.
      */
-    public async fetch(currentFeed: MomentProps[], isReloading = false): Promise<FeedResponse> {
+    public async fetch(currentFeed: Moment[], isReloading = false): Promise<FeedResponse> {
         console.log("🔍 Fetch feed function called...")
         if (!this.debounceGate.canProceed()) {
             return { newFeed: currentFeed, addedChunk: [] }
@@ -61,7 +61,7 @@ export class FeedOrchestrator {
         return { newFeed: currentFeed, addedChunk: [] }
     }
 
-    public async remove(id: string, currentFeed: MomentProps[]): Promise<FeedResponse> {
+    public async remove(id: string, currentFeed: Moment[]): Promise<FeedResponse> {
         const { updatedList } = this.chunkManager.apply("REMOVE", [id])
 
         try {
@@ -74,10 +74,10 @@ export class FeedOrchestrator {
         return { newFeed, addedChunk: [] }
     }
 
-    public preload(ids: string[], moments: MomentProps[]) {
+    public preload(ids: string[], moments: Moment[]) {
         for (const id of ids) {
             const m = moments.find((mm) => mm.id === id)
-            const url = m?.media || m?.midia?.fullhd_resolution
+            const url = m?.media
             if (!url) continue
             this.cacheManager.preload({ id, url }).catch((e) => {
                 console.warn("video preload failed", e)

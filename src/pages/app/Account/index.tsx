@@ -1,17 +1,16 @@
-import AccountContext from "../../../contexts/account"
-import { AnimatedVerticalScrollView } from "../../../lib/hooks/useAnimatedScrollView"
-import PersistedContext from "../../../contexts/Persisted"
-import React, { useState, useEffect } from "react"
-import RenderProfile from "../../../features/render-profile"
-import { RenderProfileSkeleton } from "../../../features/render-profile/skeleton"
-import { View } from "../../../components/Themed"
-import { colors } from "../../../constants/colors"
-import { useAccountQuery, useAccountMomentsQuery } from "../../../state/queries"
-import Animated, { FadeIn, FadeOut } from "react-native-reanimated"
-import { LinearGradient } from "expo-linear-gradient"
-import sizes from "@/constants/sizes"
-import { isIOS } from "@/lib/platform/detection"
 import { ScrollView } from "react-native"
+import React, { useState, useEffect } from "react"
+
+import AccountContext from "@/contexts/account"
+import PersistedContext from "@/contexts/Persisted"
+
+import { AnimatedVerticalScrollView } from "@/lib/hooks/useAnimatedScrollView"
+import { RenderProfileSkeleton } from "@/features/render-profile/skeleton"
+import { useAccountQuery, useAccountMomentsQuery } from "@/state/queries"
+import RenderProfile from "@/features/render-profile"
+import { colors } from "@/constants/colors"
+import { View } from "@/components/Themed"
+import sizes from "@/constants/sizes"
 
 export default function AccountScreen() {
     const { setRefreshing } = React.useContext(AccountContext)
@@ -82,22 +81,24 @@ export default function AccountScreen() {
                 description: accountData.description,
                 richDescription: accountData.description,
                 isVerified: accountData.status.verified,
-                isActive: true,
                 profilePicture: accountData.profilePicture,
             })
 
             // Update statistics
-            session.statistics.set({
-                total_followers_num: 104,
-                total_likes_num: accountData.metrics.totalLikesReceived,
-                total_views_num: accountData.metrics.totalViewsReceived,
+            session.metrics.set({
+                totalFollowers: accountData.metrics.totalFollowers ?? 0,
+                totalFollowing: accountData.metrics.totalFollowing ?? 0,
+                totalLikesReceived: accountData.metrics.totalLikesReceived,
+                totalViewsReceived: accountData.metrics.totalViewsReceived,
+                followerGrowthRate30d: accountData.metrics.followerGrowthRate30d ?? 0,
+                engagementGrowthRate30d: accountData.metrics.engagementGrowthRate30d ?? 0,
+                interactionsGrowthRate30d: accountData.metrics.interactionsGrowthRate30d ?? 0,
             })
         }
     }, [accountData])
 
     useEffect(() => {
         if (momentsData) {
-            // Save moments and total to persisted account
             session.account.setMoments(momentsData.moments)
             session.account.setTotalMoments(momentsData.pagination.total)
         }

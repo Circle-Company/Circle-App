@@ -103,7 +103,6 @@ export const ROUTES = {
         MOMENTS: "/(tabs)/moments",
         CREATE: "/(tabs)/create",
         YOU: "/(tabs)/you",
-        YOU_EDIT: "/(tabs)/you/edit",
     },
 
     // Camera routes (inside create tab)
@@ -111,15 +110,6 @@ export const ROUTES = {
         INDEX: "/(tabs)/create",
         PERMISSIONS: "/(tabs)/create/permissions",
         MEDIA: "/(tabs)/create/media",
-    },
-
-    // Moment routes
-    MOMENT: {
-        DETAIL: (id: string) => `/moment/${id}`,
-        NEW_GALLERY: "/moment/new-gallery",
-        NEW_IMAGE: "/moment/new-image",
-        NEW_CAMERA: "/moment/new-camera",
-        NEW_DESCRIPTION: "/moment/new-description",
     },
 
     // Profile routes
@@ -138,8 +128,6 @@ export const ROUTES = {
         PRIVACY_POLICY: "/settings/privacy-policy",
         TERMS_OF_SERVICE: "/settings/terms-of-service",
         COMMUNITY_GUIDELINES: "/settings/community-guidelines",
-        PUSH_NOTIFICATIONS: "/settings/push-notifications",
-        ALL_MOMENTS: "/settings/all-moments",
         PREFERENCES: "/settings/preferences",
         LANGUAGE: "/settings/language",
         CONTENT: "/settings/content",

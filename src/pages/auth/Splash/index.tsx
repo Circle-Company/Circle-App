@@ -1,7 +1,6 @@
-import ColorTheme, { colors } from "@/constants/colors"
+import { colors } from "@/constants/colors"
 import { default as Fonts, default as fonts } from "@/constants/fonts"
 import { ViewStyle } from "react-native"
-import StatusBar from "../../../components/StatusBar"
 import { View } from "react-native"
 import Button from "@/components/buttons/button-standart"
 import Icon from "@/assets/icons/svgs/arrow_circle_right.svg"
@@ -125,7 +124,6 @@ export default function SplashScreen() {
 
     return (
         <View style={container}>
-            <StatusBar barStyle={"light-content"} translucent backgroundColor={"transparent"} />
             <LinearGradient
                 renderToHardwareTextureAndroid
                 colors={["rgba(42, 42, 42, 1)", "#00000000"]}

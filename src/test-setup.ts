@@ -129,9 +129,13 @@ vi.mock("@/store", () => ({
             deviceType: "deviceType",
         },
         statistics: {
-            total_followers: "statistics.total_followers",
-            total_likes: "statistics.total_likes",
-            total_views: "statistics.total_views",
+            totalFollowers: "statistics.totalFollowers",
+            totalFollowing: "statistics.totalFollowing",
+            totalLikes: "statistics.totalLikes",
+            totalViews: "statistics.totalViews",
+            followerGrowthRate30d: "statistics.followerGrowthRate30d",
+            engagementGrowthRate30d: "statistics.engagementGrowthRate30d",
+            interactionsGrowthRate30d: "statistics.interactionsGrowthRate30d",
         },
         preferences: {
             primaryLanguage: "preferences.primaryLanguage",

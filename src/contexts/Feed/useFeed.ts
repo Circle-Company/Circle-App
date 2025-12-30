@@ -1,8 +1,8 @@
-import { InteractionProps, MomentProps } from "@/contexts/Feed/types"
+import { Moment } from "@/contexts/Feed/types"
 import React, { useCallback, useMemo, useState } from "react"
 
 import { FeedOrchestrator } from "@/contexts/Feed/classes/orchestrator"
-import { MomentDataProps } from "@/components/moment/context/types"
+import { dataProps } from "@/components/moment/context/types"
 import PersistedContext from "@/contexts/Persisted"
 import { useCalculeCacheMaxSize } from "@/contexts/Feed/helpers/calculeCacheMaxSize"
 import { useTimer } from "@/lib/hooks/useTimer"
@@ -10,16 +10,15 @@ import { useTimer } from "@/lib/hooks/useTimer"
 export const useFeed = () => {
     const { session } = React.useContext(PersistedContext)
 
-    const [feedData, setFeedData] = useState<MomentProps[]>([])
+    const [feedData, setFeedData] = useState<Moment[]>([])
     const [loading, setLoading] = useState(false)
     const [scrollEnabled, setScrollEnabled] = useState(true)
     const [focusedChunkItem, setFocusedChunkItem] = useState<{ id: string; index: number } | null>(
         null,
     )
     const [commentEnabled, setCommentEnabled] = useState(false)
-    const [focusedMoment, setFocusedMoment] = useState<MomentDataProps>({} as MomentDataProps)
+    const [focusedMoment, setFocusedMoment] = useState<dataProps>({} as dataProps)
     const [currentChunk, setCurrentChunk] = useState<string[]>([])
-    const [interactions, setInteractions] = useState<InteractionProps[]>([])
     const [period, setPeriod] = useState(0)
     const [keyboardVisible, setKeyboardVisible] = useState(false)
 
@@ -57,7 +56,6 @@ export const useFeed = () => {
 
                 setFeedData(newFeed)
                 setCurrentChunk(addedChunk)
-                setInteractions([])
             } catch (error) {
                 console.error("Erro ao buscar feed:", error)
             } finally {
@@ -65,7 +63,7 @@ export const useFeed = () => {
                 setLoading(false)
             }
         },
-        [feedData, interactions, session.user, period, resetTimer, feedOrchestrator],
+        [feedData, session.user, period, resetTimer, feedOrchestrator],
     )
 
     function setFocusedChunkItemFunc({ id }: { id: string }) {
@@ -118,7 +116,7 @@ export const useFeed = () => {
                 const moment = feedData.find((m) => m.id === momentId)
                 if (!moment) return null
 
-                const videoUrl = moment.media || moment.midia.fullhd_resolution
+                const videoUrl = moment.media
                 if (!videoUrl) return null
 
                 // Tentar carregar do cache primeiro
@@ -151,7 +149,7 @@ export const useFeed = () => {
             const nextMoment = feedData[nextIndex]
             if (!nextMoment) return
 
-            const videoUrl = nextMoment.media || nextMoment.midia.fullhd_resolution
+            const videoUrl = nextMoment.media
             if (!videoUrl) return
 
             try {
@@ -179,11 +177,9 @@ export const useFeed = () => {
         focusedChunkItem,
         focusedMoment,
         currentChunk,
-        interactions,
         commentEnabled,
         setCommentEnabled,
         setFocusedChunkItemFunc,
-        setInteractions,
         setFocusedMoment,
         setScrollEnabled,
         keyboardVisible,
