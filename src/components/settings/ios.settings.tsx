@@ -28,7 +28,10 @@ export function IosSettings() {
                     <Button variant="default" onPress={() => router.push("/(tabs)/settings/name")}>
                         Name
                     </Button>
-                    <Button variant="default" onPress={() => router.push("/settings/description")}>
+                    <Button
+                        variant="default"
+                        onPress={() => router.push("/(tabs)/settings/description")}
+                    >
                         Description
                     </Button>
                 </Section>
