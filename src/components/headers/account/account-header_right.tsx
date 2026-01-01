@@ -16,7 +16,7 @@ export default function AccountHeaderRight() {
 
     return (
         <View style={container}>
-            <ButtonStandart square margins={false} action={() => router.push("/settings")}>
+            <ButtonStandart square margins={false} action={() => router.push("/(tabs)/settings")}>
                 <Cog fill={String(ColorTheme().text)} width={22} height={22} />
             </ButtonStandart>
         </View>

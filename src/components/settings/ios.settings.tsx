@@ -21,11 +21,11 @@ export function IosSettings() {
                 <Section title="Public Profile">
                     <Button
                         variant="default"
-                        onPress={() => router.push("/settings/profile-picture")}
+                        onPress={() => router.push("/(tabs)/settings/profile-picture")}
                     >
                         Profile Picture
                     </Button>
-                    <Button variant="default" onPress={() => router.push("/settings/name")}>
+                    <Button variant="default" onPress={() => router.push("/(tabs)/settings/name")}>
                         Name
                     </Button>
                     <Button variant="default" onPress={() => router.push("/settings/description")}>
@@ -34,10 +34,16 @@ export function IosSettings() {
                 </Section>
 
                 <Section title="Account">
-                    <Button variant="default" onPress={() => router.push("/settings/preferences")}>
+                    <Button
+                        variant="default"
+                        onPress={() => router.push("/(tabs)/settings/preferences")}
+                    >
                         Preferences
                     </Button>
-                    <Button variant="default" onPress={() => router.push("/settings/password")}>
+                    <Button
+                        variant="default"
+                        onPress={() => router.push("/(tabs)/settings/password")}
+                    >
                         Password
                     </Button>
                 </Section>
@@ -105,32 +111,41 @@ export function IosSettings() {
                 <Section title="Legal">
                     <Button
                         variant="default"
-                        onPress={() => router.push("/settings/privacy-policy")}
+                        onPress={() => router.push("/(tabs)/settings/privacy-policy")}
                     >
                         Privacy Policy
                     </Button>
                     <Button
                         variant="default"
-                        onPress={() => router.push("/settings/terms-of-service")}
+                        onPress={() => router.push("/(tabs)/settings/terms-of-service")}
                     >
                         Terms of Service
                     </Button>
                     <Button
                         variant="default"
-                        onPress={() => router.push("/settings/community-guidelines")}
+                        onPress={() => router.push("/(tabs)/settings/community-guidelines")}
                     >
                         Community Guidelines
                     </Button>
                 </Section>
 
                 <Section title="More">
-                    <Button variant="default" onPress={() => router.push("/settings/version")}>
+                    <Button
+                        variant="default"
+                        onPress={() => router.push("/(tabs)/settings/version")}
+                    >
                         Version
                     </Button>
-                    <Button variant="default" onPress={() => router.push("/settings/support")}>
+                    <Button
+                        variant="default"
+                        onPress={() => router.push("/(tabs)/settings/support")}
+                    >
                         Support
                     </Button>
-                    <Button variant="default" onPress={() => router.push("/settings/log-out")}>
+                    <Button
+                        variant="default"
+                        onPress={() => router.push("/(tabs)/settings/log-out")}
+                    >
                         Log Out
                     </Button>
                 </Section>

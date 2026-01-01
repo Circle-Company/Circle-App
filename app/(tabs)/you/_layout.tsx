@@ -21,8 +21,6 @@ export default function YouLayout() {
                 contentStyle: {
                     backgroundColor,
                 },
-                statusBarAnimation: "fade",
-                statusBarStyle: "light",
                 headerTransparent: false,
                 headerShadowVisible: false,
                 headerStyle: {
@@ -42,19 +40,6 @@ export default function YouLayout() {
                         fontSize: Fonts.size.title2 * 0.9,
                         color: colors.gray.white,
                     },
-                    headerRight: () => (
-                        <Pressable
-                            onPress={() => router.push("/settings")}
-                            hitSlop={8}
-                            style={{
-                                paddingHorizontal: 8,
-                                alignItems: "center",
-                                justifyContent: "center",
-                            }}
-                        >
-                            <Cog fill={String(colors.gray.white)} width={20} height={20} />
-                        </Pressable>
-                    ),
                     headerTitle: session?.user?.username ? `@${session.user.username}` : "",
                 }}
             />
