@@ -202,6 +202,7 @@
     "Confirm": "Confirmar",
     "Log Out Anyway": "Deslogar Mesmo Assim",
     "Fetch Again": "Procurar Novamente",
+    "Back": "Voltar",
 
     "description": "descrição",
     "Tags": "Tags",
@@ -230,7 +231,7 @@
     "Memory": "Memória",
     "Memories": "Memórias",
     "Edit Memory": "Editar Memória",
-    "Settings": "Configurações",
+    "Settings": "Ajustes",
     "Add Profile Picture": "Nova Foto de Perfil",
     "Add Description": "Nova Descrição",
     "Add description": "Adicionar descrição",
@@ -266,6 +267,7 @@
     "See how it turned out": "Veja como ficou",
     "Recording": "Gravando",
     "Enter on Circle": "Entrar no Circle",
+    "Update": "Atualizar",
 
     "When your moment gets a like.": "Quando algum Moment seu receber uma curtida.",
     "When someone you follow posts a new Memory.": "Quando alguém que você segue postar uma nova Memória.",
@@ -326,5 +328,14 @@
     "auth.errors.tooManyRequests": "Muitas tentativas. Tente novamente mais tarde.",
     "auth.errors.network": "Erro de rede. Verifique sua conexão e tente novamente.",
     "auth.errors.generic": "Não foi possível fazer login. Tente novamente.",
-    "auth.errors.unknown": "Ocorreu um erro desconhecido."
+    "auth.errors.unknown": "Ocorreu um erro desconhecido.",
+    "Change Picture": "Alterar foto",
+    "Open Camera": "Abrir câmera",
+    "Choose from Library": "Escolher da galeria",
+    "Upload": "Enviar",
+    "Uploading": "Enviando",
+    "Permission to access the gallery is required": "Permissão para acessar a galeria é necessária",
+    "Failed to open the gallery": "Falha ao abrir a galeria",
+    "Permission to use the camera is required": "Permissão para usar a câmera é necessária",
+    "Failed to open the camera": "Falha ao abrir a câmera"
 }

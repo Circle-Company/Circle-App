@@ -1,4 +1,18 @@
-import ProfilePictureScreen from "@/pages/app/Settings/public.profile.picture"
+import { useNavigation } from "@react-navigation/native"
+import React from "react"
+import { Image, View, Platform, StyleSheet, Keyboard, ActionSheetIOS, Alert } from "react-native"
+import * as FileSystem from "expo-file-system"
+import * as ImagePicker from "expo-image-picker"
+import * as ImageManipulator from "expo-image-manipulator"
+import ButtonStandart from "@/components/buttons/button-standart"
+import { Loading } from "@/components/loading"
+import { Text } from "@/components/Themed"
+import ColorTheme, { colors } from "@/constants/colors"
+import fonts from "@/constants/fonts"
+import sizes from "@/constants/sizes"
+import PersistedContext from "@/contexts/Persisted"
+import api from "@/api"
+import LanguageContext from "@/contexts/language"
 
 export default function ProfilePictureScreen() {
     const { t } = React.useContext(LanguageContext)
@@ -6,18 +20,17 @@ export default function ProfilePictureScreen() {
     const [selectedAsset, setSelectedAsset] = React.useState<ImagePicker.ImagePickerAsset | null>(
         null,
     )
-    const { expand } = React.useContext(BottomSheetContext)
+
     const [loading, setLoading] = React.useState(false)
-    const [pickerVisible, setPickerVisible] = React.useState(false)
+
     const [error, setError] = React.useState<string | null>(null)
     const navigation = useNavigation()
-    const [isIOSSheetOpen, setIOSSheetOpen] = React.useState(false)
 
     async function pickFromLibrary() {
         try {
             const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync()
             if (status !== "granted") {
-                setError("Permissão para acessar a galeria é necessária.")
+                setError(t("Permission to access the gallery is required"))
                 return
             }
             const result = await ImagePicker.launchImageLibraryAsync({
@@ -25,15 +38,14 @@ export default function ProfilePictureScreen() {
                 allowsEditing: true,
                 aspect: [1, 1],
                 quality: 0.9,
-                base64: false,
+                base64: true,
             })
             if (!result.canceled && result.assets?.length) {
                 setSelectedAsset(result.assets[0])
-                setPickerVisible(false)
                 setError(null)
             }
         } catch (e: any) {
-            setError(e?.message ?? "Falha ao abrir a galeria.")
+            setError(e?.message ?? t("Failed to open the gallery"))
         }
     }
 
@@ -41,22 +53,21 @@ export default function ProfilePictureScreen() {
         try {
             const { status } = await ImagePicker.requestCameraPermissionsAsync()
             if (status !== "granted") {
-                setError("Permissão para usar a câmera é necessária.")
+                setError(t("Permission to use the camera is required"))
                 return
             }
             const result = await ImagePicker.launchCameraAsync({
                 allowsEditing: true,
                 aspect: [1, 1],
                 quality: 0.9,
-                base64: false,
+                base64: true,
             })
             if (!result.canceled && result.assets?.length) {
                 setSelectedAsset(result.assets[0])
-                setPickerVisible(false)
                 setError(null)
             }
         } catch (e: any) {
-            setError(e?.message ?? "Falha ao abrir a câmera.")
+            setError(e?.message ?? t("Failed to open the camera"))
         }
     }
 
@@ -70,30 +81,35 @@ export default function ProfilePictureScreen() {
         setError(null)
 
         try {
-            const imageBase64 = await FileSystem.readAsStringAsync(selectedAsset.uri, {
-                encoding: FileSystem.EncodingType.Base64,
+            console.log("ProfilePicture: converting to JPEG", { uri: selectedAsset.uri })
+            const manipulated = await ImageManipulator.manipulateAsync(selectedAsset.uri, [], {
+                compress: 0.9,
+                format: ImageManipulator.SaveFormat.JPEG,
+                base64: true,
             })
+            const imageBase64 = manipulated.base64 || ""
+            console.log("ProfilePicture: converted to base64", { length: imageBase64.length })
 
             const token = session.account.jwtToken
             const auth = token?.startsWith("Bearer ") ? token : token ? `Bearer ${token}` : ""
 
-            await api.put(
-                "/account/edit/profile-picture",
-                {
-                    user_id: session.user.id,
-                    midia: { base64: imageBase64 },
-                    metadata: {
-                        file_name: selectedAsset.fileName || "profile-picture.jpg",
-                        file_size: selectedAsset.fileSize || 0,
-                        file_type:
-                            (selectedAsset as any)?.mimeType || selectedAsset.type || "image/jpeg",
-                        resolution_width: selectedAsset.width || 0,
-                        resolution_height: selectedAsset.height || 0,
-                    },
-                },
-                auth ? { headers: { Authorization: auth } } : undefined,
+            const mimeType = "image/jpeg"
+            const formData = new FormData()
+            formData.append("imageData", `data:${mimeType};base64,${imageBase64}`)
+
+            console.log("ProfilePicture: uploading to /account/profile-picture", {
+                hasAuth: !!auth,
+                length: imageBase64.length,
+            })
+            await api.post(
+                "/account/profile-picture",
+                formData,
+                auth
+                    ? { headers: { Authorization: auth, "Content-Type": "multipart/form-data" } }
+                    : { headers: { "Content-Type": "multipart/form-data" } },
             )
 
+            console.log("ProfilePicture: upload success")
             // Atualiza dados locais (ou refetch)
             try {
                 await (session.user as any).get?.(session.user.id)
@@ -102,20 +118,37 @@ export default function ProfilePictureScreen() {
             setSelectedAsset(null)
             navigation.goBack()
         } catch (e: any) {
+            console.error("ProfilePicture: upload error", e)
             setError(e?.message ?? t("Not possible send your picture"))
         } finally {
             setLoading(false)
         }
     }
     function handlePressViewMore() {
-        if (isIOS) {
-            setIOSSheetOpen(true)
+        if (Platform.OS === "ios") {
+            ActionSheetIOS.showActionSheetWithOptions(
+                {
+                    title: t("Change Picture"),
+                    userInterfaceStyle: "dark",
+                    options: [t("Open Camera"), t("Choose from Library"), t("Cancel")],
+                    cancelButtonIndex: 2,
+                },
+                (buttonIndex) => {
+                    if (buttonIndex === 0) pickFromCamera()
+                    else if (buttonIndex === 1) pickFromLibrary()
+                },
+            )
         } else {
-            expand({
-                snapPoints: ["60%"],
-                enablePanDownToClose: true,
-                children: <FetchedCommentsList />,
-            })
+            Alert.alert(
+                t("Change Picture"),
+                "",
+                [
+                    { text: t("Open Camera"), onPress: pickFromCamera },
+                    { text: t("Choose from Library"), onPress: pickFromLibrary },
+                    { text: t("Cancel"), style: "cancel" },
+                ],
+                { cancelable: true },
+            )
         }
     }
 
@@ -140,7 +173,7 @@ export default function ProfilePictureScreen() {
                 <ButtonStandart
                     margins={false}
                     height={sizes.buttons.height * 0.7}
-                    action={}
+                    action={handlePressViewMore}
                     backgroundColor={String(colors.gray.white)}
                     style={styles.primaryBtn}
                 >
@@ -150,15 +183,15 @@ export default function ProfilePictureScreen() {
                 <View style={styles.bottomBar}>
                     <ButtonStandart
                         margins={false}
-                        width={sizes.buttons.width * 0.55}
-                        height={sizes.buttons.height * 0.9}
+                        width={sizes.buttons.width * 0.4}
+                        height={sizes.buttons.height * 0.7}
                         action={updateProfilePicture}
                         backgroundColor={String(colors.gray.white)}
                         style={styles.primaryBtn}
                     >
                         {loading ? (
                             <View style={styles.loadingContainer}>
-                                <Text style={styles.primaryBtnText}>Enviando</Text>
+                                <Text style={styles.primaryBtnText}>{t("Uploading")}</Text>
                                 <Loading.Container width={40} height={30}>
                                     <Loading.ActivityIndicator size={10} />
                                 </Loading.Container>
@@ -169,74 +202,6 @@ export default function ProfilePictureScreen() {
                     </ButtonStandart>
                 </View>
             )}
-            {isIOS && isIOSSheetOpen && (
-                <SwiftBottomSheet
-                    isOpened={isIOSSheetOpen}
-                    onIsOpenedChange={(opened) => {
-                        if (!opened) setIOSSheetOpen(false)
-                    }}
-                >
-                    <TouchableOpacity
-                        activeOpacity={0.8}
-                        style={styles.sheetBtn}
-                        onPress={pickFromCamera}
-                    >
-                        <Text style={styles.sheetBtnText}>Abrir câmera</Text>
-                    </TouchableOpacity>
-                    <TouchableOpacity
-                        activeOpacity={0.8}
-                        style={styles.sheetBtn}
-                        onPress={pickFromLibrary}
-                    >
-                        <Text style={styles.sheetBtnText}>Escolher da galeria</Text>
-                    </TouchableOpacity>
-                    <TouchableOpacity
-                        activeOpacity={0.8}
-                        style={[styles.sheetBtn, styles.sheetCancel]}
-                        onPress={() => setPickerVisible(false)}
-                    >
-                        <Text style={[styles.sheetBtnText, { color: colors.gray.grey_04 }]}>
-                            {t("cancel")}
-                        </Text>
-                    </TouchableOpacity>
-                </SwiftBottomSheet>
-            )}
-
-            <Modal
-                animationType="fade"
-                transparent
-                visible={pickerVisible}
-                onRequestClose={() => setPickerVisible(false)}
-            >
-                <View style={styles.sheetBackdrop}>
-                    <View style={styles.sheet}>
-                        <Text style={styles.sheetTitle}>{}</Text>
-                        <TouchableOpacity
-                            activeOpacity={0.8}
-                            style={styles.sheetBtn}
-                            onPress={pickFromCamera}
-                        >
-                            <Text style={styles.sheetBtnText}>Abrir câmera</Text>
-                        </TouchableOpacity>
-                        <TouchableOpacity
-                            activeOpacity={0.8}
-                            style={styles.sheetBtn}
-                            onPress={pickFromLibrary}
-                        >
-                            <Text style={styles.sheetBtnText}>Escolher da galeria</Text>
-                        </TouchableOpacity>
-                        <TouchableOpacity
-                            activeOpacity={0.8}
-                            style={[styles.sheetBtn, styles.sheetCancel]}
-                            onPress={() => setPickerVisible(false)}
-                        >
-                            <Text style={[styles.sheetBtnText, { color: colors.gray.grey_04 }]}>
-                                {t("cancel")}
-                            </Text>
-                        </TouchableOpacity>
-                    </View>
-                </View>
-            </Modal>
         </View>
     )
 }
@@ -279,6 +244,7 @@ const styles = StyleSheet.create({
     },
     primaryBtn: {
         marginTop: sizes.margins["1sm"],
+        paddingVertical: sizes.paddings["1sm"],
     },
     primaryBtnText: {
         fontSize: fonts.size.body * 1.1,
@@ -300,9 +266,6 @@ const styles = StyleSheet.create({
         alignItems: "center",
         justifyContent: "center",
         flexDirection: "row",
-        borderTopWidth: sizes.borders["1md"],
-        borderBottomWidth: sizes.borders["1md"],
-        borderColor: ColorTheme().backgroundDisabled,
         paddingHorizontal: sizes.paddings["1md"] * 0.7,
         paddingVertical: sizes.paddings["1sm"],
     },
@@ -354,6 +317,7 @@ const styles = StyleSheet.create({
         borderRadius: sizes.borderRadius["1sm"],
         backgroundColor: "#1a1a1a",
         marginBottom: sizes.margins["1sm"],
+        marginHorizontal: sizes.margins["1md"],
     },
     sheetBtnText: {
         color: colors.gray.white,

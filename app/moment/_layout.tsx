@@ -1,46 +1,72 @@
-import { router, Stack } from "expo-router"
+import { router, Stack, useLocalSearchParams } from "expo-router"
 import React from "react"
 import ColorTheme, { colors } from "@/constants/colors"
 import Sizes from "@/constants/sizes"
-import LanguageContext from "@/contexts/Preferences/language"
+import LanguageContext from "@/contexts/language"
 import MomentFullHeaderLeft from "@/components/headers/moment/moment_full-header_left"
 import NewMomentImageRight from "@/components/headers/moment/new_moment_image-header_right"
 import NewMomentInputDescriptionRight from "@/components/headers/moment/new_moment_input_description-header_right"
 import { Button, HeaderBackButton } from "@react-navigation/elements"
+import fonts from "@/constants/fonts"
 
 export default function MomentLayout() {
     const { t } = React.useContext(LanguageContext)
+    const { from } = useLocalSearchParams<{ from?: string }>()
 
     const HeaderStyle = {
         ...Sizes.headers,
-        backgroundColor: ColorTheme().background,
+        backgroundColor: colors.gray.black,
     }
 
     return (
         <Stack
             screenOptions={{
-                statusBarStyle: "light",
-                headerShadowVisible: false,
                 contentStyle: {
-                    backgroundColor: String(ColorTheme().background),
+                    backgroundColor: colors.gray.black,
                 },
+                statusBarAnimation: "fade",
+                statusBarStyle: "light",
+                headerTransparent: false,
+                headerShadowVisible: false,
+                headerStyle: {
+                    backgroundColor: colors.gray.black,
+                },
+
+                headerTintColor: colors.gray.white,
             }}
         >
             <Stack.Screen
                 name="[id]"
                 options={{
-                    headerStyle: HeaderStyle,
-                    headerTitle: undefined,
+                    headerTitle: "Moment",
+                    headerTitleAlign: "center",
+                    animation: "slide_from_right",
+                    headerTintColor: "white",
+                    headerLargeTitle: false,
                     headerTransparent: true,
-                    headerLeft: () => <MomentFullHeaderLeft />,
-                    contentStyle: {
-                        backgroundColor: colors.gray.black.toString(),
-                        overflow: "hidden",
+                    headerTitleStyle: { fontFamily: fonts.family["Black-Italic"] },
+                    headerLargeTitleStyle: { fontFamily: fonts.family["Black-Italic"] },
+                    headerStyle: {
+                        backgroundColor: "transparent",
                     },
+                    headerLeft: () => (
+                        <HeaderBackButton
+                            tintColor={colors.gray.white}
+                            displayMode="default"
+                            pressColor={colors.purple.purple_05}
+                            onPress={() => {
+                                if (from === "you") {
+                                    router.replace("/(tabs)/you")
+                                } else {
+                                    router.back()
+                                }
+                            }}
+                        />
+                    ),
                 }}
             />
             <Stack.Screen
-                name="new-camera"
+                name="camera"
                 options={{
                     headerShown: false,
                     headerStyle: HeaderStyle,
