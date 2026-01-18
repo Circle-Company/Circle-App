@@ -100,8 +100,9 @@ export function AccountMoments({ moments, totalMoments }: AccountMomentsProps) {
         [],
     )
 
-    function navigateToViewMoment() {
-        router.navigate("(tabs)/you/moment")
+    function navigateToViewMoment(id: string) {
+        console.log("Navigating to moment", id)
+        router.push(`/moment/${id}`)
     }
     function deleteMoment() {}
 

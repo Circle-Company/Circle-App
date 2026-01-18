@@ -29,7 +29,7 @@ export default function RenderComment({ comment, preview, index }: CommentsRende
         marginBottom: preview ? sizes.margins["1sm"] * 0.5 : sizes.margins["1sm"],
         backgroundColor: isDarkMode ? colors.gray.grey_09 : colors.gray.grey_01,
         borderRadius: sizes.borderRadius["1md"],
-        padding: sizes.paddings["1sm"],
+        padding: preview ? sizes.paddings["1sm"] : ,
         flex: 1,
     }
     const container_left: ViewStyle = {

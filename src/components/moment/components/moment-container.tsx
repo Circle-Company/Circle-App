@@ -20,6 +20,7 @@ export default function Container({
     forceMute = false,
     showSlider = true,
     disableCache = false,
+    disableWatch = false,
 }: MomentContainerProps & { onVideoEnd?: () => void }) {
     const { data, actions, size, options, video } = React.useContext(MomentContext)
     const { session } = React.useContext(PersistedContext)
@@ -31,10 +32,13 @@ export default function Container({
     const [isLoadingCache, setIsLoadingCache] = useState(false)
     const [adjacentThumbnails, setAdjacentThumbnails] = useState<string[]>([])
 
-    // Atualizar o estado de pausa do vídeo quando muda o foco
+    // Atualizar o estado de pausa do vídeo quando muda o foco (evitar loops)
     useEffect(() => {
-        video.setIsPaused(!isFocused || commentEnabled)
-    }, [isFocused, commentEnabled, video])
+        const shouldPause = !isFocused || !!commentEnabled
+        if (video.isPaused !== shouldPause) {
+            video.setIsPaused(shouldPause)
+        }
+    }, [isFocused, commentEnabled, video.isPaused])
 
     const container: any = {
         ...size,
@@ -67,7 +71,7 @@ export default function Container({
         bottom: 0,
         left: 0,
         right: 0,
-        zIndex: 10,
+        zIndex: 20,
     }
 
     // Função para carregar vídeo do cache otimizado
@@ -163,6 +167,12 @@ export default function Container({
         }
     }, [data.id, data.thumbnail, cacheManager, disableCache])
 
+    // Resetar estado do slider ao trocar de momento (evita exibir slider sem duração)
+    useEffect(() => {
+        if (video?.setCurrentTime) video.setCurrentTime(0)
+        if (video?.setDuration) video.setDuration(0)
+    }, [data.id])
+
     async function handleDoublePress() {
         if (data.user.id != session.user.id) actions.registerInteraction("LIKE")
     }
@@ -182,7 +192,7 @@ export default function Container({
                     thumbnailUri={data.thumbnail}
                     hasVideoCache={hasVideoCache}
                     isLoadingCache={isLoadingCache}
-                    momentId={String(data.id)}
+                    momentId={disableWatch ? undefined : String(data.id)}
                     autoPlay={!video.isPaused}
                     style={{
                         width: size.width,
@@ -199,6 +209,7 @@ export default function Container({
                     blurRadius={15}
                     prefetchAdjacentThumbnails={adjacentThumbnails}
                     forceMute={forceMute}
+                    disableWatch={disableWatch}
                 />
             </View>
         )
@@ -231,46 +242,27 @@ export default function Container({
     return (
         <View style={container}>
             <View style={content_container}>
-                <DoubleTapPressable onDoubleTap={handleDoublePress}>
-                    <MidiaRender.Root data={contentRender} content_sizes={size}>
-                        {renderVideoContent()}
-                    </MidiaRender.Root>
-                </DoubleTapPressable>
+                <MidiaRender.Root data={contentRender} content_sizes={size}>
+                    {renderVideoContent()}
+                </MidiaRender.Root>
             </View>
 
             {/* Controles de vídeo (áudio e slider) */}
-            {isFocused && !commentEnabled && showSlider && (
-                <>
-                    <View style={sliderContainerStyle}>
+            {isFocused &&
+                !commentEnabled &&
+                showSlider &&
+                Number.isFinite(video.duration) &&
+                video.duration > 0 && (
+                    <View style={sliderContainerStyle} pointerEvents="box-none">
                         <MomentVideoSlider
-                            width={size.width * 0.9}
+                            width={size.width * 0.95}
                             currentTime={video.currentTime}
                             duration={video.duration}
                         />
                     </View>
-                </>
-            )}
+                )}
 
-            {!commentEnabled ? (
-                isFocused ? (
-                    children
-                ) : null
-            ) : (
-                <Reanimated.View
-                    style={tiny_container}
-                    entering={FadeIn.delay(300).duration(200)}
-                    exiting={FadeOut.duration(100)}
-                >
-                    <UserShow.Root data={data.user}>
-                        <View style={{ top: 1 }}>
-                            <UserShow.ProfilePicture
-                                pictureDimensions={{ width: 15, height: 15 }}
-                            />
-                        </View>
-                        <UserShow.Username scale={0.8} margin={0} truncatedSize={8} />
-                    </UserShow.Root>
-                </Reanimated.View>
-            )}
+            {isFocused ? children : null}
         </View>
     )
 }
