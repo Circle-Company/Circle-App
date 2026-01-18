@@ -2,18 +2,13 @@ import { View, StyleSheet, Dimensions, FlatList, ViewToken } from "react-native"
 import { Moment } from "@/components/moment"
 import { dataProps } from "@/components/moment/context/types"
 import sizes from "@/constants/sizes"
-import { AccountMoment } from "@/state/queries/account"
+import { AccountMoment } from "@/queries/account"
 import { colors } from "@/constants/colors"
 import React from "react"
 import PersistedContext from "@/contexts/Persisted"
-
-import { EmptyList as MomentEmptyList } from "../list-moments/components/render-empty_list"
-
-import { DropDownMenuIOS } from "./components/moments.dropdown.menu"
+import { DropDownMenuIOS } from "@/features/account/account.moments.dropdown.menu"
 import { iOSMajorVersion } from "@/lib/platform/detection"
-import { router } from "expo-router"
-import { Pressable } from "react-native"
-import { ProfileMomentEmpty } from "./components/moments.empty"
+import { ProfileMomentEmpty } from "@/features/profile/profile.moments.empty"
 
 const { width } = Dimensions.get("window")
 const SPACING = 5

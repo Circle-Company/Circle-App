@@ -9,7 +9,7 @@ import main_root from "./components/roots/moment-main_root"
 import top_left_root from "./components/roots/top/moment-top_left_root"
 import top_right_root from "./components/roots/top/moment-top_right_root"
 import top_root from "./components/roots/top/moment-top_root"
-import iosLikeButton from "../ios/ios.like.button"
+import { likeIOS as iosLikeButton } from "./components/moment.ios.like"
 export const Moment = {
     Root: {
         Main: main_root,

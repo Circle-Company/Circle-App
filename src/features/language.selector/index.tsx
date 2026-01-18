@@ -1,14 +1,13 @@
-import { FlatList, Pressable, View, useColorScheme } from "react-native"
-import { Text, TextStyle, ViewStyle } from "../../components/Themed"
-import ColorTheme, { colors } from "../../constants/colors"
-
 import React from "react"
-import CheckIcon from "../../assets/icons/svgs/check_circle.svg"
-import fonts from "../../constants/fonts"
-import sizes from "../../constants/sizes"
-import PersistedContext from "../../contexts/Persisted"
-import LanguageContext from "../../contexts/Preferences/language"
-import { LanguagesCodesType } from "../../locales/LanguageTypes"
+import { FlatList, Pressable, View, useColorScheme } from "react-native"
+import CheckIcon from "@/assets/icons/svgs/check_circle.svg"
+import ColorTheme, { colors } from "@/constants/colors"
+import fonts from "@/constants/fonts"
+import sizes from "@/constants/sizes"
+import PersistedContext from "@/contexts/Persisted"
+import LanguageContext from "@/contexts/language"
+import { Text, TextStyle, ViewStyle } from "@/components/Themed"
+import { LanguagesCodesType } from "@/locales/LanguageTypes"
 
 export default function ListLanguagesSelector() {
     const { changeAppLanguage, languagesList } = React.useContext(LanguageContext)
@@ -22,7 +21,7 @@ export default function ListLanguagesSelector() {
     const icon_fill: string = ColorTheme().primary
 
     const container: ViewStyle = {
-        width: sizes.screens.width,
+        width: "100%",
         alignItems: "center",
         justifyContent: "flex-start",
         flexDirection: "row",
@@ -62,6 +61,7 @@ export default function ListLanguagesSelector() {
         <FlatList
             data={languagesList}
             showsVerticalScrollIndicator={false}
+            style={{ width: "100%" }}
             renderItem={({ item }) => {
                 return (
                     <Pressable

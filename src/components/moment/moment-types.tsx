@@ -40,6 +40,7 @@ export type MomentContainerProps = {
     disableCache?: boolean
     disableTopGradient?: boolean
     disableBottomGradient?: boolean
+    disableWatch?: boolean
 }
 
 export type MomentLikeProps = {

@@ -1,6 +1,6 @@
 import React from "react"
 import PersistedContext from "../../../contexts/Persisted"
-import { apiRoutes } from "../../../services/Api"
+import { apiRoutes } from "../../../api"
 import { actionsProps, InteractionPayload, InteractionPayloadMap } from "./types"
 
 export type InteractionType = "LIKE" | "UNLIKE" | "WATCH" | "COMMENT" | "EXCLUDE"
@@ -87,7 +87,7 @@ export function useActions(momentId?: string): MomentActionsState {
                     }
                     case "EXCLUDE": {
                         if (momentId == session.user.id) {
-                            await apiRoutes.moment.actions.exclude({
+                            await apiRoutes.moment.author.exclude({
                                 ...baseParams,
                             })
                         }

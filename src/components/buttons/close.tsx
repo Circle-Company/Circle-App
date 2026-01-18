@@ -1,10 +1,6 @@
 import Close from "@/assets/icons/svgs/close.svg"
 import { useRouter } from "expo-router"
-import React from "react"
-import { Platform, TouchableOpacity } from "react-native"
 import ColorTheme, { colors } from "../../constants/colors"
-import { Host, Button as SwiftButton } from "@expo/ui/swift-ui"
-import { isIOS } from "@/lib/platform/detection"
 import { Pressable } from "react-native"
 
 type ButtonCloseProps = {

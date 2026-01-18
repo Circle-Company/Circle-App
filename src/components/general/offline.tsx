@@ -3,7 +3,7 @@ import React from "react"
 import ColorTheme from "../../constants/colors"
 import fonts from "../../constants/fonts"
 import sizes from "../../constants/sizes"
-import LanguageContext from "../../contexts/Preferences/language"
+import LanguageContext from "../../contexts/language"
 import { Text, View } from "../Themed"
 
 type OfflineCardProps = {

@@ -1,7 +1,7 @@
 import React from "react"
 import { View, Text, StyleSheet } from "react-native"
 import { colors } from "@/constants/colors"
-import LanguageContext from "@/contexts/Preferences/language"
+import LanguageContext from "@/contexts/language"
 import sizes from "@/constants/sizes"
 
 type AccountMomentsHeaderProps = {

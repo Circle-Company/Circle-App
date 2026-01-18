@@ -11,6 +11,7 @@ import { TextStyle } from "react-native"
 import sizes from "@/constants/sizes"
 import NumberConversor from "@/helpers/numberConversor"
 import { hidden } from "@expo/ui/swift-ui/modifiers"
+import { like } from "@/api/moment/moment.actions"
 
 export function likeIOS({ isLiked }: { isLiked: boolean }) {
     const { session } = React.useContext(PersistedContext)
@@ -49,7 +50,9 @@ export function likeIOS({ isLiked }: { isLiked: boolean }) {
 
     async function onLikeAction() {
         try {
+            setLikedPressed(true)
             Vibrate("effectHeavyClick")
+            console.log(session.account.jwtToken)
             actions
                 .registerInteraction("LIKE", {
                     momentId: data.id,
@@ -57,17 +60,20 @@ export function likeIOS({ isLiked }: { isLiked: boolean }) {
                 })
                 .then(() => {})
         } catch (error) {
+            setLikedPressed(false)
             Vibrate("notificationError")
         }
     }
     async function onUnlikeAction() {
         try {
-            Vibrate("effectTick")
+            setLikedPressed(false)
+            Vibrate("notificationError")
             actions.registerInteraction("UNLIKE", {
                 momentId: data.id,
                 authorizationToken: session.account.jwtToken,
             })
         } catch (error) {
+            setLikedPressed(true)
             console.error("Erro ao processar unlike:", error)
         }
     }
@@ -84,7 +90,7 @@ export function likeIOS({ isLiked }: { isLiked: boolean }) {
                 <Button
                     key={likedPressed ? "liked" : "unliked"}
                     onPress={handlePress}
-                    variant="glass"
+                    variant={likedPressed ? "glassProminent" : "glass"}
                     modifiers={[
                         {
                             $type: "frame",
@@ -94,12 +100,12 @@ export function likeIOS({ isLiked }: { isLiked: boolean }) {
                             $type: "background",
                             material: "systemUltraThinMaterialDark",
                             shape: "circle",
-                            color: "#F2F",
                         },
                     ]}
                     controlSize="large"
                     systemImage={"heart.fill"}
-                    color={isLiked ? colors.red.red_05 : colors.gray.grey_01 + 80}
+                    disabled={!options.enableLike}
+                    color={likedPressed ? colors.red.red_05 : colors.gray.grey_01 + 80}
                 />
             </Host>
         )

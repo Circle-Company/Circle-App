@@ -1,5 +1,5 @@
 import { colors } from "@/constants/colors"
-import LanguageContext from "@/contexts/Preferences/language"
+import LanguageContext from "@/contexts/language"
 import { ContextMenu, Host, Button } from "@expo/ui/swift-ui"
 import React from "react"
 import { Alert } from "react-native"

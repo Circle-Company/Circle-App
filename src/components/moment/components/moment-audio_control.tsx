@@ -10,9 +10,11 @@ import BlurredBackground from "../../general/blurred-background"
 import { iOSMajorVersion } from "@/lib/platform/detection"
 import { Button, Host, Text } from "@expo/ui/swift-ui"
 import { VectorIcon } from "expo-router/unstable-native-tabs"
+import MomentContext from "../context"
 
 export default function MomentAudioControl() {
     const { session } = React.useContext(PersistedContext)
+    const { data } = React.useContext(MomentContext)
 
     const isMuted = session?.preferences?.content?.muteAudio || false
     const animatedScale = React.useRef(new Animated.Value(1)).current
@@ -83,6 +85,8 @@ export default function MomentAudioControl() {
         backgroundColor: "transparent",
         overflow: "hidden",
     }
+
+    if (data.hasAudio === false) return null
 
     if (iOSMajorVersion! >= 26) {
         return (
