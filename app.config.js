@@ -18,6 +18,7 @@ module.exports = function (_config) {
             androidStatusBar: { barStyle: "light-content" },
             androidNavigationBar: { barStyle: "light-content" },
             android: {
+                newArchEnabled: false,
                 icon: "./assets/app-icons/android_icon_default_light.png",
                 adaptiveIcon: {
                     foregroundImage: "./assets/icon-android-foreground.png",
@@ -29,14 +30,13 @@ module.exports = function (_config) {
                 package: "com.circlecompany.circleapp",
             },
             ios: {
-                bundleIdentifier: "com.circlecompany.circleapp",
-                icon: "./assets/app-icons/circle-ios.icon",
+                bundleIdentifier: "circlellc.circleapp",
+                newArchEnabled: true,
+                icon: "./assets/app-icons/ios-icon@x1.png",
+                userInterfaceStyle: "automatic",
                 infoPlist: {
-                    userInterfaceStyle: "dark",
                     UIApplicationSupportsIndirectInputEvents: true,
-                    // Desabilitar análises automáticas de imagem do iOS
                     VKCImageAnalysisDisabled: true,
-                    // Desabilitar Live Text (seleção de texto em imagens)
                     UISupportsLiveText: false,
                     UIViewControllerBasedStatusBarAppearance: true,
                 },
@@ -47,12 +47,17 @@ module.exports = function (_config) {
                 "expo-router",
                 "expo-video",
                 "expo-localization",
-                "expo-web-browser",
+                [
+                    "expo-web-browser",
+                    {
+                        experimentalLauncherActivity: true,
+                    },
+                ],
                 ["react-native-edge-to-edge", { android: { enforceNavigationBarContrast: false } }],
                 [
                     "expo-build-properties",
                     {
-                        ios: { deploymentTarget: "15.1", newArchEnabled: false },
+                        ios: { deploymentTarget: "15.1", newArchEnabled: true },
                         android: {
                             compileSdkVersion: 35,
                             targetSdkVersion: 35,
@@ -95,16 +100,9 @@ module.exports = function (_config) {
                     "expo-splash-screen",
                     {
                         ios: {
-                            enableFullScreenImage_legacy: true,
-                            backgroundColor: "#000000",
                             image: "./assets/splash.png",
                             resizeMode: "cover",
-                            dark: {
-                                enableFullScreenImage_legacy: true,
-                                backgroundColor: "#000000",
-                                image: "./assets/splash-dark.png",
-                                resizeMode: "cover",
-                            },
+                            backgroundColor: "#000000",
                         },
                         android: {
                             backgroundColor: "#000000",

@@ -28,7 +28,7 @@
         <key>CFBundleURLSchemes</key>
         <array>
           <string>circle</string>
-          <string>com.circlecompany.circleapp</string>
+          <string>circlellc.circleapp</string>
         </array>
       </dict>
       <dict>
@@ -69,6 +69,10 @@
     <string>Allow $(PRODUCT_NAME) to save photos</string>
     <key>NSPhotoLibraryUsageDescription</key>
     <string>Allow $(PRODUCT_NAME) to access your photos</string>
+    <key>NSUserActivityTypes</key>
+    <array>
+      <string>$(PRODUCT_BUNDLE_IDENTIFIER).expo.index_route</string>
+    </array>
     <key>RCTNewArchEnabled</key>
     <true/>
     <key>UIAppFonts</key>
@@ -77,11 +81,13 @@
       <string>Inter-Italic.otf</string>
       <string>Inter-SemiBold.otf</string>
       <string>Inter-SemiBoldItalic.otf</string>
-      <string>Inter-ExtraBold.otf</string>
-      <string>Inter-ExtraBoldItalic.otf</string>
       <string>Inter-Bold.otf</string>
       <string>Inter-BoldItalic.otf</string>
+      <string>Inter-ExtraBold.otf</string>
+      <string>Inter-ExtraBoldItalic.otf</string>
     </array>
+    <key>UIApplicationSupportsIndirectInputEvents</key>
+    <true/>
     <key>UILaunchStoryboardName</key>
     <string>SplashScreen</string>
     <key>UIRequiredDeviceCapabilities</key>
@@ -97,9 +103,13 @@
       <string>UIInterfaceOrientationPortrait</string>
       <string>UIInterfaceOrientationPortraitUpsideDown</string>
     </array>
+    <key>UISupportsLiveText</key>
+    <false/>
     <key>UIUserInterfaceStyle</key>
     <string>Automatic</string>
     <key>UIViewControllerBasedStatusBarAppearance</key>
-    <false/>
+    <true/>
+    <key>VKCImageAnalysisDisabled</key>
+    <true/>
   </dict>
 </plist>
