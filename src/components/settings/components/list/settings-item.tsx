@@ -4,49 +4,77 @@ import ColorTheme, { colors } from "@/constants/colors"
 import { Pressable, TextStyle, View, ViewStyle, useColorScheme } from "react-native"
 
 import ChevronRight from "@/assets/icons/svgs/chevron_right.svg"
-import LanguageContext from "@/contexts/Preferences/language"
-import { navigateLegacy } from "@/lib/navigation"
+import LanguageContext from "@/contexts/language"
+
 import PersistedContext from "@/contexts/Persisted"
+
 import React from "react"
 import { SettingsiItemObjectProps } from "@/components/settings/settings-types"
 import { Text } from "@/components/Themed"
 import { UserShow } from "@/components/user_show"
 import fonts from "@/constants/fonts"
 import sizes from "@/constants/sizes"
+import Animated, {
+    useAnimatedStyle,
+    useSharedValue,
+    withTiming,
+    Easing,
+} from "react-native-reanimated"
 // migrated: removed useNavigation import
 import { userReciveDataProps } from "@/components/user_show/user_show-types"
+import { isIOS } from "@/lib/platform/detection"
 
 // migrated: removed legacy navigator types
 //
 //
 //
 //
+//
+const AnimatedPressable = Animated.createAnimatedComponent(Pressable)
 
 export default function SettingsItem({
     name,
     value,
     type,
     icon,
-    navigateTo,
-    secure,
+    secure = false,
+
+    rightComponent,
+    onPress,
 }: SettingsiItemObjectProps) {
     // migrated: removed legacy navigation variable
     const { t } = React.useContext(LanguageContext)
     const isDarkMode = useColorScheme() === "dark"
     const { session } = React.useContext(PersistedContext)
+    const resolvedType = type ?? "TEXT"
+    const showChevron = (resolvedType === "IMAGE" || resolvedType === "TEXT") && !rightComponent
 
     const iconFill = colors.gray.grey_06
+
+    // Reanimated press-in/out scale
+    const scale = useSharedValue(1)
+    const animatedStyle = useAnimatedStyle(() => {
+        return {
+            transform: [{ scale: scale.value }],
+        }
+    }, [])
+    const handlePressIn = () => {
+        scale.value = withTiming(1.02, { duration: 90, easing: Easing.out(Easing.quad) })
+    }
+    const handlePressOut = () => {
+        scale.value = withTiming(1, { duration: 110, easing: Easing.out(Easing.quad) })
+    }
 
     const styles = {
         container: {
             width: sizes.screens.width - sizes.paddings["2sm"] * 2,
             marginHorizontal: sizes.paddings["2sm"],
-            height: sizes.sizes["3md"],
+            height: isIOS ? sizes.sizes["3md"] * 1.1 : sizes.sizes["3md"],
             alignItems: "center" as const,
             justifyContent: "flex-start" as const,
             flexDirection: "row" as const,
-            borderRadius: sizes.borderRadius["1sm"] * 1.4,
-            marginBottom: sizes.margins["1sm"],
+            borderRadius: sizes.borderRadius["1sm"] * (isIOS ? 1.8 : 1.4),
+            marginBottom: isIOS ? sizes.margins["2sm"] : sizes.margins["1sm"],
             backgroundColor: colors.gray.grey_09,
         } as ViewStyle,
         containerLeft: {
@@ -98,22 +126,27 @@ export default function SettingsItem({
                 biometricsSecurityLevel: "weak",
                 promptMessage: t("You're changing your password"),
             })
-            if (isAuthenticated) {
-                navigateLegacy(navigateTo)
-            }
-        } else {
-            navigateLegacy(navigateTo)
+            if (!isAuthenticated) return
         }
+
+        if (onPress) await onPress()
     }
 
     return (
-        <Pressable style={styles.container} onPress={handlePress}>
+        <AnimatedPressable
+            style={[styles.container, animatedStyle]}
+            onPress={handlePress}
+            onPressIn={handlePressIn}
+            onPressOut={handlePressOut}
+        >
             <View style={styles.containerLeft}>
                 {icon && <View style={styles.iconContainer}>{icon}</View>}
                 <Text style={styles.textStyle}>{name}</Text>
             </View>
             <View style={styles.containerRight}>
-                {type === "IMAGE" ? (
+                {rightComponent ? (
+                    <View style={styles.valueContainer}>{rightComponent}</View>
+                ) : resolvedType === "IMAGE" ? (
                     <View style={styles.valueContainerImage}>
                         <UserShow.Root
                             data={
@@ -133,13 +166,17 @@ export default function SettingsItem({
                     </View>
                 ) : (
                     <View style={styles.valueContainer}>
-                        <Text style={styles.valueStyle}>{String(value)}</Text>
+                        {value === "" ? null : value !== undefined && value !== null ? (
+                            <Text style={styles.valueStyle}>{String(value)}</Text>
+                        ) : null}
                     </View>
                 )}
-                <View>
-                    <ChevronRight fill={String(iconFill)} width={16} height={16} />
-                </View>
+                {showChevron && (
+                    <View>
+                        <ChevronRight fill={String(iconFill)} width={16} height={16} />
+                    </View>
+                )}
             </View>
-        </Pressable>
+        </AnimatedPressable>
     )
 }

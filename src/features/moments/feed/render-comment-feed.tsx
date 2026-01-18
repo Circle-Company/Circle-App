@@ -8,16 +8,18 @@ import { CommentObject } from "@/components/comment/comments-types"
 import { Comments } from "@/components/comment"
 import FeedContext from "@/contexts/Feed"
 import FetchedCommentsList from "@/components/comment/components/fetched-comments-list"
-import LanguageContext from "@/contexts/Preferences/language"
+import LanguageContext from "@/contexts/language"
 import { Moment as MomentProps } from "@/contexts/Feed/types"
 import PreviewCommentsList from "@/components/comment/components/comments-list_comments"
 import React from "react"
 import ViewMorebutton from "@/components/buttons/view_more"
 import fonts from "@/constants/fonts"
 import sizes from "@/constants/sizes"
-import { textLib } from "@/shared/circle.text.library"
+import { textLib } from "@/circle.text.library"
 import { isIOS } from "@/lib/platform/detection"
 import { SwiftBottomSheet } from "@/components/ios/ios.bottom.sheet"
+import Input from "@/components/comment/components/comments-input"
+import { View } from "react-native"
 
 type renderCommentFeedProps = {
     moment: MomentProps
@@ -29,39 +31,17 @@ export default function RenderCommentFeed({ moment, focused }: renderCommentFeed
     const { commentEnabled, setCommentEnabled, setKeyboardVisible } = React.useContext(FeedContext)
     const [animatedOpacityValue] = React.useState(new Animated.Value(1))
     const [animatedHeaderOpacityValue] = React.useState(new Animated.Value(1))
-    const { expand, collapse } = React.useContext(BottomSheetContext)
-    const isDarkMode = useColorScheme() === "dark"
+    const { expand } = React.useContext(BottomSheetContext)
+    const [isIOSSheetOpen, setIOSSheetOpen] = React.useState(false)
 
     function handlePressViewMore() {
         if (isIOS) {
-            ;<SwiftBottomSheet isOpened={true} onIsOpenedChange={collapse}>
-                <FetchedCommentsList
-                    totalComments={moment.metrics.totalComments}
-                    momentId={moment.id}
-                />
-            </SwiftBottomSheet>
+            setIOSSheetOpen(true)
         } else {
             expand({
+                snapPoints: ["60%"],
                 enablePanDownToClose: true,
-                enableHandlePanningGesture: true,
-                enableContentPanningGesture: true,
-                children: (
-                    <FetchedCommentsList
-                        totalComments={moment.metrics.totalComments}
-                        momentId={moment.id}
-                    />
-                ),
-                snapPoints: ["70%", "99%"],
-                customStyles: {
-                    modal: {
-                        width: sizes.screens.width,
-                        marginHorizontal: 0,
-                        paddingHorizontal: 0,
-                    },
-                    modalBackground: {
-                        backgroundColor: isDarkMode ? colors.gray.black : colors.gray.white,
-                    },
-                },
+                children: <FetchedCommentsList />,
             })
         }
     }
@@ -146,7 +126,7 @@ export default function RenderCommentFeed({ moment, focused }: renderCommentFeed
     return (
         <Comments.MainRoot data={commentsData} preview={true}>
             <Comments.Container focused={true}>
-                <Animated.View style={animated_header_container}>
+                <Animated.View pointerEvents="box-none" style={animated_header_container}>
                     <Comments.TopRoot>
                         <Comments.TopLeftRoot>
                             <Comments.HeaderLeft>
@@ -160,7 +140,7 @@ export default function RenderCommentFeed({ moment, focused }: renderCommentFeed
                         </Comments.TopLeftRoot>
                         <Comments.TopRightRoot>
                             <ViewMorebutton
-                                action={handlePress}
+                                action={() => handlePress()}
                                 text={t("Add Comment")}
                                 icon={
                                     <AddIcon
@@ -174,9 +154,11 @@ export default function RenderCommentFeed({ moment, focused }: renderCommentFeed
                         </Comments.TopRightRoot>
                     </Comments.TopRoot>
                 </Animated.View>
-                <Animated.View style={animated_center_container}>
+                <Animated.View pointerEvents="box-none" style={animated_center_container}>
                     <Comments.CenterRoot>
-                        <PreviewCommentsList comment={commentsData} />
+                        <Animated.View pointerEvents="box-none">
+                            <PreviewCommentsList comment={commentsData} />
+                        </Animated.View>
                     </Comments.CenterRoot>
 
                     <ButtonStandart
@@ -196,6 +178,17 @@ export default function RenderCommentFeed({ moment, focused }: renderCommentFeed
                         }
                     </ButtonStandart>
                 </Animated.View>
+                {isIOS && isIOSSheetOpen && (
+                    <SwiftBottomSheet
+                        zIndex={10}
+                        isOpened={isIOSSheetOpen}
+                        onIsOpenedChange={(opened) => {
+                            if (!opened) setIOSSheetOpen(false)
+                        }}
+                    >
+                        <FetchedCommentsList />
+                    </SwiftBottomSheet>
+                )}
             </Comments.Container>
         </Comments.MainRoot>
     )

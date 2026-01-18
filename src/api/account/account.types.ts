@@ -1,3 +1,5 @@
+import { AccountM}
+
 export type accountProps = {
     success: boolean
     account: {
@@ -20,20 +22,6 @@ export type accountProps = {
         }
     }
     error?: string
-}
-
-type accountMomentProps = {
-    id: string
-    description: string
-    video: {
-        url: string
-    }
-    thumbnail: {
-        url: string
-        width: number
-        height: number
-    }
-    publishedAt: string
 }
 
 export type momentsProps = {

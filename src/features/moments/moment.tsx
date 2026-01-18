@@ -1,13 +1,13 @@
 import { Animated, View, useColorScheme } from "react-native"
 
-import FeedContext from "../../../../contexts/Feed"
-import { Moment } from "../../../../components/moment"
-import { dataProps } from "../../../../components/moment/context/types"
+import FeedContext from "@/contexts/Feed"
+import { Moment } from "@/components/moment"
+import { dataProps } from "@/components/moment/context/types"
 import React from "react"
-import RenderComment from "../comments/render-comment"
-import { UserShow } from "../../../../components/user_show"
+import RenderComment from "../comments/comment"
+import { UserShow } from "@/components/user_show"
 import fonts from "@/constants/fonts"
-import sizes from "../../../../constants/sizes"
+import sizes from "@/constants/sizes"
 import { useKeyboardAnimation } from "react-native-keyboard-controller"
 
 type renderMomentProps = {

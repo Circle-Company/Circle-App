@@ -24,15 +24,110 @@ const api: AxiosInstance = axios.create({
 api.interceptors.request.use((cfg) => {
     const token = storage.getString(storageKeys().account.jwt.token)
 
+    // Timestamp para medir duração (usado no response interceptor)
+    ;(cfg as any).metadata = { start: Date.now() }
+    // Garante baseURL em requests reexecutadas (ex.: após refresh)
+    cfg.baseURL = cfg.baseURL || PATH
+
     // Atenção: o app usa o token "cru" no header Authorization (sem "Bearer ")
     // Vários endpoints já passam authorizationToken manualmente.
     // Mantemos o comportamento global como "cru" para não quebrar endpoints existentes.
     if (token) {
         cfg.headers = cfg.headers ?? {}
-        if (!cfg.headers.Authorization) {
-            cfg.headers.Authorization = token
+        const headersAny = cfg.headers as any
+        const hasSet = typeof headersAny.set === "function"
+        const hasAuthUpper = !!headersAny.Authorization
+        const hasAuthLower = !!headersAny.authorization
+        if (!hasAuthUpper && !hasAuthLower) {
+            if (hasSet) {
+                headersAny.set("Authorization", `Bearer ${token}`)
+            } else {
+                headersAny.Authorization = `Bearer ${token}`
+            }
         }
+        const preview = token.slice ? token.slice(-10) : ""
+        console.log(
+            "🧩 Injected Authorization header from storage",
+            JSON.stringify({ url: cfg.url || "", preview }),
+        )
     }
+
+    // Logs ricos para diagnóstico de WATCH e AUTH
+    const url = cfg.url || ""
+    const method = (cfg.method || "GET").toUpperCase()
+    if (url.includes("/moments/") && url.includes("/watch")) {
+        const header = (cfg.headers?.Authorization as string) || token || ""
+        const preview = header.slice ? header.slice(0, 10) : ""
+        let bodyInfo = ""
+        try {
+            bodyInfo = JSON.stringify(cfg.data ?? {})
+        } catch {
+            bodyInfo = "[unserializable]"
+        }
+        console.log(
+            "▶️ WATCH request",
+            JSON.stringify({
+                method,
+                url,
+                authHeaderPresent: !!header,
+                authPreview: preview,
+                body: bodyInfo,
+            }),
+        )
+    } else if (url.includes("/moments/")) {
+        const methodUpper = (method || "GET").toUpperCase()
+        // Enforce Authorization header for mutating requests to /moments/*
+        if (["POST", "PUT", "PATCH", "DELETE"].includes(methodUpper)) {
+            if (!cfg.headers) cfg.headers = {}
+            const headersAny = cfg.headers as any
+            const hasSet = typeof headersAny.set === "function"
+            const hasAuthUpper = !!headersAny.Authorization
+            const hasAuthLower = !!headersAny.authorization
+            if (!hasAuthUpper && !hasAuthLower && token) {
+                if (hasSet) {
+                    headersAny.set("Authorization", `Bearer ${token}`)
+                } else {
+                    headersAny.Authorization = `Bearer ${token}`
+                }
+                const enforcedPreview = token.slice ? token.slice(-10) : ""
+                console.log(
+                    "🛡️ Enforced Authorization for mutating /moments request",
+                    JSON.stringify({ method: methodUpper, url, authPreview: enforcedPreview }),
+                )
+            }
+            if (!(cfg.headers as any).Authorization) {
+                console.warn(
+                    "⚠️ Missing Authorization for mutating /moments request",
+                    JSON.stringify({ method: methodUpper, url }),
+                )
+            }
+        }
+        const finalHeader = (cfg.headers?.Authorization as string) || ""
+        const preview = finalHeader.slice ? finalHeader.slice(-10) : ""
+        console.log(
+            "▶️ MOMENTS request",
+            JSON.stringify({
+                method,
+                url,
+                authHeaderPresent: !!finalHeader,
+                authPreview: preview,
+            }),
+        )
+    }
+    if (url.includes("/auth/")) {
+        const header = (cfg.headers?.Authorization as string) || token || ""
+        const preview = header.slice ? header.slice(0, 10) : ""
+        console.log(
+            "▶️ AUTH request",
+            JSON.stringify({
+                method,
+                url,
+                authHeaderPresent: !!header,
+                authPreview: preview,
+            }),
+        )
+    }
+
     return cfg
 })
 
@@ -54,14 +149,39 @@ async function doRefreshToken(): Promise<string> {
     const currentRefresh = storage.getString(jwtKeys.refreshToken)
 
     if (!currentRefresh) {
-        throw new Error("Missing refreshToken")
+        // No refresh token available: log, clean tokens/defaults, and abort refresh
+        console.warn("🔒 Refresh aborted: missing refreshToken in storage")
+        try {
+            safeDelete(jwtKeys.token)
+            safeDelete(jwtKeys.refreshToken)
+            safeDelete(jwtKeys.expiration)
+            if (api?.defaults?.headers?.common?.Authorization) {
+                delete api.defaults.headers.common.Authorization
+            }
+        } catch {}
+        throw new Error("Abort refresh: missing refreshToken")
     }
 
-    // Chamamos a rota de refresh com Authorization: Bearer <refreshToken>
-    // Usamos a própria instância `api`, mas o response interceptor ignora essa rota.
+    // Chama a rota de refresh enviando Authorization com o refresh token "cru" (sem Bearer)
+    // Usamos a própria instância `api`, e o response interceptor ignora essa rota.
+    const refreshStartTs = Date.now()
+    const refreshHeaderPreview = (currentRefresh || "").slice(0, 10)
+    console.log(
+        "🔄 Refresh start",
+        JSON.stringify({
+            url: "/auth/refresh-token",
+            headerPreview: refreshHeaderPreview,
+            ts: refreshStartTs,
+        }),
+    )
     const res = await api.get("/auth/refresh-token", {
-        headers: { Authorization: `${currentRefresh}` },
+        headers: { Authorization: `Bearer ${currentRefresh}` },
     })
+    const refreshDurationMs = Date.now() - refreshStartTs
+    console.log(
+        "✅ Refresh success",
+        JSON.stringify({ durationMs: refreshDurationMs, status: res?.status }),
+    )
     // Backend retorna { success, token, refreshToken, expiresIn, refreshExpiresIn, user }
     const newToken: string | undefined = res.data?.token
     const newRefresh: string | undefined = res.data?.refreshToken
@@ -81,7 +201,8 @@ async function doRefreshToken(): Promise<string> {
     }
 
     // Atualizar defaults
-    api.defaults.headers.Authorization = newToken
+    api.defaults.headers.common = api.defaults.headers.common || {}
+    api.defaults.headers.common.Authorization = `Bearer ${newToken}`
 
     // Refletir no Zustand (sem hooks)
     try {
@@ -104,7 +225,7 @@ async function doRefreshToken(): Promise<string> {
 }
 
 /**
- * Ao receber um 401 com code VAL_1001, executa o refresh com single-flight:
+ * Ao receber 401 (exceto rota de refresh), executa o refresh com single-flight uma vez por request:
  * - Se já estiver refrescando, enfileira a request para repetir após conclusão.
  * - Se não, inicia o refresh, atualiza os tokens e re-executa a request original.
  */
@@ -116,25 +237,57 @@ async function handleAuthError(error: AxiosError) {
         throw error
     }
 
-    const isRefreshable =
-        response.status === 401 &&
-        (response.data as any)?.code === "VAL_1001" &&
-        !originalRequest._retry &&
-        !(originalRequest.url || "").includes("/auth/refresh-token")
+    const responseCode = (response.data as any)?.code
+    const isRefreshRoute = (originalRequest.url || "").includes("/auth/refresh-token")
+
+    console.log("🔍 Erro 401 detectado")
+    console.log("  Status:", response.status)
+    console.log("  Code:", responseCode)
+    console.log("  URL:", originalRequest.url)
+    let safeData = ""
+    try {
+        safeData = JSON.stringify(response.data)
+    } catch {
+        safeData = "[unserializable]"
+    }
+    console.log("  Response data:", safeData)
+    console.log("  Is retry:", originalRequest._retry)
+    console.log("  Is refresh route:", isRefreshRoute)
+
+    const isRefreshable = response.status === 401 && !originalRequest._retry && !isRefreshRoute
 
     if (!isRefreshable) {
+        console.log("❌ Erro 401 não é refrescável, repassando erro")
         throw error
     }
+
+    console.log("🔄 Tentando refresh token para requisição:", originalRequest.url)
 
     originalRequest._retry = true
 
     // Se já existe um refresh em andamento, enfileira a repetição da request
     if (isRefreshing && refreshPromise) {
+        console.log(
+            "⏳ Refresh in progress - enqueue request",
+            JSON.stringify({ url: originalRequest.url, queueSize: pendingQueue.length }),
+        )
         return new Promise((resolve, reject) => {
             pendingQueue.push((newToken) => {
                 try {
-                    originalRequest.headers = originalRequest.headers ?? {}
-                    originalRequest.headers.Authorization = newToken
+                    console.log(
+                        "▶️ Resuming enqueued request",
+                        JSON.stringify({
+                            url: originalRequest.url,
+                            gotTokenPreview: (newToken || "").slice(0, 10),
+                        }),
+                    )
+                    const plainHeaders =
+                        originalRequest.headers &&
+                        typeof (originalRequest.headers as any).toJSON === "function"
+                            ? (originalRequest.headers as any).toJSON()
+                            : { ...(originalRequest.headers || {}) }
+                    plainHeaders.Authorization = `Bearer ${newToken}`
+                    originalRequest.headers = plainHeaders
                     resolve(api(originalRequest))
                 } catch (e) {
                     reject(e)
@@ -149,6 +302,13 @@ async function handleAuthError(error: AxiosError) {
 
     try {
         const newToken = await refreshPromise
+        console.log(
+            "✅ Refresh done - resuming queued requests",
+            JSON.stringify({
+                queued: pendingQueue.length,
+                tokenPreview: (newToken || "").slice(0, 10),
+            }),
+        )
 
         // Desenfileira e repete todas requests pendentes
         while (pendingQueue.length) {
@@ -161,10 +321,23 @@ async function handleAuthError(error: AxiosError) {
         }
 
         // Repetir a request original com o novo token
-        originalRequest.headers = originalRequest.headers ?? {}
-        originalRequest.headers.Authorization = newToken
+        const plainHeaders =
+            originalRequest.headers && typeof (originalRequest.headers as any).toJSON === "function"
+                ? (originalRequest.headers as any).toJSON()
+                : { ...(originalRequest.headers || {}) }
+        plainHeaders.Authorization = `Bearer ${newToken}`
+        originalRequest.headers = plainHeaders
+        console.log(
+            "🔄 Retrying original request with new token",
+            JSON.stringify({
+                url: originalRequest.url,
+                tokenPreview: (newToken || "").slice(0, 10),
+            }),
+        )
         return api(originalRequest)
     } catch (refreshErr) {
+        console.error("❌ Falha no refresh token:", refreshErr)
+
         // Falha no refresh: limpa fila (tenta rejeitar como vazio)
         while (pendingQueue.length) {
             const resume = pendingQueue.shift()
@@ -181,6 +354,10 @@ async function handleAuthError(error: AxiosError) {
             safeDelete(jwtKeys.token)
             safeDelete(jwtKeys.refreshToken)
             safeDelete(jwtKeys.expiration)
+            if (api?.defaults?.headers?.common?.Authorization) {
+                delete api.defaults.headers.common.Authorization
+            }
+            console.log("🧹 Tokens limpos após falha no refresh")
         } catch {
             // ignore
         }
@@ -196,7 +373,30 @@ async function handleAuthError(error: AxiosError) {
 // Response Interceptor
 // -----------------------------
 api.interceptors.response.use(
-    (res) => res,
+    (res) => {
+        try {
+            const url = res.config?.url || ""
+            const method = res.config?.method?.toUpperCase?.() || ""
+            const status = res.status
+            const start = (res.config as any)?.metadata?.start
+            const durationMs = typeof start === "number" ? Date.now() - start : undefined
+
+            if (url.includes("/moments/") && url.includes("/watch")) {
+                console.log(
+                    "◀️ WATCH response",
+                    JSON.stringify({ method, url, status, durationMs }),
+                )
+            } else if (url.includes("/moments/")) {
+                console.log(
+                    "◀️ MOMENTS response",
+                    JSON.stringify({ method, url, status, durationMs }),
+                )
+            } else if (url.includes("/auth/")) {
+                console.log("◀️ AUTH response", JSON.stringify({ method, url, status, durationMs }))
+            }
+        } catch {}
+        return res
+    },
     (error) => handleAuthError(error),
 )
 

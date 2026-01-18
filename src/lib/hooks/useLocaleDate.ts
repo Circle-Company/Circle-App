@@ -1,7 +1,7 @@
 import { Timezone, TimezoneCode } from "circle-text-library"
 import { storage, storageKeys } from "../../store"
 
-import { textLib } from "@/shared/circle.text.library"
+import { textLib } from "@/circle.text.library"
 
 export function useLocaleDate(date: string) {
     const localTZ = new Timezone()

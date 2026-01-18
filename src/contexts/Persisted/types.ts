@@ -65,7 +65,6 @@ export type PreferencesDataType = {
     timezoneCode: string
     language: PreferencesLanguage
     content: PreferencesContent
-    pushNotifications: {}
 }
 
 export type UserDataType = SessionUser

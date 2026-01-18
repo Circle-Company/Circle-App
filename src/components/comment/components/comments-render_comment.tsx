@@ -1,35 +1,21 @@
-import { TextStyle, View, ViewStyle, useColorScheme } from "react-native"
-import ColorTheme, { colors } from "../../../constants/colors"
-
-import React from "react"
-import fonts from "../../../constants/fonts"
-import sizes from "../../../constants/sizes"
-import PersistedContext from "../../../contexts/Persisted"
-import { timeDifferenceConverter } from "../../../helpers/dateConversor"
-import MomentContext from "../../moment/context"
-import { Text } from "../../Themed"
-import { UserShow } from "../../user_show"
+import { TextStyle, View, ViewStyle } from "react-native"
+import ColorTheme, { colors } from "@/constants/colors"
+import fonts from "@/constants/fonts"
+import sizes from "@/constants/sizes"
+import { timeDifferenceConverter } from "@/helpers/dateConversor"
+import { Text } from "@/components/Themed"
+import { UserShow } from "@/components/user_show"
 import { CommentsRenderCommentProps } from "../comments-types"
+import { useLocaleDateRelative } from "@/lib/hooks/useLocaleDate"
 
 export default function RenderComment({ comment, preview, index }: CommentsRenderCommentProps) {
-    const isDarkMode = useColorScheme() === "dark"
-
-    // Verificar se o MomentContext está disponível
-    let actions: any = null
-    try {
-        const momentContext = React.useContext(MomentContext)
-        actions = momentContext?.actions
-    } catch (error) {
-        // MomentContext não está disponível, funcionalidade de like será limitada
-    }
-
     const container: ViewStyle = {
         flexDirection: "row",
-        marginTop: preview ? sizes.margins["1sm"] * 0.8 : sizes.margins["1sm"] * 0.5,
-        marginBottom: preview ? sizes.margins["1sm"] * 0.5 : sizes.margins["1sm"],
-        backgroundColor: isDarkMode ? colors.gray.grey_09 : colors.gray.grey_01,
+        marginTop: preview ? sizes.margins["1sm"] * 0.8 : 0,
+        marginBottom: preview ? sizes.margins["1sm"] * 0.5 : 0,
+        backgroundColor: preview ? colors.gray.grey_09 : "#FFFFFF09",
         borderRadius: sizes.borderRadius["1md"],
-        padding: preview ? sizes.paddings["1sm"] : ,
+        padding: sizes.paddings["1sm"],
         flex: 1,
     }
     const container_left: ViewStyle = {
@@ -39,8 +25,8 @@ export default function RenderComment({ comment, preview, index }: CommentsRende
         marginRight: sizes.margins["1sm"] / 2,
     }
     const container_center: ViewStyle = {
-        top: preview ? 0 : -4,
-        left: -2,
+        top: 0,
+        left: preview ? -2 : 0,
         flex: 1,
         alignItems: "flex-start",
         justifyContent: "center",
@@ -50,8 +36,8 @@ export default function RenderComment({ comment, preview, index }: CommentsRende
         marginBottom: sizes.margins["1sm"] * 0.5,
     }
     const content_style: TextStyle = {
-        marginTop: preview ? -2 : 2,
-        fontSize: preview ? fonts.size.body * 0.9 : fonts.size.body * 0.85,
+        marginTop: preview ? -2 : 5,
+        fontSize: preview ? fonts.size.body * 0.9 : fonts.size.body * 1.05,
         fontFamily: preview ? fonts.family.Medium : fonts.family.Semibold,
         lineHeight: preview ? fonts.size.body * 1.2 : fonts.size.body,
     }
@@ -61,44 +47,6 @@ export default function RenderComment({ comment, preview, index }: CommentsRende
         fontFamily: fonts.family.Medium,
         color: ColorTheme().textDisabled,
     }
-
-    /**
-    const likesNum = like
-        ? comment.statistics.total_likes_num + 1
-        : comment.statistics.total_likes_num
-    const likeLabel = likesNum == 1 ? "like" : "likes"
-
-    async function handleLikePress() {
-        if (!actions) {
-            console.log("Não é possível curtir comentário sem MomentContext")
-            return
-        }
-
-        if (like) {
-            actions.setLikeComment(false)
-            setLike(false)
-            Vibrate("effectTick")
-            await api
-                .post(
-                    `/moments/comments/${comment.id}/unlike`,
-                    {},
-                    { headers: { Authorization: session.account.jwtToken } }
-                )
-                .catch((error) => console.log(error))
-        } else {
-            actions.setLikeComment(true)
-            setLike(true)
-            Vibrate("effectClick")
-            await api
-                .post(
-                    `/moments/comments/${comment.id}/like`,
-                    {},
-                    { headers: { Authorization: session.account.jwtToken } }
-                )
-                .catch((error) => console.log(error))
-        }
-    }
-    */
 
     return (
         <View style={container}>
@@ -123,12 +71,7 @@ export default function RenderComment({ comment, preview, index }: CommentsRende
                         />
                     </UserShow.Root>
                     <Text style={date_style}>•</Text>
-                    <Text style={date_style}>
-                        {timeDifferenceConverter({
-                            date: String(comment.createdAt),
-                            small: false,
-                        })}
-                    </Text>
+                    <Text style={date_style}>{useLocaleDateRelative(comment.createdAt)}</Text>
                 </View>
                 <Text style={content_style}>{comment.content}</Text>
             </View>

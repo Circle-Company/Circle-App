@@ -1,13 +1,13 @@
 import { Animated, ViewStyle } from "react-native"
 
 import AddIcon from "@/assets/icons/svgs/plus_circle-outline.svg"
-import ColorTheme from "../../../../constants/colors"
-import { Comments } from "../../../../components/comment"
-import FeedContext from "../../../../contexts/Feed"
-import LanguageContext from "../../../../contexts/Preferences/language"
-import { dataProps } from "../../../../components/moment/context/types"
+import ColorTheme from "@/constants/colors"
+import { Comments } from "@/components/comment"
+import FeedContext from "@/contexts/Feed"
+import LanguageContext from "@/contexts/language"
+import { dataProps } from "@/components/moment/context/types"
 import React from "react"
-import ViewMorebutton from "../../../../components/buttons/view_more"
+import ViewMorebutton from "@/components/buttons/view_more"
 
 type renderCommentProps = {
     moment: dataProps

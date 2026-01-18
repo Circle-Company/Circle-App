@@ -23,8 +23,12 @@ export type AccountData = {
 export type AccountMoment = {
     id: string
     description: string | null
-    media: string
-    thumbnail: string
+    video: { url: string }
+    thumbnail: {
+        url: string
+        width: number
+        height: number
+    }
     publishedAt: string
 }
 export type AccountMomentsResponse = {

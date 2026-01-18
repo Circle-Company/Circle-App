@@ -2,7 +2,7 @@ import ColorTheme, { colors } from "../../../constants/colors"
 import { Pressable, Text, View, useColorScheme } from "react-native"
 
 import Icon from "@/assets/icons/svgs/@2.svg"
-import LanguageContext from "../../../contexts/Preferences/language"
+import LanguageContext from "../../../contexts/language"
 import PersistedContext from "../../../contexts/Persisted"
 import React from "react"
 import Sizes from "../../../constants/sizes"

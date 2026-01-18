@@ -10,15 +10,15 @@ import {
     useColorScheme,
     ViewStyle,
 } from "react-native"
-import SearchIcon from "../../../assets/icons/svgs/bolt.svg"
-import { Text, View } from "../../../components/Themed"
-import ButtonStandart from "../../../components/buttons/button-standart"
-import { Loading } from "../../../components/loading"
-import ColorTheme, { colors } from "../../../constants/colors"
-import fonts from "../../../constants/fonts"
-import sizes from "../../../constants/sizes"
-import FeedContext from "../../../contexts/Feed"
-import LanguageContext from "../../../contexts/Preferences/language"
+import SearchIcon from "@/assets/icons/svgs/bolt.svg"
+import { Text, View } from "@/components/Themed"
+import ButtonStandart from "@/components/buttons/button-standart"
+import { Loading } from "@/components/loading"
+import ColorTheme, { colors } from "@/constants/colors"
+import fonts from "@/constants/fonts"
+import sizes from "@/constants/sizes"
+import FeedContext from "@/contexts/Feed"
+import LanguageContext from "@/contexts/language"
 
 type RootStackParamList = {
     MomentNavigator: { screen: string }
@@ -152,7 +152,7 @@ export function EmptyList() {
                     ]}
                 >
                     <Image
-                        source={require("../../../assets/images/illustrations/NewMoment-Illustration.png")}
+                        source={require("@/assets/images/illustrations/NewMoment-Illustration.png")}
                         style={illustrationStyle}
                         resizeMode="contain"
                     />

@@ -4,29 +4,27 @@ import { SetLanguageProps, SetHapticsProps } from "./preferences.types"
 
 async function setLanguage({ userId, appLanguage }: SetLanguageProps): Promise<void> {
     await api.put(
-        "/preferences/app-language",
+        "/account/language",
         {
-            user_id: userId,
-            app_language: appLanguage,
+            language: appLanguage,
         },
         {
             headers: {
-                Authorization: storage.getString(storageKeys().account.jwt.token) || "",
+                Authorization: `Bearer ${storage.getString(storageKeys().account.jwt.token) || ""}`,
             },
         },
     )
 }
 
-async function setHaptics({ userId, disableHaptics }: SetHapticsProps): Promise<void> {
+async function setHaptics({ disableHaptics }: SetHapticsProps): Promise<void> {
     await api.put(
-        "/preferences/haptics",
+        "/account/haptic-feedback",
         {
-            user_id: userId,
-            disable_haptics: disableHaptics,
+            hapticFeedback: disableHaptics,
         },
         {
             headers: {
-                Authorization: storage.getString(storageKeys().account.jwt.token) || "",
+                Authorization: `Bearer ${storage.getString(storageKeys().account.jwt.token) || ""}`,
             },
         },
     )

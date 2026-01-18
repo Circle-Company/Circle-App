@@ -6,9 +6,11 @@ import Fonts from "@/constants/fonts"
 import LanguageContext from "@/contexts/language"
 import { View } from "react-native"
 import { iOSMajorVersion } from "@/lib/platform/detection"
+import { useCameraContext } from "../../modules/camera"
 
 export default function TabsLayout() {
     const { t } = React.useContext(LanguageContext)
+    const { tabHide } = useCameraContext()
 
     const tintColor = Platform.select({
         ios: DynamicColorIOS({
@@ -24,11 +26,11 @@ export default function TabsLayout() {
         <View style={{ flex: 1, backgroundColor: "#000" }}>
             <NativeTabs
                 tintColor={tintColor}
+                labelVisibilityMode="unlabeled"
                 labelStyle={{
                     fontFamily: Fonts.family["Bold"],
                     fontSize: Fonts.size.body * 0.8,
                 }}
-                backBehavior="history"
                 backgroundColor={
                     Platform.OS === "ios" && iOSMajorVersion && iOSMajorVersion < 26
                         ? colors.gray.black + "90"
@@ -41,7 +43,7 @@ export default function TabsLayout() {
                 }
                 minimizeBehavior="onScrollDown"
             >
-                <NativeTabs.Trigger name="moments" options={{}}>
+                <NativeTabs.Trigger name="moments">
                     <Label selectedStyle={{ color: tintColor }}>{t("Moments")}</Label>
                     <Icon sf={{ default: "bolt", selected: "bolt.fill" }} />
                 </NativeTabs.Trigger>
@@ -54,6 +56,11 @@ export default function TabsLayout() {
                 <NativeTabs.Trigger name="you">
                     <Label selectedStyle={{ color: tintColor }}>{t("You")}</Label>
                     <Icon sf={{ default: "at", selected: "at" }} />
+                </NativeTabs.Trigger>
+
+                <NativeTabs.Trigger name="settings">
+                    <Label selectedStyle={{ color: tintColor }}>{t("Settings")}</Label>
+                    <Icon sf={{ default: "gear", selected: "gear" }} />
                 </NativeTabs.Trigger>
             </NativeTabs>
         </View>

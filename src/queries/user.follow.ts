@@ -1,5 +1,5 @@
 import { useMutation } from "@tanstack/react-query"
-import { apiRoutes } from "../../services/Api"
+import { apiRoutes } from "@/api"
 
 type useFollowMutationProps = {
     userId: string

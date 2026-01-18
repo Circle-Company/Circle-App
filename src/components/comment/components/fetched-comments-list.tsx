@@ -160,7 +160,7 @@ function FetchedCommentsList() {
                             alignSelf: "center",
                             alignItems: "center",
                             paddingHorizontal: sizes.paddings["1md"],
-                            paddingBottom: sizes.paddings["1md"],
+                            paddingBottom: sizes.paddings["1sm"],
                         }}
                         entering={FadeInUp.duration(250)}
                     >

@@ -1,6 +1,6 @@
-import api from "../.."
-import { storage, storageKeys } from "../../../../store"
-import { UserDataByPkProps, UserFollowProps, UserUnfollowProps } from "./types"
+import api from "@/api"
+import { storage, storageKeys } from "@/store"
+import { UserDataByPkProps, UserFollowProps, UserUnfollowProps } from "./user.types"
 
 async function follow({ userId, followedUserId }: UserFollowProps): Promise<void> {
     await api.post(
@@ -8,9 +8,9 @@ async function follow({ userId, followedUserId }: UserFollowProps): Promise<void
         { user_id: userId, followed_user_id: followedUserId },
         {
             headers: {
-                Authorization: storage.getString(storageKeys().account.jwt.token) || "",
+                Authorization: `Bearer ${storage.getString(storageKeys().account.jwt.token) || ""}`,
             },
-        }
+        },
     )
 }
 
@@ -23,9 +23,9 @@ async function unfollow({ userId, followedUserId }: UserUnfollowProps): Promise<
         },
         {
             headers: {
-                Authorization: storage.getString(storageKeys().account.jwt.token) || "",
+                Authorization: `Bearer ${storage.getString(storageKeys().account.jwt.token) || ""}`,
             },
-        }
+        },
     )
 }
 
@@ -37,9 +37,9 @@ async function getByPk({ userId, findedUserPk }: UserDataByPkProps) {
         },
         {
             headers: {
-                Authorization: storage.getString(storageKeys().account.jwt.token) || "",
+                Authorization: `Bearer ${storage.getString(storageKeys().account.jwt.token) || ""}`,
             },
-        }
+        },
     )
 }
 

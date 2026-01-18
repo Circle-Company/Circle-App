@@ -1,11 +1,11 @@
-import api from "@/services/Api"
+import api from "@/api"
 import { storage, storageKeys } from "@/store"
-import { accountProps, momentsProps } from "./types"
+import { accountProps, momentsProps } from "./account.types"
 
 async function getAccount(): Promise<accountProps> {
     const response = await api.get("/account", {
         headers: {
-            Authorization: storage.getString(storageKeys().account.jwt.token) || "",
+            Authorization: `Bearer ${storage.getString(storageKeys().account.jwt.token) || ""}`,
         },
     })
     return response.data
@@ -14,7 +14,7 @@ async function getAccount(): Promise<accountProps> {
 async function getMoments({ page, limit }: { page: number; limit: number }): Promise<momentsProps> {
     const response = await api.get(`/account/moments?page=${page}&limit=${limit}`, {
         headers: {
-            Authorization: storage.getString(storageKeys().account.jwt.token) || "",
+            Authorization: `Bearer ${storage.getString(storageKeys().account.jwt.token) || ""}`,
         },
     })
     return response.data

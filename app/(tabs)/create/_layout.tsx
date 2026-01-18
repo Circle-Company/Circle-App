@@ -3,12 +3,14 @@ import React from "react"
 import ColorTheme from "@/constants/colors"
 import fonts from "@/constants/fonts"
 import sizes from "@/constants/sizes"
-import LanguageContext from "@/contexts/Preferences/language"
+import LanguageContext from "@/contexts/language"
 import HeaderLeft from "@/components/headers/camera/camera-header_left"
 import { GestureHandlerRootView } from "react-native-gesture-handler"
 import { StyleSheet, Platform, View } from "react-native"
 import { BlurView } from "expo-blur"
-import { CameraProvider } from "@/modules/camera/context"
+import { CameraProvider } from "../../../modules/camera/context"
+import { Text } from "react-native"
+import { HeaderButton } from "@react-navigation/elements"
 
 export default function CameraLayout() {
     const { t } = React.useContext(LanguageContext)
@@ -36,32 +38,16 @@ export default function CameraLayout() {
                 )}
                 <Stack
                     screenOptions={{
-                        statusBarStyle: "light",
-                        animationTypeForReplace: "pop",
-                        headerTitleAlign: "center",
-                        headerTitleStyle: { fontFamily: fonts.family["Bold-Italic"] },
-                        headerStyle: HeaderStyle,
-                        headerTransparent: true,
-                        headerBackground: () =>
-                            Platform.OS === "ios" &&
-                            (typeof Platform.Version === "string"
-                                ? parseFloat(Platform.Version as any)
-                                : (Platform.Version as number)) < 18 ? (
-                                <BlurView
-                                    intensity={24}
-                                    tint="dark"
-                                    style={StyleSheet.absoluteFill}
-                                />
-                            ) : (
-                                <View
-                                    style={[
-                                        StyleSheet.absoluteFill,
-                                        { backgroundColor: String(ColorTheme().background) },
-                                    ]}
-                                />
-                            ),
                         headerShadowVisible: false,
-                        headerTintColor: String(ColorTheme().text),
+                        animation: "slide_from_right",
+                        gestureEnabled: true,
+                        fullScreenGestureEnabled: true,
+                        headerBackTitle: t("Back"),
+                        headerTintColor: "white",
+                        headerTitleStyle: { fontFamily: fonts.family["Black-Italic"] },
+                        headerStyle: {
+                            backgroundColor: "black",
+                        },
                     }}
                 >
                     <Stack.Screen
@@ -74,13 +60,27 @@ export default function CameraLayout() {
                         name="permissions"
                         options={{
                             headerTitle: "Permissions",
+                            headerTintColor: "white",
+                            headerTitleStyle: { fontFamily: fonts.family["Black-Italic"] },
+                            headerStyle: {
+                                backgroundColor: "black",
+                            },
+                            headerBackTitle: t("Back"),
                         }}
                     />
                     <Stack.Screen
                         name="media"
                         options={{
-                            animation: "none",
+                            statusBarAnimation: "fade",
+                            headerTransparent: false,
+                            headerShadowVisible: false,
+                            headerTintColor: "white",
+                            headerTitleStyle: { fontFamily: fonts.family["Black-Italic"] },
+                            headerStyle: {
+                                backgroundColor: "black",
+                            },
                             headerTitle: t("All Ready"),
+                            headerBackTitle: t("Back"),
                         }}
                     />
                 </Stack>

@@ -7,14 +7,6 @@ import Fonts from "@/constants/fonts"
 import sizes from "@/constants/sizes"
 import { colors } from "@/constants/colors"
 export default function MomentsLayout() {
-    const HeaderStyle = {
-        height: sizes.headers.height * 1.12,
-        backgroundColor: ColorTheme().background,
-        ...(Platform.OS === "android"
-            ? { elevation: 0 }
-            : { shadowOpacity: 0, borderBottomWidth: 0 }),
-    }
-
     return (
         <Stack
             screenOptions={{
@@ -37,14 +29,15 @@ export default function MomentsLayout() {
                 options={{
                     headerTitle: config.APPLICATION_NAME,
                     headerTitleAlign: "center",
-                    headerTransparent: false,
                     animation: "slide_from_right",
-                    headerTitleStyle: {
-                        fontFamily: Fonts.family["Black-Italic"],
-                        fontSize: Fonts.size.title2 * 0.9,
+                    headerTintColor: "white",
+                    headerLargeTitle: false,
+                    headerTransparent: true,
+                    headerTitleStyle: { fontFamily: Fonts.family["Black-Italic"] },
+                    headerLargeTitleStyle: { fontFamily: Fonts.family["Black-Italic"] },
+                    headerStyle: {
+                        backgroundColor: "transparent",
                     },
-                    headerStyle: HeaderStyle,
-                    headerTintColor: String(ColorTheme().text),
                 }}
             />
         </Stack>

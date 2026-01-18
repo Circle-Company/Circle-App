@@ -3,7 +3,7 @@ import React from "react"
 import { UserRootProps } from "../user_show-types"
 import UserShowContext from "../user_show-context"
 import { View } from "react-native"
-import api from "../../../services/Api"
+import api from "../../../api"
 
 export default function root({ children, data, executeBeforeClick }: UserRootProps) {
     const { session } = React.useContext(PersistedContext)

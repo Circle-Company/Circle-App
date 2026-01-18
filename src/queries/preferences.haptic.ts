@@ -1,8 +1,8 @@
 import { useMutation } from "@tanstack/react-query"
 import React from "react"
-import { useToast } from "../../contexts/Toast"
-import PersistedContext from "../../contexts/Persisted"
-import { apiRoutes } from "../../services/Api"
+import { useToast } from "@/contexts/Toast"
+import PersistedContext from "@/contexts/Persisted"
+import { apiRoutes } from "@/api"
 
 export function useDisableHapticsMutation() {
     const { session } = React.useContext(PersistedContext)

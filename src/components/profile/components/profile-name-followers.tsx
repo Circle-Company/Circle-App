@@ -4,10 +4,10 @@ import ColorTheme from "../../../constants/colors"
 import fonts from "../../../constants/fonts"
 import sizes from "../../../constants/sizes"
 import { Text } from "../../Themed"
-import LanguageContext from "@/contexts/Preferences/language"
+import LanguageContext from "@/contexts/language"
 import { useProfileContext as UseProfileContext } from "../profile-context"
 import { ProfileNameProps } from "../profile-types"
-import { textLib } from "@/shared/circle.text.library"
+import { textLib } from "@/circle.text.library"
 
 export default function Name({
     color = String(ColorTheme().text),

@@ -6,7 +6,7 @@ import { colors } from "../../../constants/colors"
 import fonts from "../../../constants/fonts"
 import sizes from "../../../constants/sizes"
 import NewMomentContext from "../../../contexts/newMoment"
-import LanguageContext from "../../../contexts/Preferences/language"
+import LanguageContext from "../../../contexts/language"
 import ButtonStandart from "../../buttons/button-standart"
 import { Loading } from "../../loading"
 

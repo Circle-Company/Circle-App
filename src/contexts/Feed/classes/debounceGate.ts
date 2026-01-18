@@ -1,5 +1,4 @@
-// debounceGate.ts
-import { DEBOUNCE_TIME } from "@/contexts/Feed/constants"
+export const DEBOUNCE_TIME = 1000
 
 export class DebounceGate {
     private lastRequestTime = 0

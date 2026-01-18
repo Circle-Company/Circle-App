@@ -52,9 +52,18 @@ export function Provider({ children }: PersistedProviderProps) {
                     const status = session?.status ?? {}
                     const terms = session?.terms ?? {}
                     sessionAccount.set({
-                        jwtToken: session?.token ?? "",
-                        jwtExpiration: "",
-                        refreshToken: session?.refreshToken,
+                        jwtToken:
+                            typeof session?.token === "string" && session.token
+                                ? session.token
+                                : useAccountStore.getState().jwtToken,
+                        jwtExpiration:
+                            typeof session?.jwtExpiration === "string" && session.jwtExpiration
+                                ? session.jwtExpiration
+                                : useAccountStore.getState().jwtExpiration,
+                        refreshToken:
+                            typeof session?.refreshToken === "string" && session.refreshToken
+                                ? session.refreshToken
+                                : useAccountStore.getState().refreshToken,
                         blocked: Boolean(status.blocked),
                         accessLevel: String(status.accessLevel || ""),
                         verified: Boolean(status.verified),
@@ -84,7 +93,6 @@ export function Provider({ children }: PersistedProviderProps) {
                             disableTranslation: false,
                             muteAudio: false,
                         },
-                        pushNotifications: {},
                     })
                 }
 
@@ -116,8 +124,17 @@ export function Provider({ children }: PersistedProviderProps) {
             sessionAccount.remove()
             sessionPreferences.remove()
             sessionMetrics.remove()
+
+            // Limpar também o header Authorization default do axios
+            try {
+                // Import dinâmico para evitar ciclos
+                const { default: api } = require("@/api")
+                if (api?.defaults?.headers?.common?.Authorization) {
+                    delete api.defaults.headers.common.Authorization
+                }
+            } catch (_) {}
         } catch (error) {
-            console.error("❌ Erro ao limpar stores:", error)
+            console.error("Erro ao limpar stores:", error)
         }
     }, [sessionUser, sessionAccount, sessionPreferences, sessionMetrics])
 
@@ -134,11 +151,16 @@ export function Provider({ children }: PersistedProviderProps) {
         if (sessionData && (sessionData as any)?.user && sessionKey !== sessionDataRef.current) {
             sessionDataRef.current = sessionKey
 
-            syncSessionData(sessionData).catch(() => {
+            syncSessionData(sessionData).catch((error) => {
+                console.error("Erro ao sincronizar dados:", error)
                 signOut()
             })
+        } else if (!sessionData && sessionDataRef.current !== "") {
+            // Detecta logout: sessionData ficou null depois de ter dados
+            sessionDataRef.current = ""
+            clearAllStores()
         }
-    }, [sessionData])
+    }, [sessionData, clearAllStores, signOut, syncSessionData])
 
     // Garante limpeza das stores quando o usuário sai
     const [hasCleaned, setHasCleaned] = React.useState(false)

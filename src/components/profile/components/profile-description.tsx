@@ -5,7 +5,7 @@ import sizes from "../../../constants/sizes"
 import { colors } from "../../../constants/colors"
 import { Text } from "../../Themed"
 import { useProfileContext } from "../profile-context"
-import { textLib } from "@/shared/circle.text.library"
+import { textLib } from "@/circle.text.library"
 import { RichTextRenderer } from "../../../lib/hooks/useRichTextRenderer"
 export default function Description() {
     const { user } = useProfileContext()

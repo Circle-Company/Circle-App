@@ -60,7 +60,7 @@ export default function Picture({ fromProfile = false, hasOutline = true }: Prof
     }, [])
 
     React.useEffect(() => {
-        setProfilePicture(profilePicture)
+        setProfilePicture(user.profilePicture ? user.profilePicture : "")
     }, [fromProfile, user])
 
     const animatedContainer: any = {

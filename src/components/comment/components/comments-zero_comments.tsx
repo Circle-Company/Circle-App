@@ -3,7 +3,7 @@ import { View, ViewStyle, useColorScheme } from "react-native"
 
 import ButtonStandart from "../../buttons/button-standart"
 import FeedContext from "../../../contexts/Feed"
-import LanguageContext from "../../../contexts/Preferences/language"
+import LanguageContext from "../../../contexts/language"
 import PlusIcon from "@/assets/icons/svgs/plus_circle.svg"
 import React from "react"
 import { Text } from "../../Themed"
@@ -11,13 +11,19 @@ import { Vibrate } from "../../../lib/hooks/useHapticFeedback"
 import fonts from "../../../constants/fonts"
 import sizes from "../../../constants/sizes"
 import MomentContext from "@/components/moment/context"
-import { textLib } from "@/shared/circle.text.library"
+import { textLib } from "@/circle.text.library"
 import { truncated } from "@/helpers/processText"
 import { Moment as MomentProps } from "@/contexts/Feed/types"
+import { isIOS } from "@/lib/platform/detection"
+import { SwiftBottomSheet } from "@/components/ios/ios.bottom.sheet"
+import FetchedCommentsList from "./fetched-comments-list"
+import BottomSheetContext from "@/contexts/bottomSheet"
 export default function ZeroComments({ moment }: { moment: MomentProps }) {
     const { t } = React.useContext(LanguageContext)
+    const [isIOSSheetOpen, setIOSSheetOpen] = React.useState(false)
     const { commentEnabled, setCommentEnabled, setKeyboardVisible, setScrollEnabled } =
         React.useContext(FeedContext)
+    const { expand } = React.useContext(BottomSheetContext)
     const isDarkMode = useColorScheme() === "dark"
     const container: any = {
         maxWidth: sizes.screens.width,
@@ -47,72 +53,80 @@ export default function ZeroComments({ moment }: { moment: MomentProps }) {
         color: colors.gray.black,
     }
     function handlePress() {
-        if (commentEnabled) {
-            setCommentEnabled(false)
-            setScrollEnabled(true)
-            setKeyboardVisible(false)
+        // habilita o input/teclado e abre o modal de comentários
+        setCommentEnabled(true)
+        setKeyboardVisible(true)
+        setScrollEnabled(true)
+
+        if (isIOS) {
+            setIOSSheetOpen(true)
         } else {
-            setCommentEnabled(true)
-            setKeyboardVisible(true)
-            setScrollEnabled(true)
+            expand({
+                snapPoints: ["60%"],
+                enablePanDownToClose: true,
+                children: <FetchedCommentsList />,
+            })
         }
     }
-
-    console.log("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA")
-    console.log(moment)
-
-    if (commentEnabled) return null
-    else
-        return (
-            <View style={container}>
-                <View
-                    style={{
-                        marginBottom: sizes.margins["2sm"],
-                        alignItems: "center",
-                        alignSelf: "center",
-                    }}
-                >
-                    {moment.publishedAt && (
-                        <Text
-                            style={{
-                                fontSize: fonts.size.caption1,
-                                color: ColorTheme().textDisabled,
-                            }}
-                        >
-                            {t("Shared")}{" "}
-                            {textLib.date
-                                .toRelativeTime(new Date(moment.publishedAt))
-                                .toLowerCase()}
-                        </Text>
-                    )}
+    return (
+        <View style={container} pointerEvents="box-none">
+            <View
+                style={{
+                    marginBottom: sizes.margins["2sm"],
+                    alignItems: "center",
+                    alignSelf: "center",
+                }}
+            >
+                {moment.publishedAt && (
                     <Text
                         style={{
-                            fontFamily: fonts.family.Bold,
-
-                            fontSize: fonts.size.subheadline * 0.85,
+                            fontSize: fonts.size.caption1,
+                            color: ColorTheme().textDisabled,
                         }}
                     >
-                        {t("It seems like nobody has commented yet")} 🥲
+                        {t("Shared ")}{" "}
+                        {textLib.date.toRelativeTime(new Date(moment.publishedAt)).toLowerCase()}
                     </Text>
-                </View>
+                )}
+                <Text
+                    style={{
+                        fontFamily: fonts.family.Bold,
 
-                <ButtonStandart
-                    action={handlePress}
-                    vibrate={() => {
-                        Vibrate("effectTick")
+                        fontSize: fonts.size.subheadline * 0.85,
                     }}
-                    margins={false}
-                    bounciness={2}
-                    style={buttonContainer}
                 >
-                    <Text style={buttonTitle}>
-                        {t("React to")} @
-                        {textLib.conversor.sliceWithDots({
-                            text: moment.user.username,
-                            size: 10,
-                        })}
-                    </Text>
-                </ButtonStandart>
+                    {t("It seems like nobody has commented yet")} 🥲
+                </Text>
             </View>
-        )
+
+            <ButtonStandart
+                action={handlePress}
+                vibrate={() => {
+                    Vibrate("effectTick")
+                }}
+                margins={false}
+                bounciness={2}
+                style={buttonContainer}
+            >
+                <Text style={buttonTitle}>
+                    {t("React to")} @
+                    {textLib.conversor.sliceWithDots({
+                        text: moment.user.username,
+                        size: 10,
+                    })}
+                </Text>
+            </ButtonStandart>
+            {isIOS && isIOSSheetOpen && (
+                <SwiftBottomSheet
+                    isOpened={isIOSSheetOpen}
+                    onIsOpenedChange={(opened) => {
+                        if (!opened) setIOSSheetOpen(false)
+                        setCommentEnabled(true)
+                    }}
+                >
+                    <FetchedCommentsList />
+                </SwiftBottomSheet>
+            )}
+        </View>
+    )
 }

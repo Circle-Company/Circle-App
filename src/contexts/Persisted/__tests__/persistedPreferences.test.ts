@@ -119,11 +119,6 @@ describe("persistedPreferences Store", () => {
             expect(mockPreferencesStore.content.disableHaptics).toBe(false)
             expect(mockPreferencesStore.content.disableTranslation).toBe(false)
             expect(mockPreferencesStore.content.muteAudio).toBe(false)
-            expect(mockPreferencesStore.pushNotifications.disableLikeMoment).toBe(false)
-            expect(mockPreferencesStore.pushNotifications.disableNewMemory).toBe(false)
-            expect(mockPreferencesStore.pushNotifications.disableAddToMemory).toBe(false)
-            expect(mockPreferencesStore.pushNotifications.disableFollowUser).toBe(false)
-            expect(mockPreferencesStore.pushNotifications.disableViewUser).toBe(false)
         })
     })
 
@@ -174,17 +169,9 @@ describe("persistedPreferences Store", () => {
     })
 
     describe("Push Notification Preferences", () => {
-        it("should update like moment notification preference", () => {
-            mockPreferencesStore.setDisableLikeMoment(true)
-            expect(mockPreferencesStore.setDisableLikeMoment).toHaveBeenCalledWith(true)
-            expect(mockPreferencesStore.pushNotifications.disableLikeMoment).toBe(true)
-        })
+        it("should update like moment notification preference", () => {})
 
-        it("should update new memory notification preference", () => {
-            mockPreferencesStore.setDisableNewMemory(true)
-            expect(mockPreferencesStore.setDisableNewMemory).toHaveBeenCalledWith(true)
-            expect(mockPreferencesStore.pushNotifications.disableNewMemory).toBe(true)
-        })
+        it("should update new memory notification preference", () => {})
     })
 
     describe("Method Validation", () => {

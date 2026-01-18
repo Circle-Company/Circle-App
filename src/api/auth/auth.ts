@@ -1,10 +1,10 @@
-import { SignInProps, SignUpProps } from "./styles"
+import { SignInProps, SignUpProps } from "./auth.types"
 
-import api from "../.."
+import api from "@/api"
 
 async function refreshToken({ refreshToken }: { refreshToken: string }) {
     return api.get("/auth/refresh-token", {
-        headers: { Authorization: `Bearer ${refreshToken}` },
+        headers: { Authorization: refreshToken },
     })
 }
 

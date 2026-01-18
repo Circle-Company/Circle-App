@@ -1,5 +1,5 @@
-import { Comments } from "../../../../components/comment"
-import MomentContext from "../../../../components/moment/context"
+import { Comments } from "@/components/comment"
+import MomentContext from "@/components/moment/context"
 import React from "react"
 
 export default function RenderCommentFull() {

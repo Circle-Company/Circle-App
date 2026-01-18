@@ -5,16 +5,20 @@ import Arrowbottom from "@/assets/icons/svgs/paper_plane.svg"
 import CheckIcon from "@/assets/icons/svgs/check_circle.svg"
 import { CommentsInputProps } from "../comments-types"
 import FeedContext from "../../../contexts/Feed"
-import LanguageContext from "../../../contexts/Preferences/language"
+import LanguageContext from "../../../contexts/language"
 import PersistedContext from "../../../contexts/Persisted"
 import React from "react"
+import LinearGradient from "react-native-linear-gradient"
 import { UserShow } from "../../user_show"
-import api from "../../../services/Api"
+import api from "../../../api"
 import fonts from "../../../constants/fonts"
 import sizes from "../../../constants/sizes"
 import { useToast } from "../../../contexts/Toast"
 import { userReciveDataProps } from "@/components/user_show/user_show-types"
 import MomentContext from "@/components/moment/context"
+import { TextStyle } from "react-native"
+import { ViewStyle } from "react-native"
+import { Button, Host } from "@expo/ui/swift-ui"
 
 export default function Input({
     preview = false,
@@ -24,8 +28,8 @@ export default function Input({
     autoFocus = false,
 }: CommentsInputProps) {
     const { t } = React.useContext(LanguageContext)
-    const { actions } = React.useContext(MomentContext)
-    const { focusedMoment, setCommentEnabled } = React.useContext(FeedContext)
+    const { actions, data } = React.useContext(MomentContext)
+    const { focusedMoment, setCommentEnabled, commentEnabled } = React.useContext(FeedContext)
     const { session } = React.useContext(PersistedContext)
     const [commentText, setCommentText] = React.useState<string>("")
     const isDarkMode = useColorScheme() === "dark"
@@ -54,46 +58,47 @@ export default function Input({
     }
 
     const input_container: any = {
-        width: "100%",
+        width: sizes.screens.width - sizes.margins["1md"],
         height: sizes.inputs.height,
         alignItems: "center",
+        alignSelf: "center",
         justifyContent: "center",
         flexDirection: "row",
         borderRadius: sizes.inputs.height / 2,
         paddingLeft: sizes.inputs.paddingHorizontal,
         backgroundColor: backgroundColor ? backgroundColor : ColorTheme().blur_button_color,
         overflow: "hidden",
-        paddingRight: 9,
+        paddingRight: sizes.inputs.paddingHorizontal,
     }
-    const text: any = {
+    const text: TextStyle = {
         flex: 1,
         fontFamily: fonts.family.Medium,
-        fontSize: 14,
+        fontSize: 16,
         color: colors.gray.white,
     }
-    const placeholderStyle: any = {
-        flex: 1,
-        fontFamily: fonts.family.Medium,
-        fontSize: 14,
-        color: colors.gray.white,
-    }
-    const textContainer: any = {
+    const textContainer: ViewStyle = {
         marginLeft: 5,
         height: sizes.inputs.height,
         justifyContent: "center",
         flex: 1,
     }
-    const pressable_style: any = {
+    const pressable_style: ViewStyle = {
         width: 40,
         height: 40,
     }
-    const iconContainer: any = {
-        width: 40,
+    const iconContainer: ViewStyle = {
+        width: 60,
         borderRadius: 40 / 2,
         height: 40,
         alignSelf: "center",
         alignItems: "center",
         justifyContent: "center",
+    }
+
+    const gradient_border: ViewStyle = {
+        alignSelf: "center",
+        padding: 1,
+        borderRadius: sizes.inputs.height / 2,
     }
 
     async function sendComment() {
@@ -102,11 +107,12 @@ export default function Input({
                 title: t("Comment Sended"),
                 icon: <CheckIcon fill={colors.green.green_05.toString()} width={15} height={15} />,
             })
+        setCommentEnabled(false)
         actions
             .registerInteraction("COMMENT", {
+                momentId: data.id,
+                authorizationToken: session.account.jwtToken,
                 content: commentText,
-                mentions: undefined,
-                parentId: undefined,
             })
             .then(() => {
                 toast.success(t("Comment Has been sended with success"), {
@@ -122,96 +128,80 @@ export default function Input({
             })
     }
 
+    if (commentEnabled === false) return null
+
     if (preview)
         return (
-            <View style={input_container}>
-                <View style={[textContainer, { justifyContent: "center" }]}>
-                    <Text style={[text, { opacity: 0.4, flex: 0 }]}>
-                        {placeholder ? placeholder : t("Send Comment") + "..."}
-                    </Text>
-                </View>
-                <Pressable onPress={handleButtonPress} style={pressable_style}>
-                    <Animated.View
-                        style={[
-                            iconContainer,
-                            { transform: [{ scale: animatedScale }] },
-                            {
-                                backgroundColor:
+            <LinearGradient
+                colors={[String(colors.gray.grey_06), String(colors.gray.black)]}
+                start={{ x: 0, y: 0 }}
+                end={{ x: 0, y: 1 }}
+                style={gradient_border}
+            >
+                <View style={input_container}>
+                    <View style={[textContainer, { justifyContent: "center" }]}>
+                        <Text style={[text, { opacity: 0.4, flex: 0 }]}>
+                            {placeholder ? placeholder : t("Send Comment") + "..."}
+                        </Text>
+                    </View>
+                    <Pressable onPress={handleButtonPress} style={pressable_style}>
+                        <Animated.View
+                            style={[
+                                iconContainer,
+                                { transform: [{ scale: animatedScale }] },
+                                {
+                                    backgroundColor:
+                                        commentText == ""
+                                            ? String(colors.transparent.white_10)
+                                            : String(colors.transparent.white_20),
+                                },
+                            ]}
+                        >
+                            <Arrowbottom
+                                fill={
                                     commentText == ""
-                                        ? String(colors.transparent.white_10)
-                                        : String(colors.transparent.white_20),
-                            },
-                        ]}
-                    >
-                        <Arrowbottom
-                            fill={
-                                commentText == ""
-                                    ? String(colors.transparent.white_60)
-                                    : String(colors.gray.white)
-                            }
-                            width={16}
-                            height={16}
-                        />
-                    </Animated.View>
-                </Pressable>
-            </View>
+                                        ? String(colors.transparent.white_60)
+                                        : String(colors.gray.white)
+                                }
+                                width={16}
+                                height={16}
+                            />
+                        </Animated.View>
+                    </Pressable>
+                </View>
+            </LinearGradient>
         )
     return (
-        <View style={[input_container, { paddingLeft: sizes.paddings["1sm"] * 0.2 }]}>
-            <UserShow.Root
-                data={{ ...session.user, verified: true, youFollow: false } as userReciveDataProps}
-            >
-                <UserShow.ProfilePicture
-                    displayOnMoment={false}
-                    pictureDimensions={{ width: 40, height: 40 }}
-                />
-            </UserShow.Root>
-            <View style={textContainer}>
-                <TextInput
-                    style={[text, { color }]}
-                    placeholder={placeholder}
-                    placeholderTextColor={String(
-                        isDarkMode ? colors.gray.grey_05 : colors.transparent.black_50,
-                    )}
-                    selectionColor={colors.purple.purple_04}
-                    numberOfLines={1}
-                    onChangeText={(text) => setCommentText(text)}
-                    autoFocus={autoFocus}
-                />
-            </View>
-            <Pressable
-                onPress={(n) => {
-                    handleButtonPress()
-                }}
-                style={pressable_style}
-            >
-                <Animated.View
-                    style={[
-                        iconContainer,
-                        { transform: [{ scale: animatedScale }] },
-                        {
-                            backgroundColor:
-                                commentText == ""
-                                    ? isDarkMode
-                                        ? colors.transparent.white_10
-                                        : colors.transparent.black_20
-                                    : String(colors.blue.blue_05),
-                        },
-                    ]}
-                >
-                    <Arrowbottom
-                        fill={String(
-                            !commentText
-                                ? isDarkMode
-                                    ? colors.gray.grey_05
-                                    : colors.gray.white
-                                : colors.gray.white,
+        <LinearGradient
+            colors={[String(colors.gray.grey_06), String(colors.gray.grey_06)]}
+            start={{ x: 0.5, y: 0 }}
+            end={{ x: 0.5, y: 1 }}
+            style={gradient_border}
+        >
+            <View style={[input_container]}>
+                <View style={textContainer}>
+                    <TextInput
+                        style={[text, { color, paddingRight: 12 }]}
+                        placeholder={placeholder}
+                        placeholderTextColor={String(
+                            isDarkMode ? colors.gray.grey_05 : colors.transparent.black_50,
                         )}
-                        width={16}
-                        height={16}
+                        selectionColor={colors.purple.purple_04}
+                        numberOfLines={1}
+                        onChangeText={(text) => setCommentText(text)}
+                        autoFocus={autoFocus}
                     />
-                </Animated.View>
-            </Pressable>
-        </View>
+                </View>
+                <Host matchContents>
+                    <Button
+                        color={colors.purple.purple_05}
+                        disabled={!commentText}
+                        systemImage="paperplane.fill"
+                        variant="glassProminent"
+                        controlSize="regular"
+                    />
+                </Host>
+            </View>
+        </LinearGradient>
     )
 }

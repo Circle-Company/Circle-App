@@ -175,53 +175,64 @@ export function Provider({ children }: AuthProviderProps) {
 
     const signOut = () => {
         try {
-            storage.clearAll()
-            setSessionData(null)
-            setSignInputUsername("")
-            setSignInputPassword("")
-            setErrorMessage("")
-
-            setRedirectTo("AUTH")
-            // Limpa stores persistidas do usuário
+            // Limpa stores persistidas
             try {
                 useUserStore().remove()
                 useAccountStore().remove()
                 usePreferencesStore().remove()
                 useMetricsStore().remove()
             } catch (e) {
-                console.warn("⚠️ Não foi possível limpar stores persistidas do usuário:", e)
+                console.warn("Erro ao limpar stores:", e)
             }
+
+            // Limpa storage
+            storage.clearAll()
+
+            // Reseta estados locais
+            setSessionData(null)
+            setSignInputUsername("")
+            setSignInputPassword("")
+            setErrorMessage("")
+
+            // Redireciona para AUTH
+            setRedirectTo("AUTH")
         } catch (error) {
-            console.error("❌ Erro no logout:", error)
+            console.error("Erro no logout:", error)
             setRedirectTo("AUTH")
         }
     }
 
     const checkIsSigned = (): boolean => {
         try {
-            const sessionId = storage.getString("@circle:sessionId")
             const userId = storage.getString(storageKeys().user.id)
             const jwtToken = storage.getString(storageKeys().account.jwt.token)
+            const refreshToken = storage.getString(storageKeys().account.jwt.refreshToken)
 
-            const hasEssentialData = Boolean(userId) && Boolean(jwtToken)
+            // Verifica apenas se tem tokens essenciais
+            // Não verifica expiração aqui - deixa o interceptor da API lidar com refresh
+            const hasEssentialData = Boolean(userId) && Boolean(jwtToken) && Boolean(refreshToken)
 
             if (!hasEssentialData) {
+                console.log("checkIsSigned: Dados essenciais faltando")
                 return false
             }
 
+            // Opcional: Log apenas se token estiver próximo de expirar (para debug)
             const jwtExpiration = storage.getString(storageKeys().account.jwt.expiration)
             if (jwtExpiration) {
                 const expirationDate = new Date(jwtExpiration)
                 const now = new Date()
+                const minutesUntilExpiration =
+                    (expirationDate.getTime() - now.getTime()) / 1000 / 60
 
-                if (expirationDate <= now) {
-                    return false
+                if (minutesUntilExpiration < 5 && minutesUntilExpiration > 0) {
+                    console.log("Token expira em menos de 5 minutos, refresh será automático")
                 }
             }
 
             return true
         } catch (error) {
-            console.error("❌ Erro ao verificar status de autenticação:", error)
+            console.error("Erro ao verificar status de autenticação:", error)
             return false
         }
     }

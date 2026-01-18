@@ -37,12 +37,15 @@ export class FeedOrchestrator {
 
         const moments = await this.fetcher.fetchChunk()
         const newChunkIds = moments.map((m) => m.id)
+        const dedupNewChunkIds = Array.from(new Set(newChunkIds))
         const currentPostIds = currentFeed.map((m) => m.id)
-        const uniqueNewIds = newChunkIds.filter((id) => !currentPostIds.includes(id))
+        const uniqueNewIds = Array.from(
+            new Set(dedupNewChunkIds.filter((id) => !currentPostIds.includes(id))),
+        )
 
         // caso reload -> substitui tudo
         if (isReloading) {
-            const { updatedList } = this.chunkManager.apply("RESET", newChunkIds)
+            const { updatedList } = this.chunkManager.apply("RESET", dedupNewChunkIds)
             await this.cacheManager.apply("CLEAR")
             this.preload(updatedList, moments)
             const newFeed = mapper(updatedList, moments, currentFeed)

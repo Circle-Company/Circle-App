@@ -1,18 +1,24 @@
-import { FlatList, Platform } from "react-native"
+import { Animated } from "react-native"
 
-import LanguageContext from "../../contexts/Preferences/language"
+import LanguageContext from "../../contexts/language"
 import PersistedContext from "../../contexts/Persisted"
 import React from "react"
 import { SettignsSectionProps } from "../../components/settings/settings-types"
 import { Settings } from "../../components/settings"
 import { SettingsFooterComponent } from "./footer"
 import { truncated } from "../../helpers/processText"
-
-import { IosSettings } from "@/components/settings/ios.settings"
+import { router } from "expo-router"
+import config from "@/config"
+import * as Browser from "expo-web-browser"
+import { SwitchButton } from "@/components/general/switch-button"
+import { useDisableHapticsMutation, useEnableEnableMutation } from "@/queries/preferences.haptic"
+import { View } from "react-native"
+import sizes from "@/constants/sizes"
 
 export default function ListSettings() {
-    const isIOS = Platform.OS === "ios"
     const { session } = React.useContext(PersistedContext)
+    const preferencesState = session.preferences.content
+
     const { t } = React.useContext(LanguageContext)
     const name_text = session.user.name
         ? truncated({ text: session.user.name, size: 18 })
@@ -21,33 +27,27 @@ export default function ListSettings() {
         ? truncated({ text: session.user.description.replace(/(\r\n|\n|\r)/gm, " "), size: 18 })
         : t("add new description")
 
+    const disableHapticsMutation = useDisableHapticsMutation()
+    const enableHapticsMutation = useEnableEnableMutation()
+
     const ListData: SettignsSectionProps[] = [
         {
             name: t("Public Profile"),
             content: [
                 {
                     name: t("Profile Picture"),
-                    value: "",
                     type: "IMAGE",
-                    navigateTo: "Settings-ProfilePicture",
-                    navigator: "SettingsNavigator",
-                    secure: false,
+                    onPress: () => router.push("/(tabs)/settings/profile-picture"),
                 },
                 {
                     name: t("Name"),
                     value: name_text,
-                    type: "TEXT",
-                    navigateTo: "Settings-Name",
-                    navigator: "SettingsNavigator",
-                    secure: false,
+                    onPress: () => router.push("/(tabs)/settings/name"),
                 },
                 {
                     name: t("Description"),
                     value: description_text,
-                    type: "TEXT",
-                    navigateTo: "Settings-Description",
-                    navigator: "SettingsNavigator",
-                    secure: false,
+                    onPress: () => router.push("/(tabs)/settings/description"),
                 },
             ],
         },
@@ -55,20 +55,34 @@ export default function ListSettings() {
             name: t("Account"),
             content: [
                 {
-                    name: t("Preferences"),
-                    value: "",
-                    type: "TEXT",
-                    navigateTo: "Settings-Preferences",
-                    navigator: "SettingsNavigator",
-                    secure: false,
+                    name: t("Language"),
+                    value:
+                        session.preferences.language.appLanguage == "pt" ? "Português" : "English",
+                    onPress: () => router.push("/(tabs)/settings/language"),
+                },
+                {
+                    name: t("Haptic Feedback"),
+                    value: session.preferences.content.disableHaptics
+                        ? t("Enabled")
+                        : t("Disabled"),
+
+                    rightComponent: (
+                        <SwitchButton
+                            initialState={!preferencesState.disableHaptics}
+                            onPressEnable={enableHapticsMutation.mutate}
+                            onPressDisable={disableHapticsMutation.mutate}
+                        />
+                    ),
                 },
                 {
                     name: t("Password"),
-                    value: "",
-                    type: "TEXT",
-                    navigateTo: "Settings-Password",
-                    navigator: "SettingsNavigator",
                     secure: true,
+                    onPress: () => router.push("/(tabs)/settings/password"),
+                },
+                {
+                    name: t("Personal Data"),
+                    secure: true,
+                    onPress: () => router.push("/(tabs)/settings/personal-data"),
                 },
             ],
         },
@@ -77,27 +91,21 @@ export default function ListSettings() {
             content: [
                 {
                     name: t("Privacy Policy"),
-                    value: "",
-                    type: "TEXT",
-                    navigateTo: "Settings-Privacy-Policy",
-                    navigator: "SettingsNavigator",
-                    secure: false,
+                    onPress: () => {
+                        Browser.openBrowserAsync(config.PRIVACY_POLICY_URL)
+                    },
                 },
                 {
                     name: t("Terms of Service"),
-                    value: "",
-                    type: "TEXT",
-                    navigateTo: "Settings-Terms-Of-Service",
-                    navigator: "SettingsNavigator",
-                    secure: false,
+                    onPress: () => {
+                        Browser.openBrowserAsync(config.TERMS_OF_SERVICE_URL)
+                    },
                 },
                 {
                     name: t("Community Guidelines"),
-                    value: "",
-                    type: "TEXT",
-                    navigateTo: "Settings-Community-Guidelines",
-                    navigator: "SettingsNavigator",
-                    secure: false,
+                    onPress: () => {
+                        Browser.openBrowserAsync(config.COMMUNITY_GUIDELINES_URL)
+                    },
                 },
             ],
         },
@@ -105,40 +113,44 @@ export default function ListSettings() {
             name: t("More"),
             content: [
                 {
-                    name: t("Version"),
-                    value: "",
-                    type: "TEXT",
-                    navigateTo: "Settings-Version",
-                    navigator: "SettingsNavigator",
-                    secure: false,
+                    name: t("Support"),
+                    value: config.CIRCLE_APP_URL.replace("https://", "") + "/contact-us",
+                    onPress: () => {
+                        Browser.openBrowserAsync(config.CONTACT_US_URL)
+                    },
                 },
                 {
-                    name: t("Support"),
-                    value: "",
-                    type: "TEXT",
-                    navigateTo: "Settings-Support",
-                    navigator: "SettingsNavigator",
-                    secure: false,
+                    name: t("Help"),
+                    value: config.CIRCLE_APP_URL.replace("https://", "") + "/help",
+                    onPress: () => {
+                        Browser.openBrowserAsync(config.HELP_URL)
+                    },
                 },
                 {
                     name: t("Log Out"),
-                    value: "",
-                    type: "TEXT",
-                    navigateTo: "Settings-Log-Out",
-                    navigator: "SettingsNavigator",
-                    secure: false,
+                    value: t("Signed with") + " @" + session.user.username,
+                    onPress: () => router.push("/(tabs)/settings/log-out"),
                 },
             ],
         },
     ]
 
     return (
-        <FlatList
+        <Animated.FlatList
             data={ListData}
-            scrollEnabled={false}
+            scrollEnabled={true}
+            showsVerticalScrollIndicator={false}
             keyExtractor={(item) => item.name}
+            scrollEventThrottle={16}
+            ListHeaderComponent={() => {
+                return <View style={{ height: sizes.headers.height * 1.35 }} />
+            }}
             renderItem={({ item, index }) => {
-                return <Settings.Section key={index} name={item.name} content={item.content} />
+                return (
+                    <Animated.View key={index}>
+                        <Settings.Section name={item.name} content={item.content} />
+                    </Animated.View>
+                )
             }}
             ListFooterComponent={() => {
                 return <SettingsFooterComponent />

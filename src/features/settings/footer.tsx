@@ -1,11 +1,10 @@
-import ColorTheme, { colors } from "../../constants/colors"
-import { Text, View } from "../../components/Themed"
-
-import LanguageContext from "../../contexts/Preferences/language"
+import { colors } from "@/constants/colors"
+import { Text, View } from "@/components/Themed"
+import LanguageContext from "@/contexts/language"
 import React from "react"
-import config from "../../config"
-import fonts from "../../constants/fonts"
-import sizes from "../../constants/sizes"
+import config from "@/config"
+import fonts from "@/constants/fonts"
+import sizes from "@/constants/sizes"
 import { useColorScheme } from "react-native"
 
 export function SettingsFooterComponent() {
@@ -13,10 +12,10 @@ export function SettingsFooterComponent() {
     const isDarkMode = useColorScheme() === "dark"
     const container: any = {
         width: sizes.screens.width,
-        height: sizes.headers.height,
+        height: sizes.headers.height * 1.2,
         alignItems: "center",
         justifyContent: "center",
-        marginBottom: sizes.margins["2md"],
+        marginBottom: 100,
         borderColor: isDarkMode ? colors.gray.grey_08 : colors.gray.grey_02,
     }
 
@@ -28,14 +27,21 @@ export function SettingsFooterComponent() {
     const subText: any = {
         marginTop: 3,
         fontSize: fonts.size.caption1,
-        fontFamily: fonts.family.Medium,
+        fontFamily: fonts.family["Medium-Italic"],
         color: colors.gray.grey_05,
     }
 
     return (
         <View style={container}>
-            <Text style={text}>{t("Circle for iPhone")}</Text>
-            <Text style={subText}>{config.ORGANIZATION_NAME}</Text>
+            <Text style={text}>{t("Circle App for iPhone")}</Text>
+            <Text style={subText}>
+                {t("by")} {config.ORGANIZATION_NAME}
+            </Text>
+            <Text
+                style={[text, { marginTop: sizes.margins["1md"], fontSize: fonts.size.body * 0.8 }]}
+            >
+                {t("Version")} {config.APP_VERSION}
+            </Text>
         </View>
     )
 }

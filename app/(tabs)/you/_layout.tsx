@@ -21,39 +21,31 @@ export default function YouLayout() {
                 contentStyle: {
                     backgroundColor,
                 },
-                headerTransparent: false,
                 headerShadowVisible: false,
+                animationMatchesGesture: true,
+                animation: "slide_from_right",
+                headerTransparent: true,
                 headerStyle: {
                     backgroundColor: colors.gray.black,
                 },
                 headerTintColor: colors.gray.white,
-                animation: "slide_from_right",
-                presentation: "card",
             }}
         >
             <Stack.Screen
                 name="index"
                 options={{
+                    headerStyle: {
+                        backgroundColor: "transparent",
+                    },
                     headerTitleAlign: "center",
+                    headerLargeTitle: false,
+                    headerTransparent: true,
                     headerTitleStyle: {
                         fontFamily: Fonts.family["Black-Italic"],
                         fontSize: Fonts.size.title2 * 0.9,
                         color: colors.gray.white,
                     },
                     headerTitle: session?.user?.username ? `@${session.user.username}` : "",
-                }}
-            />
-
-            <Stack.Screen
-                name="edit"
-                options={{
-                    headerTitle: t("Edit"),
-                    headerTitleAlign: "left",
-                    headerTitleStyle: {
-                        fontFamily: Fonts.family["Black-Italic"],
-                        fontSize: Fonts.size.title2,
-                        color: colors.gray.white,
-                    },
                 }}
             />
         </Stack>

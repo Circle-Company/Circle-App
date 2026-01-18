@@ -4,7 +4,7 @@ import { View } from "react-native"
 import fonts from "../../../constants/fonts"
 import sizes from "../../../constants/sizes"
 import NewMomentContext from "../../../contexts/newMoment"
-import LanguageContext from "../../../contexts/Preferences/language"
+import LanguageContext from "../../../contexts/language"
 import ViewMorebutton from "../../buttons/view_more"
 
 export default function NewMomentImageRight() {

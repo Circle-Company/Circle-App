@@ -1,7 +1,7 @@
 import { Animated, Pressable } from "react-native"
 
 import ColorTheme from "../../../constants/colors"
-import LanguageContext from "../../../contexts/Preferences/language"
+import LanguageContext from "../../../contexts/language"
 import PersistedContext from "../../../contexts/Persisted"
 import React from "react"
 import { Text } from "../../Themed"

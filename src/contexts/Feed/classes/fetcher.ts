@@ -1,7 +1,6 @@
-// feedApi.ts
+import api from "@/api"
 import config from "@/config"
 import { Moment, FeedResponse } from "@/contexts/Feed/types"
-import api from "@/api"
 
 export class Fetcher {
     constructor(private readonly jwtToken: string) {}
@@ -30,15 +29,38 @@ export class Fetcher {
 
             if (!config.PRODUCTION) {
                 data.moments.map((moment) => {
-                    const oldBases = ["http://10.15.0.235:3000", "http://10.168.15.17:3000"]
+                    // Reescrita direta do host legado para IP atual quando detectado
+                    moment.media = moment.media.replace(
+                        "http://172.31.80.1:3000",
+                        "http://10.168.15.17:3000",
+                    )
+                    moment.thumbnail = moment.thumbnail.replace(
+                        "http://172.31.80.1:3000",
+                        "http://10.168.15.17:3000",
+                    )
+
+                    const oldBases = [
+                        "http://10.15.0.235:3000",
+                        "http://10.168.15.17:3000",
+                        "http://172.31.80.1:3000",
+                    ]
                     const newBase = "http://" + config.ENDPOINT
+
+                    // Normalização do media para o ENDPOINT atual
                     for (const base of oldBases) {
                         if (moment.media.startsWith(base)) {
                             moment.media = newBase + moment.media.slice(base.length)
                             break
                         }
                     }
-                    moment.thumbnail = moment.thumbnail.replace("http://10.15.0.235:3000", newBase)
+
+                    // Normalização do thumbnail para o ENDPOINT atual
+                    for (const base of oldBases) {
+                        if (moment.thumbnail.startsWith(base)) {
+                            moment.thumbnail = newBase + moment.thumbnail.slice(base.length)
+                            break
+                        }
+                    }
                 })
             }
 
