@@ -5,9 +5,9 @@ import { Text } from "@/components/Themed"
 import ColorTheme, { colors } from "@/constants/colors"
 import fonts from "@/constants/fonts"
 import sizes from "@/constants/sizes"
-import AuthContext from "@/contexts/Auth"
+import AuthContext from "@/contexts/auth"
 import { usernameRegex } from "@/lib/hooks/useUsernameRegex"
-import api from "@/services/Api" // Serviço para verificar disponibilidade do username
+import api from "@/api" // Serviço para verificar disponibilidade do username
 import React, { useContext, useEffect, useRef, useState } from "react"
 import { useTranslation } from "react-i18next"
 import {

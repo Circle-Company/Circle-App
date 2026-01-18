@@ -3,7 +3,7 @@
 import { useNavigation } from "@react-navigation/native"
 import { act, fireEvent, render } from "@testing-library/react-native"
 import React from "react"
-import AuthContext, { AuthContextsData } from "../../../contexts/Auth"
+import AuthContext, { AuthContextsData } from "../../../contexts/auth"
 import UsernameScreen from "./Username"
 
 const mockedColorScheme = jest.fn()

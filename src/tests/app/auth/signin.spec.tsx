@@ -1,4 +1,4 @@
-import AuthContext, { AuthContextsData } from "@/contexts/Auth"
+import AuthContext, { AuthContextsData } from "@/contexts/auth"
 import { SessionDataType } from "@/contexts/Persisted/types"
 import { NavigationContainer } from "@react-navigation/native"
 import { act, fireEvent, render, waitFor } from "@testing-library/react-native"
@@ -55,7 +55,7 @@ const renderWithProvider = (contextOverrides = {}) => {
             <AuthContext.Provider value={contextValue}>
                 <SignInScreen />
             </AuthContext.Provider>
-        </NavigationContainer>
+        </NavigationContainer>,
     )
 
     return { ...utils, contextValue }

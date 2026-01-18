@@ -21,7 +21,7 @@ vi.mock("react-native", () => ({
     Dimensions: { get: vi.fn(() => ({ width: 390, height: 844 })) },
 }))
 
-vi.mock("../../services/Api", () => ({
+vi.mock("../../api", () => ({
     default: {
         post: vi.fn(),
         get: vi.fn(),
@@ -138,9 +138,6 @@ describe("Testes de Integração Completos - Criação de Conta", () => {
                 disableTranslation: false,
                 muteAudio: false,
             },
-            pushNotifications: {
-                disableLikeMoment: false,
-                disableNewMemory: false,
                 disableAddToMemory: false,
                 disableFollowUser: false,
                 disableViewUser: false,
@@ -156,7 +153,7 @@ describe("Testes de Integração Completos - Criação de Conta", () => {
 
         // Configurar mocks
         mockDeviceInfo = vi.mocked(require("react-native-device-info"))
-        mockApi = require("../../services/Api").default
+        mockApi = require("../../api").default
         mockStorage = require("../../store").storage
 
         // Configurar comportamento padrão

@@ -1,6 +1,6 @@
 import { act, fireEvent, render } from "@testing-library/react-native"
 import React from "react"
-import AuthContext from "../../../contexts/Auth"
+import AuthContext from "../../../contexts/auth"
 import PasswordInput from "../passwordInput"
 
 type MockAuthContextProps = {
@@ -39,7 +39,7 @@ describe("PasswordInput Component", () => {
         const { getByTestId, queryByTestId } = render(
             <MockAuthProvider>
                 <PasswordInput type="signUp" />
-            </MockAuthProvider>
+            </MockAuthProvider>,
         )
 
         await act(async () => {

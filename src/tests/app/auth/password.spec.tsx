@@ -2,7 +2,7 @@
 
 import { render } from "@testing-library/react-native"
 import React from "react"
-import AuthContext, { AuthContextsData } from "../../../contexts/Auth"
+import AuthContext, { AuthContextsData } from "../../../contexts/auth"
 
 // Mock para @motify/components e Loading
 jest.mock("@/components//loading", () => ({

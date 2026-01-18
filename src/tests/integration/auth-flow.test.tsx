@@ -1,7 +1,7 @@
 import { act, fireEvent, render, waitFor } from "@testing-library/react-native"
 import { beforeEach, describe, expect, it, vi } from "vitest"
 
-import AuthContext from "../../contexts/Auth"
+import AuthContext from "../../contexts/auth"
 import { Provider as PersistedProvider } from "../../contexts/Persisted"
 import { Platform } from "react-native"
 import React from "react"
@@ -19,7 +19,7 @@ vi.mock("react-native-device-info", () => ({
     getUniqueId: vi.fn(() => Promise.resolve("test-unique-id")),
 }))
 
-vi.mock("../../services/Api", () => ({
+vi.mock("../../api", () => ({
     default: {
         post: vi.fn(),
         get: vi.fn(),
@@ -236,7 +236,7 @@ describe("Fluxo de Autenticação - Teste de Integração", () => {
         vi.clearAllMocks()
 
         // Inicializar mocks
-        mockApi = vi.mocked((await import("../../services/Api")).default)
+        mockApi = vi.mocked((await import("../../api")).default)
         mockStorage = vi.mocked((await import("../../store")).storage)
 
         mockStorage.getString.mockReturnValue(null)
