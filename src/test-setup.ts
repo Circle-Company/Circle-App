@@ -161,8 +161,8 @@ vi.mock("@/store", () => ({
     })),
 }))
 
-// Mock para @/services/Api e services/Api/index
-vi.mock("@/services/Api", () => ({
+// Mock para @/api e services/Api/index
+vi.mock("@/api", () => ({
     default: {
         post: vi.fn(),
         get: vi.fn(),
@@ -171,7 +171,7 @@ vi.mock("@/services/Api", () => ({
     },
 }))
 
-vi.mock("@/services/Api/index", () => ({
+vi.mock("@/api/index", () => ({
     default: {
         post: vi.fn(),
         get: vi.fn(),
