@@ -1,6 +1,9 @@
 import React, { createContext, useContext, useState, ReactNode, useCallback, useMemo } from "react"
 import { uploadMoment } from "./hooks/uploadMoment"
 import PersistedContext from "@/contexts/Persisted"
+import type { CameraDevice } from "react-native-vision-camera"
+import { useMicrophonePermission, useLocationPermission } from "react-native-vision-camera"
+import { usePreferredCameraDevice } from "./hooks/usePreferredCameraDevice"
 
 export type CameraVideoInfo = {
     path: string
@@ -14,10 +17,40 @@ export type CameraVideoInfo = {
 
 type UploadResult = { ok: true; data: any } | { ok: false; error: string }
 
-type CameraContextType = {
+export type CameraContextType = {
+    // UI / tab visibility
+    tabHide: boolean
+    setTabHide: React.Dispatch<React.SetStateAction<boolean>>
+
     // Recording state
     isRecording: boolean
     setIsRecording: (value: boolean) => void
+
+    // Camera lifecycle / init and activity
+    isCameraInitialized: boolean
+    setIsCameraInitialized: (value: boolean) => void
+    isActive: boolean
+    setIsActive: (value: boolean) => void
+
+    // Camera controls
+    zoom: number
+    setZoom: (value: number) => void
+    isPressingButton: boolean
+    setIsPressingButton: (value: boolean) => void
+    rotateAnimation: number
+    setRotateAnimation: (value: number) => void
+    cameraPosition: "front" | "back"
+    setCameraPosition: React.Dispatch<React.SetStateAction<"front" | "back">>
+    torch: "off" | "on"
+    setTorch: (value: "off" | "on") => void
+
+    // Permissions
+    microphonePermission: ReturnType<typeof useMicrophonePermission>
+    locationPermission: ReturnType<typeof useLocationPermission>
+
+    // Preferred device
+    preferredDevice: CameraDevice | undefined
+    setPreferredDevice: (device: CameraDevice) => void
 
     // Video state
     video: CameraVideoInfo
@@ -25,7 +58,7 @@ type CameraContextType = {
 
     // Timer state
     recordingTime: number
-    setRecordingTime: (value: number) => void
+    setRecordingTime: React.Dispatch<React.SetStateAction<number>>
 
     // Raw video buffer (expected base64 or data-URI)
     videoBuffer: string | null
@@ -54,12 +87,29 @@ const CameraContext = createContext<CameraContextType | undefined>(undefined)
 
 export const CameraProvider = ({ children }: { children: ReactNode }) => {
     const { session } = useContext(PersistedContext)
+    const [tabHide, setTabHide] = React.useState(false)
     const [isRecording, setIsRecording] = useState(false)
     const [video, setVideo] = useState<CameraVideoInfo>(null)
     const [recordingTime, setRecordingTime] = useState(0)
     const [videoBuffer, setVideoBuffer] = useState<string | null>(null)
     const [description, setDescription] = useState<string | null>(null)
     const [authToken, setAuthToken] = useState<string | null>(null)
+
+    // Global camera UI/state
+    const [zoom, setZoom] = useState(1)
+    const [isPressingButton, setIsPressingButton] = useState(false)
+    const [rotateAnimation, setRotateAnimation] = useState(0)
+    const [isCameraInitialized, setIsCameraInitialized] = useState(false)
+    const [cameraPosition, setCameraPosition] = useState<"front" | "back">("back")
+    const [torch, setTorch] = useState<"off" | "on">("off")
+    const [isActive, setIsActive] = useState(true)
+
+    // Permissions
+    const microphonePermission = useMicrophonePermission()
+    const locationPermission = useLocationPermission()
+
+    // Preferred camera device
+    const [preferredDevice, setPreferredDevice] = usePreferredCameraDevice()
 
     // Upload state
     const [isUploading, setIsUploading] = useState(false)
@@ -154,9 +204,39 @@ export const CameraProvider = ({ children }: { children: ReactNode }) => {
 
     const value = useMemo<CameraContextType>(
         () => ({
+            // UI / tab visibility
+            tabHide,
+            setTabHide,
+
             // recording
             isRecording,
             setIsRecording,
+
+            // lifecycle / activity
+            isCameraInitialized,
+            setIsCameraInitialized,
+            isActive,
+            setIsActive,
+
+            // controls
+            zoom,
+            setZoom,
+            isPressingButton,
+            setIsPressingButton,
+            rotateAnimation,
+            setRotateAnimation,
+            cameraPosition,
+            setCameraPosition,
+            torch,
+            setTorch,
+
+            // permissions
+            microphonePermission,
+            locationPermission,
+
+            // preferred device
+            preferredDevice,
+            setPreferredDevice,
 
             // video
             video,
@@ -189,7 +269,19 @@ export const CameraProvider = ({ children }: { children: ReactNode }) => {
             reset,
         }),
         [
+            tabHide,
+            setTabHide,
             isRecording,
+            isCameraInitialized,
+            isActive,
+            zoom,
+            isPressingButton,
+            rotateAnimation,
+            cameraPosition,
+            torch,
+            microphonePermission,
+            locationPermission,
+            preferredDevice,
             video,
             recordingTime,
             videoBuffer,

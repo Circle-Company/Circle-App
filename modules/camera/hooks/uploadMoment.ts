@@ -1,7 +1,7 @@
-import api from "@/services/Api"
+import api from "@/api"
 import DeviceInfo from "react-native-device-info"
 import { Dimensions, PixelRatio } from "react-native"
-import * as FileSystem from "expo-file-system"
+import * as FileSystem from "expo-file-system/legacy"
 
 export interface uploadMomentInterface {
     description: string | null

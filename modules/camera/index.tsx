@@ -10,9 +10,9 @@
 export { CameraPage } from "./pages/camera"
 export { PermissionsPage } from "./pages/permissions"
 export { MediaPage } from "./pages/share"
-export { DevicesPage } from "./pages/devices"
 
 export { CameraProvider, useCameraContext } from "./context"
+export type { CameraContextType } from "./context"
 
 export type { Routes, CameraRoutes } from "./routes"
 export { CAMERA_ROUTES } from "./routes"

@@ -21,23 +21,18 @@ import Reanimated, {
     withSpring,
 } from "react-native-reanimated"
 import type { CameraProps, CameraRuntimeError, VideoFile } from "react-native-vision-camera"
-import {
-    Camera,
-    useCameraDevice,
-    useCameraFormat,
-    useLocationPermission,
-    useMicrophonePermission,
-} from "react-native-vision-camera"
+import { Camera, useCameraDevice, useCameraFormat } from "react-native-vision-camera"
 import { CaptureButton } from "../components/CaptureButton"
 import CameraVideoSlider from "../components/CameraVideoSlider"
 import { CONTENT_SPACING, MAX_ZOOM_FACTOR, SCREEN_HEIGHT, SCREEN_WIDTH } from "../constants"
 import { useIsForeground } from "../hooks/useIsForeground"
-import { usePreferredCameraDevice } from "../hooks/usePreferredCameraDevice"
-import type { Routes } from "../routes"
+
 import { useCameraContext } from "../context"
-import LanguageContext from "@/contexts/Preferences/language"
+import LanguageContext from "@/contexts/language"
 import { colors } from "@/constants/colors"
 import fonts from "@/constants/fonts"
+import { FlashButton } from "../components/flashButton"
+import { RotateButton } from "../components/rotateButton"
 
 const ReanimatedCamera = Reanimated.createAnimatedComponent(Camera)
 Reanimated.addWhitelistedNativeProps({
@@ -51,9 +46,7 @@ const TARGET_FPS = 60
 export function CameraPage(): React.ReactElement {
     const router = useRouter()
     const camera: any = useRef<Camera>(null)
-    const [isCameraInitialized, setIsCameraInitialized] = useState(false)
-    const microphone = useMicrophonePermission()
-    const location = useLocationPermission()
+
     const zoom = useSharedValue(1)
     const isPressingButton = useSharedValue(false)
     const rotateAnimation = useSharedValue(0)
@@ -61,19 +54,32 @@ export function CameraPage(): React.ReactElement {
     const insets = useSafeAreaInsets()
 
     // Camera context
-    const { isRecording, setIsRecording, setVideo, setRecordingTime, setVideoBuffer } =
-        useCameraContext()
+    const {
+        isRecording,
+        setIsRecording,
+        setVideo,
+        setRecordingTime,
+        setVideoBuffer,
+        setTabHide,
+        isCameraInitialized,
+        setIsCameraInitialized,
+        cameraPosition,
+        setCameraPosition,
+        torch,
+        setTorch,
+        preferredDevice,
+        microphonePermission,
+        locationPermission,
+    } = useCameraContext()
     const { t } = React.useContext(LanguageContext)
 
     // check if camera page is active
     const isFocussed = useIsFocused()
     const isForeground = useIsForeground()
     const isActive = isFocussed && isForeground
-    const [cameraPosition, setCameraPosition] = useState<"front" | "back">("back")
-    const [torch, setTorch] = useState<"off" | "on">("off")
 
     // camera device settings
-    const [preferredDevice] = usePreferredCameraDevice()
+
     let device = useCameraDevice(cameraPosition)
 
     if (preferredDevice != null && preferredDevice.position === cameraPosition) {
@@ -126,6 +132,8 @@ export function CameraPage(): React.ReactElement {
         async (media: VideoFile, type: "video") => {
             console.log(`Media captured! ${JSON.stringify(media)}`)
             console.log("📹 Original path:", media.path)
+
+            // Finaliza estado de gravação e timer
             setIsRecording(false)
             setRecordingTime(0)
             if (recordingIntervalRef.current) {
@@ -133,81 +141,15 @@ export function CameraPage(): React.ReactElement {
                 recordingIntervalRef.current = null
             }
 
-            // Caminho do vídeo capturado temporário
-            const tempPath = media.path
-
-            // Obter tamanho do arquivo
-            let fileSize = 0
-            const mimeType = "video/mp4" // Sempre MP4 agora
-
-            try {
-                const fileInfo = await FileSystem.getInfoAsync(tempPath)
-                if (fileInfo.exists && !fileInfo.isDirectory) {
-                    fileSize = fileInfo.size || 0
-                    console.log("📊 Tamanho do arquivo:", fileSize, "bytes")
-                }
-            } catch (error) {
-                console.error("❌ Erro ao obter informações do arquivo:", error)
-            }
-
-            // Criar diretório temp se não existir
-            const tempDir = `${FileSystem.documentDirectory}temp`
-
-            console.log("📁 Document directory:", FileSystem.documentDirectory)
-            console.log("📁 Temp directory:", tempDir)
-
-            try {
-                const dirInfo = await FileSystem.getInfoAsync(tempDir)
-                if (!dirInfo.exists) {
-                    console.log("📁 Criando diretório temp...")
-                    await FileSystem.makeDirectoryAsync(tempDir, { intermediates: true })
-                    console.log("✅ Diretório criado com sucesso!")
-                }
-            } catch (error) {
-                console.error("❌ Erro ao criar diretório temp:", error)
-            }
-
-            // Copiar vídeo para pasta temp com nome único
-            const timestamp = Date.now()
-            const fileName = `video_${timestamp}.mp4`
-            const finalPath = `${tempDir}/${fileName}`
-
-            console.log("📂 Copiando vídeo de:", tempPath)
-            console.log("📂 Para:", finalPath)
-
-            try {
-                await FileSystem.copyAsync({
-                    from: tempPath,
-                    to: finalPath,
-                })
-                console.log("✅ Vídeo copiado com sucesso!")
-
-                // Verificar se arquivo foi copiado
-                const copiedInfo = await FileSystem.getInfoAsync(finalPath)
-                if (copiedInfo.exists && !copiedInfo.isDirectory) {
-                    fileSize = copiedInfo.size || fileSize
-                    console.log("✅ Arquivo verificado, tamanho:", fileSize, "bytes")
-                }
-            } catch (error) {
-                console.error("❌ Erro ao copiar vídeo:", error)
-                console.error("❌ Detalhes do erro:", JSON.stringify(error))
-            }
-
-            console.log("📹 Arquivo de vídeo salvo:", {
-                path: finalPath,
-                duration: media.duration,
-                size: fileSize,
-                mimeType: mimeType,
-                width: media.width,
-                height: media.height,
-            })
-
-            // Adicionar prefixo file:// ao path final se necessário
-            // FileSystem.documentDirectory pode já incluir file://
-            let fileUri = finalPath
-            if (!fileUri.startsWith("file://")) {
+            // Usa o caminho original do vídeo e apenas garante o prefixo file://
+            const mimeType = "video/mp4"
+            let fileUri = media.path || ""
+            if (fileUri && !fileUri.startsWith("file://")) {
                 fileUri = `file://${fileUri}`
             }
+
+            // Tenta inferir tamanho com a API nova no futuro; por ora mantemos 0
+            const fileSize = 0
 
             console.log("📹 URI final para exibição:", fileUri)
 
@@ -235,12 +177,12 @@ export function CameraPage(): React.ReactElement {
         [router, setIsRecording, setVideo, setRecordingTime, setVideoBuffer],
     )
     const onFlipCameraPressed = useCallback(() => {
-        setCameraPosition((p) => (p === "back" ? "front" : "back"))
+        setCameraPosition(cameraPosition === "back" ? "front" : "back")
         rotateAnimation.value = withSpring(rotateAnimation.value + 180, {
             damping: 15,
             stiffness: 150,
         })
-    }, [rotateAnimation])
+    }, [rotateAnimation, cameraPosition])
 
     //#endregion
 
@@ -267,6 +209,10 @@ export function CameraPage(): React.ReactElement {
     }, [zoom, device])
     //#endregion
 
+    React.useEffect(() => {
+        setTabHide(false)
+    }, [])
+
     // Timer para gravação
     useEffect(() => {
         if (isRecording) {
@@ -275,17 +221,17 @@ export function CameraPage(): React.ReactElement {
                 setRecordingTime(0)
             }
             if (recordingIntervalRef.current) clearInterval(recordingIntervalRef.current)
+            let current = 0
             recordingIntervalRef.current = setInterval(() => {
-                setRecordingTime((prev) => {
-                    if (prev + 0.1 >= MAX_RECORDING_TIME) {
-                        setIsRecording(false)
-                        if (camera.current) {
-                            camera.current.stopRecording()
-                        }
-                        return MAX_RECORDING_TIME
+                current = current + 0.1
+                if (current >= MAX_RECORDING_TIME) {
+                    setIsRecording(false)
+                    if (camera.current) {
+                        camera.current.stopRecording()
                     }
-                    return prev + 0.1
-                })
+                    current = MAX_RECORDING_TIME
+                }
+                setRecordingTime(current)
             }, 100)
         } else {
             if (recordingIntervalRef.current) {
@@ -344,23 +290,22 @@ export function CameraPage(): React.ReactElement {
     }, [device?.name, format, fps])
 
     useEffect(() => {
-        location.requestPermission()
-    }, [location])
+        locationPermission.requestPermission()
+    }, [locationPermission])
 
     const cameraStyle: ViewStyle = {
         width: sizes.moment.full.width,
         height: sizes.moment.full.height,
         backgroundColor: "black",
-        borderRadius: 25,
+        borderRadius: 40,
         overflow: "hidden",
         alignItems: "center",
         justifyContent: "center",
         alignSelf: "center",
-        position: "relative",
     }
 
     return (
-        <SafeAreaView style={styles.container} edges={["top", "bottom"]}>
+        <View style={styles.container}>
             <Stack.Screen
                 options={{
                     headerTitle: isRecording ? t("Recording") : t("New Moment"),
@@ -400,9 +345,10 @@ export function CameraPage(): React.ReactElement {
                                     animatedProps={cameraAnimatedProps}
                                     exposure={0}
                                     outputOrientation="device"
+                                    photo={false}
                                     video={true}
-                                    audio={microphone.hasPermission}
-                                    enableLocation={location.hasPermission}
+                                    audio={microphonePermission.hasPermission}
+                                    enableLocation={locationPermission.hasPermission}
                                     torch={torch}
                                 />
                             </TapGestureHandler>
@@ -423,21 +369,12 @@ export function CameraPage(): React.ReactElement {
                     </View>
                 )}
 
-                <View style={[styles.bottomBar, { bottom: CONTENT_SPACING * 3 + insets.bottom }]}>
-                    <PressableOpacity
-                        style={styles.sideButton}
-                        onPress={onFlipCameraPressed}
-                        disabledOpacity={0.4}
-                    >
-                        <Reanimated.View style={rotateIconStyle}>
-                            <RotateIcon fill={colors.gray.white} width={22} height={22} />
-                        </Reanimated.View>
-                    </PressableOpacity>
-
+                <View style={[styles.bottomBar, { bottom: CONTENT_SPACING * 8.5 + insets.bottom }]}>
+                    <RotateButton />
                     <CaptureButton
                         style={styles.captureButton}
                         camera={camera}
-                        onMediaCaptured={onMediaCaptured}
+                        onMediaCaptured={onMediaCaptured as any}
                         cameraZoom={zoom}
                         minZoom={minZoom}
                         maxZoom={maxZoom}
@@ -448,37 +385,10 @@ export function CameraPage(): React.ReactElement {
                         onRecordingStop={() => setIsRecording(false)}
                     />
 
-                    <PressableOpacity
-                        style={[
-                            styles.sideButton,
-                            torch === "on" && styles.sideButtonTorchOn,
-                            cameraPosition === "front" && { opacity: 0.4 },
-                        ]}
-                        onPress={() => {
-                            if (cameraPosition !== "front") {
-                                setTorch((t) => (t === "off" ? "on" : "off"))
-                            }
-                        }}
-                        disabledOpacity={0.4}
-                        disabled={cameraPosition === "front"}
-                    >
-                        {torch === "on" ? (
-                            <FlashOnIcon
-                                fill={cameraPosition === "front" ? "#888" : "white"}
-                                width={22}
-                                height={22}
-                            />
-                        ) : (
-                            <FlashOffIcon
-                                fill={cameraPosition === "front" ? "#888" : "white"}
-                                width={22}
-                                height={22}
-                            />
-                        )}
-                    </PressableOpacity>
+                    <FlashButton />
                 </View>
             </View>
-        </SafeAreaView>
+        </View>
     )
 }
 
@@ -486,6 +396,8 @@ const styles = StyleSheet.create({
     container: {
         flex: 1,
         backgroundColor: "black",
+        justifyContent: "flex-start",
+        alignItems: "center",
     },
     captureButton: {
         width: 80,
@@ -512,7 +424,7 @@ const styles = StyleSheet.create({
         alignItems: "center",
         justifyContent: "center",
         position: "absolute",
-        bottom: CONTENT_SPACING * 3,
+        bottom: CONTENT_SPACING,
         left: 0,
         right: 0,
         zIndex: 10,

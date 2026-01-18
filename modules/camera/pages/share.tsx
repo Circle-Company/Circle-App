@@ -1,41 +1,63 @@
 import UploadIcon from "@/assets/icons/svgs/arrow_up.svg"
 import { useIsFocused } from "@react-navigation/core"
 import { useRouter, useLocalSearchParams } from "expo-router"
-import React, { useCallback, useMemo, useState, useContext, useRef } from "react"
-import type { ImageLoadEventData, NativeSyntheticEvent } from "react-native"
+import React, { useState } from "react"
 import { SafeAreaView } from "react-native-safe-area-context"
 import { StyleSheet, View, Text, Keyboard, Animated, Easing } from "react-native"
 import { VideoView, useVideoPlayer } from "expo-video"
 import { useToast } from "@/contexts/Toast"
 import sizes from "@/constants/sizes"
+import { useNavigation } from "expo-router"
 import { SAFE_AREA_PADDING } from "../constants"
 import { useIsForeground } from "../hooks/useIsForeground"
-import type { Routes } from "../routes"
 import { useCameraContext } from "../context"
 import CameraVideoSlider from "../components/CameraVideoSlider"
 import ColorTheme, { colors } from "@/constants/colors"
 import fonts from "@/constants/fonts"
 import ButtonStandart from "@/components/buttons/button-standart"
-import LanguageContext from "@/contexts/Preferences/language"
+import LanguageContext from "@/contexts/language"
 import { ViewStyle } from "react-native"
 import { TextInput } from "react-native"
+import { scale } from "happy-dom/lib/PropertySymbol.js"
 
 export function MediaPage(): React.ReactElement {
+    const navigation = useNavigation()
+
+    React.useEffect(() => {
+        navigation.getParent()?.setOptions({
+            tabBarStyle: { display: "none" },
+        })
+
+        return () => {
+            navigation.getParent()?.setOptions({
+                tabBarStyle: undefined,
+            })
+        }
+    }, [navigation])
     const router = useRouter()
+
     const params = useLocalSearchParams<{
         videoUri?: string
         duration?: string
         width?: string
         height?: string
     }>()
-    const { description, setDescription, upload, uploadError, isUploading, reset, video } =
-        useCameraContext()
-    const [isVideoLoading, setIsVideoLoading] = useState(true)
+    const {
+        description,
+        setDescription,
+        upload,
+        uploadError,
+        isUploading,
+        reset,
+        video,
+        setTabHide,
+    } = useCameraContext()
 
+    React.useEffect(() => {
+        setTabHide(true)
+    }, [])
     // Get video URI from route params
     const videoUri = params?.videoUri
-    const videoWidth = params?.width ? parseInt(params.width, 10) : undefined
-    const videoHeight = params?.height ? parseInt(params.height, 10) : undefined
 
     // Log video path for debugging
     React.useEffect(() => {
@@ -80,10 +102,8 @@ export function MediaPage(): React.ReactElement {
 
         const subscription = player.addListener("statusChange", (status) => {
             if (status.status === "readyToPlay") {
-                setIsVideoLoading(false)
-                setVideoDuration(status.duration)
+                setVideoDuration(status.duration as any)
             } else if (status.status === "error") {
-                setIsVideoLoading(false)
                 setVideoError("Não foi possível reproduzir o vídeo.")
             }
         })
@@ -169,8 +189,8 @@ export function MediaPage(): React.ReactElement {
 
     // Same transform used in share.description: translateY first (to keep top fixed), then scale
     const baseScale = 1
-    const focusedScale = 0.67
-    const containerHeight = sizes.moment.full.height * 0.95
+    const focusedScale = 0.8
+    const containerHeight = sizes.moment.full.height * 0.8
     const translateCompensation = (containerHeight / 2) * (1 - focusedScale)
 
     const animatedScaleStyle = {
@@ -201,7 +221,7 @@ export function MediaPage(): React.ReactElement {
             {
                 scale: keyboardAnim.interpolate({
                     inputRange: [0, 1],
-                    outputRange: [baseScale, 1 + focusedScale * 0.3],
+                    outputRange: [baseScale, 1 + focusedScale * 0.7],
                 }),
             },
         ],
@@ -250,7 +270,7 @@ export function MediaPage(): React.ReactElement {
     const [videoError, setVideoError] = useState<string | null>(null)
 
     return (
-        <SafeAreaView style={styles.container}>
+        <View style={styles.container}>
             <Animated.View style={[styles.cameraContainer, animatedScaleStyle]}>
                 {!displayUri ? (
                     <View style={styles.cameraContainer}>
@@ -301,11 +321,6 @@ export function MediaPage(): React.ReactElement {
                                 />
                             </Animated.View>
                         </View>
-                        <CameraVideoSlider
-                            maxTime={videoDuration}
-                            width={sizes.moment.full.width}
-                            currentTime={currentTime}
-                        />
                     </>
                 ) : (
                     <View
@@ -355,7 +370,7 @@ export function MediaPage(): React.ReactElement {
                     </Text>
                 </ButtonStandart>
             </View>
-        </SafeAreaView>
+        </View>
     )
 }
 
@@ -389,8 +404,8 @@ const styles = StyleSheet.create({
         textAlign: "center",
     },
     cameraContainer: {
-        width: sizes.moment.full.width * 0.95,
-        height: sizes.moment.full.height * 0.95,
+        width: sizes.moment.full.width * 0.85,
+        height: sizes.moment.full.height * 0.85,
         backgroundColor: "black",
         borderRadius: 40,
         overflow: "hidden",

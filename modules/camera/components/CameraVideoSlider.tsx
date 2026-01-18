@@ -4,6 +4,8 @@ import { colors } from "@/constants/colors"
 import sizes from "@/constants/sizes"
 
 import { useCameraContext } from "../context"
+import { iOSMajorVersion } from "@/lib/platform/detection"
+import { Host, LinearProgress, VStack } from "@expo/ui/swift-ui"
 
 interface CameraVideoSliderProps {
     maxTime?: number // segundos, default 30
@@ -102,12 +104,20 @@ export default function CameraVideoSlider({
         extrapolate: "clamp",
     })
 
-    return (
-        <View style={container}>
-            <View style={sliderContainer}>
-                <View style={[track, backgroundTrack]} />
-                <Animated.View style={[progressTrack, { width: progressWidth }]} />
+    if (iOSMajorVersion! >= 26) {
+        return (
+            <Host style={{ width }}>
+                <LinearProgress progress={sliderTime} color={colors.gray.white} />
+            </Host>
+        )
+    } else {
+        return (
+            <View style={container}>
+                <View style={sliderContainer}>
+                    <View style={[track, backgroundTrack]} />
+                    <Animated.View style={[progressTrack, { width: progressWidth }]} />
+                </View>
             </View>
-        </View>
-    )
+        )
+    }
 }
