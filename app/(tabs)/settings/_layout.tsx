@@ -17,14 +17,18 @@ export default function SettingsLayout() {
     return (
         <Stack
             screenOptions={{
-                contentStyle: { backgroundColor: String(ColorTheme().background) },
+                contentStyle: { backgroundColor: colors.gray.black },
                 headerShadowVisible: false,
+                animationMatchesGesture: true,
                 animation: "slide_from_right",
                 gestureEnabled: true,
-                fullScreenGestureEnabled: true,
                 headerBackTitle: t("Back"),
                 headerTintColor: "white",
+                headerLargeTitleShadowVisible: true,
+                headerLargeTitle: false,
+                headerTransparent: false,
                 headerTitleStyle: { fontFamily: Fonts.family["Black-Italic"] },
+                headerLargeTitleStyle: { fontFamily: Fonts.family["Black-Italic"] },
                 headerStyle: {
                     backgroundColor: "black",
                 },
@@ -33,125 +37,72 @@ export default function SettingsLayout() {
             <Stack.Screen
                 name="index"
                 options={{
-                    headerTitle: t("Settings"),
-                    headerTintColor: "white",
-                    headerTitleStyle: { fontFamily: fonts.family["Black-Italic"] },
                     headerStyle: {
-                        backgroundColor: "black",
+                        backgroundColor: "transparent",
                     },
-                    headerLeft: () => (
-                        <HeaderBackButton
-                            onPress={() => navigation.replace("/(tabs)/you")}
-                            tintColor="white"
-                        />
-                    ),
+                    headerTitle: t("Settings"),
+                    headerTransparent: true,
                 }}
             />
             <Stack.Screen
                 name="profile-picture"
                 options={{
+                    headerTransparent: false,
+
                     headerTitle: t("Add Profile Picture"),
                 }}
             />
             <Stack.Screen
                 name="description"
                 options={{
+                    headerTransparent: false,
+
                     headerTitle: t("Add Description"),
-                }}
-            />
-            <Stack.Screen
-                name="followings"
-                options={{
-                    headerTitle: t("Following"),
                 }}
             />
             <Stack.Screen
                 name="name"
                 options={{
+                    headerTransparent: false,
+
                     headerTitle: t("Name"),
                 }}
             />
             <Stack.Screen
                 name="password"
                 options={{
+                    headerTransparent: false,
+
                     headerTitle: t("Password"),
                 }}
             />
             <Stack.Screen
-                name="privacy-policy"
+                name="personal-data"
                 options={{
-                    headerTitle: t("Privacy Policy"),
+                    headerTransparent: false,
+
+                    headerTitle: t("Personal Data"),
                 }}
             />
             <Stack.Screen
-                name="terms-of-service"
+                name="exclude-account"
                 options={{
-                    headerTitle: t("Terms of Service"),
-                }}
-            />
-            <Stack.Screen
-                name="community-guidelines"
-                options={{
-                    headerTitle: t("Community Guidelines"),
-                }}
-            />
-            <Stack.Screen
-                name="push-notifications"
-                options={{
-                    headerTitle: t("Push Notifications"),
-                }}
-            />
-            <Stack.Screen
-                name="all-moments"
-                options={{
-                    headerTitle: t("All Moments"),
-                }}
-            />
-            <Stack.Screen
-                name="preferences"
-                options={{
-                    headerTitle: t("Preferences"),
+                    headerTransparent: false,
+
+                    headerTitle: t("Delete Account"),
                 }}
             />
             <Stack.Screen
                 name="language"
                 options={{
+                    headerTransparent: false,
                     headerTitle: t("Language"),
-                }}
-            />
-            <Stack.Screen
-                name="content"
-                options={{
-                    headerTitle: t("Content"),
-                }}
-            />
-            <Stack.Screen
-                name="haptics"
-                options={{
-                    headerTitle: t("Haptic Feedback"),
-                }}
-            />
-            <Stack.Screen
-                name="open-source"
-                options={{
-                    headerTitle: t("Open Source"),
-                }}
-            />
-            <Stack.Screen
-                name="support"
-                options={{
-                    headerTitle: t("Support"),
-                }}
-            />
-            <Stack.Screen
-                name="version"
-                options={{
-                    headerTitle: t("Version"),
                 }}
             />
             <Stack.Screen
                 name="log-out"
                 options={{
+                    headerTransparent: false,
                     headerTitle: t("Log Out"),
                 }}
             />
