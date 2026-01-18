@@ -1,13 +1,13 @@
 import { Text, View } from "react-native"
 
-import ClockIcon from "@/assets/icons/svgs/clock.svg"
 import React from "react"
-import ColorTheme from "../../../constants/colors"
-import fonts from "../../../constants/fonts"
-import sizes from "../../../constants/sizes"
-import { timeDifferenceConverter } from "../../../helpers/dateConversor"
+import ColorTheme from "@/constants/colors"
+import fonts from "@/constants/fonts"
+import sizes from "@/constants/sizes"
 import MomentContext from "../context"
 import { MomentDateProps } from "../moment-types"
+import LanguageContext from "@/contexts/language"
+import { useLocaleDateRelative } from "@/lib/hooks/useLocaleDate"
 
 export default function Date({
     color = String(ColorTheme().text),
@@ -19,11 +19,10 @@ export default function Date({
 
     const container: any = {
         borderRadius: (sizes.sizes["2md"] * 0.9) / 2,
-        alignItems: "center",
-        justifyContent: "center",
         paddingHorizontal,
         backgroundColor,
         flexDirection: "row",
+        opacity: 0.6,
     }
     const description_style: any = {
         fontSize: fonts.size.body * 0.8,
@@ -31,22 +30,10 @@ export default function Date({
         color,
     }
 
-    if (data.publishedAt === null) {
-        return null
-    }
-
-    const date = timeDifferenceConverter({ date: String(data.publishedAt), small })
-
     return (
         <View style={container}>
-            <ClockIcon
-                fill={color}
-                width={14}
-                height={14}
-                style={{ marginRight: sizes.margins["1sm"] * 1.4 }}
-            />
             <Text style={description_style} selectable={false}>
-                {date}
+                {data.publishedAt ? useLocaleDateRelative(data.publishedAt) : ""}
             </Text>
         </View>
     )

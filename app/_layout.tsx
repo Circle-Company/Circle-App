@@ -1,20 +1,19 @@
-import { Slot, SplashScreen, useRouter, useSegments } from "expo-router"
-import { useEffect, useState } from "react"
-import * as React from "react"
 import { SafeAreaProvider, initialWindowMetrics } from "react-native-safe-area-context"
+import { Slot, SplashScreen, useRouter, useSegments } from "expo-router"
 import { GestureHandlerRootView } from "react-native-gesture-handler"
 import { KeyboardProvider } from "react-native-keyboard-controller"
+import React, { useEffect, useState } from "react"
 import { useColorScheme } from "react-native"
 import { useFonts } from "expo-font"
 
 import { Provider as AccountProvider } from "@/contexts/account"
-import AuthContext, { Provider as AuthProvider } from "@/contexts/Auth"
+import AuthContext, { Provider as AuthProvider } from "@/contexts/auth"
 import { Provider as BottomSheetProvider } from "@/contexts/bottomSheet"
 import { Provider as FeedProvider } from "@/contexts/Feed"
 import { Provider as GeolocationProvider } from "@/contexts/geolocation"
 import { Provider as NetworkProvider } from "@/contexts/network"
 import { Provider as NewMomentProvider } from "@/contexts/newMoment"
-import { Provider as PreferencesProvider } from "@/contexts/Preferences"
+import { Provider as LanguageProvider } from "@/contexts/language"
 import { Provider as ProfileProvider } from "@/contexts/profile"
 import { CameraProvider } from "../modules/camera/context"
 import { QueryProvider } from "@/lib/react-query"
@@ -33,62 +32,50 @@ function RootLayoutNav() {
     const router = useRouter()
     const [isInitializing, setIsInitializing] = useState(true)
     const scheme = useColorScheme()
+    const hasRedirectedRef = React.useRef(false)
 
-    // Check authentication and handle routing
+    // Inicializa o estado de redirect baseado na sessão
     useEffect(() => {
-        const checkAuthentication = async () => {
+        const initializeAuth = async () => {
             try {
-                const authenticated = checkIsSigned()
-
-                if (authenticated) setRedirectTo("APP")
-                else setRedirectTo("AUTH")
+                const isAuthenticated = checkIsSigned()
+                if (isAuthenticated) {
+                    setRedirectTo("APP")
+                } else {
+                    setRedirectTo("SPLASH")
+                }
             } catch (error) {
-                setRedirectTo("AUTH")
+                console.error("❌ Erro ao inicializar auth:", error)
+                setRedirectTo("SPLASH")
             } finally {
                 setIsInitializing(false)
             }
         }
 
-        checkAuthentication()
-    }, [checkIsSigned, sessionData])
+        initializeAuth()
+    }, [])
 
-    // Handle navigation based on auth state
+    // Handle navigation based on auth state (robust)
     useEffect(() => {
-        if (isInitializing || !redirectTo) {
+        if (isInitializing || !redirectTo || hasRedirectedRef.current) {
             return
         }
 
-        const atRoot = segments.length === 0
-        const firstSegment = atRoot ? null : segments[0]
-        const inAuthGroup = firstSegment === "(auth)"
-        const inTabsGroup = firstSegment === "(tabs)"
         const isAuthenticated = redirectTo === "APP"
 
-        console.log("📍 Navigation state:", {
-            segments,
-            inAuthGroup,
-            inTabsGroup,
-            atRoot,
-            isAuthenticated,
-            redirectTo,
-        })
-
-        if (isAuthenticated && (inAuthGroup || atRoot)) {
-            // Authenticated and either in auth screens or at root → go to default tab
-            console.log("🔄 Redirecting authenticated user to app (/(tabs)/moments)")
-            router.replace("/(tabs)/moments")
-        } else if (!isAuthenticated && !inAuthGroup) {
-            // Not authenticated and not in auth screens → go to auth
-            console.log("🔄 Redirecting unauthenticated user to auth (/(auth)/init)")
-            router.replace("/(auth)/init")
+        // Redirect once after the first auth resolution to ensure router is ready
+        hasRedirectedRef.current = true
+        if (isAuthenticated) {
+            requestAnimationFrame(() => router.replace("/(tabs)/moments"))
+        } else {
+            requestAnimationFrame(() => router.replace("/(auth)/init"))
         }
-    }, [isInitializing, redirectTo, segments])
+    }, [isInitializing, redirectTo, router])
 
     return <Slot />
 }
 
 export default function RootLayout() {
-    const scheme = useColorScheme()
     const [fontsLoaded, fontError] = useFonts(Fonts.files)
 
     useEffect(() => {
@@ -115,7 +102,7 @@ export default function RootLayout() {
                         <RedirectProvider>
                             <AuthProvider>
                                 <QueryProvider>
-                                    <PreferencesProvider>
+                                    <LanguageProvider>
                                         <NetworkProvider>
                                             <GeolocationProvider>
                                                 <CameraProvider>
@@ -133,7 +120,7 @@ export default function RootLayout() {
                                                 </CameraProvider>
                                             </GeolocationProvider>
                                         </NetworkProvider>
-                                    </PreferencesProvider>
+                                    </LanguageProvider>
                                 </QueryProvider>
                             </AuthProvider>
                         </RedirectProvider>

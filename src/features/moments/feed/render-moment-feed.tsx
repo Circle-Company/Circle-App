@@ -1,4 +1,4 @@
-import { View, useColorScheme } from "react-native"
+import { View, useColorScheme, Keyboard, Animated as RNAnimated, Platform } from "react-native"
 import Animated, {
     useAnimatedStyle,
     useSharedValue,
@@ -9,6 +9,7 @@ import Animated, {
     runOnJS,
     type SharedValue,
 } from "react-native-reanimated"
+import Input from "@/components/comment/components/comments-input"
 import FeedContext from "@/contexts/Feed"
 import { Moment } from "@/components/moment"
 import { Moment as MomentProps } from "@/contexts/Feed/types"
@@ -49,6 +50,38 @@ export default function RenderMomentFeed({
     const { progress: keyboardProgress, height: keyboardHeight } = useKeyboard()
 
     const commentShared = useSharedValue(commentEnabled ? 1 : 0)
+
+    // Animate input position based on keyboard height
+    const keyboardHeightAnim = React.useRef(new RNAnimated.Value(0)).current
+
+    React.useEffect(() => {
+        const showListener = Keyboard.addListener(
+            Platform.OS === "ios" ? "keyboardWillShow" : "keyboardDidShow",
+            (e) => {
+                const offset = Platform.OS === "ios" ? 0 : 20
+                RNAnimated.timing(keyboardHeightAnim, {
+                    toValue: e.endCoordinates.height - offset,
+                    duration: Platform.OS === "ios" ? 250 : 200,
+                    useNativeDriver: false,
+                }).start()
+            },
+        )
+        const hideListener = Keyboard.addListener(
+            Platform.OS === "ios" ? "keyboardWillHide" : "keyboardDidHide",
+            () => {
+                RNAnimated.timing(keyboardHeightAnim, {
+                    toValue: 0,
+                    duration: Platform.OS === "ios" ? 250 : 200,
+                    useNativeDriver: false,
+                }).start()
+            },
+        )
+
+        return () => {
+            showListener.remove()
+            hideListener.remove()
+        }
+    }, [])
 
     React.useEffect(() => {
         commentShared.value = withTiming(commentEnabled ? 1 : 0, {
@@ -116,13 +149,6 @@ export default function RenderMomentFeed({
 
         // Quando o input estiver ativo (commentEnabled), momentos não focados devem ter opacidade 0
         // Momentos focados mantêm a opacidade base reduzida quando comentários estão ativos
-        let opacity = baseOpacity
-        if (commentShared.value > 0) {
-            // Se o momento está focado, reduzir opacidade um pouco
-            // Se o momento não está focado, opacidade vai para 0
-            opacity =
-                focusProgressValue.value > 0.5 ? baseOpacity * (1 - 0.15 * commentShared.value) : 0
-        }
 
         // Redução de escala quando comentários estão habilitados (só para momentos focados)
         // Aplicar apenas quando o momento está focado (focusProgressValue > 0.5)
@@ -135,31 +161,15 @@ export default function RenderMomentFeed({
                 ? 1 - 0.65 * keyboardProgress.value * commentShared.value
                 : 1
 
-        // TranslateY quando teclado aparece (movendo para cima)
-        // Aplicar apenas quando o momento está focado (focusProgressValue > 0.5)
-        const translateY = focusProgressValue.value > 0.5 ? -160 * commentShared.value : 0
-
         // Escala final: apenas commentScale e keyboardScale
         // A escala base é 100% controlada pelo scrollX no index.tsx
         const finalScale = commentScale * keyboardScale
 
         return {
-            opacity,
-            transform: [{ translateY }, { scale: finalScale }],
+            opacity: baseOpacity,
+            transform: [, { scale: finalScale }],
         }
     }, [dimmedOpacity])
-
-    // Animação dos comentários: APENAS OPACIDADE (SEM ESCALA E SEM TRANSLATEY)
-    const animatedCommentStyle = useAnimatedStyle(() => {
-        "worklet"
-
-        // Opacidade: desaparecer quando input estiver ativo
-        const opacity = commentShared.value > 0 ? 0 : 1
-
-        return {
-            opacity,
-        }
-    }, [])
 
     return (
         <Moment.Root.Main
@@ -223,7 +233,7 @@ export default function RenderMomentFeed({
             </Animated.View>
 
             {/* Comentários SEM escala, apenas opacidade (desaparecem quando input ativo) */}
-            <Animated.View style={[animatedCommentStyle, { marginTop: 3 }]}>
+            <Animated.View style={{ marginTop: 3 }}>
                 {data.topComment ? (
                     <RenderCommentFeed moment={data} focused={isFocused} />
                 ) : (
@@ -232,6 +242,21 @@ export default function RenderMomentFeed({
                     </View>
                 )}
             </Animated.View>
+
+            {/* Input flutuante quando commentEnabled=true */}
+            {commentEnabled && isFocused && (
+                <RNAnimated.View
+                    style={{
+                        position: "absolute",
+                        left: 0,
+                        right: 0,
+                        bottom: keyboardHeightAnim,
+                        zIndex: 9999,
+                    }}
+                >
+                    <Input autoFocus={commentEnabled} />
+                </RNAnimated.View>
+            )}
         </Moment.Root.Main>
     )
 }
