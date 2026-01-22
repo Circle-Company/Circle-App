@@ -4,10 +4,10 @@ import MomentContext from "../../moment/context"
 import { CommentsContainerProps } from "../comments-types"
 
 export default function Container({ children, focused }: CommentsContainerProps) {
-    const { momentSize } = React.useContext(MomentContext)
+    const { size } = React.useContext(MomentContext)
 
     const container: any = {
-        width: momentSize.width,
+        width: size.width,
     }
 
     if (focused) return <View style={container}>{children}</View>

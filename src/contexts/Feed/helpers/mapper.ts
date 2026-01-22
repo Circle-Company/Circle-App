@@ -1,5 +1,5 @@
 // feedMapper.ts
-import { MomentProps } from "../types"
+import { Moment as MomentProps } from "../types"
 
 export function mapper(
     ids: string[],

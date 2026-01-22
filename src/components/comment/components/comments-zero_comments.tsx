@@ -3,26 +3,38 @@ import { View, ViewStyle, useColorScheme } from "react-native"
 
 import ButtonStandart from "../../buttons/button-standart"
 import FeedContext from "../../../contexts/Feed"
-import LanguageContext from "../../../contexts/Preferences/language"
+import LanguageContext from "../../../contexts/language"
 import PlusIcon from "@/assets/icons/svgs/plus_circle.svg"
 import React from "react"
 import { Text } from "../../Themed"
 import { Vibrate } from "../../../lib/hooks/useHapticFeedback"
 import fonts from "../../../constants/fonts"
 import sizes from "../../../constants/sizes"
-export default function ZeroComments() {
+import MomentContext from "@/components/moment/context"
+import { textLib } from "@/circle.text.library"
+
+import { Moment as MomentProps } from "@/contexts/Feed/types"
+import { isIOS } from "@/lib/platform/detection"
+import { SwiftBottomSheet } from "@/components/ios/ios.bottom.sheet"
+import FetchedCommentsList from "./fetched-comments-list"
+import BottomSheetContext from "@/contexts/bottomSheet"
+import { UserShow } from "@/components/user_show"
+export default function ZeroComments({ moment }: { moment: MomentProps }) {
     const { t } = React.useContext(LanguageContext)
+    const [isIOSSheetOpen, setIOSSheetOpen] = React.useState(false)
     const { commentEnabled, setCommentEnabled, setKeyboardVisible, setScrollEnabled } =
         React.useContext(FeedContext)
+    const { expand } = React.useContext(BottomSheetContext)
     const isDarkMode = useColorScheme() === "dark"
+
     const container: any = {
-        width: sizes.screens.width * 0.7,
-        flex: 1,
+        maxWidth: sizes.screens.width,
         borderRadius: sizes.borderRadius["1md"] * 1.2,
         backgroundColor: isDarkMode ? colors.gray.grey_08 : colors.gray.grey_02,
         alignSelf: "center",
         alignItems: "center",
         justifyContent: "center",
+        paddingHorizontal: sizes.paddings["1md"],
         paddingBottom: sizes.paddings["2sm"],
         paddingTop: sizes.paddings["1sm"],
     }
@@ -30,75 +42,91 @@ export default function ZeroComments() {
     const buttonContainer: ViewStyle = {
         alignSelf: "center",
         alignItems: "center",
-        width: sizes.buttons.width * 0.5,
-        height: sizes.buttons.height * 0.5,
+        maxWidth: sizes.buttons.width * 0.7,
+        height: sizes.buttons.height * 0.4,
         borderRadius: sizes.borderRadius["1md"],
         overflow: "hidden",
-        backgroundColor: isDarkMode ? colors.gray.grey_06 : colors.gray.grey_03,
+        backgroundColor: colors.gray.white,
     }
 
     const buttonTitle: any = {
-        top: -1,
-        fontFamily: fonts.family.Bold,
-        fontSize: fonts.size.body * 0.9,
-        marginRight: sizes.margins["1sm"],
+        fontFamily: fonts.family["Black-Italic"],
+        fontSize: fonts.size.body * 1,
+        color: colors.gray.black,
     }
     function handlePress() {
-        if (commentEnabled) {
-            setCommentEnabled(false)
-            setScrollEnabled(true)
-            setKeyboardVisible(false)
+        // habilita o input/teclado e abre o modal de comentários
+        setCommentEnabled(true)
+        setKeyboardVisible(true)
+        setScrollEnabled(true)
+
+        if (isIOS) {
+            setIOSSheetOpen(true)
         } else {
-            setCommentEnabled(true)
-            setKeyboardVisible(true)
-            setScrollEnabled(true)
+            expand({
+                snapPoints: ["60%"],
+                enablePanDownToClose: true,
+                children: <FetchedCommentsList />,
+            })
         }
     }
-
-    if (commentEnabled) return null
-    else
-        return (
-            <View style={container}>
-                <View
-                    style={{
-                        marginBottom: sizes.margins["2sm"],
-                        alignItems: "center",
-                        alignSelf: "center",
-                    }}
-                >
-                    <Text
-                        style={{ fontSize: fonts.size.caption1, color: ColorTheme().textDisabled }}
-                    >
-                        {t("This Moment has no comments.")}
-                    </Text>
+    return (
+        <View style={container} pointerEvents="box-none">
+            <View
+                style={{
+                    marginBottom: sizes.margins["2sm"],
+                    alignItems: "center",
+                    alignSelf: "center",
+                }}
+            >
+                {moment.publishedAt && (
                     <Text
                         style={{
-                            fontFamily: fonts.family.Semibold,
-
-                            fontSize: fonts.size.subheadline * 0.85,
+                            fontSize: fonts.size.caption1,
+                            color: ColorTheme().textDisabled,
                         }}
                     >
-                        {t("Be the first to comment.")}
+                        {t("Shared ")}{" "}
+                        {textLib.date.toRelativeTime(new Date(moment.publishedAt)).toLowerCase()}
                     </Text>
-                </View>
+                )}
+                <Text
+                    style={{
+                        fontFamily: fonts.family.Bold,
 
-                <ButtonStandart
-                    action={handlePress}
-                    vibrate={() => {
-                        Vibrate("effectTick")
+                        fontSize: fonts.size.subheadline * 0.85,
                     }}
-                    margins={false}
-                    bounciness={2}
-                    style={buttonContainer}
                 >
-                    <Text style={buttonTitle}>{t("Add Comment")}</Text>
-                    <PlusIcon
-                        style={{ top: -0.5 }}
-                        width={16}
-                        height={16}
-                        fill={ColorTheme().text}
-                    />
-                </ButtonStandart>
+                    {t("It seems like nobody has commented yet")} 🥲
+                </Text>
             </View>
-        )
+
+            <ButtonStandart
+                action={handlePress}
+                vibrate={() => {
+                    Vibrate("effectTick")
+                }}
+                margins={false}
+                bounciness={2}
+                style={buttonContainer}
+            >
+                <Text style={buttonTitle}>
+                    {t("React to")}{" "}
+                    <UserShow.Root data={moment.user}>
+                        <View style={{ top: 3 }}>
+                            <UserShow.Username
+                                pressable={false}
+                                margin={0}
+                                displayOnMoment={false}
+                                color={colors.gray.black}
+                                fontSize={fonts.size.body}
+                                fontFamily={fonts.family["Black-Italic"]}
+                                truncatedSize={10}
+                            />
+                        </View>
+                    </UserShow.Root>
+                </Text>
+            </ButtonStandart>
+        </View>
+    )
 }

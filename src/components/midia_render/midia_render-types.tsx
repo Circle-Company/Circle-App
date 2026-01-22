@@ -1,10 +1,10 @@
-import { MomentMidiaProps, MomentSizeProps } from "../moment/context/types"
+import { MomentMidiaProps, sizeProps } from "../moment/context/types"
 
 export type MidiaReciveDataProps = MomentMidiaProps
 
 export type MidiaRenderMainRootProps = {
     data: any
-    content_sizes: MomentSizeProps
+    content_sizes: sizeProps
     children: React.ReactNode
 }
 export type MidiaRenderCenterRootProps = {

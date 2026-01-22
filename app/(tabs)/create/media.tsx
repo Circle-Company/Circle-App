@@ -1,3 +1,3 @@
-import { MediaPage } from "@/modules/camera/pages/share";
+import { MediaPage } from "../../../modules/camera/pages/share"
 
-export default MediaPage;
+export default MediaPage

@@ -9,6 +9,7 @@ export const RedirectContext = React.createContext<RedirectContextType>({} as Re
 
 export function Provider({ children }: { children: React.ReactNode }) {
     const [redirectTo, setRedirectTo] = React.useState<"APP" | "AUTH" | "SPLASH">("SPLASH")
+
     return (
         <RedirectContext.Provider value={{ redirectTo, setRedirectTo }}>
             {children}

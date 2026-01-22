@@ -3,10 +3,11 @@ import React from "react"
 import { Pressable } from "react-native"
 import { colors } from "@/constants/colors"
 import Fonts from "@/constants/fonts"
-import LanguageContext from "@/contexts/Preferences/language"
+import LanguageContext from "@/contexts/language"
 import PersistedContext from "@/contexts/Persisted"
 import { iOSMajorVersion } from "@/lib/platform/detection"
 import Cog from "@/assets/icons/svgs/cog.svg"
+import fonts from "@/constants/fonts"
 
 export default function YouLayout() {
     const { session } = React.useContext(PersistedContext)
@@ -21,53 +22,49 @@ export default function YouLayout() {
                 contentStyle: {
                     backgroundColor,
                 },
-                statusBarAnimation: "fade",
-                statusBarStyle: "light",
-                headerTransparent: false,
-                headerBlurEffect: "systemUltraThinMaterialDark",
+                headerShadowVisible: false,
+                animationMatchesGesture: true,
+                animation: "slide_from_right",
+                headerTransparent: true,
                 headerStyle: {
                     backgroundColor: colors.gray.black,
                 },
-
                 headerTintColor: colors.gray.white,
             }}
         >
             <Stack.Screen
                 name="index"
                 options={{
+                    headerStyle: {
+                        backgroundColor: "transparent",
+                    },
                     headerTitleAlign: "center",
+                    headerLargeTitle: false,
+                    headerTransparent: true,
                     headerTitleStyle: {
                         fontFamily: Fonts.family["Black-Italic"],
                         fontSize: Fonts.size.title2 * 0.9,
                         color: colors.gray.white,
                     },
-                    headerRight: () => (
-                        <Pressable
-                            onPress={() => router.push("/settings")}
-                            hitSlop={8}
-                            style={{
-                                paddingHorizontal: 8,
-                                alignItems: "center",
-                                justifyContent: "center",
-                            }}
-                        >
-                            <Cog fill={String(colors.gray.white)} width={20} height={20} />
-                        </Pressable>
-                    ),
                     headerTitle: session?.user?.username ? `@${session.user.username}` : "",
                 }}
             />
-
             <Stack.Screen
-                name="edit"
+                name="[id]"
                 options={{
-                    headerTitle: t("Edit"),
-                    headerTitleAlign: "left",
-                    headerTitleStyle: {
-                        fontFamily: Fonts.family["Black-Italic"],
-                        fontSize: Fonts.size.title2,
-                        color: colors.gray.white,
+                    headerTitle: "Moment",
+                    headerTitleAlign: "center",
+                    animation: "slide_from_right",
+                    headerTintColor: "white",
+                    headerLargeTitle: false,
+                    headerTransparent: true,
+                    headerTitleStyle: { fontFamily: fonts.family["Black-Italic"] },
+                    headerLargeTitleStyle: { fontFamily: fonts.family["Black-Italic"] },
+                    headerStyle: {
+                        backgroundColor: "transparent",
                     },
+                    headerBackTitle: t("Back"),
+                    headerBackVisible: true,
                 }}
             />
         </Stack>

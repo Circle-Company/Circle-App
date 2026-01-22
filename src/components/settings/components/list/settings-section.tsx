@@ -6,6 +6,10 @@ import { Text, TextStyle, ViewStyle } from "../../../Themed"
 import SettingsItem from "./settings-item"
 import fonts from "../../../../constants/fonts"
 import sizes from "../../../../constants/sizes"
+import { isIOS } from "@/lib/platform/detection"
+import { Host, List, Label } from "@expo/ui/swift-ui"
+
+import * as Browser from "expo-web-browser"
 
 export default function SettingsSection({ name, content }: SettignsSectionProps) {
     const isDarkMode = useColorScheme() === "dark"
@@ -18,7 +22,7 @@ export default function SettingsSection({ name, content }: SettignsSectionProps)
     const header_container: ViewStyle = {
         height: sizes.sizes["2md"],
         width: sizes.screens.width - sizes.paddings["1sm"],
-        marginBottom: sizes.margins["2sm"],
+        marginBottom: isIOS ? sizes.margins["1sm"] : sizes.margins["2sm"],
         marginLeft: sizes.paddings["2sm"] * 1.3,
         paddingHorizontal: sizes.paddings["2sm"],
         alignItems: "flex-start",
@@ -46,10 +50,19 @@ export default function SettingsSection({ name, content }: SettignsSectionProps)
                             icon={item.icon}
                             type={item.type}
                             value={item.value}
-                            navigator=""
                             name={item.name}
-                            navigateTo={item.navigateTo}
                             secure={item.secure}
+                            rightComponent={item.rightComponent}
+                            onPress={async () => {
+                                const v = item.value
+                                if (typeof v === "string" && /^https?:\/\//i.test(v)) {
+                                    await Browser.openBrowserAsync(v)
+                                    return
+                                }
+                                if (item.onPress) {
+                                    await item.onPress()
+                                }
+                            }}
                         />
                     )}
                 />

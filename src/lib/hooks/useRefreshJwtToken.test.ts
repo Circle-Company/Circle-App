@@ -1,6 +1,6 @@
 import { afterAll, beforeAll, beforeEach, describe, expect, it, vi } from "vitest"
 
-import { apiRoutes } from "../../services/Api"
+import { apiRoutes } from "../../api"
 import { refreshJwtToken } from "./useRefreshJwtToken"
 
 // Mock dos módulos
@@ -31,7 +31,7 @@ vi.mock("../../store", () => ({
 }))
 
 vi.useFakeTimers() // Ativar fake timers para simular tempo
-vi.mock("@/services/Api", () => ({
+vi.mock("@/api", () => ({
     apiRoutes: {
         auth: {
             refreshToken: vi.fn(() =>

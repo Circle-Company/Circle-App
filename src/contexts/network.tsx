@@ -1,19 +1,66 @@
 import WifiIcon from "@/assets/icons/svgs/wifi.svg"
 import WifiSlashIcon from "@/assets/icons/svgs/wifi_slash.svg"
-import NetInfo from "@react-native-community/netinfo"
-import React, { ReactNode, createContext, useContext, useEffect, useState } from "react"
+import { addNetworkStateListener, getNetworkStateAsync, NetworkStateType } from "expo-network"
+import { ReactNode, createContext, useContext, useEffect, useState } from "react"
 import { useToast } from "./Toast"
 import { colors } from "../constants/colors"
-import LanguageContext from "./Preferences/language"
+import LanguageContext from "./language"
 
 type NetworkProviderProps = { children: ReactNode }
 
+/**
+ * Describes the shape of the Network context.
+ *
+ * Example:
+ *   import { NetworkContext } from "@/contexts/network"
+ *   import React from "react"
+ *
+ *   function MyComponent() {
+ *     const { networkStats } = React.useContext(NetworkContext)
+ *     if (networkStats === "OFFLINE") {
+ *       // Show an offline banner, disable actions, etc.
+ *     }
+ *     return null
+ *   }
+ */
 export type NetworkContextData = {
     networkStats: "ONLINE" | "OFFLINE" | "RECONNECTING"
 }
 
-const NetworkContext = createContext<NetworkContextData>({} as NetworkContextData)
+/**
+ * React context for network status.
+ *
+ * Example:
+ *   import { NetworkContext } from "@/contexts/network"
+ *   import React from "react"
+ *
+ *   export function StatusBadge() {
+ *     const { networkStats } = React.useContext(NetworkContext)
+ *     return <Text>{networkStats}</Text>
+ *   }
+ */
+export const NetworkContext = createContext<NetworkContextData>({} as NetworkContextData)
 
+/**
+ * Network Provider: subscribes to Expo Network state changes and exposes a high-level
+ * "networkStats" value ("ONLINE" | "OFFLINE" | "RECONNECTING") via context. Also
+ * triggers visual toasts on state transitions.
+ *
+ * Usage:
+ *   import { Provider as NetworkProvider } from "@/contexts/network"
+ *
+ *   export default function App() {
+ *     return (
+ *       <NetworkProvider>
+ *         <YourApp />
+ *       </NetworkProvider>
+ *     )
+ *   }
+ *
+ * Consuming:
+ *   import { NetworkContext } from "@/contexts/network"
+ *   const { networkStats } = React.useContext(NetworkContext)
+ */
 export function Provider({ children }: NetworkProviderProps) {
     const [networkStatus, setNetworkStatus] = useState<"ONLINE" | "OFFLINE" | "RECONNECTING">(
         "ONLINE",
@@ -25,17 +72,50 @@ export function Provider({ children }: NetworkProviderProps) {
     const toast = useToast()
 
     useEffect(() => {
-        let previousState = isConnected
-        const previousIsInternetReachable = isInternetReachable
+        let previousConnected: boolean | null = isConnected
+        let previousReachable: boolean | null = isInternetReachable
+        let previousType: any = null
+        let isMounted = true
 
-        const unsubscribe = NetInfo.addEventListener((state) => {
-            const currentState = state.isConnected
-            const currentIsInternetReachable = state.isInternetReachable
+        async function init() {
+            try {
+                const initial = await getNetworkStateAsync()
+                previousConnected = initial.isConnected ?? null
+                previousReachable = initial.isInternetReachable ?? null
+                previousType = initial.type ?? null
+                if (!isMounted) return
+                setIsConnected(previousConnected)
+                setIsInternetReachable(previousReachable)
+                if (appStarted) setAppStarted(false)
+            } catch {}
+        }
+        init()
 
-            // Exibir apenas o último estado de conexão
-            if (previousState !== currentState) {
-                if (currentState === false) {
-                    // Se desconectou, exibe "Offline"
+        let firstEvent = true
+        const subscription = addNetworkStateListener((state) => {
+            const currentConnected = state.isConnected ?? null
+            const currentReachable = state.isInternetReachable ?? null
+            const currentType = state.type ?? null
+
+            // Conectividade efetiva: precisa estar conectado e a internet não pode estar explicitamente inalcançável
+            const prevEffective = previousConnected === true && previousReachable !== false
+            const currEffective = currentConnected === true && currentReachable !== false
+
+            // Ignora o primeiro evento (estado inicial) para evitar toasts indevidos
+            if (firstEvent) {
+                previousConnected = currentConnected
+                previousReachable = currentReachable
+                previousType = currentType
+                setIsConnected(currentConnected)
+                setIsInternetReachable(currentReachable)
+                firstEvent = false
+                return
+            }
+
+            // Transições de efetivo ONLINE/OFFLINE
+            if (prevEffective !== currEffective) {
+                if (currEffective === false) {
+                    // Foi para OFFLINE
                     toast.show({
                         title: t("You are Offline"),
                         type: "error",
@@ -51,8 +131,8 @@ export function Provider({ children }: NetworkProviderProps) {
                         ),
                     })
                     setNetworkStatus("OFFLINE")
-                } else if (currentState === true && previousState === false) {
-                    // Se reconectou, exibe "Online"
+                } else if (currEffective === true) {
+                    // Voltou para ONLINE
                     toast.show({
                         title: t("Connected to Internet"),
                         type: "success",
@@ -65,11 +145,13 @@ export function Provider({ children }: NetworkProviderProps) {
                     })
                     setNetworkStatus("ONLINE")
                 }
-            }
-
-            if (previousIsInternetReachable !== currentIsInternetReachable) {
-                if (currentIsInternetReachable === true && previousIsInternetReachable === false) {
-                    // Exibe "Reconnecting" apenas se houver mudança no estado de alcançabilidade da Internet
+            } else {
+                // Sem mudança efetiva; se a internet voltou a ficar alcançável enquanto continuou conectado, mostra "Reconnecting"
+                if (
+                    previousReachable === false &&
+                    currentReachable === true &&
+                    currentConnected === true
+                ) {
                     toast.show({
                         title: t("Reconnecting..."),
                         type: "warning",
@@ -88,15 +170,30 @@ export function Provider({ children }: NetworkProviderProps) {
                 }
             }
 
-            previousState = currentState
-            setIsConnected(currentState)
-            if (appStarted) setAppStarted(false)
+            // Handle UNKNOWN type change with neutral toast
+            if (previousType !== currentType && currentType === NetworkStateType.UNKNOWN) {
+                toast.show({
+                    title: t("Reconnecting..."),
+                    type: "warning",
+                    duration: 1000,
+                    position: "top",
+                    backgroundColor: colors.gray.grey_06,
+                    icon: <WifiIcon fill={colors.gray.white.toString()} width={12} height={12} />,
+                })
+            }
+
+            previousConnected = currentConnected
+            previousReachable = currentReachable
+            previousType = currentType
+            setIsConnected(currentConnected)
+            setIsInternetReachable(currentReachable)
         })
 
         return () => {
-            unsubscribe()
+            isMounted = false
+            subscription?.remove?.()
         }
-    }, [isConnected])
+    }, [t])
 
     return (
         <NetworkContext.Provider value={{ networkStats: networkStatus }}>
@@ -104,5 +201,3 @@ export function Provider({ children }: NetworkProviderProps) {
         </NetworkContext.Provider>
     )
 }
-
-export default NetworkContext

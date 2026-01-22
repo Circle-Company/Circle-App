@@ -1,6 +1,5 @@
 import React from "react"
 import * as Location from "expo-location"
-import { apiRoutes } from "../services/Api"
 import PersistedContext from "./Persisted"
 
 interface UpdateCoordinatesPayload {
@@ -46,13 +45,17 @@ export function Provider({ children }: GeolocationProviderProps) {
     const updateUserCoordinates = async (payload: UpdateCoordinatesPayload): Promise<void> => {
         if (session.user.id) {
             try {
-                await apiRoutes.account.updateCoordinates({
-                    userId: session?.user?.id,
-                    coordinates: {
-                        latitude: payload.latitude,
-                        longitude: payload.longitude,
-                    },
-                })
+                // A api ainda não recebe coordenadas do usuário
+                /**
+                    await apiRoutes.account.updateCoordinates({
+                        userId: session?.user?.id,
+                        coordinates: {
+                            latitude: payload.latitude,
+                            longitude: payload.longitude,
+                        },
+                    })
+                 */
+
                 session.account.setCoordinates({
                     latitude: payload.latitude,
                     longitude: payload.longitude,
@@ -128,6 +131,7 @@ export function Provider({ children }: GeolocationProviderProps) {
         }
     }, [])
 
+    /**
     // Verifica se o usuário está logado e inicia o processo
     React.useEffect(() => {
         const checkUserAndStartUpdating = async () => {
@@ -154,6 +158,7 @@ export function Provider({ children }: GeolocationProviderProps) {
 
         checkUserAndStartUpdating()
     }, [session.user.id]) // Dependência na ID do usuário para reiniciar quando mudar
+    */
 
     const contextValue: GeolocationContextsData = {
         updateUserLocation,

@@ -1,4 +1,4 @@
-import { Image, StyleSheet, View, Pressable, Platform, ImageProps } from "react-native"
+import { Image, StyleSheet, View, Platform, ImageProps } from "react-native"
 import React, { useCallback, useEffect, useRef, useState } from "react"
 import { VideoView, useVideoPlayer } from "expo-video"
 import * as VideoThumbnails from "expo-video-thumbnails"
@@ -7,7 +7,7 @@ import * as FileSystem from "expo-file-system"
 import MidiaRenderVideoError from "./midia_render-video_error"
 import MomentContext from "../../moment/context"
 import PersistedContext from "../../../contexts/Persisted"
-import LanguageContext from "@/contexts/Preferences/language"
+import LanguageContext from "@/contexts/language"
 
 // Componente de imagem otimizado que desabilita análises do iOS
 const OptimizedImage = React.memo(
@@ -49,6 +49,7 @@ interface VideoPlayerProps {
     momentId?: string
     forceMute?: boolean
     prefetchAdjacentThumbnails?: string[]
+    disableWatch?: boolean
 }
 
 export default function MediaRenderVideo({
@@ -67,11 +68,12 @@ export default function MediaRenderVideo({
     momentId,
     forceMute = false,
     prefetchAdjacentThumbnails = [],
+    disableWatch = false,
 }: VideoPlayerProps) {
     const { t } = React.useContext(LanguageContext)
-    const { momentSize } = React.useContext(MomentContext)
-    const videoWidth = momentSize?.width ?? width ?? 200
-    const videoHeight = momentSize?.height ?? height ?? 200
+    const { size, actions, data } = React.useContext(MomentContext)
+    const videoWidth = size?.width ?? width ?? 200
+    const videoHeight = size?.height ?? height ?? 200
 
     // Estados otimizados
     const [hasError, setHasError] = useState(false)
@@ -84,6 +86,9 @@ export default function MediaRenderVideo({
     const progressIntervalRef = useRef<NodeJS.Timeout | null>(null)
     const destroyedRef = useRef(false)
     const attachedRef = useRef(false)
+    const lastWatchTimeRef = useRef(0) // Rastreia tempo total assistido
+    const watchSessionStartRef = useRef(0) // Marca início da sessão de visualização
+    const lastPositionRef = useRef(0) // Rastreia última posição para detectar loop
 
     const { session } = React.useContext(PersistedContext)
     const isMuted = forceMute ? true : session?.preferences?.content?.muteAudio || false
@@ -134,6 +139,69 @@ export default function MediaRenderVideo({
         }
     }, [thumbnailSource])
 
+    // Função para registrar tempo assistido
+    const registerWatchTime = useCallback(() => {
+        if (disableWatch) return
+        // Guardas defensivos para evitar acesso ao player nativo quando não está anexado
+        const effectiveMomentId = data?.id || momentId
+        if (!player || !effectiveMomentId || !session?.account?.jwtToken) {
+            console.log("WATCH skip: missing deps", {
+                hasPlayer: !!player,
+                hasMoment: !!data?.id,
+                hasMomentFallback: !!momentId,
+                hasToken: !!session?.account?.jwtToken,
+            })
+            return
+        }
+
+        if (destroyedRef.current || !attachedRef.current) {
+            console.log("WATCH skip: player not attached or destroyed", {
+                destroyed: destroyedRef.current,
+                attached: attachedRef.current,
+            })
+            return
+        }
+
+        let currentTime = 0
+        try {
+            // Alguns acessos podem lançar se o objeto nativo foi desalocado
+            // @ts-ignore
+            currentTime = player.currentTime || 0
+            if (typeof currentTime !== "number" || !isFinite(currentTime)) currentTime = 0
+        } catch (e) {
+            console.warn("WATCH skip: failed to read currentTime", e)
+            return
+        }
+
+        const watchedTime = currentTime - (watchSessionStartRef.current || 0)
+
+        // Só registra se assistiu pelo menos 100ms
+        if (watchedTime >= 0.1) {
+            const totalWatchTime = (lastWatchTimeRef.current || 0) + watchedTime
+
+            console.log(
+                "Registrando WATCH - Tempo:",
+                Math.round(watchedTime * 100) / 100,
+                "s (total:",
+                Math.round(totalWatchTime * 100) / 100,
+                "s)",
+            )
+
+            actions.registerInteraction("WATCH", {
+                momentId: effectiveMomentId,
+                authorizationToken: session.account.jwtToken,
+                watchTime: Math.round(totalWatchTime * 1000), // Converter para milissegundos
+            })
+
+            lastWatchTimeRef.current = totalWatchTime
+        } else {
+            console.log("WATCH skip: below threshold", { watchedTime })
+        }
+
+        // Reseta marcador de sessão
+        watchSessionStartRef.current = 0
+    }, [player, data?.id, session?.account?.jwtToken, actions])
+
     // Controle de play/pause baseado em foco e autoPlay
     useEffect(() => {
         if (!player) return
@@ -141,21 +209,25 @@ export default function MediaRenderVideo({
             try {
                 player.play()
                 setShowThumbnail(false)
+                // Marca início da sessão de visualização
+                watchSessionStartRef.current = player.currentTime || 0
             } catch (e) {
                 // evita erro quando o objeto nativo ainda não está anexado
             }
         } else if (isVideoReadyRef.current && attachedRef.current) {
             try {
                 player.pause()
+                // Registra tempo assistido quando pausar/perder foco
+                registerWatchTime()
             } catch (e) {
                 // evita erro quando o objeto nativo ainda não está anexado
             }
         }
     }, [isFocused, autoPlay, player])
 
-    // Garantir que, ao focar e o vídeo já estiver pronto, esconda a thumbnail
+    // Garantir que, ao focar e o vídeo já estiver pronto, esconda a thumbnail apenas quando anexado
     useEffect(() => {
-        if (isFocused && isVideoReadyRef.current) {
+        if (isFocused && isVideoReadyRef.current && attachedRef.current) {
             setShowThumbnail(false)
         }
     }, [isFocused])
@@ -234,10 +306,7 @@ export default function MediaRenderVideo({
         const loadSub = player.addListener("statusChange", (status) => {
             if (status.status === "readyToPlay") {
                 const duration = player.duration || 0
-                console.log(`Video loaded:`, {
-                    momentId: momentId || "unknown",
-                    duration,
-                })
+                console.log("Video loaded - duration:", duration)
                 retryCount.current = 0
 
                 if (onVideoLoad) {
@@ -251,6 +320,7 @@ export default function MediaRenderVideo({
                     player.volume = isMuted ? 0 : 1
                 } catch (e) {}
                 attachedRef.current = true
+                console.log("Video attached", { momentId, uri })
 
                 // Esconder thumbnail quando vídeo estiver pronto
                 if (isFocused) {
@@ -261,6 +331,9 @@ export default function MediaRenderVideo({
                     if (autoPlay && attachedRef.current) {
                         try {
                             player.play()
+                            // Marca início da sessão quando começar a tocar
+                            watchSessionStartRef.current = player.currentTime || 0
+                            lastPositionRef.current = player.currentTime || 0
                         } catch (e) {
                             // se falhar, será retomado pelo efeito de foco quando estiver pronto
                         }
@@ -268,6 +341,7 @@ export default function MediaRenderVideo({
                 }
             } else if (status.status === "error") {
                 attachedRef.current = false
+                console.log("Video error statusChange", { momentId, uri, error: status.error })
                 handleError(status.error)
             }
         })
@@ -276,9 +350,16 @@ export default function MediaRenderVideo({
         const playSub = player.addListener("playingChange", (isPlaying) => {
             if (isPlaying && isVideoReadyRef.current) {
                 setShowThumbnail(false)
+                // Marca início da sessão quando começa a tocar
+                watchSessionStartRef.current = player.currentTime || 0
             }
             if (!isPlaying && player.currentTime >= (player.duration || 0) - 0.1) {
-                console.log("Video playback ended")
+                if (!disableWatch) {
+                    console.log("Video playback ended - registrando watch time")
+                    // Registra tempo assistido quando vídeo terminar
+                    registerWatchTime()
+                }
+
                 if (onVideoEnd) {
                     onVideoEnd()
                 }
@@ -289,21 +370,43 @@ export default function MediaRenderVideo({
             loadSub.remove()
             playSub.remove()
         }
-    }, [player, isFocused, autoPlay, onVideoLoad, onVideoEnd, momentId])
+    }, [player, isFocused, autoPlay, onVideoLoad, onVideoEnd, momentId, registerWatchTime])
 
-    // Monitorar progresso do vídeo
+    // Monitorar progresso do vídeo e detectar loops
     useEffect(() => {
-        if (!player || !isFocused || !onProgressChange) return
+        if (!player || !isFocused) return
         if (!attachedRef.current) return
 
-        // Atualizar progresso a cada 120ms
+        // Atualizar progresso e detectar loop a cada 120ms
         progressIntervalRef.current = setInterval(() => {
             if (
                 attachedRef.current &&
                 player.currentTime !== undefined &&
                 player.duration !== undefined
             ) {
-                onProgressChange(player.currentTime, player.duration)
+                const currentTime = player.currentTime
+                const duration = player.duration
+
+                // Detecta se o vídeo voltou ao início (loop)
+                if (
+                    lastPositionRef.current > 0 &&
+                    currentTime < 0.5 &&
+                    lastPositionRef.current > duration - 1
+                ) {
+                    if (!disableWatch) {
+                        console.log("Loop detectado - registrando watch time")
+                        registerWatchTime()
+                    }
+                    // Reinicia contadores para nova sessão
+                    watchSessionStartRef.current = currentTime
+                }
+
+                lastPositionRef.current = currentTime
+
+                // Callback de progresso se fornecido
+                if (onProgressChange) {
+                    onProgressChange(currentTime, duration)
+                }
             }
         }, 120)
 
@@ -312,7 +415,7 @@ export default function MediaRenderVideo({
                 clearInterval(progressIntervalRef.current)
             }
         }
-    }, [player, isFocused, onProgressChange])
+    }, [player, isFocused, onProgressChange, registerWatchTime])
 
     // Atualizar mute quando mudar
     useEffect(() => {
@@ -337,22 +440,28 @@ export default function MediaRenderVideo({
             isVideoReadyRef.current = false
             attachedRef.current = false
 
-            setTimeout(() => {
-                if (destroyedRef.current) return
-                if (player && isFocused && autoPlay && attachedRef.current) {
-                    try {
-                        player.currentTime = 0
-                    } catch (e) {}
-                    try {
-                        player.play()
-                    } catch (e) {}
-                }
-            }, 400)
+            if (destroyedRef.current) return
+            if (player && uri) {
+                try {
+                    const anyPlayer = player as any
+                    if (typeof anyPlayer.replaceAsync === "function") {
+                        anyPlayer.replaceAsync(uri)
+                    } else if (typeof anyPlayer.replace === "function") {
+                        anyPlayer.replace(uri)
+                    }
+                } catch (e) {}
+            }
+            // autoplay will be handled on statusChange when readyToPlay
         }
-    }, [player, isFocused, autoPlay])
+    }, [player, isFocused, autoPlay, registerWatchTime])
 
     const handleError = useCallback(
         (error: any) => {
+            // Registra tempo assistido antes de mostrar erro (se habilitado)
+            if (!disableWatch) {
+                console.log("🔴 Vídeo com erro - Registrando tempo assistido automaticamente")
+                registerWatchTime()
+            }
             console.error("Video error:", error)
 
             let errorMsg = t("Erro ao carregar o vídeo")
@@ -375,14 +484,19 @@ export default function MediaRenderVideo({
                 }
             }
         },
-        [retryPlayback, onVideoEnd],
+        [retryPlayback, onVideoEnd, registerWatchTime],
     )
 
     // Cleanup ao desmontar
     useEffect(() => {
         return () => {
+            // Registra tempo assistido ao desmontar componente
+            registerWatchTime()
+
+            // Desanexa antes de marcar como destruído para evitar estados inconsistentes
+            attachedRef.current = false
             destroyedRef.current = true
-            if (player && attachedRef.current) {
+            if (player) {
                 try {
                     player.pause()
                 } catch (e) {}
@@ -391,7 +505,7 @@ export default function MediaRenderVideo({
                 clearInterval(progressIntervalRef.current)
             }
         }
-    }, [player])
+    }, [])
 
     const styles = StyleSheet.create({
         container: {
@@ -440,7 +554,7 @@ export default function MediaRenderVideo({
 
     // Renderização normal
     return Platform.OS === "ios" ? (
-        <Pressable onLongPress={() => {}} delayLongPress={100000} style={styles.container}>
+        <View style={styles.container}>
             {/* Vídeo - sempre renderizado quando há URI */}
             {uri && uri.length > 0 && player && (
                 <View style={styles.absoluteFill}>
@@ -449,7 +563,6 @@ export default function MediaRenderVideo({
                         style={styles.video}
                         contentFit="cover"
                         nativeControls={false}
-                        allowsFullscreen={false}
                         allowsPictureInPicture={false}
                         accessible={false}
                     />
@@ -468,7 +581,7 @@ export default function MediaRenderVideo({
                     />
                 </View>
             )}
-        </Pressable>
+        </View>
     ) : (
         <View style={styles.container}>
             {/* Vídeo - sempre renderizado quando há URI */}

@@ -5,9 +5,9 @@ import { Text } from "@/components/Themed"
 import ColorTheme, { colors } from "@/constants/colors"
 import fonts from "@/constants/fonts"
 import sizes from "@/constants/sizes"
-import AuthContext from "@/contexts/Auth"
+import AuthContext from "@/contexts/auth"
 import { usernameRegex } from "@/lib/hooks/useUsernameRegex"
-import api from "@/services/Api" // Serviço para verificar disponibilidade do username
+import api from "@/api" // Serviço para verificar disponibilidade do username
 import React, { useContext, useEffect, useRef, useState } from "react"
 import { useTranslation } from "react-i18next"
 import {
@@ -110,24 +110,53 @@ export default function UsernameInput({ type }: UsernameInputProps) {
             return false
         }
 
-        // Se formato válido, dispara verificação de disponibilidade
-        setStatusMessage(t("Checking availability..."))
+        // Limpa estado anterior antes de consultar a API
         setIsUsernameAvailable(false)
         setUsernameIsValid(false)
         setSignInputUsername("")
 
         try {
-            const response = await api.post("/auth/username-already-in-use", { username: value })
-            // Atualiza os estados de acordo com a resposta
-            setSignInputUsername(value)
-            setUsernameIsValid(true)
-            setIsUsernameAvailable(response.data.enable_to_use)
-            setStatusMessage(t(response.data.message))
-            return response.data.enable_to_use
-        } catch {
-            setStatusMessage(t("Error verifying username."))
-            setIsUsernameAvailable(false)
+            setStatusMessage(t("Checking availability..."))
+            const response = await api.get(`/auth/username-availability/${value}`)
+            const data = response?.data ?? {}
+
+            // API nova: 200 { success: true, available: boolean }
+            if (response.status === 200 && data?.success === true) {
+                const available = Boolean(data.available)
+                setUsernameIsValid(true)
+                setIsUsernameAvailable(available)
+
+                if (available) {
+                    setSignInputUsername(value)
+                    setStatusMessage(t("This username is available for use."))
+                    return true
+                } else {
+                    setStatusMessage(t("This username is already in use, try another."))
+                    return false
+                }
+            }
+
+            // Fallback genérico caso 200 sem success ou payload inesperado
             setUsernameIsValid(false)
+            setIsUsernameAvailable(false)
+            setStatusMessage(t("Error verifying username."))
+            return false
+        } catch (err: any) {
+            // API nova: 500 { success: false, error: "The username '...' is already in use" }
+            const serverMsg =
+                err?.response?.data?.error || err?.message || t("Error verifying username.")
+
+            // Para mensagens "em uso", mantemos formato válido porém indisponível
+            const isInUse =
+                typeof serverMsg === "string" && serverMsg.toLowerCase().includes("already in use")
+
+            setUsernameIsValid(isInUse ? true : false)
+            setIsUsernameAvailable(false)
+            setStatusMessage(
+                isInUse
+                    ? t("This username is already in use, try another.")
+                    : t("Error verifying username."),
+            )
             return false
         }
     }
@@ -297,7 +326,7 @@ export default function UsernameInput({ type }: UsernameInputProps) {
                     maxLength={20}
                     style={input}
                     autoFocus={type === "signUp" ? true : false}
-                    selectionColor={ColorTheme().primary}
+                    selectionColor={colors.purple.purple_04}
                     placeholder={type === "signUp" ? t("user.name") : t("Username")}
                     placeholderTextColor={String(ColorTheme().textDisabled + "99")}
                 />

@@ -1,3 +1,3 @@
-import { PermissionsPage } from "@/modules/camera/pages/permissions";
+import { PermissionsPage } from "../../../modules/camera/pages/permissions"
 
-export default PermissionsPage;
+export default PermissionsPage

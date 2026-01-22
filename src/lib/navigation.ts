@@ -103,7 +103,6 @@ export const ROUTES = {
         MOMENTS: "/(tabs)/moments",
         CREATE: "/(tabs)/create",
         YOU: "/(tabs)/you",
-        YOU_EDIT: "/(tabs)/you/edit",
     },
 
     // Camera routes (inside create tab)
@@ -113,15 +112,6 @@ export const ROUTES = {
         MEDIA: "/(tabs)/create/media",
     },
 
-    // Moment routes
-    MOMENT: {
-        DETAIL: (id: string) => `/moment/${id}`,
-        NEW_GALLERY: "/moment/new-gallery",
-        NEW_IMAGE: "/moment/new-image",
-        NEW_CAMERA: "/moment/new-camera",
-        NEW_DESCRIPTION: "/moment/new-description",
-    },
-
     // Profile routes
     PROFILE: {
         USER: (userId: string) => `/profile/${userId}`,
@@ -129,25 +119,23 @@ export const ROUTES = {
 
     // Settings routes
     SETTINGS: {
-        INDEX: "/settings",
-        PROFILE_PICTURE: "/settings/profile-picture",
-        DESCRIPTION: "/settings/description",
-        FOLLOWINGS: "/settings/followings",
-        NAME: "/settings/name",
-        PASSWORD: "/settings/password",
-        PRIVACY_POLICY: "/settings/privacy-policy",
-        TERMS_OF_SERVICE: "/settings/terms-of-service",
-        COMMUNITY_GUIDELINES: "/settings/community-guidelines",
-        PUSH_NOTIFICATIONS: "/settings/push-notifications",
-        ALL_MOMENTS: "/settings/all-moments",
-        PREFERENCES: "/settings/preferences",
-        LANGUAGE: "/settings/language",
-        CONTENT: "/settings/content",
-        HAPTICS: "/settings/haptics",
-        OPEN_SOURCE: "/settings/open-source",
-        SUPPORT: "/settings/support",
-        VERSION: "/settings/version",
-        LOG_OUT: "/settings/log-out",
+        INDEX: "/(tabs)/settings",
+        PROFILE_PICTURE: "/(tabs)/settings/profile-picture",
+        DESCRIPTION: "/(tabs)/settings/description",
+        FOLLOWINGS: "/(tabs)/settings/followings",
+        NAME: "/(tabs)/settings/name",
+        PASSWORD: "/(tabs)/settings/password",
+        PRIVACY_POLICY: "/(tabs)/settings/privacy-policy",
+        TERMS_OF_SERVICE: "/(tabs)/settings/terms-of-service",
+        COMMUNITY_GUIDELINES: "/(tabs)/settings/community-guidelines",
+        PREFERENCES: "/(tabs)/settings/preferences",
+        LANGUAGE: "/(tabs)/settings/language",
+        CONTENT: "/(tabs)/settings/content",
+        HAPTICS: "/(tabs)/settings/haptics",
+        OPEN_SOURCE: "/(tabs)/settings/open-source",
+        SUPPORT: "/(tabs)/settings/support",
+        VERSION: "/(tabs)/settings/version",
+        LOG_OUT: "/(tabs)/settings/log-out",
     },
 } as const
 
@@ -170,14 +158,9 @@ export const LEGACY_ROUTE_MAP: Record<string, string> = {
     HomeScreen: ROUTES.TABS.MOMENTS,
     CreateBottomTab: ROUTES.TABS.CREATE,
     AccountScreen: ROUTES.TABS.YOU,
-    EditAccountScreen: ROUTES.TABS.YOU_EDIT,
 
     // Moments
     MomentFullScreen: "/moment/",
-    NewMomentGalleryScreen: ROUTES.MOMENT.NEW_GALLERY,
-    NewMomentImageScreen: ROUTES.MOMENT.NEW_IMAGE,
-    NewMomentCameraModule: ROUTES.MOMENT.NEW_CAMERA,
-    NewMomentDescription: ROUTES.MOMENT.NEW_DESCRIPTION,
 
     // Profile
     Profile: "/profile/",
@@ -192,8 +175,6 @@ export const LEGACY_ROUTE_MAP: Record<string, string> = {
     "Settings-Privacy-Policy": ROUTES.SETTINGS.PRIVACY_POLICY,
     "Settings-Terms-Of-Service": ROUTES.SETTINGS.TERMS_OF_SERVICE,
     "Settings-Community-Guidelines": ROUTES.SETTINGS.COMMUNITY_GUIDELINES,
-    "Settings-Preferences-PushNotifications": ROUTES.SETTINGS.PUSH_NOTIFICATIONS,
-    "Settings-All-Moments": ROUTES.SETTINGS.ALL_MOMENTS,
     "Settings-Preferences": ROUTES.SETTINGS.PREFERENCES,
     "Settings-Preferences-Language": ROUTES.SETTINGS.LANGUAGE,
     "Settings-Preferences-Content": ROUTES.SETTINGS.CONTENT,

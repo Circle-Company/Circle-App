@@ -5,15 +5,17 @@ export default function main_root({
     children,
     isFeed,
     isFocused,
-    momentData,
-    momentSize,
+    data,
+    size,
+    shadow,
 }: MomentMainRootProps) {
     return (
         <MomentProvider
             isFeed={isFeed}
             isFocused={isFocused}
-            momentData={momentData}
-            momentSize={momentSize}
+            data={data}
+            size={size}
+            shadow={shadow}
         >
             {children}
         </MomentProvider>

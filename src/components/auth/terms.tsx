@@ -2,10 +2,12 @@ import { useRouter } from "expo-router"
 import React from "react"
 import { useTranslation } from "react-i18next"
 import { TextStyle, TouchableOpacity, useColorScheme, ViewProps } from "react-native"
-import { colors, default as ColorScheme, default as ColorTheme } from "../../constants/colors"
-import fonts from "../../constants/fonts"
-import sizes from "../../constants/sizes"
+import { colors, default as ColorScheme, default as ColorTheme } from "@/constants/colors"
+import fonts from "@/constants/fonts"
+import sizes from "@/constants/sizes"
 import { Text } from "../Themed"
+import config from "@/config"
+import * as Browser from "expo-web-browser"
 
 type Props = ViewProps & {
     signText: string
@@ -50,7 +52,7 @@ export default function AuthTermsText({ signText }: Props) {
                 <TouchableOpacity
                     testID="handle-privacy-policy"
                     onPress={() => {
-                        router.push("/(auth)/privacy-policy")
+                        Browser.openBrowserAsync(config.PRIVACY_POLICY_URL)
                     }}
                 >
                     <Text style={termsButton}>{t("Privacy Policy")}</Text>
@@ -59,7 +61,7 @@ export default function AuthTermsText({ signText }: Props) {
                 <TouchableOpacity
                     testID="handle-terms-of-service"
                     onPress={() => {
-                        router.push("/(auth)/terms-of-service")
+                        Browser.openBrowserAsync(config.TERMS_OF_SERVICE_URL)
                     }}
                 >
                     <Text style={termsButton}>{t("Terms of Service")}</Text>
@@ -68,7 +70,7 @@ export default function AuthTermsText({ signText }: Props) {
                 <TouchableOpacity
                     testID="handle-community-guidelines"
                     onPress={() => {
-                        router.push("/(auth)/community-guidelines")
+                        Browser.openBrowserAsync(config.COMMUNITY_GUIDELINES_URL)
                     }}
                 >
                     <Text style={termsButton}>{t("Community Guidelines")}</Text>

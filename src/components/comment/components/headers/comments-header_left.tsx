@@ -8,7 +8,8 @@ export default function header_left({ children }: CommentsHeaderLeftProps) {
     const container: ViewStyle = {
         paddingLeft: sizes.paddings["1sm"] * 0.7,
         flexDirection: "row",
-        width: 120,
+        width: "100%",
+        maxWidth: sizes.screens.width * 0.6,
         borderRadius: 20,
         paddingVertical: 4,
     }

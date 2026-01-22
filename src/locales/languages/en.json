@@ -5,6 +5,7 @@
 
     "Create Account": "Create Account",
     "Sign In with Circle": "Sign In with Circle",
+    "Connect with real people.": "Connect with real people.",
     "Step 1 of 3": "Step 1 of 3",
     "Step 2 of 3": "Step 2 of 3",
     "Step 3 of 3": "Step 3 of 3",
@@ -138,6 +139,9 @@
     "All Memories": "All Memories",
     "Add Comment": "Add Comment",
     "Done": "Done",
+    "Cancel": "Cancel",
+    "Delete Moment": "Delete Moment",
+    "You will permanently remove it.": "You will permanently remove it.",
     "Delete": "Delete",
     "Error": "Error",
     "Reload": "Reload",
@@ -194,6 +198,7 @@
     "Confirm": "Confirm",
     "Log Out Anyway": "Log Out Anyway",
     "Fetch Again": "Fetch Again",
+    "Back": "Back",
 
     "description": "description",
     "Tags": "Tags",
@@ -259,6 +264,7 @@
     "See how it turned out": "See how it turned out",
     "Recording": "Recording",
     "Enter on Circle": "Enter on Circle",
+    "Update": "Update",
 
     "When your moment gets a like.": "When your moment gets a like.",
     "When someone you follow posts a new Memory.": "When someone you follow posts a new Memory.",
@@ -320,5 +326,20 @@
     "auth.errors.tooManyRequests": "Too many attempts. Please wait a moment and try again.",
     "auth.errors.network": "Network error. Check your internet connection and try again.",
     "auth.errors.generic": "We couldn't complete the sign-in. Please try again.",
-    "auth.errors.unknown": "An unknown error occurred."
+    "auth.errors.unknown": "An unknown error occurred.",
+
+    "Change Picture": "Change Picture",
+    "Open Camera": "Open Camera",
+    "Choose from Library": "Choose from Library",
+    "Upload": "Upload",
+    "Uploading": "Uploading",
+    "Permission to access the gallery is required": "Permission to access the gallery is required",
+    "Failed to open the gallery": "Failed to open the gallery",
+    "Permission to use the camera is required": "Permission to use the camera is required",
+    "Failed to open the camera": "Failed to open the camera",
+    "Nothing to show for now": "Nothing to show for now",
+    "It seems that you haven't shared anithing in the last 30 days": "It seems that you haven't shared anything in the last 30 days",
+    "Create Moment": "Create Moment",
+    "You are offline": "You are offline",
+    "Verify your internet connection": "Verify your internet connection"
 }

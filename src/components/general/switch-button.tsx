@@ -6,8 +6,8 @@ import Animated, {
     useSharedValue,
     withSpring,
 } from "react-native-reanimated"
-import { colors } from "../../constants/colors"
-import { Vibrate } from "../../lib/hooks/useHapticFeedback"
+import { colors } from "@/constants/colors"
+import { Vibrate } from "@/lib/hooks/useHapticFeedback"
 import { Host, Switch } from "@expo/ui/swift-ui"
 
 interface SwitchButtonProps {

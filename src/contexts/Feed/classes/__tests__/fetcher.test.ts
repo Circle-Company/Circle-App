@@ -1,11 +1,11 @@
 import { beforeEach, describe, expect, it, vi } from "vitest"
 
 import { Fetcher } from "../fetcher"
-import api from "@/services/Api"
+import api from "@/api"
 
 const mockApiGet = vi.hoisted(() => vi.fn())
 
-vi.mock("@/services/Api", () => ({
+vi.mock("@/api", () => ({
     default: {
         get: mockApiGet,
     },

@@ -8,7 +8,7 @@ import Sizes from "../../../constants/sizes"
 import fonts from "../../../constants/fonts"
 
 export default function Description({ displayOnMoment = true }: MomentDescriptionProps) {
-    const { momentData } = React.useContext(MomentContext)
+    const { data } = React.useContext(MomentContext)
 
     const container: any = {
         margin: Sizes.margins["1sm"],
@@ -25,9 +25,9 @@ export default function Description({ displayOnMoment = true }: MomentDescriptio
         textShadowRadius: displayOnMoment ? 4 : 0,
         justifyContent: "flex-start", // Ajuste para que o texto comece do início
     }
-    const animationTime = momentData.description?.length * 700
-    const animationToValue = -(momentData.description?.length * 8)
-    const needAnimation = momentData.description?.length > 50 ? true : false
+    const animationTime = data.description?.length * 700
+    const animationToValue = -(data.description?.length * 8)
+    const needAnimation = data.description?.length > 50 ? true : false
     const textAnim = useRef(new Animated.Value(0)).current
 
     useEffect(() => {
@@ -50,7 +50,7 @@ export default function Description({ displayOnMoment = true }: MomentDescriptio
     return (
         <View style={container}>
             <Text style={descriptionStyle} selectable={false}>
-                {momentData.description}
+                {data.description}
             </Text>
         </View>
     )

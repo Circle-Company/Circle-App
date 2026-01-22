@@ -2,16 +2,16 @@ import ColorTheme, { colors } from "../../../constants/colors"
 import { Pressable, Text, View, useColorScheme } from "react-native"
 
 import Icon from "@/assets/icons/svgs/@2.svg"
-import LanguageContext from "../../../contexts/Preferences/language"
+import LanguageContext from "../../../contexts/language"
 import PersistedContext from "../../../contexts/Persisted"
 import React from "react"
 import Sizes from "../../../constants/sizes"
 import { UserUsernameProps } from "../user_show-types"
 import Verifyed from "@/assets/icons/svgs/check_circle_verify.svg"
 import fonts from "../../../constants/fonts"
-import { truncated } from "../../../helpers/processText"
 import { useNavigation } from "@react-navigation/native"
 import { useUserShowContext } from "../user_show-context"
+import { textLib } from "@/circle.text.library"
 
 export default function UserShowUsername({
     pressable = true,
@@ -53,11 +53,6 @@ export default function UserShowUsername({
         color,
     }
 
-    const icon_style = {
-        top: 2,
-        marginRight: 1 * scale,
-    }
-
     async function onUsernameAction() {
         if (pressable) {
             executeBeforeClick ? executeBeforeClick() : null
@@ -68,7 +63,7 @@ export default function UserShowUsername({
         }
     }
 
-    const username = `${truncated({ text: user.username, size: Number(truncatedSize) })}`
+    const username = textLib.conversor.sliceWithDots({ text: user.username, size: truncatedSize })
     const usernameText = displayYou ? (isMe ? t("You") : username) : username
     return (
         <Pressable onPress={async () => await onUsernameAction()} style={container}>

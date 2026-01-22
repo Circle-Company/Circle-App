@@ -5,33 +5,27 @@ import { FlatList } from "react-native"
 import sizes from "../../../constants/sizes"
 import { CommentObject } from "../comments-types"
 import RenderComment from "./comments-render_comment"
-import ZeroComments from "./comments-zero_comments"
+
+import { View } from "react-native"
 
 function PreviewCommentsList({ comment }: { comment: CommentObject[] }) {
-    return (
-        <FlatList
-            showsVerticalScrollIndicator={false}
-            scrollEventThrottle={16}
-            scrollEnabled={false}
-            data={comment}
-            keyExtractor={(item: CommentObject, index: number) => String(item.id || index)}
-            renderItem={({ item, index }) => (
-                <Reanimated.View
-                    style={{ width: "95%", alignSelf: "center" }}
-                    entering={FadeInUp.duration(100 * (index + 1))}
-                >
-                    <RenderComment preview={true} comment={item} index={index} />
+    if (comment?.length === 0) {
+        return null
+    } else {
+        return (
+            <View
+                style={{
+                    width: "100%",
+                    paddingHorizontal: sizes.paddings["1sm"],
+                    alignItems: "stretch",
+                }}
+            >
+                <Reanimated.View style={{ width: "100%" }} entering={FadeInUp.duration(100)}>
+                    <RenderComment preview={true} comment={comment[0]} index={0} />
                 </Reanimated.View>
-            )}
-            ListFooterComponent={() => {
-                if (comment?.length === 0) {
-                    return <ZeroComments />
-                }
-                return null
-            }}
-            style={{ width: sizes.moment.standart.width, alignSelf: "center" }}
-        />
-    )
+            </View>
+        )
+    }
 }
 
 export default PreviewCommentsList

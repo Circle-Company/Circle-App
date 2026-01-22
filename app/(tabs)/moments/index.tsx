@@ -1,3 +1,10 @@
-import HomeScreen from "@/pages/app/Home";
+import { View } from "@/components/Themed"
+import ListMoments from "@/features/moments"
 
-export default HomeScreen;
+export default function HomeScreen() {
+    return (
+        <View style={{ flex: 1 }}>
+            <ListMoments />
+        </View>
+    )
+}

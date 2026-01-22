@@ -3,17 +3,21 @@ import React from "react"
 export type ProfileReciveDataProps = {
     id: number
     username: string
-    verified: boolean
     name: string | null
     description: string | null
-    profile_picture: {
-        small_resolution: string
-        tiny_resolution: string
+    profilePicture: string | null
+    status: {
+        verified: boolean
     }
-    statistics: {
-        total_followers_num: number
-        total_likes_num: number
-        total_views_num: number
+    metrics: {
+        totalMomentsCreated: number
+        totalFollowers: number
+    }
+    interactions: {
+        isFollowing: boolean
+        isFollowedBy: boolean
+        isBlockedBy: boolean
+        isBlocking: boolean
     }
 }
 export type ProfileMainRootProps = {
@@ -33,6 +37,7 @@ export type ProfileNameProps = {
 }
 export type ProfilePictureProps = {
     fromProfile?: boolean
+    hasOutline?: boolean
 }
 export type ProfileStatisticsContainerProps = {
     children: React.ReactNode

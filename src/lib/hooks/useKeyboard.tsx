@@ -7,48 +7,50 @@ import {
     withTiming,
 } from "react-native-reanimated"
 
-type InterpolatableSharedValue = SharedValue<number> & {
-    interpolate: (inputRange: [number, number], outputRange: [number, number]) => number
-}
-
-function makeInterpolatable(value: SharedValue<number>): InterpolatableSharedValue {
+function createInterpolatable(value: SharedValue<number>) {
     "worklet"
-    return Object.assign(value, {
-        interpolate(inputRange: [number, number], outputRange: [number, number]) {
-            "worklet"
-            return reanimatedInterpolate(value.value, inputRange, outputRange)
-        },
-    })
+    return (inputRange: [number, number], outputRange: [number, number]): number => {
+        "worklet"
+        return reanimatedInterpolate(value.value, inputRange, outputRange)
+    }
 }
 
 export type UseKeyboardReturn = {
-    height: InterpolatableSharedValue
+    height: SharedValue<number>
     visible: SharedValue<boolean>
-    progress: InterpolatableSharedValue
+    progress: SharedValue<number>
     keyboardIsVisible: SharedValue<boolean>
+    interpolateHeight: ReturnType<typeof createInterpolatable>
+    interpolateProgress: ReturnType<typeof createInterpolatable>
 }
 
 export function useKeyboard(): UseKeyboardReturn {
-    const height = makeInterpolatable(useSharedValue(0))
+    const height = useSharedValue(0)
     const visible = useSharedValue(false)
-    const rawProgress = makeInterpolatable(useSharedValue(0))
+    const progress = useSharedValue(0)
     const keyboardIsVisible = useSharedValue(false)
+
+    const interpolateHeight = createInterpolatable(height)
+    const interpolateProgress = createInterpolatable(progress)
 
     useEffect(() => {
         const showEvent = Platform.OS === "ios" ? "keyboardWillShow" : "keyboardDidShow"
         const hideEvent = Platform.OS === "ios" ? "keyboardWillHide" : "keyboardDidHide"
 
         const showSub = Keyboard.addListener(showEvent, (e: KeyboardEvent) => {
-            height.value = withTiming(e.endCoordinates.height, { duration: 250 })
+            const keyboardH = e.endCoordinates?.height ?? 0
+            height.value = withTiming(keyboardH, { duration: 250 })
+            progress.value = withTiming(1, { duration: 250 })
+
             visible.value = true
-            rawProgress.value = withTiming(1, { duration: 250 })
             keyboardIsVisible.value = true
         })
 
         const hideSub = Keyboard.addListener(hideEvent, () => {
             height.value = withTiming(0, { duration: 250 })
+            progress.value = withTiming(0, { duration: 250 })
+
             visible.value = false
-            rawProgress.value = withTiming(0, { duration: 250 })
             keyboardIsVisible.value = false
         })
 
@@ -61,7 +63,9 @@ export function useKeyboard(): UseKeyboardReturn {
     return {
         height,
         visible,
-        progress: rawProgress,
+        progress,
         keyboardIsVisible,
+        interpolateHeight,
+        interpolateProgress,
     }
 }

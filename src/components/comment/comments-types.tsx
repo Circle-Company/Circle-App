@@ -2,16 +2,15 @@ import React from "react"
 
 export type CommentObject = {
     id: string
+    content: string
+    richContent?: string
     user: {
         id: string
         username: string
-        profilePicture?: string
+        profilePicture: string
         verified?: boolean
     }
-    content: string
-    richContent?: string
-    totalLikes: number
-    isLiked: boolean
+    sentiment: string
     createdAt: string
 }
 

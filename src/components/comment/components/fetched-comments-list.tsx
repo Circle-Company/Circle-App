@@ -1,240 +1,174 @@
-import { FlatList, TextStyle, ViewStyle } from "react-native"
+import {
+    View,
+    Text,
+    FlatList,
+    TextStyle,
+    ViewStyle,
+    Platform,
+    Keyboard,
+    Animated,
+} from "react-native"
 import Reanimated, { FadeInUp } from "react-native-reanimated"
-import { Text, View } from "../../Themed"
-
-import BottomSheetContext from "../../../contexts/bottomSheet"
-import ButtonClose from "../../buttons/close"
-import { CommentObject } from "../comments-types"
-import LanguageContext from "../../../contexts/Preferences/language"
-import { Loading } from "../../loading"
-import NetworkContext from "../../../contexts/network"
-import OfflineCard from "../../general/offline"
-import PersistedContext from "../../../contexts/Persisted"
+import { CommentObject } from "@/components/comment/comments-types"
+import LanguageContext from "@/contexts/language"
+import { Loading } from "@/components/loading"
+import { NetworkContext } from "@/contexts/network"
+import OfflineCard from "@/components/general/offline"
 import React from "react"
 import RenderComment from "./comments-render_comment"
-import fonts from "../../../constants/fonts"
-import sizes from "../../../constants/sizes"
+import fonts from "@/constants/fonts"
+import sizes from "@/constants/sizes"
+import MomentContext from "@/components/moment/context"
+import { colors } from "@/constants/colors"
 
-const MOCK_COMMENTS: CommentObject[] = [
-    {
-        id: "1",
-        user: {
-            id: "1",
-            username: "johndoe",
-            verified: true,
-            profile_picture: {
-                small_resolution: "https://picsum.photos/50/50",
-                tiny_resolution: "https://picsum.photos/30/30",
-            },
-            youFollow: true,
-        },
-        content: "Que foto incrível! Adorei as cores e a composição. 📸✨",
-        created_at: "2024-03-20T10:30:00Z",
-        statistics: {
-            total_likes_num: 15,
-        },
-        is_liked: true,
-    },
-    {
-        id: "2",
-        user: {
-            id: "2",
-            username: "mariasilva",
-            verified: false,
-            profile_picture: {
-                small_resolution: "https://picsum.photos/51/51",
-                tiny_resolution: "https://picsum.photos/31/31",
-            },
-            youFollow: false,
-        },
-        content: "Esse lugar é maravilhoso! Onde fica? Quero muito conhecer! 🌎",
-        created_at: "2024-03-20T11:15:00Z",
-        statistics: {
-            total_likes_num: 8,
-        },
-        is_liked: false,
-    },
-    {
-        id: "3",
-        user: {
-            id: "3",
-            username: "photoexpert",
-            verified: true,
-            profile_picture: {
-                small_resolution: "https://picsum.photos/52/52",
-                tiny_resolution: "https://picsum.photos/32/32",
-            },
-            youFollow: true,
-        },
-        content: "A luz natural nessa foto está perfeita! Qual câmera você usou? 📷",
-        created_at: "2024-03-20T12:00:00Z",
-        statistics: {
-            total_likes_num: 25,
-        },
-        is_liked: true,
-    },
-    {
-        id: "4",
-        user: {
-            id: "4",
-            username: "travelgram",
-            verified: false,
-            profile_picture: {
-                small_resolution: "https://picsum.photos/53/53",
-                tiny_resolution: "https://picsum.photos/33/33",
-            },
-            youFollow: false,
-        },
-        content: "Mais um lugar para adicionar na minha lista de destinos! 🗺️✈️",
-        created_at: "2024-03-20T13:45:00Z",
-        statistics: {
-            total_likes_num: 12,
-        },
-        is_liked: false,
-    },
-]
-
-function FetchedCommentsList({
-    totalCommentsNum,
-    momentId,
-}: {
-    totalCommentsNum: number
-    momentId: string | number
-}) {
+function FetchedCommentsList() {
     const { t } = React.useContext(LanguageContext)
-    const { session } = React.useContext(PersistedContext)
     const { networkStats } = React.useContext(NetworkContext)
-    const { collapse } = React.useContext(BottomSheetContext)
+    const { data } = React.useContext(MomentContext)
+
     const [page, setPage] = React.useState<number>(1)
     const [loading, setLoading] = React.useState<boolean>(false)
     const [endReached, setEndReached] = React.useState<boolean>(false)
-    const [allComments, setAllComments] = React.useState<CommentObject[]>(MOCK_COMMENTS)
     const pageSize = 4
 
+    // Animate input position based on keyboard height
+    const keyboardHeight = React.useRef(new Animated.Value(0)).current
+
+    React.useEffect(() => {
+        const showListener = Keyboard.addListener(
+            Platform.OS === "ios" ? "keyboardWillShow" : "keyboardDidShow",
+            (e) => {
+                const offset = 0
+                Animated.timing(keyboardHeight, {
+                    toValue: e.endCoordinates.height - offset,
+                    duration: Platform.OS === "ios" ? 250 : 200,
+                    useNativeDriver: false,
+                }).start()
+            },
+        )
+        const hideListener = Keyboard.addListener(
+            Platform.OS === "ios" ? "keyboardWillHide" : "keyboardDidHide",
+            () => {
+                Animated.timing(keyboardHeight, {
+                    toValue: 0,
+                    duration: Platform.OS === "ios" ? 250 : 200,
+                    useNativeDriver: false,
+                }).start()
+            },
+        )
+
+        return () => {
+            showListener.remove()
+            hideListener.remove()
+        }
+    }, [])
+
     const titleContainer: ViewStyle = {
-        flex: 1,
-        flexDirection: "row",
         alignSelf: "center",
+        alignItems: "center",
+        width: sizes.screens.width,
         paddingHorizontal: sizes.paddings["1sm"],
         marginBottom: sizes.margins["2sm"],
-        height: sizes.headers.height * 0.7,
-        alignItems: "center",
-        justifyContent: "flex-start",
+        height: sizes.headers.height * 0.8,
+        justifyContent: "center",
     }
 
     const title: TextStyle = {
-        marginLeft: sizes.margins["2sm"] * 0.7,
-        fontSize: fonts.size.body,
+        alignSelf: "center",
+        fontSize: fonts.size.body * 1.1,
         fontFamily: fonts.family.Bold,
+        color: colors.gray.white,
     }
 
-    const inputOverflow: ViewStyle = {
-        zIndex: 100,
-        position: "absolute",
-        bottom: 0,
-        width: sizes.screens.width,
+    const endText: TextStyle = {
+        alignSelf: "center",
+        fontSize: fonts.size.body * 0.9,
+        fontFamily: fonts.family.Medium,
+        color: colors.gray.white,
     }
 
     async function fetchData() {
-        // Temporariamente comentado para usar dados mock
-        /*if (!momentId) {
-            return
+        if (data.id) {
+            await data.getComments({ page, pageSize }).then(function (response: any) {
+                const totalPages = Number(response?.data?.totalPages ?? 1)
+                setEndReached(page >= totalPages)
+                setPage((prev) => prev + 1)
+            })
         }
-        await api
-            .get(`/moments/${momentId}/comments?page=${page}&pageSize=${pageSize}`, {
-                headers: { Authorization: session.account.jwtToken },
-            })
-            .then(function (response) {
-                if (page === 1) setAllComments(response.data.comments)
-                else {
-                    setAllComments([...allComments, ...response.data.comments])
-                    if (page > response.data.totalPages) setEndReached(true)
-                    else setEndReached(false)
-                }
-                setPage(page + 1)
-            })
-            .catch(function (error) {
-                console.log(error)
-            })*/
     }
 
     React.useEffect(() => {
-        // Temporariamente desabilitado para usar dados mock
-        /*if (momentId) {
+        if (data.id) {
             setLoading(true)
-            if (momentId && momentId !== "0")
+            if (data.id)
                 fetchData().finally(() => {
                     setLoading(false)
                 })
-        }*/
-    }, [momentId])
+        }
+    }, [data.id])
 
     React.useEffect(() => {
         // Temporariamente desabilitado para usar dados mock
-        /*if (momentId) fetchData()*/
+        fetchData()
     }, [networkStats])
 
-    if (networkStats == "OFFLINE" && allComments?.length == 0)
-        return <OfflineCard height={sizes.screens.height - sizes.headers.height} />
+    if (networkStats == "OFFLINE" && data.comments.length == 0) return <OfflineCard />
     if (loading)
         return (
-            <Loading.Container
-                width={sizes.moment.standart.width}
-                height={sizes.screens.height - sizes.headers.height}
-            >
+            <Loading.Container width={sizes.screens.width}>
                 <Loading.ActivityIndicator />
             </Loading.Container>
         )
 
     return (
-        <FlatList
-            showsVerticalScrollIndicator={false}
-            onEndReached={async () => {
-                // Temporariamente desabilitado para usar dados mock
-                /*if (momentId) {
-                    await fetchData()
-                }*/
-            }}
-            scrollEventThrottle={16}
-            onEndReachedThreshold={0.1}
-            scrollEnabled={true}
-            data={allComments}
-            keyExtractor={(item: CommentObject, index: number) => String(item.id || index)}
-            ListHeaderComponent={() => (
-                <View style={titleContainer}>
-                    <View style={{ flex: 1 }}>
+        <View style={{ flex: 1 }}>
+            <FlatList
+                showsVerticalScrollIndicator={false}
+                onEndReached={async () => {
+                    if (!endReached && !loading) {
+                        setLoading(true)
+                        await fetchData().finally(() => setLoading(false))
+                    }
+                }}
+                scrollEventThrottle={16}
+                onEndReachedThreshold={0.1}
+                scrollEnabled={true}
+                data={data.comments}
+                keyExtractor={(item: CommentObject, index: number) => String(item.id || index)}
+                ListHeaderComponent={() => (
+                    <View style={titleContainer}>
                         <Text style={title}>
-                            {totalCommentsNum} {t("Comments")}
+                            {data.metrics?.totalComments} {t("Comments")}
                         </Text>
                     </View>
-                    <ButtonClose onPress={collapse} />
-                </View>
-            )}
-            renderItem={({ item, index }) => (
-                <Reanimated.View
-                    style={{ width: "100%", alignSelf: "center" }}
-                    entering={FadeInUp.duration(250)}
-                >
-                    <RenderComment preview={false} comment={item} index={index} />
-                </Reanimated.View>
-            )}
-            ListFooterComponent={() => {
-                if (endReached) {
-                    if (allComments.length == 0)
-                        return <Text>{t("No one has commented yet.")}</Text>
-                    else return <Text>{t("No more comments.")}</Text>
-                } else
-                    return (
-                        <Loading.Container
-                            width={sizes.moment.standart.width}
-                            height={sizes.headers.height * 2}
-                        >
-                            <Loading.ActivityIndicator size={25} />
-                        </Loading.Container>
-                    )
-            }}
-            style={{ width: sizes.moment.standart.width, alignSelf: "center" }}
-        />
+                )}
+                renderItem={({ item, index }) => (
+                    <Reanimated.View
+                        style={{
+                            width: "100%",
+                            alignSelf: "center",
+                            alignItems: "center",
+                            paddingHorizontal: sizes.paddings["1md"],
+                            paddingBottom: sizes.paddings["1sm"],
+                        }}
+                        entering={FadeInUp.duration(250)}
+                    >
+                        <RenderComment preview={false} comment={item} index={index} />
+                    </Reanimated.View>
+                )}
+                ListFooterComponent={() => {
+                    if (endReached) {
+                        if (data.comments.length == 0)
+                            return <Text style={endText}>{t("No one has commented yet.")}</Text>
+                        else return <Text style={endText}>{t("No more comments.")}</Text>
+                    } else return <Loading.ActivityIndicator size={25} />
+                }}
+                style={{ alignSelf: "center", flex: 1 }}
+                contentContainerStyle={{
+                    paddingBottom: sizes.inputs.height + sizes.margins["2md"],
+                }}
+            />
+        </View>
     )
 }
 

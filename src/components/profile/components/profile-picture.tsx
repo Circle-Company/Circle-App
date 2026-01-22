@@ -2,12 +2,12 @@ import Icon from "@/assets/icons/svgs/@2.svg"
 import { Image } from "expo-image"
 import React from "react"
 import { Animated, Pressable, View, useColorScheme } from "react-native"
-import { colors } from "../../../constants/colors"
-import sizes from "../../../constants/sizes"
+import { colors } from "@/constants/colors"
+import sizes from "@/constants/sizes"
 import { useProfileContext } from "../profile-context"
 import { ProfilePictureProps } from "../profile-types"
 
-export default function Picture({ fromProfile = false }: ProfilePictureProps) {
+export default function Picture({ fromProfile = false, hasOutline = true }: ProfilePictureProps) {
     const { user } = useProfileContext()
     const isDarkMode = useColorScheme() === "dark"
     const [profilePicture, setProfilePicture] = React.useState<string>("")
@@ -17,7 +17,7 @@ export default function Picture({ fromProfile = false }: ProfilePictureProps) {
         height: 150,
         borderRadius: 150 / 2,
     }
-    const outlineSize: number = Number(Number(pictureDimensions.width) / 20)
+    const outlineSize: number = hasOutline ? Number(Number(pictureDimensions.width) / 20) : 0
 
     const container: any = {
         alignItems: "center",
@@ -25,6 +25,8 @@ export default function Picture({ fromProfile = false }: ProfilePictureProps) {
         marginHorizontal: sizes.margins["1sm"],
         width: Number(pictureDimensions.width) + Number(outlineSize),
         height: Number(pictureDimensions.height) + Number(outlineSize),
+        backgroundColor: colors.gray.grey_08,
+        borderRadius: (Number(pictureDimensions.width) + Number(outlineSize)) / 2,
     }
 
     const iconContainer: any = {
@@ -58,13 +60,7 @@ export default function Picture({ fromProfile = false }: ProfilePictureProps) {
     }, [])
 
     React.useEffect(() => {
-        const { tiny_resolution, small_resolution } = user?.profile_picture || {}
-
-        if (fromProfile) {
-            setProfilePicture(small_resolution || tiny_resolution || "")
-        } else {
-            setProfilePicture(tiny_resolution || small_resolution || "")
-        }
+        setProfilePicture(user.profilePicture ? user.profilePicture : "")
     }, [fromProfile, user])
 
     const animatedContainer: any = {
@@ -89,18 +85,15 @@ export default function Picture({ fromProfile = false }: ProfilePictureProps) {
                         left: Number(outlineSize) / 2,
                     }}
                 />
-                {!user?.profile_picture?.tiny_resolution &&
-                    !user?.profile_picture?.small_resolution && (
-                        <View style={iconContainer}>
-                            <Icon
-                                width={pictureDimensions.width * 0.5}
-                                height={pictureDimensions.height * 0.5}
-                                fill={
-                                    isDarkMode ? colors.gray.grey_04 + 90 : colors.gray.grey_04 + 50
-                                }
-                            />
-                        </View>
-                    )}
+                {!user?.profilePicture && (
+                    <View style={iconContainer}>
+                        <Icon
+                            width={pictureDimensions.width * 0.5}
+                            height={pictureDimensions.height * 0.5}
+                            fill={isDarkMode ? colors.gray.grey_04 + 90 : colors.gray.grey_04 + 50}
+                        />
+                    </View>
+                )}
             </Pressable>
         </Animated.View>
     )

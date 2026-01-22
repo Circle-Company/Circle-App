@@ -1,13 +1,14 @@
 import React from "react"
 import { MidiaReciveDataProps } from "../midia_render/midia_render-types"
-import { MomentDataProps, MomentSizeProps } from "./context/types"
+import { dataProps, MomentVideoProps, sizeProps } from "./context/types"
 
 export type MomentMainRootProps = {
-    momentData: MomentDataProps
-    momentSize: MomentSizeProps
+    data: dataProps
+    size: sizeProps
     isFeed: boolean
     isFocused: boolean
     children: React.ReactNode
+    shadow?: MomentVideoProps["shadow"]
 }
 export type MomentTopRootProps = {
     children: React.ReactNode
@@ -37,6 +38,9 @@ export type MomentContainerProps = {
     forceMute?: boolean
     showSlider?: boolean
     disableCache?: boolean
+    disableTopGradient?: boolean
+    disableBottomGradient?: boolean
+    disableWatch?: boolean
 }
 
 export type MomentLikeProps = {

@@ -4,6 +4,8 @@ import React, { useEffect, useRef } from "react"
 import { colors } from "../../../constants/colors"
 import sizes from "../../../constants/sizes"
 import BlurredBackground from "../../general/blurred-background"
+import { isIOS } from "@/lib/platform/detection"
+import { LinearGradient } from "expo-linear-gradient"
 
 interface VideoSliderProps {
     currentTime: number
@@ -78,27 +80,40 @@ export default function MomentVideoSlider({
         extrapolate: "clamp", // Garante que o valor não ultrapasse os limites
     })
 
+    if (isIOS) {
+        return (
+            <View style={container}>
+                <BlurredBackground
+                    intensity={10}
+                    tint="systemMaterialDark"
+                    overlayColor={`${colors.gray.grey_04}20`}
+                    radius={6}
+                    style={sliderContainer}
+                >
+                    <Animated.View
+                        style={[
+                            progressTrack,
+                            { width: progressWidth, overflow: "hidden", opacity: 0.5 },
+                        ]}
+                    >
+                        <LinearGradient
+                            style={{ width: "100%", height: "100%" }}
+                            colors={[colors.gray.white + "20", colors.gray.white]}
+                            start={{ x: 0, y: 0 }}
+                            end={{ x: 1, y: 0 }}
+                        />
+                    </Animated.View>
+                </BlurredBackground>
+            </View>
+        )
+    }
+
     return (
         <View style={container}>
-            {Platform.OS === "ios" ? (
-                <BlurredBackground
-                    intensity={30}
-                    tint="systemMaterialDark"
-                    overlayColor={`${colors.gray.grey_07}80`}
-                    radius={6}
-                    style={{ borderRadius: 6 }}
-                >
-                    <View style={sliderContainer}>
-                        <View style={[track, backgroundTrack]} />
-                        <Animated.View style={[progressTrack, { width: progressWidth }]} />
-                    </View>
-                </BlurredBackground>
-            ) : (
-                <View style={sliderContainer}>
-                    <View style={[track, backgroundTrack]} />
-                    <Animated.View style={[progressTrack, { width: progressWidth }]} />
-                </View>
-            )}
+            <View style={sliderContainer}>
+                <View style={[track, backgroundTrack]} />
+                <Animated.View style={[progressTrack, { width: progressWidth }]} />
+            </View>
         </View>
     )
 }

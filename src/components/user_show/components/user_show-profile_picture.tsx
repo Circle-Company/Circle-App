@@ -1,6 +1,6 @@
 import Animated, { FadeIn } from "react-native-reanimated"
 import ColorTheme, { colors } from "../../../constants/colors"
-import { Pressable, View, useColorScheme } from "react-native"
+import { BackHandler, Pressable, View, useColorScheme } from "react-native"
 
 import Icon from "@/assets/icons/svgs/@2.svg"
 import { Image } from "expo-image"
@@ -13,6 +13,7 @@ import { useUserShowContext } from "../user_show-context"
 export default function profile_picture({
     displayOnMoment = true,
     pictureDimensions,
+    disableAction = false,
 }: UserProfilePictureProps) {
     const { user, executeBeforeClick } = useUserShowContext()
     const navigation: any = useNavigation()
@@ -33,28 +34,24 @@ export default function profile_picture({
     const iconContainer: any = {
         alignSelf: "center",
         justifyContent: "center",
+        backgroundColor: colors.gray.grey_07,
     }
 
     const [profilePicture, setProfilePicture] = React.useState<string>("")
     async function onProfilePictureAction() {
-        await navigation.navigate("ProfileNavigator", {
-            screen: "Profile",
-            params: { findedUserPk: user.id },
-        })
-        executeBeforeClick ? executeBeforeClick() : null
+        if (!disableAction) {
+            await navigation.navigate("ProfileNavigator", {
+                screen: "Profile",
+                params: { findedUserPk: user.id },
+            })
+            executeBeforeClick ? executeBeforeClick() : null
+        }
     }
 
     React.useEffect(() => {
         // Suportar tanto profilePicture (string) quanto profile_picture (objeto)
-        if (user.profilePicture) {
-            setProfilePicture(String(user.profilePicture))
-        } else if (user.profile_picture?.small_resolution) {
-            setProfilePicture(String(user.profile_picture.small_resolution))
-        } else if (user.profile_picture?.tiny_resolution) {
-            setProfilePicture(String(user.profile_picture.tiny_resolution))
-        } else {
-            setProfilePicture("")
-        }
+        if (user.profilePicture) setProfilePicture(String(user.profilePicture))
+        else setProfilePicture("")
     }, [user])
 
     return (
