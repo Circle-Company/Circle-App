@@ -1,12 +1,10 @@
-import { Text, View } from "react-native"
-
 import React from "react"
-import ColorTheme from "@/constants/colors"
+import { Text, View } from "react-native"
 import fonts from "@/constants/fonts"
 import sizes from "@/constants/sizes"
-import MomentContext from "../context"
-import { MomentDateProps } from "../moment-types"
-import LanguageContext from "@/contexts/language"
+import ColorTheme from "@/constants/colors"
+import MomentContext from "@/components/moment/context"
+import { MomentDateProps } from "@/components/moment/moment-types"
 import { useLocaleDateRelative } from "@/lib/hooks/useLocaleDate"
 
 export default function Date({

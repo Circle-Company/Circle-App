@@ -49,15 +49,12 @@ export default function Name({
         fontFamily: fontFamily,
         color: color,
     }
-    if (!user?.name) {
-        return null
-    }
     return (
         <Animated.View style={container}>
-            <Text style={text_style}>{user?.name}</Text>
+            {user?.name && <Text style={text_style}>{user?.name}</Text>}
             {followsNum > 0 && (
                 <Text style={text_style}>
-                    <Text style={text_style}>, </Text>
+                    {user?.name && <Text style={text_style}>, </Text>}
                     {textLib.conversor.formatNumWithDots(followsNum)}{" "}
                     {followsNum > 1 ? t("Followers") : t("Follower")}
                 </Text>

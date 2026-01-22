@@ -6,7 +6,6 @@ import LinearGradient from "react-native-linear-gradient"
 import BlurredBackground from "../../general/blurred-background"
 import MomentContext from "../context"
 import { MomentLikeProps } from "../moment-types"
-import NumberConversor from "../../../helpers/numberConversor"
 import PersistedContext from "../../../contexts/Persisted"
 /* eslint-disable no-var */
 import React from "react"
@@ -15,6 +14,7 @@ import { Vibrate } from "../../../lib/hooks/useHapticFeedback"
 import fonts from "../../../constants/fonts"
 import sizes from "../../../constants/sizes"
 import { isIOS } from "@/lib/platform/detection"
+import { textLib } from "@/circle.text.library"
 
 export default function Like({
     isLiked,
@@ -84,7 +84,7 @@ export default function Like({
     const adjustedLikes = totalLikes + likeDifference
 
     // Converte para formato legível
-    const displayLikes = NumberConversor(adjustedLikes)
+    const displayLikes = textLib.conversor.convertNumToShort(adjustedLikes)
     const buttonWidth = adjustedLikes > 0 ? 84 : 76
     const borderWidth = 1
     const borderRadiusValue = Number([sizes.buttons.width / 4]) / 2

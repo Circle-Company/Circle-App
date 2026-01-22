@@ -52,14 +52,12 @@ export function ProfileHeader({ user }: RenderProfileProps) {
         <Profile.MainRoot data={user}>
             <View style={top_container}>
                 <Profile.Picture fromProfile={true} hasOutline={false} />
-                {user?.name && (
-                    <View style={name_container}>
-                        <Profile.NameFollow scale={0.75} />
-                    </View>
-                )}
+                <View style={name_container}>
+                    <Profile.NameFollow scale={0.75} />
+                </View>
             </View>
             {user?.description && <Profile.Description />}
-            {session.account.totalMoments !== undefined && moments.length > 0 && (
+            {session.account.totalMoments !== undefined && (
                 <AccountMomentsHeader
                     totalMoments={session.account.totalMoments}
                     lastUpdateDate={lastUpdateDate}

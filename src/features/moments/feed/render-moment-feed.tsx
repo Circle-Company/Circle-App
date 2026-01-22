@@ -54,11 +54,14 @@ export default function RenderMomentFeed({
     // Animate input position based on keyboard height
     const keyboardHeightAnim = React.useRef(new RNAnimated.Value(0)).current
 
+    const [showFloatingInput, setShowFloatingInput] = React.useState(false)
+
     React.useEffect(() => {
         const showListener = Keyboard.addListener(
             Platform.OS === "ios" ? "keyboardWillShow" : "keyboardDidShow",
             (e) => {
                 const offset = Platform.OS === "ios" ? 0 : 20
+                setShowFloatingInput(true)
                 RNAnimated.timing(keyboardHeightAnim, {
                     toValue: e.endCoordinates.height - offset,
                     duration: Platform.OS === "ios" ? 250 : 200,
@@ -73,7 +76,9 @@ export default function RenderMomentFeed({
                     toValue: 0,
                     duration: Platform.OS === "ios" ? 250 : 200,
                     useNativeDriver: false,
-                }).start()
+                }).start(() => {
+                    setShowFloatingInput(false)
+                })
             },
         )
 
@@ -87,7 +92,22 @@ export default function RenderMomentFeed({
         commentShared.value = withTiming(commentEnabled ? 1 : 0, {
             duration: 250,
         })
+        // Hide floating input immediately when comments are disabled
+        if (!commentEnabled) {
+            setShowFloatingInput(false)
+            RNAnimated.timing(keyboardHeightAnim, {
+                toValue: 0,
+                duration: 0,
+                useNativeDriver: false,
+            }).start()
+        }
     }, [commentEnabled, commentShared])
+
+    React.useEffect(() => {
+        if (commentEnabled && isFocused) {
+            setShowFloatingInput(true)
+        }
+    }, [commentEnabled, isFocused])
 
     const dimmedOpacity = isDarkMode ? 0.2 : BASE_OPACITY_OFF
 
@@ -158,16 +178,20 @@ export default function RenderMomentFeed({
         // Aplicar apenas quando o momento está focado (focusProgressValue > 0.5)
         const keyboardScale =
             focusProgressValue.value > 0.5
-                ? 1 - 0.65 * keyboardProgress.value * commentShared.value
+                ? 1 - 0.3 * keyboardProgress.value * commentShared.value
                 : 1
 
         // Escala final: apenas commentScale e keyboardScale
         // A escala base é 100% controlada pelo scrollX no index.tsx
         const finalScale = commentScale * keyboardScale
 
+        // Elevação leve do momento quando teclado/comentários ativos
+        const translateY =
+            focusProgressValue.value > 0.5 ? -100 * keyboardProgress.value * commentShared.value : 0
+
         return {
             opacity: baseOpacity,
-            transform: [, { scale: finalScale }],
+            transform: [{ translateY }, { scale: finalScale }],
         }
     }, [dimmedOpacity])
 
@@ -234,7 +258,7 @@ export default function RenderMomentFeed({
 
             {/* Comentários SEM escala, apenas opacidade (desaparecem quando input ativo) */}
             <Animated.View style={{ marginTop: 3 }}>
-                {data.topComment ? (
+                {data.topComment || data.metrics.totalComments > 1 ? (
                     <RenderCommentFeed moment={data} focused={isFocused} />
                 ) : (
                     <View style={{ alignSelf: "center", marginTop: sizes.margins["2sm"] }}>
@@ -243,8 +267,8 @@ export default function RenderMomentFeed({
                 )}
             </Animated.View>
 
-            {/* Input flutuante quando commentEnabled=true */}
-            {commentEnabled && isFocused && (
+            {/* Input flutuante: mostrar enquanto teclado visível/animando e foco no momento */}
+            {isFocused && showFloatingInput && (
                 <RNAnimated.View
                     style={{
                         position: "absolute",

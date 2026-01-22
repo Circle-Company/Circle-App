@@ -337,5 +337,10 @@
     "Permission to access the gallery is required": "Permissão para acessar a galeria é necessária",
     "Failed to open the gallery": "Falha ao abrir a galeria",
     "Permission to use the camera is required": "Permissão para usar a câmera é necessária",
-    "Failed to open the camera": "Falha ao abrir a câmera"
+    "Failed to open the camera": "Falha ao abrir a câmera",
+    "Nothing to show for now": "Nada para mostrar por enquanto",
+    "It seems that you haven't shared anithing in the last 30 days": "Parece que você não compartilhou nada nos últimos 30 dias",
+    "Create Moment": "Criar Momento",
+    "You are offline": "Você está offline",
+    "Verify your internet connection": "Verifique sua conexão com a internet"
 }

@@ -190,6 +190,9 @@ export default function Input({
                         numberOfLines={1}
                         onChangeText={(text) => setCommentText(text)}
                         autoFocus={autoFocus}
+                        onBlur={() => {
+                            setCommentEnabled(false)
+                        }}
                     />
                 </View>
                 <Host matchContents>

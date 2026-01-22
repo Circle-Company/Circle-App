@@ -1,4 +1,4 @@
-import { AccountM}
+import { AccountMomentsResponse } from "@/queries"
 
 export type accountProps = {
     success: boolean
@@ -26,7 +26,7 @@ export type accountProps = {
 
 export type momentsProps = {
     success: boolean
-    moments: Array<accountMomentProps>
+    moments: Array<AccountMomentsResponse>
     pagination: {
         total: number
         page: number

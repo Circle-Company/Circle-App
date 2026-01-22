@@ -49,20 +49,8 @@ export default function MomentLayout() {
                     headerStyle: {
                         backgroundColor: "transparent",
                     },
-                    headerLeft: () => (
-                        <HeaderBackButton
-                            tintColor={colors.gray.white}
-                            displayMode="default"
-                            pressColor={colors.purple.purple_05}
-                            onPress={() => {
-                                if (from === "you") {
-                                    router.replace("/(tabs)/you")
-                                } else {
-                                    router.back()
-                                }
-                            }}
-                        />
-                    ),
+                    headerBackTitle: t("Back"),
+                    headerBackVisible: true,
                 }}
             />
             <Stack.Screen

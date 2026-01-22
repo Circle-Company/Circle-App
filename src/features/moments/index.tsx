@@ -1,5 +1,5 @@
 import React, { useCallback, useRef, useState } from "react"
-import { Animated, RefreshControl, useColorScheme } from "react-native"
+import { Animated } from "react-native"
 import { Loading } from "@/components/loading"
 import { colors } from "@/constants/colors"
 import sizes from "@/constants/sizes"
@@ -37,7 +37,6 @@ const ListMoments = () => {
     const [centerIndex, setCenterIndex] = useState<number | null>(0)
     const [loading] = React.useState(false)
     const [refreshing, setRefreshing] = React.useState(false)
-    const isDarkMode = useColorScheme() === "dark"
     const flatListRef = useRef<Animated.FlatList<any> | null>(null)
     const { session } = React.useContext(PersistedContext)
     const scrollX = useRef(new Animated.Value(0)).current
@@ -116,6 +115,10 @@ const ListMoments = () => {
                 scrollEnabled={enableScrollFeed}
                 showsHorizontalScrollIndicator={false}
                 showsVerticalScrollIndicator={false}
+                bounces={false}
+                alwaysBounceVertical={true}
+                alwaysBounceHorizontal={true}
+                overScrollMode="never"
                 viewabilityConfig={viewabilityConfig}
                 scrollEventThrottle={16}
                 snapToInterval={SNAP_INTERVAL}

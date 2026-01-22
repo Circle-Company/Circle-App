@@ -10,14 +10,6 @@ async function flushWatch(momentId: string, watchTime: number): Promise<void> {
     const token = storage.getString(storageKeys().account.jwt.token) || ""
     const tokenPreview = token.slice ? token.slice(0, 10) : ""
     const url = `/moments/${momentId}/watch`
-    console.log(
-        "WATCH flush -> sending",
-        JSON.stringify({ url, watchTimeSeconds: Math.round(watchTime / 1000) }),
-        "| authHeaderPresent:",
-        !!token,
-        "| authPreview:",
-        tokenPreview,
-    )
 
     try {
         const res = await api.post(url, { watchTime: Math.round(watchTime / 1000) })

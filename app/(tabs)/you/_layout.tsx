@@ -7,6 +7,7 @@ import LanguageContext from "@/contexts/language"
 import PersistedContext from "@/contexts/Persisted"
 import { iOSMajorVersion } from "@/lib/platform/detection"
 import Cog from "@/assets/icons/svgs/cog.svg"
+import fonts from "@/constants/fonts"
 
 export default function YouLayout() {
     const { session } = React.useContext(PersistedContext)
@@ -46,6 +47,24 @@ export default function YouLayout() {
                         color: colors.gray.white,
                     },
                     headerTitle: session?.user?.username ? `@${session.user.username}` : "",
+                }}
+            />
+            <Stack.Screen
+                name="[id]"
+                options={{
+                    headerTitle: "Moment",
+                    headerTitleAlign: "center",
+                    animation: "slide_from_right",
+                    headerTintColor: "white",
+                    headerLargeTitle: false,
+                    headerTransparent: true,
+                    headerTitleStyle: { fontFamily: fonts.family["Black-Italic"] },
+                    headerLargeTitleStyle: { fontFamily: fonts.family["Black-Italic"] },
+                    headerStyle: {
+                        backgroundColor: "transparent",
+                    },
+                    headerBackTitle: t("Back"),
+                    headerBackVisible: true,
                 }}
             />
         </Stack>

@@ -12,12 +12,13 @@ import fonts from "../../../constants/fonts"
 import sizes from "../../../constants/sizes"
 import MomentContext from "@/components/moment/context"
 import { textLib } from "@/circle.text.library"
-import { truncated } from "@/helpers/processText"
+
 import { Moment as MomentProps } from "@/contexts/Feed/types"
 import { isIOS } from "@/lib/platform/detection"
 import { SwiftBottomSheet } from "@/components/ios/ios.bottom.sheet"
 import FetchedCommentsList from "./fetched-comments-list"
 import BottomSheetContext from "@/contexts/bottomSheet"
+import { UserShow } from "@/components/user_show"
 export default function ZeroComments({ moment }: { moment: MomentProps }) {
     const { t } = React.useContext(LanguageContext)
     const [isIOSSheetOpen, setIOSSheetOpen] = React.useState(false)
@@ -25,6 +26,7 @@ export default function ZeroComments({ moment }: { moment: MomentProps }) {
         React.useContext(FeedContext)
     const { expand } = React.useContext(BottomSheetContext)
     const isDarkMode = useColorScheme() === "dark"
+
     const container: any = {
         maxWidth: sizes.screens.width,
         borderRadius: sizes.borderRadius["1md"] * 1.2,
@@ -109,24 +111,22 @@ export default function ZeroComments({ moment }: { moment: MomentProps }) {
                 style={buttonContainer}
             >
                 <Text style={buttonTitle}>
-                    {t("React to")} @
-                    {textLib.conversor.sliceWithDots({
-                        text: moment.user.username,
-                        size: 10,
-                    })}
+                    {t("React to")}{" "}
+                    <UserShow.Root data={moment.user}>
+                        <View style={{ top: 3 }}>
+                            <UserShow.Username
+                                pressable={false}
+                                margin={0}
+                                displayOnMoment={false}
+                                color={colors.gray.black}
+                                fontSize={fonts.size.body}
+                                fontFamily={fonts.family["Black-Italic"]}
+                                truncatedSize={10}
+                            />
+                        </View>
+                    </UserShow.Root>
                 </Text>
             </ButtonStandart>
-            {isIOS && isIOSSheetOpen && (
-                <SwiftBottomSheet
-                    isOpened={isIOSSheetOpen}
-                    onIsOpenedChange={(opened) => {
-                        if (!opened) setIOSSheetOpen(false)
-                        setCommentEnabled(true)
-                    }}
-                >
-                    <FetchedCommentsList />
-                </SwiftBottomSheet>
-            )}
         </View>
     )
 }

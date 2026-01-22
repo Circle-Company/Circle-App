@@ -9,32 +9,22 @@ import {
     Animated,
 } from "react-native"
 import Reanimated, { FadeInUp } from "react-native-reanimated"
-
-import BottomSheetContext from "../../../contexts/bottomSheet"
-import ButtonClose from "../../buttons/close"
-import { CommentObject } from "../comments-types"
-import LanguageContext from "../../../contexts/language"
-import { Loading } from "../../loading"
-import NetworkContext from "../../../contexts/network"
-import OfflineCard from "../../general/offline"
-import PersistedContext from "../../../contexts/Persisted"
+import { CommentObject } from "@/components/comment/comments-types"
+import LanguageContext from "@/contexts/language"
+import { Loading } from "@/components/loading"
+import { NetworkContext } from "@/contexts/network"
+import OfflineCard from "@/components/general/offline"
 import React from "react"
 import RenderComment from "./comments-render_comment"
-import fonts from "../../../constants/fonts"
-import sizes from "../../../constants/sizes"
+import fonts from "@/constants/fonts"
+import sizes from "@/constants/sizes"
 import MomentContext from "@/components/moment/context"
-import api from "@/api"
 import { colors } from "@/constants/colors"
-import Input from "./comments-input"
-import FeedContext from "@/contexts/Feed"
 
 function FetchedCommentsList() {
     const { t } = React.useContext(LanguageContext)
-    const { session } = React.useContext(PersistedContext)
     const { networkStats } = React.useContext(NetworkContext)
     const { data } = React.useContext(MomentContext)
-    const { collapse } = React.useContext(BottomSheetContext)
-    const { commentEnabled } = React.useContext(FeedContext)
 
     const [page, setPage] = React.useState<number>(1)
     const [loading, setLoading] = React.useState<boolean>(false)
@@ -122,8 +112,7 @@ function FetchedCommentsList() {
         fetchData()
     }, [networkStats])
 
-    if (networkStats == "OFFLINE" && data.comments.length == 0)
-        return <OfflineCard height={sizes.screens.height - sizes.headers.height} />
+    if (networkStats == "OFFLINE" && data.comments.length == 0) return <OfflineCard />
     if (loading)
         return (
             <Loading.Container width={sizes.screens.width}>

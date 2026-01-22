@@ -12,20 +12,23 @@ import AccountContext from "@/contexts/account"
 import PersistedContext from "@/contexts/Persisted"
 import { RenderProfileSkeleton } from "@/features/profile/profile.skeleton"
 import { ProfileHeader } from "@/features/profile"
-//
 import sizes from "@/constants/sizes"
 import { Moment } from "@/components/moment"
-import { dataProps } from "@/components/moment/context/types"
 import config from "@/config"
 import { colors } from "@/constants/colors"
 import { iOSMajorVersion } from "@/lib/platform/detection"
 import { router } from "expo-router"
-import Animated from "react-native-reanimated"
+import { NoMoments } from "@/features/profile/profile.no.moments"
+import fonts from "@/constants/fonts"
+import { NetworkContext } from "@/contexts/network"
+import OfflineCard from "@/components/general/offline"
+import { AccountMoment, AccountMomentsResponse } from "@/queries"
 
 export default function AccountScreen() {
     const { account, moments, isLoadingAccount, isLoadingMoments, getAccount, getMoments } =
         React.useContext(AccountContext)
     const { session } = React.useContext(PersistedContext)
+    const { networkStats } = React.useContext(NetworkContext)
     const [currentPage, setCurrentPage] = useState(1)
     const [hasMoreMoments, setHasMoreMoments] = useState(true)
     const [refreshing, setRefreshing] = useState(false)
@@ -38,6 +41,7 @@ export default function AccountScreen() {
     const SPACING = 5
     const NUM_COLUMNS = 2
     const ITEM_SIZE = (width - (NUM_COLUMNS + 1) * SPACING) / NUM_COLUMNS
+    const isOnline = networkStats === "ONLINE"
 
     const user = useMemo(() => {
         if (!account || !account.id) return null
@@ -100,10 +104,10 @@ export default function AccountScreen() {
     }
 
     function navigateToViewMoment(id: string) {
-        router.push({ pathname: "/moment/[id]", params: { id: String(id), from: "you" } })
+        router.navigate({ pathname: "/you/[id]", params: { id: String(id), from: "you" } })
     }
 
-    const normalizedMoments = moments.map((moment) => {
+    const normalizedMoments = moments.map((moment: any) => {
         const rewrite = (url: string) => {
             if (!url) return url
             const original = String(url).trim()
@@ -123,37 +127,17 @@ export default function AccountScreen() {
             return original
         }
 
-        const data: dataProps = {
-            id: String(moment.id),
+        return {
+            ...moment,
             user: {
-                id: String(session?.user?.id || ""),
-                username: session?.user?.username || "",
-                verified: !!session?.user?.isVerified,
-                profilePicture: session?.user?.profilePicture || "",
+                ...session.user,
+                profilePicture: rewrite(session?.user?.profilePicture) || "",
                 youFollow: false,
                 followYou: false,
-            } as any,
-            description: moment.description || "",
-            media: rewrite(moment.video.url),
-            thumbnail: rewrite(moment.thumbnail.url),
-            midia: {
-                content_type: "VIDEO",
-                fullhd_resolution: rewrite(moment.video.url),
-                nhd_resolution: rewrite(moment.video.url),
-                nhd_thumbnail: rewrite(moment.thumbnail.url),
-            } as any,
-            metrics: {
-                totalViews: 0,
-                totalLikes: 0,
-                totalComments: 0,
-            } as any,
-            tags: [],
-            language: "pt" as any,
-            publishedAt: moment.publishedAt,
-            isLiked: false,
+            },
+            media: rewrite((moment?.midia?.fullhd_resolution as string) || moment?.video?.url),
+            thumbnail: rewrite((moment?.midia?.nhd_thumbnail as string) || moment?.thumbnail?.url),
         } as any
-
-        return data
     })
 
     // Sync Persisted session when context data changes
@@ -242,7 +226,7 @@ export default function AccountScreen() {
             showsHorizontalScrollIndicator={false}
             columnWrapperStyle={{ justifyContent: "flex-start", marginBottom: SPACING }}
             contentContainerStyle={{ paddingHorizontal: SPACING, backgroundColor: "#000" }}
-            keyExtractor={(item) => item.id}
+            keyExtractor={(item: any) => item.id}
             ListHeaderComponent={
                 loading ? (
                     <RenderProfileSkeleton />
@@ -254,51 +238,54 @@ export default function AccountScreen() {
             }
             renderItem={({ item }) => {
                 const isVisible = true
-                return (
-                    <Animated.View
-                        sharedTransitionTag={`moment-${item.id}`}
-                        style={{
-                            width: ITEM_SIZE,
-                            marginRight: SPACING,
-                            borderRadius: sizes.moment.small.borderRadius * 0.7,
-                            borderWidth: iOSMajorVersion! >= 26 ? 0 : 1,
-                            borderColor: iOSMajorVersion! >= 26 ? "#00000000" : colors.gray.grey_09,
-                            overflow: "hidden",
-                        }}
-                    >
-                        <Pressable onPress={() => navigateToViewMoment(item.id)}>
-                            <Moment.Root.Main
-                                size={{
-                                    ...sizes.moment.small,
-                                    width: ITEM_SIZE,
-                                    height: ITEM_SIZE * sizes.moment.aspectRatio,
-                                    borderRadius: sizes.moment.small.borderRadius * 0.7,
-                                }}
-                                isFeed={false}
-                                isFocused={isVisible}
-                                data={item}
-                                shadow={{ top: false, bottom: true }}
-                            >
-                                <Moment.Container
-                                    contentRender={item.media}
+
+                if (!isOnline) return null
+                else
+                    return (
+                        <View
+                            style={{
+                                width: ITEM_SIZE,
+                                marginRight: SPACING,
+                                borderRadius: sizes.moment.small.borderRadius * 0.7,
+                                borderWidth: iOSMajorVersion! >= 26 ? 0 : 1,
+                                borderColor:
+                                    iOSMajorVersion! >= 26 ? "#00000000" : colors.gray.grey_09,
+                                overflow: "hidden",
+                            }}
+                        >
+                            <Pressable onPress={() => navigateToViewMoment(item.id)}>
+                                <Moment.Root.Main
+                                    size={{
+                                        ...sizes.moment.small,
+                                        width: ITEM_SIZE,
+                                        height: ITEM_SIZE * sizes.moment.aspectRatio,
+                                        borderRadius: sizes.moment.small.borderRadius * 0.7,
+                                    }}
+                                    isFeed={false}
                                     isFocused={isVisible}
-                                    loading={false}
-                                    blurRadius={0}
-                                    forceMute={true}
-                                    showSlider={false}
-                                    disableCache={true}
-                                    disableWatch={true}
+                                    data={item}
+                                    shadow={{ top: false, bottom: true }}
                                 >
-                                    <Moment.Root.Center />
-                                    <Moment.Root.Bottom>
-                                        <Moment.Description displayOnMoment={true} />
-                                        <Moment.Date />
-                                    </Moment.Root.Bottom>
-                                </Moment.Container>
-                            </Moment.Root.Main>
-                        </Pressable>
-                    </Animated.View>
-                )
+                                    <Moment.Container
+                                        contentRender={item.media}
+                                        isFocused={isVisible}
+                                        loading={false}
+                                        blurRadius={0}
+                                        forceMute={true}
+                                        showSlider={false}
+                                        disableCache={true}
+                                        disableWatch={true}
+                                    >
+                                        <Moment.Root.Center />
+                                        <Moment.Root.Bottom>
+                                            <Moment.Description displayOnMoment={true} />
+                                            <Moment.Date />
+                                        </Moment.Root.Bottom>
+                                    </Moment.Container>
+                                </Moment.Root.Main>
+                            </Pressable>
+                        </View>
+                    )
             }}
             onEndReached={async () => {
                 await handleLoadMore()
@@ -312,17 +299,50 @@ export default function AccountScreen() {
                     colors={["#888"]}
                 />
             }
-            ListFooterComponent={
-                isLoadingMoments ? (
-                    <View style={{ paddingVertical: 12, alignItems: "center" }}>
-                        <ActivityIndicator color="#888" />
-                    </View>
-                ) : !hasMoreMoments ? (
-                    <View style={{ paddingVertical: 12, alignItems: "center" }}>
-                        <Text style={{ color: colors.gray.grey_04 }}>No more moments</Text>
-                    </View>
-                ) : null
-            }
+            ListFooterComponent={() => {
+                if (!isOnline) {
+                    return <OfflineCard />
+                }
+                if (isLoadingMoments) {
+                    return (
+                        <View
+                            style={{
+                                paddingVertical: sizes.paddings["1md"],
+                                alignItems: "center",
+                            }}
+                        >
+                            <ActivityIndicator
+                                style={{ transform: [{ scale: 1.4 }] }}
+                                color="#888"
+                            />
+                        </View>
+                    )
+                } else if (!isLoadingMoments && !hasMoreMoments && moments.length === 0) {
+                    return (
+                        <View
+                            style={{ paddingVertical: sizes.paddings["1md"], alignItems: "center" }}
+                        >
+                            <NoMoments />
+                        </View>
+                    )
+                } else if (!hasMoreMoments) {
+                    return (
+                        <View
+                            style={{ paddingVertical: sizes.paddings["1md"], alignItems: "center" }}
+                        >
+                            <Text
+                                style={{
+                                    color: colors.gray.grey_04,
+                                    fontFamily: fonts.family.Semibold,
+                                    fontStyle: "italic",
+                                }}
+                            >
+                                No more moments
+                            </Text>
+                        </View>
+                    )
+                }
+            }}
         />
     )
 }

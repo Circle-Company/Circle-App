@@ -79,7 +79,7 @@ async function fetchAccountMoments(
 ): Promise<AccountMomentsResponse> {
     const response = await apiRoutes.account.getMoments({ page, limit })
     return {
-        moments: response.moments,
+        moments: response.moments as any as AccountMoment[],
         pagination: response.pagination,
     }
 }

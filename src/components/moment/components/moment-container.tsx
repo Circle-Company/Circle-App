@@ -1,7 +1,6 @@
 import React, { useCallback, useEffect, useState, useMemo } from "react"
 import Reanimated, { FadeIn, FadeOut } from "react-native-reanimated"
 import ColorTheme from "@/constants/colors"
-import DoubleTapPressable from "@/components/general/double-tap-pressable"
 import FeedContext from "@/contexts/Feed"
 import MediaRenderVideo from "@/components/midia_render/components/midia_render-video"
 import { MidiaRender } from "@/components/midia_render"

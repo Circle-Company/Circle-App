@@ -33,6 +33,7 @@ function RootLayoutNav() {
     const [isInitializing, setIsInitializing] = useState(true)
     const scheme = useColorScheme()
     const hasRedirectedRef = React.useRef(false)
+    // hasNavigated state removed; rendering <Slot /> directly
 
     // Inicializa o estado de redirect baseado na sessão
     useEffect(() => {
@@ -55,33 +56,35 @@ function RootLayoutNav() {
         initializeAuth()
     }, [])
 
-    // Handle navigation based on auth state (robust)
+    // Handle navigation based on auth state (stay on splash until decided)
     useEffect(() => {
         if (isInitializing || !redirectTo || hasRedirectedRef.current) {
             return
         }
 
         const isAuthenticated = redirectTo === "APP"
-
-        // Redirect once after the first auth resolution to ensure router is ready
         hasRedirectedRef.current = true
-        if (isAuthenticated) {
-            requestAnimationFrame(() => router.replace("/(tabs)/moments"))
-        } else {
-            requestAnimationFrame(() => router.replace("/(auth)/init"))
-        }
+
+        // Schedule navigation and only then hide splash + render the app
+        requestAnimationFrame(() => {
+            const target = isAuthenticated ? "/(tabs)/moments" : "/(auth)/init"
+            // Hide splash before navigating to avoid black screen/404 flash
+            SplashScreen.hideAsync().finally(() => {
+                router.replace(target)
+            })
+        })
     }, [isInitializing, redirectTo, router])
 
+    // Render app content; splash will be hidden right before navigation
     return <Slot />
 }
 
 export default function RootLayout() {
     const [fontsLoaded, fontError] = useFonts(Fonts.files)
 
+    // Keep the splash screen until navigation is resolved in RootLayoutNav
     useEffect(() => {
-        if (fontsLoaded || fontError) {
-            SplashScreen.hideAsync()
-        }
+        // Intentionally do not hide splash here
     }, [fontsLoaded, fontError])
 
     if (!fontsLoaded && !fontError) {

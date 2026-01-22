@@ -336,5 +336,10 @@
     "Permission to access the gallery is required": "Permission to access the gallery is required",
     "Failed to open the gallery": "Failed to open the gallery",
     "Permission to use the camera is required": "Permission to use the camera is required",
-    "Failed to open the camera": "Failed to open the camera"
+    "Failed to open the camera": "Failed to open the camera",
+    "Nothing to show for now": "Nothing to show for now",
+    "It seems that you haven't shared anithing in the last 30 days": "It seems that you haven't shared anything in the last 30 days",
+    "Create Moment": "Create Moment",
+    "You are offline": "You are offline",
+    "Verify your internet connection": "Verify your internet connection"
 }

@@ -107,8 +107,16 @@ export default function MomentFullScreen() {
         const raw = remoteMoment ?? fallbackList.find((m) => String(m?.id) === String(id))
         if (!raw) return null
 
-        const videoUrl = rewrite(raw?.video?.url || (raw?.midia?.fullhd_resolution as string))
-        const thumbUrl = rewrite(raw?.thumbnail?.url || (raw?.midia?.nhd_thumbnail as string))
+        const videoUrl = rewrite(
+            (raw?.midia?.fullhd_resolution as string) ||
+                (raw?.midia?.nhd_resolution as string) ||
+                raw?.video?.url,
+        )
+        const thumbUrl = rewrite(
+            (raw?.midia?.nhd_thumbnail as string) ||
+                raw?.thumbnail?.url ||
+                (raw?.thumbnail as string),
+        )
 
         return {
             id: String(raw.id),

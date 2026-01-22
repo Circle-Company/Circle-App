@@ -4,14 +4,10 @@ import React from "react"
 import MomentContext from "../context"
 import { iOSMajorVersion } from "@/lib/platform/detection"
 import { colors } from "@/constants/colors"
-import LikeIcon from "@/assets/icons/svgs/heart_2.svg"
 import { Vibrate } from "@/lib/hooks/useHapticFeedback"
 import fonts from "@/constants/fonts"
 import { TextStyle } from "react-native"
 import sizes from "@/constants/sizes"
-import NumberConversor from "@/helpers/numberConversor"
-import { hidden } from "@expo/ui/swift-ui/modifiers"
-import { like } from "@/api/moment/moment.actions"
 
 export function likeIOS({ isLiked }: { isLiked: boolean }) {
     const { session } = React.useContext(PersistedContext)
@@ -28,7 +24,6 @@ export function likeIOS({ isLiked }: { isLiked: boolean }) {
 
     const totalLikes = data?.metrics?.totalLikes ?? 0
     const adjustedLikes = totalLikes + likeDifference
-    const displayLikes = NumberConversor(adjustedLikes)
 
     React.useEffect(() => {
         if (actions.like) setLikedPressed(true)

@@ -1,36 +1,48 @@
-import WifiIcon from "@/assets/icons/svgs/wifi_slash.svg"
+import { Text } from "@/components/Themed"
+import sizes from "@/constants/sizes"
+import { ViewStyle, TextStyle } from "react-native"
+import LanguageContext from "@/contexts/language"
 import React from "react"
-import ColorTheme from "../../constants/colors"
-import fonts from "../../constants/fonts"
-import sizes from "../../constants/sizes"
-import LanguageContext from "../../contexts/language"
-import { Text, View } from "../Themed"
+import { colors } from "@/constants/colors"
+import fonts from "@/constants/fonts"
+import WifiIcon from "@/assets/icons/svgs/wifi_slash.svg"
+import Reanimated, { FadeIn, Easing } from "react-native-reanimated"
 
-type OfflineCardProps = {
-    width?: number
-    height?: number
-}
-export default function OfflineCard({
-    width = sizes.screens.width,
-    height = sizes.screens.height - sizes.bottomTab.height,
-}: OfflineCardProps) {
+export default function OfflineCard() {
     const { t } = React.useContext(LanguageContext)
 
-    const container: any = {
-        width,
-        height,
+    const container: ViewStyle = {
+        width: sizes.screens.width - sizes.paddings["1md"] * 2,
+        backgroundColor: colors.gray.grey_08,
+        paddingVertical: sizes.paddings["1lg"] * 0.8,
+        borderRadius: sizes.borderRadius["1lg"] * 1.2,
+        paddingHorizontal: sizes.paddings["1md"],
+        alignSelf: "center",
         alignItems: "center",
         justifyContent: "center",
     }
-    const text_style: any = {
-        fontSize: fonts.size.headline,
-        fontFamily: fonts.family.Semibold,
-        color: ColorTheme().error,
+
+    const title: TextStyle = {
+        fontSize: fonts.size.title3 * 0.9,
+        fontFamily: fonts.family.Bold,
+        fontStyle: "italic",
+        marginVertical: sizes.margins["2sm"],
+    }
+
+    const description: TextStyle = {
+        fontSize: fonts.size.body,
+        fontFamily: fonts.family.Medium,
+        paddingHorizontal: sizes.paddings["1md"],
+        textAlign: "center",
     }
     return (
-        <View style={container}>
-            <WifiIcon fill={String(ColorTheme().error)} width={60} height={60} />
-            <Text style={text_style}>{t("You are offline")}</Text>
-        </View>
+        <Reanimated.View
+            style={container}
+            entering={FadeIn.springify().duration(300).delay(100).easing(Easing.linear).damping(30)}
+        >
+            <WifiIcon fill={colors.gray.grey_06} width={60} height={60} />
+            <Text style={title}>{t("You are offline")} 😰</Text>
+            <Text style={description}>{t("Verify your internet connection")}</Text>
+        </Reanimated.View>
     )
 }
