@@ -68,9 +68,10 @@ function RootLayoutNav() {
         // Schedule navigation and only then hide splash + render the app
         requestAnimationFrame(() => {
             const target = isAuthenticated ? "/(tabs)/moments" : "/(auth)/init"
-            // Hide splash before navigating to avoid black screen/404 flash
-            SplashScreen.hideAsync().finally(() => {
-                router.replace(target)
+            // Navigate first, then hide splash to avoid NotFound flash
+            router.replace(target)
+            Promise.resolve().then(() => {
+                SplashScreen.hideAsync().catch(() => {})
             })
         })
     }, [isInitializing, redirectTo, router])
