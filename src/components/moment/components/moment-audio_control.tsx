@@ -87,44 +87,52 @@ export default function MomentAudioControl() {
     }
 
     if (data.hasAudio === false) return null
+    return (
+        <Host matchContents>
+            <Button
+                key={isMuted ? "muted" : "unmuted"}
+                onPress={handlePress}
+                variant={iOSMajorVersion! >= 26 ? "glass" : "bordered"}
+                modifiers={[
+                    {
+                        $type: "frame",
+                        width: 46,
+                        height: 46,
+                    },
+                    ...(iOSMajorVersion! < 26
+                        ? [
+                              {
+                                  $type: "cornerRadius",
+                                  radius: 23,
+                              },
+                          ]
+                        : []),
+                    {
+                        $type: "background",
+                        material: "systemUltraThinMaterialDark",
+                        shape: "circle",
+                    },
+                ]}
+                color={iOSMajorVersion! >= 26 ? colors.gray.grey_01 + 80 : colors.gray.grey_01}
+            >
+                {isMuted ? (
+                    <InactiveSoundIcon
+                        fill={colors.gray.white + 80}
+                        width={sizes.icons["2sm"].width}
+                        height={sizes.icons["2sm"].height}
+                    />
+                ) : (
+                    <ActiveSoundIcon
+                        fill={colors.gray.white + 80}
+                        width={sizes.icons["2sm"].width}
+                        height={sizes.icons["2sm"].height}
+                    />
+                )}
+            </Button>
+        </Host>
+    )
 
-    if (iOSMajorVersion! >= 26) {
-        return (
-            <Host matchContents>
-                <Button
-                    key={isMuted ? "muted" : "unmuted"}
-                    onPress={handlePress}
-                    variant="glass"
-                    modifiers={[
-                        {
-                            $type: "frame",
-                            width: 46,
-                            height: 46,
-                        },
-                        {
-                            $type: "background",
-                            material: "systemUltraThinMaterialDark",
-                            shape: "circle",
-                        },
-                    ]}
-                >
-                    {isMuted ? (
-                        <InactiveSoundIcon
-                            fill={colors.gray.white + 80}
-                            width={sizes.icons["2sm"].width}
-                            height={sizes.icons["2sm"].height}
-                        />
-                    ) : (
-                        <ActiveSoundIcon
-                            fill={colors.gray.white + 80}
-                            width={sizes.icons["2sm"].width}
-                            height={sizes.icons["2sm"].height}
-                        />
-                    )}
-                </Button>
-            </Host>
-        )
-    } else {
+    /**
         return (
             <Animated.View style={animated_container}>
                 <Pressable onPress={handlePress} style={pressable_container}>
@@ -181,4 +189,5 @@ export default function MomentAudioControl() {
             </Animated.View>
         )
     }
+*/
 }

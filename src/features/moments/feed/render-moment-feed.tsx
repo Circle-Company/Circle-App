@@ -19,7 +19,7 @@ import sizes from "@/constants/sizes"
 import { useKeyboard } from "@/lib/hooks/useKeyboard"
 import ZeroComments from "@/components/comment/components/comments-zero_comments"
 import { LinearGradient } from "expo-linear-gradient"
-import { isIOS } from "@/lib/platform/detection"
+import { isIOS, iOSMajorVersion } from "@/lib/platform/detection"
 
 type renderMomentProps = {
     data: MomentProps
@@ -215,7 +215,9 @@ export default function RenderMomentFeed({
                             <View style={{ flexDirection: "row", alignItems: "center" }}>
                                 <View style={{ flex: 1, height: 46 }}>
                                     {isIOS ? (
-                                        <Moment.LikeButtonIOS isLiked={false} />
+                                        <>
+                                            <Moment.LikeButtonIOS isLiked={false} />
+                                        </>
                                     ) : (
                                         <Moment.LikeButton isLiked={false} />
                                     )}
@@ -266,7 +268,13 @@ export default function RenderMomentFeed({
                         zIndex: 9999,
                     }}
                 >
-                    <Input autoFocus={commentEnabled} />
+                    <Input
+                        momentId={data.id}
+                        onSent={() => {
+                            setShowFloatingInput(false)
+                        }}
+                        autoFocus={commentEnabled}
+                    />
                 </RNAnimated.View>
             )}
         </Moment.Root.Main>

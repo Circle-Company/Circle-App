@@ -85,7 +85,7 @@ export default function Like({
 
     // Converte para formato legível
     const displayLikes = textLib.conversor.convertNumToShort(adjustedLikes)
-    const buttonWidth = adjustedLikes > 0 ? 84 : 76
+    const buttonWidth = 65 //adjustedLikes > 0 ? 84 : 76
     const borderWidth = 1
     const borderRadiusValue = Number([sizes.buttons.width / 4]) / 2
     const gradientColors = [
@@ -207,9 +207,11 @@ export default function Like({
                                 <Animated.View style={icon_container_pressed}>
                                     <LikeIcon fill={like_fill} width={20} height={20} />
                                 </Animated.View>
-                                <Text style={likedPressed ? like_text_pressed : like_text}>
-                                    {displayLikes}
-                                </Text>
+                                {/**
+                                    <Text style={likedPressed ? like_text_pressed : like_text}>
+                                        {displayLikes}
+                                    </Text>
+                                    */}
                             </View>
                         </BlurredBackground>
                     </LinearGradient>
@@ -231,9 +233,11 @@ export default function Like({
                                 <Animated.View style={icon_container}>
                                     <LikeIcon fill={like_fill} width={18} height={18} />
                                 </Animated.View>
-                                <Text style={likedPressed ? like_text_pressed : like_text}>
-                                    {displayLikes}
-                                </Text>
+                                {/*
+                                    <Animated.View style={icon_container}>
+                                        <LikeIcon fill={like_fill} width={18} height={18} />
+                                    </Animated.View>
+                                */}
                             </View>
                         </View>
                     </LinearGradient>
@@ -264,9 +268,14 @@ export default function Like({
                                     <Animated.View style={icon_container}>
                                         <LikeIcon fill={like_fill} width={16} height={16} />
                                     </Animated.View>
+
+                                    {/**
                                     <Text style={likedPressed ? like_text_pressed : like_text}>
                                         {displayLikes}
                                     </Text>
+                                    *
+                                    *
+                                    */}
                                 </View>
                             </BlurredBackground>
                         ) : (
@@ -275,9 +284,11 @@ export default function Like({
                                     <Animated.View style={icon_container}>
                                         <LikeIcon fill={like_fill} width={16} height={16} />
                                     </Animated.View>
-                                    <Text style={likedPressed ? like_text_pressed : like_text}>
-                                        {displayLikes}
-                                    </Text>
+                                    {/**
+                                        <Text style={likedPressed ? like_text_pressed : like_text}>
+                                            {displayLikes}
+                                        </Text>
+                                        */}
                                 </View>
                             </View>
                         )}
