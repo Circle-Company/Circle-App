@@ -5,27 +5,61 @@ import MomentContext from "../context"
 import { iOSMajorVersion } from "@/lib/platform/detection"
 import { colors } from "@/constants/colors"
 import { Vibrate } from "@/lib/hooks/useHapticFeedback"
+import { storage, safeSet, safeDelete } from "@/store"
+
+const LIKE_NS = "@circle:like:pressed:"
+
+;(function clearLikePressedNamespaceOnce() {
+    try {
+        const anyStorage = storage as any
+        const keys: string[] =
+            typeof anyStorage.getAllKeys === "function" ? anyStorage.getAllKeys() : []
+        for (const k of keys) {
+            if (typeof k === "string" && k.startsWith(LIKE_NS)) {
+                safeDelete(k)
+            }
+        }
+    } catch {
+        // noop
+    }
+})()
 
 export function likeIOS({ isLiked }: { isLiked: boolean }) {
     const { session } = React.useContext(PersistedContext)
     const { data, actions, options } = React.useContext(MomentContext)
     const [likedPressed, setLikedPressed] = React.useState(isLiked ? isLiked : actions.like)
+    const likeKey = React.useMemo(() => `${LIKE_NS}${data.id}`, [data.id])
 
     React.useEffect(() => {
+        try {
+            const persisted = (storage as any)?.getString?.(likeKey)
+            if (persisted === "1" || persisted === "0") {
+                // respect persisted transient likePressed; don't override
+                return
+            }
+        } catch {}
         if (actions.like) setLikedPressed(true)
         else setLikedPressed(false)
-    }, [actions.like])
+    }, [actions.like, likeKey])
 
-    // When moment regains focus in feed, recover the local like state from context
+    // When moment regains focus in feed, recover from MMKV if present, otherwise from context
     React.useEffect(() => {
         if (options.isFocused) {
-            setLikedPressed(actions.like)
+            try {
+                const persisted = (storage as any)?.getString?.(likeKey)
+                if (persisted === "1") setLikedPressed(true)
+                else if (persisted === "0") setLikedPressed(false)
+                else setLikedPressed(actions.like)
+            } catch {
+                setLikedPressed(actions.like)
+            }
         }
-    }, [options.isFocused])
+    }, [options.isFocused, actions.like, likeKey])
 
     async function onLikeAction() {
         try {
             setLikedPressed(true)
+            safeSet(likeKey, "1")
             Vibrate("effectHeavyClick")
             console.log(session.account.jwtToken)
             actions
@@ -42,6 +76,7 @@ export function likeIOS({ isLiked }: { isLiked: boolean }) {
     async function onUnlikeAction() {
         try {
             setLikedPressed(false)
+            safeSet(likeKey, "0")
             Vibrate("notificationError")
             actions.registerInteraction("UNLIKE", {
                 momentId: data.id,
