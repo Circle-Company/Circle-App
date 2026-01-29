@@ -12,7 +12,7 @@ import { routes as userRoutes } from "./user/user"
 
 type PendingResolver = (token: string) => void
 
-const PATH = `http://${config.ENDPOINT}`
+const PATH = `${config.ENDPOINT}`
 
 const api: AxiosInstance = axios.create({
     baseURL: PATH,
@@ -149,17 +149,9 @@ async function doRefreshToken(): Promise<string> {
     const currentRefresh = storage.getString(jwtKeys.refreshToken)
 
     if (!currentRefresh) {
-        // No refresh token available: log, clean tokens/defaults, and abort refresh
+        // No refresh token available: skip cleanup and signal sentinel error
         console.warn("🔒 Refresh aborted: missing refreshToken in storage")
-        try {
-            safeDelete(jwtKeys.token)
-            safeDelete(jwtKeys.refreshToken)
-            safeDelete(jwtKeys.expiration)
-            if (api?.defaults?.headers?.common?.Authorization) {
-                delete api.defaults.headers.common.Authorization
-            }
-        } catch {}
-        throw new Error("Abort refresh: missing refreshToken")
+        throw new Error("NO_REFRESH_TOKEN")
     }
 
     // Chama a rota de refresh enviando Authorization com o refresh token "cru" (sem Bearer)
@@ -348,18 +340,22 @@ async function handleAuthError(error: AxiosError) {
             }
         }
 
-        // Limpar tokens no MMKV — o app detectará não autenticado depois
-        try {
-            const jwtKeys = storageKeys().account.jwt
-            safeDelete(jwtKeys.token)
-            safeDelete(jwtKeys.refreshToken)
-            safeDelete(jwtKeys.expiration)
-            if (api?.defaults?.headers?.common?.Authorization) {
-                delete api.defaults.headers.common.Authorization
+        // Limpeza de tokens somente quando o erro não for o sentinela de ausência de refresh token
+        if (String((refreshErr as any)?.message) !== "NO_REFRESH_TOKEN") {
+            try {
+                const jwtKeys = storageKeys().account.jwt
+                safeDelete(jwtKeys.token)
+                safeDelete(jwtKeys.refreshToken)
+                safeDelete(jwtKeys.expiration)
+                if (api?.defaults?.headers?.common?.Authorization) {
+                    delete api.defaults.headers.common.Authorization
+                }
+                console.log("🧹 Tokens limpos após falha no refresh")
+            } catch {
+                // ignore
             }
-            console.log("🧹 Tokens limpos após falha no refresh")
-        } catch {
-            // ignore
+        } else {
+            console.log("🔕 Skipping token cleanup due to NO_REFRESH_TOKEN")
         }
 
         throw refreshErr
