@@ -111,7 +111,7 @@ const ListMoments = () => {
             <Animated.FlatList
                 data={feedData}
                 horizontal
-                style={{ paddingTop: sizes.headers.height * 1.4 }}
+                style={{ paddingTop: IOS sizes.headers.height * 1.4 }}
                 scrollEnabled={enableScrollFeed}
                 showsHorizontalScrollIndicator={false}
                 showsVerticalScrollIndicator={false}
@@ -202,7 +202,12 @@ const ListMoments = () => {
                 }}
             />
         )
-    else return <EmptyList />
+    else
+        return (
+            <View style={{ alignItems: "center", paddingTop: sizes.headers.height * 1.4 }}>
+                <EmptyList />
+            </View>
+        )
 }
 
 export default ListMoments

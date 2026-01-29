@@ -149,8 +149,7 @@ export function RenderReportModal({ moment }: { moment: dataProps }) {
                     },
                 )
                 .then(() => {
-                    toast.success(t("Report Has been sended with success"), {
-                        title: t("Report Sended"),
+                    toast.success(t("Report Sended"), {
                         icon: (
                             <CheckIcon
                                 fill={colors.green.green_05.toString()}
