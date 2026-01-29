@@ -204,18 +204,36 @@ export default function ProfileScreen() {
                     tintColor="#888"
                     colors={["#888"]}
                     progressBackgroundColor="#000"
-                    progressViewOffset={sizes.headers.height * 1.6}
+                    progressViewOffset={
+                        iOSMajorVersion! >= 26
+                            ? sizes.headers.height * 1.6
+                            : sizes.headers.height * 1.2
+                    }
                 />
             }
             ListHeaderComponent={
                 loading ? (
                     <>
-                        <View style={{ paddingTop: sizes.headers.height * 1.6 }} />
+                        <View
+                            style={{
+                                paddingTop:
+                                    iOSMajorVersion! >= 26
+                                        ? sizes.headers.height * 1.6
+                                        : sizes.headers.height * 1.2,
+                            }}
+                        />
                         <RenderProfileSkeleton />
                     </>
                 ) : user ? (
                     <>
-                        <View style={{ paddingTop: sizes.headers.height * 1.6 }} />
+                        <View
+                            style={{
+                                paddingTop:
+                                    iOSMajorVersion! >= 26
+                                        ? sizes.headers.height * 1.6
+                                        : sizes.headers.height * 1.2,
+                            }}
+                        />
                         <ProfileHeader
                             user={user}
                             isAccount={false}
@@ -225,7 +243,14 @@ export default function ProfileScreen() {
                     </>
                 ) : (
                     <>
-                        <View style={{ paddingTop: sizes.headers.height * 1.6 }} />
+                        <View
+                            style={{
+                                paddingTop:
+                                    iOSMajorVersion! >= 26
+                                        ? sizes.headers.height * 1.6
+                                        : sizes.headers.height * 1.2,
+                            }}
+                        />
                         <RenderProfileSkeleton />
                     </>
                 )

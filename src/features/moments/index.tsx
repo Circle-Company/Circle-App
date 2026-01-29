@@ -8,6 +8,7 @@ import RenderMomentFeed from "@/features/moments/feed/render-moment-feed"
 import { EmptyList } from "@/features/moments/empty.list"
 import PersistedContext from "@/contexts/Persisted"
 import { View } from "react-native"
+import { iOSMajorVersion } from "@/lib/platform/detection"
 
 const ITEM_WIDTH = sizes.moment.standart.width
 const SPACING = -20
@@ -111,7 +112,12 @@ const ListMoments = () => {
             <Animated.FlatList
                 data={feedData}
                 horizontal
-                style={{ paddingTop: IOS sizes.headers.height * 1.4 }}
+                style={{
+                    paddingTop:
+                        iOSMajorVersion! >= 26
+                            ? sizes.headers.height * 1.4
+                            : sizes.headers.height * 1.2,
+                }}
                 scrollEnabled={enableScrollFeed}
                 showsHorizontalScrollIndicator={false}
                 showsVerticalScrollIndicator={false}
@@ -204,7 +210,15 @@ const ListMoments = () => {
         )
     else
         return (
-            <View style={{ alignItems: "center", paddingTop: sizes.headers.height * 1.4 }}>
+            <View
+                style={{
+                    alignItems: "center",
+                    paddingTop:
+                        iOSMajorVersion! >= 26
+                            ? sizes.headers.height * 1.4
+                            : sizes.headers.height * 1.2,
+                }}
+            >
                 <EmptyList />
             </View>
         )

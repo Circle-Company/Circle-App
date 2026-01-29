@@ -84,7 +84,7 @@ export function EmptyList() {
     const gradientBorderStyle: ViewStyle = {
         alignItems: "center",
         justifyContent: "center",
-        borderRadius: sizes.borderRadius["1xl"] * 1.4,
+        borderRadius: sizes.borderRadius["1xl"] * 1.1,
         padding: 2, // 2px gradient border
         marginBottom: sizes.margins["1md"],
         width: sizes.screens.width - sizes.paddings["2sm"] * 2,
@@ -93,7 +93,7 @@ export function EmptyList() {
     const cardInnerStyle: ViewStyle = {
         alignItems: "center",
         justifyContent: "center",
-        borderRadius: sizes.borderRadius["1xl"] * 1.4 - 2,
+        borderRadius: sizes.borderRadius["1xl"] * 1.1 - 2,
         paddingHorizontal: sizes.paddings["1md"],
         paddingVertical: sizes.paddings["2md"],
         backgroundColor: "#FFF",
