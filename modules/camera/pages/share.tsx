@@ -2,8 +2,7 @@ import UploadIcon from "@/assets/icons/svgs/arrow_up.svg"
 import { useIsFocused } from "@react-navigation/core"
 import { useRouter, useLocalSearchParams } from "expo-router"
 import React, { useState } from "react"
-import { SafeAreaView } from "react-native-safe-area-context"
-import { StyleSheet, View, Text, Keyboard, Animated, Easing } from "react-native"
+import { StyleSheet, View, Text, Keyboard, Animated, Easing, Alert } from "react-native"
 import { VideoView, useVideoPlayer } from "expo-video"
 import { useToast } from "@/contexts/Toast"
 import sizes from "@/constants/sizes"
@@ -18,7 +17,6 @@ import ButtonStandart from "@/components/buttons/button-standart"
 import LanguageContext from "@/contexts/language"
 import { ViewStyle } from "react-native"
 import { TextInput } from "react-native"
-import { scale } from "happy-dom/lib/PropertySymbol.js"
 
 export function MediaPage(): React.ReactElement {
     const navigation = useNavigation()
@@ -102,7 +100,8 @@ export function MediaPage(): React.ReactElement {
 
         const subscription = player.addListener("statusChange", (status) => {
             if (status.status === "readyToPlay") {
-                setVideoDuration(status.duration as any)
+                const d = typeof player?.duration === "number" ? player.duration : 0
+                setVideoDuration(d)
             } else if (status.status === "error") {
                 setVideoError("Não foi possível reproduzir o vídeo.")
             }
@@ -218,12 +217,6 @@ export function MediaPage(): React.ReactElement {
                     outputRange: [0, -translateCompensation * 0.2],
                 }),
             },
-            {
-                scale: keyboardAnim.interpolate({
-                    inputRange: [0, 1],
-                    outputRange: [baseScale, 1 + focusedScale * 0.7],
-                }),
-            },
         ],
     }
 
@@ -248,10 +241,7 @@ export function MediaPage(): React.ReactElement {
         const result = await upload()
 
         if (result.ok) {
-            toast.success(t("Moment Has been uploaded with success"), {
-                title: t("Moment Created"),
-                icon: <UploadIcon fill={colors.green.green_05.toString()} width={15} height={15} />,
-            })
+            toast.success(t("Moment Has been uploaded with success"))
 
             // Reset camera context
             reset()
@@ -259,11 +249,7 @@ export function MediaPage(): React.ReactElement {
             // Navigate to home (Moments tab)
             router.replace("/(tabs)/moments")
         } else {
-            toast.error(result.error, {
-                backgroundColor: colors.red.red_05.toString(),
-                duration: 1000,
-                position: "top",
-            })
+            toast.error(t("Error to share your moment"))
         }
     }
 
@@ -290,7 +276,7 @@ export function MediaPage(): React.ReactElement {
                             style={{
                                 position: "absolute",
                                 left: 20,
-                                bottom: 15,
+                                bottom: 20,
                                 width: "100%",
                                 alignItems: "flex-start",
                                 paddingHorizontal: 16,
@@ -316,6 +302,7 @@ export function MediaPage(): React.ReactElement {
                                     textContentType="none"
                                     autoCorrect={false}
                                     autoFocus={false}
+                                    placeholderTextColor={"#FFFFFF80"}
                                     selectionColor={ColorTheme().primary}
                                     onChangeText={(value) => setDescription(value)}
                                 />

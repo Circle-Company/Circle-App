@@ -120,7 +120,6 @@ export function Provider({ children }: NetworkProviderProps) {
                         title: t("You are Offline"),
                         type: "error",
                         duration: 1000,
-                        position: "top",
                         backgroundColor: colors.red.red_05,
                         icon: (
                             <WifiSlashIcon
@@ -137,7 +136,6 @@ export function Provider({ children }: NetworkProviderProps) {
                         title: t("Connected to Internet"),
                         type: "success",
                         duration: 1000,
-                        position: "top",
                         backgroundColor: colors.green.green_05,
                         icon: (
                             <WifiIcon fill={colors.gray.white.toString()} width={12} height={12} />
@@ -154,9 +152,7 @@ export function Provider({ children }: NetworkProviderProps) {
                 ) {
                     toast.show({
                         title: t("Reconnecting..."),
-                        type: "warning",
                         duration: 1000,
-                        position: "top",
                         backgroundColor: colors.yellow.yellow_05,
                         icon: (
                             <WifiSlashIcon
@@ -174,9 +170,7 @@ export function Provider({ children }: NetworkProviderProps) {
             if (previousType !== currentType && currentType === NetworkStateType.UNKNOWN) {
                 toast.show({
                     title: t("Reconnecting..."),
-                    type: "warning",
                     duration: 1000,
-                    position: "top",
                     backgroundColor: colors.gray.grey_06,
                     icon: <WifiIcon fill={colors.gray.white.toString()} width={12} height={12} />,
                 })

@@ -3,7 +3,6 @@ import { APP_VERSION, DEBUG, MIXPANEL_KEY, NODE_ENV } from "@env"
 
 import emails from "./emails"
 import metadata from "./metadata"
-import SettingsPrivacyPolicy from "@/pages/app/Settings/terms.privacy"
 
 const environment = {
     APP_VERSION: APP_VERSION,
@@ -14,7 +13,7 @@ const environment = {
 }
 
 const api = {
-    ENDPOINT: "192.168.15.17:3000",
+    ENDPOINT: "http://192.168.15.17:3000",
     API_VERSION: "1.0.0",
 }
 
@@ -22,6 +21,14 @@ const required = {
     ...api,
     NODE_ENV: NODE_ENV,
     APPLICATION_NAME: metadata.APPLICATION_NAME,
+}
+
+const MIXPANEL_KEY_RAW =
+    (typeof MIXPANEL_KEY === "string" ? MIXPANEL_KEY : "") ||
+    (typeof process !== "undefined" && (process as any)?.env?.MIXPANEL_KEY) ||
+    ""
+const tracking = {
+    MIXPANEL_KEY: (MIXPANEL_KEY_RAW as string).trim(),
 }
 
 const options = {
@@ -56,4 +63,5 @@ export default {
     ...environment,
     ...options,
     ...links,
+    ...tracking,
 }

@@ -5,15 +5,7 @@ export interface NotifyParams {
     params: {
         title?: string
         description?: string
-        variant?:
-            | "success"
-            | "error"
-            | "warning"
-            | "info"
-            | "toast"
-            | "tiny"
-            | "notification"
-            | "alert"
+        variant?: "success" | "warning"
         config?: {
             duration?: number
             notificationPosition?: "top" | "center" | "bottom"

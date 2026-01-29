@@ -18,6 +18,7 @@ export default function Container({
     onVideoEnd,
     forceMute = false,
     showSlider = true,
+    blurRadius = 15,
     disableCache = false,
     disableWatch = false,
 }: MomentContainerProps & { onVideoEnd?: () => void }) {
@@ -205,7 +206,7 @@ export default function Container({
                     }}
                     onProgressChange={handleProgressChange}
                     isFocused={isFocused}
-                    blurRadius={15}
+                    blurRadius={blurRadius}
                     prefetchAdjacentThumbnails={adjacentThumbnails}
                     forceMute={forceMute}
                     disableWatch={disableWatch}

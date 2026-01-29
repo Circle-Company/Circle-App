@@ -81,11 +81,6 @@ export default function ListSettings() {
                     ),
                 },
                 {
-                    name: t("Password"),
-                    secure: true,
-                    onPress: () => router.push("/(tabs)/settings/password"),
-                },
-                {
                     name: t("Personal Data"),
                     secure: true,
                     onPress: () => router.push("/(tabs)/settings/personal-data"),

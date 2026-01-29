@@ -2,25 +2,21 @@ import React from "react"
 import { View, Text, StyleSheet } from "react-native"
 import { colors } from "@/constants/colors"
 import LanguageContext from "@/contexts/language"
-import sizes from "@/constants/sizes"
+import { useLocaleDateRelative } from "@/lib/hooks/useLocaleDate"
 
 type AccountMomentsHeaderProps = {
     totalMoments: number
     lastUpdateDate: Date
-    dateFormatter: { toRelativeTime: (date: Date) => string }
 }
 
-export function AccountMomentsHeader({
-    totalMoments,
-    lastUpdateDate,
-    dateFormatter,
-}: AccountMomentsHeaderProps) {
+export function AccountMomentsHeader({ totalMoments, lastUpdateDate }: AccountMomentsHeaderProps) {
     const { t } = React.useContext(LanguageContext)
     return (
         <View style={styles.headerContainer}>
             <Text style={styles.totalText}>
                 {totalMoments} {totalMoments === 1 ? "Moment" : "Moments"}
-                {","} {t("updated")} {dateFormatter.toRelativeTime(lastUpdateDate)}
+                {","} {t("updated")}{" "}
+                {useLocaleDateRelative(lastUpdateDate.toISOString()).toLowerCase()}
             </Text>
         </View>
     )
@@ -29,8 +25,6 @@ export function AccountMomentsHeader({
 const styles = StyleSheet.create({
     headerContainer: {
         paddingHorizontal: 10,
-        paddingTop: sizes.margins["1lg"],
-        paddingBottom: 8,
         alignItems: "center",
         justifyContent: "center",
     },

@@ -30,6 +30,7 @@ module.exports = function (_config) {
                 package: "com.circlecompany.circleapp",
             },
             ios: {
+                usesAppleSignIn: true,
                 bundleIdentifier: "circlellc.circleapp",
                 newArchEnabled: true,
                 icon: "./assets/app-icons/ios-icon@x1.png",
@@ -96,6 +97,7 @@ module.exports = function (_config) {
                         faceIDPermission: "Allow $(PRODUCT_NAME) to use Face ID.",
                     },
                 ],
+                ["expo-apple-authentication"],
                 [
                     "expo-splash-screen",
                     {

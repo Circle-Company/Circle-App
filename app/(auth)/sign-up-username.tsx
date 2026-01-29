@@ -76,7 +76,7 @@ export default function UsernameScreen() {
         opacity: 0.4,
     }
     const button_text: any = {
-        fontSize: fonts.size.body * 0.9,
+        fontSize: fonts.size.body * 1.2,
         fontFamily: fonts.family["Black-Italic"],
         color: signInputUsername
             ? colors.gray.white
@@ -92,7 +92,7 @@ export default function UsernameScreen() {
 
     function handlePress() {
         if (signInputUsername) {
-            router.push("/(auth)/sign-up-password")
+            router.push("/(auth)/sign-up-agree")
         }
     }
 
@@ -113,7 +113,7 @@ export default function UsernameScreen() {
                 <ButtonClose />
                 <View style={{ flex: 1, alignSelf: "center" }}>
                     <Text style={headerTitle} testID="header-title">
-                        {t("Step 1 of 3")}
+                        {t("Step 1 of 2")}
                     </Text>
                 </View>
             </View>
@@ -126,6 +126,7 @@ export default function UsernameScreen() {
                 <UsernameInput type="signUp" />
             </View>
             <ButtonStandart
+                height={sizes.buttons.height * 0.6}
                 testID="handle-submit"
                 margins={false}
                 action={handlePress}

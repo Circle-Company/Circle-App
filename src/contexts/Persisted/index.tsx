@@ -20,7 +20,7 @@ export type PersistedContextProps = {
 const PersistedContext = React.createContext<PersistedContextProps>({} as PersistedContextProps)
 
 export function Provider({ children }: PersistedProviderProps) {
-    const { sessionData, signOut, checkIsSigned } = React.useContext(AuthContext)
+    const { sessionData, signOut, checkIsSigned, isAuthenticating } = React.useContext(AuthContext)
 
     const sessionUser = useUserStore()
     const sessionAccount = useAccountStore()
@@ -156,11 +156,12 @@ export function Provider({ children }: PersistedProviderProps) {
                 signOut()
             })
         } else if (!sessionData && sessionDataRef.current !== "") {
-            // Detecta logout: sessionData ficou null depois de ter dados
             sessionDataRef.current = ""
-            clearAllStores()
+            if (!isAuthenticating) {
+                clearAllStores()
+            }
         }
-    }, [sessionData, clearAllStores, signOut, syncSessionData])
+    }, [sessionData, clearAllStores, signOut, syncSessionData, isAuthenticating])
 
     // Garante limpeza das stores quando o usuário sai
     const [hasCleaned, setHasCleaned] = React.useState(false)
@@ -168,14 +169,14 @@ export function Provider({ children }: PersistedProviderProps) {
     useEffect(() => {
         const isSigned = checkIsSigned()
 
-        if (!isSigned && sessionUser.id && !hasCleaned) {
+        if (!isSigned && sessionUser.id && !hasCleaned && !isAuthenticating) {
             clearAllStores()
             setHasCleaned(true)
         }
         if (isSigned && hasCleaned) {
             setHasCleaned(false)
         }
-    }, [sessionUser.id, checkIsSigned, clearAllStores, hasCleaned])
+    }, [sessionUser.id, checkIsSigned, clearAllStores, hasCleaned, isAuthenticating])
 
     const injectAuthSession = useCallback(
         async (payload: any) => {

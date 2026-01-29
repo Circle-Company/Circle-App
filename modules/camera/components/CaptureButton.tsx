@@ -1,4 +1,4 @@
-import ColorTheme, { colors } from "@/constants/colors"
+import ColorTheme from "@/constants/colors"
 import React from "react"
 import type { ViewProps } from "react-native"
 import { StyleSheet, View } from "react-native"
@@ -55,10 +55,7 @@ const CaptureButtonComponent: React.FC<Props> = ({
     const isRecording = React.useRef(false)
     const recordingProgress = useSharedValue(0)
     const isPressingButton = useSharedValue(false)
-
-    //#region Camera Capture
-    const takePhoto = React.useCallback(() => {}, [camera, flash, onMediaCaptured])
-
+    const holdTimerRef = React.useRef<NodeJS.Timeout | null>(null)
     const onStoppedRecording = React.useCallback(() => {
         isRecording.current = false
         cancelAnimation(recordingProgress)
@@ -143,14 +140,38 @@ const CaptureButtonComponent: React.FC<Props> = ({
     const tapHandler = React.useRef<TapGestureHandler>()
     const onHandlerStateChanged = React.useCallback(
         async ({ nativeEvent: event }: TapGestureHandlerStateChangeEvent) => {
-            // Toggle recording on tap end; keep pan zoom separate
+            // Press-and-hold to record: start after a short delay on press-in; stop on release
             console.debug(`state: ${Object.keys(State)[event.state]}`)
             switch (event.state) {
+                case State.BEGAN: {
+                    // Visual feedback immediately
+                    isPressingButton.value = true
+                    setIsPressingButton(true)
+                    // Arm delayed start to avoid short taps
+                    if (holdTimerRef.current) clearTimeout(holdTimerRef.current)
+                    holdTimerRef.current = setTimeout(() => {
+                        if (!isRecording.current) {
+                            try {
+                                startRecording()
+                            } catch {}
+                        }
+                    }, START_RECORDING_DELAY)
+                    return
+                }
+                case State.CANCELLED:
+                case State.FAILED:
                 case State.END: {
+                    // Release: clear pending start and stop if recording
+                    if (holdTimerRef.current) {
+                        clearTimeout(holdTimerRef.current)
+                        holdTimerRef.current = null
+                    }
                     if (isRecording.current) {
                         await stopRecording()
                     } else {
-                        startRecording()
+                        // Reset UI if not started
+                        isPressingButton.value = false
+                        setIsPressingButton(false)
                     }
                     return
                 }
@@ -246,6 +267,13 @@ const CaptureButtonComponent: React.FC<Props> = ({
             ],
         }
     }, [enabled, isPressingButton])
+
+    React.useEffect(() => {
+        return () => {
+            if (holdTimerRef.current) clearTimeout(holdTimerRef.current)
+            if (autoStopTimeoutRef.current) clearTimeout(autoStopTimeoutRef.current)
+        }
+    }, [])
 
     return (
         <TapGestureHandler

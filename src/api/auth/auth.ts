@@ -1,4 +1,4 @@
-import { SignInProps, SignUpProps } from "./auth.types"
+import { SignInProps, SignUpProps, signWithAppleProps } from "./auth.types"
 
 import api from "@/api"
 
@@ -16,8 +16,24 @@ async function signUp({ username, password }: SignUpProps, headers?: Record<stri
     return api.post("/auth/signup", { username, password }, { headers })
 }
 
+async function signWithApple(
+    { username, appleSign }: { username: string; appleSign: signWithAppleProps },
+    headers?: Record<string, string>,
+) {
+    return api.post("/auth/apple", { username, appleSign }, { headers })
+}
+
+async function signWithAppleAlreadyExists(
+    { user }: { user: signWithAppleProps["user"] },
+    headers?: Record<string, string>,
+) {
+    return api.post("/auth/apple/exists", { user }, { headers })
+}
+
 export const routes = {
     refreshToken,
     signIn,
     signUp,
+    signWithApple,
+    signWithAppleAlreadyExists,
 }

@@ -1,31 +1,26 @@
-import { Animated, Keyboard, Pressable, Text, TextInput, View, useColorScheme } from "react-native"
-import ColorTheme, { colors } from "../../../constants/colors"
-
-import Arrowbottom from "@/assets/icons/svgs/paper_plane.svg"
+import { Animated, Keyboard, TextInput, View } from "react-native"
+import ColorTheme, { colors } from "@/constants/colors"
 import CheckIcon from "@/assets/icons/svgs/check_circle.svg"
 import { CommentsInputProps } from "../comments-types"
-import FeedContext from "@/contexts/Feed"
 import LanguageContext from "@/contexts/language"
 import PersistedContext from "@/contexts/Persisted"
 import React from "react"
-import api from "@/api"
+import { apiRoutes } from "@/api"
 import fonts from "@/constants/fonts"
-import sizes from "../../../constants/sizes"
-import { useToast } from "../../../contexts/Toast"
-import { userReciveDataProps } from "@/components/user_show/user_show-types"
-import MomentContext from "@/components/moment/context"
+import sizes from "@/constants/sizes"
+import { useToast } from "@/contexts/Toast"
 import { TextStyle } from "react-native"
 import { ViewStyle } from "react-native"
 import { Button, Host } from "@expo/ui/swift-ui"
 import { Vibrate } from "@/lib/hooks/useHapticFeedback"
 
 export default function Input({
+    momentId,
     color = String(ColorTheme().text),
     autoFocus = false,
+    onSent,
 }: CommentsInputProps) {
     const { t } = React.useContext(LanguageContext)
-    const { actions, data } = React.useContext(MomentContext)
-    const { setCommentEnabled, commentEnabled } = React.useContext(FeedContext)
     const { session } = React.useContext(PersistedContext)
     const [commentText, setCommentText] = React.useState<string>("")
     const toast = useToast()
@@ -36,21 +31,26 @@ export default function Input({
     React.useEffect(() => {
         animatedScale.setValue(1)
     }, [])
-    const handleButtonPress = () => {
-        animatedScale.setValue(0.8)
-        Animated.spring(animatedScale, {
-            toValue: 1,
-            bounciness: 12,
-            speed: 10,
-            useNativeDriver: true,
-        }).start()
-        async function fetch() {
-            await sendComment().then(() => {
-                setCommentText("")
-                Keyboard.dismiss()
+    async function sendComment() {
+        const content = (commentText || "").trim()
+        if (!content || isSendingRef.current) return
+        isSendingRef.current = true
+        try {
+            await apiRoutes.moment.actions.comment({
+                momentId,
+                authorizationToken: session.account.jwtToken,
+                content: commentText,
+                mentions: [],
+                parentId: "",
             })
+            toast.success(t("Comment Sended with success"))
+            Vibrate("notificationSuccess")
+            setCommentText("")
+            Keyboard.dismiss()
+            onSent?.()
+        } finally {
+            isSendingRef.current = false
         }
-        fetch()
     }
 
     const input_container: any = {
@@ -79,32 +79,7 @@ export default function Input({
         justifyContent: "center",
         flex: 1,
     }
-    const pressable_style: ViewStyle = {
-        width: 40,
-        height: 40,
-    }
 
-    async function sendComment() {
-        const content = (commentText || "").trim()
-        if (!content || isSendingRef.current) return
-        isSendingRef.current = true
-        try {
-            await actions.registerInteraction("COMMENT", {
-                momentId: data.id,
-                authorizationToken: session.account.jwtToken,
-                content,
-            })
-            toast.success(t("Comment Sended with success"))
-            Vibrate("notificationSuccess")
-            setCommentText("")
-            Keyboard.dismiss()
-            setCommentEnabled(false)
-        } finally {
-            isSendingRef.current = false
-        }
-    }
-
-    if (commentEnabled === false) return null
     return (
         <View style={[input_container]}>
             <View style={textContainer}>
@@ -116,9 +91,6 @@ export default function Input({
                     numberOfLines={1}
                     onChangeText={(text) => setCommentText(text)}
                     autoFocus={autoFocus}
-                    onBlur={() => {
-                        setCommentEnabled(false)
-                    }}
                 />
             </View>
             <Host matchContents>

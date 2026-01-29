@@ -3,10 +3,8 @@ import Animated, {
     useAnimatedStyle,
     useSharedValue,
     withTiming,
-    withSpring,
     interpolate,
     useAnimatedReaction,
-    runOnJS,
     type SharedValue,
 } from "react-native-reanimated"
 import Input from "@/components/comment/components/comments-input"
@@ -45,15 +43,11 @@ export default function RenderMomentFeed({
     scrollXShared,
     itemIndex,
 }: renderMomentProps) {
-    const { commentEnabled } = React.useContext(FeedContext)
     const isDarkMode = useColorScheme() === "dark"
-    const { progress: keyboardProgress, height: keyboardHeight } = useKeyboard()
-
+    const { progress: keyboardProgress } = useKeyboard()
+    const { commentEnabled } = React.useContext(FeedContext)
     const commentShared = useSharedValue(commentEnabled ? 1 : 0)
-
-    // Animate input position based on keyboard height
     const keyboardHeightAnim = React.useRef(new RNAnimated.Value(0)).current
-
     const [showFloatingInput, setShowFloatingInput] = React.useState(false)
 
     React.useEffect(() => {
@@ -110,11 +104,7 @@ export default function RenderMomentFeed({
     }, [commentEnabled, isFocused])
 
     const dimmedOpacity = isDarkMode ? 0.2 : BASE_OPACITY_OFF
-
-    // Converter focusProgress (AnimatedInterpolation) para SharedValue
     const focusProgressValue = useSharedValue(isFocused ? 1 : 0)
-
-    // Sincronizar focusProgress do React Native Animated com Reanimated SharedValue
     useAnimatedReaction(
         () => {
             "worklet"
@@ -124,34 +114,28 @@ export default function RenderMomentFeed({
                 const itemFullWidth = sizes.moment.standart.width + margin + margin
                 const centerOffset = (sizes.screens.width - sizes.moment.standart.width) / 2
                 const focusPointX = sizes.screens.width - 200
-
                 const itemScrollPosition = itemIndex === 0 ? 0 : itemIndex * itemFullWidth
                 const itemCenterAtFocus =
                     itemScrollPosition +
                     sizes.moment.standart.width / 2 -
                     focusPointX +
                     (itemIndex === 0 ? centerOffset : 0)
-
                 const inputRange = [
                     itemCenterAtFocus - itemFullWidth,
                     itemCenterAtFocus,
                     itemCenterAtFocus + itemFullWidth,
                 ]
-
-                // Interpolação fluida: [0, 1, 0] para escala e opacidade suaves
                 return interpolate(scrollXShared.value, inputRange, [0, 1, 0], "clamp")
             }
             return isFocused ? 1 : 0
         },
         (result) => {
             "worklet"
-            // Atualizar diretamente sem timing para máxima fluidez com o scroll
             focusProgressValue.value = result
         },
         [itemIndex, scrollXShared],
     )
 
-    // Fallback: sincronizar com isFocused se scrollXShared não estiver disponível
     React.useEffect(() => {
         if (!scrollXShared || itemIndex === undefined) {
             focusProgressValue.value = withTiming(isFocused ? 1 : 0, {
@@ -223,7 +207,11 @@ export default function RenderMomentFeed({
                         <View
                             style={{ marginBottom: sizes.margins["2sm"], width: "100%", zIndex: 1 }}
                         >
-                            {!isMe && <Moment.Description />}
+                            {!isMe && (
+                                <View style={{ marginLeft: 6, marginBottom: 10 }}>
+                                    <Moment.Description />
+                                </View>
+                            )}
                             <View style={{ flexDirection: "row", alignItems: "center" }}>
                                 <View style={{ flex: 1, height: 46 }}>
                                     {isIOS ? (

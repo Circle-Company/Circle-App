@@ -2,23 +2,16 @@ import sizes from "@/constants/sizes"
 import { useIsFocused } from "@react-navigation/core"
 import { Stack, useRouter } from "expo-router"
 import * as React from "react"
-import * as FileSystem from "expo-file-system"
-import { useCallback, useEffect, useRef, useState } from "react"
+import { useCallback, useEffect, useRef } from "react"
 import type { GestureResponderEvent, ViewStyle } from "react-native"
 import { StyleSheet, Text, View } from "react-native"
-import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context"
-import RotateIcon from "@/assets/icons/svgs/arrow.triangle.2.circlepath.svg"
-import FlashOnIcon from "@/assets/icons/svgs/flashlight.on.fill.svg"
-import FlashOffIcon from "@/assets/icons/svgs/flashlight.off.fill.svg"
-import { Gesture, GestureDetector, TapGestureHandler } from "react-native-gesture-handler"
-import { PressableOpacity } from "react-native-pressable-opacity"
+import { useSafeAreaInsets } from "react-native-safe-area-context"
+import { Gesture, GestureDetector } from "react-native-gesture-handler"
 import Reanimated, {
     Extrapolate,
     interpolate,
     useAnimatedProps,
-    useAnimatedStyle,
     useSharedValue,
-    withSpring,
 } from "react-native-reanimated"
 import type { CameraProps, CameraRuntimeError, VideoFile } from "react-native-vision-camera"
 import { Camera, useCameraDevice, useCameraFormat } from "react-native-vision-camera"
@@ -26,7 +19,6 @@ import { CaptureButton } from "../components/CaptureButton"
 import CameraVideoSlider from "../components/CameraVideoSlider"
 import { CONTENT_SPACING, MAX_ZOOM_FACTOR, SCREEN_HEIGHT, SCREEN_WIDTH } from "../constants"
 import { useIsForeground } from "../hooks/useIsForeground"
-
 import { useCameraContext } from "../context"
 import LanguageContext from "@/contexts/language"
 import { colors } from "@/constants/colors"
@@ -49,7 +41,6 @@ export function CameraPage(): React.ReactElement {
 
     const zoom = useSharedValue(1)
     const isPressingButton = useSharedValue(false)
-    const rotateAnimation = useSharedValue(0)
     const recordingIntervalRef = useRef<NodeJS.Timeout | null>(null)
     const insets = useSafeAreaInsets()
 
@@ -64,9 +55,7 @@ export function CameraPage(): React.ReactElement {
         isCameraInitialized,
         setIsCameraInitialized,
         cameraPosition,
-        setCameraPosition,
         torch,
-        setTorch,
         preferredDevice,
         microphonePermission,
         locationPermission,
@@ -107,11 +96,6 @@ export function CameraPage(): React.ReactElement {
         }
     }, [maxZoom, minZoom, zoom])
 
-    const rotateIconStyle = useAnimatedStyle(() => {
-        return {
-            transform: [{ rotate: `${rotateAnimation.value}deg` }],
-        }
-    }, [rotateAnimation])
     //#endregion
 
     //#region Callbacks
@@ -176,13 +160,6 @@ export function CameraPage(): React.ReactElement {
         },
         [router, setIsRecording, setVideo, setRecordingTime, setVideoBuffer],
     )
-    const onFlipCameraPressed = useCallback(() => {
-        setCameraPosition(cameraPosition === "back" ? "front" : "back")
-        rotateAnimation.value = withSpring(rotateAnimation.value + 180, {
-            damping: 15,
-            stiffness: 150,
-        })
-    }, [rotateAnimation, cameraPosition])
 
     //#endregion
 
@@ -197,10 +174,6 @@ export function CameraPage(): React.ReactElement {
         },
         [device?.supportsFocus],
     )
-    const onDoubleTap = useCallback(() => {
-        onFlipCameraPressed()
-    }, [onFlipCameraPressed])
-    //#endregion
 
     //#region Effects
     useEffect(() => {
@@ -213,7 +186,7 @@ export function CameraPage(): React.ReactElement {
         setTabHide(false)
     }, [])
 
-    // Timer para gravação
+    // Timer para gravação§
     useEffect(() => {
         if (isRecording) {
             // Só reseta o tempo se não estiver gravando ainda
@@ -224,14 +197,16 @@ export function CameraPage(): React.ReactElement {
             let current = 0
             recordingIntervalRef.current = setInterval(() => {
                 current = current + 0.1
+                if (current > MAX_RECORDING_TIME) {
+                    current = MAX_RECORDING_TIME
+                }
+                setRecordingTime(current)
                 if (current >= MAX_RECORDING_TIME) {
                     setIsRecording(false)
                     if (camera.current) {
                         camera.current.stopRecording()
                     }
-                    current = MAX_RECORDING_TIME
                 }
-                setRecordingTime(current)
             }, 100)
         } else {
             if (recordingIntervalRef.current) {
@@ -330,9 +305,9 @@ export function CameraPage(): React.ReactElement {
                                 },
                             ]}
                         >
-                            <TapGestureHandler onEnded={onDoubleTap} numberOfTaps={2}>
+                            <View style={cameraStyle}>
                                 <ReanimatedCamera
-                                    style={cameraStyle}
+                                    style={StyleSheet.absoluteFillObject}
                                     device={device}
                                     isActive={isActive}
                                     ref={camera}
@@ -351,7 +326,7 @@ export function CameraPage(): React.ReactElement {
                                     enableLocation={locationPermission.hasPermission}
                                     torch={torch}
                                 />
-                            </TapGestureHandler>
+                            </View>
                         </Reanimated.View>
                     </GestureDetector>
                 ) : (
@@ -360,16 +335,7 @@ export function CameraPage(): React.ReactElement {
                     </View>
                 )}
 
-                {isRecording && (
-                    <View>
-                        <CameraVideoSlider
-                            maxTime={MAX_RECORDING_TIME}
-                            width={sizes.moment.full.width}
-                        />
-                    </View>
-                )}
-
-                <View style={[styles.bottomBar, { bottom: CONTENT_SPACING * 8.5 + insets.bottom }]}>
+                <View style={[styles.bottomBar, { bottom: CONTENT_SPACING * 9 + insets.bottom }]}>
                     <RotateButton />
                     <CaptureButton
                         style={styles.captureButton}
@@ -387,6 +353,19 @@ export function CameraPage(): React.ReactElement {
 
                     <FlashButton />
                 </View>
+                {isRecording && (
+                    <View
+                        style={{
+                            position: "absolute",
+                            bottom: CONTENT_SPACING * 7.8 + insets.bottom,
+                        }}
+                    >
+                        <CameraVideoSlider
+                            maxTime={MAX_RECORDING_TIME}
+                            width={sizes.moment.full.width * 0.6}
+                        />
+                    </View>
+                )}
             </View>
         </View>
     )

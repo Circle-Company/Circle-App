@@ -6,6 +6,8 @@ import {
     Pressable,
     Text,
     RefreshControl,
+    Platform,
+    Alert,
 } from "react-native"
 import React, { useState, useEffect, useMemo, useRef } from "react"
 import AccountContext from "@/contexts/account"
@@ -18,11 +20,14 @@ import config from "@/config"
 import { colors } from "@/constants/colors"
 import { iOSMajorVersion } from "@/lib/platform/detection"
 import { router } from "expo-router"
+import { useNavigation } from "@react-navigation/native"
 import { NoMoments } from "@/features/profile/profile.no.moments"
 import fonts from "@/constants/fonts"
 import { NetworkContext } from "@/contexts/network"
 import OfflineCard from "@/components/general/offline"
-import { AccountMoment, AccountMomentsResponse } from "@/queries"
+import { DropDownMenuIOS } from "@/features/account/account.moments.dropdown.menu"
+import { apiRoutes } from "@/api"
+import useUniqueAppend from "@/lib/hooks/useUniqueAppend"
 
 export default function AccountScreen() {
     const { account, moments, isLoadingAccount, isLoadingMoments, getAccount, getMoments } =
@@ -42,6 +47,15 @@ export default function AccountScreen() {
     const NUM_COLUMNS = 2
     const ITEM_SIZE = (width - (NUM_COLUMNS + 1) * SPACING) / NUM_COLUMNS
     const isOnline = networkStats === "ONLINE"
+    const navigation = useNavigation()
+
+    const {
+        items: uniqueMoments,
+        appendUnique,
+        resetUnique,
+    } = useUniqueAppend<any>({
+        keySelector: (m) => m?.id,
+    })
 
     const user = useMemo(() => {
         if (!account || !account.id) return null
@@ -68,10 +82,24 @@ export default function AccountScreen() {
         }
     }, [account, session.account.totalMoments, moments])
 
+    // Update header title with username (null-safe)
     useEffect(() => {
-        // Initialize data on mount
-        getAccount()
-        getMoments({ page: 1, limit: pageSize })
+        const title =
+            (user && (user.username || user.name)) || (session?.user?.username ?? "") || ""
+        // Avoid setting undefined titles
+        try {
+            // @ts-ignore - navigation types depend on navigator setup
+            navigation.setOptions?.({ title })
+        } catch {}
+    }, [navigation, user?.username, user?.name, session?.user?.username])
+
+    useEffect(() => {
+        // Initialize data on mount with unique dedupe
+        ;(async () => {
+            await getAccount()
+            const list = await getMoments({ page: 1, limit: pageSize })
+            if (Array.isArray(list)) resetUnique(list)
+        })()
     }, [])
 
     const handleRefresh = async () => {
@@ -81,7 +109,8 @@ export default function AccountScreen() {
             setCurrentPage(1)
             setHasMoreMoments(true)
             await getAccount()
-            await getMoments({ page: 1, limit: pageSize })
+            const list = await getMoments({ page: 1, limit: pageSize })
+            resetUnique(Array.isArray(list) ? list : [])
         } catch (error) {
             console.error("Error refreshing account data:", error)
         } finally {
@@ -93,7 +122,8 @@ export default function AccountScreen() {
         if (!isLoadingMoments && hasMoreMoments) {
             const nextPage = currentPage + 1
             const list = await getMoments({ page: nextPage, limit: pageSize })
-            if (list && list.length > 0) {
+            if (Array.isArray(list) && list.length > 0) {
+                appendUnique(list)
                 console.log(`📄 Loaded page ${nextPage}`)
                 setCurrentPage(nextPage)
             } else {
@@ -103,11 +133,36 @@ export default function AccountScreen() {
         }
     }
 
+    async function handleDeleteMoment(id: string) {
+        try {
+            await apiRoutes.moment.author.exclude({
+                momentId: id,
+                authorizationToken: session.account.jwtToken,
+            })
+
+            const currentTotal = Number(session.account.totalMoments ?? 0)
+            session.account.setTotalMoments(Math.max(0, currentTotal - 1))
+
+            setHasMoreMoments(true)
+            setCurrentPage(1)
+            await getMoments({ page: 1, limit: pageSize })
+        } catch (error) {
+            console.error("Error deleting moment:", error)
+        }
+    }
+
+    function confirmDelete(id: string) {
+        Alert.alert("Delete Moment", "You will permanently remove it.", [
+            { text: "Cancel", style: "cancel" },
+            { text: "Delete", style: "destructive", onPress: () => handleDeleteMoment(id) },
+        ])
+    }
+
     function navigateToViewMoment(id: string) {
         router.navigate({ pathname: "/you/[id]", params: { id: String(id), from: "you" } })
     }
 
-    const normalizedMoments = moments.map((moment: any) => {
+    const normalizedMoments = uniqueMoments.map((moment: any) => {
         const rewrite = (url: string) => {
             if (!url) return url
             const original = String(url).trim()
@@ -174,7 +229,7 @@ export default function AccountScreen() {
 
     useEffect(() => {
         if (moments) {
-            session.account.setMoments(moments)
+            session.account.setMoments(moments as any)
             if (
                 typeof session.account.totalMoments !== "number" ||
                 session.account.totalMoments === 0
@@ -218,6 +273,22 @@ export default function AccountScreen() {
         session?.user?.profilePicture,
     ])
 
+    const lastCreatedAt = useMemo(() => {
+        if (!Array.isArray(moments) || moments.length === 0) return undefined
+        const getDate = (m: any) =>
+            m?.publishedAt || m?.createdAt || m?.created_at || m?.date || m?.timestamp
+        const timestamps = moments
+            .map((m: any) => {
+                const d = getDate(m)
+                const ts = d ? new Date(d as any).getTime() : NaN
+                return ts
+            })
+            .filter((ts: number) => Number.isFinite(ts))
+        if (timestamps.length === 0) return undefined
+        const maxTs = Math.max(...timestamps)
+        return new Date(maxTs)
+    }, [moments])
+
     return (
         <FlatList
             data={normalizedMoments}
@@ -231,14 +302,17 @@ export default function AccountScreen() {
                 loading ? (
                     <RenderProfileSkeleton />
                 ) : user ? (
-                    <ProfileHeader user={user} />
+                    <ProfileHeader
+                        isAccount={true}
+                        user={user}
+                        lastUpdateDate={lastCreatedAt ?? new Date()}
+                        totalMoments={user.metrics.totalMomentsCreated}
+                    />
                 ) : (
                     <RenderProfileSkeleton />
                 )
             }
             renderItem={({ item }) => {
-                const isVisible = true
-
                 if (!isOnline) return null
                 else
                     return (
@@ -253,37 +327,41 @@ export default function AccountScreen() {
                                 overflow: "hidden",
                             }}
                         >
-                            <Pressable onPress={() => navigateToViewMoment(item.id)}>
-                                <Moment.Root.Main
-                                    size={{
-                                        ...sizes.moment.small,
-                                        width: ITEM_SIZE,
-                                        height: ITEM_SIZE * sizes.moment.aspectRatio,
-                                        borderRadius: sizes.moment.small.borderRadius * 0.7,
-                                    }}
-                                    isFeed={false}
-                                    isFocused={isVisible}
-                                    data={item}
-                                    shadow={{ top: false, bottom: true }}
-                                >
-                                    <Moment.Container
-                                        contentRender={item.media}
-                                        isFocused={isVisible}
-                                        loading={false}
-                                        blurRadius={0}
-                                        forceMute={true}
-                                        showSlider={false}
-                                        disableCache={true}
-                                        disableWatch={true}
+                            <DropDownMenuIOS onDelete={() => handleDeleteMoment(item.id)}>
+                                <Pressable onPress={() => navigateToViewMoment(item.id)}>
+                                    <Moment.Root.Main
+                                        size={{
+                                            ...sizes.moment.small,
+                                            width: ITEM_SIZE,
+                                            height: ITEM_SIZE * sizes.moment.aspectRatio,
+                                            borderRadius: sizes.moment.small.borderRadius * 0.7,
+                                        }}
+                                        isFeed={false}
+                                        isFocused={true}
+                                        data={item}
+                                        shadow={{ top: false, bottom: true }}
                                     >
-                                        <Moment.Root.Center />
-                                        <Moment.Root.Bottom>
-                                            <Moment.Description displayOnMoment={true} />
-                                            <Moment.Date />
-                                        </Moment.Root.Bottom>
-                                    </Moment.Container>
-                                </Moment.Root.Main>
-                            </Pressable>
+                                        <Moment.Container
+                                            contentRender={item.media}
+                                            isFocused={true}
+                                            loading={false}
+                                            blurRadius={0}
+                                            forceMute={true}
+                                            showSlider={false}
+                                            disableCache={true}
+                                            disableWatch={true}
+                                        >
+                                            <Moment.Root.Center />
+                                            <Moment.Root.Bottom>
+                                                <View style={{ marginLeft: 5, marginBottom: 2 }}>
+                                                    <Moment.Description displayOnMoment={true} />
+                                                    <Moment.Date />
+                                                </View>
+                                            </Moment.Root.Bottom>
+                                        </Moment.Container>
+                                    </Moment.Root.Main>
+                                </Pressable>
+                            </DropDownMenuIOS>
                         </View>
                     )
             }}

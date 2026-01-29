@@ -1,5 +1,3 @@
-import { useNavigation } from "@react-navigation/native"
-import { StackNavigationProp } from "@react-navigation/stack"
 import React, { useEffect } from "react"
 import {
     Animated,
@@ -19,15 +17,13 @@ import fonts from "@/constants/fonts"
 import sizes from "@/constants/sizes"
 import FeedContext from "@/contexts/Feed"
 import LanguageContext from "@/contexts/language"
-
-type RootStackParamList = {
-    MomentNavigator: { screen: string }
-}
+import { LinearGradient } from "expo-linear-gradient"
+import { router } from "expo-router"
 
 export function EmptyList() {
     const { t } = React.useContext(LanguageContext)
     const { reloadFeed, loading } = React.useContext(FeedContext)
-    const navigation = useNavigation<StackNavigationProp<RootStackParamList>>()
+
     const isDarkMode = useColorScheme() === "dark"
 
     const fadeAnim = React.useRef(new Animated.Value(0)).current
@@ -81,26 +77,34 @@ export function EmptyList() {
 
     // Estilos como constantes
     const containerStyle: ViewStyle = {
-        top: sizes.margins["1xxl"] * 0.8,
         alignItems: "center",
         justifyContent: "center",
     }
 
-    const cardContainerStyle: ViewStyle = {
+    const gradientBorderStyle: ViewStyle = {
         alignItems: "center",
         justifyContent: "center",
-        borderRadius: sizes.borderRadius["1lg"],
-        paddingHorizontal: sizes.paddings["1md"],
-        paddingVertical: sizes.paddings["2md"],
+        borderRadius: sizes.borderRadius["1xl"] * 1.4,
+        padding: 2, // 2px gradient border
         marginBottom: sizes.margins["1md"],
         width: sizes.screens.width - sizes.paddings["2sm"] * 2,
-        backgroundColor: isDarkMode ? colors.gray.grey_09 : colors.gray.grey_01,
+    }
+
+    const cardInnerStyle: ViewStyle = {
+        alignItems: "center",
+        justifyContent: "center",
+        borderRadius: sizes.borderRadius["1xl"] * 1.4 - 2,
+        paddingHorizontal: sizes.paddings["1md"],
+        paddingVertical: sizes.paddings["2md"],
+        backgroundColor: "#FFF",
+        width: "100%",
     }
 
     const illustrationContainerStyle: ViewStyle = {
         alignItems: "center",
         justifyContent: "center",
         marginBottom: sizes.margins["1lg"],
+        marginTop: sizes.margins["1md"],
         position: "relative",
     }
 
@@ -110,90 +114,100 @@ export function EmptyList() {
     }
 
     const messageTextStyle: TextStyle = {
-        fontSize: fonts.size.body * 1.2,
+        fontSize: fonts.size.title1 * 0.8,
         fontFamily: fonts.family.Bold,
         textAlign: "center",
         marginBottom: sizes.margins["1sm"],
-        color: ColorTheme().text,
+        color: colors.gray.grey_01,
     }
 
     const subMessageTextStyle: TextStyle = {
         fontSize: fonts.size.footnote,
         fontFamily: fonts.family.Medium,
-        color: ColorTheme().textDisabled,
+        color: colors.gray.grey_04,
         textAlign: "center",
         marginBottom: sizes.margins["1md"],
         lineHeight: 16,
     }
 
     const buttonTextStyle: TextStyle = {
-        fontSize: fonts.size.body * 1.1,
-        fontFamily: fonts.family["Bold-Italic"],
+        fontSize: fonts.size.body * 1.2,
+        fontFamily: fonts.family["Black-Italic"],
         color: colors.gray.white,
     }
 
     const reloadTextStyle: TextStyle = {
         fontSize: fonts.size.body,
         fontFamily: fonts.family.Medium,
-        color: ColorTheme().text,
+        color: colors.gray.grey_01,
         marginRight: sizes.margins["2sm"],
     }
 
     return (
         <View style={containerStyle}>
-            <View style={cardContainerStyle}>
-                <Animated.View
-                    style={[
-                        illustrationContainerStyle,
-                        {
+            <LinearGradient
+                colors={[colors.gray.grey_07, colors.gray.black]}
+                start={{ x: 0.5, y: 0 }}
+                end={{ x: 0.5, y: 1 }}
+                style={gradientBorderStyle}
+            >
+                <LinearGradient
+                    colors={[colors.gray.grey_09, colors.gray.black]}
+                    start={{ x: 0.5, y: 0 }}
+                    end={{ x: 0.5, y: 1 }}
+                    style={cardInnerStyle}
+                >
+                    <Animated.View
+                        style={[
+                            illustrationContainerStyle,
+                            {
+                                opacity: fadeAnim,
+                                transform: [{ scale: scaleAnim }, { translateY: moveAnim }],
+                            },
+                        ]}
+                    >
+                        <Image
+                            source={require("@/assets/images/illustrations/NewMoment-Illustration.png")}
+                            style={illustrationStyle}
+                            resizeMode="contain"
+                        />
+                    </Animated.View>
+
+                    <Animated.View
+                        style={{
                             opacity: fadeAnim,
-                            transform: [{ scale: scaleAnim }, { translateY: moveAnim }],
-                        },
-                    ]}
-                >
-                    <Image
-                        source={require("@/assets/images/illustrations/NewMoment-Illustration.png")}
-                        style={illustrationStyle}
-                        resizeMode="contain"
-                    />
-                </Animated.View>
-
-                <Animated.View
-                    style={{
-                        opacity: fadeAnim,
-                        transform: [{ translateY: moveAnim }, { scale: scaleAnim }],
-                    }}
-                >
-                    <Text style={messageTextStyle}>{t("Capture Your Day")}</Text>
-                    <Text style={subMessageTextStyle}>
-                        {t(
-                            "No recommendations available right now. Why not share a special moment from your day instead?",
-                        )}
-                    </Text>
-                </Animated.View>
-
-                <Animated.View
-                    style={{
-                        opacity: fadeAnim,
-                        transform: [{ translateY: moveAnim }, { scale: scaleAnim }],
-                    }}
-                >
-                    <ButtonStandart
-                        animationScale={0.92}
-                        width={sizes.buttons.width * 0.6}
-                        height={sizes.buttons.height * 0.6}
-                        margins={false}
-                        backgroundColor={ColorTheme().primary.toString()}
-                        action={() => {
-                            navigation.navigate("MomentNavigator", {
-                                screen: "NewMomentImageScreen",
-                            })
+                            transform: [{ translateY: moveAnim }, { scale: scaleAnim }],
                         }}
                     >
-                        <Text style={buttonTextStyle}>{t("Share a Moment")}</Text>
-                    </ButtonStandart>
-                </Animated.View>
-            </View>
+                        <Text style={messageTextStyle}>{t("Capture Your Day")}</Text>
+                        <Text style={subMessageTextStyle}>
+                            {t(
+                                "No recommendations available right now. Why not share a special moment from your day instead?",
+                            )}
+                        </Text>
+                    </Animated.View>
+
+                    <Animated.View
+                        style={{
+                            opacity: fadeAnim,
+                            transform: [{ translateY: moveAnim }, { scale: scaleAnim }],
+                        }}
+                    >
+                        <ButtonStandart
+                            animationScale={0.92}
+                            width={sizes.buttons.width * 0.6}
+                            height={55}
+                            margins={false}
+                            backgroundColor={ColorTheme().primary.toString()}
+                            action={() => {
+                                router.push("/(tabs)/create")
+                            }}
+                        >
+                            <Text style={buttonTextStyle}>{t("Share a Moment")}</Text>
+                        </ButtonStandart>
+                    </Animated.View>
+                </LinearGradient>
+            </LinearGradient>
 
             <ButtonStandart
                 width={loading ? sizes.screens.width * 0.2 : undefined}

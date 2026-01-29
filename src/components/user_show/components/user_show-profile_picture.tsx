@@ -7,7 +7,9 @@ import { Image } from "expo-image"
 import React from "react"
 import { UserProfilePictureProps } from "../user_show-types"
 import sizes from "../../../constants/sizes"
-import { useNavigation } from "@react-navigation/native"
+import PersistedContext from "../../../contexts/Persisted"
+import ProfileContext from "../../../contexts/profile"
+import { router, usePathname } from "expo-router"
 import { useUserShowContext } from "../user_show-context"
 
 export default function profile_picture({
@@ -16,7 +18,9 @@ export default function profile_picture({
     disableAction = false,
 }: UserProfilePictureProps) {
     const { user, executeBeforeClick } = useUserShowContext()
-    const navigation: any = useNavigation()
+    const { session } = React.useContext(PersistedContext)
+    const pathname = usePathname()
+    const { setUserId, setProfilePreview } = React.useContext(ProfileContext)
 
     const isDarkMode = useColorScheme() === "dark"
     const outlineSize: number = Number(Number(pictureDimensions.width) / (displayOnMoment ? 8 : 14)) // /6
@@ -40,10 +44,27 @@ export default function profile_picture({
     const [profilePicture, setProfilePicture] = React.useState<string>("")
     async function onProfilePictureAction() {
         if (!disableAction) {
-            await navigation.navigate("ProfileNavigator", {
-                screen: "Profile",
-                params: { findedUserPk: user.id },
-            })
+            const targetId = String(user.id)
+            const myId = String(session.user.id)
+            const isSelf = targetId === myId
+            const targetPath = isSelf ? `/you/${targetId}` : `/profile/${targetId}`
+            if (pathname === targetPath) {
+                executeBeforeClick ? executeBeforeClick() : null
+                return
+            }
+
+            // Inject preview into ProfileContext before navigating
+            setProfilePreview({ id: targetId, username: String(user.username || "") })
+            setUserId(targetId)
+
+            if (isSelf) {
+                router.replace({
+                    pathname: "/you/[id]",
+                    params: { id: targetId, from: "profile" },
+                })
+            } else {
+                router.replace({ pathname: "/profile/[userId]", params: { userId: targetId } })
+            }
             executeBeforeClick ? executeBeforeClick() : null
         }
     }

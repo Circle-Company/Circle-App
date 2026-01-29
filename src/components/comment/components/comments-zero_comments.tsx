@@ -1,36 +1,31 @@
 import ColorTheme, { colors } from "../../../constants/colors"
-import { View, ViewStyle, useColorScheme } from "react-native"
-
+import { View, ViewStyle } from "react-native"
 import ButtonStandart from "../../buttons/button-standart"
 import FeedContext from "../../../contexts/Feed"
 import LanguageContext from "../../../contexts/language"
-import PlusIcon from "@/assets/icons/svgs/plus_circle.svg"
 import React from "react"
 import { Text } from "../../Themed"
 import { Vibrate } from "../../../lib/hooks/useHapticFeedback"
 import fonts from "../../../constants/fonts"
 import sizes from "../../../constants/sizes"
-import MomentContext from "@/components/moment/context"
 import { textLib } from "@/circle.text.library"
-
 import { Moment as MomentProps } from "@/contexts/Feed/types"
 import { isIOS } from "@/lib/platform/detection"
-import { SwiftBottomSheet } from "@/components/ios/ios.bottom.sheet"
 import FetchedCommentsList from "./fetched-comments-list"
 import BottomSheetContext from "@/contexts/bottomSheet"
 import { UserShow } from "@/components/user_show"
+
 export default function ZeroComments({ moment }: { moment: MomentProps }) {
     const { t } = React.useContext(LanguageContext)
     const [isIOSSheetOpen, setIOSSheetOpen] = React.useState(false)
-    const { commentEnabled, setCommentEnabled, setKeyboardVisible, setScrollEnabled } =
+    const { setCommentEnabled, setKeyboardVisible, setScrollEnabled } =
         React.useContext(FeedContext)
     const { expand } = React.useContext(BottomSheetContext)
-    const isDarkMode = useColorScheme() === "dark"
 
     const container: any = {
         maxWidth: sizes.screens.width,
         borderRadius: sizes.borderRadius["1md"] * 1.2,
-        backgroundColor: isDarkMode ? colors.gray.grey_08 : colors.gray.grey_02,
+        backgroundColor: colors.gray.grey_08,
         alignSelf: "center",
         alignItems: "center",
         justifyContent: "center",

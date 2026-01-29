@@ -11,6 +11,7 @@ interface CameraVideoSliderProps {
     maxTime?: number // segundos, default 30
     width?: number
     currentTime?: number // tempo atual do vídeo, opcional
+    inline?: boolean // quando true, não usa posicionamento absoluto interno
 }
 
 function formatCurrentTime(sec: number): string {
@@ -23,12 +24,14 @@ export default function CameraVideoSlider({
     maxTime = 30,
     width = sizes.moment.full.width,
     currentTime,
+    inline,
 }: CameraVideoSliderProps) {
     const { recordingTime } = useCameraContext()
     const progressAnim = useRef(new Animated.Value(0)).current
 
     // Use currentTime se fornecido, senão recordingTime do contexto
     const sliderTime = typeof currentTime === "number" ? currentTime : recordingTime
+    const effectiveInline = inline ?? typeof currentTime === "number"
 
     useEffect(() => {
         const calculateProgress = (): number => {
@@ -47,15 +50,22 @@ export default function CameraVideoSlider({
         }).start()
     }, [sliderTime, maxTime, progressAnim])
 
-    const container: ViewStyle = {
-        position: "absolute",
-        bottom: 10, // mais acima, dentro da imagem da câmera
-        left: "50%",
-        transform: [{ translateX: -(width - sizes.margins["2md"] * 2) / 2 }],
-        paddingHorizontal: sizes.margins["2md"],
-        width: width - sizes.margins["2md"] * 2,
-        zIndex: 30,
-    }
+    const container: ViewStyle = effectiveInline
+        ? {
+              position: "relative",
+              paddingHorizontal: 0,
+              width: width,
+              zIndex: 30,
+          }
+        : {
+              position: "absolute",
+              bottom: 10, // mais acima, dentro da imagem da câmera
+              left: "50%",
+              transform: [{ translateX: -width / 2 }],
+              paddingHorizontal: 0,
+              width: width,
+              zIndex: 30,
+          }
 
     const sliderContainer: ViewStyle = {
         height: 6,
@@ -107,7 +117,10 @@ export default function CameraVideoSlider({
     if (iOSMajorVersion! >= 26) {
         return (
             <Host style={{ width }}>
-                <LinearProgress progress={sliderTime} color={colors.gray.white} />
+                <LinearProgress
+                    progress={Math.min(1, Math.max(0, sliderTime / maxTime))}
+                    color={colors.gray.white}
+                />
             </Host>
         )
     } else {
