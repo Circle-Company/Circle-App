@@ -91,3 +91,25 @@ export function storageKeys() {
         },
     }
 }
+
+// Ephemeral like-pressed memory namespace and helpers
+export const LIKE_PRESSED_NS = "@circle:like:pressed:"
+
+export const clearKeysByPrefix = (prefix: string) => {
+    try {
+        const anyStorage = storage as any
+        const keys: string[] =
+            typeof anyStorage.getAllKeys === "function" ? anyStorage.getAllKeys() : []
+        for (const k of keys) {
+            if (typeof k === "string" && k.startsWith(prefix)) {
+                safeDelete(k)
+            }
+        }
+    } catch {
+        // noop
+    }
+}
+
+export const clearLikePressedNamespace = () => {
+    clearKeysByPrefix(LIKE_PRESSED_NS)
+}
