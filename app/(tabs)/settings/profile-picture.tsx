@@ -1,7 +1,6 @@
 import { useNavigation } from "@react-navigation/native"
 import React from "react"
 import { Image, View, Platform, StyleSheet, Keyboard, ActionSheetIOS, Alert } from "react-native"
-import * as FileSystem from "expo-file-system"
 import * as ImagePicker from "expo-image-picker"
 import * as ImageManipulator from "expo-image-manipulator"
 import ButtonStandart from "@/components/buttons/button-standart"
