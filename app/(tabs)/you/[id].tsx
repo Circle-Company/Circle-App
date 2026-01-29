@@ -1,7 +1,8 @@
-import React, { useEffect, useRef } from "react"
-import { BackHandler } from "react-native"
-import { useLocalSearchParams, useRouter } from "expo-router"
-import { useNavigation } from "@react-navigation/native"
+import React, { useEffect, useCallback } from "react"
+import { View, Keyboard, Platform, Animated as RNAnimated, Pressable } from "react-native"
+import Animated, { useAnimatedStyle, useSharedValue, withTiming } from "react-native-reanimated"
+import { useLocalSearchParams } from "expo-router"
+import { useNavigation, useFocusEffect } from "@react-navigation/native"
 import { SafeAreaView } from "react-native-safe-area-context"
 import PersistedContext from "@/contexts/Persisted"
 import { Moment } from "@/components/moment"
@@ -11,20 +12,25 @@ import { UserShow } from "@/components/user_show"
 import { LinearGradient } from "expo-linear-gradient"
 import fonts from "@/constants/fonts"
 import api from "@/api"
-import { View, Keyboard, Platform, Animated as RNAnimated, Modal, Pressable } from "react-native"
-import Animated from "react-native-reanimated"
 import RenderCommentFeed from "@/features/moments/feed/render-comment-feed"
-import Input from "@/components/comment/components/comments-input"
+import Input from "@/components/comment/components/comments-profile-input"
 import ZeroComments from "@/components/comment/components/comments-zero_comments"
-
+import FeedContext from "@/contexts/Feed"
+import useUniqueAppend from "@/lib/hooks/useUniqueAppend"
 export default function MomentFullScreen() {
-    const router = useRouter()
-    const navigation = useNavigation()
-    const { id, from } = useLocalSearchParams<{ id: string; from?: string }>()
-    const hasNavigatedRef = useRef(false)
+    const { id } = useLocalSearchParams<{ id: string; from?: string }>()
     const { session } = React.useContext(PersistedContext)
+    const { commentEnabled, setCommentEnabled } = React.useContext(FeedContext)
 
-    const [remoteMoment, setRemoteMoment] = React.useState<any | null>(null)
+    const {
+        items: uniqueMoments,
+        appendOneUnique,
+
+        appendUnique,
+        resetUnique,
+    } = useUniqueAppend<any>({
+        keySelector: (m) => m?.id,
+    })
 
     // Fetch moment by id (GET /moments/:id) with Authorization
     useEffect(() => {
@@ -38,7 +44,29 @@ export default function MomentFullScreen() {
                     auth ? { headers: { Authorization: auth } } : undefined,
                 )
                 if (!cancelled) {
-                    setRemoteMoment((res as any)?.data?.moment ?? (res as any)?.data ?? null)
+                    const payload = (res as any)?.data?.moment ?? (res as any)?.data ?? null
+                    if (!payload) return
+
+                    // Support single payload or chunk (array)
+                    const incoming: any[] = Array.isArray(payload) ? payload : [payload]
+
+                    // Current chunk ids already rendered
+                    const currentIds = new Set(uniqueMoments.map((m: any) => String(m?.id)))
+                    const currentChunkIds = Array.from(currentIds)
+
+                    // New chunk ids from incoming payload
+                    const newChunkIds = incoming
+                        .map((m) => String(m?.id))
+                        .filter((v): v is string => !!v)
+
+                    // Only append items that are not yet present
+                    const uniqueIncoming = incoming.filter((m) => !currentIds.has(String(m?.id)))
+
+                    if (uniqueIncoming.length === 1) appendOneUnique(uniqueIncoming[0])
+                    else if (uniqueIncoming.length > 1) appendUnique(uniqueIncoming)
+
+                    // Debug if needed:
+                    // console.debug({ currentChunkIds, newChunkIds, uniqueNewChunkIds: uniqueIncoming.map(m => String(m?.id)) })
                 }
             } catch (e) {
                 console.log("Moment fetch error:", e)
@@ -48,11 +76,37 @@ export default function MomentFullScreen() {
         return () => {
             cancelled = true
         }
-    }, [id, session?.account?.jwtToken])
+    }, [id, session?.account?.jwtToken, uniqueMoments, appendOneUnique, appendUnique])
+
+    React.useEffect(() => {
+        const list = ((session?.account as any)?.moments as any[]) || []
+        if (Array.isArray(list) && list.length) resetUnique(list as any[])
+    }, [session?.account?.moments, resetUnique])
 
     // Comments UI and keyboard handling
-    const [commentsOpen, setCommentsOpen] = React.useState(false)
+
+    const [isKeyboardVisible, setIsKeyboardVisible] = React.useState(false)
+    const navigation = useNavigation()
+    useFocusEffect(
+        useCallback(() => {
+            const parent = navigation.getParent?.()
+            if (parent) {
+                parent.setOptions({
+                    tabBarStyle: { display: "none", height: 0 },
+                } as any)
+            }
+            return () => {
+                if (parent) {
+                    parent.setOptions({
+                        tabBarStyle: undefined,
+                    } as any)
+                }
+            }
+        }, [navigation]),
+    )
     const keyboardHeightAnim = React.useRef(new RNAnimated.Value(0)).current
+    const keyboardProgress = useSharedValue(0)
+    const commentShared = useSharedValue(commentEnabled ? 1 : 0)
 
     React.useEffect(() => {
         const showListener = Keyboard.addListener(
@@ -64,6 +118,10 @@ export default function MomentFullScreen() {
                     duration: Platform.OS === "ios" ? 250 : 200,
                     useNativeDriver: false,
                 }).start()
+                setIsKeyboardVisible(true)
+                keyboardProgress.value = withTiming(1, {
+                    duration: Platform.OS === "ios" ? 250 : 200,
+                })
             },
         )
         const hideListener = Keyboard.addListener(
@@ -74,6 +132,10 @@ export default function MomentFullScreen() {
                     duration: Platform.OS === "ios" ? 250 : 200,
                     useNativeDriver: false,
                 }).start()
+                setIsKeyboardVisible(false)
+                keyboardProgress.value = withTiming(0, {
+                    duration: Platform.OS === "ios" ? 250 : 200,
+                })
             },
         )
 
@@ -83,11 +145,15 @@ export default function MomentFullScreen() {
         }
     }, [])
 
+    React.useEffect(() => {
+        commentShared.value = withTiming(commentEnabled ? 1 : 0, { duration: 250 })
+    }, [commentEnabled, commentShared])
+
     const momentData = React.useMemo(() => {
         const rewrite = (url: string) => {
             if (!url) return url
             const original = String(url).trim()
-            const newBase = `http://${config.ENDPOINT}`
+            const newBase = `${config.ENDPOINT}`
             if (original.startsWith("/")) return `${newBase}${original}`
             const protoMatch = original.match(/^https?:\/\//i)
             if (protoMatch) {
@@ -103,8 +169,7 @@ export default function MomentFullScreen() {
             return original
         }
 
-        const fallbackList = ((session?.account as any)?.moments as any[]) || []
-        const raw = remoteMoment ?? fallbackList.find((m) => String(m?.id) === String(id))
+        const raw = uniqueMoments.find((m: any) => String(m?.id) === String(id))
         if (!raw) return null
 
         const videoUrl = rewrite(
@@ -118,7 +183,6 @@ export default function MomentFullScreen() {
                 (raw?.thumbnail as string),
         )
 
-        console.log("warMoment: ", JSON.stringify(raw))
         return {
             id: String(raw.id),
             user: {
@@ -151,7 +215,16 @@ export default function MomentFullScreen() {
             topComment: raw.topComment || null,
             isLiked: Boolean(raw.isLiked ?? false),
         } as any
-    }, [id, remoteMoment, session?.account?.moments, session?.user])
+    }, [id, uniqueMoments, session?.user])
+
+    const animatedMomentStyle = useAnimatedStyle(() => {
+        "worklet"
+        const commentScale = 1 - 0.06 * commentShared.value
+        const keyboardScale = 1 - 0.3 * keyboardProgress.value * commentShared.value
+        const finalScale = commentScale * keyboardScale
+        const translateY = -100 * keyboardProgress.value * commentShared.value
+        return { transform: [{ translateY }, { scale: finalScale }] }
+    }, [])
 
     return (
         <SafeAreaView
@@ -172,7 +245,7 @@ export default function MomentFullScreen() {
                         data={momentData}
                         shadow={{ top: false, bottom: true }}
                     >
-                        <Animated.View sharedTransitionTag={`moment-${momentData.id}`}>
+                        <Animated.View style={animatedMomentStyle}>
                             <Moment.Container
                                 contentRender={momentData.midia}
                                 isFocused={true}
@@ -199,14 +272,16 @@ export default function MomentFullScreen() {
                                         </UserShow.Root>
                                     </Moment.Root.TopLeft>
                                 </Moment.Root.Top>
+
                                 <Moment.Root.Center>
-                                    <Moment.Description displayOnMoment={true} />
+                                    <Moment.Description />
                                 </Moment.Root.Center>
 
                                 {/* Bottom description opens comments modal */}
                                 <Moment.Root.Bottom>
-                                    <Moment.Date />
-                                    <Moment.AudioControl />
+                                    <View style={{ marginBottom: 5 }}>
+                                        <Moment.AudioControl />
+                                    </View>
                                 </Moment.Root.Bottom>
 
                                 {/* Subtle bottom gradient like feed */}
@@ -241,6 +316,43 @@ export default function MomentFullScreen() {
                     </Moment.Root.Main>
                 </>
             ) : null}
+            {/* Dismiss overlay when input is active and keyboard visible */}
+            {commentEnabled && isKeyboardVisible && (
+                <Pressable
+                    onPress={() => {
+                        setCommentEnabled(false)
+                        Keyboard.dismiss()
+                    }}
+                    style={{
+                        position: "absolute",
+                        top: 0,
+                        left: 0,
+                        right: 0,
+                        bottom: 0,
+                        zIndex: 9998,
+                    }}
+                />
+            )}
+            {/* Input flutuante: mostrar quando commentEnabled estiver ativo */}
+            {commentEnabled && (
+                <RNAnimated.View
+                    style={{
+                        position: "absolute",
+                        left: 0,
+                        right: 0,
+                        bottom: keyboardHeightAnim,
+                        zIndex: 9999,
+                    }}
+                >
+                    <Input
+                        momentId={momentData.id}
+                        onSent={() => {
+                            setCommentEnabled(false)
+                        }}
+                        autoFocus={true}
+                    />
+                </RNAnimated.View>
+            )}
         </SafeAreaView>
     )
 }
