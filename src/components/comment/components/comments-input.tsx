@@ -100,6 +100,9 @@ export default function Input({
             setCommentText("")
             Keyboard.dismiss()
             setCommentEnabled(false)
+        } catch {
+            toast.error(t("Fail to send comment"))
+            Vibrate("notificationError")
         } finally {
             isSendingRef.current = false
         }
