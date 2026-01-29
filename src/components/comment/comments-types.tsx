@@ -46,11 +46,10 @@ export type CommentsHeaderLeftProps = {
     children: React.ReactNode
 }
 export type CommentsInputProps = {
-    placeholder?: string
-    backgroundColor?: string
     color?: string
-    preview?: boolean
     autoFocus: boolean
+    momentId: string
+    onSent?: () => void
 }
 export type CommentsListCommentsProps = {
     comment: CommentObject[]

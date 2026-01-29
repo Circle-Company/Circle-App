@@ -7,6 +7,7 @@ import container from "./components/comments-container"
 import list_comments from "./components/comments-list_comments"
 import header_left from "./components/headers/comments-header_left"
 import input from "./components/comments-input"
+import profileInput from "./components/comments-profile-input"
 export const Comments = {
     MainRoot: main_root,
     TopRoot: top_root,
@@ -17,4 +18,5 @@ export const Comments = {
     ListComments: list_comments,
     HeaderLeft: header_left,
     Input: input,
+    InputProfile: profileInput,
 }
