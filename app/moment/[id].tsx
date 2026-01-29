@@ -12,16 +12,14 @@ import { LinearGradient } from "expo-linear-gradient"
 import fonts from "@/constants/fonts"
 import api from "@/api"
 import { View, Keyboard, Platform, Animated as RNAnimated, Modal, Pressable } from "react-native"
-import Animated from "react-native-reanimated"
 import RenderCommentFeed from "@/features/moments/feed/render-comment-feed"
-import Input from "@/components/comment/components/comments-input"
 import ZeroComments from "@/components/comment/components/comments-zero_comments"
 
 export default function MomentFullScreen() {
     const router = useRouter()
     const navigation = useNavigation()
-    const { id, from } = useLocalSearchParams<{ id: string; from?: string }>()
     const hasNavigatedRef = useRef(false)
+    const { id, from } = useLocalSearchParams<{ id: string; from?: string }>()
     const { session } = React.useContext(PersistedContext)
 
     const [remoteMoment, setRemoteMoment] = React.useState<any | null>(null)
@@ -50,8 +48,6 @@ export default function MomentFullScreen() {
         }
     }, [id, session?.account?.jwtToken])
 
-    // Comments UI and keyboard handling
-    const [commentsOpen, setCommentsOpen] = React.useState(false)
     const keyboardHeightAnim = React.useRef(new RNAnimated.Value(0)).current
 
     React.useEffect(() => {
@@ -196,82 +192,79 @@ export default function MomentFullScreen() {
         >
             <View style={{ height: sizes.headers.height * 0.7 }} />
             {momentData ? (
-                <>
-                    <Moment.Root.Main
-                        size={sizes.moment.standart}
-                        isFeed={false}
+                <Moment.Root.Main
+                    size={sizes.moment.standart}
+                    isFeed={false}
+                    isFocused={true}
+                    data={momentData}
+                    shadow={{ top: false, bottom: true }}
+                >
+                    <Moment.Container
+                        contentRender={momentData.midia}
                         isFocused={true}
-                        data={momentData}
-                        shadow={{ top: false, bottom: true }}
+                        loading={false}
+                        blurRadius={0}
+                        forceMute={false}
+                        showSlider={true}
+                        disableCache={false}
+                        disableWatch={false}
                     >
-                        <Animated.View sharedTransitionTag={`moment-${momentData.id}`}>
-                            <Moment.Container
-                                contentRender={momentData.midia}
-                                isFocused={true}
-                                loading={false}
-                                blurRadius={0}
-                                forceMute={false}
-                                showSlider={true}
-                                disableCache={false}
-                                disableWatch={false}
-                            >
-                                {/* Top user info (no scale animations) */}
-                                <Moment.Root.Top>
-                                    <Moment.Root.TopLeft>
-                                        <UserShow.Root data={momentData.user}>
-                                            <UserShow.ProfilePicture
-                                                disableAction={true}
-                                                displayOnMoment={true}
-                                                pictureDimensions={{ width: 30, height: 30 }}
-                                            />
-                                            <UserShow.Username
-                                                pressable={false}
-                                                fontFamily={fonts.family["Bold-Italic"]}
-                                            />
-                                        </UserShow.Root>
-                                    </Moment.Root.TopLeft>
-                                </Moment.Root.Top>
-                                <Moment.Root.Center>
-                                    <Moment.Description displayOnMoment={true} />
-                                </Moment.Root.Center>
+                        {/* Top user info (no scale animations) */}
+                        <Moment.Root.Top>
+                            <Moment.Root.TopLeft>
+                                <UserShow.Root data={momentData.user}>
+                                    <UserShow.ProfilePicture
+                                        disableAction={true}
+                                        displayOnMoment={true}
+                                        pictureDimensions={{ width: 30, height: 30 }}
+                                    />
+                                    <UserShow.Username
+                                        pressable={false}
+                                        fontFamily={fonts.family["Bold-Italic"]}
+                                    />
+                                </UserShow.Root>
+                            </Moment.Root.TopLeft>
+                        </Moment.Root.Top>
 
-                                {/* Bottom description opens comments modal */}
-                                <Moment.Root.Bottom>
-                                    <Moment.Date />
-                                    <Moment.AudioControl />
-                                </Moment.Root.Bottom>
+                        <Moment.Root.Center>
+                            <Moment.Description displayOnMoment={true} />
+                        </Moment.Root.Center>
 
-                                {/* Subtle bottom gradient like feed */}
-                                <LinearGradient
-                                    colors={["rgba(0, 0, 0, 0.00)", "rgba(0, 0, 0, 0.4)"]}
-                                    start={{ x: 0.5, y: 0 }}
-                                    end={{ x: 0.5, y: 1 }}
-                                    style={{
-                                        position: "absolute",
-                                        left: 0,
-                                        right: 0,
-                                        bottom: 0,
-                                        width: sizes.moment.standart.width,
-                                        height: sizes.moment.standart.height * 0.1,
-                                        zIndex: 0,
-                                    }}
-                                />
-                            </Moment.Container>
-                        </Animated.View>
-                        {momentData?.topComment ? (
-                            <RenderCommentFeed moment={momentData} focused={true} />
-                        ) : (
-                            <View
-                                style={{
-                                    alignSelf: "center",
-                                    marginTop: sizes.margins["2sm"],
-                                }}
-                            >
-                                <ZeroComments moment={momentData} />
-                            </View>
-                        )}
-                    </Moment.Root.Main>
-                </>
+                        {/* Bottom description opens comments modal */}
+                        <Moment.Root.Bottom>
+                            <Moment.Date />
+                            <Moment.AudioControl />
+                        </Moment.Root.Bottom>
+
+                        {/* Subtle bottom gradient like feed */}
+                        <LinearGradient
+                            colors={["rgba(0, 0, 0, 0.00)", "rgba(0, 0, 0, 0.4)"]}
+                            start={{ x: 0.5, y: 0 }}
+                            end={{ x: 0.5, y: 1 }}
+                            style={{
+                                position: "absolute",
+                                left: 0,
+                                right: 0,
+                                bottom: 0,
+                                width: sizes.moment.standart.width,
+                                height: sizes.moment.standart.height * 0.1,
+                                zIndex: 0,
+                            }}
+                        />
+                    </Moment.Container>
+                    {momentData?.topComment ? (
+                        <RenderCommentFeed moment={momentData} focused={true} />
+                    ) : (
+                        <View
+                            style={{
+                                alignSelf: "center",
+                                marginTop: sizes.margins["2sm"],
+                            }}
+                        >
+                            <ZeroComments moment={momentData} />
+                        </View>
+                    )}
+                </Moment.Root.Main>
             ) : null}
         </SafeAreaView>
     )
