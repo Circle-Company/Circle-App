@@ -4,6 +4,7 @@ import ErrorIcon from "@/assets/icons/svgs/exclamationmark_icloud_fill.svg"
 import React from "react"
 import { colors } from "../../../constants/colors"
 import sizes from "../../../constants/sizes"
+import fonts from "@/constants/fonts"
 
 export interface VideoErrorProps {
     message: string
@@ -14,7 +15,7 @@ export default function MidiaRenderVideoError({ message, onRetry }: VideoErrorPr
     return (
         <View style={styles.container}>
             <View style={styles.iconContainer}>
-                <ErrorIcon width={24} height={24} fill={colors.gray.white} />
+                <ErrorIcon width={40} height={40} fill={colors.gray.grey_05} />
             </View>
             <Text style={styles.errorText}>{message}</Text>
         </View>
@@ -24,21 +25,19 @@ export default function MidiaRenderVideoError({ message, onRetry }: VideoErrorPr
 const styles = StyleSheet.create({
     container: {
         alignItems: "center",
-        backgroundColor: "rgba(0, 0, 0, 0.7)",
         borderRadius: sizes.borderRadius["1md"],
         justifyContent: "center",
         padding: sizes.paddings["1md"],
         width: "80%",
     },
     errorText: {
-        color: colors.gray.white,
-        fontSize: 14,
-        marginTop: sizes.margins["2sm"],
+        color: colors.gray.grey_05,
+        fontSize: 11,
         textAlign: "center",
+        fontFamily: fonts.family.ExtraBold,
     },
     iconContainer: {
         alignItems: "center",
         justifyContent: "center",
-        marginBottom: sizes.margins["2sm"],
     },
 })

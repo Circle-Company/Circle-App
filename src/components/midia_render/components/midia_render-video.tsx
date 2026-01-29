@@ -464,11 +464,11 @@ export default function MediaRenderVideo({
             }
             console.error("Video error:", error)
 
-            let errorMsg = t("Erro ao carregar o vídeo")
+            let errorMsg = t("Error to load moment")
 
             if (error && typeof error === "object") {
                 if (error.message && error.message.includes("network")) {
-                    errorMsg = t("Não foi possível acessar o vídeo. Verifique sua conexão.")
+                    errorMsg = t("Cannot possible load moment, check your internet connection")
                 }
             }
 
