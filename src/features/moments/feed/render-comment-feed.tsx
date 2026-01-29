@@ -161,22 +161,35 @@ export default function RenderCommentFeed({ moment, focused }: renderCommentFeed
                         </Animated.View>
                     </Comments.CenterRoot>
 
-                    <ButtonStandart
-                        style={{
-                            alignSelf: "center",
-                        }}
-                        action={handlePressViewMore}
-                        margins={false}
-                        backgroundColor="transparent"
-                    >
-                        {
-                            <Text style={viewMoreTextStyle}>
-                                {`${t("View more")} ${commentsCount - 1} ${
-                                    commentsCount - 1 > 1 ? t("comments") : t("comment")
-                                }`}
-                            </Text>
-                        }
-                    </ButtonStandart>
+                    {commentsCount - 1 <= 0 ? (
+                        <View
+                            style={{
+                                width: "100%",
+                                alignItems: "center",
+                                justifyContent: "center",
+                                marginTop: sizes.margins["2sm"],
+                            }}
+                        >
+                            <Text style={viewMoreTextStyle}>{t("No more comments")}</Text>
+                        </View>
+                    ) : (
+                        <ButtonStandart
+                            style={{
+                                alignSelf: "center",
+                            }}
+                            action={handlePressViewMore}
+                            margins={false}
+                            backgroundColor="transparent"
+                        >
+                            {
+                                <Text style={viewMoreTextStyle}>
+                                    {`${t("View more")} ${commentsCount - 1} ${
+                                        commentsCount - 1 > 1 ? t("comments") : t("comment")
+                                    }`}
+                                </Text>
+                            }
+                        </ButtonStandart>
+                    )}
                 </Animated.View>
                 {isIOS && isIOSSheetOpen && (
                     <SwiftBottomSheet
