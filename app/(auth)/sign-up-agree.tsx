@@ -1,5 +1,5 @@
 import ColorTheme, { colors } from "@/constants/colors"
-import { StyleProp, TextStyle, View, ViewStyle, useColorScheme } from "react-native"
+import { StyleProp, TextStyle, View, ViewStyle, useColorScheme, Alert } from "react-native"
 import AuthContext from "@/contexts/auth"
 import AuthTermsText from "@/components/auth/terms"
 import ButtonClose from "@/components/buttons/close"
@@ -11,14 +11,24 @@ import React from "react"
 import { Text } from "@/components/Themed"
 import fonts from "@/constants/fonts"
 import sizes from "@/constants/sizes"
+import Checkbox from "@/components/general/checkbox"
 import { useTranslation } from "react-i18next"
+import { useRouter } from "expo-router"
 
 export default function AgreeScreen() {
     const isDarkMode = useColorScheme() === "dark"
     const { t } = useTranslation()
-    const { signUp, setErrorMessage, signInputPassword, errorMessage, loading } =
-        React.useContext(AuthContext)
-
+    const router = useRouter()
+    const {
+        signUp,
+        appleSignUp,
+        setErrorMessage,
+        signInputPassword,
+        errorMessage,
+        loading,
+        setAgeConfirmation,
+        ageConfirmation,
+    } = React.useContext(AuthContext)
     const container: StyleProp<ViewStyle> = {
         flex: 1,
         alignItems: "center",
@@ -68,7 +78,7 @@ export default function AgreeScreen() {
     }
 
     const button_text: StyleProp<TextStyle> = {
-        fontSize: fonts.size.body * 0.9,
+        fontSize: fonts.size.body * 1.2,
         fontFamily: fonts.family["Black-Italic"],
         color: colors.gray.white,
     }
@@ -100,9 +110,18 @@ export default function AgreeScreen() {
     }
 
     function handlePress() {
-        if (signInputPassword && signInputPassword.length >= 4) {
-            signUp()
+        if (!ageConfirmation) {
+            Alert.alert(t("You must confirm you are at least 16 years old"), "", [
+                {
+                    text: t("OK"),
+                    onPress: () => {
+                        router.replace("/(auth)/init")
+                    },
+                },
+            ])
+            return
         }
+        appleSignUp()
     }
 
     React.useEffect(() => {
@@ -120,7 +139,7 @@ export default function AgreeScreen() {
                 <ButtonClose />
                 <View style={{ flex: 1 }}>
                     <Text style={headerTitle} testID="title">
-                        {t("Step 3 of 3")}
+                        {t("Step 2 of 2")}
                     </Text>
                 </View>
             </View>
@@ -128,6 +147,31 @@ export default function AgreeScreen() {
             <View style={input_container}>
                 <Text style={description}>{t("All Ready")} 🎉</Text>
                 <Text style={subDescription}>{t("Just one small step to go...")}</Text>
+
+                <View
+                    style={{
+                        flexDirection: "row",
+                        alignItems: "center",
+                        paddingHorizontal: sizes.paddings["1md"],
+                        marginBottom: sizes.margins["1md"],
+                        backgroundColor: "transparent",
+                    }}
+                >
+                    <Checkbox
+                        checked={ageConfirmation}
+                        onChange={setAgeConfirmation}
+                        size={20}
+                        color={ColorTheme().primary.toString()}
+                        label={t("I declare that I am at least 16 years old")}
+                        style={{ marginRight: sizes.margins["1sm"] }}
+                        labelStyle={{
+                            color: colors.gray.grey_03,
+                            fontFamily: fonts.family.Medium,
+                            fontSize: fonts.size.body,
+                            flex: 1,
+                        }}
+                    />
+                </View>
 
                 <AuthTermsText signText={t("Accept")} />
             </View>
@@ -140,6 +184,7 @@ export default function AgreeScreen() {
             <ButtonStandart
                 testID="handle-submit"
                 margins={false}
+                height={sizes.buttons.height * 0.6}
                 action={handlePress}
                 backgroundColor={
                     loading ? ColorTheme().backgroundDisabled : ColorTheme().primary.toString()

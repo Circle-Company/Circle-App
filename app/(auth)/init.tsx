@@ -1,23 +1,26 @@
 import { colors } from "@/constants/colors"
 import { default as Fonts, default as fonts } from "@/constants/fonts"
 import { ViewStyle } from "react-native"
-import { View } from "react-native"
+import { View, Image } from "react-native"
 import Button from "@/components/buttons/button-standart"
-import Icon from "@/assets/icons/svgs/arrow_circle_right.svg"
+import AppleLogo from "@/assets/icons/svgs/apple-logo.svg"
 import { LanguageSelector } from "@/components/language/selector"
 import { LinearGradient } from "expo-linear-gradient"
-import LogoIcon from "@/assets/icons/svgs/circle-icon-logo.svg"
+import * as AppleAuthentication from "expo-apple-authentication"
 import { Text } from "@/components/Themed"
 import config from "@/config"
 import sizes from "@/constants/sizes"
 import { useRouter } from "expo-router"
 import { useTranslation } from "react-i18next"
 import { SafeAreaInsetsContext, useSafeAreaInsets } from "react-native-safe-area-context"
-
+import AuthContext from "@/contexts/auth"
+import React from "react"
 export default function SplashScreen() {
     const router = useRouter()
     const { t } = useTranslation()
     const insets = useSafeAreaInsets()
+    const { setAppleSignData, setErrorMessage, checkAppleAccountExists, appleSignIn, appleSignUp } =
+        React.useContext(AuthContext)
 
     const container: any = {
         flex: 1,
@@ -26,7 +29,6 @@ export default function SplashScreen() {
         backgroundColor: colors.gray.black,
     }
     const header: any = {
-        top: 100,
         alignItems: "center",
         alignSelf: "center",
         justifyContent: "center",
@@ -53,8 +55,8 @@ export default function SplashScreen() {
         fontFamily: Fonts.family["Semibold-Italic"],
         alignSelf: "center",
         textAlign: "center",
-        marginTop: sizes.margins["1md"],
-        fontSize: fonts.size.subheadline * 0.9,
+        marginTop: sizes.margins["2sm"],
+        fontSize: fonts.size.subheadline,
         color: colors.gray.grey_04,
     }
     const buttons: any = {
@@ -74,10 +76,10 @@ export default function SplashScreen() {
         justifyContent: "center",
     }
     const primaryActionText: any = {
-        fontSize: fonts.size.body * 1.2,
-        fontFamily: fonts.family["Black-Italic"],
+        fontSize: fonts.size.body * 1.4,
+        fontFamily: fonts.family["Black"],
         color: colors.gray.black,
-        marginRight: sizes.margins["3sm"],
+        marginLeft: sizes.margins["2sm"],
     }
 
     const secundaryActionText: any = {
@@ -122,6 +124,87 @@ export default function SplashScreen() {
         top: 0,
     }
 
+    // Optional hero image just above the header (rendered only if provided)
+    const heroImageSource = require("@/assets/images/illustrations/Init-Illustration.png")
+
+    const heroContainer: ViewStyle = {
+        width: sizes.screens.width,
+        alignItems: "center",
+        justifyContent: "center",
+        marginTop: sizes.margins["1md"],
+        marginBottom: sizes.margins["1md"],
+    }
+
+    const heroImage: any = {
+        left: 3,
+        height: sizes.screens.height * 0.5,
+        overflow: "hidden",
+    }
+
+    async function SignWithApple() {
+        try {
+            const isAvailable = await AppleAuthentication.isAvailableAsync()
+            if (!isAvailable) {
+                setErrorMessage("Apple Sign In não está disponível neste dispositivo")
+                return
+            }
+
+            const credential = await AppleAuthentication.signInAsync({
+                requestedScopes: [
+                    AppleAuthentication.AppleAuthenticationScope.EMAIL,
+                    AppleAuthentication.AppleAuthenticationScope.FULL_NAME,
+                ],
+            })
+
+            const authorizationCode = credential?.authorizationCode ?? ""
+            const identityToken = credential?.identityToken ?? ""
+
+            const user = credential?.user ?? ""
+            const givenName = credential?.fullName?.givenName ?? ""
+            const familyName = credential?.fullName?.familyName ?? ""
+            const realUserStatus =
+                typeof credential?.realUserStatus === "number" ? credential.realUserStatus : 0
+
+            if (!authorizationCode || !identityToken || !user) {
+                setErrorMessage("Não foi possível obter as credenciais da Apple. Tente novamente.")
+                return
+            }
+
+            setAppleSignData({
+                authorizationCode,
+                identityToken,
+                fullName: { givenName, familyName },
+                realUserStatus,
+                user,
+            })
+
+            const check = await checkAppleAccountExists(user)
+            if (!check.success) {
+                return
+            }
+            if (check.flow === "signup") {
+                // Keep username step in the flow; navigate to username screen
+                router.replace("/(auth)/sign-up-username")
+            } else {
+                await appleSignIn({
+                    authorizationCode,
+                    identityToken,
+                    fullName: { givenName, familyName },
+                    realUserStatus,
+                    user,
+                })
+                router.replace("/(tabs)")
+            }
+        } catch (err: any) {
+            if (err?.code === "ERR_CANCELED") {
+                setErrorMessage("Operação cancelada pelo usuário.")
+                return
+            }
+            setErrorMessage("Falha ao iniciar Sign in with Apple. Tente novamente.")
+            console.log("Apple SignIn error:", err)
+        }
+    }
+
     return (
         <View style={container}>
             <LinearGradient
@@ -140,46 +223,43 @@ export default function SplashScreen() {
                     <View style={langugageContainer}>
                         <LanguageSelector />
                     </View>
+                    <View style={heroContainer}>
+                        <Image source={heroImageSource} style={heroImage} resizeMode="contain" />
+                    </View>
                     <View style={header}>
-                        <View style={logoContainer}>
-                            <LinearGradient
-                                renderToHardwareTextureAndroid
-                                colors={[colors.purple.purple_04, colors.purple.purple_08]}
-                                style={iconGradient}
-                            />
-                            <LogoIcon fill="#edddffff" width={100} height={100} />
-                        </View>
                         <Text style={title}>{config.APPLICATION_NAME}</Text>
                         <Text style={slogan}>{t(config.APPLICATION_DESCRIPTION)}</Text>
                     </View>
 
                     <View style={[buttons, { bottom: insets.bottom }]}>
-                        <Button
-                            action={() => {
-                                router.push("/(auth)/sign-in")
-                            }}
-                            margins={false}
-                            style={{
-                                marginBottom: 0,
-                            }}
-                            backgroundColor={"#00000000"}
-                        >
-                            <Text style={secundaryActionText}>{t("Sign In with Circle")}</Text>
-                        </Button>
                         <View style={primaryActionContainer}>
                             <Button
-                                action={() => {
-                                    router.push("/(auth)/sign-up-username")
-                                }}
-                                style={{ paddingHorizontal: sizes.paddings["1lg"] }}
+                                action={SignWithApple}
+                                style={{ paddingHorizontal: sizes.paddings["2md"] }}
                                 margins={false}
                                 backgroundColor={colors.gray.white.toString()}
                                 bounciness={10}
                                 height={60}
                             >
-                                <Text style={primaryActionText}>{t("Create Account")}</Text>
-                                <Icon width={26} height={26} fill={colors.gray.black.toString()} />
+                                <AppleLogo
+                                    style={{ top: -2 }}
+                                    width={28}
+                                    height={28}
+                                    fill={colors.gray.black.toString()}
+                                />
+                                <Text style={primaryActionText}>{t("Sign in with Apple")}</Text>
                             </Button>
+                        </View>
+                        <View style={{ marginTop: sizes.margins["1sm"], alignItems: "center" }}>
+                            <Text
+                                style={{
+                                    color: colors.gray.grey_05,
+                                    fontSize: fonts.size.caption1,
+                                    fontFamily: fonts.family.Medium,
+                                }}
+                            >
+                                {config.ORGANIZATION_NAME}
+                            </Text>
                         </View>
                     </View>
                 </View>

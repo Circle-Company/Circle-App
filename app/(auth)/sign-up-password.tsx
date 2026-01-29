@@ -71,7 +71,7 @@ export default function PasswordScreen() {
     }
 
     const button_text: StyleProp<TextStyle> = {
-        fontSize: fonts.size.body * 0.9,
+        fontSize: fonts.size.body * 1.2,
         fontFamily: fonts.family["Black-Italic"],
         color:
             signInputPassword && signInputPassword.length >= 4 && !loading
@@ -151,6 +151,7 @@ export default function PasswordScreen() {
 
             <ButtonStandart
                 testID="handle-submit"
+                height={sizes.buttons.height * 0.6}
                 margins={false}
                 action={handlePress}
                 backgroundColor={
