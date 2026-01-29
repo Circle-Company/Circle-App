@@ -102,7 +102,7 @@ export function ProfileMoments({ moments, totalMoments }: AccountMomentsProps) {
         <View style={styles.container}>
             <FlatList
                 ref={flatListRef}
-                data={moments}
+                data={moments as any}
                 renderItem={renderItem}
                 keyExtractor={(item) => item.id}
                 numColumns={NUM_COLUMNS}
