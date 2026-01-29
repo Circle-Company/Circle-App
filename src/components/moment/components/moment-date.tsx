@@ -9,15 +9,12 @@ import { useLocaleDateRelative } from "@/lib/hooks/useLocaleDate"
 
 export default function Date({
     color = String(ColorTheme().text),
-    paddingHorizontal = sizes.paddings["2sm"],
     backgroundColor,
-    small = false,
 }: MomentDateProps) {
     const { data } = React.useContext(MomentContext)
 
     const container: any = {
         borderRadius: (sizes.sizes["2md"] * 0.9) / 2,
-        paddingHorizontal,
         backgroundColor,
         flexDirection: "row",
         opacity: 0.6,

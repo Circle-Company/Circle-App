@@ -10,14 +10,8 @@ import fonts from "../../../constants/fonts"
 export default function Description({ displayOnMoment = true }: MomentDescriptionProps) {
     const { data } = React.useContext(MomentContext)
 
-    const container: any = {
-        margin: Sizes.margins["1sm"],
-    }
-
     const descriptionStyle: any = {
-        marginLeft: Sizes.margins["2sm"],
-        lineHeight: 18,
-        fontSize: fonts.size.body,
+        fontSize: fonts.size.body * 0.9,
         fontFamily: fonts.family.Bold,
         color: displayOnMoment ? colors.gray.white : ColorTheme().text,
         textShadowColor: displayOnMoment ? "#00000070" : "#00000000",
@@ -31,27 +25,50 @@ export default function Description({ displayOnMoment = true }: MomentDescriptio
     const textAnim = useRef(new Animated.Value(0)).current
 
     useEffect(() => {
-        if (needAnimation && displayOnMoment) {
-            const animateText = () => {
+        // Reinicia a animação ao montar/alterar dependências
+        textAnim.setValue(0)
+        if (needAnimation && displayOnMoment && (data.description || "").length > 0) {
+            const animate = () => {
                 Animated.timing(textAnim, {
-                    toValue: animationToValue, // Deslocamento horizontal desejado
-                    duration: animationTime, // Duração da animação em milissegundos
+                    toValue: animationToValue,
+                    duration: animationTime,
                     useNativeDriver: true,
                 }).start(() => {
-                    // Após a animação, reinicie o valor de textAnim para continuar a animação
                     textAnim.setValue(0)
-                    animateText() // Chamar a função recursivamente para criar um loop infinito
+                    animate()
                 })
             }
-            animateText()
+            animate()
         }
-    }, [])
+        return () => {
+            // Interrompe animações pendentes no unmount
+            // @ts-ignore - stopAnimation existe em Animated.Value
+            textAnim.stopAnimation && textAnim.stopAnimation()
+        }
+    }, [
+        needAnimation,
+        displayOnMoment,
+        data.description,
+        animationToValue,
+        animationTime,
+        textAnim,
+    ])
 
     return (
-        <View style={container}>
-            <Text style={descriptionStyle} selectable={false}>
-                {data.description}
-            </Text>
+        <View style={{ overflow: "hidden", alignSelf: "flex-start", maxWidth: "95%" }}>
+            {needAnimation && displayOnMoment ? (
+                <Animated.Text
+                    style={[descriptionStyle, { transform: [{ translateX: textAnim }] }]}
+                    numberOfLines={1}
+                    selectable={false}
+                >
+                    {data.description}
+                </Animated.Text>
+            ) : (
+                <Text style={descriptionStyle} selectable={false} numberOfLines={2}>
+                    {data.description}
+                </Text>
+            )}
         </View>
     )
 }
