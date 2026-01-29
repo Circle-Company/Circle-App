@@ -44,7 +44,7 @@ export class Fetcher {
                         "http://10.168.15.17:3000",
                         "http://172.31.80.1:3000",
                     ]
-                    const newBase = "http://" + config.ENDPOINT
+                    const newBase = config.ENDPOINT
 
                     // Normalização do media para o ENDPOINT atual
                     for (const base of oldBases) {

@@ -1,7 +1,7 @@
 import React from "react"
 import { useAccountQuery, useAccountMomentsQuery } from "@/queries/account"
-import PersistedContext, { PersistedContextProps } from "./Persisted"
 import { accountProps, momentsProps } from "@/api/account/account.types"
+import PersistedContext, { PersistedContextProps } from "./Persisted"
 
 type AccountProviderProps = { children: React.ReactNode }
 type pagination = { page: number; limit: number }
@@ -9,11 +9,11 @@ type pagination = { page: number; limit: number }
 export type AccountContextsData = {
     isLoadingAccount: boolean
     isLoadingMoments: boolean
-    setIsLoadingAccount: React.Dispatch<React.SetStateAction<boolean>>
-    setIsLoadingMoments: React.Dispatch<React.SetStateAction<boolean>>
     account: accountProps["account"]
     moments: momentsProps["moments"]
     getAccount: () => Promise<accountProps["account"]>
+    setIsLoadingAccount: React.Dispatch<React.SetStateAction<boolean>>
+    setIsLoadingMoments: React.Dispatch<React.SetStateAction<boolean>>
     getMoments: ({ page, limit }: pagination) => Promise<momentsProps["moments"]>
 }
 

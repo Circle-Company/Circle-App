@@ -67,8 +67,7 @@ export function Provider({ children }: NewMomentProviderProps) {
                 )
                 .then(function (response) {
                     setCreatedMoment(response.data)
-                    toast.success(t("Vídeo enviado com sucesso"), {
-                        title: t("Momento Criado"),
+                    toast.success(t("Momento Criado"), {
                         icon: (
                             <UploadIcon
                                 fill={colors.green.green_05.toString()}

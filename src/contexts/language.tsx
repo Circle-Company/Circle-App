@@ -61,10 +61,10 @@ export function Provider({ children }: LanguageProviderProps) {
             // console.warn("Failed to persist language to session:", err)
         }
 
-        // 4) call server mutation if available (call with a payload object; adjust if your mutate signature differs)
+        // 4) call server mutation only when session is available (avoid requests while logged out)
         try {
-            if (typeof setAppLanguageMutation?.mutate === "function") {
-                // try common shapes: mutate(payload) where payload = { appLanguage: languageCode }
+            const hasSession = Boolean(session?.user?.id) && Boolean(session?.account?.jwtToken)
+            if (hasSession && typeof setAppLanguageMutation?.mutate === "function") {
                 setAppLanguageMutation.mutate({ appLanguage: languageCode })
             }
         } catch (err) {
@@ -90,7 +90,12 @@ export function Provider({ children }: LanguageProviderProps) {
         setAtualAppLanguage(selectedLanguage)
 
         // if we have session language explicitly, sync to server (optional)
-        if (session?.preferences?.language?.appLanguage) {
+        // only when session is available (avoid requests while logged out)
+        if (
+            session?.preferences?.language?.appLanguage &&
+            session?.user?.id &&
+            session?.account?.jwtToken
+        ) {
             try {
                 if (typeof setAppLanguageMutation?.mutate === "function") {
                     setAppLanguageMutation.mutate({ appLanguage: currentLanguageCode })
