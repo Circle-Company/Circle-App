@@ -9,7 +9,8 @@ import Sizes from "../../../constants/sizes"
 import { UserUsernameProps } from "../user_show-types"
 import Verifyed from "@/assets/icons/svgs/check_circle_verify.svg"
 import fonts from "../../../constants/fonts"
-import { useNavigation } from "@react-navigation/native"
+import { router, usePathname } from "expo-router"
+import ProfileContext from "../../../contexts/profile"
 import { useUserShowContext } from "../user_show-context"
 import { textLib } from "@/circle.text.library"
 
@@ -28,7 +29,8 @@ export default function UserShowUsername({
     const { t } = React.useContext(LanguageContext)
     const { user, executeBeforeClick } = useUserShowContext()
     const isDarkMode = useColorScheme() === "dark"
-    const navigation: any = useNavigation()
+    const pathname = usePathname()
+    const { setUserId, setProfilePreview } = React.useContext(ProfileContext)
 
     const isMe = user.id == session.user.id ? true : false
 
@@ -54,12 +56,21 @@ export default function UserShowUsername({
     }
 
     async function onUsernameAction() {
-        if (pressable) {
-            executeBeforeClick ? executeBeforeClick() : null
-            await navigation.navigate("ProfileNavigator", {
-                screen: "Profile",
-                params: { findedUserPk: user.id },
-            })
+        if (!pressable) return
+        executeBeforeClick ? executeBeforeClick() : null
+        const targetId = String(user.id)
+        const myId = String(session.user.id)
+        const isSelf = targetId === myId
+        const targetPath = isSelf ? `/you/${targetId}` : `/profile/${targetId}`
+        // Evitar navegação duplicada
+        if (pathname === targetPath) return
+        // Injeta no ProfileContext antes de navegar
+        setProfilePreview({ id: targetId, username: String(user.username || "") })
+        setUserId(targetId)
+        if (isSelf) {
+            router.push({ pathname: "/you/[id]", params: { id: targetId, from: "profile" } })
+        } else {
+            router.push({ pathname: "/profile/[userId]", params: { userId: targetId } })
         }
     }
 
