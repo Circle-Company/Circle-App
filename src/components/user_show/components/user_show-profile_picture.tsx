@@ -23,7 +23,7 @@ export default function profile_picture({
     const { setUserId, setProfilePreview } = React.useContext(ProfileContext)
 
     const isDarkMode = useColorScheme() === "dark"
-    const outlineSize: number = Number(Number(pictureDimensions.width) / (displayOnMoment ? 8 : 14)) // /6
+    const outlineSize: number = 0 // Number(Number(pictureDimensions.width) / (displayOnMoment ? 8 : 14)) // /6
     const container: any = {
         marginHorizontal: sizes.paddings["1sm"] / 2,
         alignItems: "center",
