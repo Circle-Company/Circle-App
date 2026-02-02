@@ -5,8 +5,7 @@ import sizes from "@/constants/sizes"
 import ColorTheme from "@/constants/colors"
 import MomentContext from "@/components/moment/context"
 import { MomentDateProps } from "@/components/moment/moment-types"
-import { useLocaleDateRelative } from "@/lib/hooks/useLocaleDate"
-
+import { useLocaleDateRelative, useLocaleDateRelative2 } from "@/lib/hooks/useLocaleDate"
 export default function Date({
     color = String(ColorTheme().text),
     backgroundColor,
@@ -28,7 +27,7 @@ export default function Date({
     return (
         <View style={container}>
             <Text style={description_style} selectable={false}>
-                {data.publishedAt ? useLocaleDateRelative(data.publishedAt) : ""}
+                {data.publishedAt ? useLocaleDateRelative2(data.publishedAt) : ""}
             </Text>
         </View>
     )

@@ -2,7 +2,7 @@ import audio_control from "./components/moment-audio_control"
 import bottom_root from "./components/roots/bottom/moment-bottom_root"
 import center_root from "./components/roots/center/moment-center_root"
 import container from "./components/moment-container"
-import date from "./components/moment-date"
+import moment_date from "./components/moment-date"
 import description from "./components/moment-description"
 import like from "./components/moment-like"
 import main_root from "./components/roots/moment-main_root"
@@ -24,5 +24,5 @@ export const Moment = {
     LikeButtonIOS: iosLikeButton,
     Container: container,
     Description: description,
-    Date: date,
+    Date: moment_date,
 }
