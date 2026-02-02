@@ -121,54 +121,52 @@ function FetchedCommentsList() {
         )
 
     return (
-        <View style={{ flex: 1 }}>
-            <FlatList
-                showsVerticalScrollIndicator={false}
-                onEndReached={async () => {
-                    if (!endReached && !loading) {
-                        setLoading(true)
-                        await fetchData().finally(() => setLoading(false))
-                    }
-                }}
-                scrollEventThrottle={16}
-                onEndReachedThreshold={0.1}
-                scrollEnabled={true}
-                data={data.comments}
-                keyExtractor={(item: CommentObject, index: number) => String(item.id || index)}
-                ListHeaderComponent={() => (
-                    <View style={titleContainer}>
-                        <Text style={title}>
-                            {data.metrics?.totalComments} {t("Comments")}
-                        </Text>
-                    </View>
-                )}
-                renderItem={({ item, index }) => (
-                    <Reanimated.View
-                        style={{
-                            width: "100%",
-                            alignSelf: "center",
-                            alignItems: "center",
-                            paddingHorizontal: sizes.paddings["1md"],
-                            paddingBottom: sizes.paddings["1sm"],
-                        }}
-                        entering={FadeInUp.duration(250)}
-                    >
-                        <RenderComment preview={false} comment={item} index={index} />
-                    </Reanimated.View>
-                )}
-                ListFooterComponent={() => {
-                    if (endReached) {
-                        if (data.comments.length == 0)
-                            return <Text style={endText}>{t("No one has commented yet.")}</Text>
-                        else return <Text style={endText}>{t("No more comments.")}</Text>
-                    } else return <Loading.ActivityIndicator size={25} />
-                }}
-                style={{ alignSelf: "center", flex: 1 }}
-                contentContainerStyle={{
-                    paddingBottom: sizes.inputs.height + sizes.margins["2md"],
-                }}
-            />
-        </View>
+        <FlatList
+            showsVerticalScrollIndicator={false}
+            onEndReached={async () => {
+                if (!endReached && !loading) {
+                    setLoading(true)
+                    await fetchData().finally(() => setLoading(false))
+                }
+            }}
+            scrollEventThrottle={16}
+            onEndReachedThreshold={0.1}
+            scrollEnabled={true}
+            data={data.comments}
+            keyExtractor={(item: CommentObject, index: number) => String(item.id || index)}
+            ListHeaderComponent={() => (
+                <View style={titleContainer}>
+                    <Text style={title}>
+                        {data.metrics?.totalComments} {t("Comments")}
+                    </Text>
+                </View>
+            )}
+            renderItem={({ item, index }) => (
+                <Reanimated.View
+                    style={{
+                        width: "100%",
+                        alignSelf: "center",
+                        alignItems: "center",
+                        paddingHorizontal: sizes.paddings["1md"],
+                        paddingBottom: sizes.paddings["1sm"],
+                    }}
+                    entering={FadeInUp.duration(250)}
+                >
+                    <RenderComment preview={false} comment={item} index={index} />
+                </Reanimated.View>
+            )}
+            ListFooterComponent={() => {
+                if (endReached) {
+                    if (data.comments.length == 0)
+                        return <Text style={endText}>{t("No one has commented yet.")}</Text>
+                    else return <Text style={endText}>{t("No more comments.")}</Text>
+                } else return <Loading.ActivityIndicator size={25} />
+            }}
+            style={{ alignSelf: "center", flex: 1 }}
+            contentContainerStyle={{
+                paddingBottom: sizes.inputs.height + sizes.margins["2md"],
+            }}
+        />
     )
 }
 

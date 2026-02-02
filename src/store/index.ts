@@ -33,6 +33,7 @@ export function storageKeys() {
     return {
         sessionId,
         baseKey,
+        clockOffset: baseKey + "clockoffset",
         account: {
             coordinates: {
                 latitude: baseKey + "account:coordinates:latitude",

@@ -1,6 +1,8 @@
 import { create } from "zustand"
 import { storage, storageKeys, safeDelete, safeSet } from "@/store"
 import { PreferencesContent, PreferencesDataType, PreferencesLanguage } from "./types"
+import { TimezoneCode } from "circle-text-library"
+import { state } from "happy-dom/lib/PropertySymbol.js"
 
 const key = storageKeys().preferences
 
@@ -15,6 +17,7 @@ export interface PreferencesState {
     setDisableHaptics: (value: boolean) => void
     setDisableTranslation: (value: boolean) => void
     setTranslationLanguage: (value: string) => void
+    setTimezoneCode: (value: TimezoneCode) => void
     setMuteAudio: (value: boolean) => void
     set: (value: PreferencesDataType) => void
     load: () => void
@@ -95,6 +98,14 @@ export const usePreferencesStore = create<PreferencesState>((set) => ({
                 ...state.content,
                 translationLanguage: value,
             },
+        }))
+    },
+
+    setTimezoneCode: (value: TimezoneCode) => {
+        safeSet(key.timezoneCode, value)
+        set((state) => ({
+            ...state,
+            timezoneCode: value,
         }))
     },
 

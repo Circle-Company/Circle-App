@@ -247,8 +247,12 @@ export function MediaPage(): React.ReactElement {
             // Reset camera context
             reset()
 
-            // Navigate to home (Moments tab)
-            router.replace("/(tabs)/moments")
+            // Navigate back if possible; fallback to Moments tab
+            if (router?.canGoBack?.()) {
+                router.back()
+            } else {
+                router.replace("/(tabs)/create")
+            }
         } else {
             toast.error(t("Error to share your moment"))
             Vibrate("notificationError")

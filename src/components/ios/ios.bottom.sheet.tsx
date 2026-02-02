@@ -1,5 +1,5 @@
 import React from "react"
-import { Host, BottomSheet } from "@expo/ui/swift-ui"
+import { Host, BottomSheet, HStack } from "@expo/ui/swift-ui"
 import { View } from "react-native"
 import { colors } from "@/constants/colors"
 import sizes from "@/constants/sizes"
@@ -40,15 +40,7 @@ export function SwiftBottomSheet({
                     },
                 ]}
             >
-                <View
-                    style={{
-                        flex: 1,
-                        width: sizes.screens.width,
-                        paddingTop: sizes.paddings["1md"],
-                    }}
-                >
-                    {children}
-                </View>
+                <HStack>{children}</HStack>
             </BottomSheet>
         </Host>
     )

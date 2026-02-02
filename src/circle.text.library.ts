@@ -361,7 +361,8 @@ function createDateConfig(): CircleTextProps["dateFormatterConfig"] {
         capitalize: true,
         useApproximateTime: true,
         recentTimeThreshold: 60,
-        recentTimeLabel: "agora",
+        recentTimeLabel:
+            storage.getString(storageKeys().preferences.appLanguage) == "en" ? "now" : "agora",
     }
 }
 

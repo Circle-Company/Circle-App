@@ -252,7 +252,7 @@ export default function RenderMomentFeed({
                     <RenderCommentFeed moment={data} focused={isFocused} />
                 ) : (
                     <View style={{ alignSelf: "center", marginTop: sizes.margins["2sm"] }}>
-                        <ZeroComments moment={data} />
+                        <ZeroComments isAccount={false} moment={data} />
                     </View>
                 )}
             </Animated.View>
