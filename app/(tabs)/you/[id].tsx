@@ -32,11 +32,17 @@ export default function MomentFullScreen() {
         keySelector: (m) => m?.id,
     })
 
+    const [isLoadingMoment, setIsLoadingMoment] = React.useState(false)
+    const fetchInProgressRef = React.useRef(false)
+
     // Fetch moment by id (GET /moments/:id) with Authorization
     useEffect(() => {
         let cancelled = false
         async function fetchMoment() {
+            if (fetchInProgressRef.current) return
+            fetchInProgressRef.current = true
             try {
+                setIsLoadingMoment(true)
                 const token = session?.account?.jwtToken
                 const auth = token?.startsWith("Bearer ") ? token : token ? `Bearer ${token}` : ""
                 const res = await api.get(
@@ -70,6 +76,9 @@ export default function MomentFullScreen() {
                 }
             } catch (e) {
                 console.log("Moment fetch error:", e)
+            } finally {
+                if (!cancelled) setIsLoadingMoment(false)
+                fetchInProgressRef.current = false
             }
         }
         if (id) fetchMoment()
@@ -249,7 +258,7 @@ export default function MomentFullScreen() {
                             <Moment.Container
                                 contentRender={momentData.midia}
                                 isFocused={true}
-                                loading={false}
+                                loading={isLoadingMoment}
                                 blurRadius={0}
                                 forceMute={false}
                                 showSlider={true}
