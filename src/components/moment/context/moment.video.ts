@@ -1,5 +1,6 @@
 import { MomentVideoProps } from "./types"
 import React from "react"
+import PersistedContext from "../../../contexts/Persisted"
 
 export interface MomentVideoState extends MomentVideoProps {
     setCurrentTime: React.Dispatch<React.SetStateAction<number>>
@@ -19,6 +20,12 @@ export function useVideo(): MomentVideoState {
         bottom: true,
         top: true,
     })
+    const { session } = React.useContext(PersistedContext)
+
+    React.useEffect(() => {
+        const prefMuted = session?.preferences?.content?.muteAudio ?? false
+        setIsMuted(prefMuted)
+    }, [session?.preferences?.content?.muteAudio])
 
     function togglePlay() {
         setIsPaused((prev) => !prev)
