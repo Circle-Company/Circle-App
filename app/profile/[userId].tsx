@@ -44,6 +44,10 @@ export default function ProfileScreen() {
     const [currentPage, setCurrentPage] = useState(1)
     const [hasMoreMoments, setHasMoreMoments] = useState(true)
     const [refreshing, setRefreshing] = useState(false)
+    // Guards to prevent duplicate fetches and pagination races
+    const loadingMoreRef = React.useRef(false)
+    const lastRequestedPageRef = React.useRef<number | null>(null)
+    const refreshInProgressRef = React.useRef(false)
 
     const pageSize = 6
     useEffect(() => {
@@ -92,23 +96,39 @@ export default function ProfileScreen() {
     }, [profile, totalMoments, moments])
 
     const handleRefresh = async () => {
+        // Prevent concurrent refresh
+        if (refreshing || refreshInProgressRef.current) return
+        refreshInProgressRef.current = true
         try {
             setRefreshing(true)
             // Reset to first page when refreshing
             setCurrentPage(1)
             setHasMoreMoments(true)
+            // Reset pagination guards
+            loadingMoreRef.current = false
+            lastRequestedPageRef.current = null
+
             await getProfile(String(userId))
             await getMoments({ page: 1, limit: pageSize, userId: String(userId) })
         } catch (error) {
             console.error("Error refreshing profile data:", error)
         } finally {
             setRefreshing(false)
+            refreshInProgressRef.current = false
         }
     }
 
     const handleLoadMore = async () => {
-        if (!isLoadingMoments && hasMoreMoments) {
-            const nextPage = currentPage + 1
+        // Block if loading or no more items or refreshing
+        if (loadingMoreRef.current || isLoadingMoments || refreshing || !hasMoreMoments) return
+
+        const nextPage = currentPage + 1
+        // Prevent duplicate same-page requests caused by repeated onEndReached
+        if (lastRequestedPageRef.current === nextPage) return
+
+        loadingMoreRef.current = true
+        lastRequestedPageRef.current = nextPage
+        try {
             const list = await getMoments({
                 page: nextPage,
                 limit: pageSize,
@@ -121,6 +141,10 @@ export default function ProfileScreen() {
                 console.log("📭 No more moments to load")
                 setHasMoreMoments(false)
             }
+        } catch (e) {
+            console.error("Error loading more moments:", e)
+        } finally {
+            loadingMoreRef.current = false
         }
     }
 
