@@ -304,7 +304,7 @@ export default function MomentFullScreen() {
                                 marginTop: sizes.margins["2sm"],
                             }}
                         >
-                            <ZeroComments moment={momentData} />
+                            <ZeroComments isAccount={false} moment={momentData} />
                         </View>
                     )}
                 </Moment.Root.Main>

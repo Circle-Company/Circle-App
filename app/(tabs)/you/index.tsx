@@ -300,7 +300,9 @@ export default function AccountScreen() {
             keyExtractor={(item: any) => item.id}
             ListHeaderComponent={
                 loading ? (
-                    <RenderProfileSkeleton />
+                    <View style={{ marginBottom: sizes.margins["1md"] }}>
+                        <RenderProfileSkeleton />
+                    </View>
                 ) : user ? (
                     <ProfileHeader
                         isAccount={true}
@@ -309,7 +311,9 @@ export default function AccountScreen() {
                         totalMoments={user.metrics.totalMomentsCreated}
                     />
                 ) : (
-                    <RenderProfileSkeleton />
+                    <View style={{ marginBottom: sizes.margins["1md"] }}>
+                        <RenderProfileSkeleton />
+                    </View>
                 )
             }
             renderItem={({ item }) => {

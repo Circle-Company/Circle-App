@@ -279,7 +279,7 @@ export default function MomentFullScreen() {
 
                                 {/* Bottom description opens comments modal */}
                                 <Moment.Root.Bottom>
-                                    <View style={{ marginBottom: 5 }}>
+                                    <View style={{ marginBottom: 7, marginLeft: 5 }}>
                                         <Moment.AudioControl />
                                     </View>
                                 </Moment.Root.Bottom>
@@ -310,7 +310,7 @@ export default function MomentFullScreen() {
                                     marginTop: sizes.margins["2sm"],
                                 }}
                             >
-                                <ZeroComments moment={momentData} />
+                                <ZeroComments isAccount={true} moment={momentData} />
                             </View>
                         )}
                     </Moment.Root.Main>
