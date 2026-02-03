@@ -14,6 +14,7 @@ import { isIOS } from "@/lib/platform/detection"
 import FetchedCommentsList from "./fetched-comments-list"
 import BottomSheetContext from "@/contexts/bottomSheet"
 import { UserShow } from "@/components/user_show"
+import { useLocaleDateRelative2 } from "@/lib/hooks/useLocaleDate"
 
 export default function ZeroComments({
     moment,
@@ -87,8 +88,7 @@ export default function ZeroComments({
                             color: ColorTheme().textDisabled,
                         }}
                     >
-                        {t("Shared ")}{" "}
-                        {textLib.date.toRelativeTime(new Date(moment.publishedAt)).toLowerCase()}
+                        {t("Shared ")} {useLocaleDateRelative2(moment.publishedAt).toLowerCase()}
                     </Text>
                 )}
                 <Text
