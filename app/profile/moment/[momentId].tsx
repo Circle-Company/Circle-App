@@ -280,6 +280,7 @@ export default function MomentFullScreen() {
 
                             {/* Subtle bottom gradient like feed */}
                             <LinearGradient
+                                pointerEvents="none"
                                 colors={["rgba(0, 0, 0, 0.00)", "rgba(0, 0, 0, 0.4)"]}
                                 start={{ x: 0.5, y: 0 }}
                                 end={{ x: 0.5, y: 1 }}
