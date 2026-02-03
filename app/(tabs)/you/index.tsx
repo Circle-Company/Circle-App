@@ -38,6 +38,11 @@ export default function AccountScreen() {
     const [hasMoreMoments, setHasMoreMoments] = useState(true)
     const [refreshing, setRefreshing] = useState(false)
 
+    // Guards to avoid duplicate loads
+    const loadingMoreRef = useRef(false)
+    const lastRequestedPageRef = useRef<number | null>(null)
+    const refreshInProgressRef = useRef(false)
+
     const pageSize = 6
     const userSnapshotRef = useRef<string>("")
 
@@ -103,11 +108,18 @@ export default function AccountScreen() {
     }, [])
 
     const handleRefresh = async () => {
+        // Prevent concurrent refresh
+        if (refreshing || refreshInProgressRef.current) return
+        refreshInProgressRef.current = true
         try {
             setRefreshing(true)
             // Reset to first page when refreshing
             setCurrentPage(1)
             setHasMoreMoments(true)
+            // Reset pagination guards
+            loadingMoreRef.current = false
+            lastRequestedPageRef.current = null
+
             await getAccount()
             const list = await getMoments({ page: 1, limit: pageSize })
             resetUnique(Array.isArray(list) ? list : [])
@@ -115,12 +127,21 @@ export default function AccountScreen() {
             console.error("Error refreshing account data:", error)
         } finally {
             setRefreshing(false)
+            refreshInProgressRef.current = false
         }
     }
 
     const handleLoadMore = async () => {
-        if (!isLoadingMoments && hasMoreMoments) {
-            const nextPage = currentPage + 1
+        // Block if loading or no more items or refreshing
+        if (loadingMoreRef.current || isLoadingMoments || refreshing || !hasMoreMoments) return
+
+        const nextPage = currentPage + 1
+        // Prevent duplicate same-page requests caused by repeated onEndReached
+        if (lastRequestedPageRef.current === nextPage) return
+
+        loadingMoreRef.current = true
+        lastRequestedPageRef.current = nextPage
+        try {
             const list = await getMoments({ page: nextPage, limit: pageSize })
             if (Array.isArray(list) && list.length > 0) {
                 appendUnique(list)
@@ -130,6 +151,10 @@ export default function AccountScreen() {
                 console.log("📭 No more moments to load")
                 setHasMoreMoments(false)
             }
+        } catch (e) {
+            console.error("Error loading more moments:", e)
+        } finally {
+            loadingMoreRef.current = false
         }
     }
 
@@ -286,6 +311,8 @@ export default function AccountScreen() {
             .filter((ts: number) => Number.isFinite(ts))
         if (timestamps.length === 0) return undefined
         const maxTs = Math.max(...timestamps)
+
+        console.log(moments)
         return new Date(maxTs)
     }, [moments])
 
