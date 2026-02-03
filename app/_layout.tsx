@@ -21,6 +21,7 @@ import { Provider as RedirectProvider, RedirectContext } from "@/contexts/redire
 import { Provider as ToastProvider } from "@/contexts/Toast"
 import Fonts from "@/constants/fonts"
 import sizes from "@/constants/sizes"
+import { clearLikePressedNamespace } from "@/store"
 
 // Keep the splash screen visible while we fetch resources
 SplashScreen.preventAutoHideAsync()
@@ -87,6 +88,11 @@ export default function RootLayout() {
     useEffect(() => {
         // Intentionally do not hide splash here
     }, [fontsLoaded, fontError])
+
+    // Clear ephemeral like-pressed memory namespace on cold start
+    useEffect(() => {
+        clearLikePressedNamespace()
+    }, [])
 
     if (!fontsLoaded && !fontError) {
         return null

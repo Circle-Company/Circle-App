@@ -124,7 +124,7 @@ export function useActions(momentId?: string): MomentActionsState {
         setLike(actions.like)
         setWatch(actions.watch)
         setComment(actions.comment)
-        setInitialLikedState(actions.like)
+        setInitialLikedState(actions.initialLikedState)
     }
 
     return {

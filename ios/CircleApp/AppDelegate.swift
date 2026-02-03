@@ -1,6 +1,7 @@
 import Expo
 import React
 import ReactAppDependencyProvider
+import AVFoundation
 
 @UIApplicationMain
 public class AppDelegate: ExpoAppDelegate {
@@ -28,6 +29,14 @@ public class AppDelegate: ExpoAppDelegate {
       in: window,
       launchOptions: launchOptions)
 #endif
+
+    // Initialize audio session for recording/playback so microphone audio is captured during video
+    do {
+      try AVAudioSession.sharedInstance().setCategory(.playAndRecord, mode: .videoRecording, options: [.defaultToSpeaker, .allowBluetooth])
+      try AVAudioSession.sharedInstance().setActive(true)
+    } catch {
+      NSLog("AVAudioSession setup failed: \(error)")
+    }
 
     return super.application(application, didFinishLaunchingWithOptions: launchOptions)
   }

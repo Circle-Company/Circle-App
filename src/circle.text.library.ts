@@ -355,13 +355,14 @@ function createConversorConfig(): CircleTextProps["conversorConfig"] {
 function createDateConfig(): CircleTextProps["dateFormatterConfig"] {
     return {
         style: "full",
-        locale: storage.getString(storageKeys().preferences.appLanguage) as any,
+        locale: "en",
         usePrefix: true,
         useSuffix: true,
         capitalize: true,
         useApproximateTime: true,
         recentTimeThreshold: 60,
-        recentTimeLabel: "agora",
+        recentTimeLabel:
+            storage.getString(storageKeys().preferences.appLanguage) == "en" ? "now" : "agora",
     }
 }
 

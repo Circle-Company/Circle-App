@@ -43,6 +43,7 @@ export function CameraPage(): React.ReactElement {
     const isPressingButton = useSharedValue(false)
     const recordingIntervalRef = useRef<NodeJS.Timeout | null>(null)
     const insets = useSafeAreaInsets()
+    const [shouldEnableAudio, setShouldEnableAudio] = React.useState(false)
 
     // Camera context
     const {
@@ -102,8 +103,13 @@ export function CameraPage(): React.ReactElement {
     const setIsPressingButton = useCallback(
         (_isPressingButton: boolean) => {
             isPressingButton.value = _isPressingButton
+            if (_isPressingButton) {
+                setShouldEnableAudio(true)
+            } else if (!isRecording) {
+                setShouldEnableAudio(false)
+            }
         },
-        [isPressingButton],
+        [isPressingButton, isRecording],
     )
     const onError = useCallback((error: CameraRuntimeError) => {
         console.error(error)
@@ -223,6 +229,19 @@ export function CameraPage(): React.ReactElement {
         }
     }, [isRecording, camera, setRecordingTime, setIsRecording, MAX_RECORDING_TIME])
 
+    // Disable audio input when not recording or when screen is inactive
+    useEffect(() => {
+        if (!isRecording) {
+            setShouldEnableAudio(false)
+        }
+    }, [isRecording])
+
+    useEffect(() => {
+        if (!isActive) {
+            setShouldEnableAudio(false)
+        }
+    }, [isActive])
+
     //#region Pinch to Zoom Gesture
     // The gesture handler maps the linear pinch gesture (0 - 1) to an exponential curve since a camera's zoom
     // function does not appear linear to the user. (aka zoom 0.1 -> 0.2 does not look equal in difference as 0.8 -> 0.9)
@@ -263,6 +282,10 @@ export function CameraPage(): React.ReactElement {
                 : undefined
         console.log(`Camera: ${device?.name} | Format: ${f}`)
     }, [device?.name, format, fps])
+
+    useEffect(() => {
+        microphonePermission.requestPermission()
+    }, [microphonePermission])
 
     useEffect(() => {
         locationPermission.requestPermission()

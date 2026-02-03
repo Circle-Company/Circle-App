@@ -1,8 +1,5 @@
 import Reanimated, { FadeInUp } from "react-native-reanimated"
-
-import React from "react"
-import { FlatList } from "react-native"
-import sizes from "../../../constants/sizes"
+import sizes from "@/constants/sizes"
 import { CommentObject } from "../comments-types"
 import RenderComment from "./comments-render_comment"
 

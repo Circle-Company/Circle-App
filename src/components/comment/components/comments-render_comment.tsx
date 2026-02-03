@@ -5,7 +5,9 @@ import sizes from "@/constants/sizes"
 import { Text } from "@/components/Themed"
 import { UserShow } from "@/components/user_show"
 import { CommentsRenderCommentProps } from "../comments-types"
-import { useLocaleDateRelative } from "@/lib/hooks/useLocaleDate"
+import { useLocaleDateRelative, useLocaleDateRelative2 } from "@/lib/hooks/useLocaleDate"
+import { iOSMajorVersion } from "@/lib/platform/detection"
+import { textLib } from "@/circle.text.library"
 
 export default function RenderComment({ comment, preview, index }: CommentsRenderCommentProps) {
     const container: ViewStyle = {
@@ -72,9 +74,14 @@ export default function RenderComment({ comment, preview, index }: CommentsRende
                         />
                     </UserShow.Root>
                     <Text style={date_style}>•</Text>
-                    <Text style={date_style}>{useLocaleDateRelative(comment.createdAt)}</Text>
+                    <Text style={date_style}>{useLocaleDateRelative2(comment.createdAt)}</Text>
                 </View>
-                <Text style={content_style}>{comment.richContent || comment.content}</Text>
+                <Text style={content_style}>
+                    {textLib.conversor.sliceWithDots({
+                        text: comment.content,
+                        size: sizes.screens.width * 0.147,
+                    })}
+                </Text>
             </View>
         </View>
     )

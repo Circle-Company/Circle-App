@@ -34,97 +34,59 @@ export default function MomentAudioControl() {
     }
 
     const handlePress = () => {
-        handleButtonAnimation()
-        // Atualizar a preferência global
+        console.log("mute clieckeeeeeees")
         if (session?.preferences?.setMuteAudio) {
             session.preferences.setMuteAudio(!isMuted)
         }
     }
 
-    const borderWidth = 1
-    const borderRadiusValue = 23
-    const gradientColors = [
-        Platform.OS === "ios" ? colors.gray.grey_04 + "50" : colors.gray.grey_06,
-        Platform.OS === "ios" ? colors.gray.grey_05 + "10" : colors.gray.grey_08,
-    ]
-
-    const animated_container: ViewStyle = {
-        width: 46,
-        height: 46,
-        marginRight: sizes.margins["1sm"],
-        transform: [{ scale: animatedScale }],
-    }
-
-    const pressable_container: ViewStyle = {
-        overflow: "hidden",
-        borderRadius: borderRadiusValue,
-        width: "100%",
-        height: "100%",
-    }
-
-    const gradient_border: ViewStyle = {
-        flex: 1,
-        borderRadius: borderRadiusValue,
-        padding: borderWidth,
-        overflow: "hidden",
-    }
-
-    const blur_container: ViewStyle = {
-        flex: 1,
-        borderRadius: borderRadiusValue - borderWidth,
-        overflow: "hidden",
-        backgroundColor: colors.gray.grey_07,
-    }
-
-    const container: ViewStyle = {
-        flex: 1,
-        height: "100%",
-        borderRadius: borderRadiusValue - borderWidth,
-        alignItems: "center",
-        justifyContent: "center",
-        backgroundColor: "transparent",
-        overflow: "hidden",
-    }
-
     if (data.hasAudio === false) return null
+    return (
+        <Host matchContents>
+            <Button
+                key={isMuted ? "muted" : "unmuted"}
+                onPress={handlePress}
+                variant={iOSMajorVersion! >= 26 ? "glass" : "bordered"}
+                modifiers={[
+                    {
+                        $type: "frame",
+                        width: 46,
+                        height: 46,
+                    },
+                    ...(iOSMajorVersion! < 26
+                        ? [
+                              {
+                                  $type: "cornerRadius",
+                                  radius: 23,
+                              },
+                          ]
+                        : []),
+                    {
+                        $type: "background",
+                        material: "systemUltraThinMaterialDark",
+                        shape: "circle",
+                    },
+                ]}
+                color={iOSMajorVersion! >= 26 ? colors.gray.grey_01 + 80 : colors.gray.grey_01}
+            >
+                {isMuted ? (
+                    <InactiveSoundIcon
+                        fill={colors.gray.white + 80}
+                        width={sizes.icons["2sm"].width}
+                        height={sizes.icons["2sm"].height}
+                    />
+                ) : (
+                    <ActiveSoundIcon
+                        fill={colors.gray.white + 80}
+                        width={sizes.icons["2sm"].width}
+                        height={sizes.icons["2sm"].height}
+                    />
+                )}
+            </Button>
+        </Host>
+    )
 
-    if (iOSMajorVersion! >= 26) {
-        return (
-            <Host matchContents>
-                <Button
-                    key={isMuted ? "muted" : "unmuted"}
-                    onPress={handlePress}
-                    variant="glass"
-                    modifiers={[
-                        {
-                            $type: "frame",
-                            width: 46,
-                            height: 46,
-                        },
-                        {
-                            $type: "background",
-                            material: "systemUltraThinMaterialDark",
-                            shape: "circle",
-                        },
-                    ]}
-                >
-                    {isMuted ? (
-                        <InactiveSoundIcon
-                            fill={colors.gray.white + 80}
-                            width={sizes.icons["2sm"].width}
-                            height={sizes.icons["2sm"].height}
-                        />
-                    ) : (
-                        <ActiveSoundIcon
-                            fill={colors.gray.white + 80}
-                            width={sizes.icons["2sm"].width}
-                            height={sizes.icons["2sm"].height}
-                        />
-                    )}
-                </Button>
-            </Host>
-        )
-    } else {
+    /**
         return (
             <Animated.View style={animated_container}>
                 <Pressable onPress={handlePress} style={pressable_container}>
@@ -181,4 +143,5 @@ export default function MomentAudioControl() {
             </Animated.View>
         )
     }
+*/
 }

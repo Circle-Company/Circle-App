@@ -1,7 +1,7 @@
 import ColorTheme from "@/constants/colors"
 import React from "react"
 import type { ViewProps } from "react-native"
-import { StyleSheet, View } from "react-native"
+import { StyleSheet, View, Platform } from "react-native"
 import type { TapGestureHandlerStateChangeEvent } from "react-native-gesture-handler"
 import { Gesture, GestureDetector, State, TapGestureHandler } from "react-native-gesture-handler"
 import Reanimated, {
@@ -20,6 +20,10 @@ import type { Camera, PhotoFile, VideoFile } from "react-native-vision-camera"
 import { CAPTURE_BUTTON_SIZE, SCREEN_HEIGHT, SCREEN_WIDTH } from "../constants"
 
 const START_RECORDING_DELAY = 200
+const START_DEBOUNCE_MS = 120
+const STOP_DEBOUNCE_MS = 120
+const STOP_CONFIRM_RETRY_MS = 250
+const MAX_STOP_RETRIES = 3
 const BORDER_WIDTH = CAPTURE_BUTTON_SIZE * 0.1
 
 interface Props extends ViewProps {
@@ -53,50 +57,111 @@ const CaptureButtonComponent: React.FC<Props> = ({
 }): React.ReactElement => {
     const autoStopTimeoutRef = React.useRef<NodeJS.Timeout | null>(null)
     const isRecording = React.useRef(false)
+    const startInProgressRef = React.useRef(false)
+    const stopInProgressRef = React.useRef(false)
+    const stopDebounceRef = React.useRef<NodeJS.Timeout | null>(null)
+    const stopRetryCountRef = React.useRef(0)
+    const releasePendingRef = React.useRef(false)
     const recordingProgress = useSharedValue(0)
     const isPressingButton = useSharedValue(false)
     const holdTimerRef = React.useRef<NodeJS.Timeout | null>(null)
     const onStoppedRecording = React.useCallback(() => {
         isRecording.current = false
+        startInProgressRef.current = false
+        stopInProgressRef.current = false
+        stopRetryCountRef.current = 0
+        if (stopDebounceRef.current) {
+            clearTimeout(stopDebounceRef.current)
+            stopDebounceRef.current = null
+        }
         cancelAnimation(recordingProgress)
         if (props.onRecordingStop) props.onRecordingStop()
     }, [recordingProgress, props.onRecordingStop])
 
     const stopRecording = React.useCallback(async () => {
         if (camera.current == null) throw new Error("Camera ref is null!")
-        if (!isRecording.current) {
-            console.log("⏹️ stopRecording called but not currently recording; ignoring")
-            // ensure UI resets in case of stale state
+        // If a stop is already in-flight, ignore
+        if (stopInProgressRef.current) {
+            console.log("⏹️ stopRecording debounced (stop in progress)")
+            return
+        }
+
+        // If we haven't started yet but start is in progress, mark release pending
+        if (startInProgressRef.current && !isRecording.current) {
+            console.log("⏹️ stopRecording queued (start in progress)")
+            releasePendingRef.current = true
+            return
+        }
+
+        // If not recording and no start in progress, just reset UI
+        if (!isRecording.current && !startInProgressRef.current) {
+            console.log("⏹️ stopRecording called but not recording; resetting UI")
             isPressingButton.value = false
             setIsPressingButton(false)
             return
         }
-        try {
-            console.log("⏹️ Stopping recording…")
-            // clear auto-stop timer
-            if (autoStopTimeoutRef.current) {
-                clearTimeout(autoStopTimeoutRef.current)
-                autoStopTimeoutRef.current = null
-            }
-            // update UI immediately
-            isPressingButton.value = false
-            setIsPressingButton(false)
-            await camera.current.stopRecording()
-            // give the native bridge a tick to dispatch onRecordingFinished
-            await new Promise((r) => setTimeout(r, 30))
-        } catch (e) {
-            console.error("❌ Error stopping recording:", e)
-            onStoppedRecording()
+
+        // Debounce multiple stop calls in quick succession
+        if (stopDebounceRef.current) {
+            console.log("⏹️ stopRecording debounced (recent call)")
+            return
         }
+        stopDebounceRef.current = setTimeout(async () => {
+            stopDebounceRef.current = null
+            stopInProgressRef.current = true
+            try {
+                console.log("⏹️ Stopping recording…")
+                // clear auto-stop timer
+                if (autoStopTimeoutRef.current) {
+                    clearTimeout(autoStopTimeoutRef.current)
+                    autoStopTimeoutRef.current = null
+                }
+                // update UI immediately
+                isPressingButton.value = false
+                setIsPressingButton(false)
+
+                await camera.current!.stopRecording()
+                // give the native bridge a tick to dispatch onRecordingFinished
+                await new Promise((r) => setTimeout(r, 30))
+
+                // confirm stop: if still marked as recording, retry a few times
+                if (isRecording.current && stopRetryCountRef.current < MAX_STOP_RETRIES) {
+                    stopRetryCountRef.current += 1
+                    console.log(
+                        `⏹️ Stop confirm retry ${stopRetryCountRef.current}/${MAX_STOP_RETRIES}`,
+                    )
+                    setTimeout(() => {
+                        // Fire-and-forget retry
+                        if (isRecording.current) {
+                            camera.current
+                                ?.stopRecording()
+                                .catch(() => {})
+                                .finally(() => {
+                                    if (stopRetryCountRef.current >= MAX_STOP_RETRIES) {
+                                        onStoppedRecording()
+                                    }
+                                })
+                        }
+                    }, STOP_CONFIRM_RETRY_MS)
+                }
+            } catch (e) {
+                console.error("❌ Error stopping recording:", e)
+                onStoppedRecording()
+            } finally {
+                stopInProgressRef.current = false
+            }
+        }, STOP_DEBOUNCE_MS)
     }, [camera, onStoppedRecording, isPressingButton, setIsPressingButton])
 
     const startRecording = React.useCallback(() => {
         if (camera.current == null) throw new Error("Camera ref is null!")
         // avoid double-starts
-        if (isRecording.current) {
-            console.log("⏺️ startRecording called while already recording; ignoring")
+        if (isRecording.current || startInProgressRef.current) {
+            console.log("⏺️ startRecording ignored (already recording or in progress)")
             return
         }
+        startInProgressRef.current = true
+
         if (props.onRecordingStart) props.onRecordingStart()
 
         // Set state early to avoid race with release handler
@@ -116,7 +181,7 @@ const CaptureButtonComponent: React.FC<Props> = ({
         try {
             console.log("⏺️ Starting recording…")
             camera.current.startRecording({
-                fileType: "mp4",
+                fileType: Platform.OS === "ios" ? "mov" : "mp4",
                 flash: flash,
                 onRecordingError: (error) => {
                     console.error("Recording failed!", error)
@@ -131,8 +196,27 @@ const CaptureButtonComponent: React.FC<Props> = ({
         } catch (e) {
             console.error("❌ Error starting recording:", e)
             onStoppedRecording()
+        } finally {
+            // Release start-in-progress after a short debounce window
+            setTimeout(() => {
+                startInProgressRef.current = false
+                // If user already released during start, stop now
+                if (releasePendingRef.current) {
+                    releasePendingRef.current = false
+                    stopRecording()
+                }
+            }, START_DEBOUNCE_MS)
         }
-    }, [camera, flash, onMediaCaptured, onStoppedRecording, props.onRecordingStart])
+    }, [
+        camera,
+        flash,
+        onMediaCaptured,
+        onStoppedRecording,
+        props.onRecordingStart,
+        stopRecording,
+        isPressingButton,
+        setIsPressingButton,
+    ])
     //#endregion
 
     //#region Tap handler
@@ -150,7 +234,7 @@ const CaptureButtonComponent: React.FC<Props> = ({
                     // Arm delayed start to avoid short taps
                     if (holdTimerRef.current) clearTimeout(holdTimerRef.current)
                     holdTimerRef.current = setTimeout(() => {
-                        if (!isRecording.current) {
+                        if (!isRecording.current && !startInProgressRef.current) {
                             try {
                                 startRecording()
                             } catch {}
@@ -165,6 +249,11 @@ const CaptureButtonComponent: React.FC<Props> = ({
                     if (holdTimerRef.current) {
                         clearTimeout(holdTimerRef.current)
                         holdTimerRef.current = null
+                    }
+                    // If we released during a start-in-progress, mark pending stop
+                    if (startInProgressRef.current && !isRecording.current) {
+                        releasePendingRef.current = true
+                        return
                     }
                     if (isRecording.current) {
                         await stopRecording()
@@ -272,6 +361,11 @@ const CaptureButtonComponent: React.FC<Props> = ({
         return () => {
             if (holdTimerRef.current) clearTimeout(holdTimerRef.current)
             if (autoStopTimeoutRef.current) clearTimeout(autoStopTimeoutRef.current)
+            if (stopDebounceRef.current) clearTimeout(stopDebounceRef.current)
+            startInProgressRef.current = false
+            stopInProgressRef.current = false
+            releasePendingRef.current = false
+            stopRetryCountRef.current = 0
         }
     }, [])
 

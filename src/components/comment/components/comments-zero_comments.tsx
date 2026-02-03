@@ -14,8 +14,15 @@ import { isIOS } from "@/lib/platform/detection"
 import FetchedCommentsList from "./fetched-comments-list"
 import BottomSheetContext from "@/contexts/bottomSheet"
 import { UserShow } from "@/components/user_show"
+import { useLocaleDateRelative2 } from "@/lib/hooks/useLocaleDate"
 
-export default function ZeroComments({ moment }: { moment: MomentProps }) {
+export default function ZeroComments({
+    moment,
+    isAccount,
+}: {
+    moment: MomentProps
+    isAccount: boolean
+}) {
     const { t } = React.useContext(LanguageContext)
     const [isIOSSheetOpen, setIOSSheetOpen] = React.useState(false)
     const { setCommentEnabled, setKeyboardVisible, setScrollEnabled } =
@@ -30,7 +37,7 @@ export default function ZeroComments({ moment }: { moment: MomentProps }) {
         alignItems: "center",
         justifyContent: "center",
         paddingHorizontal: sizes.paddings["1md"],
-        paddingBottom: sizes.paddings["2sm"],
+        paddingBottom: isAccount ? sizes.paddings["1sm"] * 0.6 : sizes.paddings["2sm"],
         paddingTop: sizes.paddings["1sm"],
     }
 
@@ -81,14 +88,13 @@ export default function ZeroComments({ moment }: { moment: MomentProps }) {
                             color: ColorTheme().textDisabled,
                         }}
                     >
-                        {t("Shared ")}{" "}
-                        {textLib.date.toRelativeTime(new Date(moment.publishedAt)).toLowerCase()}
+                        {t("Shared ")} {useLocaleDateRelative2(moment.publishedAt).toLowerCase()}
                     </Text>
                 )}
                 <Text
                     style={{
                         fontFamily: fonts.family.Bold,
-
+                        paddingTop: isAccount ? sizes.margins["1sm"] : 0,
                         fontSize: fonts.size.subheadline * 0.85,
                     }}
                 >
@@ -96,32 +102,34 @@ export default function ZeroComments({ moment }: { moment: MomentProps }) {
                 </Text>
             </View>
 
-            <ButtonStandart
-                action={handlePress}
-                vibrate={() => {
-                    Vibrate("effectTick")
-                }}
-                margins={false}
-                bounciness={2}
-                style={buttonContainer}
-            >
-                <Text style={buttonTitle}>
-                    {t("React to")}{" "}
-                    <UserShow.Root data={moment.user}>
-                        <View style={{ top: 3 }}>
-                            <UserShow.Username
-                                pressable={false}
-                                margin={0}
-                                displayOnMoment={false}
-                                color={colors.gray.black}
-                                fontSize={fonts.size.body}
-                                fontFamily={fonts.family["Black-Italic"]}
-                                truncatedSize={10}
-                            />
-                        </View>
-                    </UserShow.Root>
-                </Text>
-            </ButtonStandart>
+            {!isAccount && (
+                <ButtonStandart
+                    action={handlePress}
+                    vibrate={() => {
+                        Vibrate("effectTick")
+                    }}
+                    margins={false}
+                    bounciness={2}
+                    style={buttonContainer}
+                >
+                    <Text style={buttonTitle}>
+                        {t("React to")}{" "}
+                        <UserShow.Root data={moment.user}>
+                            <View style={{ top: 3 }}>
+                                <UserShow.Username
+                                    pressable={false}
+                                    margin={0}
+                                    displayOnMoment={false}
+                                    color={colors.gray.black}
+                                    fontSize={fonts.size.body}
+                                    fontFamily={fonts.family["Black-Italic"]}
+                                    truncatedSize={10}
+                                />
+                            </View>
+                        </UserShow.Root>
+                    </Text>
+                </ButtonStandart>
+            )}
         </View>
     )
 }

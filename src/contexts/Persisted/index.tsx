@@ -5,6 +5,7 @@ import { AccountState, useAccountStore } from "./persist.account"
 import { PreferencesState, usePreferencesStore } from "./persist.preferences"
 import { MetricsState, useMetricsStore } from "./persist.metrics"
 import { UserState, useUserStore } from "./persist.user"
+import { textLib } from "@/circle.text.library"
 
 type PersistedProviderProps = { children: React.ReactNode }
 export type PersistedContextProps = {
@@ -79,10 +80,12 @@ export function Provider({ children }: PersistedProviderProps) {
                 // Preferences (app e notificações)
                 if (session?.preferences?.app) {
                     const app = session.preferences.app
+                    const deviceTzOffset = new Date().getTimezoneOffset()
+                    const deviceTzCode = textLib.timezone.getCodeFromOffset(deviceTzOffset)
 
                     sessionPreferences.set({
-                        appTimezone: Number(app.timezone ?? 0),
-                        timezoneCode: String(app.timezoneCode ?? ""),
+                        appTimezone: deviceTzOffset,
+                        timezoneCode: deviceTzCode,
                         language: {
                             appLanguage: String(app.language ?? "en"),
                             translationLanguage: String(app.language ?? "en"),

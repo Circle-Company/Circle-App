@@ -32,11 +32,17 @@ export default function MomentFullScreen() {
         keySelector: (m) => m?.id,
     })
 
+    const [isLoadingMoment, setIsLoadingMoment] = React.useState(false)
+    const fetchInProgressRef = React.useRef(false)
+
     // Fetch moment by id (GET /moments/:id) with Authorization
     useEffect(() => {
         let cancelled = false
         async function fetchMoment() {
+            if (fetchInProgressRef.current) return
+            fetchInProgressRef.current = true
             try {
+                setIsLoadingMoment(true)
                 const token = session?.account?.jwtToken
                 const auth = token?.startsWith("Bearer ") ? token : token ? `Bearer ${token}` : ""
                 const res = await api.get(
@@ -70,6 +76,9 @@ export default function MomentFullScreen() {
                 }
             } catch (e) {
                 console.log("Moment fetch error:", e)
+            } finally {
+                if (!cancelled) setIsLoadingMoment(false)
+                fetchInProgressRef.current = false
             }
         }
         if (id) fetchMoment()
@@ -249,12 +258,12 @@ export default function MomentFullScreen() {
                             <Moment.Container
                                 contentRender={momentData.midia}
                                 isFocused={true}
-                                loading={false}
-                                blurRadius={0}
+                                loading={isLoadingMoment}
+                                blurRadius={30}
                                 forceMute={false}
                                 showSlider={true}
                                 disableCache={false}
-                                disableWatch={false}
+                                disableWatch={true}
                             >
                                 {/* Top user info (no scale animations) */}
                                 <Moment.Root.Top>
@@ -279,7 +288,7 @@ export default function MomentFullScreen() {
 
                                 {/* Bottom description opens comments modal */}
                                 <Moment.Root.Bottom>
-                                    <View style={{ marginBottom: 5 }}>
+                                    <View style={{ marginBottom: 7, marginLeft: 5 }}>
                                         <Moment.AudioControl />
                                     </View>
                                 </Moment.Root.Bottom>
@@ -290,6 +299,7 @@ export default function MomentFullScreen() {
                                     start={{ x: 0.5, y: 0 }}
                                     end={{ x: 0.5, y: 1 }}
                                     style={{
+                                        pointerEvents: "none",
                                         position: "absolute",
                                         left: 0,
                                         right: 0,
@@ -310,7 +320,7 @@ export default function MomentFullScreen() {
                                     marginTop: sizes.margins["2sm"],
                                 }}
                             >
-                                <ZeroComments moment={momentData} />
+                                <ZeroComments isAccount={true} moment={momentData} />
                             </View>
                         )}
                     </Moment.Root.Main>

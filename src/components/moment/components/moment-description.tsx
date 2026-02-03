@@ -19,11 +19,12 @@ export default function Description({ displayOnMoment = true }: MomentDescriptio
         textShadowRadius: displayOnMoment ? 4 : 0,
         justifyContent: "flex-start", // Ajuste para que o texto comece do início
     }
-    const animationTime = data.description?.length * 700
-    const animationToValue = -(data.description?.length * 8)
+    // const animationTime = data.description?.length * 700
+    // const animationToValue = -(data.description?.length * 8)
     const needAnimation = data.description?.length > 50 ? true : false
     const textAnim = useRef(new Animated.Value(0)).current
 
+    /**
     useEffect(() => {
         // Reinicia a animação ao montar/alterar dependências
         textAnim.setValue(0)
@@ -54,6 +55,7 @@ export default function Description({ displayOnMoment = true }: MomentDescriptio
         textAnim,
     ])
 
+    */
     return (
         <View style={{ overflow: "hidden", alignSelf: "flex-start", maxWidth: "95%" }}>
             {needAnimation && displayOnMoment ? (

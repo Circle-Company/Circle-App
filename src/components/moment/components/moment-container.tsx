@@ -188,11 +188,11 @@ export default function Container({
         return (
             <View style={{ width: size.width, height: size.height }}>
                 <MediaRenderVideo
-                    uri={cachedVideoUri}
+                    uri={cachedVideoUri ?? data.media}
                     thumbnailUri={data.thumbnail}
                     hasVideoCache={hasVideoCache}
                     isLoadingCache={isLoadingCache}
-                    momentId={disableWatch ? undefined : String(data.id)}
+                    momentId={data.id}
                     autoPlay={!video.isPaused}
                     style={{
                         width: size.width,

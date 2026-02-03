@@ -71,7 +71,7 @@ export default function MediaRenderVideo({
     disableWatch = false,
 }: VideoPlayerProps) {
     const { t } = React.useContext(LanguageContext)
-    const { size, actions, data } = React.useContext(MomentContext)
+    const { size, actions, data, video } = React.useContext(MomentContext)
     const videoWidth = size?.width ?? width ?? 200
     const videoHeight = size?.height ?? height ?? 200
 
@@ -91,7 +91,10 @@ export default function MediaRenderVideo({
     const lastPositionRef = useRef(0) // Rastreia última posição para detectar loop
 
     const { session } = React.useContext(PersistedContext)
-    const isMuted = forceMute ? true : session?.preferences?.content?.muteAudio || false
+    const isMuted = forceMute
+        ? true
+        : (video?.isMuted ?? (session?.preferences?.content?.muteAudio || false))
+    const latestIsMutedRef = useRef(isMuted)
 
     // Configurar player do expo-video
     const player = useVideoPlayer("", () => {
@@ -316,8 +319,9 @@ export default function MediaRenderVideo({
                 isVideoReadyRef.current = true
                 try {
                     player.loop = true
-                    player.muted = isMuted
-                    player.volume = isMuted ? 0 : 1
+                    const mutedNow = latestIsMutedRef.current
+                    player.muted = mutedNow
+                    player.volume = mutedNow ? 0 : 1
                 } catch (e) {}
                 attachedRef.current = true
                 console.log("Video attached", { momentId, uri })
@@ -419,6 +423,7 @@ export default function MediaRenderVideo({
 
     // Atualizar mute quando mudar
     useEffect(() => {
+        latestIsMutedRef.current = isMuted
         if (player && attachedRef.current) {
             try {
                 player.muted = isMuted
@@ -464,11 +469,11 @@ export default function MediaRenderVideo({
             }
             console.error("Video error:", error)
 
-            let errorMsg = t("Erro ao carregar o vídeo")
+            let errorMsg = t("Error to load moment")
 
             if (error && typeof error === "object") {
                 if (error.message && error.message.includes("network")) {
-                    errorMsg = t("Não foi possível acessar o vídeo. Verifique sua conexão.")
+                    errorMsg = t("Cannot possible load moment, check your internet connection")
                 }
             }
 

@@ -18,6 +18,7 @@ import { TextStyle } from "react-native"
 import { ViewStyle } from "react-native"
 import { Button, Host } from "@expo/ui/swift-ui"
 import { Vibrate } from "@/lib/hooks/useHapticFeedback"
+import { iOSMajorVersion } from "@/lib/platform/detection"
 
 export default function Input({
     color = String(ColorTheme().text),
@@ -99,6 +100,9 @@ export default function Input({
             setCommentText("")
             Keyboard.dismiss()
             setCommentEnabled(false)
+        } catch {
+            toast.error(t("Fail to send comment"))
+            Vibrate("notificationError")
         } finally {
             isSendingRef.current = false
         }
@@ -127,8 +131,18 @@ export default function Input({
                     color={colors.purple.purple_05}
                     disabled={!(commentText || "").trim() || isSendingRef.current}
                     systemImage="paperplane.fill"
-                    variant="glassProminent"
+                    variant={iOSMajorVersion! >= 26 ? "glassProminent" : "borderedProminent"}
                     controlSize="regular"
+                    modifiers={[
+                        ...(iOSMajorVersion! < 26
+                            ? [
+                                  {
+                                      $type: "cornerRadius",
+                                      radius: 25,
+                                  },
+                              ]
+                            : []),
+                    ]}
                 />
             </Host>
         </View>

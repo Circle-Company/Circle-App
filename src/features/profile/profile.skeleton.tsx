@@ -40,9 +40,9 @@ export function RenderProfileSkeleton() {
                 <View style={statistic}>
                     <Skeleton.View
                         style={{
-                            width: 260,
+                            width: 300,
                             height: 45,
-                            borderRadius: 45 / 2,
+                            borderRadius: 20,
                         }}
                     />
                 </View>
@@ -51,18 +51,9 @@ export function RenderProfileSkeleton() {
             <Skeleton.View
                 style={{
                     alignSelf: "center",
-                    width: 140,
+                    width: 180,
                     height: 15,
-                    marginTop: sizes.margins["1md"],
-                    borderRadius: 3,
-                }}
-            />
-            <Skeleton.View
-                style={{
-                    alignSelf: "center",
-                    width: 90,
-                    height: 15,
-                    marginTop: 10,
+                    marginTop: sizes.margins["1md"] * 1.3,
                     borderRadius: 3,
                 }}
             />

@@ -17,6 +17,7 @@ import ButtonStandart from "@/components/buttons/button-standart"
 import LanguageContext from "@/contexts/language"
 import { ViewStyle } from "react-native"
 import { TextInput } from "react-native"
+import { Vibrate } from "@/lib/hooks/useHapticFeedback"
 
 export function MediaPage(): React.ReactElement {
     const navigation = useNavigation()
@@ -242,14 +243,19 @@ export function MediaPage(): React.ReactElement {
 
         if (result.ok) {
             toast.success(t("Moment Has been uploaded with success"))
-
+            Vibrate("notificationSuccess")
             // Reset camera context
             reset()
 
-            // Navigate to home (Moments tab)
-            router.replace("/(tabs)/moments")
+            // Navigate back if possible; fallback to Moments tab
+            if (router?.canGoBack?.()) {
+                router.back()
+            } else {
+                router.replace("/(tabs)/create")
+            }
         } else {
             toast.error(t("Error to share your moment"))
+            Vibrate("notificationError")
         }
     }
 
