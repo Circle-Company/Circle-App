@@ -259,11 +259,11 @@ export default function MomentFullScreen() {
                                 contentRender={momentData.midia}
                                 isFocused={true}
                                 loading={isLoadingMoment}
-                                blurRadius={0}
+                                blurRadius={30}
                                 forceMute={false}
                                 showSlider={true}
                                 disableCache={false}
-                                disableWatch={false}
+                                disableWatch={true}
                             >
                                 {/* Top user info (no scale animations) */}
                                 <Moment.Root.Top>
@@ -299,6 +299,7 @@ export default function MomentFullScreen() {
                                     start={{ x: 0.5, y: 0 }}
                                     end={{ x: 0.5, y: 1 }}
                                     style={{
+                                        pointerEvents: "none",
                                         position: "absolute",
                                         left: 0,
                                         right: 0,
