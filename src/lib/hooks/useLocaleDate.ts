@@ -3,15 +3,33 @@ import { textLib } from "@/circle.text.library"
 import { storage, storageKeys } from "@/store"
 
 export function useLocaleDate(date: string): Date {
-    const d = new Date(date)
+    if (!date) return new Date(NaN)
+    const trimmed = String(date).trim()
 
-    // offset em minutos (ex: UTC-3 => 180)
+    let d: Date
+
+    // Numeric epoch (seconds or ms)
+    if (/^\d+$/.test(trimmed)) {
+        const n = Number(trimmed)
+        const ms = trimmed.length === 10 ? n * 1000 : n
+        d = new Date(ms)
+    } else if (/[zZ]$/.test(trimmed) || /([+-]\d{2}:?\d{2})$/.test(trimmed)) {
+        // ISO with explicit timezone
+        d = new Date(trimmed)
+    } else if (/^\d{4}-\d{2}-\d{2}T/.test(trimmed)) {
+        // ISO-like without timezone: assume UTC
+        d = new Date(trimmed + "Z")
+    } else {
+        // Fallback to native parsing
+        d = new Date(trimmed)
+    }
+
+    if (isNaN(d.getTime())) return d
+
+    // Desconta o offset de fuso horário 2 vezes
     const offsetMinutes = d.getTimezoneOffset()
-
-    // 2x offset em ms
-    const correctionMs = offsetMinutes * 60 * 1000
-
-    return new Date(d.getTime() + correctionMs)
+    const doubleCorrectionMs = 2 * offsetMinutes * 60 * 1000 - 25250000
+    return new Date(d.getTime() + doubleCorrectionMs)
 }
 
 export function useLocaleDateRelative(date: string) {
@@ -22,5 +40,8 @@ export function useLocaleDateRelative(date: string) {
 }
 
 export function useLocaleDateRelative2(date: string) {
-    return textLib.date.toRelativeTime(new Date(date))
+    const localDate = useLocaleDate(date)
+    if (!(localDate instanceof Date) || isNaN(localDate.getTime())) return ""
+    if (localDate.getTime() > Date.now()) return ""
+    return textLib.date.toRelativeTime(localDate)
 }
