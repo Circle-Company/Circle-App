@@ -27,7 +27,6 @@ import { NetworkContext } from "@/contexts/network"
 import OfflineCard from "@/components/general/offline"
 import { DropDownMenuIOS } from "@/features/account/account.moments.dropdown.menu"
 import { apiRoutes } from "@/api"
-import useUniqueAppend from "@/lib/hooks/useUniqueAppend"
 
 export default function AccountScreen() {
     const { account, moments, isLoadingAccount, isLoadingMoments, getAccount, getMoments } =
@@ -53,14 +52,6 @@ export default function AccountScreen() {
     const ITEM_SIZE = (width - (NUM_COLUMNS + 1) * SPACING) / NUM_COLUMNS
     const isOnline = networkStats === "ONLINE"
     const navigation = useNavigation()
-
-    const {
-        items: uniqueMoments,
-        appendUnique,
-        resetUnique,
-    } = useUniqueAppend<any>({
-        keySelector: (m) => m?.id,
-    })
 
     const user = useMemo(() => {
         if (!account || !account.id) return null
@@ -99,11 +90,10 @@ export default function AccountScreen() {
     }, [navigation, user?.username, user?.name, session?.user?.username])
 
     useEffect(() => {
-        // Initialize data on mount with unique dedupe
+        // Initialize data on mount
         ;(async () => {
             await getAccount()
-            const list = await getMoments({ page: 1, limit: pageSize })
-            if (Array.isArray(list)) resetUnique(list)
+            await getMoments({ page: 1, limit: pageSize })
         })()
     }, [])
 
@@ -121,8 +111,7 @@ export default function AccountScreen() {
             lastRequestedPageRef.current = null
 
             await getAccount()
-            const list = await getMoments({ page: 1, limit: pageSize })
-            resetUnique(Array.isArray(list) ? list : [])
+            await getMoments({ page: 1, limit: pageSize })
         } catch (error) {
             console.error("Error refreshing account data:", error)
         } finally {
@@ -144,7 +133,6 @@ export default function AccountScreen() {
         try {
             const list = await getMoments({ page: nextPage, limit: pageSize })
             if (Array.isArray(list) && list.length > 0) {
-                appendUnique(list)
                 console.log(`📄 Loaded page ${nextPage}`)
                 setCurrentPage(nextPage)
             } else {
@@ -187,7 +175,7 @@ export default function AccountScreen() {
         router.navigate({ pathname: "/you/[id]", params: { id: String(id), from: "you" } })
     }
 
-    const normalizedMoments = uniqueMoments.map((moment: any) => {
+    const normalizedMoments = (moments ?? []).map((moment: any) => {
         const rewrite = (url: string) => {
             if (!url) return url
             const original = String(url).trim()
