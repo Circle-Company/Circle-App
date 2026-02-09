@@ -27,6 +27,8 @@ import { NetworkContext } from "@/contexts/network"
 import OfflineCard from "@/components/general/offline"
 import { DropDownMenuIOS } from "@/features/account/account.moments.dropdown.menu"
 import { apiRoutes } from "@/api"
+import { useAccountQuery, useAccountMomentsQuery, accountKeys } from "@/queries/account"
+import { useQueryClient } from "@tanstack/react-query"
 
 export default function AccountScreen() {
     const { account, moments, isLoadingAccount, isLoadingMoments, getAccount, getMoments } =
@@ -45,13 +47,37 @@ export default function AccountScreen() {
     const pageSize = 6
     const userSnapshotRef = useRef<string>("")
 
-    const loading = isLoadingAccount || isLoadingMoments
+    const queryClient = useQueryClient()
+    const { data: accountData, isLoading: rqIsLoadingAccount } = useAccountQuery({
+        enabled: !!session?.account?.jwtToken,
+        staleTime: 1000 * 60 * 5,
+        refetchOnMount: false,
+    })
+    const {
+        data: momentsPage,
+        isLoading: rqIsLoadingMoments,
+        isFetching: isFetchingMoments,
+    } = useAccountMomentsQuery(currentPage, 6, {
+        enabled: !!session?.account?.jwtToken,
+        staleTime: 1000 * 60 * 2,
+        refetchOnMount: false,
+    })
+    const [accMoments, setAccMoments] = useState<any[]>([])
+    const loading = rqIsLoadingAccount || rqIsLoadingMoments
     const { width } = Dimensions.get("window")
     const SPACING = 5
     const NUM_COLUMNS = 2
     const ITEM_SIZE = (width - (NUM_COLUMNS + 1) * SPACING) / NUM_COLUMNS
     const isOnline = networkStats === "ONLINE"
     const navigation = useNavigation()
+
+    const {
+        items: uniqueMoments,
+        appendUnique,
+        resetUnique,
+    } = useUniqueAppend<any>({
+        keySelector: (m) => m?.id,
+    })
 
     const user = useMemo(() => {
         if (!account || !account.id) return null
@@ -90,12 +116,23 @@ export default function AccountScreen() {
     }, [navigation, user?.username, user?.name, session?.user?.username])
 
     useEffect(() => {
-        // Initialize data on mount
-        ;(async () => {
-            await getAccount()
-            await getMoments({ page: 1, limit: pageSize })
-        })()
-    }, [])
+        if (!momentsPage) return
+        const page = momentsPage.pagination?.page ?? currentPage
+        const incoming = momentsPage.moments ?? []
+        if (page <= 1) {
+            setAccMoments(incoming)
+        } else {
+            setAccMoments((prev) => {
+                const seen = new Set(prev.map((m: any) => String(m?.id)))
+                const add = incoming.filter((m: any) => !seen.has(String(m?.id)))
+                return [...prev, ...add]
+            })
+        }
+        if (momentsPage.pagination) {
+            const { page: p, totalPages } = momentsPage.pagination
+            setHasMoreMoments(p < totalPages)
+        }
+    }, [momentsPage])
 
     const handleRefresh = async () => {
         // Prevent concurrent refresh
@@ -110,8 +147,11 @@ export default function AccountScreen() {
             loadingMoreRef.current = false
             lastRequestedPageRef.current = null
 
-            await getAccount()
-            await getMoments({ page: 1, limit: pageSize })
+            await Promise.all([
+                queryClient.invalidateQueries({ queryKey: accountKeys.detail() }),
+                queryClient.invalidateQueries({ queryKey: accountKeys.moments() }),
+            ])
+            setAccMoments([])
         } catch (error) {
             console.error("Error refreshing account data:", error)
         } finally {
@@ -131,14 +171,9 @@ export default function AccountScreen() {
         loadingMoreRef.current = true
         lastRequestedPageRef.current = nextPage
         try {
-            const list = await getMoments({ page: nextPage, limit: pageSize })
-            if (Array.isArray(list) && list.length > 0) {
-                console.log(`📄 Loaded page ${nextPage}`)
-                setCurrentPage(nextPage)
-            } else {
-                console.log("📭 No more moments to load")
-                setHasMoreMoments(false)
-            }
+            // Advance page; hasMoreMoments will be updated when momentsPage arrives
+            console.log(`📄 Loaded page ${nextPage}`)
+            setCurrentPage(nextPage)
         } catch (e) {
             console.error("Error loading more moments:", e)
         } finally {
@@ -175,7 +210,7 @@ export default function AccountScreen() {
         router.navigate({ pathname: "/you/[id]", params: { id: String(id), from: "you" } })
     }
 
-    const normalizedMoments = (moments ?? []).map((moment: any) => {
+    const normalizedMoments = (accMoments ?? []).map((moment: any) => {
         const rewrite = (url: string) => {
             if (!url) return url
             const original = String(url).trim()
@@ -287,10 +322,10 @@ export default function AccountScreen() {
     ])
 
     const lastCreatedAt = useMemo(() => {
-        if (!Array.isArray(moments) || moments.length === 0) return undefined
+        if (!Array.isArray(accMoments) || accMoments.length === 0) return undefined
         const getDate = (m: any) =>
             m?.publishedAt || m?.createdAt || m?.created_at || m?.date || m?.timestamp
-        const timestamps = moments
+        const timestamps = accMoments
             .map((m: any) => {
                 const d = getDate(m)
                 const ts = d ? new Date(d as any).getTime() : NaN
@@ -302,7 +337,7 @@ export default function AccountScreen() {
 
         console.log(moments)
         return new Date(maxTs)
-    }, [moments])
+    }, [accMoments])
 
     return (
         <FlatList
@@ -414,7 +449,7 @@ export default function AccountScreen() {
                             />
                         </View>
                     )
-                } else if (!isLoadingMoments && !hasMoreMoments && moments.length === 0) {
+                } else if (!isLoadingMoments && !hasMoreMoments && accMoments.length === 0) {
                     return (
                         <View
                             style={{ paddingVertical: sizes.paddings["1md"], alignItems: "center" }}
