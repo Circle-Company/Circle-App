@@ -20,7 +20,23 @@ async function getMoments({ page, limit }: { page: number; limit: number }): Pro
     return response.data
 }
 
+async function updateDescription({ description }: { description: string }): Promise<void> {
+    const response = await api.post(
+        `/account/description`,
+        {
+            description,
+        },
+        {
+            headers: {
+                Authorization: `Bearer ${storage.getString(storageKeys().account.jwt.token) || ""}`,
+            },
+        },
+    )
+    return response.data
+}
+
 export const routes = {
     getAccount,
     getMoments,
+    updateDescription,
 }
