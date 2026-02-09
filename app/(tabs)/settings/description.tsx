@@ -11,11 +11,12 @@ import { textLib } from "@/circle.text.library"
 import { userRules } from "@/config/userRules"
 import fonts from "@/constants/fonts"
 import sizes from "@/constants/sizes"
-import api from "@/api"
+import { useUpdateAccountDescriptionMutation } from "@/queries/account"
 
 export default function DescriptionScreen() {
     const { t } = React.useContext(LanguageContext)
     const { session } = React.useContext(PersistedContext)
+    const { mutateAsync: updateDescription, isPending } = useUpdateAccountDescriptionMutation()
 
     const navigation = useNavigation()
     const maxLength = userRules().description.maxLength
@@ -88,28 +89,20 @@ export default function DescriptionScreen() {
     }
 
     async function handlePress() {
-        if (descriptionCanBeEdited) {
-            try {
-                await api
-                    .put(
-                        "/account/description",
-                        {
-                            description: textLib.rich.formatToEnriched(description),
-                        },
-                        { headers: { Authorization: session.account.jwtToken } },
-                    )
-                    .finally(() => {
-                        session.user.set({
-                            ...session.user,
-                            description,
-                            richDescription: textLib.rich.formatToEnriched(description),
-                        })
-                        setDescription("")
-                        navigation.goBack()
-                    })
-            } catch (err: any) {
-                console.log(err.message)
-            }
+        if (!descriptionCanBeEdited || isPending) return
+        try {
+            await updateDescription({
+                description: textLib.rich.formatToEnriched(description),
+            })
+            session.user.set({
+                ...session.user,
+                description,
+                richDescription: textLib.rich.formatToEnriched(description),
+            })
+            setDescription("")
+            navigation.goBack()
+        } catch (err: any) {
+            console.log(err?.message ?? String(err))
         }
     }
 
