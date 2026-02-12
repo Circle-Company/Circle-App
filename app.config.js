@@ -2,7 +2,7 @@ const pkg = require("./package.json")
 
 module.exports = function (_config) {
     const VERSION = pkg.version
-    const PLATFORM = process.env.EAS_BUILD_PLATFORM ?? "android"
+    const PLATFORM = "ios"
 
     return {
         expo: {
@@ -10,7 +10,7 @@ module.exports = function (_config) {
             name: "Circle App",
             slug: "Circle",
             scheme: "circle",
-            owner: "tiago.savioli",
+            owner: "circlecompany",
             runtimeVersion: { policy: "appVersion" },
             userInterfaceStyle: "dark",
             orientation: "portrait",
@@ -122,7 +122,7 @@ module.exports = function (_config) {
             ].filter(Boolean),
             extra: {
                 eas: {
-                    projectId: "7e0b5bcc-0d0b-42b6-91ae-4ee2dfbb0936",
+                    projectId: "eda55a59-2f40-4b7d-a419-f394bd8fd467",
                 },
             },
         },

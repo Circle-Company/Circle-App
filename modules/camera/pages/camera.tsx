@@ -163,6 +163,7 @@ export function CameraPage(): React.ReactElement {
                     height: media.height?.toString(),
                 },
             })
+            // zoom.value = minZoom
         },
         [router, setIsRecording, setVideo, setRecordingTime, setVideoBuffer],
     )
