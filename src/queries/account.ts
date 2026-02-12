@@ -171,7 +171,16 @@ export function useAccountMomentsQuery(
  * Mutation: update account description
  */
 type UpdateAccountDescriptionInput = {
-    description: string
+    description: string | null
+}
+
+type UpdateAccountNameInput = {
+    name: string | null
+}
+
+export type UpdateAccountCoordinatesInput = {
+    lat: string
+    lng: string
 }
 
 async function updateAccountDescription(input: UpdateAccountDescriptionInput): Promise<void> {
@@ -181,16 +190,51 @@ async function updateAccountDescription(input: UpdateAccountDescriptionInput): P
     } as any)
 }
 
+async function updateAccountName(input: UpdateAccountNameInput): Promise<void> {
+    // Backend route expected to update the name for the authenticated account
+    await apiRoutes.account.updateName({
+        name: input.name,
+    } as any)
+}
+
+export async function updateAccountCoordinates(
+    input: UpdateAccountCoordinatesInput,
+): Promise<void> {
+    await apiRoutes.account.updateCoordinates({
+        lat: input.lat,
+        lng: input.lng,
+    } as any)
+}
+
 /**
  * Hook to update the authenticated user's description and invalidate cached account detail.
  */
-export function useUpdateAccountDescriptionMutation() {
+export function useUpdateAccDescMutation() {
     const queryClient = useQueryClient()
     return useMutation({
         mutationFn: updateAccountDescription,
-        onSuccess: () => {
+        onSuccess: async () => {
             // Refresh account detail after successful update
-            queryClient.invalidateQueries({ queryKey: accountKeys.detail() })
+            await queryClient.invalidateQueries({ queryKey: accountKeys.detail() })
+            await queryClient.refetchQueries({ queryKey: accountKeys.detail() })
         },
+    })
+}
+
+export function useUpdateAccNameMutation() {
+    const queryClient = useQueryClient()
+    return useMutation({
+        mutationFn: updateAccountName,
+        onSuccess: async () => {
+            // Refresh account detail after successful update
+            await queryClient.invalidateQueries({ queryKey: accountKeys.detail() })
+            await queryClient.refetchQueries({ queryKey: accountKeys.detail() })
+        },
+    })
+}
+
+export function useUpdateAccCoordsMutation() {
+    return useMutation({
+        mutationFn: updateAccountCoordinates,
     })
 }
