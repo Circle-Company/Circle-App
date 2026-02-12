@@ -11,12 +11,18 @@ import { textLib } from "@/circle.text.library"
 import { userRules } from "@/config/userRules"
 import fonts from "@/constants/fonts"
 import sizes from "@/constants/sizes"
-import api from "@/api"
+import { useUpdateAccDescMutation } from "@/queries/account"
+import { useToast } from "@/contexts/Toast"
+import { Vibrate } from "@/lib/hooks/useHapticFeedback"
+import TrashIcon from "@/assets/icons/svgs/trash.fill.svg"
+import { ActivityIndicator } from "react-native"
 
 export default function DescriptionScreen() {
     const { t } = React.useContext(LanguageContext)
     const { session } = React.useContext(PersistedContext)
+    const { mutateAsync: updateDescription, isPending } = useUpdateAccDescMutation()
 
+    const toast = useToast()
     const navigation = useNavigation()
     const maxLength = userRules().description.maxLength
     const [description, setDescription] = React.useState(
@@ -79,7 +85,10 @@ export default function DescriptionScreen() {
     const button_text: TextStyle = {
         fontSize: fonts.size.body,
         fontFamily: fonts.family["Black-Italic"],
-        color: descriptionCanBeEdited ? colors.gray.black : colors.gray.grey_04 + "90",
+        color:
+            description !== session.user.description
+                ? colors.gray.black
+                : colors.gray.grey_04 + "90",
     }
 
     const handleInputChange = (text: string) => {
@@ -87,30 +96,23 @@ export default function DescriptionScreen() {
         setDescription(formattedText)
     }
 
-    async function handlePress() {
-        if (descriptionCanBeEdited) {
-            try {
-                await api
-                    .put(
-                        "/account/description",
-                        {
-                            description: textLib.rich.formatToEnriched(description),
-                        },
-                        { headers: { Authorization: session.account.jwtToken } },
-                    )
-                    .finally(() => {
-                        session.user.set({
-                            ...session.user,
-                            description,
-                            richDescription: textLib.rich.formatToEnriched(description),
-                        })
-                        setDescription("")
-                        navigation.goBack()
-                    })
-            } catch (err: any) {
-                console.log(err.message)
-            }
-        }
+    async function handlePress({ clean }: { clean: boolean }) {
+        if ((!clean && !descriptionCanBeEdited) || isPending) return
+        if (description === session.user.description) return
+        await updateDescription({
+            description: clean ? null : textLib.rich.formatToEnriched(description),
+        })
+            .then(() => {
+                toast.success(t("Description updated successfully"))
+                Vibrate("notificationSuccess")
+            })
+            .catch(() => {
+                toast.error(t("Failed to update your description"))
+                Vibrate("notificationError")
+            })
+            .finally(() => {
+                navigation.goBack()
+            })
     }
 
     return (
@@ -122,14 +124,19 @@ export default function DescriptionScreen() {
                         textAlignVertical="top"
                         multiline={true}
                         returnKeyType="done"
-                        keyboardType="twitter"
+                        keyboardType="default"
                         onChangeText={handleInputChange}
-                        maxLength={300}
+                        maxLength={userRules().description.maxLength}
                         autoFocus={true}
                         numberOfLines={5}
+                        autoCapitalize="sentences"
                         style={input_style}
                         placeholder={t("say something about you") + "..."}
                         placeholderTextColor={String(ColorTheme().textDisabled)}
+                        blurOnSubmit={true}
+                        onSubmitEditing={() =>
+                            handlePress({ clean: description.length > 0 ? false : true })
+                        }
                     />
                 </View>
                 <View style={bottom_style}>
@@ -141,19 +148,25 @@ export default function DescriptionScreen() {
                     </Text>
                 </View>
             </View>
-
             <ButtonStandart
                 margins={false}
                 height={40}
-                action={handlePress}
+                action={() => handlePress({ clean: description.length > 0 ? false : true })}
                 style={{ minWidth: sizes.buttons.width * 0.3 }}
                 backgroundColor={
-                    descriptionCanBeEdited
+                    description !== session.user.description
                         ? colors.gray.white
-                        : ColorTheme().backgroundDisabled.toString()
+                        : colors.gray.grey_07
                 }
             >
                 <Text style={button_text}>{t("Update")}</Text>
+                {isPending && (
+                    <ActivityIndicator
+                        style={{ marginLeft: sizes.margins["1sm"] }}
+                        size="small"
+                        color={colors.gray.grey_07}
+                    />
+                )}
             </ButtonStandart>
         </View>
     )

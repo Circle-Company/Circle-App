@@ -12,11 +12,17 @@ import { userRules } from "@/config/userRules"
 import fonts from "@/constants/fonts"
 import sizes from "@/constants/sizes"
 import api from "@/api"
+import { useUpdateAccNameMutation } from "@/queries"
+import { useToast } from "@/contexts/Toast"
+import { Vibrate } from "@/lib/hooks/useHapticFeedback"
+import { ActivityIndicator } from "react-native"
 
 export default function Name() {
     const { t } = React.useContext(LanguageContext)
     const { session } = React.useContext(PersistedContext)
+    const { mutateAsync: updateName, isPending } = useUpdateAccNameMutation()
 
+    const toast = useToast()
     const navigation = useNavigation()
     const maxLength = userRules().name.maxLength
     const [name, setname] = React.useState(session.user.name ? session.user.name : "")
@@ -45,8 +51,7 @@ export default function Name() {
         borderRadius: sizes.borderRadius["1md"],
         paddingVertical: sizes.paddings["2sm"],
         paddingHorizontal: sizes.paddings["1md"],
-        minHeight: sizes.screens.height * 0.1,
-        maxHeight: sizes.screens.height * 0.4,
+        height: sizes.screens.height * 0.07,
     }
     const bottom_style: ViewStyle = {
         width: sizes.screens.width,
@@ -73,7 +78,7 @@ export default function Name() {
     const button_text: TextStyle = {
         fontSize: fonts.size.body,
         fontFamily: fonts.family["Black-Italic"],
-        color: nameCanBeEdited ? colors.gray.black : colors.gray.grey_04 + "90",
+        color: name !== session.user.name ? colors.gray.black : colors.gray.grey_04 + "90",
     }
 
     const handleInputChange = (text: string) => {
@@ -81,29 +86,23 @@ export default function Name() {
         setname(formattedText)
     }
 
-    async function handlePress() {
-        if (nameCanBeEdited) {
-            try {
-                await api
-                    .put(
-                        "/account/name",
-                        {
-                            name: textLib.rich.formatToEnriched(name),
-                        },
-                        { headers: { Authorization: session.account.jwtToken } },
-                    )
-                    .finally(() => {
-                        session.user.set({
-                            ...session.user,
-                            name,
-                        })
-                        setname("")
-                        navigation.goBack()
-                    })
-            } catch (err: any) {
-                console.log(err.message)
-            }
-        }
+    async function handlePress({ clean }: { clean: boolean }) {
+        if ((!clean && !nameCanBeEdited) || isPending) return
+        if (name === session.user.name) return
+        await updateName({
+            name: clean ? null : textLib.rich.formatToEnriched(name),
+        })
+            .then(() => {
+                toast.success("Name updated successfully")
+                Vibrate("notificationSuccess")
+            })
+            .catch(() => {
+                toast.error("Failed to update your name")
+                Vibrate("notificationError")
+            })
+            .finally(() => {
+                navigation.goBack()
+            })
     }
 
     return (
@@ -113,16 +112,20 @@ export default function Name() {
                     <Input
                         value={name}
                         textAlignVertical="top"
-                        multiline={true}
+                        multiline={false}
                         returnKeyType="done"
-                        keyboardType="twitter"
+                        keyboardType="default"
                         onChangeText={handleInputChange}
-                        maxLength={300}
+                        maxLength={userRules().name.maxLength}
                         autoFocus={true}
-                        numberOfLines={5}
                         style={input_style}
-                        placeholder={t("say something about you") + "..."}
+                        placeholder={t("Your name") + "..."}
                         placeholderTextColor={String(ColorTheme().textDisabled)}
+                        autoCapitalize="words"
+                        textContentType="name"
+                        onSubmitEditing={() =>
+                            handlePress({ clean: name.length > 0 ? false : true })
+                        }
                     />
                 </View>
                 <View style={bottom_style}>
@@ -138,13 +141,22 @@ export default function Name() {
             <ButtonStandart
                 margins={false}
                 height={40}
-                action={handlePress}
+                action={() => handlePress({ clean: name.length > 0 ? false : true })}
                 style={{ minWidth: sizes.buttons.width * 0.3 }}
                 backgroundColor={
-                    nameCanBeEdited ? colors.gray.white : ColorTheme().backgroundDisabled.toString()
+                    name !== session.user.name
+                        ? colors.gray.white
+                        : ColorTheme().backgroundDisabled.toString()
                 }
             >
                 <Text style={button_text}>{t("Update")}</Text>
+                {isPending && (
+                    <ActivityIndicator
+                        style={{ marginLeft: sizes.margins["1sm"] }}
+                        size="small"
+                        color={colors.gray.grey_07}
+                    />
+                )}
             </ButtonStandart>
         </View>
     )

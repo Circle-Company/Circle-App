@@ -1,4 +1,4 @@
-import { useQuery, UseQueryResult } from "@tanstack/react-query"
+import { useQuery, UseQueryResult, useMutation, useQueryClient } from "@tanstack/react-query"
 import { apiRoutes } from "@/api"
 
 export type AccountData = {
@@ -51,29 +51,22 @@ export const accountKeys = {
 
 /**
  * Fetches the authenticated user's account data.
- * Note: Authentication headers are injected by the account routes service.
- * The 'token' parameter is kept for API compatibility and query enabling only.
- * @param token - Unused for headers (kept for compatibility/enabling)
  * @returns Promise resolving to AccountData
  * @throws Error if the API request fails
  */
-async function fetchAccount(token: string): Promise<AccountData> {
+async function fetchAccount(): Promise<AccountData> {
     const response = await apiRoutes.account.getAccount()
     return response.account
 }
 
 /**
  * Fetches moments (video posts) for the authenticated user's account.
- * Note: Authentication headers are injected by the account routes service.
- * The 'token' parameter is kept for API compatibility and query enabling only.
- * @param token - Unused for headers (kept for compatibility/enabling)
  * @param page - Page number for pagination (default: 1)
  * @param limit - Number of items per page (default: 20)
  * @returns Promise resolving to AccountMomentsResponse with moments and pagination info
  * @throws Error if the API request fails
  */
-async function fetchAccountMoments(
-    token: string,
+export async function fetchAccountMoments(
     page: number = 1,
     limit: number = 20,
 ): Promise<AccountMomentsResponse> {
@@ -91,7 +84,6 @@ async function fetchAccountMoments(
 /**
  * Hook to fetch and cache the authenticated user's account data.
  *
- * @param token - Value used only to control query enabling; headers are managed by the routes service
  * @param options - Query configuration options
  * @param options.enabled - Whether the query should run (default: true)
  * @param options.refetchOnMount - Whether to refetch when component mounts (default: true)
@@ -102,7 +94,7 @@ async function fetchAccountMoments(
  * @example
  * ```tsx
  * const { session } = useContext(PersistedContext)
- * const { data, isLoading, refetch } = useAccountQuery(session.account.jwtToken, {
+ * const { data, isLoading, refetch } = useAccountQuery({
  *   enabled: !!session.account.jwtToken,
  *   staleTime: 1000 * 60 * 10, // 10 minutes
  * })
@@ -111,17 +103,14 @@ async function fetchAccountMoments(
  * return <Profile user={data} />
  * ```
  */
-export function useAccountQuery(
-    token: string,
-    options?: {
-        enabled?: boolean
-        refetchOnMount?: boolean
-        staleTime?: number
-    },
-): UseQueryResult<AccountData, Error> {
+export function useAccountQuery(options?: {
+    enabled?: boolean
+    refetchOnMount?: boolean
+    staleTime?: number
+}): UseQueryResult<AccountData, Error> {
     return useQuery({
         queryKey: accountKeys.detail(),
-        queryFn: () => fetchAccount(token),
+        queryFn: () => fetchAccount(),
         staleTime: options?.staleTime ?? 1000 * 60 * 5, // 5 minutes default
         enabled: options?.enabled ?? true,
         refetchOnMount: options?.refetchOnMount ?? true,
@@ -131,7 +120,6 @@ export function useAccountQuery(
 /**
  * Hook to fetch and cache the authenticated user's moments with pagination.
  *
- * @param token - Value used only to control query enabling; headers are managed by the routes service
  * @param page - Page number to fetch (default: 1)
  * @param limit - Number of moments per page (default: 20)
  * @param options - Query configuration options
@@ -162,7 +150,6 @@ export function useAccountQuery(
  * ```
  */
 export function useAccountMomentsQuery(
-    token: string,
     page: number = 1,
     limit: number = 20,
     options?: {
@@ -173,9 +160,81 @@ export function useAccountMomentsQuery(
 ): UseQueryResult<AccountMomentsResponse, Error> {
     return useQuery({
         queryKey: accountKeys.momentsPaginated(page, limit),
-        queryFn: () => fetchAccountMoments(token, page, limit),
+        queryFn: () => fetchAccountMoments(page, limit),
         staleTime: options?.staleTime ?? 1000 * 60 * 2, // 2 minutes default
         enabled: options?.enabled ?? true,
         refetchOnMount: options?.refetchOnMount ?? true,
+    })
+}
+
+/**
+ * Mutation: update account description
+ */
+type UpdateAccountDescriptionInput = {
+    description: string | null
+}
+
+type UpdateAccountNameInput = {
+    name: string | null
+}
+
+export type UpdateAccountCoordinatesInput = {
+    lat: string
+    lng: string
+}
+
+async function updateAccountDescription(input: UpdateAccountDescriptionInput): Promise<void> {
+    // Backend route expected to update the description for the authenticated account
+    await apiRoutes.account.updateDescription({
+        description: input.description,
+    } as any)
+}
+
+async function updateAccountName(input: UpdateAccountNameInput): Promise<void> {
+    // Backend route expected to update the name for the authenticated account
+    await apiRoutes.account.updateName({
+        name: input.name,
+    } as any)
+}
+
+export async function updateAccountCoordinates(
+    input: UpdateAccountCoordinatesInput,
+): Promise<void> {
+    await apiRoutes.account.updateCoordinates({
+        lat: input.lat,
+        lng: input.lng,
+    } as any)
+}
+
+/**
+ * Hook to update the authenticated user's description and invalidate cached account detail.
+ */
+export function useUpdateAccDescMutation() {
+    const queryClient = useQueryClient()
+    return useMutation({
+        mutationFn: updateAccountDescription,
+        onSuccess: async () => {
+            // Refresh account detail after successful update
+            await queryClient.invalidateQueries({ queryKey: accountKeys.detail() })
+            await queryClient.refetchQueries({ queryKey: accountKeys.detail() })
+        },
+    })
+}
+
+export function useUpdateAccNameMutation() {
+    const queryClient = useQueryClient()
+    return useMutation({
+        mutationFn: updateAccountName,
+        onSuccess: async () => {
+            // Refresh account detail after successful update
+            await queryClient.invalidateQueries({ queryKey: accountKeys.detail() })
+            await queryClient.refetchQueries({ queryKey: accountKeys.detail() })
+        },
+    })
+}
+
+export function useUpdateAccCoordsMutation() {
+    return useMutation({
+        mutationFn: updateAccountCoordinates,
     })
 }

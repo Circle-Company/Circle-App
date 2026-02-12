@@ -20,7 +20,56 @@ async function getMoments({ page, limit }: { page: number; limit: number }): Pro
     return response.data
 }
 
+async function updateDescription({ description }: { description: string }): Promise<void> {
+    const response = await api.put(
+        `/account/description`,
+        {
+            description,
+        },
+        {
+            headers: {
+                Authorization: `Bearer ${storage.getString(storageKeys().account.jwt.token) || ""}`,
+            },
+        },
+    )
+    return response.data
+}
+
+async function updateCoordinates({ lat, lng }: { lat: string; lng: string }): Promise<void> {
+    const response = await api.put(
+        `/account/coordinates`,
+        {
+            latitude: lat,
+            longitude: lng,
+        },
+        {
+            headers: {
+                Authorization: `Bearer ${storage.getString(storageKeys().account.jwt.token) || ""}`,
+            },
+        },
+    )
+    return response.data
+}
+
+async function updateName({ name }: { name: string }): Promise<void> {
+    const response = await api.put(
+        `/account/name`,
+        {
+            name,
+        },
+        {
+            headers: {
+                Authorization: `Bearer ${storage.getString(storageKeys().account.jwt.token) || ""}`,
+            },
+        },
+    )
+    return response.data
+}
+
 export const routes = {
     getAccount,
     getMoments,
+    updateDescription,
+    updateName,
+    updateCoordinates,
 }

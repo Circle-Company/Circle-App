@@ -10,7 +10,7 @@ import {
     Alert,
 } from "react-native"
 import React, { useState, useEffect, useMemo, useRef } from "react"
-import AccountContext from "@/contexts/account"
+
 import PersistedContext from "@/contexts/Persisted"
 import { RenderProfileSkeleton } from "@/features/profile/profile.skeleton"
 import { ProfileHeader } from "@/features/profile"
@@ -19,7 +19,7 @@ import { Moment } from "@/components/moment"
 import config from "@/config"
 import { colors } from "@/constants/colors"
 import { iOSMajorVersion } from "@/lib/platform/detection"
-import { router } from "expo-router"
+import { Link, router } from "expo-router"
 import { useNavigation } from "@react-navigation/native"
 import { NoMoments } from "@/features/profile/profile.no.moments"
 import fonts from "@/constants/fonts"
@@ -27,11 +27,16 @@ import { NetworkContext } from "@/contexts/network"
 import OfflineCard from "@/components/general/offline"
 import { DropDownMenuIOS } from "@/features/account/account.moments.dropdown.menu"
 import { apiRoutes } from "@/api"
-import useUniqueAppend from "@/lib/hooks/useUniqueAppend"
+import {
+    useAccountQuery,
+    useAccountMomentsQuery,
+    accountKeys,
+    fetchAccountMoments,
+} from "@/queries/account"
+import { useQueryClient } from "@tanstack/react-query"
 
 export default function AccountScreen() {
-    const { account, moments, isLoadingAccount, isLoadingMoments, getAccount, getMoments } =
-        React.useContext(AccountContext)
+    // AccountContext fetch usage removed; using React Query hooks instead
     const { session } = React.useContext(PersistedContext)
     const { networkStats } = React.useContext(NetworkContext)
     const [currentPage, setCurrentPage] = useState(1)
@@ -46,7 +51,23 @@ export default function AccountScreen() {
     const pageSize = 6
     const userSnapshotRef = useRef<string>("")
 
-    const loading = isLoadingAccount || isLoadingMoments
+    const queryClient = useQueryClient()
+    const { data: accountData, isLoading: rqIsLoadingAccount } = useAccountQuery({
+        enabled: !!session?.account?.jwtToken,
+        staleTime: 1000 * 60 * 5,
+        refetchOnMount: false,
+    })
+    const {
+        data: momentsPage,
+        isLoading: rqIsLoadingMoments,
+        isFetching: isFetchingMoments,
+    } = useAccountMomentsQuery(currentPage, 6, {
+        enabled: !!session?.account?.jwtToken,
+        staleTime: 1000 * 60 * 2,
+        refetchOnMount: false,
+    })
+    const [accMoments, setAccMoments] = useState<any[]>([])
+    const loading = rqIsLoadingAccount || isFetchingMoments
     const { width } = Dimensions.get("window")
     const SPACING = 5
     const NUM_COLUMNS = 2
@@ -54,29 +75,22 @@ export default function AccountScreen() {
     const isOnline = networkStats === "ONLINE"
     const navigation = useNavigation()
 
-    const {
-        items: uniqueMoments,
-        appendUnique,
-        resetUnique,
-    } = useUniqueAppend<any>({
-        keySelector: (m) => m?.id,
-    })
-
     const user = useMemo(() => {
-        if (!account || !account.id) return null
+        const acc = accountData
+        if (!acc || !acc.id) return null
         return {
-            id: Number(account.id),
-            username: account.username,
-            name: account.name ?? null,
-            description: account.description ?? null,
-            profilePicture: account.profilePicture ?? null,
-            status: { verified: !!account.status?.verified },
+            id: Number(acc.id),
+            username: acc.username,
+            name: acc.name ?? null,
+            description: acc.description ?? null,
+            profilePicture: acc.profilePicture ?? null,
+            status: { verified: !!acc.status?.verified },
             metrics: {
                 totalMomentsCreated:
                     typeof session.account.totalMoments === "number"
                         ? session.account.totalMoments
-                        : (moments?.length ?? 0),
-                totalFollowers: account.metrics?.totalFollowers ?? 0,
+                        : (accMoments?.length ?? 0),
+                totalFollowers: acc.metrics?.totalFollowers ?? 0,
             },
             interactions: {
                 isFollowing: false,
@@ -85,7 +99,7 @@ export default function AccountScreen() {
                 isBlocking: false,
             },
         }
-    }, [account, session.account.totalMoments, moments])
+    }, [accountData, session.account.totalMoments, accMoments])
 
     // Update header title with username (null-safe)
     useEffect(() => {
@@ -99,13 +113,23 @@ export default function AccountScreen() {
     }, [navigation, user?.username, user?.name, session?.user?.username])
 
     useEffect(() => {
-        // Initialize data on mount with unique dedupe
-        ;(async () => {
-            await getAccount()
-            const list = await getMoments({ page: 1, limit: pageSize })
-            if (Array.isArray(list)) resetUnique(list)
-        })()
-    }, [])
+        if (!momentsPage) return
+        const page = momentsPage.pagination?.page ?? currentPage
+        const incoming = momentsPage.moments ?? []
+        if (page <= 1) {
+            setAccMoments(incoming)
+        } else {
+            setAccMoments((prev) => {
+                const seen = new Set(prev.map((m: any) => String(m?.id)))
+                const add = incoming.filter((m: any) => !seen.has(String(m?.id)))
+                return [...prev, ...add]
+            })
+        }
+        if (momentsPage.pagination) {
+            const { page: p, totalPages } = momentsPage.pagination
+            setHasMoreMoments(p < totalPages)
+        }
+    }, [momentsPage])
 
     const handleRefresh = async () => {
         // Prevent concurrent refresh
@@ -120,9 +144,11 @@ export default function AccountScreen() {
             loadingMoreRef.current = false
             lastRequestedPageRef.current = null
 
-            await getAccount()
-            const list = await getMoments({ page: 1, limit: pageSize })
-            resetUnique(Array.isArray(list) ? list : [])
+            await Promise.all([
+                queryClient.invalidateQueries({ queryKey: accountKeys.detail() }),
+                queryClient.invalidateQueries({ queryKey: accountKeys.moments() }),
+            ])
+            setAccMoments([])
         } catch (error) {
             console.error("Error refreshing account data:", error)
         } finally {
@@ -133,7 +159,7 @@ export default function AccountScreen() {
 
     const handleLoadMore = async () => {
         // Block if loading or no more items or refreshing
-        if (loadingMoreRef.current || isLoadingMoments || refreshing || !hasMoreMoments) return
+        if (loadingMoreRef.current || isFetchingMoments || refreshing || !hasMoreMoments) return
 
         const nextPage = currentPage + 1
         // Prevent duplicate same-page requests caused by repeated onEndReached
@@ -142,17 +168,16 @@ export default function AccountScreen() {
         loadingMoreRef.current = true
         lastRequestedPageRef.current = nextPage
         try {
-            const list = await getMoments({ page: nextPage, limit: pageSize })
-            if (Array.isArray(list) && list.length > 0) {
-                appendUnique(list)
-                console.log(`📄 Loaded page ${nextPage}`)
-                setCurrentPage(nextPage)
-            } else {
-                console.log("📭 No more moments to load")
-                setHasMoreMoments(false)
-            }
+            // Prefetch next page into cache; accumulator updates when query data arrives
+            await queryClient.prefetchQuery({
+                queryKey: accountKeys.momentsPaginated(nextPage, 6),
+                queryFn: () => fetchAccountMoments(nextPage, 6),
+                staleTime: 1000 * 60 * 2,
+            })
+            console.log(`📄 Prefetched page ${nextPage}`)
+            setCurrentPage(nextPage)
         } catch (e) {
-            console.error("Error loading more moments:", e)
+            console.error("Error prefetching more moments:", e)
         } finally {
             loadingMoreRef.current = false
         }
@@ -170,7 +195,11 @@ export default function AccountScreen() {
 
             setHasMoreMoments(true)
             setCurrentPage(1)
-            await getMoments({ page: 1, limit: pageSize })
+            setAccMoments([])
+            await Promise.all([
+                queryClient.invalidateQueries({ queryKey: accountKeys.detail() }),
+                queryClient.invalidateQueries({ queryKey: accountKeys.moments() }),
+            ])
         } catch (error) {
             console.error("Error deleting moment:", error)
         }
@@ -187,7 +216,7 @@ export default function AccountScreen() {
         router.navigate({ pathname: "/you/[id]", params: { id: String(id), from: "you" } })
     }
 
-    const normalizedMoments = uniqueMoments.map((moment: any) => {
+    const normalizedMoments = (accMoments ?? []).map((moment: any) => {
         const rewrite = (url: string) => {
             if (!url) return url
             const original = String(url).trim()
@@ -220,53 +249,53 @@ export default function AccountScreen() {
         } as any
     })
 
-    // Sync Persisted session when context data changes
+    // Sync Persisted session when query data changes
     useEffect(() => {
-        if (account) {
+        if (accountData) {
             session.user.set({
-                id: account.id,
-                username: account.username,
-                name: account.name,
-                description: account.description,
-                richDescription: account.description,
-                isVerified: !!account.status?.verified,
+                id: accountData.id,
+                username: accountData.username,
+                name: accountData.name,
+                description: accountData.description,
+                richDescription: accountData.description,
+                isVerified: !!accountData.status?.verified,
                 isActive: session.user.isActive,
-                profilePicture: account.profilePicture,
+                profilePicture: accountData.profilePicture,
             })
 
             session.metrics.set({
-                totalFollowers: account.metrics?.totalFollowers ?? 0,
-                totalFollowing: account.metrics?.totalFollowing ?? 0,
-                totalLikesReceived: account.metrics?.totalLikesReceived ?? 0,
-                totalViewsReceived: account.metrics?.totalViewsReceived ?? 0,
-                followerGrowthRate30d: account.metrics?.followerGrowthRate30d ?? 0,
-                engagementGrowthRate30d: account.metrics?.engagementGrowthRate30d ?? 0,
-                interactionsGrowthRate30d: account.metrics?.interactionsGrowthRate30d ?? 0,
+                totalFollowers: accountData.metrics?.totalFollowers ?? 0,
+                totalFollowing: accountData.metrics?.totalFollowing ?? 0,
+                totalLikesReceived: accountData.metrics?.totalLikesReceived ?? 0,
+                totalViewsReceived: accountData.metrics?.totalViewsReceived ?? 0,
+                followerGrowthRate30d: accountData.metrics?.followerGrowthRate30d ?? 0,
+                engagementGrowthRate30d: accountData.metrics?.engagementGrowthRate30d ?? 0,
+                interactionsGrowthRate30d: accountData.metrics?.interactionsGrowthRate30d ?? 0,
             })
             if (
                 typeof session.account.totalMoments !== "number" ||
                 session.account.totalMoments === 0
             ) {
-                session.account.setTotalMoments(moments?.length ?? 0)
+                session.account.setTotalMoments(accMoments?.length ?? 0)
             }
         }
-    }, [account])
+    }, [accountData, accMoments])
 
     useEffect(() => {
-        if (moments) {
-            session.account.setMoments(moments as any)
+        if (Array.isArray(accMoments)) {
+            session.account.setMoments(accMoments as any)
             if (
                 typeof session.account.totalMoments !== "number" ||
                 session.account.totalMoments === 0
             ) {
-                session.account.setTotalMoments(moments.length)
+                session.account.setTotalMoments(accMoments.length)
             }
         }
-    }, [moments])
+    }, [accMoments])
 
     // Snapshot session.user fields; if any field changes compared to the last snapshot, refetch account
     useEffect(() => {
-        if (!account) return
+        if (!accountData) return
 
         const fingerprint = JSON.stringify({
             id: session?.user?.id ?? "",
@@ -281,13 +310,13 @@ export default function AccountScreen() {
 
         // Only refetch when there's a previous snapshot and it differs
         if (userSnapshotRef.current && userSnapshotRef.current !== fingerprint) {
-            getAccount()
+            queryClient.invalidateQueries({ queryKey: accountKeys.detail() })
         }
 
         // Update snapshot
         userSnapshotRef.current = fingerprint
     }, [
-        account,
+        accountData,
         session?.user?.id,
         session?.user?.username,
         session?.user?.name,
@@ -299,10 +328,10 @@ export default function AccountScreen() {
     ])
 
     const lastCreatedAt = useMemo(() => {
-        if (!Array.isArray(moments) || moments.length === 0) return undefined
+        if (!Array.isArray(accMoments) || accMoments.length === 0) return undefined
         const getDate = (m: any) =>
             m?.publishedAt || m?.createdAt || m?.created_at || m?.date || m?.timestamp
-        const timestamps = moments
+        const timestamps = accMoments
             .map((m: any) => {
                 const d = getDate(m)
                 const ts = d ? new Date(d as any).getTime() : NaN
@@ -312,9 +341,9 @@ export default function AccountScreen() {
         if (timestamps.length === 0) return undefined
         const maxTs = Math.max(...timestamps)
 
-        console.log(moments)
+        console.log(accMoments)
         return new Date(maxTs)
-    }, [moments])
+    }, [accMoments])
 
     return (
         <FlatList
@@ -412,7 +441,7 @@ export default function AccountScreen() {
                 if (!isOnline) {
                     return <OfflineCard />
                 }
-                if (isLoadingMoments) {
+                if (isFetchingMoments) {
                     return (
                         <View
                             style={{
@@ -426,7 +455,7 @@ export default function AccountScreen() {
                             />
                         </View>
                     )
-                } else if (!isLoadingMoments && !hasMoreMoments && moments.length === 0) {
+                } else if (!rqIsLoadingMoments && !isFetchingMoments && accMoments.length === 0) {
                     return (
                         <View
                             style={{ paddingVertical: sizes.paddings["1md"], alignItems: "center" }}
@@ -434,7 +463,7 @@ export default function AccountScreen() {
                             <NoMoments />
                         </View>
                     )
-                } else if (!hasMoreMoments) {
+                } else if (!hasMoreMoments && accMoments.length > 0) {
                     return (
                         <View
                             style={{ paddingVertical: sizes.paddings["1md"], alignItems: "center" }}

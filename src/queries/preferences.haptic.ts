@@ -16,12 +16,10 @@ export function useDisableHapticsMutation() {
         },
         onSuccess: () => {
             session.preferences.setDisableHaptics(true)
+            toast.success("Haptics disabled successfully")
         },
         onError: (error: any) => {
-            toast.error(error.name || error.message || "An error occurred", {
-                position: "center",
-                duration: 3000,
-            })
+            toast.error(error.name || error.message || "An error occurred")
         },
     })
 
@@ -40,12 +38,10 @@ export function useEnableEnableMutation() {
         },
         onSuccess: () => {
             session.preferences.setDisableHaptics(false)
+            toast.success("Haptics enabled successfully")
         },
         onError: (error: any) => {
-            toast.error(error.name || error.message || "An error occurred", {
-                position: "center",
-                duration: 3000,
-            })
+            toast.error(error.name || error.message || "An error occurred")
         },
     })
 
