@@ -34,11 +34,11 @@ export default function Container({
 
     // Atualizar o estado de pausa do vídeo quando muda o foco (evitar loops)
     useEffect(() => {
-        const shouldPause = !isFocused || !!commentEnabled
+        const shouldPause = !isFocused || !!commentEnabled || options.hide === true
         if (video.isPaused !== shouldPause) {
             video.setIsPaused(shouldPause)
         }
-    }, [isFocused, commentEnabled, video.isPaused])
+    }, [isFocused, commentEnabled, options.hide, video.isPaused])
 
     const container: any = {
         ...size,
@@ -237,7 +237,7 @@ export default function Container({
         }
     }
 */
-    if (options.hide === true) return null
+    if (options.hide) return null
     else
         return (
             <View style={container}>
