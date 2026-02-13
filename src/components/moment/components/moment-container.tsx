@@ -236,33 +236,33 @@ export default function Container({
             navigation.navigate("MomentNavigator", { screen: "DetailScreen" })
         }
     }
-
 */
+    if (options.hide === true) return null
+    else
+        return (
+            <View style={container}>
+                <View style={content_container}>
+                    <MidiaRender.Root data={contentRender} content_sizes={size}>
+                        {renderVideoContent()}
+                    </MidiaRender.Root>
+                </View>
 
-    return (
-        <View style={container}>
-            <View style={content_container}>
-                <MidiaRender.Root data={contentRender} content_sizes={size}>
-                    {renderVideoContent()}
-                </MidiaRender.Root>
+                {/* Controles de vídeo (áudio e slider) */}
+                {isFocused &&
+                    !commentEnabled &&
+                    showSlider &&
+                    Number.isFinite(video.duration) &&
+                    video.duration > 0 && (
+                        <View style={sliderContainerStyle} pointerEvents="box-none">
+                            <MomentVideoSlider
+                                width={size.width * 0.95}
+                                currentTime={video.currentTime}
+                                duration={video.duration}
+                            />
+                        </View>
+                    )}
+
+                {isFocused ? children : null}
             </View>
-
-            {/* Controles de vídeo (áudio e slider) */}
-            {isFocused &&
-                !commentEnabled &&
-                showSlider &&
-                Number.isFinite(video.duration) &&
-                video.duration > 0 && (
-                    <View style={sliderContainerStyle} pointerEvents="box-none">
-                        <MomentVideoSlider
-                            width={size.width * 0.95}
-                            currentTime={video.currentTime}
-                            duration={video.duration}
-                        />
-                    </View>
-                )}
-
-            {isFocused ? children : null}
-        </View>
-    )
+        )
 }
