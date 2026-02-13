@@ -10,6 +10,7 @@ import MomentVideoSlider from "./moment-video-slider"
 import PersistedContext from "@/contexts/Persisted"
 import { UserShow } from "@/components/user_show"
 import { View } from "react-native"
+import { Text } from "@/components/Themed"
 
 export default function Container({
     children,
@@ -31,14 +32,20 @@ export default function Container({
     const [cachedVideoUri, setCachedVideoUri] = useState<string | undefined>()
     const [isLoadingCache, setIsLoadingCache] = useState(false)
     const [adjacentThumbnails, setAdjacentThumbnails] = useState<string[]>([])
+    const [hidden, setHidden] = useState<boolean>(options?.hide === true)
 
     // Atualizar o estado de pausa do vídeo quando muda o foco (evitar loops)
     useEffect(() => {
-        const shouldPause = !isFocused || !!commentEnabled || options.hide === true
+        const shouldPause = !isFocused || !!commentEnabled || hidden === true
         if (video.isPaused !== shouldPause) {
             video.setIsPaused(shouldPause)
         }
-    }, [isFocused, commentEnabled, options.hide, video.isPaused])
+    }, [isFocused, commentEnabled, hidden, video.isPaused])
+
+    // Espelha options.hide em estado local para garantir re-render quando mudar
+    useEffect(() => {
+        setHidden(!!options.hide)
+    }, [options.hide])
 
     const container: any = {
         ...size,
@@ -237,8 +244,9 @@ export default function Container({
         }
     }
 */
-    if (options.hide) return null
-    else
+    if (hidden) {
+        return null
+    } else {
         return (
             <View style={container}>
                 <View style={content_container}>
@@ -265,4 +273,5 @@ export default function Container({
                 {isFocused ? children : null}
             </View>
         )
+    }
 }
