@@ -14,13 +14,18 @@ export function ProfileDropDownMenuIOS({
     onHide?: () => void
     onReport?: () => void
 }) {
-    const { options } = React.useContext(MomentContext)
+    const momentCtx = React.useContext(MomentContext) as any
+    const options = momentCtx?.options
     const { t } = React.useContext(LanguageContext)
     const toast = useToast()
 
     async function handlePressHide() {
+        if (!options) {
+            onHide?.()
+            return
+        }
         if (!options.hide) {
-            options.setHide(true)
+            options.setHide?.(true)
             onHide?.()
             toast.success(t("Moment hidden"))
         } else {
