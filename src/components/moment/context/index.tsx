@@ -44,9 +44,11 @@ export function MomentProvider({
             isFeed: isFeed,
             isFocused: isFocused,
             enableLike: !isMe,
-            enableComment: true,
-            enableWatch: true,
-            enableReport: true,
+            enableComment: !isMe,
+            enableWatch: !isMe,
+            enableReport: !isMe,
+            enableContentWarning: data.contentWarning,
+            isHidden: false,
         })
     }, [isFeed, isFocused, isMe])
 
@@ -94,7 +96,16 @@ export function MomentProvider({
             options: OptionsStore,
             video: VideoStore,
         }),
-        [size, DataStore, ActionsStore, OptionsStore, VideoStore],
+        // Recompute when options hidden state toggles to force re-render
+        [
+            size,
+            DataStore,
+            ActionsStore,
+            OptionsStore,
+            OptionsStore?.isHidden,
+            OptionsStore?.hide,
+            VideoStore,
+        ],
     )
 
     return <MomentContext.Provider value={contextValue}>{children}</MomentContext.Provider>
