@@ -108,6 +108,7 @@ export function CameraPermissionNotProvidedCard() {
             <GlassContainer spacing={10}>
                 <GlassView
                     style={glassContainer}
+                    colorScheme="dark"
                     glassEffectStyle="clear"
                     isInteractive={true}
                     tintColor={colors.gray.grey_09 + "90"}

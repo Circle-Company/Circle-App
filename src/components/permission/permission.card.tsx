@@ -105,6 +105,7 @@ export default function PermissionCard({
         return (
             <GlassContainer spacing={10}>
                 <GlassView
+                    colorScheme="dark"
                     style={glassContainer}
                     glassEffectStyle="clear"
                     isInteractive={true}

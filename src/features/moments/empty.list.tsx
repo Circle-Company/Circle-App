@@ -1,13 +1,5 @@
 import React, { useEffect } from "react"
-import {
-    Animated,
-    Easing,
-    Image,
-    ImageStyle,
-    TextStyle,
-    useColorScheme,
-    ViewStyle,
-} from "react-native"
+import { Animated, Easing, Image, ImageStyle, TextStyle, ViewStyle } from "react-native"
 import SearchIcon from "@/assets/icons/svgs/bolt.svg"
 import { Text, View } from "@/components/Themed"
 import ButtonStandart from "@/components/buttons/button-standart"
@@ -23,8 +15,6 @@ import { router } from "expo-router"
 export function EmptyList() {
     const { t } = React.useContext(LanguageContext)
     const { reloadFeed, loading } = React.useContext(FeedContext)
-
-    const isDarkMode = useColorScheme() === "dark"
 
     const fadeAnim = React.useRef(new Animated.Value(0)).current
     const scaleAnim = React.useRef(new Animated.Value(0.8)).current
@@ -213,7 +203,7 @@ export function EmptyList() {
                 width={loading ? sizes.screens.width * 0.2 : undefined}
                 animationScale={0.92}
                 margins={false}
-                backgroundColor={isDarkMode ? colors.gray.grey_08 : colors.gray.grey_02}
+                backgroundColor={colors.gray.grey_08}
                 action={reloadFeed}
             >
                 {loading ? (
@@ -223,11 +213,7 @@ export function EmptyList() {
                 ) : (
                     <>
                         <Text style={reloadTextStyle}>{t("Reload Feed")}</Text>
-                        <SearchIcon
-                            fill={isDarkMode ? colors.gray.white : colors.gray.black}
-                            width={14}
-                            height={14}
-                        />
+                        <SearchIcon fill={colors.gray.white} width={14} height={14} />
                     </>
                 )}
             </ButtonStandart>
