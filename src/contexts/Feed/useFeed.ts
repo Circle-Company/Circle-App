@@ -35,7 +35,10 @@ export const useFeed = () => {
     const fetch = useCallback(
         async (isReloading = false) => {
             if (!session.user || !feedOrchestrator) {
-                throw new Error("User not found or feedManager not initialized")
+                console.warn(
+                    "Feed: waiting for session or feedManager; skipping fetch during auth/init grace",
+                )
+                return
             }
 
             setScrollEnabled(false)

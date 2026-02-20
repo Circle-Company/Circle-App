@@ -2,7 +2,7 @@ import React, { useState } from "react"
 import { AppState } from "react-native"
 import DeviceInfo from "react-native-device-info"
 
-import { apiRoutes } from "@/api"
+import { apiRoutes, beginAuthGracePeriod } from "@/api"
 import { storage, storageKeys } from "@/store"
 import { useUserStore } from "@/contexts/Persisted/persist.user"
 import { useAccountStore } from "@/contexts/Persisted/persist.account"
@@ -293,6 +293,7 @@ export function Provider({ children }: AuthProviderProps) {
             storage.set("@circle:sessionId", sessionPayload.user?.id ?? "")
             trackLogin(String(sessionPayload.user?.username || usernameForSignIn || ""))
             setRedirectTo("APP")
+            beginAuthGracePeriod(1000)
         } catch (error: any) {
             let errorMsg = "Erro interno do servidor"
             if (error?.response?.data?.message) {
@@ -345,6 +346,7 @@ export function Provider({ children }: AuthProviderProps) {
             storage.set("@circle:sessionId", sessionPayload.user?.id ?? "")
             trackLogin(String(sessionPayload.user?.username || signInputUsername.trim() || ""))
             setRedirectTo("APP")
+            beginAuthGracePeriod(1000)
             // Navigation handled by RootLayoutNav via redirectTo
         } catch (error: any) {
             console.error("❌ Erro no login:", error)
@@ -403,6 +405,7 @@ export function Provider({ children }: AuthProviderProps) {
             // Persist sessionId for compatibility with legacy checks
             storage.set("@circle:sessionId", sessionPayload.user?.id ?? "")
             setRedirectTo("APP")
+            beginAuthGracePeriod(1000)
             // Navigation handled by RootLayoutNav via redirectTo
         } catch (error: any) {
             console.error("❌ Erro na criação da conta:", error)
@@ -460,17 +463,8 @@ export function Provider({ children }: AuthProviderProps) {
                 console.log("checkIsSigned: missing jwtToken")
                 return false
             }
-            // Fallback do userId para compatibilidade com versões anteriores
-            const userIdFromStore = storage.getString(storageKeys().user.id)
-            const legacySessionId = storage.getString("@circle:sessionId")
-            const userId = userIdFromStore || legacySessionId || ""
 
-            if (!userId) {
-                // Prossegue mesmo sem userId, pois o interceptor fará a hidratação via sessão
-                console.log("checkIsSigned: proceeding with token only (no user id yet)")
-            }
-
-            // Opcional: Log se o token estiver próximo de expirar (para debug)
+            // Opcional: Log apenas se token estiver próximo de expirar (para debug)
             const jwtExpiration = storage.getString(storageKeys().account.jwt.expiration)
             if (jwtExpiration) {
                 const expirationDate = new Date(jwtExpiration)
