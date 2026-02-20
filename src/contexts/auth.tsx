@@ -455,20 +455,22 @@ export function Provider({ children }: AuthProviderProps) {
 
     const checkIsSigned = (): boolean => {
         try {
-            const userId = storage.getString(storageKeys().user.id)
             const jwtToken = storage.getString(storageKeys().account.jwt.token)
-            const refreshToken = storage.getString(storageKeys().account.jwt.refreshToken)
-
-            // Verifica apenas se tem tokens essenciais
-            // Não verifica expiração aqui - deixa o interceptor da API lidar com refresh
-            const hasEssentialData = Boolean(userId) && Boolean(jwtToken)
-
-            if (!hasEssentialData) {
-                console.log("checkIsSigned: Dados essenciais faltando")
+            if (!jwtToken) {
+                console.log("checkIsSigned: missing jwtToken")
                 return false
             }
+            // Fallback do userId para compatibilidade com versões anteriores
+            const userIdFromStore = storage.getString(storageKeys().user.id)
+            const legacySessionId = storage.getString("@circle:sessionId")
+            const userId = userIdFromStore || legacySessionId || ""
 
-            // Opcional: Log apenas se token estiver próximo de expirar (para debug)
+            if (!userId) {
+                // Prossegue mesmo sem userId, pois o interceptor fará a hidratação via sessão
+                console.log("checkIsSigned: proceeding with token only (no user id yet)")
+            }
+
+            // Opcional: Log se o token estiver próximo de expirar (para debug)
             const jwtExpiration = storage.getString(storageKeys().account.jwt.expiration)
             if (jwtExpiration) {
                 const expirationDate = new Date(jwtExpiration)
