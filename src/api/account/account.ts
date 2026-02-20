@@ -1,9 +1,24 @@
 import api from "@/api"
 import { storage, storageKeys } from "@/store"
-import { accountProps, momentsProps } from "./account.types"
+import { accountProps, momentsProps, accountBlocksProps } from "./account.types"
 
 async function getAccount(): Promise<accountProps> {
     const response = await api.get("/account", {
+        headers: {
+            Authorization: `Bearer ${storage.getString(storageKeys().account.jwt.token) || ""}`,
+        },
+    })
+    return response.data
+}
+
+async function getAccountBlocks({
+    limit,
+    offset,
+}: {
+    limit: number
+    offset: number
+}): Promise<accountBlocksProps> {
+    const response = await api.get(`/account/blocks?limit=${limit}&offset=${offset}`, {
         headers: {
             Authorization: `Bearer ${storage.getString(storageKeys().account.jwt.token) || ""}`,
         },
@@ -68,6 +83,7 @@ async function updateName({ name }: { name: string }): Promise<void> {
 
 export const routes = {
     getAccount,
+    getAccountBlocks,
     getMoments,
     updateDescription,
     updateName,

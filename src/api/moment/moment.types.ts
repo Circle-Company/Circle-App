@@ -1,5 +1,3 @@
-import { InteractionType } from "@/components/moment/context/moment.actions"
-
 export interface BaseAction {
     momentId: string
     authorizationToken: string
@@ -7,6 +5,12 @@ export interface BaseAction {
 
 export interface watchTimeAction extends BaseAction {
     watchTime: number
+}
+
+export interface reportAction {
+    momentId: string
+    reason: string
+    description: string
 }
 
 export interface commentAction extends BaseAction {

@@ -1,5 +1,6 @@
 import { NativeTabs, Icon, Label } from "expo-router/unstable-native-tabs"
 import React from "react"
+import { usePathname } from "expo-router"
 import { Platform, DynamicColorIOS } from "react-native"
 import ColorTheme, { colors } from "@/constants/colors"
 import Fonts from "@/constants/fonts"
@@ -11,6 +12,8 @@ import { useCameraContext } from "../../modules/camera"
 export default function TabsLayout() {
     const { t } = React.useContext(LanguageContext)
     const { tabHide } = useCameraContext()
+    const pathname = usePathname()
+    const hideTabs = pathname?.startsWith("/(tabs)/moments/permissions")
 
     const tintColor = Platform.select({
         ios: DynamicColorIOS({
@@ -41,7 +44,7 @@ export default function TabsLayout() {
                         ? "systemMaterialDark"
                         : undefined
                 }
-                minimizeBehavior="onScrollDown"
+                minimizeBehavior={hideTabs ? "always" : "onScrollDown"}
             >
                 <NativeTabs.Trigger name="moments">
                     <Label selectedStyle={{ color: tintColor }}>{t("Moments")}</Label>

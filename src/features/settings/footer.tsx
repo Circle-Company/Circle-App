@@ -37,11 +37,6 @@ export function SettingsFooterComponent() {
             <Text style={subText}>
                 {t("by")} {config.ORGANIZATION_NAME}
             </Text>
-            <Text
-                style={[text, { marginTop: sizes.margins["1md"], fontSize: fonts.size.body * 0.8 }]}
-            >
-                {t("Version")} {config.APP_VERSION}
-            </Text>
         </View>
     )
 }

@@ -34,6 +34,7 @@ export function MomentProvider({
     }, [data])
 
     useEffect(() => {
+        const isHidden = session.account.hiddenMoments.includes(data.id)
         ActionsStore.set({
             like: data.isLiked!,
             comment: false,
@@ -48,7 +49,8 @@ export function MomentProvider({
             enableWatch: !isMe,
             enableReport: !isMe,
             enableContentWarning: data.contentWarning,
-            isHidden: false,
+            isHidden: isHidden,
+            showReportModal: !isMe,
         })
     }, [isFeed, isFocused, isMe])
 
@@ -97,15 +99,7 @@ export function MomentProvider({
             video: VideoStore,
         }),
         // Recompute when options hidden state toggles to force re-render
-        [
-            size,
-            DataStore,
-            ActionsStore,
-            OptionsStore,
-            OptionsStore?.isHidden,
-            OptionsStore?.hide,
-            VideoStore,
-        ],
+        [size, DataStore, ActionsStore, OptionsStore, OptionsStore?.isHidden, , VideoStore],
     )
 
     return <MomentContext.Provider value={contextValue}>{children}</MomentContext.Provider>

@@ -1,5 +1,13 @@
 import { useQuery, UseQueryResult, useMutation, useQueryClient } from "@tanstack/react-query"
 import { apiRoutes } from "@/api"
+import { accountBlocksProps } from "@/api/account/account.types"
+
+export type AccountBlock = {
+    id: string
+    username: string
+    profilePicture: string
+    name: string
+}
 
 export type AccountData = {
     id: string
@@ -44,6 +52,9 @@ export type AccountMomentsResponse = {
 export const accountKeys = {
     all: ["account"] as const,
     detail: () => [...accountKeys.all, "detail"] as const,
+    blocks: () => [...accountKeys.all, "blocks"] as const,
+    blocksPaginated: (limit: number, offset: number) =>
+        [...accountKeys.blocks(), { limit, offset }] as const,
     moments: () => [...accountKeys.all, "moments"] as const,
     momentsPaginated: (page: number, limit: number) =>
         [...accountKeys.moments(), { page, limit }] as const,
@@ -57,6 +68,19 @@ export const accountKeys = {
 async function fetchAccount(): Promise<AccountData> {
     const response = await apiRoutes.account.getAccount()
     return response.account
+}
+
+/**
+ * Fetches the authenticated user's account data.
+ * @returns Promise resolving to AccountData
+ * @throws Error if the API request fails
+ */
+async function fetchAccountBlocks(
+    limit: number = 20,
+    offset: number = 0,
+): Promise<accountBlocksProps> {
+    const response = await apiRoutes.account.getAccountBlocks({ limit, offset })
+    return response
 }
 
 /**
@@ -80,6 +104,46 @@ export async function fetchAccountMoments(
 /**
  * React Query Hooks
  */
+
+/**
+ * Hook to fetch and cache the authenticated user's account data.
+ *
+ * @param options - Query configuration options
+ * @param options.enabled - Whether the query should run (default: true)
+ * @param options.refetchOnMount - Whether to refetch when component mounts (default: true)
+ * @param options.staleTime - Time in ms before data is considered stale (default: 5 minutes)
+ *
+ * @returns UseQueryResult with account data, loading states, and refetch function
+ *
+ * @example
+ * ```tsx
+ * const { session } = useContext(PersistedContext)
+ * const { data, isLoading, refetch } = useAccountBlocksQuery({
+ *   enabled: !!session.account.jwtToken,
+ *   staleTime: 1000 * 60 * 10, // 10 minutes
+ * })
+ *
+ * if (isLoading) return <Loading />
+ * return <Profile user={data} />
+ * ```
+ */
+export function useAccountBlocksQuery(
+    limit: number = 20,
+    offset: number = 0,
+    options?: {
+        enabled?: boolean
+        refetchOnMount?: boolean
+        staleTime?: number
+    },
+): UseQueryResult<accountBlocksProps, Error> {
+    return useQuery({
+        queryKey: accountKeys.blocksPaginated(limit, offset),
+        queryFn: () => fetchAccountBlocks(limit, offset),
+        staleTime: options?.staleTime ?? 1000 * 60 * 5, // 5 minutes default
+        enabled: options?.enabled ?? true,
+        refetchOnMount: options?.refetchOnMount ?? true,
+    })
+}
 
 /**
  * Hook to fetch and cache the authenticated user's account data.

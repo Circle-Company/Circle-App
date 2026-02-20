@@ -1,49 +1,39 @@
 import MomentContext from "@/components/moment/context"
 import LanguageContext from "@/contexts/language"
-import { useToast } from "@/contexts/Toast"
+import PersistedContext from "@/contexts/Persisted"
 import { ContextMenu, Host, Button } from "@expo/ui/swift-ui"
 import React from "react"
-import { Alert } from "react-native"
 
-export function ProfileDropDownMenuIOS({
-    children,
-    onHide,
-    onReport,
-}: {
-    children?: React.ReactNode
-    onHide?: () => void
-    onReport?: () => void
-}) {
-    const momentCtx = React.useContext(MomentContext) as any
-    const options = momentCtx?.options
+export function ProfileDropDownMenuIOS({ children }: { children?: React.ReactNode }) {
+    const { session } = React.useContext(PersistedContext)
+    const { options, data } = React.useContext(MomentContext)
     const { t } = React.useContext(LanguageContext)
-    const toast = useToast()
 
     async function handlePressHide() {
-        if (!options) {
-            onHide?.()
-            return
-        }
-        if (!options.hide) {
-            options.setHide?.(true)
-            onHide?.()
-            toast.success(t("Moment hidden"))
-        } else {
-            onHide?.()
-        }
+        options.setIsHidden(!options.isHidden)
+        if (options.isHidden) session.account.addHiddenMoment(data.id)
+        else session.account.removeHiddenMoment(data.id)
+    }
+
+    async function handlePressReport() {
+        options.setShowReportModal(true)
     }
 
     return (
         <Host>
             <ContextMenu activationMethod="longPress" frame={{ alignment: "center" }}>
                 <ContextMenu.Items>
-                    <Button systemImage="eye.slash" role="default" onPress={handlePressHide}>
-                        {t("Hide Moment")}
+                    <Button
+                        systemImage={options.isHidden ? "eye" : "eye.slash"}
+                        role="default"
+                        onPress={handlePressHide}
+                    >
+                        {t(options.isHidden ? "Show Moment" : "Hide Moment")}
                     </Button>
                     <Button
                         systemImage="exclamationmark.shield"
                         role="destructive"
-                        onPress={() => {}}
+                        onPress={handlePressReport}
                     >
                         {t("Report")}
                     </Button>

@@ -36,6 +36,23 @@ export default function ListSettings() {
     const disableHapticsMutation = useDisableHapticsMutation()
     const enableHapticsMutation = useEnableEnableMutation()
 
+    /**
+    {
+         name: t("Haptic Feedback"),
+         value: session.preferences.content.disableHaptics
+             ? t("Enabled")
+             : t("Disabled"),
+
+         rightComponent: (
+             <SwitchButton
+                 initialState={!preferencesState.disableHaptics}
+                 onPressEnable={enableHapticsMutation.mutate}
+                 onPressDisable={disableHapticsMutation.mutate}
+             />
+         ),
+     },
+     */
+
     const ListData: SettignsSectionProps[] = [
         {
             name: t("Public Profile"),
@@ -62,27 +79,14 @@ export default function ListSettings() {
             content: [
                 {
                     name: t("Language"),
-                    value:
-                        session.preferences.language.appLanguage == "pt" ? "Português" : "English",
                     onPress: () => router.push("/(tabs)/settings/language"),
                 },
                 {
-                    name: t("Haptic Feedback"),
-                    value: session.preferences.content.disableHaptics
-                        ? t("Enabled")
-                        : t("Disabled"),
-
-                    rightComponent: (
-                        <SwitchButton
-                            initialState={!preferencesState.disableHaptics}
-                            onPressEnable={enableHapticsMutation.mutate}
-                            onPressDisable={disableHapticsMutation.mutate}
-                        />
-                    ),
+                    name: t("Blocked Users"),
+                    onPress: () => router.push("/(tabs)/settings/blocked-users"),
                 },
                 {
                     name: t("Personal Data"),
-                    secure: true,
                     onPress: () => router.push("/(tabs)/settings/personal-data"),
                 },
             ],
@@ -115,14 +119,14 @@ export default function ListSettings() {
             content: [
                 {
                     name: t("Support"),
-                    value: config.CIRCLE_APP_URL.replace("https://", "") + "/contact-us",
+                    value: config.CIRCLE_APP_URL.replace("https://www.", "") + "/contact-us",
                     onPress: () => {
                         Browser.openBrowserAsync(config.CONTACT_US_URL)
                     },
                 },
                 {
                     name: t("Help"),
-                    value: config.CIRCLE_APP_URL.replace("https://", "") + "/help",
+                    value: config.CIRCLE_APP_URL.replace("https://www.", "") + "/help",
                     onPress: () => {
                         Browser.openBrowserAsync(config.HELP_URL)
                     },
@@ -131,6 +135,10 @@ export default function ListSettings() {
                     name: t("Log Out"),
                     value: t("Signed with") + " @" + session.user.username,
                     onPress: () => router.push("/(tabs)/settings/log-out"),
+                },
+                {
+                    name: t("Delete Account"),
+                    onPress: () => router.push("/(tabs)/settings/exclude-account"),
                 },
             ],
         },

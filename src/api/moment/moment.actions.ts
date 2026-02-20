@@ -1,4 +1,4 @@
-import { BaseAction, commentAction, watchTimeAction } from "./moment.types"
+import type { BaseAction, commentAction, watchTimeAction, reportAction } from "./moment.types"
 import api from "@/api"
 import { storage, storageKeys } from "@/store"
 
@@ -33,6 +33,21 @@ async function flushWatch(momentId: string, watchTime: number): Promise<void> {
 
 export async function like(props: BaseAction): Promise<void> {
     await api.post(`/moments/${props.momentId}/like`, {})
+}
+
+export async function report(props: reportAction): Promise<void> {
+    await api.post(
+        `/moments/${props.momentId}/report`,
+        {
+            reason: props.reason,
+            description: props.description,
+        },
+        {
+            headers: {
+                Authorization: `Bearer ${storage.getString(storageKeys().account.jwt.token) || ""}`,
+            },
+        },
+    )
 }
 
 export async function unlike(props: BaseAction): Promise<void> {

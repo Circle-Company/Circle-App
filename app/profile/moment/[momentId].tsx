@@ -20,6 +20,7 @@ import ZeroComments from "@/components/comment/components/comments-zero_comments
 import useRewriteUrl from "@/lib/hooks/useRewriteUrl"
 import { useToast } from "@/contexts/Toast"
 import LanguageContext from "@/contexts/language"
+import { ProfileDropDownMenuIOS } from "@/features/profile/profile.moments.dropdown.menu"
 
 export default function MomentFullScreen() {
     const { momentId } = useLocalSearchParams<{ momentId: string }>()
@@ -230,71 +231,75 @@ export default function MomentFullScreen() {
                     shadow={{ top: false, bottom: true }}
                 >
                     <Animated.View style={animatedMomentStyle}>
-                        <Moment.Container
-                            contentRender={momentData.media}
-                            isFocused={true}
-                            loading={false}
-                            blurRadius={30}
-                            forceMute={false}
-                            showSlider={true}
-                            disableCache={true}
-                            disableWatch={false}
-                        >
-                            {/* Top user info (no scale animations) */}
-                            <Moment.Root.Top>
-                                <Moment.Root.TopLeft>
-                                    <UserShow.Root data={momentData.user}>
-                                        <UserShow.ProfilePicture
-                                            disableAction={true}
-                                            displayOnMoment={true}
-                                            pictureDimensions={{ width: 30, height: 30 }}
-                                        />
-                                        <UserShow.Username
-                                            pressable={false}
-                                            fontFamily={fonts.family["Bold-Italic"]}
-                                        />
-                                    </UserShow.Root>
-                                </Moment.Root.TopLeft>
-                            </Moment.Root.Top>
-                            <Moment.Root.Center>
-                                <View
-                                    style={{
-                                        marginBottom: sizes.margins["2sm"],
-                                        width: "100%",
-                                        zIndex: 1,
-                                    }}
-                                >
-                                    <View style={{ marginLeft: 6, marginBottom: 10 }}>
-                                        <Moment.Description />
-                                    </View>
-                                    <View style={{ flexDirection: "row", alignItems: "center" }}>
-                                        <View style={{ flex: 1, height: 46 }}>
-                                            <Moment.LikeButtonIOS isLiked={false} />
+                        <ProfileDropDownMenuIOS>
+                            <Moment.Container
+                                contentRender={momentData.media}
+                                isFocused={true}
+                                loading={false}
+                                blurRadius={30}
+                                forceMute={false}
+                                showSlider={true}
+                                disableCache={true}
+                                disableWatch={false}
+                            >
+                                {/* Top user info (no scale animations) */}
+                                <Moment.Root.Top>
+                                    <Moment.Root.TopLeft>
+                                        <UserShow.Root data={momentData.user}>
+                                            <UserShow.ProfilePicture
+                                                disableAction={true}
+                                                displayOnMoment={true}
+                                                pictureDimensions={{ width: 30, height: 30 }}
+                                            />
+                                            <UserShow.Username
+                                                pressable={false}
+                                                fontFamily={fonts.family["Bold-Italic"]}
+                                            />
+                                        </UserShow.Root>
+                                    </Moment.Root.TopLeft>
+                                </Moment.Root.Top>
+                                <Moment.Root.Center>
+                                    <View
+                                        style={{
+                                            marginBottom: sizes.margins["2sm"],
+                                            width: "100%",
+                                            zIndex: 1,
+                                        }}
+                                    >
+                                        <View style={{ marginLeft: 6, marginBottom: 10 }}>
+                                            <Moment.Description />
                                         </View>
-                                        <View>
-                                            <Moment.AudioControl />
+                                        <View
+                                            style={{ flexDirection: "row", alignItems: "center" }}
+                                        >
+                                            <View style={{ flex: 1, height: 46 }}>
+                                                <Moment.LikeButtonIOS isLiked={false} />
+                                            </View>
+                                            <View>
+                                                <Moment.AudioControl />
+                                            </View>
                                         </View>
                                     </View>
-                                </View>
-                            </Moment.Root.Center>
+                                </Moment.Root.Center>
 
-                            {/* Subtle bottom gradient like feed */}
-                            <LinearGradient
-                                pointerEvents="none"
-                                colors={["rgba(0, 0, 0, 0.00)", "rgba(0, 0, 0, 0.4)"]}
-                                start={{ x: 0.5, y: 0 }}
-                                end={{ x: 0.5, y: 1 }}
-                                style={{
-                                    position: "absolute",
-                                    left: 0,
-                                    right: 0,
-                                    bottom: 0,
-                                    width: sizes.moment.standart.width,
-                                    height: sizes.moment.standart.height * 0.1,
-                                    zIndex: 0,
-                                }}
-                            />
-                        </Moment.Container>
+                                {/* Subtle bottom gradient like feed */}
+                                <LinearGradient
+                                    pointerEvents="none"
+                                    colors={["rgba(0, 0, 0, 0.00)", "rgba(0, 0, 0, 0.4)"]}
+                                    start={{ x: 0.5, y: 0 }}
+                                    end={{ x: 0.5, y: 1 }}
+                                    style={{
+                                        position: "absolute",
+                                        left: 0,
+                                        right: 0,
+                                        bottom: 0,
+                                        width: sizes.moment.standart.width,
+                                        height: sizes.moment.standart.height * 0.1,
+                                        zIndex: 0,
+                                    }}
+                                />
+                            </Moment.Container>
+                        </ProfileDropDownMenuIOS>
                     </Animated.View>
                     {momentData?.topComment ? (
                         <RenderCommentFeed moment={momentData} focused={true} />

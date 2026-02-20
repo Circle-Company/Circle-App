@@ -4,13 +4,10 @@ import ColorTheme from "@/constants/colors"
 import fonts from "@/constants/fonts"
 import sizes from "@/constants/sizes"
 import LanguageContext from "@/contexts/language"
-import HeaderLeft from "@/components/headers/camera/camera-header_left"
 import { GestureHandlerRootView } from "react-native-gesture-handler"
 import { StyleSheet, Platform, View } from "react-native"
 import { BlurView } from "expo-blur"
 import { CameraProvider } from "../../../modules/camera/context"
-import { Text } from "react-native"
-import { HeaderButton } from "@react-navigation/elements"
 
 export default function CameraLayout() {
     const { t } = React.useContext(LanguageContext)

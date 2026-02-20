@@ -14,7 +14,12 @@ import Reanimated, {
     useSharedValue,
 } from "react-native-reanimated"
 import type { CameraProps, CameraRuntimeError, VideoFile } from "react-native-vision-camera"
-import { Camera, useCameraDevice, useCameraFormat } from "react-native-vision-camera"
+import {
+    Camera,
+    useCameraDevice,
+    useCameraFormat,
+    useCameraPermission,
+} from "react-native-vision-camera"
 import { CaptureButton } from "../components/CaptureButton"
 import CameraVideoSlider from "../components/CameraVideoSlider"
 import { CONTENT_SPACING, MAX_ZOOM_FACTOR, SCREEN_HEIGHT, SCREEN_WIDTH } from "../constants"
@@ -25,6 +30,7 @@ import { colors } from "@/constants/colors"
 import fonts from "@/constants/fonts"
 import { FlashButton } from "../components/flashButton"
 import { RotateButton } from "../components/rotateButton"
+import { CameraPermissionNotProvidedCard } from "../components/CameraPermissionNotProvidedCard"
 
 const ReanimatedCamera = Reanimated.createAnimatedComponent(Camera)
 Reanimated.addWhitelistedNativeProps({
@@ -314,6 +320,7 @@ export function CameraPage(): React.ReactElement {
                     },
                 }}
             />
+            {useCameraPermission().hasPermission === false && <CameraPermissionNotProvidedCard />}
             <View style={styles.container}>
                 {device != null ? (
                     <GestureDetector gesture={pinchGesture}>
@@ -359,36 +366,45 @@ export function CameraPage(): React.ReactElement {
                     </View>
                 )}
 
-                <View style={[styles.bottomBar, { bottom: CONTENT_SPACING * 9 + insets.bottom }]}>
-                    <RotateButton />
-                    <CaptureButton
-                        style={styles.captureButton}
-                        camera={camera}
-                        onMediaCaptured={onMediaCaptured as any}
-                        cameraZoom={zoom}
-                        minZoom={minZoom}
-                        maxZoom={maxZoom}
-                        flash="off"
-                        enabled={isCameraInitialized && isActive}
-                        setIsPressingButton={setIsPressingButton}
-                        onRecordingStart={() => setIsRecording(true)}
-                        onRecordingStop={() => setIsRecording(false)}
-                    />
+                {useCameraPermission().hasPermission === true && (
+                    <>
+                        <View
+                            style={[
+                                styles.bottomBar,
+                                { bottom: CONTENT_SPACING * 9 + insets.bottom },
+                            ]}
+                        >
+                            <RotateButton />
+                            <CaptureButton
+                                style={styles.captureButton}
+                                camera={camera}
+                                onMediaCaptured={onMediaCaptured as any}
+                                cameraZoom={zoom}
+                                minZoom={minZoom}
+                                maxZoom={maxZoom}
+                                flash="off"
+                                enabled={isCameraInitialized && isActive}
+                                setIsPressingButton={setIsPressingButton}
+                                onRecordingStart={() => setIsRecording(true)}
+                                onRecordingStop={() => setIsRecording(false)}
+                            />
 
-                    <FlashButton />
-                </View>
-                {isRecording && (
-                    <View
-                        style={{
-                            position: "absolute",
-                            bottom: CONTENT_SPACING * 7.8 + insets.bottom,
-                        }}
-                    >
-                        <CameraVideoSlider
-                            maxTime={MAX_RECORDING_TIME}
-                            width={sizes.moment.full.width * 0.6}
-                        />
-                    </View>
+                            <FlashButton />
+                        </View>
+                        {isRecording && (
+                            <View
+                                style={{
+                                    position: "absolute",
+                                    bottom: CONTENT_SPACING * 7.8 + insets.bottom,
+                                }}
+                            >
+                                <CameraVideoSlider
+                                    maxTime={MAX_RECORDING_TIME}
+                                    width={sizes.moment.full.width * 0.6}
+                                />
+                            </View>
+                        )}
+                    </>
                 )}
             </View>
         </View>

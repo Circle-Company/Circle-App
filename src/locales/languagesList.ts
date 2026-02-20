@@ -3,11 +3,11 @@ import { LanguagesListType } from "./LanguageTypes"
 export const languagesList: LanguagesListType = [
     {
         code: "en",
-        nativeName: "English (US)",
+        nativeName: "🇺🇸 English",
     },
     {
         code: "pt",
-        nativeName: "Português (BR)",
+        nativeName: "🇧🇷 Português",
     },
 ]
 

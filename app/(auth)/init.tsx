@@ -26,7 +26,7 @@ export default function SplashScreen() {
         flex: 1,
         height: "100%",
         alignItems: "center",
-        backgroundColor: colors.gray.black,
+        backgroundColor: "#06040a",
     }
     const header: any = {
         alignItems: "center",
@@ -91,37 +91,20 @@ export default function SplashScreen() {
 
     const superior_gradient: any = {
         width: sizes.window.width,
-        height: sizes.window.height / 2,
+        height: sizes.window.height / 1.4,
         position: "absolute",
-        zIndex: 1,
+        zIndex: 0,
         top: 0,
-        opacity: 0.55,
+        opacity: 0.08,
     }
 
     const inferior_gradient: any = {
         width: sizes.window.width,
         height: sizes.window.height / 2,
         position: "absolute",
-        zIndex: 1,
-        bottom: 0,
-        opacity: 0,
-    }
-
-    const logoContainer: ViewStyle = {
-        marginBottom: sizes.margins["1md"],
-        width: 190,
-        height: 190,
-        borderRadius: 40,
-        alignItems: "center",
-        justifyContent: "center",
-        overflow: "hidden",
-    }
-    const iconGradient: any = {
-        width: 190,
-        height: 190,
-        position: "absolute",
         zIndex: 0,
-        top: 0,
+        bottom: 0,
+        opacity: 0.01,
     }
 
     // Optional hero image just above the header (rendered only if provided)
@@ -209,13 +192,13 @@ export default function SplashScreen() {
         <View style={container}>
             <LinearGradient
                 renderToHardwareTextureAndroid
-                colors={["rgba(42, 42, 42, 1)", "#00000000"]}
+                colors={["#c29eff", "#00000000"]}
                 style={superior_gradient}
             />
 
             <LinearGradient
                 renderToHardwareTextureAndroid
-                colors={["#00000000", colors.purple.purple_09]}
+                colors={["#00000000", "#c29eff"]}
                 style={inferior_gradient}
             />
             <SafeAreaInsetsContext value={insets}>
@@ -231,7 +214,7 @@ export default function SplashScreen() {
                         <Text style={slogan}>{t(config.APPLICATION_DESCRIPTION)}</Text>
                     </View>
 
-                    <View style={[buttons, { bottom: insets.bottom }]}>
+                    <View style={[buttons, { bottom: sizes.screens.height * 0.06 }]}>
                         <View style={primaryActionContainer}>
                             <Button
                                 action={SignWithApple}
@@ -247,7 +230,7 @@ export default function SplashScreen() {
                                     height={28}
                                     fill={colors.gray.black.toString()}
                                 />
-                                <Text style={primaryActionText}>{t("Sign in with Apple")}</Text>
+                                <Text style={primaryActionText}>{t("Continue with Apple")}</Text>
                             </Button>
                         </View>
                         <View style={{ marginTop: sizes.margins["1sm"], alignItems: "center" }}>

@@ -380,5 +380,9 @@
     "Nothing to save": "Nada para salvar",
     "Canceled": "Cancelado",
     "No folder was selected.": "Nenhuma pasta foi selecionada.",
-    "Error saving": "Erro ao salvar"
+    "Error saving": "Erro ao salvar",
+    "Report": "Denunciar",
+    "Hide Moment": "Ocultar Momento",
+    "Show Moment": "Mostrar Momento",
+    "Block @{{username}}": "Bloquear @{{username}}"
 }

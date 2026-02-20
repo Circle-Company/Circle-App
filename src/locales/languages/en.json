@@ -378,6 +378,10 @@
     "Error copying JSON": "Error copying JSON",
     "Nothing to save": "Nothing to save",
     "Canceled": "Canceled",
+    "Report": "Report",
+    "Hide Moment": "Hide Moment",
+    "Show Moment": "Show Moment",
+    "Block @{{username}}": "Block @{{username}}",
     "No folder was selected.": "No folder was selected.",
     "Error saving": "Error saving"
 }

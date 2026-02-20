@@ -9,7 +9,6 @@ type SwiftBottomSheetProps = {
     onIsOpenedChange: (value: boolean) => void
     children: React.ReactNode
     snapPoints?: number[]
-    zIndex?: number
 }
 
 export function SwiftBottomSheet({
@@ -17,17 +16,9 @@ export function SwiftBottomSheet({
     onIsOpenedChange,
     children,
     snapPoints = [0.5, 1],
-    zIndex = 9999,
 }: SwiftBottomSheetProps) {
     return (
-        <Host
-            style={{
-                width: "100%",
-                position: "absolute",
-                bottom: 0,
-                zIndex,
-            }}
-        >
+        <Host>
             <BottomSheet
                 presentationDragIndicator="visible"
                 presentationDetents={snapPoints}

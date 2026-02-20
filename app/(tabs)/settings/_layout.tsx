@@ -48,7 +48,6 @@ export default function SettingsLayout() {
                 name="profile-picture"
                 options={{
                     headerTransparent: false,
-
                     headerTitle: t("Add Profile Picture"),
                 }}
             />
@@ -56,7 +55,6 @@ export default function SettingsLayout() {
                 name="description"
                 options={{
                     headerTransparent: false,
-
                     headerTitle: t("Add Description"),
                 }}
             />
@@ -64,7 +62,6 @@ export default function SettingsLayout() {
                 name="name"
                 options={{
                     headerTransparent: false,
-
                     headerTitle: t("Name"),
                 }}
             />
@@ -72,7 +69,6 @@ export default function SettingsLayout() {
                 name="password"
                 options={{
                     headerTransparent: false,
-
                     headerTitle: t("Password"),
                 }}
             />
@@ -80,15 +76,30 @@ export default function SettingsLayout() {
                 name="personal-data"
                 options={{
                     headerTransparent: false,
-
                     headerTitle: t("Personal Data"),
+                }}
+            />
+            <Stack.Screen
+                name="content"
+                options={{
+                    headerTransparent: false,
+                    headerTitle: t("Content"),
+                }}
+            />
+            <Stack.Screen
+                name="blocked-users"
+                options={{
+                    headerStyle: {
+                        backgroundColor: "transparent",
+                    },
+                    headerTransparent: true,
+                    headerTitle: t("Blocked Users"),
                 }}
             />
             <Stack.Screen
                 name="exclude-account"
                 options={{
                     headerTransparent: false,
-
                     headerTitle: t("Delete Account"),
                 }}
             />

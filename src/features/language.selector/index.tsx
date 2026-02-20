@@ -1,7 +1,7 @@
 import React from "react"
-import { FlatList, Pressable, View, useColorScheme } from "react-native"
+import { FlatList, Pressable, View } from "react-native"
 import CheckIcon from "@/assets/icons/svgs/check_circle.svg"
-import ColorTheme, { colors } from "@/constants/colors"
+import { colors } from "@/constants/colors"
 import fonts from "@/constants/fonts"
 import sizes from "@/constants/sizes"
 import PersistedContext from "@/contexts/Persisted"
@@ -16,20 +16,18 @@ export default function ListLanguagesSelector() {
     function handlePress(value: LanguagesCodesType) {
         changeAppLanguage(value)
     }
-
-    const isDarkMode = useColorScheme() === "dark"
-    const icon_fill: string = ColorTheme().primary
+    const icon_fill: string = colors.purple.purple_02
 
     const container: ViewStyle = {
         width: "100%",
         alignItems: "center",
         justifyContent: "flex-start",
         flexDirection: "row",
-        paddingVertical: sizes.paddings["1md"],
+        paddingVertical: sizes.paddings["1md"] * 1.2,
         paddingLeft: sizes.paddings["1sm"],
         paddingRight: sizes.paddings["1sm"],
-        backgroundColor: isDarkMode ? colors.gray.grey_09 : colors.gray.grey_01,
-        borderRadius: sizes.borderRadius["1md"],
+        backgroundColor: colors.gray.grey_08,
+        borderRadius: sizes.borderRadius["1md"] * 1.2,
         marginBottom: sizes.paddings["1sm"],
     }
     const container_left: ViewStyle = {
@@ -44,17 +42,21 @@ export default function ListLanguagesSelector() {
     }
 
     const text_style: TextStyle = {
-        top
+        top: -1,
         fontSize: fonts.size.title3 * 0.8,
-        fontFamily: fonts.family.Semibold,
+        fontFamily: fonts.family.Bold,
     }
 
     const getContainerStyle = (code: LanguagesCodesType): ViewStyle => ({
         ...container,
         borderWidth: session.preferences.language.appLanguage === code ? 2 : 0,
+        backgroundColor:
+            session.preferences.language.appLanguage === code
+                ? colors.purple.purple_09 + 60
+                : colors.gray.grey_08,
         borderColor:
             session.preferences.language.appLanguage === code
-                ? ColorTheme().primary
+                ? colors.purple.purple_04
                 : "transparent",
     })
 
@@ -76,7 +78,7 @@ export default function ListLanguagesSelector() {
                         </View>
                         {session.preferences.language.appLanguage == item.code && (
                             <View style={container_right}>
-                                <CheckIcon fill={icon_fill} width={22} height={22} />
+                                <CheckIcon fill={icon_fill} width={23} height={23} />
                             </View>
                         )}
                     </Pressable>

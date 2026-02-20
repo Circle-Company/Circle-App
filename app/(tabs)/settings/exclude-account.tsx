@@ -104,38 +104,19 @@ export default function ExcludeAccountScreen() {
             </View>
 
             <View style={styles.buttonsRow}>
-                <View style={styles.halfLeft}>
-                    <ButtonStandart
-                        bounciness={5}
-                        animationScale={0.93}
-                        borderRadius={50}
-                        margins={false}
-                        height={46}
-                        width={"100%" as any}
-                        action={() => {
-                            if (!loading) router.back()
-                        }}
-                        backgroundColor={colors.red.red_05.toString()}
-                    >
-                        <Text style={styles.deleteButtonText}>{t("Cancel")}</Text>
-                    </ButtonStandart>
-                </View>
-                <View style={styles.halfRight}>
-                    <ButtonStandart
-                        bounciness={5}
-                        animationScale={0.93}
-                        borderRadius={50}
-                        margins={false}
-                        height={46}
-                        width={"100%" as any}
-                        action={() => {
-                            if (!loading) confirmAndDelete()
-                        }}
-                        backgroundColor={colors.gray.grey_08.toString()}
-                    >
-                        <Text style={styles.deleteButtonText}>{t("Delete Account")}</Text>
-                    </ButtonStandart>
-                </View>
+                <ButtonStandart
+                    bounciness={5}
+                    animationScale={0.93}
+                    borderRadius={50}
+                    margins={false}
+                    height={46}
+                    action={() => {
+                        if (!loading) confirmAndDelete()
+                    }}
+                    backgroundColor={colors.red.red_05.toString()}
+                >
+                    <Text style={styles.deleteButtonText}>{t("Delete Account")}</Text>
+                </ButtonStandart>
             </View>
         </View>
     )
@@ -214,6 +195,7 @@ const styles = StyleSheet.create({
     buttonsRow: {
         flexDirection: "row",
         alignItems: "center",
+        justifyContent: "center",
         marginTop: 12,
     },
     halfLeft: {

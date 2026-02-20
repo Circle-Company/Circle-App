@@ -49,6 +49,7 @@ export function storageKeys() {
                 refreshToken: baseKey + "account:jwt:refreshtoken",
             },
             moments: baseKey + "account:moments",
+            hiddenMoments: baseKey + "account:hiddenmoments",
             totalMoments: baseKey + "account:totalmoments",
             terms: {
                 agreed: baseKey + "account:terms:agreed",
@@ -71,10 +72,12 @@ export function storageKeys() {
             autoplay: baseKey + "preferences:content:autoplay",
             haptics: baseKey + "preferences:content:haptics",
             translation: baseKey + "preferences:content:translation",
+            contentWarning: baseKey + "preferences:content:warning",
             translationLanguage: baseKey + "preferences:content:translation:language",
             muteAudio: baseKey + "preferences:content:muteaudio",
             appTimezone: baseKey + "preferences:timezone:offset",
             timezoneCode: baseKey + "preferences:timezone:code",
+            onboardingPermissionsCompleted: baseKey + "preferences:onboarding:permissionsCompleted",
         },
         user: {
             id: baseKey + "user:id",
