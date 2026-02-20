@@ -44,7 +44,8 @@ export default function ListLanguagesSelector() {
     }
 
     const text_style: TextStyle = {
-        fontSize: fonts.size.body,
+        top
+        fontSize: fonts.size.title3 * 0.8,
         fontFamily: fonts.family.Semibold,
     }
 
