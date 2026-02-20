@@ -139,6 +139,12 @@ let isRefreshing = false
 let refreshPromise: Promise<string> | null = null
 const pendingQueue: PendingResolver[] = []
 
+// Auth grace period: used to delay refresh handling right after auth completes
+let authGraceUntil = 0
+export function beginAuthGracePeriod(durationMs: number = 1000) {
+    authGraceUntil = Date.now() + Math.max(0, durationMs)
+}
+
 /**
  * Dispara o refresh token flow usando o refreshToken salvo no MMKV.
  * - GET /auth/refresh-token (Authorization: Bearer <refreshToken>)
@@ -246,6 +252,22 @@ async function handleAuthError(error: AxiosError) {
     console.log("  Response data:", safeData)
     console.log("  Is retry:", originalRequest._retry)
     console.log("  Is refresh route:", isRefreshRoute)
+
+    // Auth grace: delay handling 401/refresh just after auth completes
+    const now = Date.now()
+    if (now < authGraceUntil && response.status === 401) {
+        const ms = authGraceUntil - now
+        console.log("⏳ Auth grace period active, delaying retry by", ms, "ms")
+        return new Promise((resolve) => {
+            setTimeout(() => {
+                try {
+                    resolve(api(originalRequest))
+                } catch (e) {
+                    resolve(Promise.reject(e))
+                }
+            }, ms)
+        })
+    }
 
     const isRefreshable = response.status === 401 && !originalRequest._retry && !isRefreshRoute
 

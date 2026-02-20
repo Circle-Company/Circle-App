@@ -30,7 +30,7 @@ export default function PermissionCTA({
             {disabledAllow == false && (
                 <ButtonStandart
                     action={disabledAllow ? undefined : onAllow}
-                    backgroundColor={disabledAllow ? colors.gray.grey_07 : colors.purple.purple_00}
+                    backgroundColor={disabledAllow ? colors.gray.grey_07 : colors.purple.purple_04}
                     margins={false}
                     height={54}
                     width={sizes.screens.width * 0.8}
@@ -73,7 +73,7 @@ const styles = StyleSheet.create({
     } as ViewStyle,
 
     primaryBtnText: {
-        color: colors.gray.black,
+        color: colors.gray.white,
         fontSize: fonts.size.body * 1.3,
         fontFamily: fonts.family["Black"],
     } as TextStyle,

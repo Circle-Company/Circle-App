@@ -26,7 +26,7 @@ export default function SplashScreen() {
         flex: 1,
         height: "100%",
         alignItems: "center",
-        backgroundColor: "#06040a",
+        backgroundColor: colors.gray.black,
     }
     const header: any = {
         alignItems: "center",
@@ -91,7 +91,7 @@ export default function SplashScreen() {
 
     const superior_gradient: any = {
         width: sizes.window.width,
-        height: sizes.window.height / 1.4,
+        height: sizes.window.height,
         position: "absolute",
         zIndex: 0,
         top: 0,
@@ -104,7 +104,7 @@ export default function SplashScreen() {
         position: "absolute",
         zIndex: 0,
         bottom: 0,
-        opacity: 0.01,
+        opacity: 0.07,
     }
 
     // Optional hero image just above the header (rendered only if provided)
@@ -192,14 +192,8 @@ export default function SplashScreen() {
         <View style={container}>
             <LinearGradient
                 renderToHardwareTextureAndroid
-                colors={["#c29eff", "#00000000"]}
+                colors={[colors.gray.grey_01, "#00000000"]}
                 style={superior_gradient}
-            />
-
-            <LinearGradient
-                renderToHardwareTextureAndroid
-                colors={["#00000000", "#c29eff"]}
-                style={inferior_gradient}
             />
             <SafeAreaInsetsContext value={insets}>
                 <View style={{ paddingVertical: sizes.paddings["1md"], flex: 1 }}>

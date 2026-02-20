@@ -2,7 +2,7 @@ import React, { useState } from "react"
 import { AppState } from "react-native"
 import DeviceInfo from "react-native-device-info"
 
-import { apiRoutes } from "@/api"
+import { apiRoutes, beginAuthGracePeriod } from "@/api"
 import { storage, storageKeys } from "@/store"
 import { useUserStore } from "@/contexts/Persisted/persist.user"
 import { useAccountStore } from "@/contexts/Persisted/persist.account"
@@ -293,6 +293,7 @@ export function Provider({ children }: AuthProviderProps) {
             storage.set("@circle:sessionId", sessionPayload.user?.id ?? "")
             trackLogin(String(sessionPayload.user?.username || usernameForSignIn || ""))
             setRedirectTo("APP")
+            beginAuthGracePeriod(1000)
         } catch (error: any) {
             let errorMsg = "Erro interno do servidor"
             if (error?.response?.data?.message) {
@@ -345,6 +346,7 @@ export function Provider({ children }: AuthProviderProps) {
             storage.set("@circle:sessionId", sessionPayload.user?.id ?? "")
             trackLogin(String(sessionPayload.user?.username || signInputUsername.trim() || ""))
             setRedirectTo("APP")
+            beginAuthGracePeriod(1000)
             // Navigation handled by RootLayoutNav via redirectTo
         } catch (error: any) {
             console.error("❌ Erro no login:", error)
@@ -403,6 +405,7 @@ export function Provider({ children }: AuthProviderProps) {
             // Persist sessionId for compatibility with legacy checks
             storage.set("@circle:sessionId", sessionPayload.user?.id ?? "")
             setRedirectTo("APP")
+            beginAuthGracePeriod(1000)
             // Navigation handled by RootLayoutNav via redirectTo
         } catch (error: any) {
             console.error("❌ Erro na criação da conta:", error)
@@ -455,16 +458,9 @@ export function Provider({ children }: AuthProviderProps) {
 
     const checkIsSigned = (): boolean => {
         try {
-            const userId = storage.getString(storageKeys().user.id)
             const jwtToken = storage.getString(storageKeys().account.jwt.token)
-            const refreshToken = storage.getString(storageKeys().account.jwt.refreshToken)
-
-            // Verifica apenas se tem tokens essenciais
-            // Não verifica expiração aqui - deixa o interceptor da API lidar com refresh
-            const hasEssentialData = Boolean(userId) && Boolean(jwtToken)
-
-            if (!hasEssentialData) {
-                console.log("checkIsSigned: Dados essenciais faltando")
+            if (!jwtToken) {
+                console.log("checkIsSigned: missing jwtToken")
                 return false
             }
 

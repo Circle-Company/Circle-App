@@ -191,7 +191,11 @@ export default function PermissionsWizardScreen() {
         } else {
             // End of wizard: if all required done, auto-close via the effect; otherwise remain open.
             if (!hasMissingRequired) {
-                router.back()
+                if (router?.canGoBack?.()) {
+                    router.back()
+                } else {
+                    router.replace("/(tabs)/moments")
+                }
             } else {
                 // Optional: help user reach Settings on finish when required are still missing
                 const missing = requiredMissingIds
@@ -299,8 +303,9 @@ export default function PermissionsWizardScreen() {
                                 ...styles.ctaBar,
                                 paddingTop: requiresFGFirst || isGranted ? 10 : 20,
                             }}
-                            glassEffectStyle="regular"
-                            isInteractive={false}
+                            colorScheme="dark"
+                            glassEffectStyle="clear"
+                            isInteractive={true}
                             tintColor={colors.gray.grey_09 + "90"}
                         >
                             <PermissionCTA
