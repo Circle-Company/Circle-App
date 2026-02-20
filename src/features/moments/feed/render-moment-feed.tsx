@@ -20,6 +20,7 @@ import { useKeyboard } from "@/lib/hooks/useKeyboard"
 import ZeroComments from "@/components/comment/components/comments-zero_comments"
 import { LinearGradient } from "expo-linear-gradient"
 import { isIOS, iOSMajorVersion } from "@/lib/platform/detection"
+import { ProfileDropDownMenuIOS } from "@/features/profile/profile.moments.dropdown.menu"
 
 type renderMomentProps = {
     data: MomentProps
@@ -188,62 +189,72 @@ export default function RenderMomentFeed({
         >
             {/* Momento com escala + opacidade + translateY */}
             <Animated.View style={animatedMomentStyle}>
-                <Moment.Container contentRender={data.media} isFocused={isFocused} blurRadius={120}>
-                    <Moment.Root.Top>
-                        <Moment.Root.TopLeft>
-                            <UserShow.Root data={data.user}>
-                                <UserShow.ProfilePicture
-                                    pictureDimensions={{ width: 30, height: 30 }}
-                                />
-                                <UserShow.Username fontFamily={fonts.family["Bold-Italic"]} />
-                            </UserShow.Root>
-                        </Moment.Root.TopLeft>
-                        <Moment.Root.TopRight>
-                            <></>
-                        </Moment.Root.TopRight>
-                    </Moment.Root.Top>
+                <ProfileDropDownMenuIOS>
+                    <Moment.Container
+                        contentRender={data.media}
+                        isFocused={isFocused}
+                        blurRadius={120}
+                    >
+                        <Moment.Root.Top>
+                            <Moment.Root.TopLeft>
+                                <UserShow.Root data={data.user}>
+                                    <UserShow.ProfilePicture
+                                        pictureDimensions={{ width: 30, height: 30 }}
+                                    />
+                                    <UserShow.Username fontFamily={fonts.family["Bold-Italic"]} />
+                                </UserShow.Root>
+                            </Moment.Root.TopLeft>
+                            <Moment.Root.TopRight>
+                                <></>
+                            </Moment.Root.TopRight>
+                        </Moment.Root.Top>
 
-                    <Moment.Root.Center>
-                        <View
-                            style={{ marginBottom: sizes.margins["2sm"], width: "100%", zIndex: 1 }}
-                        >
-                            {!isMe && (
-                                <View style={{ marginLeft: 6, marginBottom: 10 }}>
-                                    <Moment.Description />
-                                </View>
-                            )}
-                            <View style={{ flexDirection: "row", alignItems: "center" }}>
-                                <View style={{ flex: 1, height: 46 }}>
-                                    {isIOS ? (
-                                        <>
-                                            <Moment.LikeButtonIOS isLiked={false} />
-                                        </>
-                                    ) : (
-                                        <Moment.LikeButton isLiked={false} />
-                                    )}
-                                    {isMe && <Moment.Description />}
-                                </View>
-                                <View>
-                                    <Moment.AudioControl />
+                        <Moment.Root.Center>
+                            <View
+                                style={{
+                                    marginBottom: sizes.margins["2sm"],
+                                    width: "100%",
+                                    zIndex: 1,
+                                }}
+                            >
+                                {!isMe && (
+                                    <View style={{ marginLeft: 6, marginBottom: 10 }}>
+                                        <Moment.Description />
+                                    </View>
+                                )}
+                                <View style={{ flexDirection: "row", alignItems: "center" }}>
+                                    <View style={{ flex: 1, height: 46 }}>
+                                        {isIOS ? (
+                                            <>
+                                                <Moment.LikeButtonIOS isLiked={false} />
+                                            </>
+                                        ) : (
+                                            <Moment.LikeButton isLiked={false} />
+                                        )}
+                                        {isMe && <Moment.Description />}
+                                    </View>
+                                    <View>
+                                        <Moment.AudioControl />
+                                    </View>
                                 </View>
                             </View>
-                        </View>
-                    </Moment.Root.Center>
-                    <LinearGradient
-                        colors={["rgba(0, 0, 0, 0.00)", "rgba(0, 0, 0, 0.4)"]}
-                        start={{ x: 0.5, y: 0 }}
-                        end={{ x: 0.5, y: 1 }}
-                        style={{
-                            position: "absolute",
-                            left: 0,
-                            right: 0,
-                            bottom: 0,
-                            width: sizes.moment.standart.width,
-                            height: sizes.moment.standart.height * 0.1,
-                            zIndex: 0,
-                        }}
-                    />
-                </Moment.Container>
+                        </Moment.Root.Center>
+                        <LinearGradient
+                            colors={["rgba(0, 0, 0, 0.00)", "rgba(0, 0, 0, 0.4)"]}
+                            start={{ x: 0.5, y: 0 }}
+                            end={{ x: 0.5, y: 1 }}
+                            style={{
+                                position: "absolute",
+                                left: 0,
+                                right: 0,
+                                bottom: 0,
+                                width: sizes.moment.standart.width,
+                                height: sizes.moment.standart.height * 0.1,
+                                zIndex: 0,
+                            }}
+                        />
+                    </Moment.Container>
+                </ProfileDropDownMenuIOS>
             </Animated.View>
 
             {/* Comentários SEM escala, apenas opacidade (desaparecem quando input ativo) */}

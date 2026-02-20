@@ -10,9 +10,13 @@ export interface AccountState extends AccountDataType {
         longitude: number
     }
     moments: AccountMoment[]
+    hiddenMoments: string[]
     totalMoments?: number
     setMoments: (value: AccountMoment[]) => void
     setTotalMoments: (value: number) => void
+    setHiddenMoments: (value: string[]) => void
+    addHiddenMoment: (id: string) => void
+    removeHiddenMoment: (id: string) => void
     setCoordinates: (value: { latitude: number; longitude: number }) => void
     set: (value: AccountDataType) => void
     load: () => void
@@ -22,11 +26,14 @@ export interface AccountState extends AccountDataType {
 const read = (): AccountDataType & {
     coordinates: { latitude: number; longitude: number }
     moments: AccountMoment[]
+    hiddenMoments: string[]
     totalMoments?: number
 } => {
     let moments: AccountMoment[] = []
+    let hiddenMoments: string[] = []
 
     const momentsJson = storage.getString(key.moments) || null
+    const hiddenJson = storage.getString(key.hiddenMoments) || null
     const totalMoments = storage.getNumber(key.totalMoments) || 0
     const terms = {
         agreed: storage.getBoolean(key.terms?.agreed) || false,
@@ -39,6 +46,14 @@ const read = (): AccountDataType & {
         } catch (error) {
             console.error(error)
             moments = []
+        }
+    }
+    if (hiddenJson) {
+        try {
+            hiddenMoments = JSON.parse(hiddenJson)
+        } catch (error) {
+            console.error(error)
+            hiddenMoments = []
         }
     }
 
@@ -55,6 +70,7 @@ const read = (): AccountDataType & {
             longitude: storage.getNumber(key.coordinates.longitude) || 0,
         },
         moments,
+        hiddenMoments,
         totalMoments,
         terms,
     }
@@ -93,6 +109,30 @@ export const useAccountStore = create<AccountState>((set) => ({
             totalMoments: value,
         }))
     },
+    setHiddenMoments: (value: string[]) => {
+        storage.set(key.hiddenMoments, JSON.stringify(value))
+        set((state) => ({
+            ...state,
+            hiddenMoments: value,
+        }))
+    },
+    addHiddenMoment: (id: string) => {
+        set((state) => {
+            const next = Array.isArray(state.hiddenMoments) ? state.hiddenMoments.slice() : []
+            if (!next.includes(id)) next.push(id)
+            storage.set(key.hiddenMoments, JSON.stringify(next))
+            return { ...state, hiddenMoments: next }
+        })
+    },
+    removeHiddenMoment: (id: string) => {
+        set((state) => {
+            const next = (Array.isArray(state.hiddenMoments) ? state.hiddenMoments : []).filter(
+                (m) => m !== id,
+            )
+            storage.set(key.hiddenMoments, JSON.stringify(next))
+            return { ...state, hiddenMoments: next }
+        })
+    },
     setCoordinates: (value: { latitude: number; longitude: number }) => {
         storage.set(key.coordinates.latitude, value.latitude)
         storage.set(key.coordinates.longitude, value.longitude)
@@ -112,6 +152,7 @@ export const useAccountStore = create<AccountState>((set) => ({
         safeDelete(key.coordinates.latitude)
         safeDelete(key.coordinates.longitude)
         safeDelete(key.moments)
+        safeDelete(key.hiddenMoments)
         safeDelete(key.accessLevel)
         safeDelete(key.verified)
         safeDelete(key.deleted)
@@ -130,6 +171,7 @@ export const useAccountStore = create<AccountState>((set) => ({
             verified: false,
             deleted: false,
             moments: [],
+            hiddenMoments: [],
             coordinates: { latitude: 0, longitude: 0 },
             terms: { agreed: false, version: "", agreedAt: "" },
         })

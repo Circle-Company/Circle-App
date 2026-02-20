@@ -49,6 +49,8 @@ export default function Name({
         fontFamily: fontFamily,
         color: color,
     }
+    if (user.interactions?.isBlockedBy === true || user.interactions.isBlocking === true)
+        return null
     return (
         <Animated.View style={container}>
             {user?.name && <Text style={text_style}>{user?.name}</Text>}

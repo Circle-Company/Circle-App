@@ -1,12 +1,12 @@
 import React from "react"
 import {
-    Text,
     View,
-    TouchableOpacity,
     ActivityIndicator,
     StyleSheet,
     Alert,
     ScrollView,
+    ViewStyle,
+    TextStyle,
 } from "react-native"
 import PersistedContext from "@/contexts/Persisted"
 import api from "@/api"
@@ -16,8 +16,8 @@ import ButtonStandart from "@/components/buttons/button-standart"
 import * as Clipboard from "expo-clipboard"
 import fonts from "@/constants/fonts"
 import { colors } from "@/constants/colors"
-import AppleLogo from "@/assets/icons/svgs/apple-logo.svg"
 import LanguageContext from "@/contexts/language"
+import { Text } from "@/components/Themed"
 
 export default function PersonalData() {
     const { session } = React.useContext(PersistedContext)
@@ -135,8 +135,50 @@ export default function PersonalData() {
         }
     }
 
+    const container: ViewStyle = {
+        width: sizes.screens.width - sizes.paddings["1md"] * 2,
+        backgroundColor: colors.gray.grey_08,
+        paddingVertical: sizes.paddings["1lg"] * 0.8,
+        borderRadius: sizes.borderRadius["1lg"] * 1.2,
+        paddingHorizontal: sizes.paddings["1md"],
+        alignSelf: "center",
+        alignItems: "center",
+        justifyContent: "center",
+    }
+
+    const title: TextStyle = {
+        fontSize: fonts.size.title3 * 0.9,
+        fontFamily: fonts.family.Bold,
+        fontStyle: "italic",
+        marginBottom: sizes.margins["2sm"],
+    }
+
+    const description: TextStyle = {
+        fontSize: fonts.size.body,
+        fontFamily: fonts.family.Medium,
+        paddingHorizontal: sizes.paddings["1md"],
+        textAlign: "center",
+    }
+
+    const buttonContainer: ViewStyle = {
+        alignSelf: "center",
+        alignItems: "center",
+        marginTop: sizes.margins["1md"],
+        maxWidth: sizes.buttons.width,
+        height: sizes.buttons.height * 0.5,
+        borderRadius: sizes.borderRadius["1md"],
+        overflow: "hidden",
+        backgroundColor: colors.gray.white,
+    }
+
+    const buttonLabel: any = {
+        fontFamily: fonts.family["Black-Italic"],
+        fontSize: fonts.size.body * 1.2,
+        color: colors.gray.black,
+    }
+
     return (
-        <View style={styles.container}>
+        <View style={container}>
             {/**
             <View style={styles.appleCard}>
                 <View style={{ flexDirection: "row", alignItems: "center", marginBottom: 8 }}>
@@ -157,16 +199,8 @@ export default function PersonalData() {
                 </View>
             </View>
             */}
-            <Text style={styles.title}>{t("Export account data")}</Text>
-            <Text style={styles.explainer}>{t("Personal data export explainer")}</Text>
-
-            {!jsonData && (
-                <Text style={styles.explainer}>
-                    {t(
-                        "You haven't exported your personal data yet. Click the button below to request the export.",
-                    )}
-                </Text>
-            )}
+            <Text style={title}>{t("Export account data")}</Text>
+            <Text style={description}>{t("Personal data export explainer")}</Text>
             {!jsonData && (
                 <ButtonStandart
                     bounciness={5}
@@ -177,24 +211,19 @@ export default function PersonalData() {
                     action={() => {
                         if (!(loading || !!jsonData)) handleExport()
                     }}
-                    style={{ marginTop: sizes.margins["1md"] }}
+                    style={buttonContainer}
                     backgroundColor={"#fff"}
                 >
                     {loading ? (
                         <ActivityIndicator color="#000" />
                     ) : (
-                        <Text style={[styles.buttonText, { color: colors.gray.black }]}>
-                            {t("Request export")}
-                        </Text>
+                        <Text style={buttonLabel}>{t("Request export")}</Text>
                     )}
                 </ButtonStandart>
             )}
 
             {result ? (
                 <View style={styles.resultBox}>
-                    <Text style={styles.resultTitle}>
-                        {t("Account data")} @{session?.user?.username ?? ""}
-                    </Text>
                     <ScrollView
                         style={styles.resultScroll}
                         contentContainerStyle={styles.resultScrollContent}
@@ -281,7 +310,7 @@ const styles = StyleSheet.create({
         borderRadius: sizes.borderRadius["1md"],
         paddingVertical: sizes.paddings["1md"],
         paddingHorizontal: sizes.paddings["2md"],
-        marginBottom: sizes.margins["1md"],
+        marginVertical: sizes.margins["1md"],
         borderWidth: StyleSheet.hairlineWidth,
         borderColor: "#2a2a2a",
         height: sizes.screens.height * 0.55,

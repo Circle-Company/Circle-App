@@ -1,4 +1,5 @@
-import Icon from "@/assets/icons/svgs/@2.svg"
+import AtIcon from "@/assets/icons/svgs/@2.svg"
+import LockIcon from "@/assets/icons/svgs/lock.svg"
 import { Image } from "expo-image"
 import React from "react"
 import { Animated, Pressable, View, useColorScheme } from "react-native"
@@ -23,6 +24,10 @@ export default function Picture({ fromProfile = false, hasOutline = true }: Prof
         alignItems: "center",
         justifyContent: "center",
         marginHorizontal: sizes.margins["1sm"],
+        marginBottom:
+            user.interactions.isBlockedBy == false || user.interactions.isBlocking == false
+                ? sizes.margins["1md"]
+                : 0,
         width: Number(pictureDimensions.width) + Number(outlineSize),
         height: Number(pictureDimensions.height) + Number(outlineSize),
         backgroundColor: colors.gray.grey_08,
@@ -65,36 +70,77 @@ export default function Picture({ fromProfile = false, hasOutline = true }: Prof
 
     const animatedContainer: any = {
         transform: [{ scale: animatedScale }],
+
         opacity: animatedOpacity,
     }
 
-    return (
-        <Animated.View style={animatedContainer}>
-            <Pressable onPress={onProfilePictureAction} style={container}>
-                <Image
-                    priority={"normal"}
-                    cachePolicy={"memory"}
-                    recyclingKey={profilePicture}
-                    source={{ uri: profilePicture }}
+    const hasBlock = user.interactions.isBlocking || user.interactions.isBlockedBy
+
+    if (hasBlock)
+        return (
+            <Animated.View style={animatedContainer}>
+                <View
                     style={{
-                        width: Number(pictureDimensions.width),
-                        height: Number(pictureDimensions.height),
-                        borderRadius: Number(pictureDimensions.width) / 2,
-                        position: "absolute",
-                        top: Number(outlineSize) / 2,
-                        left: Number(outlineSize) / 2,
+                        ...container,
                     }}
-                />
-                {!user?.profilePicture && (
+                >
+                    <Image
+                        priority={"normal"}
+                        recyclingKey={profilePicture}
+                        source={{ uri: profilePicture }}
+                        blurRadius={150}
+                        style={{
+                            opacity: 0.4,
+                            width: Number(pictureDimensions.width),
+                            height: Number(pictureDimensions.height),
+                            borderRadius: Number(pictureDimensions.width) / 2,
+                            position: "absolute",
+                            top: Number(outlineSize) / 2,
+                            left: Number(outlineSize) / 2,
+                        }}
+                    />
                     <View style={iconContainer}>
-                        <Icon
-                            width={pictureDimensions.width * 0.5}
-                            height={pictureDimensions.height * 0.5}
-                            fill={isDarkMode ? colors.gray.grey_04 + 90 : colors.gray.grey_04 + 50}
+                        <LockIcon
+                            width={pictureDimensions.width * 0.35}
+                            height={pictureDimensions.height * 0.35}
+                            fill={
+                                !user?.profilePicture
+                                    ? colors.gray.grey_04 + 90
+                                    : colors.gray.grey_03 + 90
+                            }
                         />
                     </View>
-                )}
-            </Pressable>
-        </Animated.View>
-    )
+                </View>
+            </Animated.View>
+        )
+    else
+        return (
+            <Animated.View style={animatedContainer}>
+                <Pressable onPress={onProfilePictureAction} style={container}>
+                    <Image
+                        priority={"normal"}
+                        cachePolicy={"memory"}
+                        recyclingKey={profilePicture}
+                        source={{ uri: profilePicture }}
+                        style={{
+                            width: Number(pictureDimensions.width),
+                            height: Number(pictureDimensions.height),
+                            borderRadius: Number(pictureDimensions.width) / 2,
+                            position: "absolute",
+                            top: Number(outlineSize) / 2,
+                            left: Number(outlineSize) / 2,
+                        }}
+                    />
+                    {!user?.profilePicture && (
+                        <View style={iconContainer}>
+                            <AtIcon
+                                width={pictureDimensions.width * 0.5}
+                                height={pictureDimensions.height * 0.5}
+                                fill={colors.gray.grey_04 + 90}
+                            />
+                        </View>
+                    )}
+                </Pressable>
+            </Animated.View>
+        )
 }

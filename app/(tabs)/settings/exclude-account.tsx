@@ -2,6 +2,7 @@ import React from "react"
 import { View, Text, StyleSheet, Alert } from "react-native"
 import { useRouter } from "expo-router"
 import PersistedContext from "@/contexts/Persisted"
+import LanguageContext from "@/contexts/language"
 import api from "@/api"
 import ButtonStandart from "@/components/buttons/button-standart"
 import { colors } from "@/constants/colors"
@@ -11,15 +12,18 @@ import sizes from "@/constants/sizes"
 export default function ExcludeAccountScreen() {
     const router = useRouter()
     const { session } = React.useContext(PersistedContext)
+    const { t } = React.useContext(LanguageContext)
     const [loading, setLoading] = React.useState(false)
 
     const confirmAndDelete = () => {
         Alert.alert(
-            "Excluir conta",
-            "Esta ação é permanente e irreversível. Todos os seus dados serão removidos. Deseja continuar?",
+            t("Delete account"),
+            t(
+                "This action is permanent and irreversible. All your data will be removed. Do you want to continue?",
+            ),
             [
-                { text: "Cancelar", style: "cancel" },
-                { text: "Excluir", style: "destructive", onPress: handleDelete },
+                { text: t("Cancel"), style: "cancel" },
+                { text: t("Delete"), style: "destructive", onPress: handleDelete },
             ],
         )
     }
@@ -27,7 +31,7 @@ export default function ExcludeAccountScreen() {
     const handleDelete = async () => {
         const token = session?.account?.jwtToken
         if (!token) {
-            Alert.alert("Erro", "Não foi possível autenticar sua sessão.")
+            Alert.alert(t("Error"), t("It was not possible to authenticate your session."))
             return
         }
 
@@ -48,18 +52,21 @@ export default function ExcludeAccountScreen() {
             } catch {}
 
             Alert.alert(
-                "Conta excluída",
-                "Sua conta foi excluída com sucesso. Você será redirecionado.",
-                [{ text: "OK", onPress: () => router.replace("/") }],
+                t("Account deleted"),
+                t("Your account has been successfully deleted. You will be redirected."),
+                [{ text: t("Confirm"), onPress: () => router.replace("/") }],
             )
         } catch (e: any) {
             const status = e?.response?.status
             const message =
                 e?.response?.data?.message ||
                 e?.message ||
-                "Não foi possível excluir a conta. Tente novamente."
+                t("It was not possible to delete the account. Please try again.")
             console.log("❌ Erro ao excluir conta:", status, message)
-            Alert.alert("Erro ao excluir conta", status ? `Status: ${status}\n${message}` : message)
+            Alert.alert(
+                t("Error deleting account"),
+                status ? `${t("Status")}: ${status}\n${message}` : message,
+            )
         } finally {
             setLoading(false)
         }
@@ -67,66 +74,49 @@ export default function ExcludeAccountScreen() {
 
     return (
         <View style={styles.container}>
-            <Text style={styles.title}>Excluir conta</Text>
+            <Text style={styles.title}>{t("Delete account")}</Text>
             <Text style={styles.subtitle}>
-                A exclusão da sua conta é permanente e irreversível. Todos os seus dados e conteúdo
-                serão removidos. Caso deseje prosseguir, confirme a exclusão abaixo.
+                {t(
+                    "Deleting your account is permanent and irreversible. All your data and content will be removed. If you wish to proceed, confirm the deletion below.",
+                )}
             </Text>
 
             <View style={styles.card}>
-                <Text style={styles.cardTitle}>Atenção</Text>
+                <Text style={styles.cardTitle}>{t("Attention")}</Text>
                 <View style={styles.bulletRow}>
                     <Text style={styles.bulletDot}>•</Text>
-                    <Text style={styles.bulletText}>Esta ação não pode ser desfeita.</Text>
+                    <Text style={styles.bulletText}>{t("This action cannot be undone.")}</Text>
                 </View>
                 <View style={styles.bulletRow}>
                     <Text style={styles.bulletDot}>•</Text>
                     <Text style={styles.bulletText}>
-                        Você perderá acesso à sua conta e aos seus dados.
+                        {t("You will lose access to your account and your data.")}
                     </Text>
                 </View>
                 <View style={styles.bulletRow}>
                     <Text style={styles.bulletDot}>•</Text>
                     <Text style={styles.bulletText}>
-                        Recomendamos que apenas saia e dê um tempo do Circle App — você poderá
-                        voltar se mudar de ideia.
+                        {t(
+                            "We recommend you just sign out and take a break from Circle App — you can come back if you change your mind.",
+                        )}
                     </Text>
                 </View>
             </View>
 
             <View style={styles.buttonsRow}>
-                <View style={styles.halfLeft}>
-                    <ButtonStandart
-                        bounciness={5}
-                        animationScale={0.93}
-                        borderRadius={50}
-                        margins={false}
-                        height={46}
-                        width={"100%" as any}
-                        action={() => {
-                            if (!loading) router.back()
-                        }}
-                        backgroundColor={colors.red.red_05.toString()}
-                    >
-                        <Text style={styles.deleteButtonText}>Cancelar</Text>
-                    </ButtonStandart>
-                </View>
-                <View style={styles.halfRight}>
-                    <ButtonStandart
-                        bounciness={5}
-                        animationScale={0.93}
-                        borderRadius={50}
-                        margins={false}
-                        height={46}
-                        width={"100%" as any}
-                        action={() => {
-                            if (!loading) confirmAndDelete()
-                        }}
-                        backgroundColor={colors.gray.grey_08.toString()}
-                    >
-                        <Text style={styles.deleteButtonText}>Excluir Conta</Text>
-                    </ButtonStandart>
-                </View>
+                <ButtonStandart
+                    bounciness={5}
+                    animationScale={0.93}
+                    borderRadius={50}
+                    margins={false}
+                    height={46}
+                    action={() => {
+                        if (!loading) confirmAndDelete()
+                    }}
+                    backgroundColor={colors.red.red_05.toString()}
+                >
+                    <Text style={styles.deleteButtonText}>{t("Delete Account")}</Text>
+                </ButtonStandart>
             </View>
         </View>
     )
@@ -205,6 +195,7 @@ const styles = StyleSheet.create({
     buttonsRow: {
         flexDirection: "row",
         alignItems: "center",
+        justifyContent: "center",
         marginTop: 12,
     },
     halfLeft: {

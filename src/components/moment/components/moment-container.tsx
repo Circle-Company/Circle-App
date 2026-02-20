@@ -1,15 +1,16 @@
 import React, { useCallback, useEffect, useState, useMemo } from "react"
-import Reanimated, { FadeIn, FadeOut } from "react-native-reanimated"
 import ColorTheme from "@/constants/colors"
 import FeedContext from "@/contexts/Feed"
 import MediaRenderVideo from "@/components/midia_render/components/midia_render-video"
 import { MidiaRender } from "@/components/midia_render"
+import { MomentReportModal } from "./moment-report.modal"
 import { MomentContainerProps } from "../moment-types"
 import MomentContext from "../context"
 import MomentVideoSlider from "./moment-video-slider"
 import PersistedContext from "@/contexts/Persisted"
-import { UserShow } from "@/components/user_show"
 import { View } from "react-native"
+import { Hidden } from "./moment-hidden"
+import { SwiftBottomSheet } from "@/components/ios/ios.bottom.sheet"
 
 export default function Container({
     children,
@@ -34,11 +35,11 @@ export default function Container({
 
     // Atualizar o estado de pausa do vídeo quando muda o foco (evitar loops)
     useEffect(() => {
-        const shouldPause = !isFocused || !!commentEnabled
+        const shouldPause = !isFocused || !!commentEnabled || options.isHidden === true
         if (video.isPaused !== shouldPause) {
             video.setIsPaused(shouldPause)
         }
-    }, [isFocused, commentEnabled, video.isPaused])
+    }, [isFocused, commentEnabled, options.isHidden, video.isPaused])
 
     const container: any = {
         ...size,
@@ -51,19 +52,6 @@ export default function Container({
         width: size.width,
         height: size.height,
         zIndex: 0,
-    }
-
-    const tiny_container: any = {
-        width: size.width * 0.31,
-        height: size.height * 0.31,
-        position: "absolute",
-        alignItems: "flex-start",
-        flexDirection: "row",
-        top: 190,
-        left: 120,
-        flex: 1,
-        zIndex: 1,
-        transform: [{ scale: 3 }],
     }
 
     const sliderContainerStyle = {
@@ -182,7 +170,7 @@ export default function Container({
         video.setDuration(duration)
     }
 
-    const renderVideoContent = () => {
+    const renderVideoContent = ({ isHidden }: { isHidden: boolean }) => {
         // Sempre renderiza o componente de vídeo para pré-carregar a thumbnail
         // O componente interno controla a visibilidade através da prop isFocused
         return (
@@ -193,7 +181,7 @@ export default function Container({
                     hasVideoCache={hasVideoCache}
                     isLoadingCache={isLoadingCache}
                     momentId={data.id}
-                    autoPlay={!video.isPaused}
+                    autoPlay={isHidden ? false : !video.isPaused}
                     style={{
                         width: size.width,
                         height: size.height,
@@ -205,8 +193,8 @@ export default function Container({
                         if (onVideoEnd) onVideoEnd()
                     }}
                     onProgressChange={handleProgressChange}
-                    isFocused={isFocused}
-                    blurRadius={blurRadius}
+                    isFocused={isHidden ? false : true}
+                    blurRadius={isHidden ? 40 : blurRadius}
                     prefetchAdjacentThumbnails={adjacentThumbnails}
                     forceMute={forceMute}
                     disableWatch={disableWatch}
@@ -236,33 +224,65 @@ export default function Container({
             navigation.navigate("MomentNavigator", { screen: "DetailScreen" })
         }
     }
-
 */
-
-    return (
-        <View style={container}>
-            <View style={content_container}>
-                <MidiaRender.Root data={contentRender} content_sizes={size}>
-                    {renderVideoContent()}
-                </MidiaRender.Root>
-            </View>
-
-            {/* Controles de vídeo (áudio e slider) */}
-            {isFocused &&
-                !commentEnabled &&
-                showSlider &&
-                Number.isFinite(video.duration) &&
-                video.duration > 0 && (
-                    <View style={sliderContainerStyle} pointerEvents="box-none">
-                        <MomentVideoSlider
-                            width={size.width * 0.95}
-                            currentTime={video.currentTime}
-                            duration={video.duration}
-                        />
-                    </View>
+    if (options.isHidden)
+        return (
+            <View style={container}>
+                <View style={content_container}>
+                    <MidiaRender.Root data={contentRender} content_sizes={size}>
+                        <Hidden width={contentRender?.width} height={contentRender?.height} />
+                        {renderVideoContent({ isHidden: true })}
+                    </MidiaRender.Root>
+                </View>
+                {options.showReportModal && (
+                    <SwiftBottomSheet
+                        snapPoints={[0.8]}
+                        isOpened={options.showReportModal}
+                        onIsOpenedChange={(opened) => {
+                            if (!opened) options.setShowReportModal(false)
+                        }}
+                    >
+                        <MomentReportModal />
+                    </SwiftBottomSheet>
                 )}
+            </View>
+        )
+    else
+        return (
+            <View style={container}>
+                <View style={content_container}>
+                    <MidiaRender.Root data={contentRender} content_sizes={size}>
+                        {renderVideoContent({ isHidden: false })}
+                    </MidiaRender.Root>
+                </View>
 
-            {isFocused ? children : null}
-        </View>
-    )
+                {/* Controles de vídeo (áudio e slider) */}
+                {isFocused &&
+                    !commentEnabled &&
+                    showSlider &&
+                    Number.isFinite(video.duration) &&
+                    video.duration > 0 && (
+                        <View style={sliderContainerStyle} pointerEvents="box-none">
+                            <MomentVideoSlider
+                                width={size.width * 0.95}
+                                currentTime={video.currentTime}
+                                duration={video.duration}
+                            />
+                        </View>
+                    )}
+
+                {isFocused ? children : null}
+                {options.showReportModal && (
+                    <SwiftBottomSheet
+                        snapPoints={[1]}
+                        isOpened={options.showReportModal}
+                        onIsOpenedChange={(opened) => {
+                            if (!opened) options.setShowReportModal(false)
+                        }}
+                    >
+                        <MomentReportModal />
+                    </SwiftBottomSheet>
+                )}
+            </View>
+        )
 }

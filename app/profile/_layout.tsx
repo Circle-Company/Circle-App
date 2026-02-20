@@ -4,13 +4,20 @@ import { colors } from "@/constants/colors"
 import { Stack, useRouter } from "expo-router"
 import ProfileContext from "@/contexts/profile"
 import LanguageContext from "@/contexts/language"
-import { HeaderBackButton } from "@react-navigation/elements"
+import ExclamationIcon from "@/assets/icons/svgs/exclamationmark_circle.svg"
+import { HeaderBackButton, HeaderButton } from "@react-navigation/elements"
+import BottomSheetContext from "@/contexts/bottomSheet"
+import { Text } from "@/components/Themed"
+import { Button, Host } from "@expo/ui/swift-ui"
+import { ScreenStackHeaderConfig } from "react-native-screens"
+import { ProfileOptionsDropDownMenuIOS } from "@/features/profile/profile.dropdown.menu"
 
 export default function ProfileLayout() {
     const { t } = React.useContext(LanguageContext)
     const { profile } = React.useContext(ProfileContext)
     const router = useRouter()
     const usernameTitle = profile?.username ? `@${profile.username}` : t("Profile")
+
     return (
         <Stack
             screenOptions={{
@@ -46,6 +53,18 @@ export default function ProfileLayout() {
                     headerBackTitle: t("Back"),
                     headerBackVisible: true,
                     // Always show a back button action, even if it's the first screen
+                    headerRight: () => (
+                        <ProfileOptionsDropDownMenuIOS profile={profile}>
+                            <HeaderButton
+                                pressOpacity={0.8}
+                                tintColor={colors.gray.white}
+                                pressColor={colors.gray.white}
+                                style={{ alignItems: "center", justifyContent: "center" }}
+                            >
+                                <ExclamationIcon width={20} height={20} fill={colors.gray.white} />
+                            </HeaderButton>
+                        </ProfileOptionsDropDownMenuIOS>
+                    ),
                     headerLeft: () => (
                         <HeaderBackButton
                             tintColor={colors.gray.white}
@@ -58,7 +77,7 @@ export default function ProfileLayout() {
                                     router.replace("/(tabs)/moments")
                                 }
                             }}
-                        ></HeaderBackButton>
+                        />
                     ),
                 }}
             />

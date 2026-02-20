@@ -1,9 +1,10 @@
 import React from "react"
 import PersistedContext from "@/contexts/Persisted"
 import api from "@/api"
+import { Image } from "expo-image"
 
 import { momentsProps } from "@/api/account/account.types"
-interface profileProps {
+export interface profileProps {
     success: boolean
     profile: {
         id: string
@@ -32,8 +33,10 @@ type ProfileProviderProps = { children: React.ReactNode }
 type pagination = { page: number; limit: number; userId?: string }
 
 export type ProfileContextsData = {
+    showReportModal: boolean
     isLoadingProfile: boolean
     isLoadingMoments: boolean
+    setShowReportModal: React.Dispatch<React.SetStateAction<boolean>>
     setIsLoadingProfile: React.Dispatch<React.SetStateAction<boolean>>
     setIsLoadingMoments: React.Dispatch<React.SetStateAction<boolean>>
     profile: profileProps["profile"]
@@ -53,6 +56,7 @@ const ProfileContext = React.createContext<ProfileContextsData>({} as ProfileCon
 export function Provider({ children }: ProfileProviderProps) {
     const { session } = React.useContext(PersistedContext)
 
+    const [showReportModal, setShowReportModal] = React.useState(false)
     const [isLoadingProfile, setIsLoadingProfile] = React.useState(false)
     const [isLoadingMoments, setIsLoadingMoments] = React.useState(false)
     const [moments, setMoments] = React.useState<momentsProps["moments"]>(
@@ -243,6 +247,17 @@ export function Provider({ children }: ProfileProviderProps) {
         lastRequestedUserIdRef.current = ""
         setIsLoadingProfile(false)
         setIsLoadingMoments(false)
+
+        // Purge cached images for moments (memory and disk - best effort)
+        try {
+            // Clear in-memory cache immediately
+            Image.clearMemoryCache?.()
+            // Fire-and-forget disk cache purge (async in expo-image)
+            ;(Image as any).clearDiskCache?.()
+        } catch {
+            // noop
+        }
+
         setMoments([] as momentsProps["moments"])
         setProfile({} as profileProps["profile"])
         setTotalMoments(0)
@@ -253,6 +268,8 @@ export function Provider({ children }: ProfileProviderProps) {
     }
 
     const contextValue: ProfileContextsData = {
+        setShowReportModal,
+        showReportModal,
         isLoadingProfile,
         isLoadingMoments,
         setIsLoadingProfile,

@@ -57,6 +57,7 @@ export type PreferencesContent = {
     disableAutoplay: boolean
     disableHaptics: boolean
     disableTranslation: boolean
+    disableContentWarning: boolean
     muteAudio: boolean
 }
 
@@ -150,6 +151,7 @@ export type AuthSessionPayload = {
                 timezoneCode?: string
                 enableAutoplayFeed?: boolean
                 enableHapticFeedback?: boolean
+                enableContentWarning?: boolean
             }
             notifications?: {}
         }

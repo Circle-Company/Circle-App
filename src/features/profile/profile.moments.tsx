@@ -9,6 +9,7 @@ import PersistedContext from "@/contexts/Persisted"
 import { DropDownMenuIOS } from "@/features/account/account.moments.dropdown.menu"
 import { iOSMajorVersion } from "@/lib/platform/detection"
 import { ProfileMomentEmpty } from "@/features/profile/profile.moments.empty"
+import { ProfileDropDownMenuIOS } from "./profile.moments.dropdown.menu"
 
 const { width } = Dimensions.get("window")
 const SPACING = 5
@@ -62,7 +63,7 @@ export function ProfileMoments({ moments, totalMoments }: AccountMomentsProps) {
 
             return (
                 <View style={styles.momentWrapper}>
-                    <DropDownMenuIOS onDelete={deleteMoment}>
+                    <ProfileDropDownMenuIOS>
                         <Moment.Root.Main
                             size={{
                                 ...sizes.moment.small,
@@ -91,7 +92,7 @@ export function ProfileMoments({ moments, totalMoments }: AccountMomentsProps) {
                                 </Moment.Root.Bottom>
                             </Moment.Container>
                         </Moment.Root.Main>
-                    </DropDownMenuIOS>
+                    </ProfileDropDownMenuIOS>
                 </View>
             )
         },

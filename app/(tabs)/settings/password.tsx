@@ -1,7 +1,6 @@
-import Icon from "@/assets/icons/svgs/check_circle.svg"
 import { useNavigation } from "@react-navigation/native"
 import React from "react"
-import { StatusBar, TextStyle, useColorScheme, ViewStyle } from "react-native"
+import { TextStyle, ViewStyle } from "react-native"
 import { Text, View } from "@/components/Themed"
 import PasswordInput from "@/components/auth/passwordInput"
 import ButtonStandart from "@/components/buttons/button-standart"
@@ -12,7 +11,6 @@ import AuthContext from "@/contexts/auth"
 import PersistedContext from "@/contexts/Persisted"
 import LanguageContext from "@/contexts/language"
 import api from "@/api"
-import { SafeAreaView } from "react-native-safe-area-context"
 
 export default function PasswordScreen() {
     const { t } = React.useContext(LanguageContext)

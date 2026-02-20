@@ -22,6 +22,7 @@ import { NoMoments } from "@/features/profile/profile.no.moments"
 import fonts from "@/constants/fonts"
 import { NetworkContext } from "@/contexts/network"
 import OfflineCard from "@/components/general/offline"
+import { ProfileDropDownMenuIOS } from "@/features/profile/profile.moments.dropdown.menu"
 
 export default function ProfileScreen() {
     const {
@@ -73,8 +74,8 @@ export default function ProfileScreen() {
         if (!profile || !profile.id) {
             return null
         }
-        const u = {
-            id: Number(profile.id),
+        const u: typeof profile = {
+            id: profile.id,
             username: profile.username,
             name: profile.name ?? null,
             description: profile.description ?? null,
@@ -86,10 +87,10 @@ export default function ProfileScreen() {
                 totalFollowers: profile.metrics?.totalFollowers ?? 0,
             },
             interactions: {
-                isFollowing: false,
-                isFollowedBy: false,
-                isBlockedBy: false,
-                isBlocking: false,
+                isFollowedBy: profile.interactions?.isFollowedBy ?? false,
+                isBlockedBy: profile.interactions?.isBlockedBy ?? false,
+                isBlocking: profile.interactions?.isBlocking ?? false,
+                isFollowing: profile.interactions?.isFollowing ?? false,
             },
         }
         return u
@@ -280,9 +281,9 @@ export default function ProfileScreen() {
                 )
             }
             renderItem={({ item }) => {
-                const isVisible = true
-
                 if (!isOnline) return null
+                else if (user?.interactions?.isBlocking) return null
+                else if (user?.interactions?.isBlockedBy) return null
                 else
                     return (
                         <View
@@ -314,28 +315,30 @@ export default function ProfileScreen() {
                                         borderRadius: sizes.moment.small.borderRadius * 0.7,
                                     }}
                                     isFeed={false}
-                                    isFocused={isVisible}
+                                    isFocused={true}
                                     data={item}
                                     shadow={{ top: false, bottom: true }}
                                 >
-                                    <Moment.Container
-                                        contentRender={item.media}
-                                        isFocused={isVisible}
-                                        loading={false}
-                                        blurRadius={0}
-                                        forceMute={true}
-                                        showSlider={false}
-                                        disableCache={true}
-                                        disableWatch={true}
-                                    >
-                                        <Moment.Root.Center />
-                                        <Moment.Root.Bottom>
-                                            <View style={{ marginLeft: 5, marginBottom: 2 }}>
-                                                <Moment.Description displayOnMoment={true} />
-                                                <Moment.Date />
-                                            </View>
-                                        </Moment.Root.Bottom>
-                                    </Moment.Container>
+                                    <ProfileDropDownMenuIOS>
+                                        <Moment.Container
+                                            contentRender={item.media}
+                                            isFocused={true}
+                                            loading={false}
+                                            blurRadius={0}
+                                            forceMute={true}
+                                            showSlider={false}
+                                            disableCache={true}
+                                            disableWatch={true}
+                                        >
+                                            <Moment.Root.Center />
+                                            <Moment.Root.Bottom>
+                                                <View style={{ marginLeft: 5, marginBottom: 2 }}>
+                                                    <Moment.Description displayOnMoment={true} />
+                                                    <Moment.Date />
+                                                </View>
+                                            </Moment.Root.Bottom>
+                                        </Moment.Container>
+                                    </ProfileDropDownMenuIOS>
                                 </Moment.Root.Main>
                             </Pressable>
                         </View>
@@ -346,6 +349,8 @@ export default function ProfileScreen() {
             }}
             onEndReachedThreshold={0.5}
             ListFooterComponent={() => {
+                if (user?.interactions?.isBlocking) return null
+                if (user?.interactions?.isBlockedBy) return null
                 if (!isOnline) {
                     return <OfflineCard />
                 }

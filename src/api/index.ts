@@ -9,6 +9,7 @@ import { routes as authRoutes } from "./auth/auth"
 import { routes as momentRoutes } from "./moment/moment"
 import { routes as preferencesRoutes } from "./preferences/preferences"
 import { routes as userRoutes } from "./user/user"
+import { routes as profileRoutes } from "./profile/profile"
 
 type PendingResolver = (token: string) => void
 
@@ -408,4 +409,5 @@ export const apiRoutes = {
     user: userRoutes,
     preferences: preferencesRoutes,
     auth: authRoutes,
+    profile: profileRoutes,
 }

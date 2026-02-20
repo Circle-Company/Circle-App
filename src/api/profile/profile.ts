@@ -20,7 +20,45 @@ async function getMoments({ page, limit }: { page: number; limit: number }): Pro
     return response.data
 }
 
+async function postBlock({ blockedUserId }: { blockedUserId: string }): Promise<void> {
+    await api.post(`/users/${blockedUserId}/block`, {
+        headers: {
+            Authorization: `Bearer ${storage.getString(storageKeys().account.jwt.token) || ""}`,
+        },
+    })
+}
+
+async function deleteBlock({ unlockedUserId }: { unlockedUserId: string }): Promise<void> {
+    await api.delete(`/users/${unlockedUserId}/block`, {
+        headers: {
+            Authorization: `Bearer ${storage.getString(storageKeys().account.jwt.token) || ""}`,
+        },
+    })
+}
+
+async function postReport(props: {
+    userId: string
+    reason: string
+    description: string
+}): Promise<void> {
+    await api.post(
+        `/users/${props.userId}/reports`,
+        {
+            reason: props.reason,
+            description: props.description,
+        },
+        {
+            headers: {
+                Authorization: `Bearer ${storage.getString(storageKeys().account.jwt.token) || ""}`,
+            },
+        },
+    )
+}
+
 export const routes = {
     getAccount,
     getMoments,
+    postBlock,
+    deleteBlock,
+    postReport,
 }

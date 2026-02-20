@@ -13,9 +13,12 @@ export type MomentOptionsProps = {
     enableReport: boolean
     enableLike: boolean
     enableComment: boolean
+    enableContentWarning: boolean
     enableWatch: boolean
+    isHidden: boolean
     isFeed: boolean
     isFocused: boolean
+    showReportModal: boolean
 }
 
 export type actionsProps = {

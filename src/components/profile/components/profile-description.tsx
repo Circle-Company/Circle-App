@@ -39,9 +39,10 @@ export default function Description() {
         alignItems: "center",
     }
 
-    if (!user?.description) {
+    if (!user?.description) return null
+
+    if (user.interactions?.isBlockedBy === true || user.interactions.isBlocking === true)
         return null
-    }
 
     return (
         <Animated.View style={container}>

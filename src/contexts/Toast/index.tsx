@@ -56,9 +56,18 @@ interface ToastItemProps {
 
 const ToastItem: React.FC<ToastItemProps> = ({ toast, onDismiss }) => {
     const translateY = useSharedValue(-100)
-    const opacity = useSharedValue(0)
     const scale = useSharedValue(0.95)
     const dragY = useSharedValue(0)
+
+    const dismissToast = useCallback(() => {
+        runOnUI(() => {
+            "worklet"
+            scale.value = withTiming(0.96, { duration: EXIT_DURATION })
+            translateY.value = withTiming(-60, { duration: EXIT_DURATION }, () =>
+                runOnJS(onDismiss)(),
+            )
+        })()
+    }, [onDismiss])
 
     React.useEffect(() => {
         runOnUI(() => {
@@ -75,7 +84,6 @@ const ToastItem: React.FC<ToastItemProps> = ({ toast, onDismiss }) => {
                 mass: 0.9,
                 overshootClamping: false,
             })
-            opacity.value = withTiming(1, { duration: ENTER_DURATION })
         })()
 
         if (toast.duration !== Infinity) {
@@ -85,17 +93,6 @@ const ToastItem: React.FC<ToastItemProps> = ({ toast, onDismiss }) => {
             return () => clearTimeout(timer)
         }
     }, [dismissToast, toast.duration])
-
-    const dismissToast = useCallback(() => {
-        runOnUI(() => {
-            "worklet"
-            opacity.value = withTiming(0, { duration: EXIT_DURATION })
-            scale.value = withTiming(0.96, { duration: EXIT_DURATION })
-            translateY.value = withTiming(-60, { duration: EXIT_DURATION }, () =>
-                runOnJS(onDismiss)(),
-            )
-        })()
-    }, [onDismiss])
 
     const panGesture = Gesture.Pan()
         .onUpdate((event) => {
@@ -109,7 +106,6 @@ const ToastItem: React.FC<ToastItemProps> = ({ toast, onDismiss }) => {
             const shouldDismiss = Math.abs(event.translationY) > DISMISS_THRESHOLD
 
             if (shouldDismiss) {
-                opacity.value = withTiming(0, { duration: EXIT_DURATION })
                 scale.value = withTiming(0.96, { duration: EXIT_DURATION })
                 translateY.value = withTiming(-60, { duration: EXIT_DURATION }, () =>
                     runOnJS(onDismiss)(),
@@ -120,7 +116,6 @@ const ToastItem: React.FC<ToastItemProps> = ({ toast, onDismiss }) => {
         })
 
     const animatedStyle = useAnimatedStyle(() => ({
-        opacity: opacity.value,
         transform: [{ translateY: translateY.value + dragY.value }, { scale: scale.value }],
     }))
 

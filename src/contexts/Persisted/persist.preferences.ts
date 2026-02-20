@@ -2,7 +2,6 @@ import { create } from "zustand"
 import { storage, storageKeys, safeDelete, safeSet } from "@/store"
 import { PreferencesContent, PreferencesDataType, PreferencesLanguage } from "./types"
 import { TimezoneCode } from "circle-text-library"
-import { state } from "happy-dom/lib/PropertySymbol.js"
 
 const key = storageKeys().preferences
 
@@ -11,14 +10,17 @@ export interface PreferencesState {
     timezoneCode: string
     language: PreferencesLanguage
     content: PreferencesContent
+    onboardingPermissionsCompleted: boolean
     setAppLanguage: (value: string) => void
     setPrimaryLanguage: (value: string) => void
     setDisableAutoPlay: (value: boolean) => void
     setDisableHaptics: (value: boolean) => void
     setDisableTranslation: (value: boolean) => void
+    setDisableContentWarning: (value: boolean) => void
     setTranslationLanguage: (value: string) => void
     setTimezoneCode: (value: TimezoneCode) => void
     setMuteAudio: (value: boolean) => void
+    setOnboardingPermissionsCompleted: (value: boolean) => void
     set: (value: PreferencesDataType) => void
     load: () => void
     remove: () => void
@@ -35,8 +37,10 @@ export const usePreferencesStore = create<PreferencesState>((set) => ({
         disableAutoplay: storage.getBoolean(key.autoplay) || false,
         disableHaptics: storage.getBoolean(key.haptics) || false,
         disableTranslation: storage.getBoolean(key.translation) || false,
+        disableContentWarning: storage.getBoolean(key.contentWarning) || false,
         muteAudio: storage.getBoolean(key.muteAudio) || false,
     },
+    onboardingPermissionsCompleted: storage.getBoolean(key.onboardingPermissionsCompleted) || false,
     setAppLanguage: (value: string) => {
         safeSet(key.appLanguage, value)
         set((state) => ({
@@ -82,6 +86,15 @@ export const usePreferencesStore = create<PreferencesState>((set) => ({
             },
         }))
     },
+    setDisableContentWarning: (value: boolean) => {
+        safeSet(key.contentWarning, value)
+        set((state) => ({
+            content: {
+                ...state.content,
+                DisableContentWarning: value,
+            },
+        }))
+    },
     setMuteAudio: (value: boolean) => {
         safeSet(key.muteAudio, value)
         set((state) => ({
@@ -98,6 +111,12 @@ export const usePreferencesStore = create<PreferencesState>((set) => ({
                 ...state.content,
                 translationLanguage: value,
             },
+        }))
+    },
+    setOnboardingPermissionsCompleted: (value: boolean) => {
+        safeSet(key.onboardingPermissionsCompleted, value)
+        set(() => ({
+            onboardingPermissionsCompleted: value,
         }))
     },
 
@@ -122,6 +141,7 @@ export const usePreferencesStore = create<PreferencesState>((set) => ({
         safeSet(key.autoplay, value.content.disableAutoplay)
         safeSet(key.haptics, value.content.disableHaptics)
         safeSet(key.translation, value.content.disableTranslation)
+        safeSet(key.contentWarning, value.content.disableContentWarning)
         safeSet(key.muteAudio, value.content.muteAudio)
         safeSet(key.appTimezone, value.appTimezone)
         safeSet(key.timezoneCode, value.timezoneCode)
@@ -138,8 +158,11 @@ export const usePreferencesStore = create<PreferencesState>((set) => ({
                 disableAutoplay: storage.getBoolean(key.autoplay) || false,
                 disableHaptics: storage.getBoolean(key.haptics) || false,
                 disableTranslation: storage.getBoolean(key.translation) || false,
+                disableContentWarning: storage.getBoolean(key.contentWarning) || false,
                 muteAudio: storage.getBoolean(key.muteAudio) || false,
             },
+            onboardingPermissionsCompleted:
+                storage.getBoolean(key.onboardingPermissionsCompleted) || false,
         })
     },
     remove: () => {
@@ -148,10 +171,12 @@ export const usePreferencesStore = create<PreferencesState>((set) => ({
         safeDelete(key.autoplay)
         safeDelete(key.haptics)
         safeDelete(key.translation)
+        safeDelete(key.contentWarning)
         safeDelete(key.translationLanguage)
         safeDelete(key.muteAudio)
         safeDelete(key.appTimezone)
         safeDelete(key.timezoneCode)
+        safeDelete(key.onboardingPermissionsCompleted)
 
         set({
             appTimezone: 0,
@@ -164,8 +189,10 @@ export const usePreferencesStore = create<PreferencesState>((set) => ({
                 disableAutoplay: false,
                 disableHaptics: false,
                 disableTranslation: false,
+                disableContentWarning: false,
                 muteAudio: false,
             },
+            onboardingPermissionsCompleted: false,
         })
     },
 }))

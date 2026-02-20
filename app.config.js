@@ -30,6 +30,7 @@ module.exports = function (_config) {
                 package: "com.circlecompany.circleapp",
             },
             ios: {
+                supportsTablet: false,
                 usesAppleSignIn: true,
                 bundleIdentifier: "circlellc.circleapp",
                 newArchEnabled: true,

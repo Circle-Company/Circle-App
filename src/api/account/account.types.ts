@@ -1,4 +1,4 @@
-import { AccountMomentsResponse } from "@/queries"
+import { AccountMomentsResponse, AccountBlock } from "@/queries"
 
 export type accountProps = {
     success: boolean
@@ -20,6 +20,18 @@ export type accountProps = {
             engagementGrowthRate30d: number
             interactionsGrowthRate30d: number
         }
+    }
+    error?: string
+}
+
+export type accountBlocksProps = {
+    success: boolean
+    blocks: Array<AccountBlock>
+    pagination: {
+        total: number
+        page: number
+        limit: number
+        totalPages: number
     }
     error?: string
 }
