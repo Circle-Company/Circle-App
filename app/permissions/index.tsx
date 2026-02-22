@@ -141,7 +141,17 @@ export default function PermissionsWizardScreen() {
         }
     }, [items, stepIndex, totalSteps])
 
-    const progressRatio = Math.min((stepIndex + 1) / totalSteps, 1)
+    const pendingSteps: StepId[] = React.useMemo(() => {
+        return STEPS.filter((id) => {
+            const it = getItem(id)
+            const status = it?.status ?? "unknown"
+            return !treatAsGranted(id, status)
+        })
+    }, [items])
+    const currentPendingIndex = Math.max(0, pendingSteps.indexOf(currentId))
+    const pendingTotal = pendingSteps.length
+    const progressRatio =
+        pendingTotal > 0 ? Math.min((currentPendingIndex + 1) / pendingTotal, 1) : 1
 
     const handleAllow = async () => {
         // Special handling for BG location: require FG first
@@ -216,7 +226,7 @@ export default function PermissionsWizardScreen() {
     const status = currentItem?.status ?? "unknown"
     const isGranted = treatAsGranted(currentId, status)
 
-    const isLastStep = stepIndex === totalSteps - 1
+    const isLastStep = pendingTotal > 0 ? currentPendingIndex === pendingTotal - 1 : true
     const showOpenSettings = status === "denied" && canAskAgain === false
 
     // For BG location, block immediate Allow if FG missing, showing hint
@@ -265,7 +275,8 @@ export default function PermissionsWizardScreen() {
                     <View style={[styles.progressFill, { width: `${progressRatio * 100}%` }]} />
                 </View>
                 <Text style={styles.progressText}>
-                    Step {Math.min(stepIndex + 1, totalSteps)} of {totalSteps}
+                    Step {Math.min(currentPendingIndex + 1, pendingTotal)} of{" "}
+                    {Math.max(pendingTotal, 1)}
                 </Text>
             </View>
 
