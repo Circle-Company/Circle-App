@@ -215,8 +215,8 @@ export function Provider({ children }: GeolocationProviderProps) {
 
     // Função para obter e atualizar a localização do usuário (one-shot)
     const UseUpdateUserLocation = async () => {
-        const hasPermission = await requestLocationPermission()
-        if (!hasPermission) throw new Error("Location permission is not granted")
+        const fg = await Location.getForegroundPermissionsAsync()
+        if (fg.status !== "granted") throw new Error("Location permission is not granted")
 
         setIsUpdating(true)
 
@@ -320,8 +320,14 @@ export function Provider({ children }: GeolocationProviderProps) {
                     `🔄 Iniciando serviço de localização para usuário ID: ${session.user.id}`,
                 )
                 try {
-                    const granted = await requestLocationPermission()
-                    if (!granted) return
+                    // Apenas consulta o status; não solicita permissão automaticamente
+                    await refreshPermissions()
+                    const fg = await Location.getForegroundPermissionsAsync()
+                    const bg = await Location.getBackgroundPermissionsAsync()
+                    if (fg.status !== "granted") {
+                        // Sem permissão: não iniciar fluxos
+                        return
+                    }
 
                     // Atualiza a localização imediatamente
                     await updateUserLocation()
@@ -329,8 +335,10 @@ export function Provider({ children }: GeolocationProviderProps) {
                     // Inicia o intervalo para atualizações em foreground
                     startLocationUpdateInterval()
 
-                    // Inicia atualizações em background
-                    await startBackgroundLocationUpdates()
+                    // Inicia atualizações em background somente se já concedida
+                    if (bg.status === "granted") {
+                        await startBackgroundLocationUpdates()
+                    }
                 } catch (error) {
                     console.error("Error in initial location update:", error)
                 }
