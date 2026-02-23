@@ -28,6 +28,7 @@ import { useToast } from "@/contexts/Toast"
 import { usePreferencesStore } from "@/contexts/Persisted/persist.preferences"
 import PermissionCard from "@/components/permission/permission.card"
 import PermissionCTA from "@/components/permission/permission.cta"
+import PermissionHeader from "@/components/permission/permission.header"
 import { TextStyle } from "react-native"
 
 type StepId = "camera" | "microphone" | "mediaLibrary" | "locationForeground" | "locationBackground"
@@ -275,21 +276,10 @@ export default function PermissionsWizardScreen() {
                 colors={["#00000000", "#c29eff"]}
                 style={inferiorGradient}
             />
-            {/* Header + Progress */}
-            <View style={styles.header}>
-                <Text style={styles.headerTitle}>Allow Permissions</Text>
-                <Text style={styles.headerLead}>
-                    Circle App need some permissions to provide best experience for you
-                </Text>
-
-                <View style={styles.progressBar}>
-                    <View style={[styles.progressFill, { width: `${progressRatio * 100}%` }]} />
-                </View>
-                <Text style={styles.progressText}>
-                    Step {Math.min(currentPendingIndex + 1, pendingTotal)} of{" "}
-                    {Math.max(pendingTotal, 1)}
-                </Text>
-            </View>
+            <PermissionHeader
+                currentStep={Math.min(currentPendingIndex + 1, pendingTotal)}
+                totalSteps={Math.max(pendingTotal, 1)}
+            />
 
             {/* Step content */}
             <PermissionCard
