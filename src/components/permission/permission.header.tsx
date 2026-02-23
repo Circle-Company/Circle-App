@@ -44,7 +44,7 @@ export default function PermissionHeader({
 
             <Text style={styles.progressText}>
                 {remaining > 0
-                    ? `Just ${remaining} more ${remaining === 1 ? "tap" : "taps"} and done ✨`
+                    ? `Just more ${remaining} ${remaining === 1 ? "tap" : "taps"} and done ✨`
                     : "You're all set ✨"}
             </Text>
         </View>
@@ -69,7 +69,7 @@ const styles = StyleSheet.create({
     },
     headerLead: {
         marginTop: sizes.margins["1sm"],
-        fontSize: Fonts.size.body * 1.1,
+        fontSize: Fonts.size.body * 0.9,
         color: colors.gray.grey_04,
         fontFamily: Fonts.family.Medium,
         textAlign: "center",
@@ -81,7 +81,7 @@ const styles = StyleSheet.create({
     progressText: {
         color: colors.gray.grey_04,
         fontStyle: "italic",
-        fontSize: Fonts.size.footnote,
+        fontSize: Fonts.size.body * 1.1,
         fontFamily: Fonts.family.Medium,
     },
 })
