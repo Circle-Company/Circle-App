@@ -153,6 +153,17 @@ export default function PermissionsWizardScreen() {
     const progressRatio =
         pendingTotal > 0 ? Math.min((currentPendingIndex + 1) / pendingTotal, 1) : 1
 
+    // Ensure we auto-jump to the first pending permission step when re-entering
+    React.useEffect(() => {
+        if (pendingTotal > 0) {
+            const firstPending = pendingSteps[0]
+            const desiredIndex = STEPS.indexOf(firstPending)
+            if (desiredIndex !== -1 && desiredIndex !== stepIndex) {
+                setStepIndex(desiredIndex)
+            }
+        }
+    }, [pendingTotal, pendingSteps, stepIndex])
+
     const handleAllow = async () => {
         // Special handling for BG location: require FG first
         if (currentId === "locationBackground") {
