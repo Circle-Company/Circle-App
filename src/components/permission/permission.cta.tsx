@@ -9,7 +9,7 @@ import ButtonStandart from "@/components/buttons/button-standart"
 export type PermissionCTAProps = {
     onAllow: () => void | Promise<void>
     onSkip: () => void | Promise<void>
-    onOpenSettings?: () => void | Promise<void>
+
     disabledAllow?: boolean
     allowLabel?: string
     skipLabel?: string
@@ -19,7 +19,6 @@ export type PermissionCTAProps = {
 export default function PermissionCTA({
     onAllow,
     onSkip,
-    onOpenSettings,
     disabledAllow,
     allowLabel = "Allow",
     skipLabel = "Not now",
@@ -27,24 +26,19 @@ export default function PermissionCTA({
 }: PermissionCTAProps) {
     return (
         <View style={[styles.ctaContent, style]}>
-            {disabledAllow == false && (
-                <ButtonStandart
-                    action={disabledAllow ? undefined : onAllow}
-                    backgroundColor={disabledAllow ? colors.gray.grey_07 : colors.purple.purple_04}
-                    margins={false}
-                    height={54}
-                    width={sizes.screens.width * 0.8}
+            <ButtonStandart
+                action={disabledAllow ? undefined : onAllow}
+                backgroundColor={disabledAllow ? colors.gray.grey_07 : colors.purple.purple_04}
+                margins={false}
+                height={54}
+                width={sizes.screens.width * 0.8}
+            >
+                <Text
+                    style={[styles.primaryBtnText, disabledAllow && { color: colors.gray.grey_05 }]}
                 >
-                    <Text
-                        style={[
-                            styles.primaryBtnText,
-                            disabledAllow && { color: colors.gray.grey_05 },
-                        ]}
-                    >
-                        {allowLabel}
-                    </Text>
-                </ButtonStandart>
-            )}
+                    {allowLabel}
+                </Text>
+            </ButtonStandart>
 
             <Pressable
                 onPress={onSkip}
@@ -52,15 +46,6 @@ export default function PermissionCTA({
             >
                 <Text style={styles.secondaryBtnText}>{skipLabel}</Text>
             </Pressable>
-
-            {onOpenSettings ? (
-                <Pressable
-                    onPress={onOpenSettings}
-                    style={({ pressed }) => [styles.linkBtn, pressed && styles.pressedLight]}
-                >
-                    <Text style={styles.linkBtnText}>Open Settings</Text>
-                </Pressable>
-            ) : null}
         </View>
     )
 }
@@ -74,8 +59,9 @@ const styles = StyleSheet.create({
 
     primaryBtnText: {
         color: colors.gray.white,
-        fontSize: fonts.size.body * 1.3,
-        fontFamily: fonts.family["Black"],
+        fontSize: fonts.size.body * 1.4,
+        fontFamily: fonts.family["ExtraBold"],
+        fontStyle: "italic",
     } as TextStyle,
 
     secondaryBtn: {
@@ -86,20 +72,9 @@ const styles = StyleSheet.create({
     } as ViewStyle,
 
     secondaryBtnText: {
-        color: colors.gray.white,
+        color: colors.gray.white + 80,
         fontSize: fonts.size.body * 1.05,
-        fontFamily: fonts.family["Black"],
-    } as TextStyle,
-
-    linkBtn: {
-        paddingVertical: 8,
-    } as ViewStyle,
-
-    linkBtnText: {
-        color: colors.purple.purple_00,
-        fontSize: fonts.size.footnote,
-        fontFamily: fonts.family["Bold-Italic"],
-        textDecorationLine: "underline",
+        fontFamily: fonts.family["Bold"],
     } as TextStyle,
 
     pressedLight: { opacity: 0.7 } as ViewStyle,
