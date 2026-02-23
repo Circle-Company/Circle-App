@@ -76,7 +76,7 @@ export default function PermissionHeader({
 
             <Text style={styles.progressText}>
                 {safeRemaining > 0
-                    ? `Just more ${safeRemaining} ${safeRemaining === 1 ? "tap" : "taps"} and done ✨`
+                    ? `Just more ${safeRemaining} ${safeRemaining === 1 ? "step" : "steps"} and done ✨`
                     : "You're all set ✨"}
             </Text>
         </View>
