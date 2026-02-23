@@ -290,14 +290,6 @@ export function CameraPage(): React.ReactElement {
         console.log(`Camera: ${device?.name} | Format: ${f}`)
     }, [device?.name, format, fps])
 
-    useEffect(() => {
-        microphonePermission.requestPermission()
-    }, [microphonePermission])
-
-    useEffect(() => {
-        locationPermission.requestPermission()
-    }, [locationPermission])
-
     const cameraStyle: ViewStyle = {
         width: sizes.moment.full.width,
         height: sizes.moment.full.height,

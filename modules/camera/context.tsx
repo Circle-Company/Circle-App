@@ -2,7 +2,7 @@ import React, { createContext, useContext, useState, ReactNode, useCallback, use
 import { uploadMoment } from "./hooks/uploadMoment"
 import PersistedContext from "@/contexts/Persisted"
 import type { CameraDevice } from "react-native-vision-camera"
-import { useMicrophonePermission, useLocationPermission } from "react-native-vision-camera"
+import { useMicrophonePermission, useLocationPermission } from "react-native-vision-camera" // observe-only in context; do not auto-request here
 import { usePreferredCameraDevice } from "./hooks/usePreferredCameraDevice"
 
 export type CameraVideoInfo = {
