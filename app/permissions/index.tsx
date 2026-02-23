@@ -168,20 +168,20 @@ export default function PermissionsWizardScreen() {
     }, [pendingTotal, pendingSteps, stepIndex])
 
     const handleAllow = async () => {
-        // Special handling for BG location: require FG first
-        if (currentId === "locationBackground") {
-            const fg = getItem("locationForeground")
-            if (fg?.status !== "granted") {
-                toast.show({
-                    title: "Grant Foreground Location first",
-                    duration: 1800,
-                })
-                return
-            }
-        }
-
         const result = await requestOne(currentId)
         await refresh()
+
+        // For Background Location: if not granted, take user straight to Settings
+        if (currentId === "locationBackground") {
+            if (result !== "granted") {
+                toast.error("Permission denied. Opening Settings…", { duration: 1200 })
+                await openSettings()
+                return
+            }
+            toast.success("Permission granted", { duration: 1200 })
+            goNext()
+            return
+        }
 
         if (result === "granted" || (currentId === "mediaLibrary" && result === "limited")) {
             toast.success("Permission granted", { duration: 1200 })
@@ -263,8 +263,12 @@ export default function PermissionsWizardScreen() {
                 style={styles.gradient}
             />
             <PermissionHeader
-                currentStep={Math.min(currentPendingIndex + 1, pendingTotal)}
-                totalSteps={Math.max(pendingTotal, 1)}
+                completed={Math.max(0, pendingTotal > 0 ? currentPendingIndex : pendingTotal)}
+                total={Math.max(pendingTotal, 1)}
+                remaining={Math.max(
+                    0,
+                    pendingTotal > 0 ? pendingTotal - currentPendingIndex - 1 : 0,
+                )}
             />
 
             {/* Step content */}
@@ -285,8 +289,10 @@ export default function PermissionsWizardScreen() {
                 }
                 description={description as any}
                 hint={
-                    requiresFGFirst
-                        ? "Please enable “Location Access (Foreground)” first to allow background location."
+                    currentId === "locationBackground"
+                        ? requiresFGFirst
+                            ? "Foreground Location is required first. Tap Allow to try enabling Background — we'll open Settings if needed."
+                            : "Tap Allow to enable Background Location. If it's denied, we'll open Settings so you can turn it on."
                         : undefined
                 }
                 okText={isGranted ? "This permission is already enabled." : undefined}
@@ -309,8 +315,10 @@ export default function PermissionsWizardScreen() {
                             <PermissionCTA
                                 onAllow={handleAllow}
                                 onSkip={handleNotNow}
-                                onOpenSettings={showOpenSettings ? handleOpenSettings : undefined}
-                                disabledAllow={requiresFGFirst || isGranted}
+                                disabledAllow={
+                                    isGranted ||
+                                    (currentId !== "locationBackground" && requiresFGFirst)
+                                }
                                 allowLabel={"Allow"}
                                 skipLabel={isLastStep ? "Finish" : "Not now"}
                             />
@@ -321,8 +329,9 @@ export default function PermissionsWizardScreen() {
                         <PermissionCTA
                             onAllow={handleAllow}
                             onSkip={handleNotNow}
-                            onOpenSettings={showOpenSettings ? handleOpenSettings : undefined}
-                            disabledAllow={requiresFGFirst || isGranted}
+                            disabledAllow={
+                                isGranted || (currentId !== "locationBackground" && requiresFGFirst)
+                            }
                             allowLabel={isLastStep ? "Allow" : "Allow"}
                             skipLabel={isLastStep ? "Finish" : "Not now"}
                         />
