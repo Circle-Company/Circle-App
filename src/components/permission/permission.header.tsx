@@ -7,25 +7,57 @@ import sizes from "@/constants/sizes"
 import { Host, Slider, LinearProgress } from "@expo/ui/swift-ui"
 
 export type PermissionHeaderProps = {
-    currentStep: number
-    totalSteps: number
+    // New API
+    completed?: number
+    total?: number
+    remaining?: number
+    // Legacy API (kept for backward compatibility with callers)
+    currentStep?: number
+    totalSteps?: number
     title?: string
     lead?: string
 }
 
 export default function PermissionHeader({
+    // New API
+    completed,
+    total,
+    remaining,
+    // Legacy API
     currentStep,
     totalSteps,
-    title = "Setup your App",
+    title = "Setup your app",
     lead = "Circle App need some permissions to provide best experience for you",
 }: PermissionHeaderProps) {
-    const safeTotal = Math.max(1, Number.isFinite(totalSteps) ? totalSteps : 1)
-    const safeCurrent = Math.min(
-        Math.max(1, Number.isFinite(currentStep) ? currentStep : 1),
+    // Resolve totals from new or legacy props
+    const rawTotal =
+        typeof total === "number" ? total : typeof totalSteps === "number" ? totalSteps : 1
+    const safeTotal = Math.max(1, Number.isFinite(rawTotal) ? rawTotal : 1)
+
+    // Resolve completed steps:
+    // - Prefer `completed` (new API)
+    // - Fallback: derive from legacy `currentStep` (1-based ordinal => completed = currentStep - 1)
+    const legacyCurrent = typeof currentStep === "number" ? currentStep : undefined
+    const rawCompleted =
+        typeof completed === "number"
+            ? completed
+            : legacyCurrent !== undefined
+              ? Math.max(0, legacyCurrent - 1)
+              : 0
+    const safeCompleted = Math.min(
+        Math.max(0, Number.isFinite(rawCompleted) ? rawCompleted : 0),
         safeTotal,
     )
-    const progressRatio = Math.min(Math.max(0, 1 - safeCurrent / safeTotal), 1)
-    const remaining = Math.max(0, safeTotal - safeCurrent)
+
+    // Remaining: prefer provided prop; else compute from completed/total
+    const computedRemaining = Math.max(0, safeTotal - safeCompleted)
+    const safeRemaining =
+        typeof remaining === "number" && Number.isFinite(remaining)
+            ? Math.max(0, Math.min(remaining, safeTotal))
+            : computedRemaining
+
+    // Progress is the completed fraction
+    const progressRatio = safeTotal > 0 ? Math.min(Math.max(0, safeCompleted / safeTotal), 1) : 0
 
     return (
         <View style={styles.header}>
@@ -43,8 +75,8 @@ export default function PermissionHeader({
             </View>
 
             <Text style={styles.progressText}>
-                {remaining > 0
-                    ? `Just more ${remaining} ${remaining === 1 ? "tap" : "taps"} and done ✨`
+                {safeRemaining > 0
+                    ? `Just more ${safeRemaining} ${safeRemaining === 1 ? "tap" : "taps"} and done ✨`
                     : "You're all set ✨"}
             </Text>
         </View>
@@ -69,6 +101,7 @@ const styles = StyleSheet.create({
     },
     headerLead: {
         marginTop: sizes.margins["1sm"],
+        width: sizes.screens.width * 0.7,
         fontSize: Fonts.size.body * 0.9,
         color: colors.gray.grey_04,
         fontFamily: Fonts.family.Medium,
