@@ -19,6 +19,7 @@ import {
     useCameraDevice,
     useCameraFormat,
     useCameraPermission,
+    useMicrophonePermission,
 } from "react-native-vision-camera"
 import { CaptureButton } from "../components/CaptureButton"
 import CameraVideoSlider from "../components/CameraVideoSlider"
@@ -31,6 +32,7 @@ import fonts from "@/constants/fonts"
 import { FlashButton } from "../components/flashButton"
 import { RotateButton } from "../components/rotateButton"
 import { CameraPermissionNotProvidedCard } from "../components/CameraPermissionNotProvidedCard"
+import { MicPermissionNotProvidedCard } from "../components/MicPermissionNotProvidedCard"
 
 const ReanimatedCamera = Reanimated.createAnimatedComponent(Camera)
 Reanimated.addWhitelistedNativeProps({
@@ -290,14 +292,6 @@ export function CameraPage(): React.ReactElement {
         console.log(`Camera: ${device?.name} | Format: ${f}`)
     }, [device?.name, format, fps])
 
-    useEffect(() => {
-        microphonePermission.requestPermission()
-    }, [microphonePermission])
-
-    useEffect(() => {
-        locationPermission.requestPermission()
-    }, [locationPermission])
-
     const cameraStyle: ViewStyle = {
         width: sizes.moment.full.width,
         height: sizes.moment.full.height,
@@ -321,6 +315,20 @@ export function CameraPage(): React.ReactElement {
                 }}
             />
             {useCameraPermission().hasPermission === false && <CameraPermissionNotProvidedCard />}
+            {useMicrophonePermission().hasPermission === false && !isRecording && (
+                <View
+                    style={{
+                        position: "absolute",
+                        top: sizes.paddings["2sm"],
+                        left: 0,
+                        right: 0,
+                        bottom: 0,
+                        zIndex: 1,
+                    }}
+                >
+                    <MicPermissionNotProvidedCard />
+                </View>
+            )}
             <View style={styles.container}>
                 {device != null ? (
                     <GestureDetector gesture={pinchGesture}>

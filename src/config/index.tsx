@@ -13,7 +13,7 @@ const environment = {
 }
 
 const api = {
-    ENDPOINT: "http://192.168.15.17:3000", //"https://api.circleapp.com.br"
+    ENDPOINT: "https://api.circleapp.com.br", //"http://192.168.15.17:3000"
     API_VERSION: "1.0.0",
 }
 

@@ -10,12 +10,6 @@ import { colors } from "@/constants/colors"
 import Fonts from "@/constants/fonts"
 import sizes from "@/constants/sizes"
 
-import CameraIcon from "@/assets/icons/svgs/camera.svg"
-import MicrophoneIcon from "@/assets/icons/svgs/globe_americas.svg"
-import MediaLibraryIcon from "@/assets/icons/svgs/moments.svg"
-import LocationForegroundIcon from "@/assets/icons/svgs/arrow-thic-down.svg"
-import LocationBackgroundIcon from "@/assets/icons/svgs/map.svg"
-
 import {
     GlassContainer,
     GlassView,
@@ -23,11 +17,12 @@ import {
     isGlassEffectAPIAvailable,
 } from "expo-glass-effect"
 
-import useAppPermissions, { PermissionItem, PermissionStatus } from "@/lib/hooks/useAppPermissions"
+import useAppPermissions, { PermissionStatus } from "@/lib/hooks/useAppPermissions"
 import { useToast } from "@/contexts/Toast"
 import { usePreferencesStore } from "@/contexts/Persisted/persist.preferences"
 import PermissionCard from "@/components/permission/permission.card"
 import PermissionCTA from "@/components/permission/permission.cta"
+import PermissionHeader from "@/components/permission/permission.header"
 import { TextStyle } from "react-native"
 
 type StepId = "camera" | "microphone" | "mediaLibrary" | "locationForeground" | "locationBackground"
@@ -79,7 +74,15 @@ export default function PermissionsWizardScreen() {
         Platform.OS === "ios" && isLiquidGlassAvailable() && isGlassEffectAPIAvailable()
 
     const { items, refresh, requestOne, hasMissingRequired, requiredMissingIds, openSettings } =
-        useAppPermissions()
+        useAppPermissions({
+            required: [
+                "camera",
+                "microphone",
+                "mediaLibrary",
+                "locationForeground",
+                "locationBackground",
+            ],
+        })
 
     const [stepIndex, setStepIndex] = React.useState(0)
     const totalSteps = STEPS.length
@@ -141,23 +144,44 @@ export default function PermissionsWizardScreen() {
         }
     }, [items, stepIndex, totalSteps])
 
-    const progressRatio = Math.min((stepIndex + 1) / totalSteps, 1)
+    const pendingSteps: StepId[] = React.useMemo(() => {
+        return STEPS.filter((id) => {
+            const it = getItem(id)
+            const status = it?.status ?? "unknown"
+            return !treatAsGranted(id, status)
+        })
+    }, [items])
+    const currentPendingIndex = Math.max(0, pendingSteps.indexOf(currentId))
+    const pendingTotal = pendingSteps.length
+    const progressRatio =
+        pendingTotal > 0 ? Math.min((currentPendingIndex + 1) / pendingTotal, 1) : 1
 
-    const handleAllow = async () => {
-        // Special handling for BG location: require FG first
-        if (currentId === "locationBackground") {
-            const fg = getItem("locationForeground")
-            if (fg?.status !== "granted") {
-                toast.show({
-                    title: "Grant Foreground Location first",
-                    duration: 1800,
-                })
-                return
+    // Ensure we auto-jump to the first pending permission step when re-entering
+    React.useEffect(() => {
+        if (pendingTotal > 0) {
+            const firstPending = pendingSteps[0]
+            const desiredIndex = STEPS.indexOf(firstPending)
+            if (desiredIndex !== -1 && desiredIndex !== stepIndex) {
+                setStepIndex(desiredIndex)
             }
         }
+    }, [pendingTotal, pendingSteps, stepIndex])
 
+    const handleAllow = async () => {
         const result = await requestOne(currentId)
         await refresh()
+
+        // For Background Location: if not granted, take user straight to Settings
+        if (currentId === "locationBackground") {
+            if (result !== "granted") {
+                toast.error("Permission denied. Opening Settings…", { duration: 1200 })
+                await openSettings()
+                return
+            }
+            toast.success("Permission granted", { duration: 1200 })
+            goNext()
+            return
+        }
 
         if (result === "granted" || (currentId === "mediaLibrary" && result === "limited")) {
             toast.success("Permission granted", { duration: 1200 })
@@ -216,29 +240,13 @@ export default function PermissionsWizardScreen() {
     const status = currentItem?.status ?? "unknown"
     const isGranted = treatAsGranted(currentId, status)
 
-    const isLastStep = stepIndex === totalSteps - 1
+    const isLastStep = pendingTotal > 0 ? currentPendingIndex === pendingTotal - 1 : true
     const showOpenSettings = status === "denied" && canAskAgain === false
 
     // For BG location, block immediate Allow if FG missing, showing hint
     const requiresFGFirst =
         currentId === "locationBackground" && getItem("locationForeground")?.status !== "granted"
 
-    const inferiorGradient: any = {
-        width: sizes.window.width,
-        height: sizes.window.height * 1.5,
-        position: "absolute",
-        zIndex: 0,
-        bottom: 0,
-        opacity: 0.07,
-    }
-
-    const iconStyle: TextStyle = {
-        fontSize: 100,
-        shadowColor: "black",
-        shadowOffset: { width: 0, height: 10 },
-        shadowOpacity: 0.5,
-        shadowRadius: 10,
-    }
     return (
         <View
             style={[
@@ -252,43 +260,39 @@ export default function PermissionsWizardScreen() {
             <LinearGradient
                 renderToHardwareTextureAndroid
                 colors={["#00000000", "#c29eff"]}
-                style={inferiorGradient}
+                style={styles.gradient}
             />
-            {/* Header + Progress */}
-            <View style={styles.header}>
-                <Text style={styles.headerTitle}>Allow Permissions</Text>
-                <Text style={styles.headerLead}>
-                    Circle App need some permissions to provide best experience for you
-                </Text>
-
-                <View style={styles.progressBar}>
-                    <View style={[styles.progressFill, { width: `${progressRatio * 100}%` }]} />
-                </View>
-                <Text style={styles.progressText}>
-                    Step {Math.min(stepIndex + 1, totalSteps)} of {totalSteps}
-                </Text>
-            </View>
+            <PermissionHeader
+                completed={Math.max(0, pendingTotal > 0 ? currentPendingIndex : pendingTotal)}
+                total={Math.max(pendingTotal, 1)}
+                remaining={Math.max(
+                    0,
+                    pendingTotal > 0 ? pendingTotal - currentPendingIndex - 1 : 0,
+                )}
+            />
 
             {/* Step content */}
             <PermissionCard
                 title={title as any}
                 icon={
                     currentId === "camera" ? (
-                        <Text style={iconStyle}>📷</Text>
+                        <Text style={styles.iconStyle}>📷</Text>
                     ) : currentId === "microphone" ? (
-                        <Text style={iconStyle}>🎙️</Text>
+                        <Text style={styles.iconStyle}>🎙️</Text>
                     ) : currentId === "mediaLibrary" ? (
-                        <Text style={iconStyle}>🤩</Text>
+                        <Text style={styles.iconStyle}>🤩</Text>
                     ) : currentId === "locationForeground" ? (
-                        <Text style={iconStyle}>📍</Text>
+                        <Text style={styles.iconStyle}>📍</Text>
                     ) : (
-                        <Text style={iconStyle}>🌎</Text>
+                        <Text style={styles.iconStyle}>🌎</Text>
                     )
                 }
                 description={description as any}
                 hint={
-                    requiresFGFirst
-                        ? "Please enable “Location Access (Foreground)” first to allow background location."
+                    currentId === "locationBackground"
+                        ? requiresFGFirst
+                            ? "Foreground Location is required first. Tap Allow to try enabling Background — we'll open Settings if needed."
+                            : "Tap Allow to enable Background Location. If it's denied, we'll open Settings so you can turn it on."
                         : undefined
                 }
                 okText={isGranted ? "This permission is already enabled." : undefined}
@@ -311,8 +315,10 @@ export default function PermissionsWizardScreen() {
                             <PermissionCTA
                                 onAllow={handleAllow}
                                 onSkip={handleNotNow}
-                                onOpenSettings={showOpenSettings ? handleOpenSettings : undefined}
-                                disabledAllow={requiresFGFirst || isGranted}
+                                disabledAllow={
+                                    isGranted ||
+                                    (currentId !== "locationBackground" && requiresFGFirst)
+                                }
                                 allowLabel={"Allow"}
                                 skipLabel={isLastStep ? "Finish" : "Not now"}
                             />
@@ -323,8 +329,9 @@ export default function PermissionsWizardScreen() {
                         <PermissionCTA
                             onAllow={handleAllow}
                             onSkip={handleNotNow}
-                            onOpenSettings={showOpenSettings ? handleOpenSettings : undefined}
-                            disabledAllow={requiresFGFirst || isGranted}
+                            disabledAllow={
+                                isGranted || (currentId !== "locationBackground" && requiresFGFirst)
+                            }
                             allowLabel={isLastStep ? "Allow" : "Allow"}
                             skipLabel={isLastStep ? "Finish" : "Not now"}
                         />
@@ -340,96 +347,21 @@ const styles = StyleSheet.create({
         flex: 1,
         backgroundColor: colors.gray.black,
     },
-
-    // Header / progress
-    header: {
-        alignItems: "center",
-        paddingTop: sizes.screens.height * 0.07,
-        paddingBottom: sizes.margins["1md"] * 1.3,
-        paddingHorizontal: sizes.paddings["1md"],
+    iconStyle: {
+        fontSize: 100,
+        shadowColor: "black",
+        shadowOffset: { width: 0, height: 10 },
+        shadowOpacity: 0.5,
+        shadowRadius: 10,
     },
-    headerTitle: {
-        fontSize: Fonts.size.title1,
-        color: colors.gray.white,
-        fontFamily: Fonts.family["Black-Italic"],
-        marginBottom: sizes.margins["1sm"],
+    gradient: {
+        width: sizes.window.width,
+        height: sizes.window.height * 1.5,
+        position: "absolute",
+        zIndex: 0,
+        bottom: 0,
+        opacity: 0.07,
     },
-    headerLead: {
-        marginTop: sizes.margins["1sm"],
-        fontSize: Fonts.size.body * 1.1,
-        color: colors.gray.grey_04,
-        fontFamily: Fonts.family.Medium,
-        textAlign: "center",
-    },
-    progressBar: {
-        width: sizes.screens.width - sizes.paddings["1md"] * 2,
-        height: 10,
-        backgroundColor: colors.gray.grey_08,
-        borderRadius: 999,
-        overflow: "hidden",
-        marginTop: sizes.margins["1md"],
-    },
-    progressFill: {
-        height: "100%",
-        backgroundColor: colors.purple.purple_00,
-        borderRadius: 999,
-    },
-    progressText: {
-        marginTop: sizes.margins["2sm"],
-        color: colors.gray.grey_04,
-        fontStyle: "italic",
-        fontSize: Fonts.size.footnote,
-        fontFamily: Fonts.family.Medium,
-    },
-
-    // Card
-    card: {
-        borderRadius: sizes.borderRadius["1lg"] * 1.1,
-        backgroundColor: colors.gray.grey_08,
-        paddingHorizontal: sizes.paddings["1md"],
-        paddingVertical: sizes.paddings["1md"],
-        marginHorizontal: sizes.paddings["1md"],
-    },
-    cardTitle: {
-        fontSize: Fonts.size.body * 1.25,
-        color: colors.gray.white,
-        fontFamily: Fonts.family["Bold"],
-    },
-    cardSubtitle: {
-        fontSize: Fonts.size.callout,
-        color: colors.gray.grey_04,
-        fontFamily: Fonts.family.Medium,
-        marginTop: sizes.margins["1sm"],
-    },
-    statusRow: {
-        marginTop: sizes.margins["1md"],
-        flexDirection: "row",
-        alignItems: "center",
-        gap: sizes.margins["1sm"],
-    },
-    statusChip: {
-        paddingHorizontal: 10,
-        paddingVertical: 4,
-        borderRadius: 999,
-    },
-    statusChipText: {
-        fontSize: Fonts.size.caption2,
-        fontFamily: Fonts.family["Bold"],
-    },
-    okText: {
-        marginTop: sizes.margins["1sm"],
-        color: colors.green.green_05,
-        fontSize: Fonts.size.footnote,
-        fontFamily: Fonts.family.Medium,
-    },
-    hintText: {
-        marginTop: sizes.margins["1sm"],
-        color: colors.yellow.yellow_03,
-        fontSize: Fonts.size.footnote,
-        fontFamily: Fonts.family.Medium,
-    },
-
-    // CTA area
     ctaWrapper: {
         position: "absolute",
         left: 0,
@@ -445,49 +377,4 @@ const styles = StyleSheet.create({
         paddingBottom: sizes.paddings["1sm"],
         paddingHorizontal: 20,
     },
-    ctaContent: {
-        alignItems: "center",
-        justifyContent: "center",
-        gap: sizes.margins["1sm"],
-    },
-    primaryBtn: {
-        width: "100%",
-        backgroundColor: colors.purple.purple_00,
-        borderRadius: 100,
-        alignItems: "center",
-        justifyContent: "center",
-        paddingVertical: 14,
-    },
-    primaryBtnDisabled: {
-        backgroundColor: colors.gray.grey_07,
-    },
-    primaryBtnText: {
-        color: colors.gray.black,
-        fontSize: Fonts.size.body * 1.05,
-        fontFamily: Fonts.family["Black"],
-    },
-    secondaryBtn: {
-        width: "100%",
-        alignItems: "center",
-        justifyContent: "center",
-        paddingVertical: 14,
-    },
-    secondaryBtnText: {
-        color: colors.gray.white,
-        fontSize: Fonts.size.body * 1.05,
-        fontFamily: Fonts.family["Black"],
-    },
-    linkBtn: {
-        paddingVertical: 8,
-    },
-    linkBtnText: {
-        color: colors.purple.purple_00,
-        fontSize: Fonts.size.footnote,
-        fontFamily: Fonts.family["Bold-Italic"],
-        textDecorationLine: "underline",
-    },
-
-    // press states
-    pressed: { opacity: 0.9, transform: [{ scale: 0.995 }] },
-    pressedLight: { opacity: 0.7 },
 })

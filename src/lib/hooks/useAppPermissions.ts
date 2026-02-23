@@ -1,5 +1,5 @@
 import React from "react"
-import { Linking, Platform } from "react-native"
+import { Linking } from "react-native"
 
 // Camera & Microphone (react-native-vision-camera)
 import { Camera } from "react-native-vision-camera"
@@ -94,10 +94,14 @@ const mapExpoPermissionStatus = (s: string | undefined): PermissionStatus => {
 }
 
 export function useAppPermissions(options: UseAppPermissionsOptions = {}): UseAppPermissionsResult {
-    const required = React.useMemo(
-        () => new Set<PermissionId>(options.required ?? DEFAULT_REQUIRED),
-        [options.required],
-    )
+    // Stabilize required list across renders using a normalized key
+    const requiredIds = React.useMemo<PermissionId[]>(() => {
+        const base = (options.required ?? DEFAULT_REQUIRED).slice() as PermissionId[]
+        base.sort()
+        return base
+    }, [JSON.stringify((options.required ?? DEFAULT_REQUIRED).slice().sort())])
+
+    const required = React.useMemo(() => new Set<PermissionId>(requiredIds), [requiredIds])
 
     // Local state for all items
     const [items, setItems] = React.useState<PermissionItem[]>(() => {
@@ -183,7 +187,7 @@ export function useAppPermissions(options: UseAppPermissionsOptions = {}): UseAp
                 options.onStatusChange?.(id, partial.status)
             }
         },
-        [options],
+        [options.onStatusChange],
     )
 
     // Build "request" functions that always work with latest closures
@@ -253,6 +257,22 @@ export function useAppPermissions(options: UseAppPermissionsOptions = {}): UseAp
         buildRequesters()
     }, [buildRequesters])
 
+    // Keep `required` flags in sync with options.required, but only update when it actually changes
+    React.useEffect(() => {
+        setItems((prev) => {
+            let changed = false
+            const next = prev.map((it) => {
+                const nextRequired = required.has(it.id)
+                if (it.required !== nextRequired) {
+                    changed = true
+                    return { ...it, required: nextRequired }
+                }
+                return it
+            })
+            return changed ? next : prev
+        })
+    }, [required])
+
     // Read current statuses without prompting the OS
     const refresh = React.useCallback(async () => {
         // camera
@@ -308,9 +328,11 @@ export function useAppPermissions(options: UseAppPermissionsOptions = {}): UseAp
             if (!current?.request) return "unknown"
             const status = await current.request()
             updateOne(id, { status })
+            // Re-sync canAskAgain flags and any dependent permissions (e.g., BG after FG)
+            await refresh()
             return status
         },
-        [items, updateOne],
+        [items, updateOne, refresh],
     )
 
     // Recommended request order
