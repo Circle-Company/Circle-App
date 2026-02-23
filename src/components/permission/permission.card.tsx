@@ -81,6 +81,7 @@ export default function PermissionCard({
         fontSize: fonts.size.body,
         fontFamily: fonts.family.Medium,
         paddingHorizontal: sizes.paddings["1md"],
+        paddingTop: sizes.paddings["1sm"],
         textAlign: "center",
         color: colors.gray.grey_04,
     }
