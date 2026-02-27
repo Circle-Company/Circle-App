@@ -435,12 +435,18 @@ export function Provider({ children }: AuthProviderProps) {
                 console.warn("Erro ao limpar stores:", e)
             }
 
-            // Limpa storage
+            // Limpa dados do usuário e tokens, preservando chaves de tutorial
             try {
                 const username = storage.getString(storageKeys().user.username) || ""
                 trackLogout(username)
             } catch {}
-            storage.clearAll()
+            // storage.clearAll() removido para preservar chaves de tutorial (MMKV)
+            try {
+                const { clearSessionDataPreservingTutorial } = require("@/store")
+                if (typeof clearSessionDataPreservingTutorial === "function") {
+                    clearSessionDataPreservingTutorial()
+                }
+            } catch {}
 
             // Reseta estados locais
             setSessionData(null)
