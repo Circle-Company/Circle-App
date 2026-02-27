@@ -26,6 +26,5 @@ export type Routes = {
 // Expo Router paths
 export const CAMERA_ROUTES = {
     INDEX: "/(tabs)/create",
-    PERMISSIONS: "/(tabs)/permissions",
     MEDIA: "/(tabs)/create/media",
 } as const

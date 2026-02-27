@@ -17,6 +17,8 @@ import Input from "@/components/comment/components/comments-profile-input"
 import ZeroComments from "@/components/comment/components/comments-zero_comments"
 import FeedContext from "@/contexts/Feed"
 import useUniqueAppend from "@/lib/hooks/useUniqueAppend"
+import { isIPad11 } from "@/lib/platform/detection"
+
 export default function MomentFullScreen() {
     const { id } = useLocalSearchParams<{ id: string; from?: string }>()
     const { session } = React.useContext(PersistedContext)
@@ -244,7 +246,9 @@ export default function MomentFullScreen() {
                 alignItems: "center",
             }}
         >
-            <View style={{ height: sizes.headers.height * 0.7 }} />
+            <View
+                style={{ height: isIPad11 ? sizes.headers.height * 1.2 : sizes.headers.height * 0.7 }}
+            />
             {momentData ? (
                 <>
                     <Moment.Root.Main

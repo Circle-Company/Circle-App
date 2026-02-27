@@ -11,6 +11,7 @@ import FeedContext from "@/contexts/Feed"
 import LanguageContext from "@/contexts/language"
 import { LinearGradient } from "expo-linear-gradient"
 import { router } from "expo-router"
+import { isIPad, isIPad11 } from "@/lib/platform/detection"
 
 export function EmptyList() {
     const { t } = React.useContext(LanguageContext)
@@ -117,7 +118,6 @@ export function EmptyList() {
         color: colors.gray.grey_04,
         textAlign: "center",
         marginBottom: sizes.margins["1md"],
-        lineHeight: 16,
     }
 
     const buttonTextStyle: TextStyle = {
@@ -186,7 +186,9 @@ export function EmptyList() {
                         <ButtonStandart
                             animationScale={0.92}
                             width={sizes.buttons.width * 0.6}
-                            height={55}
+                            height={
+                                isIPad11 ? sizes.buttons.height * 0.6 : sizes.buttons.height * 0.7
+                            }
                             margins={false}
                             backgroundColor={ColorTheme().primary.toString()}
                             action={() => {
@@ -213,7 +215,11 @@ export function EmptyList() {
                 ) : (
                     <>
                         <Text style={reloadTextStyle}>{t("Reload Feed")}</Text>
-                        <SearchIcon fill={colors.gray.white} width={14} height={14} />
+                        <SearchIcon
+                            fill={colors.gray.white}
+                            width={sizes.icons["1sm"].width}
+                            height={sizes.icons["1sm"].height}
+                        />
                     </>
                 )}
             </ButtonStandart>

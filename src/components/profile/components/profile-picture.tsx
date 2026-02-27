@@ -7,15 +7,15 @@ import { colors } from "@/constants/colors"
 import sizes from "@/constants/sizes"
 import { useProfileContext } from "../profile-context"
 import { ProfilePictureProps } from "../profile-types"
+import { isIPad11 } from "@/lib/platform/detection"
 
 export default function Picture({ fromProfile = false, hasOutline = true }: ProfilePictureProps) {
     const { user } = useProfileContext()
-    const isDarkMode = useColorScheme() === "dark"
     const [profilePicture, setProfilePicture] = React.useState<string>("")
 
     const pictureDimensions = {
-        width: 150,
-        height: 150,
+        width: isIPad11 ? 120 : 150,
+        height: isIPad11 ? 120 : 150,
         borderRadius: 150 / 2,
     }
     const outlineSize: number = hasOutline ? Number(Number(pictureDimensions.width) / 20) : 0

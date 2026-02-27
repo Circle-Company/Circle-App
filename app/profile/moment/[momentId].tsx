@@ -21,6 +21,7 @@ import useRewriteUrl from "@/lib/hooks/useRewriteUrl"
 import { useToast } from "@/contexts/Toast"
 import LanguageContext from "@/contexts/language"
 import { ProfileDropDownMenuIOS } from "@/features/profile/profile.moments.dropdown.menu"
+import { isIPad11 } from "@/lib/platform/detection"
 
 export default function MomentFullScreen() {
     const { momentId } = useLocalSearchParams<{ momentId: string }>()
@@ -266,7 +267,12 @@ export default function MomentFullScreen() {
                                             zIndex: 1,
                                         }}
                                     >
-                                        <View style={{ marginLeft: 6, marginBottom: 10 }}>
+                                        <View
+                                            style={{
+                                                marginLeft: 6,
+                                                marginBottom: isIPad11 ? sizes.margins["2sm"] : 10,
+                                            }}
+                                        >
                                             <Moment.Description />
                                         </View>
                                         <View

@@ -8,10 +8,10 @@ import RenderMomentFeed from "@/features/moments/feed/render-moment-feed"
 import { EmptyList } from "@/features/moments/empty.list"
 import PersistedContext from "@/contexts/Persisted"
 import { View } from "react-native"
-import { iOSMajorVersion } from "@/lib/platform/detection"
+import { iOSMajorVersion, isIPad11 } from "@/lib/platform/detection"
 
 const ITEM_WIDTH = sizes.moment.standart.width
-const SPACING = -20
+const SPACING = isIPad11 ? 15 : -20
 const SNAP_INTERVAL = ITEM_WIDTH + SPACING
 const INITIAL_PADDING = (sizes.screens.width - ITEM_WIDTH) / 2
 
@@ -171,7 +171,7 @@ const ListMoments = () => {
 
                     const opacity = scrollX.interpolate({
                         inputRange,
-                        outputRange: [0.95, 1, 0.95],
+                        outputRange: [0.9, 1, 0.9],
                         extrapolate: "clamp",
                     })
 

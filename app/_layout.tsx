@@ -22,7 +22,7 @@ import { Provider as ToastProvider } from "@/contexts/Toast"
 import Fonts from "@/constants/fonts"
 import sizes from "@/constants/sizes"
 import { clearLikePressedNamespace } from "@/store"
-
+import { TutorialProvider } from "@/contexts/tutorial"
 // Keep the splash screen visible while we fetch resources
 SplashScreen.preventAutoHideAsync()
 
@@ -112,25 +112,27 @@ export default function RootLayout() {
                         <RedirectProvider>
                             <AuthProvider>
                                 <QueryProvider>
-                                    <LanguageProvider>
-                                        <NetworkProvider>
-                                            <GeolocationProvider>
-                                                <CameraProvider>
-                                                    <AccountProvider>
-                                                        <ProfileProvider>
-                                                            <FeedProvider>
-                                                                <BottomSheetProvider>
-                                                                    <NewMomentProvider>
-                                                                        <RootLayoutNav />
-                                                                    </NewMomentProvider>
-                                                                </BottomSheetProvider>
-                                                            </FeedProvider>
-                                                        </ProfileProvider>
-                                                    </AccountProvider>
-                                                </CameraProvider>
-                                            </GeolocationProvider>
-                                        </NetworkProvider>
-                                    </LanguageProvider>
+                                    <TutorialProvider>
+                                        <LanguageProvider>
+                                            <NetworkProvider>
+                                                <GeolocationProvider>
+                                                    <CameraProvider>
+                                                        <AccountProvider>
+                                                            <ProfileProvider>
+                                                                <FeedProvider>
+                                                                    <BottomSheetProvider>
+                                                                        <NewMomentProvider>
+                                                                            <RootLayoutNav />
+                                                                        </NewMomentProvider>
+                                                                    </BottomSheetProvider>
+                                                                </FeedProvider>
+                                                            </ProfileProvider>
+                                                        </AccountProvider>
+                                                    </CameraProvider>
+                                                </GeolocationProvider>
+                                            </NetworkProvider>
+                                        </LanguageProvider>
+                                    </TutorialProvider>
                                 </QueryProvider>
                             </AuthProvider>
                         </RedirectProvider>

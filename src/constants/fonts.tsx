@@ -1,18 +1,23 @@
+import { isIPad11 } from "@/lib/platform/detection"
+
+const IPAD_FONT_REDUCTION = 0.75
+
+const scaleFont = (value: number) => (isIPad11 ? value * IPAD_FONT_REDUCTION : value)
 export default {
     size: {
-        extraLargeTitle: 36,
-        extraLargeTitle2: 28,
-        largeTitle: 34,
-        title1: 28,
-        title2: 22,
-        title3: 20,
-        headline: 17,
-        subheadline: 15,
-        body: 14,
-        callout: 16,
-        footnote: 13,
-        caption1: 11,
-        caption2: 10,
+        extraLargeTitle: scaleFont(36),
+        extraLargeTitle2: scaleFont(28),
+        largeTitle: scaleFont(34),
+        title1: scaleFont(28),
+        title2: scaleFont(22),
+        title3: scaleFont(20),
+        headline: scaleFont(17),
+        subheadline: scaleFont(15),
+        body: scaleFont(14),
+        callout: scaleFont(16),
+        footnote: scaleFont(13),
+        caption1: scaleFont(11),
+        caption2: scaleFont(10),
     },
 
     family: {

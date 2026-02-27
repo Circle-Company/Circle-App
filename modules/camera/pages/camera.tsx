@@ -1,6 +1,6 @@
 import sizes from "@/constants/sizes"
 import { useIsFocused } from "@react-navigation/core"
-import { Stack, useRouter } from "expo-router"
+import { Stack, useRouter, useSegments } from "expo-router"
 import * as React from "react"
 import { useCallback, useEffect, useRef } from "react"
 import type { GestureResponderEvent, ViewStyle } from "react-native"
@@ -70,12 +70,44 @@ export function CameraPage(): React.ReactElement {
         locationPermission,
     } = useCameraContext()
     const { t } = React.useContext(LanguageContext)
+    const cameraPermission = useCameraPermission()
+    const segments = useSegments()
+    const isCreateTabActive = segments.includes("create")
+    // using useSegments() to detect active create tab; no pathname needed
 
     // check if camera page is active
     const isFocussed = useIsFocused()
     const isForeground = useIsForeground()
     const isActive = isFocussed && isForeground
 
+    // Request camera and microphone permissions only when this CameraPage is active
+    // and we are on the /(tabs)/create route, and only if their status is undetermined.
+    React.useEffect(() => {
+        if (!isActive) return
+        if (!isCreateTabActive) return
+
+        let cancelled = false
+        ;(async () => {
+            try {
+                const camStatus = Camera.getCameraPermissionStatus()
+                const micStatus = Camera.getMicrophonePermissionStatus()
+                if (cancelled) return
+
+                if (camStatus === "not-determined") {
+                    await cameraPermission.requestPermission?.()
+                }
+                if (micStatus === "not-determined") {
+                    await microphonePermission.requestPermission?.()
+                }
+            } catch {
+                // no-op
+            }
+        })()
+
+        return () => {
+            cancelled = true
+        }
+    }, [isCreateTabActive, isActive])
     // camera device settings
 
     let device = useCameraDevice(cameraPosition)
@@ -314,67 +346,67 @@ export function CameraPage(): React.ReactElement {
                     },
                 }}
             />
-            {useCameraPermission().hasPermission === false && <CameraPermissionNotProvidedCard />}
-            {useMicrophonePermission().hasPermission === false && !isRecording && (
-                <View
-                    style={{
-                        position: "absolute",
-                        top: sizes.paddings["2sm"],
-                        left: 0,
-                        right: 0,
-                        bottom: 0,
-                        zIndex: 1,
-                    }}
-                >
-                    <MicPermissionNotProvidedCard />
-                </View>
-            )}
-            <View style={styles.container}>
-                {device != null ? (
-                    <GestureDetector gesture={pinchGesture}>
-                        <Reanimated.View
-                            onTouchEnd={onFocusTap}
-                            style={[
-                                {
-                                    alignItems: "center",
-                                    justifyContent: "center",
-                                    alignSelf: "center",
-                                    borderRadius: 40,
-                                    overflow: "hidden",
-                                },
-                            ]}
-                        >
-                            <View style={cameraStyle}>
-                                <ReanimatedCamera
-                                    style={StyleSheet.absoluteFillObject}
-                                    device={device}
-                                    isActive={isActive}
-                                    ref={camera}
-                                    onInitialized={onInitialized}
-                                    onError={onError}
-                                    format={format}
-                                    fps={fps}
-                                    lowLightBoost={false}
-                                    enableZoomGesture={false}
-                                    animatedProps={cameraAnimatedProps}
-                                    exposure={0}
-                                    outputOrientation="device"
-                                    photo={false}
-                                    video={true}
-                                    audio={microphonePermission.hasPermission}
-                                    enableLocation={locationPermission.hasPermission}
-                                    torch={torch}
-                                />
-                            </View>
-                        </Reanimated.View>
-                    </GestureDetector>
-                ) : (
-                    <View style={styles.emptyContainer}>
-                        <Text style={styles.text}>Your phone does not have a Camera.</Text>
+            {!cameraPermission.hasPermission && <CameraPermissionNotProvidedCard />}
+            {!microphonePermission.hasPermission &&
+                cameraPermission.hasPermission &&
+                !isRecording && (
+                    <View
+                        style={{
+                            position: "absolute",
+                            top: sizes.paddings["2sm"],
+                            left: 0,
+                            right: 0,
+                            bottom: 0,
+                            zIndex: 1,
+                        }}
+                    >
+                        <MicPermissionNotProvidedCard />
                     </View>
                 )}
+            <View style={styles.container}>
+                {cameraPermission.hasPermission ? (
+                    device != null ? (
+                        <GestureDetector gesture={pinchGesture}>
+                            <Reanimated.View
+                                onTouchEnd={onFocusTap}
+                                style={[
+                                    {
+                                        alignItems: "center",
+                                        justifyContent: "center",
+                                        alignSelf: "center",
+                                        borderRadius: 40,
+                                        overflow: "hidden",
+                                    },
+                                ]}
+                            >
+                                <View style={cameraStyle}>
+                                    <ReanimatedCamera
+                                        style={StyleSheet.absoluteFillObject}
+                                        device={device}
+                                        isActive={isActive}
+                                        ref={camera}
+                                        onInitialized={onInitialized}
+                                        onError={onError}
+                                        format={format}
+                                        fps={fps}
+                                        lowLightBoost={false}
+                                        enableZoomGesture={false}
+                                        animatedProps={cameraAnimatedProps}
+                                        exposure={0}
+                                        outputOrientation="device"
+                                        photo={false}
+                                        video={true}
+                                        audio={microphonePermission.hasPermission}
+                                        enableLocation={locationPermission.hasPermission}
+                                        torch={torch}
+                                    />
+                                </View>
+                            </Reanimated.View>
+                        </GestureDetector>
+                    ) : null
+                ) : null}
 
-                {useCameraPermission().hasPermission === true && (
+                {cameraPermission.hasPermission && (
                     <>
                         <View
                             style={[

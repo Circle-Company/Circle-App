@@ -1,11 +1,7 @@
 import { Stack } from "expo-router"
-import React from "react"
-import { Platform } from "react-native"
-import config from "@/config"
-import ColorTheme from "@/constants/colors"
-import Fonts from "@/constants/fonts"
-import sizes from "@/constants/sizes"
+import fonts from "@/constants/fonts"
 import { colors } from "@/constants/colors"
+
 export default function MomentsLayout() {
     return (
         <Stack
@@ -29,13 +25,14 @@ export default function MomentsLayout() {
                 name="index"
                 options={{
                     presentation: "containedModal",
-                    headerTitle: "One more thing",
+                    headerTitle: "One last thing",
                     headerTitleAlign: "center",
                     headerTintColor: "white",
                     headerLargeTitle: false,
-                    headerTransparent: true,
-                    headerTitleStyle: { fontFamily: Fonts.family["Black-Italic"] },
-                    headerLargeTitleStyle: { fontFamily: Fonts.family["Black-Italic"] },
+                    headerTitleStyle: {
+                        fontFamily: fonts.family["Black-Italic"],
+                    },
+                    headerLargeTitleStyle: { fontFamily: fonts.family["Black-Italic"] },
                     headerStyle: {
                         backgroundColor: "transparent",
                     },
