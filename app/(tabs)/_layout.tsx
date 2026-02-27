@@ -44,7 +44,7 @@ export default function TabsLayout() {
                         ? "systemMaterialDark"
                         : undefined
                 }
-                minimizeBehavior={hideTabs ? "always" : "onScrollDown"}
+                minimizeBehavior={hideTabs ? "never" : "onScrollDown"}
             >
                 <NativeTabs.Trigger name="moments">
                     <Label selectedStyle={{ color: tintColor }}>{t("Moments")}</Label>

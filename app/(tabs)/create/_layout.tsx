@@ -2,7 +2,6 @@ import { Stack } from "expo-router"
 import React from "react"
 import ColorTheme from "@/constants/colors"
 import fonts from "@/constants/fonts"
-import sizes from "@/constants/sizes"
 import LanguageContext from "@/contexts/language"
 import { GestureHandlerRootView } from "react-native-gesture-handler"
 import { StyleSheet, Platform, View } from "react-native"
@@ -11,11 +10,6 @@ import { CameraProvider } from "../../../modules/camera/context"
 
 export default function CameraLayout() {
     const { t } = React.useContext(LanguageContext)
-
-    const HeaderStyle = {
-        ...sizes.headers,
-        backgroundColor: ColorTheme().background,
-    }
 
     return (
         <CameraProvider>
@@ -51,18 +45,6 @@ export default function CameraLayout() {
                         name="index"
                         options={{
                             headerTitle: "Camera",
-                        }}
-                    />
-                    <Stack.Screen
-                        name="permissions"
-                        options={{
-                            headerTitle: "Permissions",
-                            headerTintColor: "white",
-                            headerTitleStyle: { fontFamily: fonts.family["Black-Italic"] },
-                            headerStyle: {
-                                backgroundColor: "black",
-                            },
-                            headerBackTitle: t("Back"),
                         }}
                     />
                     <Stack.Screen
