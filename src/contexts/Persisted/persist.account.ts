@@ -50,7 +50,10 @@ const read = (): AccountDataType & {
     }
     if (hiddenJson) {
         try {
-            hiddenMoments = JSON.parse(hiddenJson)
+            const parsed = JSON.parse(hiddenJson)
+            hiddenMoments = Array.isArray(parsed)
+                ? Array.from(new Set(parsed.map((v: any) => String(v))))
+                : []
         } catch (error) {
             console.error(error)
             hiddenMoments = []
@@ -110,25 +113,30 @@ export const useAccountStore = create<AccountState>((set) => ({
         }))
     },
     setHiddenMoments: (value: string[]) => {
-        storage.set(key.hiddenMoments, JSON.stringify(value))
+        const normalized = Array.isArray(value)
+            ? Array.from(new Set(value.map((v: any) => String(v))))
+            : []
+        storage.set(key.hiddenMoments, JSON.stringify(normalized))
         set((state) => ({
             ...state,
-            hiddenMoments: value,
+            hiddenMoments: normalized,
         }))
     },
     addHiddenMoment: (id: string) => {
         set((state) => {
-            const next = Array.isArray(state.hiddenMoments) ? state.hiddenMoments.slice() : []
-            if (!next.includes(id)) next.push(id)
-            storage.set(key.hiddenMoments, JSON.stringify(next))
-            return { ...state, hiddenMoments: next }
+            const sid = String(id)
+            const base = Array.isArray(state.hiddenMoments) ? state.hiddenMoments : []
+            const normalized = Array.from(new Set(base.map((v: any) => String(v))))
+            if (!normalized.includes(sid)) normalized.push(sid)
+            storage.set(key.hiddenMoments, JSON.stringify(normalized))
+            return { ...state, hiddenMoments: normalized }
         })
     },
     removeHiddenMoment: (id: string) => {
         set((state) => {
-            const next = (Array.isArray(state.hiddenMoments) ? state.hiddenMoments : []).filter(
-                (m) => m !== id,
-            )
+            const sid = String(id)
+            const base = Array.isArray(state.hiddenMoments) ? state.hiddenMoments : []
+            const next = base.map((m: any) => String(m)).filter((m) => m !== sid)
             storage.set(key.hiddenMoments, JSON.stringify(next))
             return { ...state, hiddenMoments: next }
         })

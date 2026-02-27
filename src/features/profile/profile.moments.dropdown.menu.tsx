@@ -10,8 +10,9 @@ export function ProfileDropDownMenuIOS({ children }: { children?: React.ReactNod
     const { t } = React.useContext(LanguageContext)
 
     async function handlePressHide() {
-        options.setIsHidden(!options.isHidden)
-        if (options.isHidden) session.account.addHiddenMoment(data.id)
+        const nextIsHidden = !options.isHidden
+        options.setIsHidden(nextIsHidden)
+        if (nextIsHidden) session.account.addHiddenMoment(data.id)
         else session.account.removeHiddenMoment(data.id)
     }
 
