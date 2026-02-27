@@ -93,6 +93,13 @@ export function storageKeys() {
             postNotifications: baseKey + "permissions:postnotifications",
             firebaseMessaging: baseKey + "permissions:firebasemessaging",
         },
+        tutorial: {
+            feed: {
+                step1Seen: baseKey + "tutorial:feed:step1Seen",
+                step2Seen: baseKey + "tutorial:feed:step2Seen",
+            },
+            dismissed: baseKey + "tutorial:dismissed",
+        },
     }
 }
 
@@ -116,4 +123,21 @@ export const clearKeysByPrefix = (prefix: string) => {
 
 export const clearLikePressedNamespace = () => {
     clearKeysByPrefix(LIKE_PRESSED_NS)
+}
+
+export const clearSessionDataPreservingTutorial = () => {
+    try {
+        const anyStorage = storage as any
+        const keys: string[] =
+            typeof anyStorage.getAllKeys === "function" ? anyStorage.getAllKeys() : []
+        const base = storageKeys().baseKey
+        const tutorialPrefix = base + "tutorial:"
+        for (const k of keys) {
+            if (typeof k === "string" && k.startsWith(base) && !k.startsWith(tutorialPrefix)) {
+                safeDelete(k)
+            }
+        }
+    } catch {
+        // noop
+    }
 }

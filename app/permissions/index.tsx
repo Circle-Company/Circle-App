@@ -1,93 +1,40 @@
 import React from "react"
-import { Platform, Pressable, StyleSheet, View } from "react-native"
+import { StyleSheet, View } from "react-native"
 import { useRouter } from "expo-router"
 import { useFocusEffect } from "@react-navigation/native"
-import { useSafeAreaInsets } from "react-native-safe-area-context"
 import { LinearGradient } from "expo-linear-gradient"
-
 import { Text } from "@/components/Themed"
 import { colors } from "@/constants/colors"
-import Fonts from "@/constants/fonts"
 import sizes from "@/constants/sizes"
-
-import {
-    GlassContainer,
-    GlassView,
-    isLiquidGlassAvailable,
-    isGlassEffectAPIAvailable,
-} from "expo-glass-effect"
 
 import useAppPermissions, { PermissionStatus } from "@/lib/hooks/useAppPermissions"
 import { useToast } from "@/contexts/Toast"
 import { usePreferencesStore } from "@/contexts/Persisted/persist.preferences"
 import PermissionCard from "@/components/permission/permission.card"
-import PermissionCTA from "@/components/permission/permission.cta"
-import PermissionHeader from "@/components/permission/permission.header"
 import { TextStyle } from "react-native"
+import ButtonStandart from "@/components/buttons/button-standart"
+import fonts from "@/constants/fonts"
 
-type StepId = "camera" | "microphone" | "mediaLibrary" | "locationForeground" | "locationBackground"
+type StepId = "locationForeground" | "locationBackground"
 
-const STEPS: StepId[] = [
-    "camera",
-    "microphone",
-    "mediaLibrary",
-    "locationForeground",
-    "locationBackground",
-]
-
-const TITLES: Record<StepId, string> = {
-    camera: "Record your Moments with camera",
-    microphone: "Give your Moments a voice",
-    mediaLibrary: "Choose from your library",
-    locationForeground: "See what’s nearby (while using the app)",
-    locationBackground: "Keep nearby suggestions fresh",
-}
-
-const DESCRIPTIONS: Record<StepId, string> = {
-    camera: "Circle App use your camera to capture Moments and create posts right from the app.",
-    microphone:
-        "Allow audio recording so your videos and voice notes include clear, high‑quality sound.",
-    mediaLibrary:
-        "Give access to your photo and video library to select, upload, and share media. You can choose limited access if you prefer.",
-    locationForeground:
-        "Share your approximate location while using the app to discover nearby content and experiences that match where you are.",
-    locationBackground:
-        "Enable occasional background location updates to keep nearby recommendations fresh.",
-}
-
-function treatAsGranted(id: StepId, status: PermissionStatus) {
-    // Media Library: "limited" is acceptable to proceed
-    if (id === "mediaLibrary") {
-        return status === "granted" || status === "limited"
-    }
+const STEPS: StepId[] = ["locationForeground", "locationBackground"]
+function treatAsGranted(status: PermissionStatus) {
     return status === "granted"
 }
 
 export default function PermissionsWizardScreen() {
-    const insets = useSafeAreaInsets()
     const router = useRouter()
-    const toast = useToast()
     const setOnboardingPermissionsCompleted = usePreferencesStore(
         (s) => s.setOnboardingPermissionsCompleted,
     )
-    const shouldUseGlass =
-        Platform.OS === "ios" && isLiquidGlassAvailable() && isGlassEffectAPIAvailable()
 
     const { items, refresh, requestOne, hasMissingRequired, requiredMissingIds, openSettings } =
         useAppPermissions({
-            required: [
-                "camera",
-                "microphone",
-                "mediaLibrary",
-                "locationForeground",
-                "locationBackground",
-            ],
+            required: ["locationForeground", "locationBackground"],
         })
 
     const [stepIndex, setStepIndex] = React.useState(0)
     const totalSteps = STEPS.length
-    const currentId: StepId = STEPS[Math.min(stepIndex, totalSteps - 1)]
-    const currentItem = items.find((it) => it.id === currentId)
 
     const getItem = (id: StepId) => items.find((it) => it.id === id)
 
@@ -131,7 +78,7 @@ export default function PermissionsWizardScreen() {
                 }
             }
 
-            if (treatAsGranted(id, status)) {
+            if (treatAsGranted(status)) {
                 idx += 1
             } else {
                 break
@@ -148,14 +95,10 @@ export default function PermissionsWizardScreen() {
         return STEPS.filter((id) => {
             const it = getItem(id)
             const status = it?.status ?? "unknown"
-            return !treatAsGranted(id, status)
+            return !treatAsGranted(status)
         })
     }, [items])
-    const currentPendingIndex = Math.max(0, pendingSteps.indexOf(currentId))
     const pendingTotal = pendingSteps.length
-    const progressRatio =
-        pendingTotal > 0 ? Math.min((currentPendingIndex + 1) / pendingTotal, 1) : 1
-
     // Ensure we auto-jump to the first pending permission step when re-entering
     React.useEffect(() => {
         if (pendingTotal > 0) {
@@ -168,92 +111,42 @@ export default function PermissionsWizardScreen() {
     }, [pendingTotal, pendingSteps, stepIndex])
 
     const handleAllow = async () => {
-        const result = await requestOne(currentId)
-        await refresh()
+        const order: StepId[] = ["locationForeground", "locationBackground"]
 
-        // For Background Location: if not granted, take user straight to Settings
-        if (currentId === "locationBackground") {
-            if (result !== "granted") {
-                toast.error("Permission denied. Opening Settings…", { duration: 1200 })
-                await openSettings()
+        for (const id of order) {
+            const currentStatus = getItem(id)?.status ?? "unknown"
+            if (treatAsGranted(currentStatus)) {
+                continue
+            }
+
+            const result = await requestOne(id)
+            await refresh()
+
+            // If requesting Background and it did not grant, open Settings and finish
+            if (id === "locationBackground" && result !== "granted") {
+                setOnboardingPermissionsCompleted(true)
+                router.replace("/(tabs)/moments")
                 return
             }
-            toast.success("Permission granted", { duration: 1200 })
-            goNext()
-            return
         }
 
-        if (result === "granted" || (currentId === "mediaLibrary" && result === "limited")) {
-            toast.success("Permission granted", { duration: 1200 })
-            goNext()
-        } else if (result === "limited") {
-            toast.show({ title: "Limited access enabled", duration: 1600 })
-            goNext()
-        } else {
-            // denied — open Settings so the user can enable it manually (after prior denial)
-            toast.error("Permission denied. Opening Settings…", { duration: 1200 })
-            await openSettings()
-        }
-    }
-
-    const handleNotNow = () => {
-        if (stepIndex >= totalSteps - 1) {
+        // Final refresh and immediately navigate if both permissions have been requested
+        await refresh()
+        const fg = getItem("locationForeground")?.status ?? "unknown"
+        const bg = getItem("locationBackground")?.status ?? "unknown"
+        if (fg !== "unknown" && bg !== "unknown") {
             setOnboardingPermissionsCompleted(true)
             router.replace("/(tabs)/moments")
-        } else {
-            goNext()
+            return
         }
     }
-
-    const handleOpenSettings = async () => {
-        await openSettings()
-    }
-
-    const goNext = () => {
-        if (stepIndex < totalSteps - 1) {
-            setStepIndex(stepIndex + 1)
-        } else {
-            // End of wizard: if all required done, auto-close via the effect; otherwise remain open.
-            if (!hasMissingRequired) {
-                if (router?.canGoBack?.()) {
-                    router.back()
-                } else {
-                    router.replace("/(tabs)/moments")
-                }
-            } else {
-                // Optional: help user reach Settings on finish when required are still missing
-                const missing = requiredMissingIds
-                if (missing.length > 0) {
-                    toast.show({
-                        title: "Some permissions are still missing",
-                        duration: 1800,
-                    })
-                }
-            }
-        }
-    }
-
-    // Derived UI values
-    const title = TITLES[currentId] || currentItem?.title
-    const description = DESCRIPTIONS[currentId] || currentItem?.description
-    const canAskAgain = currentItem?.canAskAgain
-    const status = currentItem?.status ?? "unknown"
-    const isGranted = treatAsGranted(currentId, status)
-
-    const isLastStep = pendingTotal > 0 ? currentPendingIndex === pendingTotal - 1 : true
-    const showOpenSettings = status === "denied" && canAskAgain === false
-
-    // For BG location, block immediate Allow if FG missing, showing hint
-    const requiresFGFirst =
-        currentId === "locationBackground" && getItem("locationForeground")?.status !== "granted"
 
     return (
         <View
             style={[
                 styles.container,
                 {
-                    paddingTop: Math.max(insets.top, 16),
-                    paddingBottom: Math.max(insets.bottom, 12),
+                    gap: 40,
                 },
             ]}
         >
@@ -262,81 +155,45 @@ export default function PermissionsWizardScreen() {
                 colors={["#00000000", "#c29eff"]}
                 style={styles.gradient}
             />
-            <PermissionHeader
-                completed={Math.max(0, pendingTotal > 0 ? currentPendingIndex : pendingTotal)}
-                total={Math.max(pendingTotal, 1)}
-                remaining={Math.max(
-                    0,
-                    pendingTotal > 0 ? pendingTotal - currentPendingIndex - 1 : 0,
-                )}
-            />
 
             {/* Step content */}
-            <PermissionCard
-                title={title as any}
-                icon={
-                    currentId === "camera" ? (
-                        <Text style={styles.iconStyle}>📷</Text>
-                    ) : currentId === "microphone" ? (
-                        <Text style={styles.iconStyle}>🎙️</Text>
-                    ) : currentId === "mediaLibrary" ? (
-                        <Text style={styles.iconStyle}>🤩</Text>
-                    ) : currentId === "locationForeground" ? (
-                        <Text style={styles.iconStyle}>📍</Text>
-                    ) : (
-                        <Text style={styles.iconStyle}>🌎</Text>
-                    )
-                }
-                description={description as any}
-                hint={
-                    currentId === "locationBackground"
-                        ? requiresFGFirst
-                            ? "Foreground Location is required first. Tap Allow to try enabling Background — we'll open Settings if needed."
-                            : "Tap Allow to enable Background Location. If it's denied, we'll open Settings so you can turn it on."
-                        : undefined
-                }
-                okText={isGranted ? "This permission is already enabled." : undefined}
-            />
+            <View style={{ alignItems: "center" }}>
+                <PermissionCard
+                    title={"Discover nearby moments and people"}
+                    icon={<Text style={{ left: -2, fontSize: 70 }}>📍</Text>}
+                />
+                <Text style={styles.hint}>
+                    Your approximate location is used while you’re using the app to show moments and
+                    people near you.
+                </Text>
+            </View>
+
+            <View style={{ alignItems: "center" }}>
+                <PermissionCard
+                    title={"Keep nearby recommendations relevant"}
+                    icon={<Text style={{ fontSize: 60 }}>🌎</Text>}
+                />
+                <Text style={styles.hint}>
+                    Background location is used to update nearby moments and people recommendations,
+                    even when the app isn’t open.
+                </Text>
+            </View>
 
             {/* Sticky CTA */}
             <View style={styles.ctaWrapper}>
-                {shouldUseGlass ? (
-                    <GlassContainer spacing={10}>
-                        <GlassView
-                            style={{
-                                ...styles.ctaBar,
-                                paddingTop: requiresFGFirst || isGranted ? 10 : 20,
-                            }}
-                            colorScheme="dark"
-                            glassEffectStyle="clear"
-                            isInteractive={true}
-                            tintColor={colors.gray.grey_09 + "90"}
-                        >
-                            <PermissionCTA
-                                onAllow={handleAllow}
-                                onSkip={handleNotNow}
-                                disabledAllow={
-                                    isGranted ||
-                                    (currentId !== "locationBackground" && requiresFGFirst)
-                                }
-                                allowLabel={"Allow"}
-                                skipLabel={isLastStep ? "Finish" : "Not now"}
-                            />
-                        </GlassView>
-                    </GlassContainer>
-                ) : (
-                    <View style={[styles.ctaBar, { backgroundColor: colors.gray.grey_09 }]}>
-                        <PermissionCTA
-                            onAllow={handleAllow}
-                            onSkip={handleNotNow}
-                            disabledAllow={
-                                isGranted || (currentId !== "locationBackground" && requiresFGFirst)
-                            }
-                            allowLabel={isLastStep ? "Allow" : "Allow"}
-                            skipLabel={isLastStep ? "Finish" : "Not now"}
-                        />
-                    </View>
-                )}
+                <Text style={styles.ctaText}>
+                    You can change permissions at any time in app settings
+                </Text>
+                <ButtonStandart
+                    action={handleAllow}
+                    backgroundColor={colors.purple.purple_04}
+                    margins={false}
+                    height={60}
+                    animationScale={0.9}
+                    style={{ paddingHorizontal: 70 }}
+                >
+                    <Text style={styles.primaryBtnText}>Continue</Text>
+                </ButtonStandart>
             </View>
         </View>
     )
@@ -345,14 +202,19 @@ export default function PermissionsWizardScreen() {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
+        paddingTop: sizes.screens.height * 0.1,
         backgroundColor: colors.gray.black,
+        alignItems: "center",
     },
+    primaryBtnText: {
+        color: colors.gray.white,
+        fontSize: fonts.size.body * 1.4,
+        fontFamily: fonts.family["ExtraBold"],
+        fontStyle: "italic",
+    } as TextStyle,
     iconStyle: {
-        fontSize: 100,
+        fontSize: 60,
         shadowColor: "black",
-        shadowOffset: { width: 0, height: 10 },
-        shadowOpacity: 0.5,
-        shadowRadius: 10,
     },
     gradient: {
         width: sizes.window.width,
@@ -360,21 +222,31 @@ const styles = StyleSheet.create({
         position: "absolute",
         zIndex: 0,
         bottom: 0,
-        opacity: 0.07,
+        opacity: 0.06,
     },
+    ctaText: {
+        color: colors.gray.grey_04,
+        fontSize: fonts.size.body * 0.95,
+        fontFamily: fonts.family.Regular,
+        width: sizes.screens.width * 0.5,
+        textAlign: "center",
+        marginBottom: sizes.margins["1md"],
+    } as TextStyle,
+    hint: {
+        color: colors.gray.grey_01 + 99,
+        fontSize: fonts.size.body * 0.95,
+        fontFamily: fonts.family.Regular,
+        width: sizes.screens.width * 0.8,
+        textAlign: "center",
+        marginTop: sizes.margins["1md"],
+    } as TextStyle,
     ctaWrapper: {
         position: "absolute",
         left: 0,
         right: 0,
-        bottom: 0,
+        bottom: sizes.margins["1xl"] * 1.2,
         paddingHorizontal: sizes.paddings["1md"],
         gap: sizes.margins["1sm"],
-    },
-    ctaBar: {
-        marginBottom: sizes.margins["1md"],
-        borderRadius: 44,
-        paddingTop: 20,
-        paddingBottom: sizes.paddings["1sm"],
-        paddingHorizontal: 20,
+        alignItems: "center",
     },
 })
