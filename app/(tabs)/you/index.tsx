@@ -473,6 +473,7 @@ export default function AccountScreen() {
                                     color: colors.gray.grey_04,
                                     fontFamily: fonts.family.Semibold,
                                     fontStyle: "italic",
+                                    fontSize: fonts.size.body,
                                 }}
                             >
                                 No more moments

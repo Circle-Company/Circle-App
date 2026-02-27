@@ -92,7 +92,7 @@ export default function RenderCommentFeed({ moment, focused }: renderCommentFeed
     }
     const viewMoreTextStyle: TextStyle = {
         top: -4,
-        fontSize: 13,
+        fontSize: fonts.size.body * 1.1,
         color: ColorTheme().textDisabled,
         fontFamily: fonts.family["Medium-Italic"],
     }

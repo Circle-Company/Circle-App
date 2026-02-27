@@ -10,7 +10,7 @@ import fonts from "../../../constants/fonts"
 import sizes from "../../../constants/sizes"
 import { textLib } from "@/circle.text.library"
 import { Moment as MomentProps } from "@/contexts/Feed/types"
-import { isIOS } from "@/lib/platform/detection"
+import { isIOS, isIPad11 } from "@/lib/platform/detection"
 import FetchedCommentsList from "./fetched-comments-list"
 import BottomSheetContext from "@/contexts/bottomSheet"
 import { UserShow } from "@/components/user_show"
@@ -115,7 +115,7 @@ export default function ZeroComments({
                     <Text style={buttonTitle}>
                         {t("React to")}{" "}
                         <UserShow.Root data={moment.user}>
-                            <View style={{ top: 3 }}>
+                            <View style={{ top: isIPad11 ? 2.5 : 3 }}>
                                 <UserShow.Username
                                     pressable={false}
                                     margin={0}
@@ -123,7 +123,7 @@ export default function ZeroComments({
                                     color={colors.gray.black}
                                     fontSize={fonts.size.body}
                                     fontFamily={fonts.family["Black-Italic"]}
-                                    truncatedSize={10}
+                                    truncatedSize={isIPad11 ? 8 : 10}
                                 />
                             </View>
                         </UserShow.Root>

@@ -15,6 +15,7 @@ import { useTranslation } from "react-i18next"
 import { SafeAreaInsetsContext, useSafeAreaInsets } from "react-native-safe-area-context"
 import AuthContext from "@/contexts/auth"
 import React from "react"
+import { isIPad11 } from "@/lib/platform/detection"
 export default function SplashScreen() {
     const router = useRouter()
     const { t } = useTranslation()
@@ -46,7 +47,7 @@ export default function SplashScreen() {
     const title: any = {
         alignSelf: "center",
         fontFamily: Fonts.family["Black-Italic"],
-        fontSize: 48,
+        fontSize: Fonts.size.title2 * 2.1,
         color: colors.gray.white,
         marginBottom: -5,
         elevation: 10,
@@ -61,17 +62,14 @@ export default function SplashScreen() {
     }
     const buttons: any = {
         alignItems: "center",
-        position: "absolute",
         justifyContent: "center",
         bottom: 0,
         zIndex: 2,
     }
 
     const primaryActionContainer: any = {
-        width: sizes.screens.width,
-        height: sizes.headers.height,
         marginTop: sizes.margins["2sm"],
-        marginBottom: sizes.margins["1xxl"],
+        marginBottom: sizes.margins["1xl"] * 1.3,
         alignItems: "center",
         justifyContent: "center",
     }
@@ -82,13 +80,6 @@ export default function SplashScreen() {
         marginLeft: sizes.margins["2sm"],
     }
 
-    const secundaryActionText: any = {
-        fontSize: fonts.size.body * 0.9,
-        fontFamily: fonts.family["Semibold-Italic"],
-        color: colors.purple.purple_00,
-        textDecorationLine: "underline",
-    }
-
     const superior_gradient: any = {
         width: sizes.window.width,
         height: sizes.window.height,
@@ -97,16 +88,6 @@ export default function SplashScreen() {
         top: 0,
         opacity: 0.08,
     }
-
-    const inferior_gradient: any = {
-        width: sizes.window.width,
-        height: sizes.window.height / 2,
-        position: "absolute",
-        zIndex: 0,
-        bottom: 0,
-        opacity: 0.07,
-    }
-
     // Optional hero image just above the header (rendered only if provided)
     const heroImageSource = require("@/assets/images/illustrations/Init-Illustration.png")
 
@@ -114,13 +95,13 @@ export default function SplashScreen() {
         width: sizes.screens.width,
         alignItems: "center",
         justifyContent: "center",
-        marginTop: sizes.margins["1md"],
-        marginBottom: sizes.margins["1md"],
+        marginTop: sizes.margins["1xl"],
+        marginBottom: sizes.margins["1sm"],
     }
 
     const heroImage: any = {
         left: 3,
-        height: sizes.screens.height * 0.5,
+        height: sizes.screens.height * 0.55,
         overflow: "hidden",
     }
 
@@ -208,20 +189,27 @@ export default function SplashScreen() {
                         <Text style={slogan}>{t(config.APPLICATION_DESCRIPTION)}</Text>
                     </View>
 
-                    <View style={[buttons, { bottom: sizes.screens.height * 0.06 }]}>
+                    <View
+                        style={[
+                            buttons,
+                            { marginTop: isIPad11 ? sizes.margins["1xxl"] : sizes.margins["1lg"] },
+                        ]}
+                    >
                         <View style={primaryActionContainer}>
                             <Button
                                 action={SignWithApple}
-                                style={{ paddingHorizontal: sizes.paddings["2md"] }}
+                                style={{
+                                    paddingHorizontal: sizes.paddings["2md"],
+                                }}
                                 margins={false}
                                 backgroundColor={colors.gray.white.toString()}
                                 bounciness={10}
-                                height={60}
+                                height={sizes.buttons.height * 0.9}
                             >
                                 <AppleLogo
-                                    style={{ top: -2 }}
-                                    width={28}
-                                    height={28}
+                                    style={{ top: -sizes.icons["1lg"].width * 0.05 }}
+                                    width={sizes.icons["1lg"].width}
+                                    height={sizes.icons["1lg"].width}
                                     fill={colors.gray.black.toString()}
                                 />
                                 <Text style={primaryActionText}>{t("Continue with Apple")}</Text>

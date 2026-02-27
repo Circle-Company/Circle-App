@@ -3,7 +3,7 @@ import { View, Text, StyleSheet } from "react-native"
 import { colors } from "@/constants/colors"
 import LanguageContext from "@/contexts/language"
 import { useLocaleDateRelative, useLocaleDateRelative2 } from "@/lib/hooks/useLocaleDate"
-
+import fonts from "@/constants/fonts"
 type AccountMomentsHeaderProps = {
     totalMoments: number
     lastUpdateDate: Date
@@ -42,7 +42,7 @@ const styles = StyleSheet.create({
     },
     totalText: {
         color: colors.gray.grey_04,
-        fontSize: 14,
+        fontSize: fonts.size.body,
         fontWeight: "600",
     },
 })

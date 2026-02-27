@@ -208,7 +208,6 @@ export default function ProfileScreen() {
 
     return (
         <FlatList
-            overScrollMode="always"
             data={normalizedMoments}
             numColumns={NUM_COLUMNS}
             showsVerticalScrollIndicator={false}
@@ -260,7 +259,7 @@ export default function ProfileScreen() {
                             }}
                         />
                         <ProfileHeader
-                            user={user}
+                            user={user as any}
                             isAccount={false}
                             totalMoments={user.metrics.totalMomentsCreated}
                             lastUpdateDate={lastCreatedAt ?? new Date()}

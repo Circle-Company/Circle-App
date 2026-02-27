@@ -19,7 +19,7 @@ import sizes from "@/constants/sizes"
 import { useKeyboard } from "@/lib/hooks/useKeyboard"
 import ZeroComments from "@/components/comment/components/comments-zero_comments"
 import { LinearGradient } from "expo-linear-gradient"
-import { isIOS, iOSMajorVersion } from "@/lib/platform/detection"
+import { isIOS, iOSMajorVersion, isIPad11 } from "@/lib/platform/detection"
 import { ProfileDropDownMenuIOS } from "@/features/profile/profile.moments.dropdown.menu"
 
 type renderMomentProps = {
@@ -222,7 +222,13 @@ export default function RenderMomentFeed({
                                         <Moment.Description />
                                     </View>
                                 )}
-                                <View style={{ flexDirection: "row", alignItems: "center" }}>
+                                <View
+                                    style={{
+                                        flexDirection: "row",
+                                        alignItems: "center",
+                                        marginBottom: isIPad11 ? sizes.margins["2md"] : 0,
+                                    }}
+                                >
                                     <View style={{ flex: 1, height: 46 }}>
                                         {isIOS ? (
                                             <>

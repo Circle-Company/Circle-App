@@ -5,7 +5,7 @@ import { ProfileReciveDataProps } from "../../components/profile/profile-types"
 import sizes from "../../constants/sizes"
 import { AccountMomentsHeader } from "@/features/profile/profile.moments.header"
 
-import { iOSMajorVersion } from "@/lib/platform/detection"
+import { iOSMajorVersion, isIPad11 } from "@/lib/platform/detection"
 import { SwiftBottomSheet } from "@/components/ios/ios.bottom.sheet"
 import { ProfileReportModal } from "./profile.report.modal"
 import ProfileContext from "@/contexts/profile"
@@ -42,7 +42,7 @@ export function ProfileHeader({
                 {user.interactions?.isBlocking === false ||
                     (user.interactions?.isBlockedBy === false && (
                         <View style={name_container}>
-                            <Profile.NameFollow scale={0.75} />
+                            <Profile.NameFollow scale={isIPad11 ? 0.7 : 0.75} />
 
                             {/**
                            isAccount === false && (
