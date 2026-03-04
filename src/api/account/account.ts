@@ -81,6 +81,37 @@ async function updateName({ name }: { name: string }): Promise<void> {
     return response.data
 }
 
+async function setPushToken({
+    expoToken,
+    deviceId,
+}: {
+    expoToken: string
+    deviceId: string
+}): Promise<void> {
+    const response = await api.put(
+        `/account/push-token`,
+        {
+            expoToken,
+            deviceId,
+        },
+        {
+            headers: {
+                Authorization: `Bearer ${storage.getString(storageKeys().account.jwt.token) || ""}`,
+            },
+        },
+    )
+    return response.data
+}
+
+async function getNotifications({ page, limit }: { page: number; limit: number }): Promise<any> {
+    const response = await api.get(`/account/notifications?page=${page}&limit=${limit}`, {
+        headers: {
+            Authorization: `Bearer ${storage.getString(storageKeys().account.jwt.token) || ""}`,
+        },
+    })
+    return response.data
+}
+
 export const routes = {
     getAccount,
     getAccountBlocks,
@@ -88,4 +119,6 @@ export const routes = {
     updateDescription,
     updateName,
     updateCoordinates,
+    setPushToken,
+    getNotifications,
 }
