@@ -1,4 +1,11 @@
-import { useQuery, UseQueryResult, useMutation, useQueryClient } from "@tanstack/react-query"
+import {
+    useQuery,
+    UseQueryResult,
+    useMutation,
+    useQueryClient,
+    useInfiniteQuery,
+    UseInfiniteQueryResult,
+} from "@tanstack/react-query"
 import { apiRoutes } from "@/api"
 import { accountBlocksProps } from "@/api/account/account.types"
 
@@ -58,6 +65,11 @@ export const accountKeys = {
     moments: () => [...accountKeys.all, "moments"] as const,
     momentsPaginated: (page: number, limit: number) =>
         [...accountKeys.moments(), { page, limit }] as const,
+    notifications: () => [...accountKeys.all, "notifications"] as const,
+    notificationsPaginated: (page: number, limit: number) =>
+        [...accountKeys.notifications(), { page, limit }] as const,
+    notificationsInfinite: (limit: number) =>
+        [...accountKeys.notifications(), { limit }, "infinite"] as const,
 }
 
 /**
@@ -99,6 +111,14 @@ export async function fetchAccountMoments(
         moments: response.moments as any as AccountMoment[],
         pagination: response.pagination,
     }
+}
+
+export async function fetchAccountNotifications(
+    page: number = 1,
+    limit: number = 20,
+): Promise<any> {
+    const response = await apiRoutes.account.getNotifications({ page, limit })
+    return response
 }
 
 /**
@@ -231,6 +251,24 @@ export function useAccountMomentsQuery(
     })
 }
 
+export function useAccountNotificationsQuery(
+    page: number = 1,
+    limit: number = 20,
+    options?: {
+        enabled?: boolean
+        refetchOnMount?: boolean
+        staleTime?: number
+    },
+): UseQueryResult<any, Error> {
+    return useQuery({
+        queryKey: accountKeys.notificationsPaginated(page, limit),
+        queryFn: () => fetchAccountNotifications(page, limit),
+        staleTime: options?.staleTime ?? 1000 * 60 * 2, // 2 minutes default
+        enabled: options?.enabled ?? true,
+        refetchOnMount: options?.refetchOnMount ?? true,
+    })
+}
+
 /**
  * Mutation: update account description
  */
@@ -270,6 +308,18 @@ export async function updateAccountCoordinates(
     } as any)
 }
 
+type SetPushTokenInput = {
+    expoToken: string
+    deviceId: string
+}
+
+async function setPushToken(input: SetPushTokenInput): Promise<void> {
+    await apiRoutes.account.setPushToken({
+        expoToken: input.expoToken,
+        deviceId: input.deviceId,
+    } as any)
+}
+
 /**
  * Hook to update the authenticated user's description and invalidate cached account detail.
  */
@@ -300,5 +350,41 @@ export function useUpdateAccNameMutation() {
 export function useUpdateAccCoordsMutation() {
     return useMutation({
         mutationFn: updateAccountCoordinates,
+    })
+}
+
+export function useSetPushTokenMutation() {
+    return useMutation({
+        mutationFn: setPushToken,
+    })
+}
+
+export function useInfiniteAccountNotificationsQuery(
+    limit: number = 20,
+    options?: {
+        enabled?: boolean
+        refetchOnMount?: boolean
+        staleTime?: number
+    },
+): UseInfiniteQueryResult<any, Error> {
+    return useInfiniteQuery({
+        queryKey: accountKeys.notificationsInfinite(limit),
+        initialPageParam: 1,
+        queryFn: ({ pageParam = 1 }) => fetchAccountNotifications(pageParam, limit),
+        getNextPageParam: (lastPage) => {
+            const pagination = lastPage?.pagination
+            if (pagination?.page != null && pagination?.totalPages != null) {
+                return pagination.page < pagination.totalPages ? pagination.page + 1 : undefined
+            }
+            const items = lastPage?.notifications || lastPage?.items || []
+            if (Array.isArray(items) && items.length >= limit) {
+                const current = pagination?.page ?? 1
+                return current + 1
+            }
+            return undefined
+        },
+        staleTime: options?.staleTime ?? 1000 * 60 * 2,
+        enabled: options?.enabled ?? true,
+        refetchOnMount: options?.refetchOnMount ?? true,
     })
 }
