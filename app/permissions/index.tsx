@@ -27,6 +27,19 @@ export default function PermissionsWizardScreen() {
     const setOnboardingPermissionsCompleted = usePreferencesStore(
         (s) => s.setOnboardingPermissionsCompleted,
     )
+    const onboardingPermissionsCompleted = usePreferencesStore(
+        (s) => s.onboardingPermissionsCompleted,
+    )
+
+    const navigatedRef = React.useRef(false)
+    const safeReplace = React.useCallback(
+        (path: string) => {
+            if (navigatedRef.current) return
+            navigatedRef.current = true
+            router.replace(path)
+        },
+        [router],
+    )
 
     const { items, refresh, requestOne, hasMissingRequired, requiredMissingIds, openSettings } =
         useAppPermissions({
@@ -55,10 +68,18 @@ export default function PermissionsWizardScreen() {
     // Auto-close when all required are granted
     React.useEffect(() => {
         if (!hasMissingRequired) {
-            setOnboardingPermissionsCompleted(true)
-            router.replace("/(tabs)/moments")
+            if (onboardingPermissionsCompleted) {
+                safeReplace("/(tabs)/moments")
+            } else {
+                safeReplace("/permissions/push")
+            }
         }
-    }, [hasMissingRequired, router, setOnboardingPermissionsCompleted])
+    }, [
+        hasMissingRequired,
+        onboardingPermissionsCompleted,
+        router,
+        setOnboardingPermissionsCompleted,
+    ])
 
     // Auto-advance through already-granted steps (or mediaLibrary limited)
     React.useEffect(() => {
@@ -124,8 +145,7 @@ export default function PermissionsWizardScreen() {
 
             // If requesting Background and it did not grant, open Settings and finish
             if (id === "locationBackground" && result !== "granted") {
-                setOnboardingPermissionsCompleted(true)
-                router.replace("/(tabs)/moments")
+                safeReplace("/permissions/push")
                 return
             }
         }
@@ -135,8 +155,7 @@ export default function PermissionsWizardScreen() {
         const fg = getItem("locationForeground")?.status ?? "unknown"
         const bg = getItem("locationBackground")?.status ?? "unknown"
         if (fg !== "unknown" && bg !== "unknown") {
-            setOnboardingPermissionsCompleted(true)
-            router.replace("/(tabs)/moments")
+            safeReplace("/permissions/push")
             return
         }
     }
