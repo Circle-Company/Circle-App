@@ -9,6 +9,7 @@ import { iOSMajorVersion, isIPad11 } from "@/lib/platform/detection"
 import { SwiftBottomSheet } from "@/components/ios/ios.bottom.sheet"
 import { ProfileReportModal } from "./profile.report.modal"
 import ProfileContext from "@/contexts/profile"
+import { NotificationCard } from "@/components/notification/notification.card"
 
 type RenderProfileProps = {
     user?: ProfileReciveDataProps
@@ -39,6 +40,7 @@ export function ProfileHeader({
         <Profile.MainRoot data={user}>
             <View style={top_container}>
                 <Profile.Picture fromProfile={true} hasOutline={false} />
+                <NotificationCard />
                 {user.interactions?.isBlocking === false ||
                     (user.interactions?.isBlockedBy === false && (
                         <View style={name_container}>

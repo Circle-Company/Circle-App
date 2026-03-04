@@ -54,7 +54,7 @@ export default function Name({
         return null
     return (
         <Animated.View style={container}>
-            {user?.name && <Text style={text_style}>{user?.name}</Text>}
+            {<Text style={text_style}>{user?.name}</Text>}
             {followsNum > 0 && (
                 <Text style={text_style}>
                     {user?.name && <Text style={text_style}>, </Text>}

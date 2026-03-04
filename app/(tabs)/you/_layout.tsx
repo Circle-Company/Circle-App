@@ -8,6 +8,8 @@ import PersistedContext from "@/contexts/Persisted"
 import { iOSMajorVersion } from "@/lib/platform/detection"
 import Cog from "@/assets/icons/svgs/cog.svg"
 import fonts from "@/constants/fonts"
+import { HeaderButton } from "@react-navigation/elements"
+import BellIcon from "@/assets/icons/svgs/bell-outline.svg"
 
 export default function YouLayout() {
     const { session } = React.useContext(PersistedContext)
@@ -47,6 +49,24 @@ export default function YouLayout() {
                         color: colors.gray.white,
                     },
                     headerTitle: session?.user?.username ? `@${session.user.username}` : "",
+                }}
+            />
+            <Stack.Screen
+                name="inbox"
+                options={{
+                    headerStyle: {
+                        backgroundColor: "transparent",
+                    },
+                    headerTitleAlign: "center",
+                    headerLargeTitle: false,
+                    headerTransparent: true,
+                    headerTitleStyle: {
+                        fontFamily: Fonts.family["Black-Italic"],
+                        fontSize: Fonts.size.title2 * 0.9,
+                        color: colors.gray.white,
+                    },
+                    headerBackTitle: "Back",
+                    headerTitle: "Notifications",
                 }}
             />
             <Stack.Screen

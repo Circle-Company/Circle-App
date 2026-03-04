@@ -25,7 +25,25 @@ export default function MomentsLayout() {
                 name="index"
                 options={{
                     presentation: "containedModal",
-                    headerTitle: "One last thing",
+                    headerTitle: "One more thing",
+                    headerTitleAlign: "center",
+                    headerTintColor: "white",
+                    headerLargeTitle: false,
+                    headerTitleStyle: {
+                        fontFamily: fonts.family["Black-Italic"],
+                    },
+                    headerLargeTitleStyle: { fontFamily: fonts.family["Black-Italic"] },
+                    headerStyle: {
+                        backgroundColor: "transparent",
+                    },
+                }}
+            />
+
+            <Stack.Screen
+                name="push"
+                options={{
+                    presentation: "containedModal",
+                    headerTitle: "Enable Notifications",
                     headerTitleAlign: "center",
                     headerTintColor: "white",
                     headerLargeTitle: false,

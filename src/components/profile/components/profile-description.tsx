@@ -30,12 +30,9 @@ export default function Description() {
     const container: ViewStyle = {
         alignSelf: "center",
         width: sizes.screens.width - sizes.paddings["1xl"] * 2,
-        paddingVertical: sizes.paddings["2sm"],
         borderRadius: sizes.paddings["1md"],
-        paddingHorizontal: sizes.paddings["1md"],
         transform: [{ scale: animatedScale }],
         opacity: animatedOpacity,
-        backgroundColor: colors.gray.grey_08,
         alignItems: "center",
     }
 
@@ -46,7 +43,10 @@ export default function Description() {
 
     return (
         <Animated.View style={container}>
-            <RichTextRenderer richText={textLib.rich.formatToUI(user.description)} />
+            <RichTextRenderer
+                textStyle={{ fontSize: fonts.size.body * 1.1, fontFamily: fonts.family.Semibold }}
+                richText={textLib.rich.formatToUI(user.description)}
+            />
         </Animated.View>
     )
 }
