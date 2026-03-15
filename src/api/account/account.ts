@@ -81,6 +81,56 @@ async function updateName({ name }: { name: string }): Promise<void> {
     return response.data
 }
 
+async function updatePushToken({
+    expoToken,
+    deviceId,
+}: {
+    expoToken: string
+    deviceId: string
+}): Promise<void> {
+    const response = await api.put(
+        `/account/push-token`,
+        {
+            expoToken,
+            deviceId,
+        },
+        {
+            headers: {
+                Authorization: `Bearer ${storage.getString(storageKeys().account.jwt.token) || ""}`,
+            },
+        },
+    )
+    return response.data
+}
+
+type GetNotificationsParams = {
+    limit?: number
+    offset?: number
+    cursor?: string | null
+    read?: "all" | "read" | "unread"
+}
+
+async function getNotifications({
+    limit = 30,
+    offset,
+    cursor,
+    read = "all",
+}: GetNotificationsParams = {}): Promise<any> {
+    const search = new URLSearchParams()
+    if (typeof limit === "number") search.set("limit", String(limit))
+    if (typeof offset === "number") search.set("offset", String(offset))
+    if (cursor != null && cursor !== "") search.set("cursor", String(cursor))
+    if (read) search.set("read", read)
+
+    const response = await api.get(`/account/notifications`, {
+        headers: {
+            Authorization: `Bearer ${storage.getString(storageKeys().account.jwt.token) || ""}`,
+        },
+    })
+    console.log(response.data)
+    return response.data
+}
+
 export const routes = {
     getAccount,
     getAccountBlocks,
@@ -88,4 +138,6 @@ export const routes = {
     updateDescription,
     updateName,
     updateCoordinates,
+    updatePushToken,
+    getNotifications,
 }
