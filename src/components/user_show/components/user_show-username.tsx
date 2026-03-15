@@ -1,16 +1,14 @@
-import ColorTheme, { colors } from "../../../constants/colors"
+import ColorTheme, { colors } from "@/constants/colors"
 import { Pressable, Text, View, useColorScheme } from "react-native"
-
-import Icon from "@/assets/icons/svgs/@2.svg"
-import LanguageContext from "../../../contexts/language"
-import PersistedContext from "../../../contexts/Persisted"
+import LanguageContext from "@/contexts/language"
+import PersistedContext from "@/contexts/Persisted"
 import React from "react"
-import Sizes from "../../../constants/sizes"
+import Sizes from "@/constants/sizes"
 import { UserUsernameProps } from "../user_show-types"
 import Verifyed from "@/assets/icons/svgs/check_circle_verify.svg"
-import fonts from "../../../constants/fonts"
+import fonts from "@/constants/fonts"
 import { router, usePathname } from "expo-router"
-import ProfileContext from "../../../contexts/profile"
+import ProfileContext from "@/contexts/profile"
 import { useUserShowContext } from "../user_show-context"
 import { textLib } from "@/circle.text.library"
 
@@ -24,6 +22,7 @@ export default function UserShowUsername({
     fontFamily = fonts.family.Bold,
     margin = Sizes.margins["1sm"],
     scale = 1,
+    textStyle,
 }: UserUsernameProps) {
     const { session } = React.useContext(PersistedContext)
     const { t } = React.useContext(LanguageContext)
@@ -78,7 +77,7 @@ export default function UserShowUsername({
     const usernameText = displayYou ? (isMe ? t("You") : username) : username
     return (
         <Pressable onPress={async () => await onUsernameAction()} style={container}>
-            <Text style={displayOnMoment ? username_style_moment : username_style}>
+            <Text style={[displayOnMoment ? username_style_moment : username_style, textStyle]}>
                 @{usernameText}
             </Text>
             {user.verified && (
