@@ -49,6 +49,27 @@ export type AccountMomentsResponse = {
     }
 }
 
+export type AccountNotification = {
+    id: string
+    read: boolean
+    createdAt: string
+    [key: string]: any
+}
+
+export type AccountNotificationsResponse = {
+    success?: boolean
+    notifications: AccountNotification[]
+    pagination?: {
+        limit?: number
+        offset?: number
+        total?: number
+        totalPages?: number
+        cursor?: string | null
+        nextCursor?: string | null
+    }
+    error?: string
+}
+
 export const accountKeys = {
     all: ["account"] as const,
     detail: () => [...accountKeys.all, "detail"] as const,
@@ -58,6 +79,13 @@ export const accountKeys = {
     moments: () => [...accountKeys.all, "moments"] as const,
     momentsPaginated: (page: number, limit: number) =>
         [...accountKeys.moments(), { page, limit }] as const,
+    notifications: () => [...accountKeys.all, "notifications"] as const,
+    notificationsParams: (params: {
+        limit?: number
+        offset?: number
+        cursor?: string | null
+        read?: "all" | "read" | "unread"
+    }) => [...accountKeys.notifications(), params] as const,
 }
 
 /**
@@ -99,6 +127,49 @@ export async function fetchAccountMoments(
         moments: response.moments as any as AccountMoment[],
         pagination: response.pagination,
     }
+}
+
+export type FetchAccountNotificationsParams = {
+    limit?: number
+    offset?: number
+    cursor?: string | null
+    read?: "all" | "read" | "unread"
+}
+
+export async function fetchAccountNotifications(
+    params: FetchAccountNotificationsParams = {},
+): Promise<AccountNotificationsResponse> {
+    const { limit = 30, offset, cursor, read = "all" } = params
+
+    // Backend exige cursor e offset juntos
+    const safeOffset = typeof offset === "number" ? offset : cursor != null ? 0 : undefined
+    const safeCursor =
+        cursor != null && cursor !== "" ? cursor : typeof offset === "number" ? "0" : null
+
+    const response = await apiRoutes.account.getNotifications({
+        limit,
+        offset: safeOffset,
+        cursor: safeCursor,
+        read,
+    } as any)
+
+    const notifications =
+        (response as any)?.notifications ??
+        (response as any)?.items ??
+        (response as any)?.data ??
+        []
+
+    const pagination =
+        (response as any)?.pagination ??
+        (response as any)?.meta ??
+        (response as any)?.pageInfo ??
+        undefined
+
+    return {
+        ...(response as any),
+        notifications,
+        pagination,
+    } as AccountNotificationsResponse
 }
 
 /**
@@ -231,6 +302,24 @@ export function useAccountMomentsQuery(
     })
 }
 
+export function useAccountNotificationsQuery(
+    params: FetchAccountNotificationsParams = {},
+    options?: {
+        enabled?: boolean
+        refetchOnMount?: boolean
+        staleTime?: number
+    },
+): UseQueryResult<AccountNotificationsResponse, Error> {
+    const { limit = 30, offset, cursor, read = "all" } = params
+    return useQuery({
+        queryKey: accountKeys.notificationsParams({ limit, offset, cursor, read }),
+        queryFn: () => fetchAccountNotifications({ limit, offset, cursor, read }),
+        staleTime: options?.staleTime ?? 1000 * 60, // 1 minute default
+        enabled: options?.enabled ?? true,
+        refetchOnMount: options?.refetchOnMount ?? true,
+    })
+}
+
 /**
  * Mutation: update account description
  */
@@ -240,6 +329,11 @@ type UpdateAccountDescriptionInput = {
 
 type UpdateAccountNameInput = {
     name: string | null
+}
+
+export type UpdateAccountPushTokenInput = {
+    expoToken: string
+    deviceId: string
 }
 
 export type UpdateAccountCoordinatesInput = {
@@ -258,6 +352,13 @@ async function updateAccountName(input: UpdateAccountNameInput): Promise<void> {
     // Backend route expected to update the name for the authenticated account
     await apiRoutes.account.updateName({
         name: input.name,
+    } as any)
+}
+
+async function updateAccountPushToken(input: UpdateAccountPushTokenInput): Promise<void> {
+    await apiRoutes.account.updatePushToken({
+        expoToken: input.expoToken,
+        deviceId: input.deviceId,
     } as any)
 }
 
@@ -300,5 +401,11 @@ export function useUpdateAccNameMutation() {
 export function useUpdateAccCoordsMutation() {
     return useMutation({
         mutationFn: updateAccountCoordinates,
+    })
+}
+
+export function useSetPushTokenMutation() {
+    return useMutation({
+        mutationFn: updateAccountPushToken,
     })
 }
