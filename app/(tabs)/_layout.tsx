@@ -1,4 +1,4 @@
-import { NativeTabs, Icon, Label } from "expo-router/unstable-native-tabs"
+import { NativeTabs, Icon, Label, Badge } from "expo-router/unstable-native-tabs"
 import React from "react"
 import { usePathname } from "expo-router"
 import { Platform, DynamicColorIOS } from "react-native"
@@ -8,9 +8,12 @@ import LanguageContext from "@/contexts/language"
 import { View } from "react-native"
 import { iOSMajorVersion } from "@/lib/platform/detection"
 import { useCameraContext } from "../../modules/camera"
+import { usePushNotifications } from "@/contexts/push.notification"
+import { Text } from "@/components/Themed"
 
 export default function TabsLayout() {
     const { t } = React.useContext(LanguageContext)
+    const { unreadCount } = usePushNotifications()
     const { tabHide } = useCameraContext()
     const pathname = usePathname()
     const hideTabs = pathname?.startsWith("/(tabs)/moments/permissions")
@@ -29,10 +32,9 @@ export default function TabsLayout() {
         <View style={{ flex: 1, backgroundColor: "#000" }}>
             <NativeTabs
                 tintColor={tintColor}
-                labelVisibilityMode="unlabeled"
                 labelStyle={{
                     fontFamily: Fonts.family["Bold"],
-                    fontSize: Fonts.size.body * 0.8,
+                    fontSize: Fonts.size.body * 0.75,
                 }}
                 backgroundColor={
                     Platform.OS === "ios" && iOSMajorVersion && iOSMajorVersion < 26
@@ -49,6 +51,14 @@ export default function TabsLayout() {
                 <NativeTabs.Trigger name="moments">
                     <Label selectedStyle={{ color: tintColor }}>{t("Moments")}</Label>
                     <Icon sf={{ default: "bolt", selected: "bolt.fill" }} />
+                </NativeTabs.Trigger>
+
+                <NativeTabs.Trigger name="inbox">
+                    <Label selectedStyle={{ color: tintColor }}>{t("Inbox")}</Label>
+                    <Icon sf={{ default: "bell", selected: "bell.fill" }} />
+                    <Badge hidden={unreadCount === 0} selectedBackgroundColor={colors.red.red_05}>
+                        {unreadCount.toString()}
+                    </Badge>
                 </NativeTabs.Trigger>
 
                 <NativeTabs.Trigger name="create">
