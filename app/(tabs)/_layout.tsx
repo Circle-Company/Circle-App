@@ -56,9 +56,11 @@ export default function TabsLayout() {
                 <NativeTabs.Trigger name="inbox">
                     <Label selectedStyle={{ color: tintColor }}>{t("Inbox")}</Label>
                     <Icon sf={{ default: "bell", selected: "bell.fill" }} />
-                    <Badge hidden={unreadCount === 0} selectedBackgroundColor={colors.red.red_05}>
-                        {unreadCount.toString()}
-                    </Badge>
+                    {!badgeHidden && (
+                        <Badge hi selectedBackgroundColor={colors.red.red_05}>
+                            {unreadCount.toString()}
+                        </Badge>
+                    )}
                 </NativeTabs.Trigger>
 
                 <NativeTabs.Trigger name="create">

@@ -188,9 +188,22 @@ export default function InboxScreen() {
     )
 
     const sections = useMemo(() => {
-        const interval = getIntervalFromMostRecent(notifications)
-        return groupNotifications(notifications, t, interval)
-    }, [notifications, t])
+        const map = new Map<string, NotificationPayload[]>()
+
+        for (const item of notifications as NotificationPayload[]) {
+            if (!item.createdAt) continue
+            const date = new Date(item.createdAt)
+            if (Number.isNaN(date.getTime())) continue
+            const title = getDateStringRelative(date, TimeInterval.)
+            if (!map.has(title)) map.set(title, [])
+            map.get(title)?.push(item)
+        }
+
+        return Array.from(map.entries()).map(([title, data]) => ({
+            title,
+            data,
+        }))
+    }, [notifications, getDateStringRelative])
 
     const headerStyle: ViewStyle = {
         paddingTop: sizes.paddings["1sm"],
@@ -289,7 +302,7 @@ export default function InboxScreen() {
                 onRefresh={handleRefresh}
                 refreshControl={
                     <RefreshControl
-                        refreshing={notificationsRefreshing}
+                        refreshing={notific}
                         onRefresh={handleRefresh}
                         tintColor={colors.gray.grey_04}
                         colors={[colors.gray.grey_04]}
