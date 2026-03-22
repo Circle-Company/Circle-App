@@ -14,6 +14,9 @@ import { useDisableHapticsMutation, useEnableEnableMutation } from "@/queries/pr
 import { View } from "react-native"
 import sizes from "@/constants/sizes"
 import { textLib } from "@/circle.text.library"
+import { NotificationPermissionNotProvidedCard } from "@/components/notification/notification.not.provided.card"
+import { PermissionStatus } from "expo-notifications"
+import { usePushNotifications } from "@/contexts/push.notification"
 
 export default function ListSettings() {
     const { session } = React.useContext(PersistedContext)
@@ -36,22 +39,7 @@ export default function ListSettings() {
     const disableHapticsMutation = useDisableHapticsMutation()
     const enableHapticsMutation = useEnableEnableMutation()
 
-    /**
-    {
-         name: t("Haptic Feedback"),
-         value: session.preferences.content.disableHaptics
-             ? t("Enabled")
-             : t("Disabled"),
-
-         rightComponent: (
-             <SwitchButton
-                 initialState={!preferencesState.disableHaptics}
-                 onPressEnable={enableHapticsMutation.mutate}
-                 onPressDisable={disableHapticsMutation.mutate}
-             />
-         ),
-     },
-     */
+    const { permissionStatus } = usePushNotifications()
 
     const ListData: SettignsSectionProps[] = [
         {
@@ -66,11 +54,6 @@ export default function ListSettings() {
                     name: t("Name"),
                     value: name_text,
                     onPress: () => router.push("/(tabs)/settings/name"),
-                },
-                {
-                    name: t("Description"),
-                    value: description_text,
-                    onPress: () => router.push("/(tabs)/settings/description"),
                 },
             ],
         },
@@ -152,7 +135,19 @@ export default function ListSettings() {
             keyExtractor={(item) => item.name}
             scrollEventThrottle={16}
             ListHeaderComponent={() => {
-                return <View style={{ height: sizes.headers.height * 1.35 }} />
+                if (
+                    permissionStatus === PermissionStatus.UNDETERMINED ||
+                    permissionStatus === PermissionStatus.DENIED
+                )
+                    return (
+                        <View>
+                            <View style={{ height: sizes.headers.height * 1.5 }} />
+                            <View style={{ marginBottom: sizes.margins["1md"] }}>
+                                <NotificationPermissionNotProvidedCard />
+                            </View>
+                        </View>
+                    )
+                else return <View style={{ height: sizes.headers.height * 1.45 }}></View>
             }}
             renderItem={({ item, index }) => {
                 return (
