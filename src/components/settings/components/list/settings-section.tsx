@@ -29,9 +29,9 @@ export default function SettingsSection({ name, content }: SettignsSectionProps)
         justifyContent: "center",
     }
     const header_text: TextStyle = {
-        fontSize: fonts.size.body * 1.2,
-        fontFamily: fonts.family.Bold,
-        color: colors.gray.white,
+        fontSize: fonts.size.body,
+        fontFamily: fonts.family.Semibold,
+        color: colors.gray.grey_04,
     }
     const content_container: ViewStyle = {
         width: sizes.screens.width,
@@ -40,7 +40,7 @@ export default function SettingsSection({ name, content }: SettignsSectionProps)
     return (
         <View style={container}>
             <View style={header_container}>
-                <Text style={header_text}>{name}</Text>
+                <Text style={header_text}>{name.toUpperCase()}</Text>
             </View>
             <View style={content_container}>
                 <FlatList<SettingsiItemObjectProps>
