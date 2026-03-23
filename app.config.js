@@ -1,7 +1,7 @@
 const pkg = require("./package.json")
 
 module.exports = function (_config) {
-    const VERSION = pkg.version
+    const VERSION = "1.1.0"
     const PLATFORM = "ios"
 
     return {
