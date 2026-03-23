@@ -1,169 +1,43 @@
-import React, { useCallback, useMemo, useState, useContext } from "react"
+import React, { useCallback, useMemo, useState, useEffect, useRef } from "react"
 import {
     View,
     ViewStyle,
     ActivityIndicator,
-    Pressable,
     SectionList,
     RefreshControl,
+    Animated,
 } from "react-native"
 import { Text } from "@/components/Themed"
 import NotificationItem from "@/components/notification/notification.item"
 import { NotificationSkeleton } from "@/components/notification/notification.skeleton"
+import { NotificationEmptyCard } from "@/components/notification/notification.empty.card"
 import { colors } from "@/constants/colors"
 import sizes from "@/constants/sizes"
 import { usePushNotifications } from "@/contexts/push.notification"
-import LanguageContext from "@/contexts/language"
+import { useDateHelpers, TimeInterval } from "@/lib/hooks/separeArrByDate"
 import type { NotificationPayload } from "@/contexts/push.notification"
+import fonts from "@/constants/fonts"
+import LanguageContext from "@/contexts/language"
+import { Pressable } from "react-native"
+import { router } from "expo-router"
 
-type Section = {
-    title: string
-    data: NotificationPayload[]
-}
-
-type TranslateFn = (key: string) => string
-
-export enum TimeInterval {
-    SECOND = 1000,
-    MINUTE = 60 * 1000,
-    HOUR = 60 * 60 * 1000,
-    DAY = 24 * 60 * 60 * 1000,
-    WEEK = 7 * 24 * 60 * 60 * 1000,
-    BIMONTH = 2 * 30 * 24 * 60 * 60 * 1000,
-    MONTH = 30 * 24 * 60 * 60 * 1000,
-    TRIMESTER = 3 * 30 * 24 * 60 * 60 * 1000,
-    SEMESTER = 6 * 30 * 24 * 60 * 60 * 1000,
-    YEAR = 365 * 24 * 60 * 60 * 1000,
-}
-
-const DEFAULT_TIME_INTERVAL = TimeInterval.DAY
-
-function getMostRecentDate(notifications: NotificationPayload[]): Date | null {
-    let mostRecent: Date | null = null
-    for (const item of notifications) {
-        if (!item.createdAt) continue
-        const date = new Date(item.createdAt)
-        if (Number.isNaN(date.getTime())) continue
-        if (!mostRecent || date.getTime() > mostRecent.getTime()) {
-            mostRecent = date
-        }
-    }
-    return mostRecent
-}
-
-function getIntervalFromMostRecent(notifications: NotificationPayload[]): TimeInterval {
-    const mostRecent = getMostRecentDate(notifications)
-    if (!mostRecent) return DEFAULT_TIME_INTERVAL
-
-    const now = new Date()
-    const diff = now.getTime() - mostRecent.getTime()
-
-    if (diff <= TimeInterval.WEEK) return TimeInterval.WEEK
-    if (diff <= TimeInterval.MONTH) return TimeInterval.MONTH
-    if (diff <= TimeInterval.TRIMESTER) return TimeInterval.TRIMESTER
-    if (diff <= TimeInterval.SEMESTER) return TimeInterval.SEMESTER
-    if (diff <= TimeInterval.YEAR) return TimeInterval.YEAR
-
+/**
+ * Given how far a notification is from now (in ms), picks the best
+ * TimeInterval so the label reads naturally.
+ */
+function pickIntervalFromAge(ageMs: number): TimeInterval {
+    const m = ageMs / 60000
+    if (m < 1) return TimeInterval.SECOND
+    if (m < 60) return TimeInterval.MINUTE
+    if (m < 60 * 24) return TimeInterval.HOUR
+    if (m < 60 * 24 * 7) return TimeInterval.DAY
+    if (m < 60 * 24 * 30) return TimeInterval.WEEK
+    if (m < 60 * 24 * 30 * 3) return TimeInterval.MONTH
+    if (m < 60 * 24 * 365) return TimeInterval.TRIMESTER
     return TimeInterval.YEAR
 }
 
-function groupNotifications(
-    notifications: NotificationPayload[],
-    t: TranslateFn,
-    timeInterval: TimeInterval = DEFAULT_TIME_INTERVAL,
-): Section[] {
-    const map = new Map<string, NotificationPayload[]>()
-
-    for (const item of notifications) {
-        if (!item.createdAt) continue
-        const date = new Date(item.createdAt)
-        if (Number.isNaN(date.getTime())) continue
-
-        const title = getDateStringRelative(date, t, timeInterval)
-        if (!map.has(title)) map.set(title, [])
-        map.get(title)?.push(item)
-    }
-
-    return Array.from(map.entries()).map(([title, data]) => ({
-        title,
-        data,
-    }))
-}
-
-function getDateStringRelative(date: Date, t: TranslateFn, timeInterval: TimeInterval): string {
-    const now = new Date()
-    const diff = now.getTime() - date.getTime()
-
-    if (timeInterval === TimeInterval.SECOND) {
-        const secondsAgo = Math.floor(diff / timeInterval)
-        return secondsAgo === 0
-            ? t("now")
-            : `${secondsAgo} ${secondsAgo === 1 ? t("second") : t("seconds")} ${t("ago")}`
-    } else if (timeInterval === TimeInterval.MINUTE) {
-        const minutesAgo = Math.floor(diff / timeInterval)
-        return minutesAgo === 0
-            ? t("now")
-            : `${minutesAgo} ${minutesAgo === 1 ? t("minute") : t("minutes")} ${t("ago")}`
-    } else if (timeInterval === TimeInterval.HOUR) {
-        const hoursAgo = Math.floor(diff / timeInterval)
-        return hoursAgo === 0
-            ? t("now")
-            : `${hoursAgo} ${hoursAgo === 1 ? t("hour") : t("hours")} ${t("ago")}`
-    } else if (timeInterval === TimeInterval.DAY) {
-        const daysAgo = Math.floor(diff / timeInterval)
-        return getDayString(daysAgo, t)
-    } else if (timeInterval === TimeInterval.WEEK) {
-        const weeksAgo = Math.floor(diff / timeInterval)
-        return weeksAgo === 0
-            ? t("this week")
-            : weeksAgo === 1
-              ? t("last week")
-              : `${weeksAgo} ${t("weeks ago")}`
-    } else if (timeInterval === TimeInterval.BIMONTH) {
-        const bimonthsAgo = Math.floor(diff / timeInterval)
-        return bimonthsAgo === 0
-            ? t("this two months")
-            : bimonthsAgo === 1
-              ? t("last two months")
-              : `${bimonthsAgo} ${t("two months ago")}`
-    } else if (timeInterval === TimeInterval.MONTH) {
-        const monthsAgo = Math.floor(diff / timeInterval)
-        return monthsAgo === 0
-            ? t("this month")
-            : monthsAgo === 1
-              ? t("last month")
-              : `${monthsAgo} ${t("months ago")}`
-    } else if (timeInterval === TimeInterval.TRIMESTER) {
-        const trimestersAgo = Math.floor(diff / timeInterval)
-        return trimestersAgo === 0
-            ? t("this quarter")
-            : trimestersAgo === 1
-              ? t("last quarter")
-              : `${trimestersAgo} ${t("quarters ago")}`
-    } else if (timeInterval === TimeInterval.SEMESTER) {
-        const semestersAgo = Math.floor(diff / timeInterval)
-        return semestersAgo === 0
-            ? t("this semester")
-            : semestersAgo === 1
-              ? t("last semester")
-              : `${semestersAgo} ${t("semesters ago")}`
-    } else if (timeInterval === TimeInterval.YEAR) {
-        const currentYear = now.getFullYear()
-        const objYear = date.getFullYear()
-
-        if (currentYear === objYear) return t("this year")
-        const yearsAgo = Math.floor(diff / timeInterval)
-        return yearsAgo === 1 ? t("last year") : `${yearsAgo} ${t("years ago")}`
-    }
-
-    return t("more than a year ago")
-}
-
-function getDayString(daysAgo: number, t: TranslateFn): string {
-    if (daysAgo === 0) return t("today")
-    if (daysAgo === 1) return t("yesterday")
-    return `${daysAgo} ${t("days ago")}`
-}
+// grouping handled in component using useDateHelpers
 
 export default function InboxScreen() {
     const {
@@ -175,9 +49,9 @@ export default function InboxScreen() {
         refetchNotifications,
         error,
     } = usePushNotifications()
-
+    const { t } = React.useContext(LanguageContext)
     const [isLoadingMore, setIsLoadingMore] = useState(false)
-    const { t } = useContext(LanguageContext)
+    const { getDateStringRelative } = useDateHelpers()
 
     const container: ViewStyle = useMemo(
         () => ({
@@ -188,38 +62,69 @@ export default function InboxScreen() {
     )
 
     const sections = useMemo(() => {
-        const map = new Map<string, NotificationPayload[]>()
+        if (!notifications.length) return []
 
-        for (const item of notifications as NotificationPayload[]) {
-            if (!item.createdAt) continue
-            const date = new Date(item.createdAt)
-            if (Number.isNaN(date.getTime())) continue
-            const title = getDateStringRelative(date, TimeInterval.)
-            if (!map.has(title)) map.set(title, [])
-            map.get(title)?.push(item)
+        const now = Date.now()
+
+        // Ordena por data decrescente (mais recente primeiro)
+        const sorted = [...notifications]
+            .filter((n) => n.createdAt && !Number.isNaN(new Date(n.createdAt).getTime()))
+            .sort((a, b) => new Date(b.createdAt!).getTime() - new Date(a.createdAt!).getTime())
+
+        if (!sorted.length) return []
+
+        // Para cada notificação, gera um label baseado na distância até agora
+        const labeled = sorted.map((n) => {
+            const date = new Date(n.createdAt!)
+            const ageMs = now - date.getTime()
+            const interval = pickIntervalFromAge(ageMs)
+            return { n, label: getDateStringRelative(date, interval) }
+        })
+
+        // Agrupa por label mantendo ordem, sem colapsar seções com mesmo nome em posições diferentes
+        const result: { title: string; data: NotificationPayload[] }[] = []
+        let currentLabel = labeled[0].label
+        let currentSection: NotificationPayload[] = [labeled[0].n]
+
+        for (let i = 1; i < labeled.length; i++) {
+            const { n, label } = labeled[i]
+            if (label === currentLabel) {
+                currentSection.push(n)
+            } else {
+                result.push({ title: currentLabel, data: currentSection })
+                currentLabel = label
+                currentSection = [n]
+            }
         }
+        result.push({ title: currentLabel, data: currentSection })
 
-        return Array.from(map.entries()).map(([title, data]) => ({
-            title,
-            data,
-        }))
+        return result
     }, [notifications, getDateStringRelative])
 
     const headerStyle: ViewStyle = {
-        paddingTop: sizes.paddings["1sm"],
+        paddingTop: sizes.paddings["2sm"],
         paddingBottom: sizes.paddings["1sm"],
+        paddingLeft: sizes.paddings["2sm"],
     }
 
     const handleRefresh = useCallback(async () => {
         await refetchNotifications()
     }, [refetchNotifications])
 
+    const [noMoreNotifications, setNoMoreNotifications] = useState(false)
+
     const handleLoadMore = useCallback(async () => {
-        if (!hasNextNotifications || notificationsLoading || isLoadingMore) return
+        if (!hasNextNotifications || notificationsLoading || isLoadingMore || noMoreNotifications)
+            return
         setIsLoadingMore(true)
         const startedAt = Date.now()
         try {
+            const prevCount = notifications.length
             await fetchNextNotifications()
+            // If count didn't increase, mark as finished
+            if (notifications.length === prevCount) {
+                setNoMoreNotifications(true)
+            }
         } finally {
             const elapsed = Date.now() - startedAt
             const remaining = 1500 - elapsed
@@ -228,9 +133,57 @@ export default function InboxScreen() {
             }
             setIsLoadingMore(false)
         }
-    }, [hasNextNotifications, notificationsLoading, isLoadingMore, fetchNextNotifications])
+    }, [
+        hasNextNotifications,
+        notificationsLoading,
+        isLoadingMore,
+        fetchNextNotifications,
+        notifications,
+        noMoreNotifications,
+    ])
 
     const showFooter = isLoadingMore && notifications.length > 0
+
+    const [showSkeleton, setShowSkeleton] = useState(false)
+    const skeletonOpacity = useRef(new Animated.Value(1)).current
+    const skeletonShownAt = useRef<number | null>(null)
+
+    useEffect(() => {
+        if (notificationsLoading && notifications.length === 0) {
+            skeletonShownAt.current = Date.now()
+            setShowSkeleton(true)
+            skeletonOpacity.setValue(1)
+            return
+        }
+
+        if (!showSkeleton) return
+
+        const elapsed = skeletonShownAt.current ? Date.now() - skeletonShownAt.current : 1000
+        const remaining = Math.max(1000 - elapsed, 0)
+
+        const timeout = setTimeout(() => {
+            Animated.timing(skeletonOpacity, {
+                toValue: 0,
+                duration: 200,
+                useNativeDriver: true,
+            }).start(() => {
+                setShowSkeleton(false)
+                skeletonOpacity.setValue(1)
+            })
+        }, remaining)
+
+        return () => clearTimeout(timeout)
+    }, [notificationsLoading, notifications.length, showSkeleton, skeletonOpacity])
+
+    const emptyOpacity = useRef(new Animated.Value(1)).current
+
+    useEffect(() => {
+        Animated.timing(emptyOpacity, {
+            toValue: notificationsRefreshing ? 0 : 1,
+            duration: 200,
+            useNativeDriver: true,
+        }).start()
+    }, [notificationsRefreshing, emptyOpacity])
 
     if (error) {
         return (
@@ -242,22 +195,24 @@ export default function InboxScreen() {
         )
     }
 
-    if (notificationsLoading) {
+    if (showSkeleton) {
         return (
             <View style={container}>
-                <View
-                    style={{
-                        paddingTop: sizes.headers.height * 1.45,
-                        paddingHorizontal: sizes.margins["1md"],
-                        gap: sizes.paddings["1sm"],
-                    }}
-                >
-                    <NotificationSkeleton />
-                    <NotificationSkeleton />
-                    <NotificationSkeleton />
-                    <NotificationSkeleton />
-                    <NotificationSkeleton />
-                </View>
+                <Animated.View style={{ opacity: skeletonOpacity }}>
+                    <View
+                        style={{
+                            paddingTop: sizes.headers.height * 1.45,
+                            paddingHorizontal: sizes.margins["1md"],
+                            gap: sizes.paddings["1sm"],
+                        }}
+                    >
+                        <NotificationSkeleton opacity={1} />
+                        <NotificationSkeleton opacity={0.8} />
+                        <NotificationSkeleton opacity={0.6} />
+                        <NotificationSkeleton opacity={0.4} />
+                        <NotificationSkeleton opacity={0.2} />
+                    </View>
+                </Animated.View>
             </View>
         )
     }
@@ -275,42 +230,74 @@ export default function InboxScreen() {
                                 color: colors.gray.grey_04,
                                 fontSize: 12,
                                 textTransform: "uppercase",
+                                fontFamily: fonts.family.Bold,
                             }}
                         >
                             {section.title}
                         </Text>
                     </View>
                 )}
-                ListHeaderComponent={<View style={{ height: sizes.headers.height * 1.45 }} />}
+                ItemSeparatorComponent={() => <View style={{ height: sizes.margins["2sm"] }} />}
+                ListHeaderComponent={<View style={{ height: sizes.headers.height * 1.3 }} />}
                 ListEmptyComponent={
-                    <Text style={{ color: colors.gray.white, padding: 16 }}>
-                        <Pressable onPress={handleRefresh}>
-                            <Text>Nenhuma notificação</Text>
-                        </Pressable>
-                    </Text>
+                    <Animated.View
+                        style={{ opacity: emptyOpacity, marginTop: sizes.headers.height * 0.2 }}
+                        pointerEvents={notificationsRefreshing ? "none" : "auto"}
+                    >
+                        <NotificationEmptyCard />
+                    </Animated.View>
                 }
                 ListFooterComponent={
                     showFooter ? (
-                        <View style={{ paddingVertical: 16 }}>
+                        <View
+                            style={{
+                                paddingTop: sizes.paddings["1md"],
+                                width: sizes.screens.width - sizes.margins["1md"] * 2,
+                                marginBottom: sizes.screens.height * 0.2,
+                                alignItems: "center",
+                                justifyContent: "center",
+                            }}
+                        >
                             <ActivityIndicator color={colors.gray.grey_04} />
                         </View>
-                    ) : null
+                    ) : (
+                        <View
+                            style={{
+                                paddingTop: sizes.paddings["1md"],
+                                width: sizes.screens.width - sizes.margins["1md"] * 2,
+                                marginBottom: sizes.screens.height * 0.2,
+                                alignItems: "center",
+                                justifyContent: "center",
+                            }}
+                        >
+                            <Text
+                                style={{
+                                    fontFamily: fonts.family["Medium-Italic"],
+                                    fontSize: fonts.size.body,
+                                    color: colors.gray.grey_04,
+                                }}
+                            >
+                                {t("No more notifications")}
+                            </Text>
+                        </View>
+                    )
                 }
                 onEndReached={handleLoadMore}
-                onEndReachedThreshold={0.5}
+                onEndReachedThreshold={0.1}
                 refreshing={notificationsRefreshing}
-                onRefresh={handleRefresh}
                 refreshControl={
                     <RefreshControl
-                        refreshing={notific}
-                        onRefresh={handleRefresh}
+                        refreshing={notificationsRefreshing}
+                        onRefresh={() => {
+                            setNoMoreNotifications(false)
+                            handleRefresh()
+                        }}
                         tintColor={colors.gray.grey_04}
                         colors={[colors.gray.grey_04]}
                         progressViewOffset={sizes.headers.height * 1.45}
                     />
                 }
                 contentContainerStyle={{
-                    paddingBottom: 24,
                     marginHorizontal: sizes.margins["1md"],
                     flexGrow: 1,
                 }}

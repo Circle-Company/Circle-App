@@ -14,10 +14,12 @@ import PermissionCard from "@/components/permission/permission.card"
 import { TextStyle } from "react-native"
 import ButtonStandart from "@/components/buttons/button-standart"
 import fonts from "@/constants/fonts"
+import { NotificationBadge } from "@/components/notification/notification.badge"
+import { NotificationType } from "@/contexts/push.notification"
 
-type StepId = "locationForeground" | "locationBackground"
+type StepId = "locationForeground" | "locationBackground" | "pushNotifications"
 
-const STEPS: StepId[] = ["locationForeground", "locationBackground"]
+const STEPS: StepId[] = ["locationForeground", "locationBackground", "pushNotifications"]
 function treatAsGranted(status: PermissionStatus) {
     return status === "granted"
 }
@@ -30,7 +32,7 @@ export default function PermissionsWizardScreen() {
 
     const { items, refresh, requestOne, hasMissingRequired, requiredMissingIds, openSettings } =
         useAppPermissions({
-            required: ["locationForeground", "locationBackground"],
+            required: ["locationForeground", "locationBackground", "pushNotifications"],
         })
 
     const [stepIndex, setStepIndex] = React.useState(0)
@@ -111,7 +113,7 @@ export default function PermissionsWizardScreen() {
     }, [pendingTotal, pendingSteps, stepIndex])
 
     const handleAllow = async () => {
-        const order: StepId[] = ["locationForeground", "locationBackground"]
+        const order: StepId[] = ["locationForeground", "locationBackground", "pushNotifications"]
 
         for (const id of order) {
             const currentStatus = getItem(id)?.status ?? "unknown"
@@ -146,7 +148,7 @@ export default function PermissionsWizardScreen() {
             style={[
                 styles.container,
                 {
-                    gap: 40,
+                    gap: 30,
                 },
             ]}
         >
@@ -179,6 +181,30 @@ export default function PermissionsWizardScreen() {
                 </Text>
             </View>
 
+            <View style={{ alignItems: "center" }}>
+                <PermissionCard
+                    title={"Turn on realtime updates"}
+                    icon={
+                        <View style={{ width: 60, alignItems: "center", justifyContent: "center" }}>
+                            <Text style={{ fontSize: 55 }}>🔔</Text>
+                            <View
+                                style={{
+                                    position: "absolute",
+                                    top: -2,
+                                    right: -10,
+                                }}
+                            >
+                                <NotificationBadge type={NotificationType.MomentLiked} />
+                            </View>
+                        </View>
+                    }
+                />
+                <Text style={styles.hint}>
+                    Push notifications are used to send you updates about your friends’ activity and
+                    interactions with you.
+                </Text>
+            </View>
+
             {/* Sticky CTA */}
             <View style={styles.ctaWrapper}>
                 <Text style={styles.ctaText}>
@@ -202,7 +228,6 @@ export default function PermissionsWizardScreen() {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        paddingTop: sizes.screens.height * 0.1,
         backgroundColor: colors.gray.black,
         alignItems: "center",
     },

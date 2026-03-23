@@ -1,4 +1,5 @@
 import { useToast, ToastConfig } from "./index"
+import type { NotificationPayload } from "@/contexts/push.notification"
 
 // Backward compatibility interface for the old notify API
 export interface NotifyParams {
@@ -36,6 +37,20 @@ let globalNotifyFn: ((config: ToastConfig) => void) | null = null
 export function setGlobalNotify(fn: (config: ToastConfig) => void) {
     // Use a ref-like approach to avoid triggering re-renders
     globalNotifyFn = fn
+}
+
+// Global notification toast — call this to show a push notification as an in-app toast
+export function notifyPush(payload: NotificationPayload, duration = 4000) {
+    const dispatch = () => {
+        if (globalNotifyFn) {
+            globalNotifyFn({ type: "notification", notificationPayload: payload, duration })
+        }
+    }
+    if (typeof requestAnimationFrame !== "undefined") {
+        requestAnimationFrame(dispatch)
+    } else {
+        setTimeout(dispatch, 0)
+    }
 }
 
 export function notify(params: NotifyParams) {

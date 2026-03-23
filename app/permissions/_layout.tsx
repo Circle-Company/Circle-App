@@ -38,6 +38,24 @@ export default function MomentsLayout() {
                     },
                 }}
             />
+            <Stack.Screen
+                name="notifications"
+                options={{
+                    presentation: "containedModal",
+                    headerTitle: "Introducing Notifications",
+                    headerTitleAlign: "center",
+                    headerTintColor: "white",
+                    headerLargeTitle: false,
+                    headerTitleStyle: {
+                        fontFamily: fonts.family["Black-Italic"],
+                    },
+                    headerLargeTitleStyle: { fontFamily: fonts.family["Black-Italic"] },
+                    headerStyle: {
+                        backgroundColor: "transparent",
+                    },
+                    headerTransparent: true,
+                }}
+            />
         </Stack>
     )
 }

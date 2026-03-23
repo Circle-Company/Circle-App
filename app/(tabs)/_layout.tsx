@@ -13,7 +13,8 @@ import { Text } from "@/components/Themed"
 
 export default function TabsLayout() {
     const { t } = React.useContext(LanguageContext)
-    const { unreadCount } = usePushNotifications()
+    const { unreadCount, inboxVisited } = usePushNotifications()
+    const badgeHidden = unreadCount === 0 || inboxVisited
     const { tabHide } = useCameraContext()
     const pathname = usePathname()
     const hideTabs = pathname?.startsWith("/(tabs)/moments/permissions")

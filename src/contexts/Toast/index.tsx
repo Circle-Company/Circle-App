@@ -1,5 +1,7 @@
 import React, { createContext, useContext, useState, useCallback } from "react"
 import { StyleSheet, View, Platform } from "react-native"
+import { NotificationToast } from "@/components/notification/notification.toast"
+import type { NotificationPayload } from "@/contexts/push.notification"
 import Animated, {
     useAnimatedStyle,
     useSharedValue,
@@ -20,12 +22,13 @@ const DISMISS_THRESHOLD = 40
 const TOP_OFFSET_IOS = 60
 const TOP_OFFSET_ANDROID = 32
 
-export type ToastType = "success" | "error"
+export type ToastType = "success" | "error" | "notification"
 
 export interface ToastConfig {
     title?: string
     type?: ToastType
     duration?: number
+    notificationPayload?: NotificationPayload
 }
 
 interface Toast extends ToastConfig {
@@ -37,6 +40,10 @@ interface ToastContextData {
     hide: (id?: string) => void
     success: (title: string, config?: Omit<ToastConfig, "title">) => void
     error: (title: string, config?: Omit<ToastConfig, "title">) => void
+    notification: (
+        payload: NotificationPayload,
+        config?: Omit<ToastConfig, "notificationPayload" | "type">,
+    ) => void
 }
 
 const ToastContext = createContext<ToastContextData>({} as ToastContextData)
@@ -133,7 +140,11 @@ const ToastItem: React.FC<ToastItemProps> = ({ toast, onDismiss }) => {
     return (
         <GestureDetector gesture={panGesture}>
             <Animated.View style={[animatedStyle]}>
-                <StandartToast title={toast.title ?? ""} tint={getTint()} />
+                {toast.type === "notification" && toast.notificationPayload ? (
+                    <NotificationToast item={toast.notificationPayload} onDismiss={onDismiss} />
+                ) : (
+                    <StandartToast title={toast.title ?? ""} tint={getTint()} />
+                )}
             </Animated.View>
         </GestureDetector>
     )
@@ -173,6 +184,16 @@ export function Provider({ children }: { children: React.ReactNode }) {
         },
         [show],
     )
+
+    const notification = useCallback(
+        (
+            payload: NotificationPayload,
+            config?: Omit<ToastConfig, "notificationPayload" | "type">,
+        ) => {
+            show({ type: "notification", notificationPayload: payload, duration: 4000, ...config })
+        },
+        [show],
+    )
     // Setup global notify function once on mount
     React.useLayoutEffect(() => {
         setGlobalNotify(show)
@@ -181,7 +202,7 @@ export function Provider({ children }: { children: React.ReactNode }) {
     const topToasts = toasts
 
     return (
-        <ToastContext.Provider value={{ show, hide, success, error }}>
+        <ToastContext.Provider value={{ show, hide, success, error, notification }}>
             {children}
 
             {topToasts.length > 0 && (

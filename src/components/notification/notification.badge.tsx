@@ -2,6 +2,9 @@ import React from "react"
 import { View, ViewStyle } from "react-native"
 import AtIcon from "@/assets/icons/svgs/@2.svg"
 import GeoIcon from "@/assets/icons/svgs/bolt.svg"
+import EyeIcon from "@/assets/icons/svgs/eye.svg"
+import DialogIcon from "@/assets/icons/svgs/text_bubble.svg"
+import HeartIcon from "@/assets/icons/svgs/heart.svg"
 import { NotificationType } from "@/contexts/push.notification"
 import { colors } from "@/constants/colors"
 import sizes from "@/constants/sizes"
@@ -20,15 +23,15 @@ export function NotificationBadge({ type }: { type: NotificationType }) {
             color = colors.purple.purple_04
             break
         case NotificationType.ProfileViewed:
-            Icon = AtIcon
+            Icon = EyeIcon
             color = colors.green.green_05
             break
         case NotificationType.MomentCommented:
-            Icon = AtIcon
+            Icon = DialogIcon
             color = colors.yellow.yellow_05
             break
         case NotificationType.MomentLiked:
-            Icon = AtIcon
+            Icon = HeartIcon
             color = colors.red.red_05
             break
         default:

@@ -109,10 +109,10 @@ export default function RootLayout() {
                 }}
             >
                 <KeyboardProvider enabled>
-                    <ToastProvider>
-                        <RedirectProvider>
-                            <AuthProvider>
-                                <QueryProvider>
+                    <RedirectProvider>
+                        <AuthProvider>
+                            <QueryProvider>
+                                <ToastProvider>
                                     <TutorialProvider>
                                         <LanguageProvider>
                                             <NetworkProvider>
@@ -136,10 +136,10 @@ export default function RootLayout() {
                                             </NetworkProvider>
                                         </LanguageProvider>
                                     </TutorialProvider>
-                                </QueryProvider>
-                            </AuthProvider>
-                        </RedirectProvider>
-                    </ToastProvider>
+                                </ToastProvider>
+                            </QueryProvider>
+                        </AuthProvider>
+                    </RedirectProvider>
                 </KeyboardProvider>
             </GestureHandlerRootView>
         </SafeAreaProvider>

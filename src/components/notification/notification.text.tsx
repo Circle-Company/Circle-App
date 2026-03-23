@@ -1,4 +1,4 @@
-import React, { useMemo } from "react"
+import React from "react"
 import { Text, TextStyle } from "react-native"
 import { colors } from "@/constants/colors"
 import fonts from "@/constants/fonts"
@@ -7,30 +7,28 @@ import { NotificationType } from "@/contexts/push.notification"
 
 type NotificationTextProps = {
     item: NotificationPayload
-    description?: string
     style?: TextStyle
 }
 
-function buildTitle(type: NotificationType) {
+function getTypeTitle(type: NotificationType) {
     switch (type) {
         case NotificationType.HexEntry:
-            return `Is close to you`
+            return "Is close to you right now, see their profile before their gone"
         case NotificationType.UserFollowed:
-            return `Started following you`
+            return "Is following you now"
         case NotificationType.ProfileViewed:
-            return `Viewed your profile`
+            return "Visited your profile"
         case NotificationType.MomentCommented:
-            return `Commented on your moment`
+            return "Commented on your moment"
         case NotificationType.MomentLiked:
-            return `Liked your moment`
+            return "Novo like"
         default:
-            return `Você recebeu uma notificação`
+            return "Notificação"
     }
 }
 
-export function NotificationText({ item, description, style }: NotificationTextProps) {
-    const title = useMemo(() => buildTitle(item.type), [item.type])
-    const text = description ? `${title}, ${description}` : title
+export function NotificationText({ item, style }: NotificationTextProps) {
+    const text = getTypeTitle(item.type)
 
     return (
         <Text

@@ -3,7 +3,7 @@ import { Skeleton } from "../skeleton"
 import sizes from "@/constants/sizes"
 import { colors } from "@/constants/colors"
 
-export function NotificationSkeleton() {
+export function NotificationSkeleton({ opacity }: { opacity?: number }) {
     const container: ViewStyle = {
         width: "100%",
         alignItems: "flex-start",
@@ -13,6 +13,7 @@ export function NotificationSkeleton() {
         paddingRight: sizes.paddings["1md"],
         paddingVertical: sizes.paddings["2sm"],
         borderRadius: sizes.borderRadius["1md"] * 1.5,
+        opacity,
     }
 
     return <Skeleton.View style={container}></Skeleton.View>
