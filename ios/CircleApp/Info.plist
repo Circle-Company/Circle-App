@@ -59,6 +59,8 @@
     <string>$(PRODUCT_NAME) uses the camera to record videos for sharing as moments and to take a photo for your profile.</string>
     <key>NSFaceIDUsageDescription</key>
     <string>Allow $(PRODUCT_NAME) to use Face ID.</string>
+    <key>NSUserNotificationUsageDescription</key>
+    <string>$(PRODUCT_NAME) uses push notifications to keep you updated on new content and important interactions with you.</string>
     <key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
     <string>$(PRODUCT_NAME) uses background location to keep nearby moments and people recommendations up to date, even when the app is not open.</string>
     <key>NSLocationAlwaysUsageDescription</key>
@@ -94,6 +96,7 @@
     <array>
       <string>fetch</string>
       <string>location</string>
+      <string>remote-notification</string>
     </array>
     <key>UILaunchStoryboardName</key>
     <string>SplashScreen</string>

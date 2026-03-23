@@ -48,6 +48,7 @@ module.exports = function (_config) {
             plugins: [
                 "expo-router",
                 "expo-video",
+                "expo-audio",
                 "expo-localization",
                 [
                     "expo-web-browser",
