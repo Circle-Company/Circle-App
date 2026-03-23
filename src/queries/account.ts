@@ -409,3 +409,17 @@ export function useSetPushTokenMutation() {
         mutationFn: updateAccountPushToken,
     })
 }
+
+async function readAllNotifications(): Promise<void> {
+    await apiRoutes.account.readAllNotifications()
+}
+
+export function useReadAllNotificationsMutation() {
+    const queryClient = useQueryClient()
+    return useMutation({
+        mutationFn: readAllNotifications,
+        onSuccess: async () => {
+            await queryClient.invalidateQueries({ queryKey: accountKeys.notifications() })
+        },
+    })
+}

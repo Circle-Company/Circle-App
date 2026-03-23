@@ -131,6 +131,15 @@ async function getNotifications({
     return response.data
 }
 
+async function readAllNotifications(): Promise<void> {
+    const response = await api.patch(`/account/notifications/read`, {
+        headers: {
+            Authorization: `Bearer ${storage.getString(storageKeys().account.jwt.token) || ""}`,
+        },
+    })
+    return response.data
+}
+
 export const routes = {
     getAccount,
     getAccountBlocks,
@@ -140,4 +149,5 @@ export const routes = {
     updateCoordinates,
     updatePushToken,
     getNotifications,
+    readAllNotifications,
 }
