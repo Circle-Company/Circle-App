@@ -1,5 +1,4 @@
 import { Animated } from "react-native"
-
 import LanguageContext from "../../contexts/language"
 import PersistedContext from "../../contexts/Persisted"
 import React from "react"
@@ -9,7 +8,6 @@ import { SettingsFooterComponent } from "./footer"
 import { router } from "expo-router"
 import config from "@/config"
 import * as Browser from "expo-web-browser"
-import { SwitchButton } from "@/components/general/switch-button"
 import { useDisableHapticsMutation, useEnableEnableMutation } from "@/queries/preferences.haptic"
 import { View } from "react-native"
 import sizes from "@/constants/sizes"
@@ -17,6 +15,19 @@ import { textLib } from "@/circle.text.library"
 import { NotificationPermissionNotProvidedCard } from "@/components/notification/notification.not.provided.card"
 import { PermissionStatus } from "expo-notifications"
 import { usePushNotifications } from "@/contexts/push.notification"
+import { colors } from "@/constants/colors"
+
+import UserIcon from "@/assets/icons/svgs/user_circle-outline.svg"
+import LockIcon from "@/assets/icons/svgs/lock-outline.svg"
+import DownloadIcon from "@/assets/icons/svgs/arrow.down.to.line.compact.svg"
+import TextIcon from "@/assets/icons/svgs/textformat.svg"
+import LockShieldIcon from "@/assets/icons/svgs/lock.shield.svg"
+import MinusIcon from "@/assets/icons/svgs/minus.circle.svg"
+import GlobeIcon from "@/assets/icons/svgs/globe.svg"
+import ExitIcon from "@/assets/icons/svgs/rectangle.portrait.and.arrow.right.svg"
+import MagazineIcon from "@/assets/icons/svgs/magazine.svg"
+import DocIcon from "@/assets/icons/svgs/doc.svg"
+import HelpIcon from "@/assets/icons/svgs/exclamationmark.bubble.svg"
 
 export default function ListSettings() {
     const { session } = React.useContext(PersistedContext)
@@ -46,13 +57,14 @@ export default function ListSettings() {
             name: t("Public Profile"),
             content: [
                 {
-                    name: t("Profile Picture"),
-                    type: "IMAGE",
+                    name: t("Change profile picture"),
+                    icon: <UserIcon fill={colors.gray.grey_03} width={24} height={24} />,
                     onPress: () => router.push("/(tabs)/settings/profile-picture"),
                 },
                 {
-                    name: t("Name"),
+                    name: t("Change name"),
                     value: name_text,
+                    icon: <TextIcon fill={colors.gray.grey_03} width={23} height={23} />,
                     onPress: () => router.push("/(tabs)/settings/name"),
                 },
             ],
@@ -61,16 +73,14 @@ export default function ListSettings() {
             name: t("Account"),
             content: [
                 {
-                    name: t("Language"),
+                    name: t("App language"),
+                    icon: <GlobeIcon fill={colors.gray.grey_03} width={22} height={22} />,
                     onPress: () => router.push("/(tabs)/settings/language"),
                 },
                 {
-                    name: t("Blocked Users"),
+                    name: t("Blocked users"),
+                    icon: <LockIcon fill={colors.gray.grey_03} width={24} height={24} />,
                     onPress: () => router.push("/(tabs)/settings/blocked-users"),
-                },
-                {
-                    name: t("Personal Data"),
-                    onPress: () => router.push("/(tabs)/settings/personal-data"),
                 },
             ],
         },
@@ -78,19 +88,22 @@ export default function ListSettings() {
             name: t("Legal"),
             content: [
                 {
-                    name: t("Privacy Policy"),
+                    name: t("Privacy policy"),
+                    icon: <LockShieldIcon fill={colors.gray.grey_03} width={24} height={24} />,
                     onPress: () => {
                         Browser.openBrowserAsync(config.PRIVACY_POLICY_URL)
                     },
                 },
                 {
-                    name: t("Terms of Service"),
+                    name: t("Terms of service"),
+                    icon: <MagazineIcon fill={colors.gray.grey_03} width={24} height={24} />,
                     onPress: () => {
                         Browser.openBrowserAsync(config.TERMS_OF_SERVICE_URL)
                     },
                 },
                 {
-                    name: t("Community Guidelines"),
+                    name: t("Community guidelines"),
+                    icon: <DocIcon fill={colors.gray.grey_03} width={22} height={22} />,
                     onPress: () => {
                         Browser.openBrowserAsync(config.COMMUNITY_GUIDELINES_URL)
                     },
@@ -101,26 +114,41 @@ export default function ListSettings() {
             name: t("More"),
             content: [
                 {
-                    name: t("Support"),
-                    value: config.CIRCLE_APP_URL.replace("https://www.", "") + "/contact-us",
-                    onPress: () => {
-                        Browser.openBrowserAsync(config.CONTACT_US_URL)
-                    },
-                },
-                {
                     name: t("Help"),
                     value: config.CIRCLE_APP_URL.replace("https://www.", "") + "/help",
+                    icon: (
+                        <HelpIcon
+                            fill={colors.gray.grey_03}
+                            width={24}
+                            height={24}
+                            style={{ top: 1.5 }}
+                        />
+                    ),
                     onPress: () => {
                         Browser.openBrowserAsync(config.HELP_URL)
                     },
                 },
                 {
-                    name: t("Log Out"),
+                    name: t("Log out"),
                     value: t("Signed with") + " @" + session.user.username,
+                    icon: (
+                        <ExitIcon
+                            fill={colors.gray.grey_03}
+                            width={23}
+                            height={23}
+                            style={{ left: 1 }}
+                        />
+                    ),
                     onPress: () => router.push("/(tabs)/settings/log-out"),
                 },
                 {
-                    name: t("Delete Account"),
+                    name: t("Download your data"),
+                    icon: <DownloadIcon fill={colors.gray.grey_03} width={21} height={21} />,
+                    onPress: () => router.push("/(tabs)/settings/personal-data"),
+                },
+                {
+                    name: t("Delete my account"),
+                    icon: <MinusIcon fill={colors.gray.grey_03} width={22} height={22} />,
                     onPress: () => router.push("/(tabs)/settings/exclude-account"),
                 },
             ],
