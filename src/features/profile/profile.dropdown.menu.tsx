@@ -56,17 +56,19 @@ export function ProfileOptionsDropDownMenuIOS({
             <ContextMenu activationMethod="singlePress">
                 <ContextMenu.Items>
                     {!profile.interactions?.isBlocking && (
-                        <Button systemImage={"lock"} role="default" onPress={handleBlock}>
-                            {t("Block @{{username}}", { username: profile.username })}
-                        </Button>
+                        <Button
+                            systemImage={"lock"}
+                            role="default"
+                            label={t("Block @{{username}}", { username: profile.username })}
+                            onPress={handleBlock}
+                        />
                     )}
                     <Button
                         systemImage="exclamationmark.shield"
                         role="destructive"
+                        label={t("Report Account")}
                         onPress={handleReport}
-                    >
-                        {t("Report Account")}
-                    </Button>
+                    />
                 </ContextMenu.Items>
                 <ContextMenu.Trigger>{children}</ContextMenu.Trigger>
             </ContextMenu>

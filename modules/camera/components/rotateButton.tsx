@@ -1,10 +1,11 @@
 import React, { useCallback } from "react"
 import { StyleSheet } from "react-native"
 import { PressableOpacity } from "react-native-pressable-opacity"
-import { Button, Host } from "@expo/ui/swift-ui"
+import { Button, Host, Image } from "@expo/ui/swift-ui"
+import { frame, glassEffect } from "@expo/ui/swift-ui/modifiers"
+import { SymbolView } from "expo-symbols"
 import Reanimated, { useAnimatedStyle, useSharedValue } from "react-native-reanimated"
 import { useCameraContext } from "../context"
-import RotateIcon from "@/assets/icons/svgs/arrow.triangle.2.circlepath.svg"
 import { colors } from "@/constants/colors"
 import { iOSMajorVersion } from "@/lib/platform/detection"
 
@@ -29,21 +30,22 @@ export function RotateButton() {
                 <Button
                     key={cameraPosition}
                     onPress={onFlipCameraPressed}
-                    variant="glass"
                     modifiers={[
-                        {
-                            $type: "frame",
+                        frame({
                             width: styles.sideButton.width,
                             height: styles.sideButton.height,
-                        },
-                        {
-                            $type: "background",
-                            material: "systemThinMaterialDark",
+                        }),
+                        glassEffect({
+                            glass: { variant: "regular", interactive: true },
                             shape: "circle",
-                        },
+                        }),
                     ]}
                 >
-                    <RotateIcon fill={colors.gray.white} width={10} height={10} />
+                    <Image
+                        systemName="arrow.triangle.2.circlepath"
+                        color={colors.gray.white}
+                        size={24}
+                    />
                 </Button>
             </Host>
         )
@@ -57,7 +59,11 @@ export function RotateButton() {
             disabledOpacity={0.4}
         >
             <Reanimated.View style={rotateIconStyle}>
-                <RotateIcon fill={colors.gray.white} width={22} height={22} />
+                <SymbolView
+                    name="arrow.triangle.2.circlepath"
+                    tintColor={colors.gray.white}
+                    size={22}
+                />
             </Reanimated.View>
         </PressableOpacity>
     )

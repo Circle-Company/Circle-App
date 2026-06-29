@@ -20,6 +20,7 @@ export function DropDownMenuIOS({
                     <Button
                         systemImage="trash"
                         role="destructive"
+                        label={t("Delete")}
                         onPress={() =>
                             Alert.alert(t("Delete Moment"), t("You will permanently remove it."), [
                                 { text: t("Cancel"), style: "cancel" },
@@ -30,9 +31,8 @@ export function DropDownMenuIOS({
                                 },
                             ])
                         }
-                    >
-                        {t("Delete")}
-                    </Button>
+                    />
+
                 </ContextMenu.Items>
 
                 <ContextMenu.Trigger>{children}</ContextMenu.Trigger>

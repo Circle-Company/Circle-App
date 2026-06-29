@@ -96,8 +96,11 @@ export default function MediaRenderVideo({
         : (video?.isMuted ?? (session?.preferences?.content?.muteAudio || false))
     const latestIsMutedRef = useRef(isMuted)
 
-    // Configurar player do expo-video
-    const player = useVideoPlayer("", () => {
+    // Configurar player do expo-video.
+    // Passar `null` evita que o expo-video interprete string vazia como URL relativa
+    // (que vira `file:///` e dispara AVFoundationErrorDomain Code=-11828).
+    // A URI real é atribuída via replaceAsync no useEffect abaixo, após validação.
+    const player = useVideoPlayer(null, () => {
         // Defer configuration until the player is attached (readyToPlay)
     })
 
@@ -534,8 +537,11 @@ export default function MediaRenderVideo({
             width: "100%",
         },
         video: {
-            height: "100%",
-            width: "100%",
+            // Explicit pixel sizing instead of "100%" — expo-video's VideoView in iOS 27 +
+            // Fabric occasionally fails to compute % sizing inside absoluteFillObject, leaving
+            // the AVPlayerLayer at zero frame so frames flow but nothing is painted.
+            height: videoHeight,
+            width: videoWidth,
         },
     })
 

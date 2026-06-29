@@ -1,7 +1,7 @@
 import React from "react"
 import { ViewStyle, TextStyle } from "react-native"
 import { Text, View } from "@/components/Themed"
-import { useNavigation } from "@react-navigation/native"
+import { useNavigation } from "expo-router"
 import ButtonStandart from "@/components/buttons/button-standart"
 import ColorTheme, { colors } from "@/constants/colors"
 import PersistedContext from "@/contexts/Persisted"

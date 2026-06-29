@@ -1,7 +1,7 @@
 import { Stack, useRouter } from "expo-router"
 import React from "react"
 
-import ColorTheme, { colors } from "@/constants/colors"
+import { colors } from "@/constants/colors"
 import Fonts from "@/constants/fonts"
 import LanguageContext from "@/contexts/language"
 
@@ -18,17 +18,30 @@ export default function InboxLayout() {
                 animation: "slide_from_right",
                 gestureEnabled: true,
                 headerBackTitle: t("Back"),
-                headerTintColor: "white",
-                headerLargeTitle: false,
                 headerTransparent: true,
-                headerTitleStyle: { fontFamily: Fonts.family["Black-Italic"] },
-                headerLargeTitleStyle: { fontFamily: Fonts.family["Black-Italic"] },
                 headerStyle: {
-                    backgroundColor: "transparent",
+                    backgroundColor: colors.gray.black,
                 },
+                headerTintColor: colors.gray.white,
             }}
         >
-            <Stack.Screen name="index" options={{ headerTitle: t("Inbox") }} />
+            <Stack.Screen
+                name="index"
+                options={{
+                    headerStyle: {
+                        backgroundColor: "transparent",
+                    },
+                    headerTitleAlign: "center",
+                    headerLargeTitle: false,
+                    headerTransparent: true,
+                    headerTitleStyle: {
+                        fontFamily: Fonts.family["Black-Italic"],
+                        fontSize: Fonts.size.title2 * 0.9,
+                        color: colors.gray.white,
+                    },
+                    headerTitle: t("Inbox"),
+                }}
+            />
         </Stack>
     )
 }

@@ -1,5 +1,5 @@
 import UploadIcon from "@/assets/icons/svgs/arrow_up.svg"
-import { useIsFocused } from "@react-navigation/core"
+import { useIsFocused } from "expo-router"
 import { useRouter, useLocalSearchParams } from "expo-router"
 import React, { useState } from "react"
 import { StyleSheet, View, Text, Keyboard, Animated, Easing, Alert } from "react-native"
@@ -78,8 +78,10 @@ export function MediaPage(): React.ReactElement {
     // Use videoUri from params, fallback to context
     const displayUri = videoUri || video?.path
 
-    // Setup expo-video player
-    const player = useVideoPlayer(displayUri || "", (player) => {
+    // Setup expo-video player.
+    // Passar `null` (não string vazia) evita expo-video interpretar como URL relativa
+    // (que vira `file:///` e dispara AVFoundationErrorDomain Code=-11828).
+    const player = useVideoPlayer(displayUri || null, (player) => {
         player.loop = true
         player.play()
     })

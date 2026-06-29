@@ -1,7 +1,7 @@
 import React from "react"
 import { StyleSheet, View } from "react-native"
 import { useRouter } from "expo-router"
-import { useFocusEffect } from "@react-navigation/native"
+import { useFocusEffect } from "expo-router"
 import { LinearGradient } from "expo-linear-gradient"
 import { Text } from "@/components/Themed"
 import { colors } from "@/constants/colors"

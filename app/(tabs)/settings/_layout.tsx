@@ -5,7 +5,6 @@ import ColorTheme, { colors } from "@/constants/colors"
 import Fonts from "@/constants/fonts"
 import LanguageContext from "@/contexts/language"
 
-import { HeaderBackButton } from "@react-navigation/elements"
 import fonts from "@/constants/fonts"
 import navigation from "@/lib/navigation"
 import { View } from "react-native"
@@ -40,8 +39,15 @@ export default function SettingsLayout() {
                     headerStyle: {
                         backgroundColor: "transparent",
                     },
-                    headerTitle: t("Settings"),
+                    headerTitleAlign: "center",
+                    headerLargeTitle: false,
                     headerTransparent: true,
+                    headerTitleStyle: {
+                        fontFamily: Fonts.family["Black-Italic"],
+                        fontSize: Fonts.size.title2 * 0.9,
+                        color: colors.gray.white,
+                    },
+                    headerTitle: t("Settings"),
                 }}
             />
             <Stack.Screen

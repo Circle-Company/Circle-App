@@ -1,7 +1,7 @@
 import React, { useEffect, useCallback } from "react"
 import { useLocalSearchParams } from "expo-router"
 import { SafeAreaView } from "react-native-safe-area-context"
-import { useNavigation, useFocusEffect } from "@react-navigation/native"
+import { useNavigation, useFocusEffect } from "expo-router"
 import { View, Keyboard, Platform, Animated as RNAnimated, Pressable } from "react-native"
 import Animated, { useAnimatedStyle, useSharedValue, withTiming } from "react-native-reanimated"
 import { LinearGradient } from "expo-linear-gradient"

@@ -1,4 +1,4 @@
-import { useNavigation } from "@react-navigation/native"
+import { useNavigation } from "expo-router"
 import React from "react"
 import { TextStyle, ViewStyle } from "react-native"
 import { Text, View } from "@/components/Themed"

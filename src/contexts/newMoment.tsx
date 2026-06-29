@@ -1,5 +1,5 @@
 import UploadIcon from "@/assets/icons/svgs/arrow_up.svg"
-import { useNavigation } from "@react-navigation/native"
+import { useNavigation } from "expo-router"
 import React from "react"
 import { useToast } from "./Toast"
 import { colors } from "../constants/colors"

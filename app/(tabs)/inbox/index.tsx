@@ -201,7 +201,7 @@ export default function InboxScreen() {
                 <Animated.View style={{ opacity: skeletonOpacity }}>
                     <View
                         style={{
-                            paddingTop: sizes.headers.height * 1.45,
+                            paddingTop: sizes.headers.height * 1.85,
                             paddingHorizontal: sizes.margins["1md"],
                             gap: sizes.paddings["1sm"],
                         }}
@@ -238,7 +238,7 @@ export default function InboxScreen() {
                     </View>
                 )}
                 ItemSeparatorComponent={() => <View style={{ height: sizes.margins["2sm"] }} />}
-                ListHeaderComponent={<View style={{ height: sizes.headers.height * 1.3 }} />}
+                ListHeaderComponent={<View style={{ height: sizes.headers.height * 1.7 }} />}
                 ListEmptyComponent={
                     <Animated.View
                         style={{ opacity: emptyOpacity, marginTop: sizes.headers.height * 0.2 }}
@@ -294,7 +294,7 @@ export default function InboxScreen() {
                         }}
                         tintColor={colors.gray.grey_04}
                         colors={[colors.gray.grey_04]}
-                        progressViewOffset={sizes.headers.height * 1.45}
+                        progressViewOffset={sizes.headers.height * 1.85}
                     />
                 }
                 contentContainerStyle={{

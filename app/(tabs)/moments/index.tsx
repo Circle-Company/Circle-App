@@ -1,7 +1,7 @@
 import React from "react"
 import ListMoments from "@/features/moments"
 import { useRouter } from "expo-router"
-import { useFocusEffect } from "@react-navigation/native"
+import { useFocusEffect } from "expo-router"
 import useAppPermissions from "@/lib/hooks/useAppPermissions"
 import { usePreferencesStore } from "@/contexts/Persisted/persist.preferences"
 import TutorialDialog from "@/features/moments/feed/render-tutorial-dialog"

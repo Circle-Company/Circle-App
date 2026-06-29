@@ -44,7 +44,7 @@ module.exports = function (_config) {
                 },
             },
             web: { favicon: "./assets/favicon.png" },
-            jsEngine: "jsc",
+            jsEngine: "hermes",
             plugins: [
                 "expo-router",
                 "expo-video",
@@ -60,7 +60,7 @@ module.exports = function (_config) {
                 [
                     "expo-build-properties",
                     {
-                        ios: { deploymentTarget: "15.1", newArchEnabled: true },
+                        ios: { deploymentTarget: "16.4", newArchEnabled: true },
                         android: {
                             compileSdkVersion: 35,
                             targetSdkVersion: 35,

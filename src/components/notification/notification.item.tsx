@@ -93,7 +93,7 @@ export function NotificationItem({ item }: NotificationItemProps) {
                 <GlassView
                     style={glassContainer}
                     colorScheme="dark"
-                    glassEffectStyle="clear"
+                    glassEffectStyle="regular"
                     isInteractive={true}
                     tintColor={colors.gray.grey_09 + "90"}
                 >

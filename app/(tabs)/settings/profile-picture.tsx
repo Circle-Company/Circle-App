@@ -1,4 +1,4 @@
-import { useNavigation } from "@react-navigation/native"
+import { useNavigation } from "expo-router"
 import React from "react"
 import { Image, View, Platform, StyleSheet, Keyboard, ActionSheetIOS, Alert } from "react-native"
 import * as ImagePicker from "expo-image-picker"

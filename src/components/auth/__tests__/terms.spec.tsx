@@ -1,5 +1,5 @@
 import AuthTermsText from "@/components/auth/terms"
-import { useNavigation } from "@react-navigation/native"
+import { useNavigation } from "expo-router"
 import { act, fireEvent, render } from "@testing-library/react-native"
 import React from "react"
 

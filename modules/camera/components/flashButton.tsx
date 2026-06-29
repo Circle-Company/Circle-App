@@ -3,12 +3,11 @@ import { StyleSheet } from "react-native"
 import { PressableOpacity } from "react-native-pressable-opacity"
 
 import { useCameraContext } from "../context"
-import FlashOnIcon from "@/assets/icons/svgs/flashlight.on.fill.svg"
-import FlashOffIcon from "@/assets/icons/svgs/flashlight.off.fill.svg"
 import { colors } from "@/constants/colors"
 import { iOSMajorVersion } from "@/lib/platform/detection"
-import sizes from "@/constants/sizes"
-import { Button, Host } from "@expo/ui/swift-ui"
+import { Button, Host, Image } from "@expo/ui/swift-ui"
+import { frame, glassEffect } from "@expo/ui/swift-ui/modifiers"
+import { SymbolView } from "expo-symbols"
 import { View } from "react-native"
 
 export function FlashButton() {
@@ -32,26 +31,22 @@ export function FlashButton() {
                 <Button
                     key={torch == "on" ? "lightOn" : "lightOff"}
                     onPress={toggleTorch}
-                    variant="glass"
                     modifiers={[
-                        {
-                            $type: "frame",
+                        frame({
                             width: styles.sideButton.width,
                             height: styles.sideButton.height,
-                        },
-                        {
-                            $type: "background",
-                            material: "systemThinMaterialDark",
+                        }),
+                        glassEffect({
+                            glass: { variant: "regular", interactive: true },
                             shape: "circle",
-                        },
+                        }),
                     ]}
-                    controlSize="large"
                 >
-                    {torch === "on" ? (
-                        <FlashOnIcon fill={iconFill} width={10} height={10} />
-                    ) : (
-                        <FlashOffIcon fill={iconFill + 40} width={10} height={10} />
-                    )}
+                    <Image
+                        systemName={torch === "on" ? "flashlight.on.fill" : "flashlight.off.fill"}
+                        color={iconFill}
+                        size={24}
+                    />
                 </Button>
             </Host>
         )
@@ -67,11 +62,11 @@ export function FlashButton() {
                 disabled={disabled}
                 disabledOpacity={0.4}
             >
-                {torch === "on" ? (
-                    <FlashOnIcon fill={colors.gray.white + 80} width={22} height={22} />
-                ) : (
-                    <FlashOnIcon fill={colors.gray.white + 80} width={22} height={22} />
-                )}
+                <SymbolView
+                    name={torch === "on" ? "flashlight.on.fill" : "flashlight.off.fill"}
+                    tintColor={colors.gray.white + 80}
+                    size={22}
+                />
             </PressableOpacity>
         )
     }

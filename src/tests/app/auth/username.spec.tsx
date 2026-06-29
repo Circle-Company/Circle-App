@@ -1,6 +1,6 @@
 // Filename: UsernameScreen.spec.tsx
 
-import { useNavigation } from "@react-navigation/native"
+import { useNavigation } from "expo-router"
 import { act, fireEvent, render } from "@testing-library/react-native"
 import React from "react"
 import AuthContext, { AuthContextsData } from "../../../contexts/auth"

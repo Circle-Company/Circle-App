@@ -169,13 +169,13 @@ export default function ListSettings() {
                 )
                     return (
                         <View>
-                            <View style={{ height: sizes.headers.height * 1.5 }} />
+                            <View style={{ height: sizes.headers.height * 1.9 }} />
                             <View style={{ marginBottom: sizes.margins["1md"] }}>
                                 <NotificationPermissionNotProvidedCard />
                             </View>
                         </View>
                     )
-                else return <View style={{ height: sizes.headers.height * 1.45 }}></View>
+                else return <View style={{ height: sizes.headers.height * 1.85 }}></View>
             }}
             renderItem={({ item, index }) => {
                 return (
