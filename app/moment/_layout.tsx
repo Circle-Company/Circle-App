@@ -3,7 +3,7 @@ import React from "react"
 import ColorTheme, { colors } from "@/constants/colors"
 import Sizes from "@/constants/sizes"
 import LanguageContext from "@/contexts/language"
-import { HeaderBackButton } from "@react-navigation/elements"
+import { HeaderBackButton } from "@/components/general/header-buttons"
 import fonts from "@/constants/fonts"
 
 export default function MomentLayout() {

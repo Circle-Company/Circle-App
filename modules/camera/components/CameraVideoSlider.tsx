@@ -5,7 +5,7 @@ import sizes from "@/constants/sizes"
 
 import { useCameraContext } from "../context"
 import { iOSMajorVersion } from "@/lib/platform/detection"
-import { Host, LinearProgress, VStack } from "@expo/ui/swift-ui"
+import { Host, ProgressView } from "@expo/ui/swift-ui"
 
 interface CameraVideoSliderProps {
     maxTime?: number // segundos, default 30
@@ -117,10 +117,7 @@ export default function CameraVideoSlider({
     if (iOSMajorVersion! >= 26) {
         return (
             <Host style={{ width }}>
-                <LinearProgress
-                    progress={Math.min(1, Math.max(0, sliderTime / maxTime))}
-                    color={colors.gray.white}
-                />
+                <ProgressView value={Math.min(1, Math.max(0, sliderTime / maxTime))} />
             </Host>
         )
     } else {

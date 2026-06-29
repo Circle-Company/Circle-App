@@ -29,8 +29,7 @@ export function ProfileHeader({
         alignItems: "center",
     }
     const name_container: ViewStyle = {
-        paddingTop: sizes.paddings["2md"],
-        paddingBottom: user?.name ? sizes.paddings["1sm"] : 0,
+        paddingTop: sizes.paddings["1sm"],
     }
 
     if (!user) return null
@@ -39,12 +38,11 @@ export function ProfileHeader({
         <Profile.MainRoot data={user}>
             <View style={top_container}>
                 <Profile.Picture fromProfile={true} hasOutline={false} />
-                {user.interactions?.isBlocking === false ||
-                    (user.interactions?.isBlockedBy === false && (
-                        <View style={name_container}>
-                            <Profile.NameFollow scale={isIPad11 ? 0.7 : 0.75} />
+                {user.interactions?.isBlocking === false &&
+                    user.interactions?.isBlockedBy === false && (
+                        <Profile.NameFollow scale={isIPad11 ? 0.7 : 0.75} />
 
-                            {/**
+                        /**
                            isAccount === false && (
                            <View style={{ marginVertical: sizes.margins["1md"] }}>
                                <Profile.Follow
@@ -53,20 +51,19 @@ export function ProfileHeader({
                                />
                            </View>
                        )
-                       */}
-                        </View>
-                    ))}
+                       */
+                    )}
             </View>
             {user.interactions?.isBlocking && isAccount === false && <Profile.BlockingCard />}
             {user.interactions?.isBlockedBy && isAccount === false && <Profile.BlockedByCard />}
-            {user?.description && <Profile.Description />}
+            {/**user?.description && <Profile.Description />**/}
             {typeof totalMoments === "number" &&
                 lastUpdateDate &&
                 user.interactions.isBlockedBy === false &&
                 user.interactions.isBlocking === false && (
                     <View
                         style={{
-                            marginTop: user?.description ? sizes.margins["1lg"] : 0,
+                            marginTop: user?.name ? sizes.margins["1sm"] * 0.5 : 0,
                             marginBottom: sizes.margins["3sm"],
                         }}
                     >

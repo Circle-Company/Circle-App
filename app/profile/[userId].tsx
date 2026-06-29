@@ -225,14 +225,9 @@ export default function ProfileScreen() {
                 <RefreshControl
                     refreshing={refreshing}
                     onRefresh={handleRefresh}
-                    tintColor="#888"
-                    colors={["#888"]}
-                    progressBackgroundColor="#000"
-                    progressViewOffset={
-                        iOSMajorVersion! >= 26
-                            ? sizes.headers.height * 1.6
-                            : sizes.headers.height * 1.2
-                    }
+                    tintColor={colors.gray.grey_04}
+                    colors={[colors.gray.grey_04]}
+                    progressViewOffset={sizes.headers.height * 1.45}
                 />
             }
             ListHeaderComponent={

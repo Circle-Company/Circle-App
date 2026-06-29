@@ -12,8 +12,8 @@ import { isIPad11 } from "@/lib/platform/detection"
 
 export default function Name({
     color = String(ColorTheme().text),
-    fontSize = fonts.size.title3,
-    fontFamily = fonts.family.Bold,
+    fontSize = fonts.size.title1,
+    fontFamily = fonts.family.ExtraBold,
     margin = sizes.margins["1sm"],
     scale = 1,
 }: ProfileNameProps) {
@@ -55,13 +55,13 @@ export default function Name({
     return (
         <Animated.View style={container}>
             {user?.name && <Text style={text_style}>{user?.name}</Text>}
-            {followsNum > 0 && (
+            {/** followsNum > 0 && (
                 <Text style={text_style}>
                     {user?.name && <Text style={text_style}>, </Text>}
                     {textLib.conversor.formatNumWithDots(followsNum)}{" "}
                     {followsNum > 1 ? t("Followers") : t("Follower")}
                 </Text>
-            )}
+            )**/}
         </Animated.View>
     )
 }

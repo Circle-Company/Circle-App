@@ -1,4 +1,5 @@
 import React from "react"
+import { TextStyle, ViewStyle } from "react-native"
 
 export type userReciveDataProps = {
     id: string
@@ -26,6 +27,7 @@ export type UserUsernameProps = {
     margin?: number
     onClickAction?: () => void
     scale?: number
+    textStyle?: TextStyle
 }
 
 export type UserProfilePictureProps = {

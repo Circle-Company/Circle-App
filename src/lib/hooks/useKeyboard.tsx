@@ -2,6 +2,7 @@ import { useEffect } from "react"
 import { Keyboard, KeyboardEvent, Platform } from "react-native"
 import {
     interpolate as reanimatedInterpolate,
+    runOnUI,
     SharedValue,
     useSharedValue,
     withTiming,
@@ -37,21 +38,29 @@ export function useKeyboard(): UseKeyboardReturn {
         const showEvent = Platform.OS === "ios" ? "keyboardWillShow" : "keyboardDidShow"
         const hideEvent = Platform.OS === "ios" ? "keyboardWillHide" : "keyboardDidHide"
 
-        const showSub = Keyboard.addListener(showEvent, (e: KeyboardEvent) => {
-            const keyboardH = e.endCoordinates?.height ?? 0
+        const animateShow = (keyboardH: number) => {
+            "worklet"
             height.value = withTiming(keyboardH, { duration: 250 })
             progress.value = withTiming(1, { duration: 250 })
-
             visible.value = true
             keyboardIsVisible.value = true
+        }
+
+        const animateHide = () => {
+            "worklet"
+            height.value = withTiming(0, { duration: 250 })
+            progress.value = withTiming(0, { duration: 250 })
+            visible.value = false
+            keyboardIsVisible.value = false
+        }
+
+        const showSub = Keyboard.addListener(showEvent, (e: KeyboardEvent) => {
+            const keyboardH = e.endCoordinates?.height ?? 0
+            runOnUI(animateShow)(keyboardH)
         })
 
         const hideSub = Keyboard.addListener(hideEvent, () => {
-            height.value = withTiming(0, { duration: 250 })
-            progress.value = withTiming(0, { duration: 250 })
-
-            visible.value = false
-            keyboardIsVisible.value = false
+            runOnUI(animateHide)()
         })
 
         return () => {

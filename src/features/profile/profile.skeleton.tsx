@@ -2,6 +2,7 @@ import React from "react"
 import { View, ViewStyle } from "react-native"
 import { Skeleton } from "../../components/skeleton"
 import sizes from "../../constants/sizes"
+import { StretchInX } from "react-native-reanimated"
 
 export function RenderProfileSkeleton() {
     const container: ViewStyle = {
@@ -26,27 +27,6 @@ export function RenderProfileSkeleton() {
     return (
         <View style={container}>
             <Skeleton.View style={{ width: 130, height: 130, borderRadius: 130 / 2 }} />
-            <Skeleton.View
-                style={{
-                    alignSelf: "center",
-                    width: 80,
-                    height: 15,
-                    marginTop: 15,
-                    borderRadius: 3,
-                }}
-            />
-
-            <View style={statisticsContainer}>
-                <View style={statistic}>
-                    <Skeleton.View
-                        style={{
-                            width: 300,
-                            height: 45,
-                            borderRadius: 20,
-                        }}
-                    />
-                </View>
-            </View>
 
             <Skeleton.View
                 style={{
@@ -54,6 +34,7 @@ export function RenderProfileSkeleton() {
                     width: 180,
                     height: 15,
                     marginTop: sizes.margins["1md"] * 1.3,
+                    marginBottom: sizes.margins["1md"],
                     borderRadius: 3,
                 }}
             />

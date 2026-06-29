@@ -10,12 +10,15 @@ import * as ImagePicker from "expo-image-picker"
 // Location (expo-location)
 import * as Location from "expo-location"
 
+import * as Notifications from "expo-notifications"
+
 export type PermissionId =
     | "camera"
     | "microphone"
     | "mediaLibrary"
     | "locationForeground"
     | "locationBackground"
+    | "pushNotifications"
 
 export type PermissionStatus = "unknown" | "granted" | "denied" | "limited"
 
@@ -147,6 +150,14 @@ export function useAppPermissions(options: UseAppPermissionsOptions = {}): UseAp
                 status: "unknown",
                 openSettings,
             },
+            {
+                id: "pushNotifications",
+                title: "Allow Push Notifications",
+                description: "Receive notifications for new content and updates.",
+                required: required.has("pushNotifications"),
+                status: "unknown",
+                openSettings,
+            },
         ]
 
         // Placeholder request; replaced after in hook body
@@ -247,6 +258,15 @@ export function useAppPermissions(options: UseAppPermissionsOptions = {}): UseAp
                     return "unknown"
                 }
             },
+
+            pushNotifications: async () => {
+                try {
+                    const res = await Notifications.requestPermissionsAsync()
+                    return mapExpoPermissionStatus((res as any)?.status)
+                } catch {
+                    return "unknown"
+                }
+            },
         }
 
         // Attach into state items so UI consumers can call item.request()
@@ -319,6 +339,14 @@ export function useAppPermissions(options: UseAppPermissionsOptions = {}): UseAp
                 updateOne("locationBackground", { status: "unknown" })
             }
         } catch {}
+        // push notifications
+        try {
+            const pn = await Notifications.getPermissionsAsync()
+            updateOne("pushNotifications", {
+                status: mapExpoPermissionStatus((pn as any)?.status),
+                canAskAgain: Boolean((pn as any)?.canAskAgain),
+            })
+        } catch {}
     }, [updateOne])
 
     // Request a single permission by id
@@ -337,7 +365,14 @@ export function useAppPermissions(options: UseAppPermissionsOptions = {}): UseAp
 
     // Recommended request order
     const ORDER: PermissionId[] = React.useMemo(
-        () => ["camera", "microphone", "mediaLibrary", "locationForeground", "locationBackground"],
+        () => [
+            "camera",
+            "microphone",
+            "mediaLibrary",
+            "pushNotifications",
+            "locationForeground",
+            "locationBackground",
+        ],
         [],
     )
 

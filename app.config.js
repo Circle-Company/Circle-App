@@ -1,7 +1,7 @@
 const pkg = require("./package.json")
 
 module.exports = function (_config) {
-    const VERSION = pkg.version
+    const VERSION = "1.1.0"
     const PLATFORM = "ios"
 
     return {
@@ -44,10 +44,11 @@ module.exports = function (_config) {
                 },
             },
             web: { favicon: "./assets/favicon.png" },
-            jsEngine: "jsc",
+            jsEngine: "hermes",
             plugins: [
                 "expo-router",
                 "expo-video",
+                "expo-audio",
                 "expo-localization",
                 [
                     "expo-web-browser",
@@ -59,7 +60,7 @@ module.exports = function (_config) {
                 [
                     "expo-build-properties",
                     {
-                        ios: { deploymentTarget: "15.1", newArchEnabled: true },
+                        ios: { deploymentTarget: "16.4", newArchEnabled: true },
                         android: {
                             compileSdkVersion: 35,
                             targetSdkVersion: 35,

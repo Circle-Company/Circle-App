@@ -1,6 +1,5 @@
 import AuthContext, { AuthContextsData } from "@/contexts/auth"
 import { SessionDataType } from "@/contexts/Persisted/types"
-import { NavigationContainer } from "@react-navigation/native"
 import { act, fireEvent, render, waitFor } from "@testing-library/react-native"
 import React from "react"
 import SignInScreen from "./index"
@@ -51,11 +50,9 @@ const renderWithProvider = (contextOverrides = {}) => {
     const contextValue = mockAuthContext(contextOverrides)
 
     const utils = render(
-        <NavigationContainer>
-            <AuthContext.Provider value={contextValue}>
-                <SignInScreen />
-            </AuthContext.Provider>
-        </NavigationContainer>,
+        <AuthContext.Provider value={contextValue}>
+            <SignInScreen />
+        </AuthContext.Provider>,
     )
 
     return { ...utils, contextValue }

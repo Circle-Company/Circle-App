@@ -115,8 +115,8 @@ const ListMoments = () => {
                 style={{
                     paddingTop:
                         iOSMajorVersion! >= 26
-                            ? sizes.headers.height * 1.4
-                            : sizes.headers.height * 1.2,
+                            ? sizes.headers.height * 1.8
+                            : sizes.headers.height * 1.6,
                 }}
                 scrollEnabled={enableScrollFeed}
                 showsHorizontalScrollIndicator={false}
@@ -215,8 +215,8 @@ const ListMoments = () => {
                     alignItems: "center",
                     paddingTop:
                         iOSMajorVersion! >= 26
-                            ? sizes.headers.height * 1.4
-                            : sizes.headers.height * 1.2,
+                            ? sizes.headers.height * 1.8
+                            : sizes.headers.height * 1.6,
                 }}
             >
                 <EmptyList />

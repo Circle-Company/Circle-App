@@ -1,7 +1,7 @@
 import React, { useEffect, useRef } from "react"
 import { BackHandler } from "react-native"
 import { useLocalSearchParams, useRouter } from "expo-router"
-import { useNavigation } from "@react-navigation/native"
+import { useNavigation } from "expo-router"
 import { SafeAreaView } from "react-native-safe-area-context"
 import PersistedContext from "@/contexts/Persisted"
 import { Moment } from "@/components/moment"

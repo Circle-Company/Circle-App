@@ -2,7 +2,7 @@ import React, { createContext, useContext, useState, ReactNode, useCallback, use
 import { uploadMoment } from "./hooks/uploadMoment"
 import PersistedContext from "@/contexts/Persisted"
 import type { CameraDevice } from "react-native-vision-camera"
-import { useMicrophonePermission, useLocationPermission } from "react-native-vision-camera" // observe-only in context; do not auto-request here
+import { useMicrophonePermission } from "react-native-vision-camera" // observe-only in context; do not auto-request here
 import { usePreferredCameraDevice } from "./hooks/usePreferredCameraDevice"
 
 export type CameraVideoInfo = {
@@ -46,7 +46,6 @@ export type CameraContextType = {
 
     // Permissions
     microphonePermission: ReturnType<typeof useMicrophonePermission>
-    locationPermission: ReturnType<typeof useLocationPermission>
 
     // Preferred device
     preferredDevice: CameraDevice | undefined
@@ -106,7 +105,6 @@ export const CameraProvider = ({ children }: { children: ReactNode }) => {
 
     // Permissions
     const microphonePermission = useMicrophonePermission()
-    const locationPermission = useLocationPermission()
 
     // Preferred camera device
     const [preferredDevice, setPreferredDevice] = usePreferredCameraDevice()
@@ -232,7 +230,6 @@ export const CameraProvider = ({ children }: { children: ReactNode }) => {
 
             // permissions
             microphonePermission,
-            locationPermission,
 
             // preferred device
             preferredDevice,
@@ -280,7 +277,6 @@ export const CameraProvider = ({ children }: { children: ReactNode }) => {
             cameraPosition,
             torch,
             microphonePermission,
-            locationPermission,
             preferredDevice,
             video,
             recordingTime,

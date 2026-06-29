@@ -1,12 +1,11 @@
 import ColorTheme from "@/constants/colors"
 import React from "react"
 import type { ViewProps } from "react-native"
-import { StyleSheet, View, Platform } from "react-native"
+import { StyleSheet, View } from "react-native"
 import type { TapGestureHandlerStateChangeEvent } from "react-native-gesture-handler"
 import { Gesture, GestureDetector, State, TapGestureHandler } from "react-native-gesture-handler"
 import Reanimated, {
     cancelAnimation,
-    Easing,
     Extrapolate,
     interpolate,
     runOnJS,
@@ -17,23 +16,25 @@ import Reanimated, {
     withTiming,
 } from "react-native-reanimated"
 import type { SharedValue } from "react-native-reanimated"
-import type { Camera, PhotoFile, VideoFile } from "react-native-vision-camera"
+import type { CameraVideoOutput, Recorder } from "react-native-vision-camera"
 import { CAPTURE_BUTTON_SIZE, SCREEN_HEIGHT } from "../constants"
 
-const START_RECORDING_DELAY = 200
+// Video-only capture: press starts recording immediately (no delay/long-press).
+const START_RECORDING_DELAY = 0
 const START_DEBOUNCE_MS = 120
 const STOP_DEBOUNCE_MS = 120
-const STOP_CONFIRM_RETRY_MS = 250
-const MAX_STOP_RETRIES = 3
+// Minimum hold time before allowing stop. Prevents accidental sub-second clips
+// from the async createRecorder/startRecording chain finishing right as the user
+// releases — gives AVAssetWriter enough samples to finalize a valid file.
+const MIN_RECORDING_MS = 600
 const BORDER_WIDTH = CAPTURE_BUTTON_SIZE * 0.1
 
 interface Props extends ViewProps {
-    camera: React.RefObject<Camera>
-    onMediaCaptured: (media: PhotoFile | VideoFile, type: "photo" | "video") => void
+    videoOutput: CameraVideoOutput
+    onMediaCaptured: (filePath: string, duration: number) => void
     minZoom: number
     maxZoom: number
     cameraZoom: SharedValue<number>
-    flash: "off" | "on"
     enabled: boolean
     setIsPressingButton: (isPressingButton: boolean) => void
     onRecordingStart?: () => void
@@ -41,12 +42,11 @@ interface Props extends ViewProps {
 }
 
 const CaptureButtonComponent: React.FC<Props> = ({
-    camera,
+    videoOutput,
     onMediaCaptured,
     minZoom,
     maxZoom,
     cameraZoom,
-    flash,
     enabled,
     setIsPressingButton,
     style,
@@ -57,12 +57,15 @@ const CaptureButtonComponent: React.FC<Props> = ({
     const autoStopTimeoutRef = React.useRef<NodeJS.Timeout | null>(null)
     const holdTimerRef = React.useRef<NodeJS.Timeout | null>(null)
     const stopDebounceRef = React.useRef<NodeJS.Timeout | null>(null)
+    const recorderRef = React.useRef<Recorder | null>(null)
+    const recordingStartedAtRef = React.useRef<number>(0)
 
     const isRecording = React.useRef(false)
     const startInProgressRef = React.useRef(false)
     const stopInProgressRef = React.useRef(false)
+    // True if user released the button while startRecording was still in flight.
+    // When the recorder finally becomes active, we honor the release immediately.
     const releasePendingRef = React.useRef(false)
-    const stopRetryCountRef = React.useRef(0)
 
     const recordingProgress = useSharedValue(0)
     const isPressingButton = useSharedValue(false)
@@ -70,6 +73,11 @@ const CaptureButtonComponent: React.FC<Props> = ({
     React.useEffect(() => {
         return () => {
             mountedRef.current = false
+            // Cancel any in-flight recording when unmounted.
+            if (recorderRef.current) {
+                recorderRef.current.cancelRecording().catch(() => {})
+                recorderRef.current = null
+            }
         }
     }, [])
 
@@ -89,7 +97,7 @@ const CaptureButtonComponent: React.FC<Props> = ({
         startInProgressRef.current = false
         stopInProgressRef.current = false
         releasePendingRef.current = false
-        stopRetryCountRef.current = 0
+        recorderRef.current = null
 
         if (stopDebounceRef.current) {
             clearTimeout(stopDebounceRef.current)
@@ -104,103 +112,147 @@ const CaptureButtonComponent: React.FC<Props> = ({
 
     const stopRecording = React.useCallback(async () => {
         if (!mountedRef.current) return
-        if (!camera.current) return
         if (stopInProgressRef.current) return
-
-        if (startInProgressRef.current && !isRecording.current) {
-            releasePendingRef.current = true
-            return
-        }
-
-        if (!isRecording.current) {
+        if (!isRecording.current || !recorderRef.current) {
             safeSetPressing(false)
             return
         }
-
         if (stopDebounceRef.current) return
+
+        // Enforce minimum recording duration: if user released before MIN_RECORDING_MS,
+        // wait the remainder before actually stopping. This avoids sub-second files
+        // that AVAssetWriter can't finalize cleanly (0-frame clips, codec errors).
+        const elapsedMs = Date.now() - recordingStartedAtRef.current
+        const debounceMs = Math.max(STOP_DEBOUNCE_MS, MIN_RECORDING_MS - elapsedMs)
 
         stopDebounceRef.current = setTimeout(async () => {
             stopDebounceRef.current = null
             stopInProgressRef.current = true
 
+            if (autoStopTimeoutRef.current) {
+                clearTimeout(autoStopTimeoutRef.current)
+                autoStopTimeoutRef.current = null
+            }
+
+            safeSetPressing(false)
             try {
-                if (autoStopTimeoutRef.current) {
-                    clearTimeout(autoStopTimeoutRef.current)
-                    autoStopTimeoutRef.current = null
-                }
-
-                safeSetPressing(false)
-                await camera.current?.stopRecording()
-
-                await new Promise((r) => setTimeout(r, 30))
-
-                if (isRecording.current && stopRetryCountRef.current < MAX_STOP_RETRIES) {
-                    stopRetryCountRef.current += 1
-                    setTimeout(() => {
-                        camera.current
-                            ?.stopRecording()
-                            .catch(() => {})
-                            .finally(() => {
-                                if (stopRetryCountRef.current >= MAX_STOP_RETRIES) {
-                                    onStoppedRecording()
-                                }
-                            })
-                    }, STOP_CONFIRM_RETRY_MS)
-                }
-            } catch {
+                await recorderRef.current?.stopRecording()
+            } catch (e) {
+                // If stop fails, force-cleanup.
                 onStoppedRecording()
             } finally {
                 stopInProgressRef.current = false
             }
-        }, STOP_DEBOUNCE_MS)
-    }, [camera, onStoppedRecording, safeSetPressing])
+        }, debounceMs)
+    }, [onStoppedRecording, safeSetPressing])
 
-    const startRecording = React.useCallback(() => {
+    const startRecording = React.useCallback(async () => {
         if (!mountedRef.current) return
-        if (!camera.current) return
+        if (!videoOutput) return
         if (isRecording.current || startInProgressRef.current) return
 
         startInProgressRef.current = true
-        isRecording.current = true
-
-        props.onRecordingStart?.()
-        safeSetPressing(true)
-
-        if (autoStopTimeoutRef.current) {
-            clearTimeout(autoStopTimeoutRef.current)
-        }
-
-        autoStopTimeoutRef.current = setTimeout(() => {
-            if (isRecording.current) stopRecording()
-        }, 30000)
 
         try {
-            camera.current.startRecording({
-                fileType: Platform.OS === "ios" ? "mov" : "mp4",
-                flash,
-                onRecordingError: () => {
-                    onStoppedRecording()
-                },
-                onRecordingFinished: (video) => {
+            // Retry createRecorder until the output is attached to the session.
+            // vision-camera v5 fires `onStarted` once the session is running, but the
+            // VideoOutput's connection may still be in flight for ~hundreds of ms after.
+            // Tolerate up to ~5s of attach latency before giving up.
+            let recorder: Awaited<ReturnType<typeof videoOutput.createRecorder>> | null = null
+            const maxAttempts = 20
+            const attemptDelayMs = 250
+            let lastErr: unknown = null
+            for (let attempt = 0; attempt < maxAttempts; attempt++) {
+                if (!mountedRef.current) {
+                    startInProgressRef.current = false
+                    return
+                }
+                try {
+                    recorder = await videoOutput.createRecorder({})
+                    break
+                } catch (e) {
+                    lastErr = e
+                    const msg = e instanceof Error ? e.message : String(e)
+                    if (!msg.includes("VideoOutput is not yet connected")) {
+                        throw e
+                    }
+                    await new Promise((r) => setTimeout(r, attemptDelayMs))
+                }
+            }
+            if (recorder == null) {
+                throw lastErr ?? new Error("createRecorder failed after retries")
+            }
+            if (!mountedRef.current) {
+                recorder.cancelRecording().catch(() => {})
+                startInProgressRef.current = false
+                return
+            }
+            recorderRef.current = recorder
+            isRecording.current = true
+            recordingStartedAtRef.current = Date.now()
+
+            props.onRecordingStart?.()
+            safeSetPressing(true)
+
+            if (autoStopTimeoutRef.current) clearTimeout(autoStopTimeoutRef.current)
+            autoStopTimeoutRef.current = setTimeout(() => {
+                if (isRecording.current) stopRecording()
+            }, 30000)
+
+            // If user already released while createRecorder was in flight, honor
+            // the release now. stopRecording itself enforces MIN_RECORDING_MS so
+            // the resulting clip won't be zero-length.
+            if (releasePendingRef.current) {
+                releasePendingRef.current = false
+                stopRecording()
+            }
+
+            await recorder.startRecording(
+                (filePath /*, reason */) => {
                     if (!mountedRef.current) return
-                    onMediaCaptured(video, "video")
+                    const durationSec = Math.max(
+                        0,
+                        (Date.now() - recordingStartedAtRef.current) / 1000,
+                    )
+                    onMediaCaptured(filePath, durationSec)
                     onStoppedRecording()
                 },
-            })
-        } catch {
+                (error) => {
+                    // vision-camera v5 routes successful stops (-11818 with
+                    // AVErrorRecordingSuccessfullyFinishedKey=true) through the error
+                    // callback instead of the finished one. Treat that as success:
+                    // pull the filePath from the recorder and deliver it normally.
+                    const msg = (error as Error)?.message ?? String(error)
+                    const isSuccessfulFinish =
+                        msg.includes("AVErrorRecordingSuccessfullyFinishedKey=true") ||
+                        msg.includes("Code=-11818")
+                    if (isSuccessfulFinish) {
+                        const path = (recorderRef.current as any)?.filePath as
+                            | string
+                            | undefined
+                        if (path && mountedRef.current) {
+                            const durationSec = Math.max(
+                                0,
+                                (Date.now() - recordingStartedAtRef.current) / 1000,
+                            )
+                            onMediaCaptured(path, durationSec)
+                        }
+                    } else {
+                        console.error("Recording error:", error)
+                    }
+                    onStoppedRecording()
+                },
+            )
+        } catch (e) {
+            console.error("Failed to start recording:", e)
             onStoppedRecording()
         } finally {
             setTimeout(() => {
                 startInProgressRef.current = false
-                if (releasePendingRef.current) {
-                    releasePendingRef.current = false
-                    stopRecording()
-                }
             }, START_DEBOUNCE_MS)
         }
     }, [
-        camera,
-        flash,
+        videoOutput,
         onMediaCaptured,
         onStoppedRecording,
         props.onRecordingStart,
@@ -216,7 +268,9 @@ const CaptureButtonComponent: React.FC<Props> = ({
                 case State.BEGAN:
                     safeSetPressing(true)
                     if (holdTimerRef.current) clearTimeout(holdTimerRef.current)
-                    holdTimerRef.current = setTimeout(startRecording, START_RECORDING_DELAY)
+                    holdTimerRef.current = setTimeout(() => {
+                        startRecording().catch(() => {})
+                    }, START_RECORDING_DELAY)
                     break
 
                 case State.CANCELLED:
@@ -228,6 +282,11 @@ const CaptureButtonComponent: React.FC<Props> = ({
                     }
                     if (isRecording.current) {
                         await stopRecording()
+                    } else if (startInProgressRef.current) {
+                        // User released while createRecorder/startRecording is still in
+                        // flight. Mark the release as pending; startRecording will honor
+                        // it (with MIN_RECORDING_MS enforced) once the recorder activates.
+                        releasePendingRef.current = true
                     } else {
                         safeSetPressing(false)
                     }
@@ -252,7 +311,6 @@ const CaptureButtonComponent: React.FC<Props> = ({
         .onBegin((event) => {
             "worklet"
             panStartY.value = event.absoluteY
-
             const yForFullZoom = panStartY.value * 0.7
             panOffsetY.value = interpolate(
                 cameraZoom.value,
@@ -264,7 +322,6 @@ const CaptureButtonComponent: React.FC<Props> = ({
         .onUpdate((event) => {
             "worklet"
             const startY = panStartY.value || SCREEN_HEIGHT
-
             cameraZoom.value = interpolate(
                 event.absoluteY - panOffsetY.value,
                 [startY * 0.7, startY],
@@ -273,16 +330,11 @@ const CaptureButtonComponent: React.FC<Props> = ({
             )
         })
         .onFinalize(() => {
-            // ⏹️ STOP DE GRAVAÇÃO (JS THREAD)
             runOnJS(handleReleaseFromPan)()
         })
 
     const shadowStyle = useAnimatedStyle(() => ({
-        transform: [
-            {
-                scale: withSpring(isPressingButton.value ? 1 : 0),
-            },
-        ],
+        transform: [{ scale: withSpring(isPressingButton.value ? 1 : 0) }],
     }))
 
     const buttonStyle = useAnimatedStyle(() => ({
@@ -321,9 +373,7 @@ const CaptureButtonComponent: React.FC<Props> = ({
 export const CaptureButton = React.memo(CaptureButtonComponent)
 
 const styles = StyleSheet.create({
-    flex: {
-        flex: 1,
-    },
+    flex: { flex: 1 },
     shadow: {
         position: "absolute",
         margin: 25,

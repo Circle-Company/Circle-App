@@ -40,7 +40,7 @@ vi.mock("react-native-mmkv", () => ({
 }))
 
 // Mock para módulos de navegação
-vi.mock("@react-navigation/native", () => ({
+vi.mock("expo-router/react-navigation", () => ({
     useNavigation: vi.fn(),
     useFocusEffect: vi.fn(),
 }))

@@ -69,31 +69,31 @@ export default function SettingsItem({
         container: {
             width: sizes.screens.width - sizes.paddings["2sm"] * 2,
             marginHorizontal: sizes.paddings["2sm"],
-            height: isIOS ? sizes.sizes["3md"] * 1.1 : sizes.sizes["3md"],
+            height: isIOS ? sizes.sizes["3md"] * 1.5 : sizes.sizes["3md"],
             alignItems: "center" as const,
             justifyContent: "flex-start" as const,
             flexDirection: "row" as const,
-            borderRadius: sizes.borderRadius["1sm"] * (isIOS ? 1.8 : 1.4),
+            borderRadius: sizes.borderRadius["1sm"] * (isIOS ? 2.4 : 1.4),
             marginBottom: isIOS ? sizes.margins["2sm"] : sizes.margins["1sm"],
             backgroundColor: colors.gray.grey_09,
         } as ViewStyle,
         containerLeft: {
-            paddingLeft: sizes.paddings["1sm"],
+            paddingLeft: icon ? sizes.paddings["1md"] * 1.5 : sizes.paddings["1md"],
             alignItems: "flex-start" as const,
             flexDirection: "row" as const,
         } as ViewStyle,
         containerRight: {
             flexDirection: "row" as const,
-            paddingRight: sizes.paddings["1md"] * 0.7,
+            paddingRight: sizes.paddings["1md"] * 1.2,
             alignItems: "center" as const,
             justifyContent: "center" as const,
             flex: 1,
         } as ViewStyle,
         textStyle: {
             textAlign: "right" as const,
-            fontSize: fonts.size.body,
-            opacity: 0.8,
-            fontFamily: fonts.family.Semibold,
+            fontSize: fonts.size.title3 * 0.8,
+            opacity: 1,
+            fontFamily: fonts.family.Bold,
             marginLeft: sizes.margins["2sm"] * 0.8,
         } as TextStyle,
         valueContainer: {
@@ -107,7 +107,7 @@ export default function SettingsItem({
             color: ColorTheme().textDisabled,
         } as TextStyle,
         iconContainer: {
-            marginRight: sizes.margins["3sm"],
+            marginRight: sizes.margins["3sm"] * 0.8,
             width: 20,
             height: 20,
             justifyContent: "center" as const,
@@ -160,7 +160,7 @@ export default function SettingsItem({
                             <UserShow.ProfilePicture
                                 disableAction={true}
                                 displayOnMoment={false}
-                                pictureDimensions={{ width: 22, height: 22 }}
+                                pictureDimensions={{ width: 34, height: 34 }}
                             />
                         </UserShow.Root>
                     </View>

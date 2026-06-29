@@ -1,10 +1,10 @@
-import Expo
+internal import Expo
 import React
 import ReactAppDependencyProvider
 import AVFoundation
 
-@UIApplicationMain
-public class AppDelegate: ExpoAppDelegate {
+@main
+class AppDelegate: ExpoAppDelegate {
   var window: UIWindow?
 
   var reactNativeDelegate: ExpoReactNativeFactoryDelegate?
@@ -20,7 +20,6 @@ public class AppDelegate: ExpoAppDelegate {
 
     reactNativeDelegate = delegate
     reactNativeFactory = factory
-    bindReactNativeFactory(factory)
 
 #if os(iOS) || os(tvOS)
     window = UIWindow(frame: UIScreen.main.bounds)
@@ -30,13 +29,10 @@ public class AppDelegate: ExpoAppDelegate {
       launchOptions: launchOptions)
 #endif
 
-    // Initialize audio session for recording/playback so microphone audio is captured during video
-    do {
-      try AVAudioSession.sharedInstance().setCategory(.playAndRecord, mode: .videoRecording, options: [.defaultToSpeaker, .allowBluetooth])
-      try AVAudioSession.sharedInstance().setActive(true)
-    } catch {
-      NSLog("AVAudioSession setup failed: \(error)")
-    }
+    // Audio session is managed lazily by vision-camera and expo-audio/expo-video.
+    // Eagerly activating .playAndRecord here caused -16418 (kAudioCodecUnspecifiedError)
+    // when vision-camera tried to record without a microphone input (enableAudio: false).
+    // Let each consumer activate its own category when needed.
 
     return super.application(application, didFinishLaunchingWithOptions: launchOptions)
   }

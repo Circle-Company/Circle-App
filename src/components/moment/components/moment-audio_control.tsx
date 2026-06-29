@@ -9,7 +9,6 @@ import sizes from "../../../constants/sizes"
 import BlurredBackground from "../../general/blurred-background"
 import { iOSMajorVersion } from "@/lib/platform/detection"
 import { Button, Host, Text } from "@expo/ui/swift-ui"
-import { VectorIcon } from "expo-router/unstable-native-tabs"
 import MomentContext from "../context"
 
 export default function MomentAudioControl() {

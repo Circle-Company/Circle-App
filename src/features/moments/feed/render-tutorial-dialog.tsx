@@ -139,17 +139,17 @@ export function TutorialDialog() {
     if (shouldUseGlass) {
         return (
             <BlurView
-                intensity={50}
+                intensity={20}
                 style={{
                     position: "absolute",
                     top: 0,
                     left: 0,
                     right: 0,
                     bottom: 0,
-                    paddingBottom: sizes.screens.height * 0.08,
+                    paddingBottom: sizes.screens.height * 0.115,
                     alignContent: "center",
                     justifyContent: "center",
-                    backgroundColor: "rgba(0, 0, 0, 0.5)",
+                    backgroundColor: "rgba(0, 0, 0, 0.4)",
                 }}
             >
                 <GlassContainer spacing={10}>
@@ -158,7 +158,7 @@ export function TutorialDialog() {
                         colorScheme="dark"
                         glassEffectStyle="regular"
                         isInteractive={true}
-                        tintColor={colors.gray.grey_09 + "99"}
+                        tintColor={colors.gray.grey_09 + "50"}
                     >
                         {Content}
                     </GlassView>

@@ -239,7 +239,7 @@ async function handleAuthError(error: AxiosError) {
     const responseCode = (response.data as any)?.code
     const isRefreshRoute = (originalRequest.url || "").includes("/auth/refresh-token")
 
-    console.log("🔍 Erro 401 detectado")
+    console.log("🔍 Erro auth detectado")
     console.log("  Status:", response.status)
     console.log("  Code:", responseCode)
     console.log("  URL:", originalRequest.url)
@@ -252,6 +252,11 @@ async function handleAuthError(error: AxiosError) {
     console.log("  Response data:", safeData)
     console.log("  Is retry:", originalRequest._retry)
     console.log("  Is refresh route:", isRefreshRoute)
+
+    if (response.status !== 401) {
+        console.log("❌ Erro não-401, repassando erro")
+        throw error
+    }
 
     // Auth grace: delay handling 401/refresh just after auth completes
     const now = Date.now()

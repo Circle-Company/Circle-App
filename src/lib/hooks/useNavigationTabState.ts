@@ -1,4 +1,4 @@
-import { useNavigationState } from "@react-navigation/native"
+import { useNavigationState } from "expo-router/react-navigation"
 
 import { getTabState, TabState } from "../routes/helpers"
 

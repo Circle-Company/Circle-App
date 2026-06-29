@@ -27,17 +27,15 @@ export function ProfileDropDownMenuIOS({ children }: { children?: React.ReactNod
                     <Button
                         systemImage={options.isHidden ? "eye" : "eye.slash"}
                         role="default"
+                        label={t(options.isHidden ? "Show Moment" : "Hide Moment")}
                         onPress={handlePressHide}
-                    >
-                        {t(options.isHidden ? "Show Moment" : "Hide Moment")}
-                    </Button>
+                    />
                     <Button
                         systemImage="exclamationmark.shield"
                         role="destructive"
+                        label={t("Report")}
                         onPress={handlePressReport}
-                    >
-                        {t("Report")}
-                    </Button>
+                    />
                 </ContextMenu.Items>
 
                 <ContextMenu.Trigger>{children}</ContextMenu.Trigger>
