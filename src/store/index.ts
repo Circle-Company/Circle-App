@@ -100,6 +100,9 @@ export function storageKeys() {
             },
             dismissed: baseKey + "tutorial:dismissed",
         },
+        camera: {
+            position: baseKey + "camera:position",
+        },
     }
 }
 

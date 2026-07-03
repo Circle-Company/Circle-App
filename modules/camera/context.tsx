@@ -5,6 +5,13 @@ import type { CameraDevice } from "react-native-vision-camera"
 import { useMicrophonePermission } from "react-native-vision-camera" // observe-only in context; do not auto-request here
 import { usePreferredCameraDevice } from "./hooks/usePreferredCameraDevice"
 
+type CameraPosition = "front" | "back"
+
+// Camera always boots on the back lens. Any prior selection is ignored:
+// front-cam sessions are treated as a temporary state that only lives while
+// the camera screen is open — cold start OR successful publish resets to
+// back. Persistence was removed here.
+
 export type CameraVideoInfo = {
     path: string
     duration?: number
@@ -99,7 +106,7 @@ export const CameraProvider = ({ children }: { children: ReactNode }) => {
     const [isPressingButton, setIsPressingButton] = useState(false)
     const [rotateAnimation, setRotateAnimation] = useState(0)
     const [isCameraInitialized, setIsCameraInitialized] = useState(false)
-    const [cameraPosition, setCameraPosition] = useState<"front" | "back">("back")
+    const [cameraPosition, setCameraPosition] = useState<CameraPosition>("back")
     const [torch, setTorch] = useState<"off" | "on">("off")
     const [isActive, setIsActive] = useState(true)
 
@@ -128,11 +135,6 @@ export const CameraProvider = ({ children }: { children: ReactNode }) => {
         // authToken intentionally preserved across resets
     }, [])
 
-    const normalizeToken = (token: string) => {
-        const t = token.trim()
-        return t.toLowerCase().startsWith("bearer ") ? t : `Bearer ${t}`
-    }
-
     const upload: CameraContextType["upload"] = useCallback(async () => {
         setIsUploading(true)
         setUploadError(null)
@@ -157,21 +159,17 @@ export const CameraProvider = ({ children }: { children: ReactNode }) => {
                 return { ok: false, error: msg }
             }
 
-            // Delegate upload to hook (conversion to base64 happens there)
             console.log("📤 Enviando para uploadMoment...")
-
-            // Extract filename from path
-            const filename = video.path.split("/").pop() || "video.mp4"
 
             const data = await uploadMoment({
                 description: description !== undefined ? description : null,
+                userId: session.user.id,
                 videoMetadata: {
-                    filename: filename,
                     mimeType: video?.mimeType || "video/mp4",
-                    size: typeof video?.size === "number" ? video.size : 0,
+                    duration: typeof video?.duration === "number" ? video.duration : undefined,
                 },
                 videoPath: video.path,
-                jwtToken: normalizeToken(session.account.jwtToken),
+                jwtToken: session.account.jwtToken,
             })
 
             console.log("✅ Upload concluído com sucesso!")
@@ -198,7 +196,7 @@ export const CameraProvider = ({ children }: { children: ReactNode }) => {
         } finally {
             setIsUploading(false)
         }
-    }, [video, description, session.account.jwtToken])
+    }, [video, description, session.account.jwtToken, session.user.id])
 
     const value = useMemo<CameraContextType>(
         () => ({

@@ -1,69 +1,68 @@
 import api from "@/api"
-import DeviceInfo from "react-native-device-info"
-import { Dimensions, PixelRatio } from "react-native"
 import * as FileSystem from "expo-file-system/legacy"
+import { Video } from "react-native-compressor"
 
 export interface uploadMomentInterface {
     description: string | null
+    userId: number | string
     videoMetadata: {
-        filename: string
         mimeType: string
-        size: number
+        duration?: number
     }
     videoPath: string
     jwtToken: string
 }
 
-export async function uploadMoment(props: uploadMomentInterface) {
-    const { width: dpW, height: dpH } = Dimensions.get("screen")
-    const scale = PixelRatio.get()
-    const screenResolution = `${Math.round(dpW * scale)}x${Math.round(dpH * scale)}`
+// Same endpoint + body shape as `src/contexts/newMoment.tsx#uploadMoment` —
+// the canonical working uploader in this project. `/moment/create` accepts
+// larger payloads than `/moments`. The 480p+800Kbps compression stays as a
+// belt-and-suspenders measure so requests are small regardless.
+const COMPRESSION_MAX_SIZE = 480
+const COMPRESSION_BITRATE_BPS = 800_000
 
-    // Garantir URI com prefixo file://
+export async function uploadMoment(props: uploadMomentInterface) {
     const fileUri = props.videoPath.startsWith("file://")
         ? props.videoPath
         : `file://${props.videoPath}`
 
-    console.log("🔄 Convertendo vídeo para base64 em uploadMoment...")
-    console.log("Path do vídeo:", fileUri)
+    const compressedUri = await Video.compress(fileUri, {
+        compressionMethod: "manual",
+        maxSize: COMPRESSION_MAX_SIZE,
+        bitrate: COMPRESSION_BITRATE_BPS,
+        minimumFileSizeForCompress: 0,
+    })
 
-    // Converter vídeo para base64 usando expo-file-system
-    const base64Video = await FileSystem.readAsStringAsync(fileUri, {
+    const compressedInfo = await FileSystem.getInfoAsync(compressedUri)
+    const compressedSize = (compressedInfo as { size?: number }).size ?? 0
+
+    const base64Video = await FileSystem.readAsStringAsync(compressedUri, {
         encoding: FileSystem.EncodingType.Base64,
     })
 
-    console.log("✅ Vídeo convertido para base64! Tamanho:", base64Video.length)
-
-    // Montar data URI com base64
-    const videoData = `data:${props.videoMetadata.mimeType};base64,${base64Video}`
+    console.log(
+        `[uploadMoment] compressed ${(compressedSize / 1024).toFixed(1)} KB → base64 ${(base64Video.length / 1024).toFixed(1)} KB`,
+    )
 
     try {
-        const authHeader = props.jwtToken?.startsWith("Bearer ")
-            ? props.jwtToken
-            : `Bearer ${props.jwtToken}`
-
-        const body = {
-            description: props.description ? props.description : null,
-            visibility: "public",
-            ageRestriction: false,
-            contentWarning: false,
-            videoMetadata: props.videoMetadata,
-            device: {
-                type: "mobile",
-                os: DeviceInfo.getSystemName(),
-                osVersion: DeviceInfo.getSystemVersion(),
-                model: DeviceInfo.getModel(),
-                screenResolution: screenResolution,
-                appVersion: DeviceInfo.getVersion(),
-                orientation: "portrait",
+        const response = await api.post(
+            "/moment/create",
+            {
+                user_id: props.userId,
+                moment: {
+                    description: props.description || null,
+                    midia: {
+                        content_type: "VIDEO",
+                        base64: base64Video,
+                    },
+                    metadata: {
+                        duration: props.videoMetadata.duration,
+                        file_size: compressedSize,
+                        file_type: props.videoMetadata.mimeType,
+                    },
+                },
             },
-            videoData: videoData,
-        }
-        console.log(body)
-
-        const response = await api.post("/moments", body, {
-            headers: { Authorization: authHeader },
-        })
+            { headers: { Authorization: props.jwtToken } },
+        )
         return response.data
     } catch (error: any) {
         const errPayload = error?.response?.data ?? error?.message ?? error

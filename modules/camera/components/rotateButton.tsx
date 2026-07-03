@@ -4,68 +4,91 @@ import { PressableOpacity } from "react-native-pressable-opacity"
 import { Button, Host, Image } from "@expo/ui/swift-ui"
 import { frame, glassEffect } from "@expo/ui/swift-ui/modifiers"
 import { SymbolView } from "expo-symbols"
-import Reanimated, { useAnimatedStyle, useSharedValue } from "react-native-reanimated"
+import Reanimated, {
+    useAnimatedStyle,
+    useSharedValue,
+    withSequence,
+    withSpring,
+    withTiming,
+} from "react-native-reanimated"
 import { useCameraContext } from "../context"
 import { colors } from "@/constants/colors"
 import { iOSMajorVersion } from "@/lib/platform/detection"
 
+// Quick squeeze-and-bounce pulse the glass container plays the moment the
+// button fires, so the user sees clearly that their tap registered (the
+// rotation/flip happens off-screen on the live preview, so without this
+// feedback the button itself feels inert).
+const PRESS_SCALE = 0.86
+const SPRING_BACK = { damping: 7, stiffness: 240, mass: 0.6 } as const
+
 export function RotateButton() {
     const { cameraPosition, setCameraPosition } = useCameraContext()
-    const rotateAnimation = useSharedValue(0)
+    const containerScale = useSharedValue(1)
+
+    const triggerPulse = useCallback(() => {
+        containerScale.value = withSequence(
+            withTiming(PRESS_SCALE, { duration: 90 }),
+            withSpring(1, SPRING_BACK),
+        )
+    }, [containerScale])
 
     const onFlipCameraPressed = useCallback(() => {
+        triggerPulse()
         setCameraPosition((p) => (p === "back" ? "front" : "back"))
-    }, [setCameraPosition])
+    }, [setCameraPosition, triggerPulse])
 
-    const rotateIconStyle = useAnimatedStyle(() => {
-        return {
-            transform: [{ rotate: `${rotateAnimation.value}deg` }],
-        }
-    }, [rotateAnimation])
+    const containerStyle = useAnimatedStyle(() => ({
+        transform: [{ scale: containerScale.value }],
+    }))
 
-    // iOS 26 render path (keep Host/Button)
+    // iOS 26 render path (keep Host/Button — wrap in Reanimated.View so we
+    // can scale the whole glass capsule; Host's native UIView honors RN
+    // transforms even though its content is SwiftUI).
     if (iOSMajorVersion! >= 26) {
         return (
-            <Host matchContents>
-                <Button
-                    key={cameraPosition}
-                    onPress={onFlipCameraPressed}
-                    modifiers={[
-                        frame({
-                            width: styles.sideButton.width,
-                            height: styles.sideButton.height,
-                        }),
-                        glassEffect({
-                            glass: { variant: "regular", interactive: true },
-                            shape: "circle",
-                        }),
-                    ]}
-                >
-                    <Image
-                        systemName="arrow.triangle.2.circlepath"
-                        color={colors.gray.white}
-                        size={24}
-                    />
-                </Button>
-            </Host>
+            <Reanimated.View style={containerStyle}>
+                <Host matchContents>
+                    <Button
+                        key={cameraPosition}
+                        onPress={onFlipCameraPressed}
+                        modifiers={[
+                            frame({
+                                width: styles.sideButton.width,
+                                height: styles.sideButton.height,
+                            }),
+                            glassEffect({
+                                glass: { variant: "regular", interactive: true },
+                                shape: "circle",
+                            }),
+                        ]}
+                    >
+                        <Image
+                            systemName="arrow.triangle.2.circlepath"
+                            color={colors.gray.white}
+                            size={24}
+                        />
+                    </Button>
+                </Host>
+            </Reanimated.View>
         )
     }
 
     // Fallback render
     return (
-        <PressableOpacity
-            style={styles.sideButton}
-            onPress={onFlipCameraPressed}
-            disabledOpacity={0.4}
-        >
-            <Reanimated.View style={rotateIconStyle}>
+        <Reanimated.View style={containerStyle}>
+            <PressableOpacity
+                style={styles.sideButton}
+                onPress={onFlipCameraPressed}
+                disabledOpacity={0.4}
+            >
                 <SymbolView
                     name="arrow.triangle.2.circlepath"
                     tintColor={colors.gray.white}
                     size={22}
                 />
-            </Reanimated.View>
-        </PressableOpacity>
+            </PressableOpacity>
+        </Reanimated.View>
     )
 }
 
