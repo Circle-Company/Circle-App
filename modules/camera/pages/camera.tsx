@@ -5,7 +5,6 @@ import LanguageContext from "@/contexts/language"
 import { Vibrate } from "@/lib/hooks/useHapticFeedback"
 import { Stack, useIsFocused, useSegments } from "expo-router"
 import * as React from "react"
-import type { GestureResponderEvent } from "react-native"
 import { StyleSheet, View } from "react-native"
 import { GestureDetector } from "react-native-gesture-handler"
 import Reanimated, { useAnimatedStyle, useSharedValue, withTiming } from "react-native-reanimated"
@@ -13,7 +12,6 @@ import { useSafeAreaInsets } from "react-native-safe-area-context"
 import type { CameraRef } from "react-native-vision-camera"
 import {
     Camera,
-    CommonResolutions,
     useCameraDevice,
     useCameraPermission,
     useVideoOutput,
@@ -22,13 +20,31 @@ import {
 import { CameraBottomBar } from "../components/CameraBottomBar"
 import { CameraPermissionNotProvidedCard } from "../components/CameraPermissionNotProvidedCard"
 import { CameraStatusLine } from "../components/CameraStatusLine"
-import { CancelUploadCard } from "../components/CancelUploadCard"
+import { CancelShareCard } from "../components/CancelShareCard"
 import { FlashIndicator } from "../components/FlashIndicator"
 import { FlipCameraHint } from "../components/FlipCameraHint"
+import { HandsFreeHint } from "../components/HandsFreeHint"
+import { HandsFreeToggle } from "../components/HandsFreeToggle"
 import { MicPermissionNotProvidedCard } from "../components/MicPermissionNotProvidedCard"
 import { RecordingProgressHeaderTitle } from "../components/RecordingProgressHeaderTitle"
 import { ZoomIndicator } from "../components/ZoomIndicator"
-import { CONTENT_SPACING, MAX_ZOOM_FACTOR } from "../constants"
+import {
+    BOTTOM_BAR_OFFSET,
+    CAMERA_HEIGHT,
+    CAMERA_RADIUS,
+    CAMERA_WIDTH,
+    FLIP_HINT_ABOVE_BAR,
+    MAX_RECORDING_TIME_SEC,
+    MAX_ZOOM_FACTOR,
+    MIN_PUBLISHABLE_SEC,
+    NAV_BAR_HEIGHT,
+    PREVIEW_TOP_OFFSET,
+    SHARE_CANCEL_WINDOW_MS,
+    TOP_INDICATOR_HALF_GAP_PX,
+    VIDEO_OUTPUT_CONFIG,
+    ZOOM_INDICATOR_FADE_MS,
+    ZOOM_RESET_ANIM_MS,
+} from "../constants"
 import { useCameraContext } from "../context"
 import { useIsForeground } from "../hooks/useIsForeground"
 import { usePendingPublish, type PendingPublishItem } from "../hooks/usePendingPublish"
@@ -37,47 +53,9 @@ import { useRecordingGlow } from "../hooks/useRecordingGlow"
 import { useRecordingInterval } from "../hooks/useRecordingInterval"
 import { useRequestCameraPermissions } from "../hooks/useRequestCameraPermissions"
 import { useZoomDisplay } from "../hooks/useZoomDisplay"
-import { uploadMoment } from "../hooks/uploadMoment"
+import { shareMoment } from "../hooks/shareMoment"
 import PersistedContext from "@/contexts/Persisted"
 import { notify } from "@/contexts/Toast/notify"
-
-// Timing & recording
-const MAX_RECORDING_TIME_SEC = 30
-const ZOOM_RESET_ANIM_MS = 220
-const ZOOM_INDICATOR_FADE_MS = 150
-// Half-gap between the top indicators when both chips are on screen at
-// once. Each chip translates this many px away from center so they meet
-// in the middle instead of overlapping. Tuned by eye — chips are ~55px
-// wide (zoom) and ~110px wide (flash), so 40 gives a tight ~4-8px gap
-// between their edges.
-const TOP_INDICATOR_HALF_GAP_PX = 40
-// Clips shorter than this are treated as accidental taps → silently
-// discarded (with a warning notify). Duration comes back from
-// onMediaCaptured in seconds.
-const MIN_PUBLISHABLE_SEC = 5
-// Cancel-window duration between the recording ending and the real upload
-// firing. The CancelUploadCard exposes the whole window as a countdown bar.
-const UPLOAD_CANCEL_WINDOW_MS = 5000
-
-// Layout
-const CAMERA_WIDTH = sizes.moment.full.width
-const CAMERA_HEIGHT = sizes.moment.full.height
-const CAMERA_RADIUS = 40
-const BOTTOM_BAR_OFFSET = CONTENT_SPACING * 7
-const FLIP_HINT_ABOVE_BAR = 96
-// Standard native-stack nav bar height. Applied as top padding on the root
-// container so the preview sits below the (now transparent) header — same
-// vertical position it had before headerTransparent was turned on.
-const NAV_BAR_HEIGHT = 46
-
-// Video output config — module-scope constant so useVideoOutput's memo deps
-// (compared with Object.is) never see a fresh reference between renders.
-const VIDEO_OUTPUT_CONFIG = {
-    targetResolution: CommonResolutions.FHD_16_9,
-    enableAudio: false,
-    // Keeps recording alive across a camera flip mid-shot.
-    enablePersistentRecorder: true,
-} as const
 
 export function CameraPage(): React.ReactElement {
     const { t } = React.useContext(LanguageContext)
@@ -102,6 +80,8 @@ export function CameraPage(): React.ReactElement {
         torch,
         preferredDevice,
         microphonePermission,
+        setIsSharing,
+        isHandsFree,
     } = useCameraContext()
     const { session } = React.useContext(PersistedContext)
 
@@ -119,10 +99,16 @@ export function CameraPage(): React.ReactElement {
 
     const zoom = useSharedValue(1)
     const isPressingButton = useSharedValue(false)
+    // Bridge React state → shared value so the pinch worklet can read it
+    // without triggering a JS re-render for every gesture frame.
+    const handsFreeSV = useSharedValue(isHandsFree)
+    React.useEffect(() => {
+        handsFreeSV.value = isHandsFree
+    }, [isHandsFree, handsFreeSV])
     const minZoom = device?.minZoom ?? 1
     const maxZoom = Math.min(device?.maxZoom ?? 1, MAX_ZOOM_FACTOR)
 
-    const pinchGesture = usePinchZoomGesture(zoom, isPressingButton, minZoom, maxZoom)
+    const pinchGesture = usePinchZoomGesture(zoom, isPressingButton, handsFreeSV, minZoom, maxZoom)
     const zoomDisplay = useZoomDisplay(zoom)
     const cameraGlowStyle = useRecordingGlow(isRecording)
 
@@ -143,10 +129,9 @@ export function CameraPage(): React.ReactElement {
             opacity: withTiming(zoomVisible ? 1 : 0, { duration: ZOOM_INDICATOR_FADE_MS }),
             transform: [
                 {
-                    translateX: withTiming(
-                        flashOnSV.value * TOP_INDICATOR_HALF_GAP_PX,
-                        { duration: ZOOM_INDICATOR_FADE_MS },
-                    ),
+                    translateX: withTiming(flashOnSV.value * TOP_INDICATOR_HALF_GAP_PX, {
+                        duration: ZOOM_INDICATOR_FADE_MS,
+                    }),
                 },
             ],
         }
@@ -160,10 +145,9 @@ export function CameraPage(): React.ReactElement {
             opacity: flashOnSV.value,
             transform: [
                 {
-                    translateX: withTiming(
-                        zoomVisible ? -TOP_INDICATOR_HALF_GAP_PX : 0,
-                        { duration: ZOOM_INDICATOR_FADE_MS },
-                    ),
+                    translateX: withTiming(zoomVisible ? -TOP_INDICATOR_HALF_GAP_PX : 0, {
+                        duration: ZOOM_INDICATOR_FADE_MS,
+                    }),
                 },
             ],
         }
@@ -182,21 +166,55 @@ export function CameraPage(): React.ReactElement {
         setCameraPosition((p) => (p === "back" ? "front" : "back"))
     }, [setCameraPosition, zoom])
 
+    // Hands-free: user pressed and held the record button (a no-op in this
+    // mode). Nudge them to tap instead via the HandsFreeHint chip. Bumping
+    // the trigger (re)shows the chip; throttled so repeated holds don't
+    // restart the animation on every frame.
+    const [handsFreeHintTrigger, setHandsFreeHintTrigger] = React.useState(0)
+    const handsFreeHintAtRef = React.useRef(0)
+    const handleHandsFreeHoldHint = React.useCallback(() => {
+        const now = Date.now()
+        if (now - handsFreeHintAtRef.current < 2500) return
+        handsFreeHintAtRef.current = now
+        Vibrate("notificationWarning")
+        setHandsFreeHintTrigger((n) => n + 1)
+    }, [])
+
+    // Companion trigger for the "aperte e segure para gravar" hint chip.
+    // Bumped from onMediaCaptured when a clip is discarded for being under
+    // MIN_PUBLISHABLE_SEC (accidental-tap guard), replacing the old notify
+    // toast that used to fire in the same spot.
+    const [holdHintTrigger, setHoldHintTrigger] = React.useState(0)
+
     const handleRecordingStop = React.useCallback(() => {
         setIsRecording(false)
         zoom.value = withTiming(device?.minZoom ?? 1, { duration: ZOOM_RESET_ANIM_MS })
     }, [setIsRecording, zoom, device])
 
-    // Commit → chama uploadMoment DIRETAMENTE com o path do item pendente.
-    // Antes o commit fazia setVideo → setTimeout → context.upload(), o que
-    // batia num race de closure (a upload() capturava o `video` state antes
-    // da re-render commitar). Chamando uploadMoment direto passamos o path
-    // como argumento — sem depender de estado — e usamos exatamente a mesma
-    // função que a tela de share usa via context.
+    // Share lifecycle beyond the cancel window: keeps the CancelShareCard
+    // on screen through the whole flow (spinner during share, animated
+    // check on success) and lets the user abort mid-share via the same
+    // Cancel button.
+    const [shareStatus, setShareStatus] = React.useState<"sharing" | "success" | null>(null)
+    const shareAbortRef = React.useRef<AbortController | null>(null)
+    const successDismissTimerRef = React.useRef<NodeJS.Timeout | null>(null)
+    React.useEffect(
+        () => () => {
+            if (successDismissTimerRef.current) clearTimeout(successDismissTimerRef.current)
+            shareAbortRef.current?.abort()
+        },
+        [],
+    )
+
+    // Commit → chama shareMoment DIRETAMENTE com o path do item pendente,
+    // usando o mesmo endpoint que newMoment.tsx usa (validado em produção).
     const commitPending = React.useCallback(
         async (item: PendingPublishItem) => {
+            const controller = new AbortController()
+            shareAbortRef.current = controller
+            setShareStatus("sharing")
             try {
-                await uploadMoment({
+                await shareMoment({
                     description: null,
                     userId: session.user.id,
                     videoMetadata: {
@@ -205,56 +223,79 @@ export function CameraPage(): React.ReactElement {
                     },
                     videoPath: item.path,
                     jwtToken: session.account.jwtToken,
+                    signal: controller.signal,
                 })
+                setShareStatus("success")
                 setCameraPosition("back")
-                notify({
-                    params: {
-                        title: t("Published"),
-                        variant: "success",
-                        config: { duration: 2400 },
-                    },
-                })
+                if (successDismissTimerRef.current) {
+                    clearTimeout(successDismissTimerRef.current)
+                }
+                successDismissTimerRef.current = setTimeout(() => {
+                    setShareStatus(null)
+                    successDismissTimerRef.current = null
+                }, 1400)
             } catch (err: any) {
+                setShareStatus(null)
+                // Aborted shares reject with an AbortError — that path is
+                // driven by the user tapping Cancel and already gets its own
+                // toast, so we skip the failure notify here.
+                const aborted =
+                    err?.name === "AbortError" ||
+                    err?.name === "CanceledError" ||
+                    err?.code === "ERR_CANCELED"
+                if (aborted) return
                 const status = err?.response?.status
                 const message = err?.response?.data?.message ?? err?.message ?? "Unknown"
                 notify({
                     params: {
-                        title: t("Failed to publish"),
-                        description: status
-                            ? `HTTP ${status}: ${message}`
-                            : String(message),
+                        title: t("Failed to share"),
+                        description: status ? `HTTP ${status}: ${message}` : String(message),
                         variant: "warning",
                         config: { duration: 3600 },
                     },
                 })
+            } finally {
+                if (shareAbortRef.current === controller) {
+                    shareAbortRef.current = null
+                }
             }
         },
         [session.account.jwtToken, session.user.id, setCameraPosition, t],
     )
 
-    const { pending, schedule: schedulePending, cancel: cancelPending } = usePendingPublish({
-        windowMs: UPLOAD_CANCEL_WINDOW_MS,
+    const {
+        pending,
+        schedule: schedulePending,
+        cancel: cancelPending,
+    } = usePendingPublish({
+        windowMs: SHARE_CANCEL_WINDOW_MS,
         onCommit: commitPending,
     })
+
+    // Bridge the whole share-card lifecycle to the context so bottom-bar
+    // buttons (capture, rotate, flash) lock themselves for the duration.
+    // Includes the cancel window, the actual upload, AND the success
+    // check-mark display — buttons only re-enable once the card fully
+    // dismisses. Flash also uses this flag to snapshot + restore its torch
+    // state (see flashButton.tsx).
+    const isSharingActive = pending !== null || shareStatus !== null
+    React.useEffect(() => {
+        setIsSharing(isSharingActive)
+    }, [isSharingActive, setIsSharing])
 
     const onMediaCaptured = React.useCallback(
         async (filePath: string, duration: number) => {
             setIsRecording(false)
             setRecordingTime(0)
 
-            // Accidental-tap guard: too short → drop it and tell the user why.
+            // Accidental-tap guard: too short → drop it and surface the
+            // "aperte e segure para gravar" hint chip. Replaces the old
+            // toast/notify so the message lives in-context above the
+            // capture button instead of pulling the user's eyes to the top
+            // of the screen.
             if (duration < MIN_PUBLISHABLE_SEC) {
                 Vibrate("notificationWarning")
-                notify({
-                    params: {
-                        title: t("Gravação muito curta"),
-                        description: t("Grave por pelo menos {{seconds}} segundos", {
-                            seconds: MIN_PUBLISHABLE_SEC,
-                        }),
-                        variant: "warning",
-                        config: { duration: 2400 },
-                    },
-                })
+                setHoldHintTrigger((n) => n + 1)
                 return
             }
 
@@ -262,18 +303,6 @@ export function CameraPage(): React.ReactElement {
             schedulePending({ path: fileUri, duration, mimeType: "video/mp4" })
         },
         [setIsRecording, setRecordingTime, schedulePending, t],
-    )
-
-    const onFocusTap = React.useCallback(
-        async ({ nativeEvent: e }: GestureResponderEvent) => {
-            if (!device?.supportsFocusMetering) return
-            try {
-                await camera.current?.focusTo({ x: e.locationX, y: e.locationY })
-            } catch {
-                /* camera not ready */
-            }
-        },
-        [device?.supportsFocusMetering],
     )
 
     const onSessionConfigSelected = React.useCallback(() => {
@@ -289,7 +318,7 @@ export function CameraPage(): React.ReactElement {
     }, [setTabHide])
 
     const bottomInset = BOTTOM_BAR_OFFSET + insets.bottom
-    const topInset = insets.top + NAV_BAR_HEIGHT
+    const topInset = insets.top + NAV_BAR_HEIGHT + PREVIEW_TOP_OFFSET
     const hasCamera = cameraPermission.hasPermission && device != null
 
     return (
@@ -329,7 +358,7 @@ export function CameraPage(): React.ReactElement {
             {hasCamera && (
                 <Reanimated.View style={[styles.cameraGlow, cameraGlowStyle]}>
                     <GestureDetector gesture={pinchGesture}>
-                        <View onTouchEnd={onFocusTap} style={styles.cameraView} collapsable={false}>
+                        <View style={styles.cameraView} collapsable={false}>
                             <Camera
                                 ref={camera}
                                 style={styles.cameraInner}
@@ -341,11 +370,18 @@ export function CameraPage(): React.ReactElement {
                                 // Front cam: mirror preview AND recording so the saved
                                 // clip matches what the user saw. Back cam: no mirror.
                                 mirrorMode={cameraPosition === "front" ? "on" : "off"}
+                                // Native tap-to-focus: vision-camera's own
+                                // gesture recognizer on the PreviewView handles
+                                // the touch → focusTo pipeline entirely on the
+                                // native side, coexisting with the pinch
+                                // GestureHandler around it.
+                                enableNativeTapToFocusGesture
                                 onSessionConfigSelected={onSessionConfigSelected}
                                 onError={console.error}
                             />
                             <ZoomIndicator text={zoomDisplay} animatedStyle={zoomIndicatorStyle} />
                             <FlashIndicator animatedStyle={flashIndicatorStyle} />
+                            <HandsFreeToggle />
                         </View>
                     </GestureDetector>
                 </Reanimated.View>
@@ -358,22 +394,35 @@ export function CameraPage(): React.ReactElement {
                 />
             )}
 
-            {pending && (
-                <View style={[styles.cancelUploadAnchor, { top: topInset + 12 }]}>
-                    <CancelUploadCard
-                        onCancel={() => {
-                            Vibrate("impactLight")
+            {(pending || shareStatus) && (
+                <CancelShareCard
+                    // Success is the only phase where Cancel is not shown —
+                    // both "cancellable" (undo window) and "sharing" (real
+                    // request in flight) let the user back out.
+                    status={
+                        shareStatus === "success" ? "success" : pending ? "cancellable" : "sharing"
+                    }
+                    onCancel={() => {
+                        Vibrate("impactLight")
+                        // If we're still in the undo window, kill the pending
+                        // timer. If the real share is already firing, abort
+                        // the in-flight request (compression + axios) via the
+                        // AbortController held in shareAbortRef.
+                        if (pending) {
                             cancelPending()
-                            notify({
-                                params: {
-                                    title: t("Publish cancelled"),
-                                    variant: "warning",
-                                    config: { duration: 1800 },
-                                },
-                            })
-                        }}
-                    />
-                </View>
+                        } else if (shareAbortRef.current) {
+                            shareAbortRef.current.abort()
+                            setShareStatus(null)
+                        }
+                        notify({
+                            params: {
+                                title: t("Share cancelled"),
+                                variant: "warning",
+                                config: { duration: 1800 },
+                            },
+                        })
+                    }}
+                />
             )}
 
             {cameraPermission.hasPermission && (
@@ -386,6 +435,14 @@ export function CameraPage(): React.ReactElement {
                         ]}
                     >
                         <FlipCameraHint isRecording={isRecording} />
+                        <HandsFreeHint
+                            trigger={handsFreeHintTrigger}
+                            label={t("Free hands on, touch to record")}
+                        />
+                        <HandsFreeHint
+                            trigger={holdHintTrigger}
+                            label={t("Aperte e segure para gravar")}
+                        />
                     </View>
                     <CameraBottomBar
                         style={{ bottom: bottomInset }}
@@ -393,12 +450,14 @@ export function CameraPage(): React.ReactElement {
                         cameraZoom={zoom}
                         minZoom={minZoom}
                         maxZoom={maxZoom}
-                        enabled={isCameraInitialized && isActive}
+                        enabled={isCameraInitialized && isActive && !isSharingActive}
+                        handsFree={isHandsFree}
                         setIsPressingButton={setIsPressingButtonCb}
                         onRecordingStart={() => setIsRecording(true)}
                         onRecordingStop={handleRecordingStop}
                         onFlipCamera={handleFlipCamera}
                         onMediaCaptured={onMediaCaptured}
+                        onHandsFreeHoldHint={handleHandsFreeHoldHint}
                     />
                 </>
             )}
@@ -428,7 +487,7 @@ const styles = StyleSheet.create({
         height: CAMERA_HEIGHT,
         alignSelf: "center",
         borderRadius: CAMERA_RADIUS,
-        shadowColor: colors.purple.purple_07,
+        shadowColor: colors.purple.purple_05,
         shadowOffset: { width: 0, height: 0 },
     },
     cameraView: {
@@ -448,12 +507,5 @@ const styles = StyleSheet.create({
         right: 0,
         alignItems: "center",
         zIndex: 9,
-    },
-    cancelUploadAnchor: {
-        position: "absolute",
-        left: 0,
-        right: 0,
-        alignItems: "center",
-        zIndex: 15,
     },
 })

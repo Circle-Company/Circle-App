@@ -14,11 +14,13 @@ interface Props {
     minZoom: number
     maxZoom: number
     enabled: boolean
+    handsFree: boolean
     setIsPressingButton: (v: boolean) => void
     onRecordingStart: () => void
     onRecordingStop: () => void
     onFlipCamera: () => void
     onMediaCaptured: (filePath: string, duration: number) => void
+    onHandsFreeHoldHint: () => void
 }
 
 export const CameraBottomBar: React.FC<Props> = ({
@@ -28,11 +30,13 @@ export const CameraBottomBar: React.FC<Props> = ({
     minZoom,
     maxZoom,
     enabled,
+    handsFree,
     setIsPressingButton,
     onRecordingStart,
     onRecordingStop,
     onFlipCamera,
     onMediaCaptured,
+    onHandsFreeHoldHint,
 }) => (
     <View style={[styles.bar, style]}>
         <RotateButton />
@@ -43,11 +47,13 @@ export const CameraBottomBar: React.FC<Props> = ({
             minZoom={minZoom}
             maxZoom={maxZoom}
             enabled={enabled}
+            handsFree={handsFree}
             setIsPressingButton={setIsPressingButton}
             onRecordingStart={onRecordingStart}
             onRecordingStop={onRecordingStop}
             onFlipCamera={onFlipCamera}
             onMediaCaptured={onMediaCaptured}
+            onHandsFreeHoldHint={onHandsFreeHoldHint}
         />
         <FlashButton />
     </View>

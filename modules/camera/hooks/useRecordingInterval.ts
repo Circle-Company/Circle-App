@@ -1,7 +1,13 @@
 import { useEffect, useRef } from "react"
 
-// Ticks recordingTime at 100ms so the header progress bar can advance
+// Ticks recordingTime at ~100ms so the header progress bar can advance
 // smoothly. Auto-stops the recording once maxTime is reached.
+//
+// Elapsed is computed from a startedAt timestamp (Date.now diff) rather
+// than by summing 0.1 per tick. setInterval on the JS thread jitters and
+// throttles under load — the old +=0.1 scheme fell increasingly behind
+// wall clock across successive recordings as the app warmed up, which
+// looked like the timer "slowing down".
 export function useRecordingInterval(
     isRecording: boolean,
     setRecordingTime: (n: number) => void,
@@ -9,30 +15,32 @@ export function useRecordingInterval(
     maxTime: number,
 ) {
     const intervalRef = useRef<NodeJS.Timeout | null>(null)
+    const startedAtRef = useRef<number>(0)
 
     useEffect(() => {
+        const clear = () => {
+            if (intervalRef.current) {
+                clearInterval(intervalRef.current)
+                intervalRef.current = null
+            }
+        }
+
         if (isRecording) {
-            if (!intervalRef.current) setRecordingTime(0)
-            if (intervalRef.current) clearInterval(intervalRef.current)
-            let current = 0
+            clear()
+            startedAtRef.current = Date.now()
+            setRecordingTime(0)
+
             intervalRef.current = setInterval(() => {
-                current += 0.1
-                if (current > maxTime) current = maxTime
-                setRecordingTime(current)
-                if (current >= maxTime) setIsRecording(false)
+                const elapsed = (Date.now() - startedAtRef.current) / 1000
+                const clamped = Math.min(elapsed, maxTime)
+                setRecordingTime(clamped)
+                if (elapsed >= maxTime) setIsRecording(false)
             }, 100)
         } else {
-            if (intervalRef.current) {
-                clearInterval(intervalRef.current)
-                intervalRef.current = null
-            }
+            clear()
             setRecordingTime(0)
         }
-        return () => {
-            if (intervalRef.current) {
-                clearInterval(intervalRef.current)
-                intervalRef.current = null
-            }
-        }
+
+        return clear
     }, [isRecording, setRecordingTime, setIsRecording, maxTime])
 }

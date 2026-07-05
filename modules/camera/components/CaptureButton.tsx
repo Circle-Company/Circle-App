@@ -16,6 +16,7 @@ import Reanimated, {
 } from "react-native-reanimated"
 import type { SharedValue } from "react-native-reanimated"
 import type { CameraVideoOutput, Recorder } from "react-native-vision-camera"
+import Svg, { Circle, Rect } from "react-native-svg"
 import { Vibrate } from "@/lib/hooks/useHapticFeedback"
 import { CAPTURE_BUTTON_SIZE, SCREEN_HEIGHT } from "../constants"
 
@@ -50,6 +51,10 @@ const FLIP_ARM_DRIFT_TOLERANCE_PX = 30
 // from firing the flip when the intent was clearly zoom-plus-side.
 const FLIP_FORWARD_HORIZONTAL_DOMINANCE = 1.5
 const BORDER_WIDTH = CAPTURE_BUTTON_SIZE * 0.1
+// Recording indicator (purple square) — geometry hoisted to module scope
+// so the JSX can consume it and styles can share the same values.
+const SHADOW_SIZE = CAPTURE_BUTTON_SIZE * 0.4
+const SHADOW_CORNER_RADIUS = CAPTURE_BUTTON_SIZE * 0.12
 
 interface Props extends ViewProps {
     videoOutput: CameraVideoOutput
@@ -67,6 +72,19 @@ interface Props extends ViewProps {
      * interrupting an active recording.
      */
     onFlipCamera?: () => void
+    /**
+     * If true, the button behaves as a single-tap toggle (tap → start,
+     * tap → stop) instead of press-and-hold. Zoom-drag and flip-drag
+     * gestures are also disabled so the button doesn't interfere with the
+     * hands-free intent. Default false.
+     */
+    handsFree?: boolean
+    /**
+     * Fired when the user presses AND HOLDS the button while in hands-free
+     * mode (where a hold is a no-op). Lets the parent surface a hint telling
+     * them to just tap. Never called in the default hold-to-record mode.
+     */
+    onHandsFreeHoldHint?: () => void
 }
 
 const CaptureButtonComponent: React.FC<Props> = ({
@@ -78,6 +96,8 @@ const CaptureButtonComponent: React.FC<Props> = ({
     enabled,
     setIsPressingButton,
     onFlipCamera,
+    handsFree = false,
+    onHandsFreeHoldHint,
     style,
     ...props
 }) => {
@@ -327,6 +347,22 @@ const CaptureButtonComponent: React.FC<Props> = ({
         }
     }, [safeSetPressing, stopRecording])
 
+    // Hands-free tap → toggle. First tap starts recording; the next tap
+    // stops it. We reuse the same start/stop pipeline as press-and-hold so
+    // MIN_RECORDING_MS, retry-on-not-connected, etc. behave identically.
+    const handleTapToggle = React.useCallback(() => {
+        if (isRecording.current) {
+            stopRecording()
+        } else if (startInProgressRef.current) {
+            // A tap arrived while start is mid-flight — mark for immediate
+            // stop when it engages.
+            releasePendingRef.current = true
+        } else {
+            safeSetPressing(true)
+            startRecording().catch(() => {})
+        }
+    }, [safeSetPressing, startRecording, stopRecording])
+
     const panStartY = useSharedValue(0)
     const panOffsetY = useSharedValue(0)
     // Detent state for the flip gesture. `flipped` reflects whether we are
@@ -443,7 +479,34 @@ const CaptureButtonComponent: React.FC<Props> = ({
             }
         })
 
-    const composedGesture = Gesture.Simultaneous(longPress, pan)
+    // Hands-free mode uses a plain Tap gesture that toggles recording on
+    // each press — no long-press, no zoom-drag, no flip-drag. The default
+    // mode composes longPress + pan for the hold/zoom/flip pipeline.
+    const tap = Gesture.Tap()
+        .enabled(enabled)
+        .onEnd(() => {
+            "worklet"
+            runOnJS(handleTapToggle)()
+        })
+
+    // Hands-free only: a deliberate press-and-hold does nothing (recording is
+    // tap-toggle), so catch the hold and surface a hint telling the user to
+    // tap. minDuration sits above the Tap recognition window so a normal tap
+    // still toggles recording and only a real hold trips the hint.
+    const handsFreeHoldHint = Gesture.LongPress()
+        .enabled(enabled && handsFree)
+        .minDuration(350)
+        .maxDistance(Number.MAX_SAFE_INTEGER)
+        .onStart(() => {
+            "worklet"
+            if (onHandsFreeHoldHint) runOnJS(onHandsFreeHoldHint)()
+        })
+
+    // Exclusive: a hold trips the hint (and blocks the tap); a quick tap fails
+    // the long-press and toggles recording as usual.
+    const composedGesture = handsFree
+        ? Gesture.Exclusive(handsFreeHoldHint, tap)
+        : Gesture.Simultaneous(longPress, pan)
 
     const shadowStyle = useAnimatedStyle(() => ({
         transform: [{ scale: withSpring(isPressingButton.value ? 1 : 0) }],
@@ -515,8 +578,58 @@ const CaptureButtonComponent: React.FC<Props> = ({
         <GestureDetector gesture={composedGesture}>
             <Reanimated.View {...props} style={[buttonStyle, style]}>
                 <Reanimated.View style={styles.flex}>
-                    <Reanimated.View style={[styles.shadow, shadowStyle]} />
-                    <Reanimated.View style={[styles.button, ringShadowStyle]} />
+                    <Reanimated.View
+                        style={[styles.shadow, shadowStyle]}
+                        pointerEvents="none"
+                    >
+                        {/*
+                          Purple recording indicator drawn as an SVG rect so
+                          the rounded corners stay sharp while shadowStyle
+                          scales it from 0 → 1. A View with borderRadius +
+                          backgroundColor gets rasterized to a bitmap at
+                          layout size and blurs at the corners during the
+                          spring; SVG re-renders each frame via CoreGraphics.
+                        */}
+                        <Svg
+                            width={SHADOW_SIZE}
+                            height={SHADOW_SIZE}
+                        >
+                            <Rect
+                                x={0}
+                                y={0}
+                                width={SHADOW_SIZE}
+                                height={SHADOW_SIZE}
+                                rx={SHADOW_CORNER_RADIUS}
+                                ry={SHADOW_CORNER_RADIUS}
+                                fill={ColorTheme().primary}
+                            />
+                        </Svg>
+                    </Reanimated.View>
+                    <Reanimated.View
+                        style={[styles.buttonShadowHost, ringShadowStyle]}
+                        pointerEvents="none"
+                    >
+                        {/*
+                          Ring drawn as an SVG stroke so it stays crisp when
+                          the parent transform scales the button up on press.
+                          A View borderRadius+borderWidth rasterizes to a
+                          bitmap at layout size and blurs when upscaled; SVG
+                          paths re-render each frame via CoreGraphics.
+                        */}
+                        <Svg
+                            width={CAPTURE_BUTTON_SIZE}
+                            height={CAPTURE_BUTTON_SIZE}
+                        >
+                            <Circle
+                                cx={CAPTURE_BUTTON_SIZE / 2}
+                                cy={CAPTURE_BUTTON_SIZE / 2}
+                                r={(CAPTURE_BUTTON_SIZE - BORDER_WIDTH) / 2}
+                                stroke="white"
+                                strokeWidth={BORDER_WIDTH}
+                                fill="transparent"
+                            />
+                        </Svg>
+                    </Reanimated.View>
                 </Reanimated.View>
             </Reanimated.View>
         </GestureDetector>
@@ -534,21 +647,20 @@ const styles = StyleSheet.create({
     // an active recording state.
     shadow: {
         position: "absolute",
-        margin: (CAPTURE_BUTTON_SIZE - CAPTURE_BUTTON_SIZE * 0.55) / 2,
-        width: CAPTURE_BUTTON_SIZE * 0.55,
-        height: CAPTURE_BUTTON_SIZE * 0.55,
-        borderRadius: CAPTURE_BUTTON_SIZE * 0.12,
-        backgroundColor: ColorTheme().primary,
+        margin: (CAPTURE_BUTTON_SIZE - SHADOW_SIZE) / 2,
+        width: SHADOW_SIZE,
+        height: SHADOW_SIZE,
+        // The visible shape is drawn by the inner SVG Rect — no need for
+        // backgroundColor + borderRadius on this container.
     },
-    button: {
+    // Hosts the SVG ring + owns the drop shadow. Circular borderRadius
+    // shapes the shadow into a ring silhouette; the SVG itself is drawn
+    // on top of that shadow layer.
+    buttonShadowHost: {
         width: CAPTURE_BUTTON_SIZE,
         height: CAPTURE_BUTTON_SIZE,
         borderRadius: CAPTURE_BUTTON_SIZE / 2,
-        borderWidth: BORDER_WIDTH,
-        borderColor: "white",
-        // Static shadow config that ringShadowStyle animates against. The
-        // solid white border gives iOS enough opaque pixels to draw the
-        // shadow around; a fully transparent ring wouldn't shadow anything.
+        // Static shadow config that ringShadowStyle animates against.
         shadowColor: "#000",
         shadowOffset: { width: 0, height: 4 },
         shadowOpacity: 0.32,

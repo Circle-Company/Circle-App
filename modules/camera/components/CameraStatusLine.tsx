@@ -1,10 +1,6 @@
 import React from "react"
 import { StyleSheet } from "react-native"
-import Reanimated, {
-    useAnimatedStyle,
-    useSharedValue,
-    withTiming,
-} from "react-native-reanimated"
+import Reanimated, { useAnimatedStyle, useSharedValue, withTiming } from "react-native-reanimated"
 
 import { Text } from "@/components/Themed"
 import { colors } from "@/constants/colors"
@@ -37,12 +33,30 @@ export function CameraStatusLine({
     maxRecordingSec,
 }: Props): React.ReactElement {
     const { t } = React.useContext(LanguageContext)
-    const { isRecording, recordingTime, torch } = useCameraContext()
+    const { isRecording, recordingTime, torch, isHandsFree } = useCameraContext()
 
     let message: string
     let emphasis = false
 
-    if (isRecording) {
+    if (isHandsFree) {
+        // Hands-free copy takes priority: the near-max countdown still fires
+        // so the user knows the auto-stop is coming, but "hold" language is
+        // replaced with "tap" wherever it would otherwise apply.
+        if (isRecording) {
+            const remainingToMax = maxRecordingSec - recordingTime
+            if (remainingToMax <= NEAR_MAX_THRESHOLD_SEC) {
+                message = t("Hands-free • Stops in {{seconds}}s", {
+                    seconds: Math.max(1, Math.ceil(remainingToMax)),
+                })
+                emphasis = true
+            } else {
+                message = t("Tap to stop record")
+                emphasis = true
+            }
+        } else {
+            message = t("Tap to start record")
+        }
+    } else if (isRecording) {
         const remainingToPublish = minPublishableSec - recordingTime
         const remainingToMax = maxRecordingSec - recordingTime
         if (remainingToPublish > 0) {
@@ -88,7 +102,7 @@ const styles = StyleSheet.create({
         alignItems: "center",
         justifyContent: "center",
         paddingHorizontal: 16,
-        marginTop: 12,
+        marginTop: 20,
     },
     text: {
         color: colors.gray.grey_04,

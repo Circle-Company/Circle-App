@@ -19,6 +19,11 @@ interface RecordingProgressHeaderTitleProps {
 
 const CONTAINER_HEIGHT = 40
 
+// "Recording 3s" style formatter. Floor to whole seconds so the ticks in
+// the header don't jitter mid-second — the purple fill already tracks
+// sub-second progression visually.
+const formatSeconds = (seconds: number): string => `${Math.floor(seconds)}s`
+
 export function RecordingProgressHeaderTitle({
     label,
     maxTime,
@@ -65,7 +70,7 @@ export function RecordingProgressHeaderTitle({
             </View>
             <View style={styles.labelWrap} pointerEvents="none">
                 <Text style={styles.label} numberOfLines={1}>
-                    {label}
+                    {label} {formatSeconds(recordingTime)}
                 </Text>
             </View>
         </Reanimated.View>
@@ -74,7 +79,7 @@ export function RecordingProgressHeaderTitle({
 
 const styles = StyleSheet.create({
     container: {
-        minWidth: 96,
+        minWidth: 140,
         height: CONTAINER_HEIGHT,
         borderRadius: CONTAINER_HEIGHT / 2,
         overflow: "hidden",
