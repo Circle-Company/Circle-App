@@ -53,7 +53,7 @@ import { useRecordingGlow } from "../hooks/useRecordingGlow"
 import { useRecordingInterval } from "../hooks/useRecordingInterval"
 import { useRequestCameraPermissions } from "../hooks/useRequestCameraPermissions"
 import { useZoomDisplay } from "../hooks/useZoomDisplay"
-import { shareMoment } from "../hooks/shareMoment"
+import { POLL_TIMEOUT_CODE, shareMoment, type SharePhase } from "../hooks/shareMoment"
 import PersistedContext from "@/contexts/Persisted"
 import { notify } from "@/contexts/Toast/notify"
 
@@ -196,7 +196,12 @@ export function CameraPage(): React.ReactElement {
     // check on success) and lets the user abort mid-share via the same
     // Cancel button.
     const [shareStatus, setShareStatus] = React.useState<"sharing" | "success" | null>(null)
+    const [sharePhase, setSharePhase] = React.useState<SharePhase | null>(null)
     const shareAbortRef = React.useRef<AbortController | null>(null)
+    // 0..1 durante o PUT direto ao Azure. Reanimated shared value pra
+    // renderizar barra de progresso na CancelShareCard sem forçar React
+    // re-render por ~30 fps de callbacks do expo-file-system.
+    const uploadProgress = useSharedValue(0)
     // Path of the clip currently in the share card. Held separately from
     // `pending` so the first-frame preview stays on screen through the whole
     // flow — `pending` is cleared once the real upload fires (and on success).
@@ -210,13 +215,15 @@ export function CameraPage(): React.ReactElement {
         [],
     )
 
-    // Commit → chama shareMoment DIRETAMENTE com o path do item pendente,
-    // usando o mesmo endpoint que newMoment.tsx usa (validado em produção).
+    // Commit → chama o pipeline SAS do shareMoment (upload-url + PUT + confirm + poll).
+    // Ver `SHARE_MOMENT_SAS_MIGRATION.md` para o detalhamento das fases.
     const commitPending = React.useCallback(
         async (item: PendingPublishItem) => {
             const controller = new AbortController()
             shareAbortRef.current = controller
             setShareStatus("sharing")
+            setSharePhase(null)
+            uploadProgress.value = 0
             try {
                 await shareMoment({
                     description: null,
@@ -228,8 +235,13 @@ export function CameraPage(): React.ReactElement {
                     videoPath: item.path,
                     jwtToken: session.account.jwtToken,
                     signal: controller.signal,
+                    onPhaseChange: (phase) => setSharePhase(phase),
+                    onUploadProgress: (frac) => {
+                        uploadProgress.value = withTiming(frac, { duration: 200 })
+                    },
                 })
                 setShareStatus("success")
+                setSharePhase(null)
                 setCameraPosition("back")
                 if (successDismissTimerRef.current) {
                     clearTimeout(successDismissTimerRef.current)
@@ -240,7 +252,7 @@ export function CameraPage(): React.ReactElement {
                     successDismissTimerRef.current = null
                 }, 1400)
             } catch (err: any) {
-                setShareStatus(null)
+                setSharePhase(null)
                 // Aborted shares reject with an AbortError — that path is
                 // driven by the user tapping Cancel and already gets its own
                 // toast, so we skip the failure notify here.
@@ -248,7 +260,27 @@ export function CameraPage(): React.ReactElement {
                     err?.name === "AbortError" ||
                     err?.name === "CanceledError" ||
                     err?.code === "ERR_CANCELED"
-                if (aborted) return
+                if (aborted) {
+                    setShareStatus(null)
+                    return
+                }
+                // Polling timeout ≠ falha: o servidor continua processando
+                // e vai publicar em background. Dismiss silencioso + toast
+                // otimista.
+                if (err?.code === POLL_TIMEOUT_CODE) {
+                    setShareStatus(null)
+                    setSharePreviewPath(null)
+                    setCameraPosition("back")
+                    notify({
+                        params: {
+                            title: t("Publicando em segundo plano"),
+                            variant: "success",
+                            config: { duration: 3000 },
+                        },
+                    })
+                    return
+                }
+                setShareStatus(null)
                 const status = err?.response?.status
                 const message = err?.response?.data?.message ?? err?.message ?? "Unknown"
                 notify({
@@ -265,7 +297,13 @@ export function CameraPage(): React.ReactElement {
                 }
             }
         },
-        [session.account.jwtToken, session.user.id, setCameraPosition, t],
+        [
+            session.account.jwtToken,
+            session.user.id,
+            setCameraPosition,
+            t,
+            uploadProgress,
+        ],
     )
 
     const {
@@ -403,10 +441,16 @@ export function CameraPage(): React.ReactElement {
             {(pending || shareStatus) && (
                 <CancelShareCard
                     // Success is the only phase where Cancel is not shown —
-                    // both "cancellable" (undo window) and "sharing" (real
-                    // request in flight) let the user back out.
+                    // cancellable, uploading and sharing all let the user
+                    // back out; polling can't be cancelled server-side, so
+                    // we hide the button once we enter that phase.
                     status={
                         shareStatus === "success" ? "success" : pending ? "cancellable" : "sharing"
+                    }
+                    phase={sharePhase}
+                    uploadProgress={uploadProgress}
+                    canCancel={
+                        shareStatus !== "success" && sharePhase !== "polling"
                     }
                     mediaPath={pending?.path ?? sharePreviewPath ?? undefined}
                     onCancel={() => {

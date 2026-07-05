@@ -8,6 +8,7 @@ import {
     isGlassEffectAPIAvailable,
     isLiquidGlassAvailable,
 } from "expo-glass-effect"
+import Reanimated, { useAnimatedStyle, type SharedValue } from "react-native-reanimated"
 
 import ButtonStandart from "@/components/buttons/button-standart"
 import { Text } from "@/components/Themed"
@@ -17,6 +18,7 @@ import sizes from "@/constants/sizes"
 import LanguageContext from "@/contexts/language"
 
 import { AnimatedCheck } from "./AnimatedCheck"
+import type { SharePhase } from "../hooks/shareMoment"
 
 export type CancelShareCardStatus = "cancellable" | "sharing" | "success"
 
@@ -26,6 +28,57 @@ interface Props {
     /** Local `file://` path of the clip being shared, used to render the
      *  first-frame preview in place of the placeholder emoji. */
     mediaPath?: string
+    /** Sub-phase of the sharing pipeline. Drives the visual choice between
+     *  spinner (requesting/confirming/polling) and progress bar (uploading). */
+    phase?: SharePhase | null
+    /** 0..1 progress of the PUT to Azure. Ignored unless `phase === "uploading"`. */
+    uploadProgress?: SharedValue<number>
+    /** Whether the Cancel button should be visible. Parent hides it during
+     *  the polling phase because the moment cannot be aborted server-side once
+     *  confirm returns. */
+    canCancel?: boolean
+}
+
+/**
+ * Contextual subtitle based on the sub-phase of the sharing pipeline. Success
+ * gets a fixed "moment is live" line; the other phases label whether we're
+ * negotiating the upload URL, actively pushing bytes, confirming, or waiting
+ * on the server to finish processing.
+ */
+function pickSubtitle(
+    t: (k: string) => string,
+    isSuccess: boolean,
+    phase: SharePhase | null | undefined,
+): string {
+    if (isSuccess) return t("Your moment is now live")
+    switch (phase) {
+        case "requesting":
+            return t("Preparando envio")
+        case "uploading":
+            return t("Enviando vídeo")
+        case "confirming":
+            return t("Quase lá")
+        case "polling":
+            return t("Processando no servidor")
+        default:
+            return t("Your moment is going live")
+    }
+}
+
+/**
+ * Thin horizontal progress bar that mirrors a Reanimated shared value from
+ * 0 → 1. Used during the "uploading" phase in place of the ActivityIndicator
+ * to give the user real feedback about the PUT to Azure.
+ */
+function ProgressBar({ progress }: { progress: SharedValue<number> }): React.ReactElement {
+    const fillStyle = useAnimatedStyle(() => ({
+        width: `${Math.min(1, Math.max(0, progress.value)) * 100}%`,
+    }))
+    return (
+        <View style={styles.progressTrack}>
+            <Reanimated.View style={[styles.progressFill, fillStyle]} />
+        </View>
+    )
 }
 
 /**
@@ -66,17 +119,25 @@ function RecordPreview({ uri }: { uri: string }): React.ReactElement {
  *    checkmark and the copy shifts to a "Shared" tone. The parent
  *    auto-dismisses the card a moment later.
  */
-export function CancelShareCard({ status, onCancel, mediaPath }: Props): React.ReactElement {
+export function CancelShareCard({
+    status,
+    onCancel,
+    mediaPath,
+    phase,
+    uploadProgress,
+    canCancel,
+}: Props): React.ReactElement {
     const { t } = React.useContext(LanguageContext)
     const useGlass =
         Platform.OS === "ios" && isLiquidGlassAvailable() && isGlassEffectAPIAvailable()
 
     const isSuccess = status === "success"
-    // Cancel button is available throughout the whole flow — only hidden
-    // once the share actually succeeds and the check is on screen.
-    const showCancel = !isSuccess
+    // Cancel visibility: caller-controlled (falls back to "always visible except on success"
+    // if the parent doesn't pass anything explicit). Parent hides it during polling.
+    const showCancel = canCancel === undefined ? !isSuccess : canCancel
 
-    const title = isSuccess ? t("Shared") : `${t("Sharing")}`
+    const title = isSuccess ? t("Shared") : t("Sharing")
+    const subTitle = pickSubtitle(t, isSuccess, phase)
 
     const Content = (
         <View style={styles.contentColumn}>
@@ -88,10 +149,13 @@ export function CancelShareCard({ status, onCancel, mediaPath }: Props): React.R
                 ))}
             <View style={styles.copy}>
                 <Text style={styles.title}>{title}</Text>
+                {subTitle ? <Text style={styles.subTitle}>{subTitle}</Text> : null}
             </View>
             <View style={styles.iconSlot}>
                 {isSuccess ? (
                     <AnimatedCheck size={72} />
+                ) : phase === "uploading" && uploadProgress ? (
+                    <ProgressBar progress={uploadProgress} />
                 ) : (
                     <ActivityIndicator size="small" color={colors.gray.white} />
                 )}
@@ -216,11 +280,23 @@ const styles = StyleSheet.create({
         textAlign: "center",
     },
     iconSlot: {
-        width: 72,
+        width: 132,
         minHeight: 32,
         alignItems: "center",
         justifyContent: "center",
         marginBottom: sizes.margins["1md"],
+    },
+    progressTrack: {
+        width: "100%",
+        height: 4,
+        borderRadius: 2,
+        backgroundColor: "rgba(255, 255, 255, 0.15)",
+        overflow: "hidden",
+    },
+    progressFill: {
+        height: "100%",
+        backgroundColor: colors.gray.white,
+        borderRadius: 2,
     },
     description: {
         fontSize: fonts.size.body * 0.95,
