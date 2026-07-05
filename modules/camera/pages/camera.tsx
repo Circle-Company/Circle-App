@@ -197,6 +197,10 @@ export function CameraPage(): React.ReactElement {
     // Cancel button.
     const [shareStatus, setShareStatus] = React.useState<"sharing" | "success" | null>(null)
     const shareAbortRef = React.useRef<AbortController | null>(null)
+    // Path of the clip currently in the share card. Held separately from
+    // `pending` so the first-frame preview stays on screen through the whole
+    // flow — `pending` is cleared once the real upload fires (and on success).
+    const [sharePreviewPath, setSharePreviewPath] = React.useState<string | null>(null)
     const successDismissTimerRef = React.useRef<NodeJS.Timeout | null>(null)
     React.useEffect(
         () => () => {
@@ -232,6 +236,7 @@ export function CameraPage(): React.ReactElement {
                 }
                 successDismissTimerRef.current = setTimeout(() => {
                     setShareStatus(null)
+                    setSharePreviewPath(null)
                     successDismissTimerRef.current = null
                 }, 1400)
             } catch (err: any) {
@@ -300,6 +305,7 @@ export function CameraPage(): React.ReactElement {
             }
 
             const fileUri = filePath.startsWith("file://") ? filePath : `file://${filePath}`
+            setSharePreviewPath(fileUri)
             schedulePending({ path: fileUri, duration, mimeType: "video/mp4" })
         },
         [setIsRecording, setRecordingTime, schedulePending, t],
@@ -402,6 +408,7 @@ export function CameraPage(): React.ReactElement {
                     status={
                         shareStatus === "success" ? "success" : pending ? "cancellable" : "sharing"
                     }
+                    mediaPath={pending?.path ?? sharePreviewPath ?? undefined}
                     onCancel={() => {
                         Vibrate("impactLight")
                         // If we're still in the undo window, kill the pending
@@ -414,6 +421,7 @@ export function CameraPage(): React.ReactElement {
                             shareAbortRef.current.abort()
                             setShareStatus(null)
                         }
+                        setSharePreviewPath(null)
                         notify({
                             params: {
                                 title: t("Share cancelled"),
