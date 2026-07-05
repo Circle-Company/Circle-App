@@ -1,6 +1,6 @@
 import api from "@/api"
 import * as FileSystem from "expo-file-system/legacy"
-import { cancelCompression, Video } from "react-native-compressor"
+import { Video } from "react-native-compressor"
 
 export interface ShareMomentProps {
     description: string | null
@@ -14,7 +14,7 @@ export interface ShareMomentProps {
     /**
      * Optional AbortSignal. When aborted:
      *   - If compression is running, it's cancelled through
-     *     `cancelCompression(id)`.
+     *     `Video.cancelCompression(id)`.
      *   - If the axios request is in flight, it's aborted at the network
      *     layer via the same signal.
      * shareMoment will reject with the abort error, letting the caller
@@ -45,7 +45,7 @@ export async function shareMoment(props: ShareMomentProps) {
 
     let compressionId: string | null = null
     const onSignalAbort = () => {
-        if (compressionId) cancelCompression(compressionId)
+        if (compressionId) Video.cancelCompression(compressionId)
     }
     props.signal?.addEventListener("abort", onSignalAbort)
 
@@ -59,7 +59,7 @@ export async function shareMoment(props: ShareMomentProps) {
             minimumFileSizeForCompress: 0,
             getCancellationId: (id) => {
                 compressionId = id
-                if (props.signal?.aborted) cancelCompression(id)
+                if (props.signal?.aborted) Video.cancelCompression(id)
             },
         })
         throwIfAborted()
