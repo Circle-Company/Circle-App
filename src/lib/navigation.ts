@@ -109,7 +109,6 @@ export const ROUTES = {
     CAMERA: {
         INDEX: "/(tabs)/create",
         PERMISSIONS: "/(tabs)/create/permissions",
-        MEDIA: "/(tabs)/create/media",
     },
 
     // Profile routes

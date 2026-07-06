@@ -47,21 +47,6 @@ export default function CameraLayout() {
                             headerTitle: "Camera",
                         }}
                     />
-                    <Stack.Screen
-                        name="media"
-                        options={{
-                            statusBarAnimation: "fade",
-                            headerTransparent: false,
-                            headerShadowVisible: false,
-                            headerTintColor: "white",
-                            headerTitleStyle: { fontFamily: fonts.family["Black-Italic"] },
-                            headerStyle: {
-                                backgroundColor: "black",
-                            },
-                            headerTitle: t("All Ready"),
-                            headerBackTitle: t("Back"),
-                        }}
-                    />
                 </Stack>
             </GestureHandlerRootView>
         </CameraProvider>

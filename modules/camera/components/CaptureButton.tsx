@@ -2,21 +2,22 @@ import ColorTheme from "@/constants/colors"
 import React from "react"
 import type { ViewProps } from "react-native"
 import { StyleSheet, View } from "react-native"
-import type { TapGestureHandlerStateChangeEvent } from "react-native-gesture-handler"
-import { Gesture, GestureDetector, State, TapGestureHandler } from "react-native-gesture-handler"
+import { Gesture, GestureDetector } from "react-native-gesture-handler"
 import Reanimated, {
     cancelAnimation,
+    Easing,
     Extrapolate,
     interpolate,
     runOnJS,
     useAnimatedStyle,
     useSharedValue,
-    withRepeat,
     withSpring,
     withTiming,
 } from "react-native-reanimated"
 import type { SharedValue } from "react-native-reanimated"
 import type { CameraVideoOutput, Recorder } from "react-native-vision-camera"
+import Svg, { Circle, Rect } from "react-native-svg"
+import { Vibrate } from "@/lib/hooks/useHapticFeedback"
 import { CAPTURE_BUTTON_SIZE, SCREEN_HEIGHT } from "../constants"
 
 // Video-only capture: press starts recording immediately (no delay/long-press).
@@ -27,7 +28,33 @@ const STOP_DEBOUNCE_MS = 120
 // from the async createRecorder/startRecording chain finishing right as the user
 // releases — gives AVAssetWriter enough samples to finalize a valid file.
 const MIN_RECORDING_MS = 600
+// Horizontal drag distance (in px) past which the camera flips during a hold.
+// FLIP_THRESHOLD_PX is the "trip" point going left from the origin; once
+// flipped, the finger has to come back past FLIP_RETURN_PX (closer to the
+// origin) to flip back. The gap between the two values is hysteresis — keeps
+// minor finger jitter near the threshold from seesawing the camera.
+const FLIP_THRESHOLD_PX = 80
+const FLIP_RETURN_PX = 24
+// Flip is only armed after the finger has been (nearly) still for this long
+// following press-down. A diagonal drag from the moment of press (e.g. user
+// pinches up-and-left to zoom) never dwells, so flip stays disabled for the
+// whole gesture — the user has to release, re-press, hold still, then drag.
+const FLIP_ARM_DWELL_MS = 350
+// Max Euclidean drift (px) allowed during the dwell window. Anything above
+// this and the arming attempt is permanently invalidated for this gesture.
+// 30 gives fat-finger jitter enough room while still failing on a real drag.
+const FLIP_ARM_DRIFT_TOLERANCE_PX = 30
+// Forward flip also demands the drag be primarily horizontal at the moment
+// it crosses the trigger threshold: |dx| must be at least this many times
+// |dy|. 1.5 = up to ~33° off horizontal counts as "sideways". Stops a slow
+// diagonal drag (which can pass the dwell check by not moving much early on)
+// from firing the flip when the intent was clearly zoom-plus-side.
+const FLIP_FORWARD_HORIZONTAL_DOMINANCE = 1.5
 const BORDER_WIDTH = CAPTURE_BUTTON_SIZE * 0.1
+// Recording indicator (purple square) — geometry hoisted to module scope
+// so the JSX can consume it and styles can share the same values.
+const SHADOW_SIZE = CAPTURE_BUTTON_SIZE * 0.4
+const SHADOW_CORNER_RADIUS = CAPTURE_BUTTON_SIZE * 0.12
 
 interface Props extends ViewProps {
     videoOutput: CameraVideoOutput
@@ -39,6 +66,25 @@ interface Props extends ViewProps {
     setIsPressingButton: (isPressingButton: boolean) => void
     onRecordingStart?: () => void
     onRecordingStop?: () => void
+    /**
+     * Called when the user drags horizontally past FLIP_THRESHOLD_PX while
+     * holding the button. Used to toggle the camera (front ↔ back) without
+     * interrupting an active recording.
+     */
+    onFlipCamera?: () => void
+    /**
+     * If true, the button behaves as a single-tap toggle (tap → start,
+     * tap → stop) instead of press-and-hold. Zoom-drag and flip-drag
+     * gestures are also disabled so the button doesn't interfere with the
+     * hands-free intent. Default false.
+     */
+    handsFree?: boolean
+    /**
+     * Fired when the user presses AND HOLDS the button while in hands-free
+     * mode (where a hold is a no-op). Lets the parent surface a hint telling
+     * them to just tap. Never called in the default hold-to-record mode.
+     */
+    onHandsFreeHoldHint?: () => void
 }
 
 const CaptureButtonComponent: React.FC<Props> = ({
@@ -49,6 +95,9 @@ const CaptureButtonComponent: React.FC<Props> = ({
     cameraZoom,
     enabled,
     setIsPressingButton,
+    onFlipCamera,
+    handsFree = false,
+    onHandsFreeHoldHint,
     style,
     ...props
 }) => {
@@ -93,6 +142,8 @@ const CaptureButtonComponent: React.FC<Props> = ({
     const onStoppedRecording = React.useCallback(() => {
         if (!mountedRef.current) return
 
+        const wasActuallyRecording = isRecording.current
+
         isRecording.current = false
         startInProgressRef.current = false
         stopInProgressRef.current = false
@@ -106,6 +157,11 @@ const CaptureButtonComponent: React.FC<Props> = ({
 
         cancelAnimation(recordingProgress)
         safeSetPressing(false)
+
+        // Only buzz on the transition out of a real recording — onStoppedRecording
+        // also runs as a cleanup path when startRecording fails before any frames
+        // were captured, and we don't want to fake a "stop" haptic in that case.
+        if (wasActuallyRecording) Vibrate("selection")
 
         props.onRecordingStop?.()
     }, [props.onRecordingStop, recordingProgress, safeSetPressing])
@@ -191,6 +247,10 @@ const CaptureButtonComponent: React.FC<Props> = ({
             isRecording.current = true
             recordingStartedAtRef.current = Date.now()
 
+            // Light tap when the recorder actually engages (not on touch-down)
+            // so the user feels the moment frames start being written, not the
+            // moment they merely pressed.
+            Vibrate("virtualKey")
             props.onRecordingStart?.()
             safeSetPressing(true)
 
@@ -227,9 +287,7 @@ const CaptureButtonComponent: React.FC<Props> = ({
                         msg.includes("AVErrorRecordingSuccessfullyFinishedKey=true") ||
                         msg.includes("Code=-11818")
                     if (isSuccessfulFinish) {
-                        const path = (recorderRef.current as any)?.filePath as
-                            | string
-                            | undefined
+                        const path = (recorderRef.current as any)?.filePath as string | undefined
                         if (path && mountedRef.current) {
                             const durationSec = Math.max(
                                 0,
@@ -260,54 +318,92 @@ const CaptureButtonComponent: React.FC<Props> = ({
         stopRecording,
     ])
 
-    const tapHandler = React.useRef<TapGestureHandler>(null)
+    const handlePressDown = React.useCallback(() => {
+        safeSetPressing(true)
+        if (holdTimerRef.current) clearTimeout(holdTimerRef.current)
+        if (START_RECORDING_DELAY === 0) {
+            startRecording().catch(() => {})
+        } else {
+            holdTimerRef.current = setTimeout(() => {
+                startRecording().catch(() => {})
+            }, START_RECORDING_DELAY)
+        }
+    }, [safeSetPressing, startRecording])
 
-    const onHandlerStateChanged = React.useCallback(
-        async ({ nativeEvent }: TapGestureHandlerStateChangeEvent) => {
-            switch (nativeEvent.state) {
-                case State.BEGAN:
-                    safeSetPressing(true)
-                    if (holdTimerRef.current) clearTimeout(holdTimerRef.current)
-                    holdTimerRef.current = setTimeout(() => {
-                        startRecording().catch(() => {})
-                    }, START_RECORDING_DELAY)
-                    break
-
-                case State.CANCELLED:
-                case State.FAILED:
-                case State.END:
-                    if (holdTimerRef.current) {
-                        clearTimeout(holdTimerRef.current)
-                        holdTimerRef.current = null
-                    }
-                    if (isRecording.current) {
-                        await stopRecording()
-                    } else if (startInProgressRef.current) {
-                        // User released while createRecorder/startRecording is still in
-                        // flight. Mark the release as pending; startRecording will honor
-                        // it (with MIN_RECORDING_MS enforced) once the recorder activates.
-                        releasePendingRef.current = true
-                    } else {
-                        safeSetPressing(false)
-                    }
-                    break
-            }
-        },
-        [safeSetPressing, startRecording, stopRecording],
-    )
-
-    const panStartY = useSharedValue(0)
-    const panOffsetY = useSharedValue(0)
-
-    const handleReleaseFromPan = React.useCallback(() => {
+    const handlePressUp = React.useCallback(() => {
+        if (holdTimerRef.current) {
+            clearTimeout(holdTimerRef.current)
+            holdTimerRef.current = null
+        }
         if (isRecording.current) {
             stopRecording()
+        } else if (startInProgressRef.current) {
+            // User released while createRecorder/startRecording is still in flight.
+            // Mark release as pending; startRecording honors it (with MIN_RECORDING_MS
+            // enforced) once the recorder activates.
+            releasePendingRef.current = true
         } else {
             safeSetPressing(false)
         }
-    }, [stopRecording, safeSetPressing])
+    }, [safeSetPressing, stopRecording])
 
-    const panGesture = Gesture.Pan()
+    // Hands-free tap → toggle. First tap starts recording; the next tap
+    // stops it. We reuse the same start/stop pipeline as press-and-hold so
+    // MIN_RECORDING_MS, retry-on-not-connected, etc. behave identically.
+    const handleTapToggle = React.useCallback(() => {
+        if (isRecording.current) {
+            stopRecording()
+        } else if (startInProgressRef.current) {
+            // A tap arrived while start is mid-flight — mark for immediate
+            // stop when it engages.
+            releasePendingRef.current = true
+        } else {
+            safeSetPressing(true)
+            startRecording().catch(() => {})
+        }
+    }, [safeSetPressing, startRecording, stopRecording])
+
+    const panStartY = useSharedValue(0)
+    const panOffsetY = useSharedValue(0)
+    // Detent state for the flip gesture. `flipped` reflects whether we are
+    // currently OFFSET from the starting camera by one flip. Crossing
+    // translationX past -FLIP_THRESHOLD_PX while not flipped sets it true
+    // and fires onFlipCamera; sliding back toward the origin past
+    // -FLIP_RETURN_PX sets it false and fires onFlipCamera again, returning
+    // the camera to its original position. Reset to false on every new hold.
+    const flipped = useSharedValue(false)
+    // Dwell arming for the flip gesture. `panStartTime` marks when the pan
+    // began; `maxEarlyDrift` tracks the biggest distance the finger has been
+    // from that origin during the FLIP_ARM_DWELL_MS window. The flip is
+    // eligible only when (elapsed >= dwell) AND (maxEarlyDrift < tolerance).
+    // A diagonal zoom drag from press-down blows past the tolerance in the
+    // first few frames, permanently disqualifying flip for that gesture —
+    // exactly what we want to keep zoom and flip separate.
+    const panStartTime = useSharedValue(0)
+    const maxEarlyDrift = useSharedValue(0)
+
+    // LongPress with minDuration(0) and maxDistance(Infinity) — fires onStart on
+    // touch and stays active during finger movement. Composed with Pan via
+    // Gesture.Simultaneous so the same touch drives both: LongPress detects the
+    // hold lifecycle (start/end of recording) while Pan tracks vertical drag
+    // for zoom. The legacy TapGestureHandler used to cancel on movement, killing
+    // the recording the moment the user started dragging to zoom.
+    const longPress = Gesture.LongPress()
+        .enabled(enabled)
+        .minDuration(0)
+        .maxDistance(Number.MAX_SAFE_INTEGER)
+        .shouldCancelWhenOutside(false)
+        .onStart(() => {
+            "worklet"
+            runOnJS(handlePressDown)()
+        })
+        .onFinalize(() => {
+            "worklet"
+            runOnJS(handlePressUp)()
+        })
+
+    const pan = Gesture.Pan()
+        .enabled(enabled)
         .onBegin((event) => {
             "worklet"
             panStartY.value = event.absoluteY
@@ -318,6 +414,9 @@ const CaptureButtonComponent: React.FC<Props> = ({
                 [0, panStartY.value - yForFullZoom],
                 Extrapolate.CLAMP,
             )
+            flipped.value = false
+            panStartTime.value = Date.now()
+            maxEarlyDrift.value = 0
         })
         .onUpdate((event) => {
             "worklet"
@@ -328,45 +427,212 @@ const CaptureButtonComponent: React.FC<Props> = ({
                 [maxZoom, minZoom],
                 Extrapolate.CLAMP,
             )
+
+            // Track the biggest drift during the arming window. Once the
+            // window closes, this value is frozen for the rest of the gesture
+            // and used to decide whether flip stays disabled.
+            const elapsed = Date.now() - panStartTime.value
+            if (elapsed < FLIP_ARM_DWELL_MS) {
+                const drift = Math.sqrt(
+                    event.translationX * event.translationX +
+                        event.translationY * event.translationY,
+                )
+                if (drift > maxEarlyDrift.value) maxEarlyDrift.value = drift
+            }
+
+            if (onFlipCamera == null) return
+
+            // Two-way flip detent, GATED on the arming check above.
+            //   - Drag LEFT past -FLIP_THRESHOLD_PX  → first flip
+            //   - Bring finger BACK past -FLIP_RETURN_PX → flip back to origin
+            // FLIP_THRESHOLD_PX (80) and FLIP_RETURN_PX (24) bracket a dead
+            // zone that absorbs finger jitter without re-firing the flip.
+            //
+            // Arming requires: (a) at least FLIP_ARM_DWELL_MS elapsed since
+            // press-down AND (b) finger stayed within FLIP_ARM_DRIFT_TOLERANCE_PX
+            // of the origin during that window. A diagonal drag from press
+            // (zoom + horizontal) fails (b) immediately and never arms.
+            const armed =
+                elapsed >= FLIP_ARM_DWELL_MS && maxEarlyDrift.value < FLIP_ARM_DRIFT_TOLERANCE_PX
+            if (!armed) return
+
+            if (!flipped.value && event.translationX < -FLIP_THRESHOLD_PX) {
+                // Second safety net: even when armed, only fire the forward
+                // flip if the drag is horizontal-dominant right now. This
+                // catches slow diagonal drags that manage to sneak past the
+                // dwell check (finger barely moving during 350ms then
+                // gradually building up an up-and-left path).
+                const horizontalDominant =
+                    Math.abs(event.translationX) >=
+                    Math.abs(event.translationY) * FLIP_FORWARD_HORIZONTAL_DOMINANCE
+                if (!horizontalDominant) return
+
+                flipped.value = true
+                runOnJS(onFlipCamera)()
+            } else if (flipped.value && event.translationX > -FLIP_RETURN_PX) {
+                // Back-flip intentionally skips the direction check — the
+                // return path can curve upward as the finger relaxes, and
+                // we don't want to strand the user on the flipped camera if
+                // dy happens to be large at the moment dx crosses back.
+                flipped.value = false
+                runOnJS(onFlipCamera)()
+            }
         })
-        .onFinalize(() => {
-            runOnJS(handleReleaseFromPan)()
+
+    // Hands-free mode uses a plain Tap gesture that toggles recording on
+    // each press — no long-press, no zoom-drag, no flip-drag. The default
+    // mode composes longPress + pan for the hold/zoom/flip pipeline.
+    const tap = Gesture.Tap()
+        .enabled(enabled)
+        .onEnd(() => {
+            "worklet"
+            runOnJS(handleTapToggle)()
         })
+
+    // Hands-free only: a deliberate press-and-hold does nothing (recording is
+    // tap-toggle), so catch the hold and surface a hint telling the user to
+    // tap. minDuration sits above the Tap recognition window so a normal tap
+    // still toggles recording and only a real hold trips the hint.
+    const handsFreeHoldHint = Gesture.LongPress()
+        .enabled(enabled && handsFree)
+        .minDuration(350)
+        .maxDistance(Number.MAX_SAFE_INTEGER)
+        .onStart(() => {
+            "worklet"
+            if (onHandsFreeHoldHint) runOnJS(onHandsFreeHoldHint)()
+        })
+
+    // Exclusive: a hold trips the hint (and blocks the tap); a quick tap fails
+    // the long-press and toggles recording as usual.
+    const composedGesture = handsFree
+        ? Gesture.Exclusive(handsFreeHoldHint, tap)
+        : Gesture.Simultaneous(longPress, pan)
 
     const shadowStyle = useAnimatedStyle(() => ({
         transform: [{ scale: withSpring(isPressingButton.value ? 1 : 0) }],
     }))
 
-    const buttonStyle = useAnimatedStyle(() => ({
-        opacity: withTiming(enabled ? 1 : 0.3),
-        transform: [
-            {
-                scale: enabled
-                    ? isPressingButton.value
-                        ? withRepeat(withSpring(1), -1, true)
-                        : withSpring(0.9)
-                    : withSpring(0.6),
-            },
-        ],
-    }))
+    // Tactile "physical button" animation: the button compresses down + sinks
+    // into the surface + loses its drop-shadow when pressed. Press-in uses a
+    // fast timing (feels like meeting a hard stop); release uses a springy
+    // response so the button pops back with a small overshoot, the way a
+    // real dome-switch button would.
+    const buttonStyle = useAnimatedStyle(() => {
+        if (!enabled) {
+            return {
+                opacity: withTiming(0.3),
+                transform: [
+                    { scale: withSpring(0.6) },
+                    { translateY: withTiming(0) },
+                ],
+            }
+        }
+        const pressed = isPressingButton.value
+        return {
+            opacity: withTiming(1),
+            transform: [
+                {
+                    scale: pressed
+                        ? withTiming(1.15, {
+                              duration: 90,
+                              easing: Easing.out(Easing.quad),
+                          })
+                        : withSpring(1, {
+                              damping: 12,
+                              stiffness: 240,
+                              mass: 0.55,
+                          }),
+                },
+                {
+                    // Sink slightly into the surface. Small value (3pt) —
+                    // enough to read visually without disconnecting the
+                    // capture button from the bottom bar.
+                    translateY: pressed
+                        ? withTiming(3, {
+                              duration: 90,
+                              easing: Easing.out(Easing.quad),
+                          })
+                        : withSpring(0, {
+                              damping: 12,
+                              stiffness: 300,
+                              mass: 0.5,
+                          }),
+                },
+            ],
+        }
+    })
+
+    // Drop shadow that lives on the ring itself. Elevated at rest, nearly
+    // flat when pressed. Reads as "the button is touching the surface now"
+    // rather than "the button is floating above it".
+    const ringShadowStyle = useAnimatedStyle(() => {
+        if (!enabled) return { shadowOpacity: 0 }
+        const pressed = isPressingButton.value
+        return {
+            shadowOpacity: withTiming(pressed ? 0.08 : 0.32, { duration: 120 }),
+            shadowRadius: withTiming(pressed ? 3 : 10, { duration: 120 }),
+        }
+    })
 
     return (
-        <TapGestureHandler
-            ref={tapHandler}
-            enabled={enabled}
-            onHandlerStateChange={onHandlerStateChanged}
-            shouldCancelWhenOutside={false}
-            maxDurationMs={99999999}
-        >
+        <GestureDetector gesture={composedGesture}>
             <Reanimated.View {...props} style={[buttonStyle, style]}>
-                <GestureDetector gesture={panGesture}>
-                    <Reanimated.View style={styles.flex}>
-                        <Reanimated.View style={[styles.shadow, shadowStyle]} />
-                        <View style={styles.button} />
+                <Reanimated.View style={styles.flex}>
+                    <Reanimated.View
+                        style={[styles.shadow, shadowStyle]}
+                        pointerEvents="none"
+                    >
+                        {/*
+                          Purple recording indicator drawn as an SVG rect so
+                          the rounded corners stay sharp while shadowStyle
+                          scales it from 0 → 1. A View with borderRadius +
+                          backgroundColor gets rasterized to a bitmap at
+                          layout size and blurs at the corners during the
+                          spring; SVG re-renders each frame via CoreGraphics.
+                        */}
+                        <Svg
+                            width={SHADOW_SIZE}
+                            height={SHADOW_SIZE}
+                        >
+                            <Rect
+                                x={0}
+                                y={0}
+                                width={SHADOW_SIZE}
+                                height={SHADOW_SIZE}
+                                rx={SHADOW_CORNER_RADIUS}
+                                ry={SHADOW_CORNER_RADIUS}
+                                fill={ColorTheme().primary}
+                            />
+                        </Svg>
                     </Reanimated.View>
-                </GestureDetector>
+                    <Reanimated.View
+                        style={[styles.buttonShadowHost, ringShadowStyle]}
+                        pointerEvents="none"
+                    >
+                        {/*
+                          Ring drawn as an SVG stroke so it stays crisp when
+                          the parent transform scales the button up on press.
+                          A View borderRadius+borderWidth rasterizes to a
+                          bitmap at layout size and blurs when upscaled; SVG
+                          paths re-render each frame via CoreGraphics.
+                        */}
+                        <Svg
+                            width={CAPTURE_BUTTON_SIZE}
+                            height={CAPTURE_BUTTON_SIZE}
+                        >
+                            <Circle
+                                cx={CAPTURE_BUTTON_SIZE / 2}
+                                cy={CAPTURE_BUTTON_SIZE / 2}
+                                r={(CAPTURE_BUTTON_SIZE - BORDER_WIDTH) / 2}
+                                stroke="white"
+                                strokeWidth={BORDER_WIDTH}
+                                fill="transparent"
+                            />
+                        </Svg>
+                    </Reanimated.View>
+                </Reanimated.View>
             </Reanimated.View>
-        </TapGestureHandler>
+        </GestureDetector>
     )
 }
 
@@ -374,19 +640,30 @@ export const CaptureButton = React.memo(CaptureButtonComponent)
 
 const styles = StyleSheet.create({
     flex: { flex: 1 },
+    // Recording indicator that sits inside the white ring. Only visible
+    // while isPressingButton is true (shadowStyle scales it from 0 → 1),
+    // so the resting borderRadius here is what the user actually sees:
+    // a rounded square that reads as "stop" — the iOS-camera pattern for
+    // an active recording state.
     shadow: {
         position: "absolute",
-        margin: 25,
-        width: CAPTURE_BUTTON_SIZE - 50,
-        height: CAPTURE_BUTTON_SIZE - 50,
-        borderRadius: CAPTURE_BUTTON_SIZE * 0.1,
-        backgroundColor: ColorTheme().primary,
+        margin: (CAPTURE_BUTTON_SIZE - SHADOW_SIZE) / 2,
+        width: SHADOW_SIZE,
+        height: SHADOW_SIZE,
+        // The visible shape is drawn by the inner SVG Rect — no need for
+        // backgroundColor + borderRadius on this container.
     },
-    button: {
+    // Hosts the SVG ring + owns the drop shadow. Circular borderRadius
+    // shapes the shadow into a ring silhouette; the SVG itself is drawn
+    // on top of that shadow layer.
+    buttonShadowHost: {
         width: CAPTURE_BUTTON_SIZE,
         height: CAPTURE_BUTTON_SIZE,
         borderRadius: CAPTURE_BUTTON_SIZE / 2,
-        borderWidth: BORDER_WIDTH,
-        borderColor: "white",
+        // Static shadow config that ringShadowStyle animates against.
+        shadowColor: "#000",
+        shadowOffset: { width: 0, height: 4 },
+        shadowOpacity: 0.32,
+        shadowRadius: 10,
     },
 })

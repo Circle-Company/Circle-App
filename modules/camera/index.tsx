@@ -8,7 +8,6 @@
  */
 
 export { CameraPage } from "./pages/camera"
-export { MediaPage } from "./pages/share"
 
 export { CameraProvider, useCameraContext } from "./context"
 export type { CameraContextType } from "./context"

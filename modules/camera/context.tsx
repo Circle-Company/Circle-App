@@ -1,9 +1,16 @@
 import React, { createContext, useContext, useState, ReactNode, useCallback, useMemo } from "react"
-import { uploadMoment } from "./hooks/uploadMoment"
+import { shareMoment } from "./hooks/shareMoment"
 import PersistedContext from "@/contexts/Persisted"
 import type { CameraDevice } from "react-native-vision-camera"
 import { useMicrophonePermission } from "react-native-vision-camera" // observe-only in context; do not auto-request here
 import { usePreferredCameraDevice } from "./hooks/usePreferredCameraDevice"
+
+type CameraPosition = "front" | "back"
+
+// Camera always boots on the back lens. Any prior selection is ignored:
+// front-cam sessions are treated as a temporary state that only lives while
+// the camera screen is open — cold start OR successful publish resets to
+// back. Persistence was removed here.
 
 export type CameraVideoInfo = {
     path: string
@@ -25,6 +32,19 @@ export type CameraContextType = {
     // Recording state
     isRecording: boolean
     setIsRecording: (value: boolean) => void
+
+    // Sharing state — true from the moment a queued clip starts uploading
+    // until either success or abort. Bottom-bar buttons lock during this
+    // window (capture, rotate) and Flash auto-restores its pre-share torch
+    // level once it goes back to false.
+    isSharing: boolean
+    setIsSharing: (value: boolean) => void
+
+    // Hands-free mode — capture button toggles recording on single tap
+    // (no press-and-hold). Flip-swipe gestures and hint UI are suppressed
+    // so the user can leave the phone somewhere and act naturally.
+    isHandsFree: boolean
+    setIsHandsFree: (value: boolean) => void
 
     // Camera lifecycle / init and activity
     isCameraInitialized: boolean
@@ -88,6 +108,8 @@ export const CameraProvider = ({ children }: { children: ReactNode }) => {
     const { session } = useContext(PersistedContext)
     const [tabHide, setTabHide] = React.useState(false)
     const [isRecording, setIsRecording] = useState(false)
+    const [isSharing, setIsSharing] = useState(false)
+    const [isHandsFree, setIsHandsFree] = useState(false)
     const [video, setVideo] = useState<CameraVideoInfo>(null)
     const [recordingTime, setRecordingTime] = useState(0)
     const [videoBuffer, setVideoBuffer] = useState<string | null>(null)
@@ -99,7 +121,7 @@ export const CameraProvider = ({ children }: { children: ReactNode }) => {
     const [isPressingButton, setIsPressingButton] = useState(false)
     const [rotateAnimation, setRotateAnimation] = useState(0)
     const [isCameraInitialized, setIsCameraInitialized] = useState(false)
-    const [cameraPosition, setCameraPosition] = useState<"front" | "back">("back")
+    const [cameraPosition, setCameraPosition] = useState<CameraPosition>("back")
     const [torch, setTorch] = useState<"off" | "on">("off")
     const [isActive, setIsActive] = useState(true)
 
@@ -128,11 +150,6 @@ export const CameraProvider = ({ children }: { children: ReactNode }) => {
         // authToken intentionally preserved across resets
     }, [])
 
-    const normalizeToken = (token: string) => {
-        const t = token.trim()
-        return t.toLowerCase().startsWith("bearer ") ? t : `Bearer ${t}`
-    }
-
     const upload: CameraContextType["upload"] = useCallback(async () => {
         setIsUploading(true)
         setUploadError(null)
@@ -157,21 +174,17 @@ export const CameraProvider = ({ children }: { children: ReactNode }) => {
                 return { ok: false, error: msg }
             }
 
-            // Delegate upload to hook (conversion to base64 happens there)
-            console.log("📤 Enviando para uploadMoment...")
+            console.log("📤 Enviando para shareMoment...")
 
-            // Extract filename from path
-            const filename = video.path.split("/").pop() || "video.mp4"
-
-            const data = await uploadMoment({
+            const data = await shareMoment({
                 description: description !== undefined ? description : null,
+                userId: session.user.id,
                 videoMetadata: {
-                    filename: filename,
                     mimeType: video?.mimeType || "video/mp4",
-                    size: typeof video?.size === "number" ? video.size : 0,
+                    duration: typeof video?.duration === "number" ? video.duration : undefined,
                 },
                 videoPath: video.path,
-                jwtToken: normalizeToken(session.account.jwtToken),
+                jwtToken: session.account.jwtToken,
             })
 
             console.log("✅ Upload concluído com sucesso!")
@@ -198,7 +211,7 @@ export const CameraProvider = ({ children }: { children: ReactNode }) => {
         } finally {
             setIsUploading(false)
         }
-    }, [video, description, session.account.jwtToken])
+    }, [video, description, session.account.jwtToken, session.user.id])
 
     const value = useMemo<CameraContextType>(
         () => ({
@@ -209,6 +222,14 @@ export const CameraProvider = ({ children }: { children: ReactNode }) => {
             // recording
             isRecording,
             setIsRecording,
+
+            // sharing
+            isSharing,
+            setIsSharing,
+
+            // hands-free
+            isHandsFree,
+            setIsHandsFree,
 
             // lifecycle / activity
             isCameraInitialized,
@@ -269,6 +290,8 @@ export const CameraProvider = ({ children }: { children: ReactNode }) => {
             tabHide,
             setTabHide,
             isRecording,
+            isSharing,
+            isHandsFree,
             isCameraInitialized,
             isActive,
             zoom,
