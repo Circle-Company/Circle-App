@@ -110,29 +110,23 @@ export const useFeed = () => {
         [feedOrchestrator, feedData, focusedChunkItem],
     )
 
-    // Função para carregar vídeo do cache (quando o usuário foca no vídeo)
+    // Função para carregar vídeo do cache (quando o usuário foca no vídeo).
+    // `fallbackUrl` permite resolver momentos que NÃO estão no `feedData`
+    // (perfil, conta, tela cheia) pelo mesmo cache do feed — antes a busca em
+    // `feedData` retornava null nessas telas e o vídeo era rebaixado.
     const loadVideoFromCache = useCallback(
-        async (momentId: string): Promise<string | null> => {
+        async (momentId: string, fallbackUrl?: string): Promise<string | null> => {
             if (!feedOrchestrator) return null
 
             try {
                 const moment = feedData.find((m) => m.id === momentId)
-                if (!moment) return null
-
-                const videoUrl = moment.media
+                const videoUrl = moment?.media ?? fallbackUrl
                 if (!videoUrl) return null
 
-                // Tentar carregar do cache primeiro
-                const cachedUrl = await feedOrchestrator.getCached(momentId)
-                if (cachedUrl) {
-                    console.log(`Vídeo carregado do cache: ${momentId}`)
-                    return cachedUrl
-                }
-
-                // Se não estiver em cache, fazer preload e retornar URL original
-                console.log(`Vídeo não em cache, fazendo preload: ${momentId}`)
-                feedOrchestrator.preloadSingle(momentId, videoUrl)
-                return videoUrl
+                // Porta única do orquestrador: devolve o arquivo local quando
+                // há entrada válida no TTL, senão a URL remota + download
+                // agendado para a próxima exibição ser instantânea.
+                return await feedOrchestrator.resolveVideo(momentId, videoUrl)
             } catch (error) {
                 console.error("Erro ao carregar vídeo do cache:", error)
                 return null
@@ -194,6 +188,14 @@ export const useFeed = () => {
         loadVideoFromCache,
         preloadNextVideo,
         reloadFeed: () => fetch(true),
+        // API de cache do orquestrador — porta única para as telas, dentro e
+        // fora do feed, em vez de cada uma falar com o CacheManager na mão.
+        getCachedVideoSync: (id: string) => feedOrchestrator?.getCachedSync(id),
+        resolveVideo: (id: string, url: string) => feedOrchestrator?.resolveVideo(id, url),
+        prefetchAround: (id: string, range?: number) =>
+            feedOrchestrator?.prefetchAround(id, feedData, range) ?? [],
+        prefetchThumbnail: (id: string, url: string) =>
+            feedOrchestrator?.prefetchThumbnail(id, url),
         // Expor cacheManager e chunkManager para prefetch otimizado
         cacheManager: feedOrchestrator?.cacheManager,
         chunkManager: feedOrchestrator?.chunkManager,

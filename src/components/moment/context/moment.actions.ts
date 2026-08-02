@@ -7,10 +7,17 @@ export type InteractionType = "LIKE" | "UNLIKE" | "WATCH" | "COMMENT" | "EXCLUDE
 
 export interface MomentActionsState extends actionsProps {
     setInitialLikedState: React.Dispatch<React.SetStateAction<boolean>>
+    // Exposto para o botão de like alinhar este estado ao `likedMoments`
+    // persistido: as guardas de LIKE/UNLIKE abaixo dependem de `like`, e sem
+    // isso um momento curtido em outra tela não conseguiria ser descurtido.
+    setLike: React.Dispatch<React.SetStateAction<boolean>>
+    // Resolve com `true` quando a interação foi de fato enviada e aceita, e com
+    // `false` quando foi ignorada (payload/token inválido) ou falhou na API.
+    // Não rejeita: vários chamadores disparam sem await nem catch.
     registerInteraction: <T extends InteractionType>(
         interactionType: T,
         data?: InteractionPayload<T>,
-    ) => Promise<void>
+    ) => Promise<boolean>
     set: (actions: actionsProps) => void
     get: () => actionsProps
 }
@@ -29,7 +36,7 @@ export function useActions(momentId?: string): MomentActionsState {
         async <T extends InteractionType>(interactionType: T, data?: InteractionPayload<T>) => {
             if (!momentId || !session.account.jwtToken) {
                 console.warn("MomentId ou token não disponível para enviar interação")
-                return
+                return false
             }
 
             try {
@@ -57,7 +64,7 @@ export function useActions(momentId?: string): MomentActionsState {
                         const payload = data as InteractionPayloadMap["WATCH"]
                         if (!payload || typeof payload.watchTime !== "number") {
                             console.warn("WATCH requer payload { watchTime: number }")
-                            return
+                            return false
                         }
                         await apiRoutes.moment.actions.watch({
                             ...baseParams,
@@ -75,7 +82,7 @@ export function useActions(momentId?: string): MomentActionsState {
                             console.warn(
                                 "COMMENT requer payload { content: string, mentions?: string[], parentId?: string }",
                             )
-                            return
+                            return false
                         }
                         await apiRoutes.moment.actions.comment({
                             ...baseParams,
@@ -95,8 +102,10 @@ export function useActions(momentId?: string): MomentActionsState {
                     }
                     default: {
                         console.warn(`Tipo de interação não reconhecido: ${interactionType}`)
+                        return false
                     }
                 }
+                return true
             } catch (error: any) {
                 const errorMessage =
                     error.response?.data?.message || error.message || "Erro desconhecido"
@@ -106,6 +115,7 @@ export function useActions(momentId?: string): MomentActionsState {
                 if (interactionType === "LIKE" || interactionType === "UNLIKE") {
                     setLike(interactionType === "UNLIKE")
                 }
+                return false
             }
         },
         [momentId, session.account.jwtToken],
@@ -133,6 +143,7 @@ export function useActions(momentId?: string): MomentActionsState {
         comment,
         initialLikedState,
         setInitialLikedState,
+        setLike,
         registerInteraction,
         set,
         get,

@@ -5,10 +5,12 @@ import sizes from "../../../../constants/sizes"
 import { CommentsHeaderLeftProps } from "../../comments-types"
 
 export default function header_left({ children }: CommentsHeaderLeftProps) {
+    // Sem `width: "100%"` nem o `paddingLeft` assimétrico — ambos empurravam o
+    // título para a esquerda. Encolhe no conteúdo e centraliza.
     const container: ViewStyle = {
-        paddingLeft: sizes.paddings["1sm"] * 0.7,
         flexDirection: "row",
-        width: "100%",
+        alignItems: "center",
+        justifyContent: "center",
         maxWidth: sizes.screens.width * 0.6,
         borderRadius: 20,
         paddingVertical: 4,

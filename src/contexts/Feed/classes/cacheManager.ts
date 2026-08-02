@@ -4,10 +4,16 @@ import { Image } from "react-native"
 const VIDEO_CACHE_DIR = `${FileSystem.cacheDirectory}videos`
 const THUMBNAIL_CACHE_DIR = `${FileSystem.cacheDirectory}thumbnails`
 
+// Validade de uma entrada em cache. Passado esse tempo o arquivo é tratado
+// como inexistente e rebaixado, para o usuário não ver mídia desatualizada.
+export const CACHE_TTL_MS = 60 * 60 * 1000 // 1h
+
 type CacheEntry = {
     id: string
     localPath: string
     originalUrl: string
+    /** Epoch em ms de quando o arquivo foi gravado. Base do TTL. */
+    cachedAt: number
 }
 
 type DownloadPriority = "high" | "medium" | "low"
@@ -71,7 +77,12 @@ export class CacheManager {
                 if (name.endsWith(".mp4")) {
                     const id = name.replace(".mp4", "")
                     const localPath = `${VIDEO_CACHE_DIR}/${name}`
-                    this.videoCache.set(id, { id, localPath, originalUrl: "" })
+                    const cachedAt = await this.readFileTimestamp(localPath)
+                    if (this.isExpired(cachedAt)) {
+                        await this.deleteFile(localPath)
+                        continue
+                    }
+                    this.videoCache.set(id, { id, localPath, originalUrl: "", cachedAt })
                     this.accessQueue.push(id)
                 }
             }
@@ -82,7 +93,12 @@ export class CacheManager {
                 if (name.endsWith(".jpg") || name.endsWith(".png")) {
                     const id = name.replace(/\.(jpg|png)$/, "")
                     const localPath = `${THUMBNAIL_CACHE_DIR}/${name}`
-                    this.thumbnailCache.set(id, { id, localPath, originalUrl: "" })
+                    const cachedAt = await this.readFileTimestamp(localPath)
+                    if (this.isExpired(cachedAt)) {
+                        await this.deleteFile(localPath)
+                        continue
+                    }
+                    this.thumbnailCache.set(id, { id, localPath, originalUrl: "", cachedAt })
                     this.thumbnailAccessQueue.push(id)
                 }
             }
@@ -93,6 +109,51 @@ export class CacheManager {
         } catch (err) {
             console.warn("Erro ao carregar cache existente:", err)
         }
+    }
+
+    /** `modificationTime` vem em segundos; ausente, assume "agora". */
+    private async readFileTimestamp(localPath: string): Promise<number> {
+        try {
+            const info: any = await FileSystem.getInfoAsync(localPath)
+            if (info?.exists && typeof info.modificationTime === "number") {
+                return info.modificationTime * 1000
+            }
+        } catch {
+            // noop
+        }
+        return Date.now()
+    }
+
+    private isExpired(cachedAt: number): boolean {
+        return !Number.isFinite(cachedAt) || Date.now() - cachedAt >= CACHE_TTL_MS
+    }
+
+    private async deleteFile(localPath: string) {
+        try {
+            await FileSystem.deleteAsync(localPath, { idempotent: true })
+        } catch {
+            // noop
+        }
+    }
+
+    /**
+     * Devolve a entrada apenas se ainda estiver dentro do TTL. Se estiver
+     * vencida, remove do índice e do disco e devolve `undefined`, para o
+     * chamador tratar como cache miss e rebaixar.
+     */
+    private getFreshEntry(id: string, type: "video" | "thumbnail"): CacheEntry | undefined {
+        const cache = type === "video" ? this.videoCache : this.thumbnailCache
+        const entry = cache.get(id)
+        if (!entry) return undefined
+        if (!this.isExpired(entry.cachedAt)) return entry
+
+        cache.delete(id)
+        const queue = type === "video" ? this.accessQueue : this.thumbnailAccessQueue
+        const index = queue.indexOf(id)
+        if (index !== -1) queue.splice(index, 1)
+        if (type === "thumbnail") this.prefetchedThumbnails.delete(id)
+        void this.deleteFile(entry.localPath)
+        return undefined
     }
 
     private markAsUsed(id: string, type: "video" | "thumbnail" = "video") {
@@ -196,17 +257,26 @@ export class CacheManager {
     private async executeDownload(task: DownloadTask): Promise<void> {
         const cache = task.type === "video" ? this.videoCache : this.thumbnailCache
 
-        // Verificar se já existe
-        if (cache.has(task.id)) {
+        // Verificar se já existe e ainda está válido
+        if (this.getFreshEntry(task.id, task.type)) {
             return
         }
 
-        const fileInfo = await FileSystem.getInfoAsync(task.localPath)
+        const fileInfo: any = await FileSystem.getInfoAsync(task.localPath)
         if (fileInfo.exists) {
-            const finalPath = task.localPath
-            cache.set(task.id, { id: task.id, localPath: finalPath, originalUrl: task.url })
-            this.markAsUsed(task.id, task.type)
-            return
+            const cachedAt = await this.readFileTimestamp(task.localPath)
+            if (!this.isExpired(cachedAt)) {
+                cache.set(task.id, {
+                    id: task.id,
+                    localPath: task.localPath,
+                    originalUrl: task.url,
+                    cachedAt,
+                })
+                this.markAsUsed(task.id, task.type)
+                return
+            }
+            // Vencido: apaga para o download abaixo regravar o arquivo.
+            await this.deleteFile(task.localPath)
         }
 
         await this.evictIfNeeded(task.type)
@@ -215,7 +285,12 @@ export class CacheManager {
             await FileSystem.downloadAsync(task.url, task.localPath)
 
             const finalPath = task.localPath
-            cache.set(task.id, { id: task.id, localPath: finalPath, originalUrl: task.url })
+            cache.set(task.id, {
+                id: task.id,
+                localPath: finalPath,
+                originalUrl: task.url,
+                cachedAt: Date.now(),
+            })
             this.markAsUsed(task.id, task.type)
 
             console.log(`${task.type} [${task.id}] baixado com sucesso`)
@@ -229,19 +304,23 @@ export class CacheManager {
      * Pré-carrega um vídeo (método principal)
      */
     public async preload({ id, url }: { id: string; url: string }): Promise<string> {
-        if (this.videoCache.has(id)) {
+        const fresh = this.getFreshEntry(id, "video")
+        if (fresh) {
             this.markAsUsed(id, "video")
-            return this.videoCache.get(id)!.localPath
+            return fresh.localPath
         }
 
         const localPath = `${VIDEO_CACHE_DIR}/${id}.mp4`
-        const fileInfo = await FileSystem.getInfoAsync(localPath)
+        const fileInfo: any = await FileSystem.getInfoAsync(localPath)
 
         if (fileInfo.exists) {
-            const finalPath = localPath
-            this.videoCache.set(id, { id, localPath: finalPath, originalUrl: url })
-            this.markAsUsed(id, "video")
-            return finalPath
+            const cachedAt = await this.readFileTimestamp(localPath)
+            if (!this.isExpired(cachedAt)) {
+                this.videoCache.set(id, { id, localPath, originalUrl: url, cachedAt })
+                this.markAsUsed(id, "video")
+                return localPath
+            }
+            await this.deleteFile(localPath)
         }
 
         // Retorna URL remota imediatamente e adiciona à fila para download
@@ -268,20 +347,24 @@ export class CacheManager {
         url: string
         priority?: DownloadPriority
     }): Promise<string> {
-        if (this.thumbnailCache.has(id)) {
+        const fresh = this.getFreshEntry(id, "thumbnail")
+        if (fresh) {
             this.markAsUsed(id, "thumbnail")
-            return this.thumbnailCache.get(id)!.localPath
+            return fresh.localPath
         }
 
         const extension = url.includes(".png") ? "png" : "jpg"
         const localPath = `${THUMBNAIL_CACHE_DIR}/${id}.${extension}`
-        const fileInfo = await FileSystem.getInfoAsync(localPath)
+        const fileInfo: any = await FileSystem.getInfoAsync(localPath)
 
         if (fileInfo.exists) {
-            const finalPath = localPath
-            this.thumbnailCache.set(id, { id, localPath: finalPath, originalUrl: url })
-            this.markAsUsed(id, "thumbnail")
-            return finalPath
+            const cachedAt = await this.readFileTimestamp(localPath)
+            if (!this.isExpired(cachedAt)) {
+                this.thumbnailCache.set(id, { id, localPath, originalUrl: url, cachedAt })
+                this.markAsUsed(id, "thumbnail")
+                return localPath
+            }
+            await this.deleteFile(localPath)
         }
 
         // Adiciona à fila de download
@@ -336,23 +419,23 @@ export class CacheManager {
     }
 
     public get(id: string): string | undefined {
-        const entry = this.videoCache.get(id)
+        const entry = this.getFreshEntry(id, "video")
         if (entry) this.markAsUsed(id, "video")
         return entry?.localPath
     }
 
     public getThumbnail(id: string): string | undefined {
-        const entry = this.thumbnailCache.get(id)
+        const entry = this.getFreshEntry(id, "thumbnail")
         if (entry) this.markAsUsed(id, "thumbnail")
         return entry?.localPath
     }
 
     public has(id: string): boolean {
-        return this.videoCache.has(id)
+        return this.getFreshEntry(id, "video") !== undefined
     }
 
     public hasThumbnail(id: string): boolean {
-        return this.thumbnailCache.has(id)
+        return this.getFreshEntry(id, "thumbnail") !== undefined
     }
 
     public async remove(id: string) {

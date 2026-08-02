@@ -4,10 +4,9 @@ import { colors } from "@/constants/colors"
 import fonts from "@/constants/fonts"
 import sizes from "@/constants/sizes"
 import LanguageContext from "@/contexts/language"
-import FeedContext from "@/contexts/Feed"
 import React from "react"
 import { router } from "expo-router"
-import { AppState, AppStateStatus, Platform } from "react-native"
+import { Platform } from "react-native"
 import { Image, ImageStyle, TextStyle, ViewStyle, View, Animated } from "react-native"
 
 import {
@@ -17,33 +16,13 @@ import {
     isGlassEffectAPIAvailable,
 } from "expo-glass-effect"
 
-// Escala reversa de re-tentativa enquanto o feed continua vazio.
-const RETRY_SCHEDULE_MS = [
-    30 * 1000, // 30s
-    2 * 60 * 1000, // 2min
-    5 * 60 * 1000, // 5min
-    10 * 60 * 1000, // 10min
-    30 * 60 * 1000, // 30min
-    60 * 60 * 1000, // 1h
-    5 * 60 * 60 * 1000, // 5h
-]
-
-// Nível atual da escala, deliberadamente em escopo de MÓDULO:
-// - sobrevive a remontagens do card (trocar de aba e voltar não reinicia a
-//   escala em 30s, o que castigaria o servidor);
-// - morre junto com o contexto JS, ou seja, zera quando o app é fechado e
-//   reaberto — exatamente o reinício pedido.
-let retryStep = 0
-
-export function EmptyList() {
+/**
+ * Ocupa o lugar do feed enquanto a conta ainda não publicou nenhum momento:
+ * o feed só é liberado depois do primeiro. Mesma linguagem visual do card
+ * "Capture Your Day" (EmptyList), que aparece quando o feed vem vazio.
+ */
+export function NoMomentsCard() {
     const { t } = React.useContext(LanguageContext)
-    const { reloadFeed } = React.useContext(FeedContext)
-
-    // `reloadFeed` é recriado a cada render (`() => fetch(true)`), então não
-    // pode entrar nas deps do efeito — reagendaria o timer para sempre e ele
-    // nunca dispararia. A ref mantém sempre a versão mais recente.
-    const reloadFeedRef = React.useRef(reloadFeed)
-    reloadFeedRef.current = reloadFeed
 
     const animatedOpacity = React.useRef(new Animated.Value(0)).current
     const shouldUseGlass =
@@ -61,59 +40,6 @@ export function EmptyList() {
 
     React.useEffect(() => {
         handleAnimation()
-        reloadFeed()
-    }, [])
-
-    // Enquanto este card estiver montado o feed está vazio; quando moments
-    // chegam ele desmonta e o cleanup cancela o timer — não é preciso checar
-    // o tamanho da lista aqui.
-    React.useEffect(() => {
-        let timer: ReturnType<typeof setTimeout> | null = null
-        let scheduledAt = Date.now()
-        let remaining = RETRY_SCHEDULE_MS[Math.min(retryStep, RETRY_SCHEDULE_MS.length - 1)]
-
-        const clear = () => {
-            if (timer) {
-                clearTimeout(timer)
-                timer = null
-            }
-        }
-
-        const schedule = (delay: number) => {
-            clear()
-            remaining = delay
-            scheduledAt = Date.now()
-            timer = setTimeout(async () => {
-                // Avança na escala antes de buscar: uma falha na requisição não
-                // pode prender a re-tentativa no mesmo intervalo curto.
-                retryStep = Math.min(retryStep + 1, RETRY_SCHEDULE_MS.length - 1)
-                try {
-                    await reloadFeedRef.current?.()
-                } catch {
-                    // silencioso: o próximo passo da escala tenta de novo
-                }
-                schedule(RETRY_SCHEDULE_MS[retryStep])
-            }, delay)
-        }
-
-        // Só conta tempo com o app em primeiro plano: ao ir para o background
-        // congelamos o que falta e retomamos daí quando voltar.
-        const onAppStateChange = (state: AppStateStatus) => {
-            if (state === "active") {
-                schedule(remaining)
-            } else {
-                remaining = Math.max(0, remaining - (Date.now() - scheduledAt))
-                clear()
-            }
-        }
-
-        schedule(remaining)
-        const subscription = AppState.addEventListener("change", onAppStateChange)
-
-        return () => {
-            clear()
-            subscription.remove()
-        }
     }, [])
 
     const container: ViewStyle = {
@@ -181,7 +107,7 @@ export function EmptyList() {
         marginBottom: sizes.margins["1md"],
     }
 
-    async function handleShareMoment() {
+    function handleRecordFirstMoment() {
         router.push("/(tabs)/create")
     }
 
@@ -192,28 +118,28 @@ export function EmptyList() {
                     <GlassView
                         style={glassContainer}
                         colorScheme="dark"
-                        glassEffectStyle="regular"
+                        glassEffectStyle="clear"
                         isInteractive={true}
                         tintColor={colors.gray.black + 40}
                     >
                         <Image
-                            source={require("@/assets/images/illustrations/NewMoment-Illustration.png")}
+                            source={require("@/assets/images/illustrations/FirstMoment-Illustration.png")}
                             style={illustrationStyle}
                             resizeMode="contain"
                         />
-                        <Text style={title}>{t("Capture Your Day")} ⚡</Text>
+                        <Text style={title}>{t("Record Your First Moment")} 🎥</Text>
                         <Text style={description}>
                             {t(
-                                "No recommendations available right now. Why not share a special moment from your day instead?",
+                                "Record your first moment to unlock the feed and discover Moments from people around you.",
                             )}
                         </Text>
 
                         <ButtonStandart
                             style={buttonContainer}
                             margins={false}
-                            action={handleShareMoment}
+                            action={handleRecordFirstMoment}
                         >
-                            <Text style={buttonLabel}>{t("Share a Moment")}</Text>
+                            <Text style={buttonLabel}>{t("Record Now")}</Text>
                         </ButtonStandart>
                     </GlassView>
                 </GlassContainer>
@@ -228,19 +154,19 @@ export function EmptyList() {
                         style={illustrationStyle}
                         resizeMode="contain"
                     />
-                    <Text style={title}>{t("Capture Your Day")} ⚡</Text>
+                    <Text style={title}>{t("Record Your First Moment")} 📸</Text>
                     <Text style={description}>
                         {t(
-                            "No recommendations available right now. Why not share a special moment from your day instead?",
+                            "Record your first moment to unlock the feed and discover Moments from people around you.",
                         )}
                     </Text>
 
                     <ButtonStandart
                         style={buttonContainer}
                         margins={false}
-                        action={handleShareMoment}
+                        action={handleRecordFirstMoment}
                     >
-                        <Text style={buttonLabel}>{t("Share a Moment")}</Text>
+                        <Text style={buttonLabel}>{t("Record Now")}</Text>
                     </ButtonStandart>
                 </View>
             </Animated.View>

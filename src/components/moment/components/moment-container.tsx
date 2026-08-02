@@ -1,4 +1,5 @@
 import React, { useCallback, useEffect, useState, useMemo } from "react"
+import { useIsFocused } from "expo-router"
 import ColorTheme from "@/constants/colors"
 import FeedContext from "@/contexts/Feed"
 import MediaRenderVideo from "@/components/midia_render/components/midia_render-video"
@@ -23,34 +24,59 @@ export default function Container({
     disableCache = false,
     disableWatch = false,
 }: MomentContainerProps & { onVideoEnd?: () => void }) {
+    // Foco da TELA (não do momento dentro do carrossel): sai da aba do feed,
+    // abre um perfil ou troca para a conta → a tela deixa de estar focada e o
+    // vídeo tem que parar, inclusive o áudio.
+    const isScreenFocused = useIsFocused()
     const { data, actions, size, options, video } = React.useContext(MomentContext)
     const { session } = React.useContext(PersistedContext)
     const feedContext = React.useContext(FeedContext)
-    const { commentEnabled, loadVideoFromCache, cacheManager, chunkManager, moments } =
-        feedContext || {}
-    const [hasVideoCache, setHasVideoCache] = useState<boolean>(false)
-    const [cachedVideoUri, setCachedVideoUri] = useState<string | undefined>()
+    const {
+        commentEnabled,
+        getCachedVideoSync,
+        resolveVideo,
+        prefetchAround,
+        prefetchThumbnail,
+    } = feedContext || {}
+    // Consulta SÍNCRONA ao cache já no primeiro render. Sem isso o player era
+    // criado com a URL remota e só depois trocava para o arquivo local — troca
+    // de `uri` que reinicia o player e reexibe a thumbnail, exatamente o
+    // "carrega de novo" ao vir do feed para o perfil / tela cheia.
+    const cachedOnMount =
+        !disableCache && data.id ? getCachedVideoSync?.(String(data.id)) : undefined
+    const [hasVideoCache, setHasVideoCache] = useState<boolean>(Boolean(cachedOnMount))
+    const [cachedVideoUri, setCachedVideoUri] = useState<string | undefined>(cachedOnMount)
     const [isLoadingCache, setIsLoadingCache] = useState(false)
     const [adjacentThumbnails, setAdjacentThumbnails] = useState<string[]>([])
 
     // Atualizar o estado de pausa do vídeo quando muda o foco (evitar loops)
     useEffect(() => {
-        const shouldPause = !isFocused || !!commentEnabled || options.isHidden === true
+        // `commentEnabled` não entra aqui: o vídeo deve continuar rodando
+        // enquanto o usuário escreve o comentário.
+        const shouldPause = !isFocused || !isScreenFocused || options.isHidden === true
         if (video.isPaused !== shouldPause) {
             video.setIsPaused(shouldPause)
         }
-    }, [isFocused, commentEnabled, options.isHidden, video.isPaused])
+    }, [isFocused, isScreenFocused, options.isHidden, video.isPaused])
 
     const container: any = {
         ...size,
+        // O padding do `size` deslocava o vídeo (content_container absoluto sem
+        // top/left assumia a posição estática = padding), fazendo a base e a
+        // direita do vídeo estourarem a borda e serem cortadas pelo overflow.
+        // O vídeo deve ser full-bleed; os overlays (Top/Center/Bottom) já têm o
+        // próprio padding interno.
+        padding: 0,
+        paddingTop: 0,
         overflow: "hidden",
         backgroundColor: ColorTheme().backgroundDisabled,
     }
     const content_container: any = {
-        flex: 1,
         position: "absolute",
-        width: size.width,
-        height: size.height,
+        top: 0,
+        left: 0,
+        right: 0,
+        bottom: 0,
         zIndex: 0,
     }
 
@@ -67,23 +93,30 @@ export default function Container({
         if (!data.media) return
 
         // Se cache desabilitado, usar URL direta
-        if (disableCache || !loadVideoFromCache) {
+        if (disableCache || !resolveVideo) {
             setCachedVideoUri(data.media)
             setHasVideoCache(false)
+            return
+        }
+
+        // Já em cache (inclusive quando a célula é reciclada para outro id):
+        // resolve sem passar pela URL remota, evitando a troca de `uri`.
+        const immediate = getCachedVideoSync?.(String(data.id))
+        if (immediate) {
+            setCachedVideoUri(immediate)
+            setHasVideoCache(true)
             return
         }
 
         setIsLoadingCache(true)
 
         try {
-            // Usar o sistema de cache do Feed
-            const cachedUrl = await loadVideoFromCache(String(data.id))
+            const resolved = await resolveVideo(String(data.id), data.media)
 
-            if (cachedUrl) {
-                setCachedVideoUri(cachedUrl)
-                setHasVideoCache(cachedUrl.startsWith("file://"))
+            if (resolved) {
+                setCachedVideoUri(resolved)
+                setHasVideoCache(resolved.startsWith("file://"))
             } else {
-                // Fallback para URL original
                 setCachedVideoUri(data.media)
                 setHasVideoCache(false)
             }
@@ -93,51 +126,16 @@ export default function Container({
         } finally {
             setIsLoadingCache(false)
         }
-    }, [data.id, data.media, loadVideoFromCache, disableCache])
+    }, [data.id, data.media, resolveVideo, getCachedVideoSync, disableCache])
 
-    // Pré-carregar thumbnails e vídeos adjacentes
+    // Pré-carregar thumbnails e vídeos adjacentes. A escolha dos vizinhos e a
+    // priorização ficam no orquestrador (ChunkManager + CacheManager); aqui só
+    // guardamos as thumbnails devolvidas para o prefetch na camada de imagem.
+    // Fora do feed `prefetchAround` devolve vazio: o momento não está no chunk.
     useEffect(() => {
-        if (disableCache || !cacheManager || !chunkManager || !moments) return
-
-        const currentId = String(data.id)
-        const neighbors = chunkManager.getNeighborIds(currentId, 3)
-
-        // Pré-carregar thumbnails dos vizinhos
-        const thumbnailUrls: string[] = []
-        const videoItems: Array<{ id: string; url: string }> = []
-        const thumbnailItems: Array<{ id: string; url: string }> = []
-
-        neighbors.all.forEach((neighborId) => {
-            const neighborMoment = moments.find((m) => String(m.id) === neighborId)
-            if (neighborMoment) {
-                if (neighborMoment.thumbnail) {
-                    thumbnailUrls.push(neighborMoment.thumbnail)
-                    thumbnailItems.push({ id: neighborId, url: neighborMoment.thumbnail })
-                }
-
-                if (neighborMoment.media)
-                    videoItems.push({ id: neighborId, url: neighborMoment.media })
-            }
-        })
-
-        setAdjacentThumbnails(thumbnailUrls)
-
-        // Pré-carregar thumbnails em lote (alta prioridade para os próximos 2, baixa para o resto)
-        if (thumbnailItems.length > 0) {
-            const highPriorityThumbnails = thumbnailItems.slice(0, 2)
-            const lowPriorityThumbnails = thumbnailItems.slice(2)
-
-            cacheManager.preloadThumbnailsBatch(highPriorityThumbnails, "high")
-            if (lowPriorityThumbnails.length > 0) {
-                cacheManager.preloadThumbnailsBatch(lowPriorityThumbnails, "low")
-            }
-        }
-
-        // Pré-carregar vídeos adjacentes com baixa prioridade (não bloqueia o atual)
-        if (videoItems.length > 0) {
-            cacheManager.preloadVideosBatch(videoItems, "low")
-        }
-    }, [data.id, cacheManager, chunkManager, moments])
+        if (disableCache || !prefetchAround) return
+        setAdjacentThumbnails(prefetchAround(String(data.id), 3))
+    }, [data.id, prefetchAround, disableCache])
 
     // Carregar vídeo quando o componente montar (independente do foco para pré-carregar thumbnail)
     useEffect(() => {
@@ -146,14 +144,10 @@ export default function Container({
 
     // Pré-carregar thumbnail do momento atual com prioridade máxima
     useEffect(() => {
-        if (!disableCache && cacheManager && data.thumbnail) {
-            cacheManager.preloadThumbnail({
-                id: String(data.id),
-                url: data.thumbnail,
-                priority: "high",
-            })
+        if (!disableCache && prefetchThumbnail && data.thumbnail) {
+            prefetchThumbnail(String(data.id), data.thumbnail)
         }
-    }, [data.id, data.thumbnail, cacheManager, disableCache])
+    }, [data.id, data.thumbnail, prefetchThumbnail, disableCache])
 
     // Resetar estado do slider ao trocar de momento (evita exibir slider sem duração)
     useEffect(() => {
@@ -196,7 +190,10 @@ export default function Container({
                     isFocused={isHidden ? false : true}
                     blurRadius={isHidden ? 40 : blurRadius}
                     prefetchAdjacentThumbnails={adjacentThumbnails}
-                    forceMute={forceMute}
+                    // Com a tela fora de foco, mutar além de pausar: garante
+                    // silêncio mesmo na janela em que o player ainda não
+                    // processou a pausa.
+                    forceMute={forceMute || !isScreenFocused}
                     disableWatch={disableWatch}
                 />
             </View>

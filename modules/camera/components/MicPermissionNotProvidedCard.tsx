@@ -98,9 +98,9 @@ export function MicPermissionNotProvidedCard() {
                 <GlassView
                     style={glassContainer}
                     colorScheme="dark"
-                    glassEffectStyle="clear"
-                    isInteractive={false}
-                    tintColor={colors.gray.black + "99"}
+                    glassEffectStyle="regular"
+                    isInteractive={true}
+                    tintColor={colors.gray.black + "50"}
                 >
                     <Text style={title}>{t("Microphone was no enabled")} 🎙️😭</Text>
                     <Text style={description}>

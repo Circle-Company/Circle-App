@@ -58,12 +58,12 @@ export default function profile_picture({
             setUserId(targetId)
 
             if (isSelf) {
-                router.replace({
+                router.push({
                     pathname: "/you/[id]",
                     params: { id: targetId, from: "profile" },
                 })
             } else {
-                router.replace({ pathname: "/profile/[userId]", params: { userId: targetId } })
+                router.push({ pathname: "/profile/[userId]", params: { userId: targetId } })
             }
             executeBeforeClick ? executeBeforeClick() : null
         }

@@ -11,22 +11,47 @@ export interface AccountState extends AccountDataType {
     }
     moments: AccountMoment[]
     hiddenMoments: string[]
+    // Ids dos momentos curtidos por esta conta. Fonte única do estado do botão
+    // de like, para ele continuar marcado ao navegar entre feed, perfil e
+    // detalhe do momento — e sobreviver ao fechamento do app.
+    likedMoments: string[]
+    // Ids de notificações já lidas. O backend só expõe "marcar todas como
+    // lidas", então este conjunto local é o que preserva a leitura por item
+    // entre aberturas do app.
+    readNotifications: string[]
     totalMoments?: number
     setMoments: (value: AccountMoment[]) => void
     setTotalMoments: (value: number) => void
     setHiddenMoments: (value: string[]) => void
     addHiddenMoment: (id: string) => void
     removeHiddenMoment: (id: string) => void
+    setLikedMoments: (value: string[]) => void
+    addLikedMoment: (id: string) => void
+    removeLikedMoment: (id: string) => void
+    addReadNotifications: (ids: string[]) => void
     setCoordinates: (value: { latitude: number; longitude: number }) => void
     set: (value: AccountDataType) => void
     load: () => void
     remove: () => void
 }
 
+const parseIdList = (json: string | null): string[] => {
+    if (!json) return []
+    try {
+        const parsed = JSON.parse(json)
+        return Array.isArray(parsed) ? Array.from(new Set(parsed.map((v: any) => String(v)))) : []
+    } catch (error) {
+        console.error(error)
+        return []
+    }
+}
+
 const read = (): AccountDataType & {
     coordinates: { latitude: number; longitude: number }
     moments: AccountMoment[]
     hiddenMoments: string[]
+    likedMoments: string[]
+    readNotifications: string[]
     totalMoments?: number
 } => {
     let moments: AccountMoment[] = []
@@ -34,6 +59,8 @@ const read = (): AccountDataType & {
 
     const momentsJson = storage.getString(key.moments) || null
     const hiddenJson = storage.getString(key.hiddenMoments) || null
+    const likedMoments = parseIdList(storage.getString(key.likedMoments) || null)
+    const readNotifications = parseIdList(storage.getString(key.readNotifications) || null)
     const totalMoments = storage.getNumber(key.totalMoments) || 0
     const terms = {
         agreed: storage.getBoolean(key.terms?.agreed) || false,
@@ -74,6 +101,8 @@ const read = (): AccountDataType & {
         },
         moments,
         hiddenMoments,
+        likedMoments,
+        readNotifications,
         totalMoments,
         terms,
     }
@@ -141,6 +170,46 @@ export const useAccountStore = create<AccountState>((set) => ({
             return { ...state, hiddenMoments: next }
         })
     },
+    setLikedMoments: (value: string[]) => {
+        const normalized = Array.isArray(value)
+            ? Array.from(new Set(value.map((v: any) => String(v))))
+            : []
+        storage.set(key.likedMoments, JSON.stringify(normalized))
+        set((state) => ({
+            ...state,
+            likedMoments: normalized,
+        }))
+    },
+    addLikedMoment: (id: string) => {
+        set((state) => {
+            const sid = String(id)
+            const base = Array.isArray(state.likedMoments) ? state.likedMoments : []
+            const normalized = Array.from(new Set(base.map((v: any) => String(v))))
+            if (normalized.includes(sid)) return state
+            normalized.push(sid)
+            storage.set(key.likedMoments, JSON.stringify(normalized))
+            return { ...state, likedMoments: normalized }
+        })
+    },
+    removeLikedMoment: (id: string) => {
+        set((state) => {
+            const sid = String(id)
+            const base = Array.isArray(state.likedMoments) ? state.likedMoments : []
+            const next = base.map((v: any) => String(v)).filter((v) => v !== sid)
+            if (next.length === base.length) return state
+            storage.set(key.likedMoments, JSON.stringify(next))
+            return { ...state, likedMoments: next }
+        })
+    },
+    addReadNotifications: (ids: string[]) => {
+        set((state) => {
+            const base = Array.isArray(state.readNotifications) ? state.readNotifications : []
+            const merged = Array.from(new Set([...base, ...ids.map((v) => String(v))]))
+            if (merged.length === base.length) return state
+            storage.set(key.readNotifications, JSON.stringify(merged))
+            return { ...state, readNotifications: merged }
+        })
+    },
     setCoordinates: (value: { latitude: number; longitude: number }) => {
         storage.set(key.coordinates.latitude, value.latitude)
         storage.set(key.coordinates.longitude, value.longitude)
@@ -161,6 +230,8 @@ export const useAccountStore = create<AccountState>((set) => ({
         safeDelete(key.coordinates.longitude)
         safeDelete(key.moments)
         safeDelete(key.hiddenMoments)
+        safeDelete(key.likedMoments)
+        safeDelete(key.readNotifications)
         safeDelete(key.accessLevel)
         safeDelete(key.verified)
         safeDelete(key.deleted)
@@ -180,6 +251,8 @@ export const useAccountStore = create<AccountState>((set) => ({
             deleted: false,
             moments: [],
             hiddenMoments: [],
+            likedMoments: [],
+            readNotifications: [],
             coordinates: { latitude: 0, longitude: 0 },
             terms: { agreed: false, version: "", agreedAt: "" },
         })

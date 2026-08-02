@@ -212,10 +212,6 @@ export default function AccountScreen() {
         ])
     }
 
-    function navigateToViewMoment(id: string) {
-        router.navigate({ pathname: "/you/[id]", params: { id: String(id), from: "you" } })
-    }
-
     const normalizedMoments = (accMoments ?? []).map((moment: any) => {
         const rewrite = (url: string) => {
             if (!url) return url
@@ -388,39 +384,58 @@ export default function AccountScreen() {
                             }}
                         >
                             <DropDownMenuIOS onDelete={() => handleDeleteMoment(item.id)}>
-                                <Pressable onPress={() => navigateToViewMoment(item.id)}>
-                                    <Moment.Root.Main
-                                        size={{
-                                            ...sizes.moment.small,
-                                            width: ITEM_SIZE,
-                                            height: ITEM_SIZE * sizes.moment.aspectRatio,
-                                            borderRadius: sizes.moment.small.borderRadius * 0.7,
-                                        }}
-                                        isFeed={false}
-                                        isFocused={true}
-                                        data={item}
-                                        shadow={{ top: false, bottom: true }}
-                                    >
-                                        <Moment.Container
-                                            contentRender={item.media}
-                                            isFocused={true}
-                                            loading={false}
-                                            blurRadius={0}
-                                            forceMute={true}
-                                            showSlider={false}
-                                            disableCache={true}
-                                            disableWatch={true}
-                                        >
-                                            <Moment.Root.Center />
-                                            <Moment.Root.Bottom>
-                                                <View style={{ marginLeft: 5, marginBottom: 2 }}>
-                                                    <Moment.Description displayOnMoment={true} />
-                                                    <Moment.Date />
-                                                </View>
-                                            </Moment.Root.Bottom>
-                                        </Moment.Container>
-                                    </Moment.Root.Main>
-                                </Pressable>
+                                <Link
+                                    href={{
+                                        pathname: "/you/[id]",
+                                        params: { id: String(item.id), from: "you" },
+                                    }}
+                                    push
+                                    asChild
+                                >
+                                    <Pressable>
+                                        <Link.AppleZoom>
+                                            <View>
+                                                <Moment.Root.Main
+                                                    size={{
+                                                        ...sizes.moment.small,
+                                                        width: ITEM_SIZE,
+                                                        height:
+                                                            ITEM_SIZE * sizes.moment.aspectRatio,
+                                                        borderRadius:
+                                                            sizes.moment.small.borderRadius * 0.7,
+                                                    }}
+                                                    isFeed={false}
+                                                    isFocused={true}
+                                                    data={item}
+                                                    shadow={{ top: false, bottom: true }}
+                                                >
+                                                    <Moment.Container
+                                                        contentRender={item.media}
+                                                        isFocused={true}
+                                                        loading={false}
+                                                        blurRadius={0}
+                                                        forceMute={true}
+                                                        showSlider={false}
+                                                        disableCache={false}
+                                                        disableWatch={true}
+                                                    >
+                                                        <Moment.Root.Center />
+                                                        <Moment.Root.Bottom>
+                                                            <View
+                                                                style={{
+                                                                    marginLeft: 5,
+                                                                    marginBottom: 2,
+                                                                }}
+                                                            >
+                                                                <Moment.Date />
+                                                            </View>
+                                                        </Moment.Root.Bottom>
+                                                    </Moment.Container>
+                                                </Moment.Root.Main>
+                                            </View>
+                                        </Link.AppleZoom>
+                                    </Pressable>
+                                </Link>
                             </DropDownMenuIOS>
                         </View>
                     )

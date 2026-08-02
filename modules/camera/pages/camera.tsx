@@ -5,7 +5,7 @@ import LanguageContext from "@/contexts/language"
 import { Vibrate } from "@/lib/hooks/useHapticFeedback"
 import { Stack, useIsFocused, useSegments } from "expo-router"
 import * as React from "react"
-import { StyleSheet, View } from "react-native"
+import { StyleSheet, View, ViewStyle } from "react-native"
 import { GestureDetector } from "react-native-gesture-handler"
 import Reanimated, { useAnimatedStyle, useSharedValue, withTiming } from "react-native-reanimated"
 import { useSafeAreaInsets } from "react-native-safe-area-context"
@@ -56,6 +56,8 @@ import { useZoomDisplay } from "../hooks/useZoomDisplay"
 import { POLL_TIMEOUT_CODE, shareMoment, type SharePhase } from "../hooks/shareMoment"
 import PersistedContext from "@/contexts/Persisted"
 import { notify } from "@/contexts/Toast/notify"
+import { InboxHeaderButton } from "@/components/general/inbox-header-button"
+import config from "@/config"
 
 export function CameraPage(): React.ReactElement {
     const { t } = React.useContext(LanguageContext)
@@ -297,13 +299,7 @@ export function CameraPage(): React.ReactElement {
                 }
             }
         },
-        [
-            session.account.jwtToken,
-            session.user.id,
-            setCameraPosition,
-            t,
-            uploadProgress,
-        ],
+        [session.account.jwtToken, session.user.id, setCameraPosition, t, uploadProgress],
     )
 
     const {
@@ -365,6 +361,14 @@ export function CameraPage(): React.ReactElement {
     const topInset = insets.top + NAV_BAR_HEIGHT + PREVIEW_TOP_OFFSET
     const hasCamera = cameraPermission.hasPermission && device != null
 
+    const permissionOverlay: ViewStyle = {
+        position: "absolute",
+        top: topInset + sizes.margins["3sm"],
+        left: 0,
+        right: 0,
+        bottom: 0,
+        zIndex: 1,
+    }
     return (
         <View style={[styles.container, { paddingTop: topInset }]}>
             <Stack.Screen
@@ -376,10 +380,11 @@ export function CameraPage(): React.ReactElement {
                                   maxTime={MAX_RECORDING_TIME_SEC}
                               />
                           )
-                        : t("New Moment"),
+                        : config.APPLICATION_NAME,
                     headerTitleStyle: {
                         color: colors.gray.white,
                         fontFamily: fonts.family["Black-Italic"],
+                        fontSize: fonts.size.title2 * 0.9,
                     },
                     // Fully transparent — no backdrop, no border. The camera
                     // preview (and its recording glow) extends behind the
@@ -387,6 +392,9 @@ export function CameraPage(): React.ReactElement {
                     headerTransparent: true,
                     headerStyle: { backgroundColor: "transparent" },
                     headerShadowVisible: false,
+                    // Botão de notificações (movido da tela de moments). Oculto
+                    // durante a gravação, quando o título vira o progresso.
+                    headerRight: isRecording ? undefined : () => <InboxHeaderButton />,
                 }}
             />
 
@@ -394,7 +402,7 @@ export function CameraPage(): React.ReactElement {
             {!microphonePermission.hasPermission &&
                 cameraPermission.hasPermission &&
                 !isRecording && (
-                    <View style={styles.micPermissionOverlay}>
+                    <View style={permissionOverlay}>
                         <MicPermissionNotProvidedCard />
                     </View>
                 )}
@@ -425,7 +433,7 @@ export function CameraPage(): React.ReactElement {
                             />
                             <ZoomIndicator text={zoomDisplay} animatedStyle={zoomIndicatorStyle} />
                             <FlashIndicator animatedStyle={flashIndicatorStyle} />
-                            <HandsFreeToggle />
+                            {microphonePermission.hasPermission && <HandsFreeToggle />}
                         </View>
                     </GestureDetector>
                 </Reanimated.View>
@@ -449,9 +457,7 @@ export function CameraPage(): React.ReactElement {
                     }
                     phase={sharePhase}
                     uploadProgress={uploadProgress}
-                    canCancel={
-                        shareStatus !== "success" && sharePhase !== "polling"
-                    }
+                    canCancel={shareStatus !== "success" && sharePhase !== "polling"}
                     mediaPath={pending?.path ?? sharePreviewPath ?? undefined}
                     onCancel={() => {
                         Vibrate("impactLight")
@@ -523,14 +529,6 @@ const styles = StyleSheet.create({
         backgroundColor: "black",
         justifyContent: "flex-start",
         alignItems: "center",
-    },
-    micPermissionOverlay: {
-        position: "absolute",
-        top: sizes.paddings["2sm"],
-        left: 0,
-        right: 0,
-        bottom: 0,
-        zIndex: 1,
     },
     // Outer wrapper hosts the animated purple recording glow. No overflow:hidden
     // — iOS clips shadow layers along with the content mask.

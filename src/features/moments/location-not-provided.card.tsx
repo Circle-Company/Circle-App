@@ -4,9 +4,9 @@ import { colors } from "@/constants/colors"
 import fonts from "@/constants/fonts"
 import sizes from "@/constants/sizes"
 import LanguageContext from "@/contexts/language"
+import GeolocationContext from "@/contexts/geolocation"
 import React from "react"
 import { Platform } from "react-native"
-import { Linking } from "react-native"
 import { TextStyle, ViewStyle, View, Animated } from "react-native"
 
 import {
@@ -16,8 +16,9 @@ import {
     isGlassEffectAPIAvailable,
 } from "expo-glass-effect"
 
-export function CameraPermissionNotProvidedCard() {
+export function LocationNotProvidedCard() {
     const { t } = React.useContext(LanguageContext)
+    const { openSettings } = React.useContext(GeolocationContext)
 
     const animatedOpacity = React.useRef(new Animated.Value(0)).current
     const shouldUseGlass =
@@ -100,24 +101,48 @@ export function CameraPermissionNotProvidedCard() {
     }
 
     async function handleGoToSettings() {
-        await Linking.openSettings()
+        await openSettings()
     }
 
     if (shouldUseGlass)
         return (
-            <GlassContainer spacing={10}>
-                <GlassView
-                    style={glassContainer}
-                    colorScheme="dark"
-                    glassEffectStyle="clear"
-                    isInteractive={true}
-                    tintColor={colors.gray.black + 40}
-                >
-                    <Text style={iconStyle}>📷</Text>
-                    <Text style={title}>{t("Camera permission not provided")} 😭</Text>
+            <Animated.View style={{ opacity: animatedOpacity }}>
+                <GlassContainer spacing={10}>
+                    <GlassView
+                        style={glassContainer}
+                        colorScheme="dark"
+                        glassEffectStyle="clear"
+                        isInteractive={true}
+                        tintColor={colors.gray.black + 40}
+                    >
+                        <Text style={iconStyle}>📍</Text>
+                        <Text style={title}>{t("Location not enabled")} 🧭</Text>
+                        <Text style={description}>
+                            {t(
+                                "To discover Moments from people around you, enable location access in your settings.",
+                            )}
+                        </Text>
+
+                        <ButtonStandart
+                            style={buttonContainer}
+                            margins={false}
+                            action={handleGoToSettings}
+                        >
+                            <Text style={buttonLabel}>{t("Go to Settings")}</Text>
+                        </ButtonStandart>
+                    </GlassView>
+                </GlassContainer>
+            </Animated.View>
+        )
+    else
+        return (
+            <Animated.View style={{ opacity: animatedOpacity }}>
+                <View style={container}>
+                    <Text style={iconStyle}>📍</Text>
+                    <Text style={title}>{t("Location not enabled")} 🧭</Text>
                     <Text style={description}>
                         {t(
-                            "If you want to share moments, you need to go to enable camera permission in your settings",
+                            "To discover Moments from people around you, enable location access in your device settings.",
                         )}
                     </Text>
 
@@ -128,23 +153,7 @@ export function CameraPermissionNotProvidedCard() {
                     >
                         <Text style={buttonLabel}>{t("Go to Settings")}</Text>
                     </ButtonStandart>
-                </GlassView>
-            </GlassContainer>
-        )
-    else
-        return (
-            <View style={container}>
-                <Text style={iconStyle}>📷</Text>
-                <Text style={title}>{t("Camera permission not provided")} 😭</Text>
-                <Text style={description}>
-                    {t(
-                        "If you want to share moments, you need to go to your device settings and enable camera permission.",
-                    )}
-                </Text>
-
-                <ButtonStandart style={buttonContainer} margins={false} action={handleGoToSettings}>
-                    <Text style={buttonLabel}>{t("Go to Settings")}</Text>
-                </ButtonStandart>
-            </View>
+                </View>
+            </Animated.View>
         )
 }

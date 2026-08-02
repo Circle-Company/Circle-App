@@ -1,9 +1,12 @@
 import { Stack } from "expo-router"
 import React from "react"
-import config from "@/config"
 import Fonts from "@/constants/fonts"
 import { colors } from "@/constants/colors"
+import LanguageContext from "@/contexts/language"
+
 export default function MomentsLayout() {
+    const { t } = React.useContext(LanguageContext)
+
     return (
         <Stack
             screenOptions={{
@@ -36,7 +39,7 @@ export default function MomentsLayout() {
                         fontSize: Fonts.size.title2 * 0.9,
                         color: colors.gray.white,
                     },
-                    headerTitle: config.APPLICATION_NAME,
+                    headerTitle: t("Moments"),
                 }}
             />
         </Stack>

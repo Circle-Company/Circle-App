@@ -79,17 +79,15 @@ export function ProfileMoments({ moments, totalMoments }: AccountMomentsProps) {
                                 contentRender={item.media}
                                 isFocused={isVisible}
                                 loading={false}
-                                blurRadius={0}
+                                blurRadius={10}
                                 forceMute={true}
                                 showSlider={false}
-                                disableCache={true}
+                                disableCache={false}
                                 // Vídeos em loop infinito: repeat={true} no MediaRenderVideo
                                 // Sem onVideoEnd para manter loop contínuo e automático
                             >
                                 <Moment.Root.Center />
-                                <Moment.Root.Bottom>
-                                    <Moment.Description displayOnMoment={true} />
-                                </Moment.Root.Bottom>
+                                <Moment.Root.Bottom />
                             </Moment.Container>
                         </Moment.Root.Main>
                     </ProfileDropDownMenuIOS>

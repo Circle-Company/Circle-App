@@ -8,12 +8,19 @@ import RenderMomentFeed from "@/features/moments/feed/render-moment-feed"
 import { EmptyList } from "@/features/moments/empty.list"
 import PersistedContext from "@/contexts/Persisted"
 import { View } from "react-native"
-import { iOSMajorVersion, isIPad11 } from "@/lib/platform/detection"
+import { useSafeAreaInsets } from "react-native-safe-area-context"
+import { isIPad11 } from "@/lib/platform/detection"
 
 const ITEM_WIDTH = sizes.moment.standart.width
 const SPACING = isIPad11 ? 15 : -20
 const SNAP_INTERVAL = ITEM_WIDTH + SPACING
 const INITIAL_PADDING = (sizes.screens.width - ITEM_WIDTH) / 2
+// Altura da nav bar + uma folga curta abaixo do header (mesma convenção do
+// módulo da câmera: 46 + 8). O espaço total reservado no topo = safe area do
+// device + esta constante, adaptando a qualquer iPhone (SE, notch, Dynamic
+// Island) em vez do multiplicador fixo `headers.height * 1.4`. Em Dynamic
+// Island (insets.top ~59) dá ~113 ≈ o 112 que funcionava, e escala nos demais.
+const NAV_BAR_HEIGHT = isIPad11 ? 44 : 54
 
 type ViewToken = {
     item: any
@@ -41,6 +48,11 @@ const ListMoments = () => {
     const flatListRef = useRef<Animated.FlatList<any> | null>(null)
     const { session } = React.useContext(PersistedContext)
     const scrollX = useRef(new Animated.Value(0)).current
+    const insets = useSafeAreaInsets()
+    // Espaço real do header = safe area do device (varia por aparelho) + nav bar.
+    // Substitui o antigo `sizes.headers.height * 1.4` (número mágico que só
+    // acertava num device específico).
+    const topInset = insets.top + NAV_BAR_HEIGHT
 
     // Criar referência para onViewableItemsChanged
     const onViewableItemsChanged = useRef(({ viewableItems }: { viewableItems: ViewToken[] }) => {
@@ -88,7 +100,10 @@ const ListMoments = () => {
 
     const handleRefresh = async () => {
         await fetch()
-        cacheManager?.clear()
+        // Sem `cacheManager.clear()`: o cache expira sozinho por TTL (1h) e faz
+        // eviction LRU. Limpar aqui apagava os vídeos que o perfil e a tela
+        // cheia reaproveitariam, obrigando a baixar tudo de novo a cada
+        // pull-to-refresh.
         if (flatListRef.current) flatListRef.current.scrollToOffset({ animated: false, offset: 0 })
         await reloadFeed().finally(() => {
             setTimeout(() => {
@@ -113,12 +128,21 @@ const ListMoments = () => {
                 data={feedData}
                 horizontal
                 style={{
-                    paddingTop:
-                        iOSMajorVersion! >= 26
-                            ? sizes.headers.height * 1.8
-                            : sizes.headers.height * 1.6,
+                    flex: 1,
+                    paddingTop: topInset,
                 }}
                 scrollEnabled={enableScrollFeed}
+                // O input de comentário é filho desta lista. Com o padrão
+                // ("never"), o primeiro toque com o teclado aberto só fecha o
+                // teclado e é engolido — o botão de enviar nunca recebia o
+                // onPress. "handled" entrega o toque a quem trata (o botão) e
+                // mantém o fechamento do teclado ao tocar fora.
+                keyboardShouldPersistTaps="handled"
+                // iOS soma um content inset automático (safe area + header) por
+                // cima do paddingTop, empurrando o vídeo pra baixo e cortando a
+                // base. Desligar o ajuste automático deixa só o paddingTop valer.
+                contentInsetAdjustmentBehavior="never"
+                automaticallyAdjustContentInsets={false}
                 showsHorizontalScrollIndicator={false}
                 showsVerticalScrollIndicator={false}
                 bounces={false}
@@ -129,7 +153,10 @@ const ListMoments = () => {
                 scrollEventThrottle={16}
                 snapToInterval={SNAP_INTERVAL}
                 snapToAlignment="start"
-                contentContainerStyle={{ paddingHorizontal: INITIAL_PADDING }}
+                contentContainerStyle={{
+                    paddingHorizontal: INITIAL_PADDING,
+                    alignItems: "flex-start",
+                }}
                 getItemLayout={(_, index) => ({
                     length: SNAP_INTERVAL,
                     offset: index * SNAP_INTERVAL,
@@ -200,9 +227,7 @@ const ListMoments = () => {
                             height={sizes.moment.standart.height}
                             width={sizes.moment.standart.width / 2.5}
                         >
-                            <View style={{ transform: [{ scale: 1.5 }] }}>
-                                <Loading.ActivityIndicator size={80} color={colors.gray.grey_06} />
-                            </View>
+                            <Loading.ActivityIndicator size={40} color={colors.gray.grey_06} />
                         </Loading.Container>
                     )
                 }}
@@ -213,10 +238,7 @@ const ListMoments = () => {
             <View
                 style={{
                     alignItems: "center",
-                    paddingTop:
-                        iOSMajorVersion! >= 26
-                            ? sizes.headers.height * 1.8
-                            : sizes.headers.height * 1.6,
+                    paddingTop: topInset,
                 }}
             >
                 <EmptyList />

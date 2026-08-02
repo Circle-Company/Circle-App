@@ -204,8 +204,11 @@ export default function MediaRenderVideo({
             console.log("WATCH skip: below threshold", { watchedTime })
         }
 
-        // Reseta marcador de sessão
-        watchSessionStartRef.current = 0
+        // Reinicia a sessão a partir da posição JÁ contabilizada, não de 0.
+        // Zerando aqui, uma segunda chamada antes de um novo `play()` (pausar
+        // e em seguida desmontar, por exemplo) media `currentTime - 0` e somava
+        // a posição inteira de novo por cima do total.
+        watchSessionStartRef.current = currentTime
     }, [player, data?.id, session?.account?.jwtToken, actions])
 
     // Controle de play/pause baseado em foco e autoPlay

@@ -1,5 +1,6 @@
 import React, { useEffect, useCallback } from "react"
-import { useLocalSearchParams } from "expo-router"
+import { Link, Stack, useLocalSearchParams } from "expo-router"
+import { colors } from "@/constants/colors"
 import { SafeAreaView } from "react-native-safe-area-context"
 import { useNavigation, useFocusEffect } from "expo-router"
 import { View, Keyboard, Platform, Animated as RNAnimated, Pressable } from "react-native"
@@ -214,148 +215,160 @@ export default function MomentFullScreen() {
     }, [])
 
     return (
-        <SafeAreaView
-            style={{
-                flex: 1,
-                backgroundColor: "#000",
-                justifyContent: "flex-start",
-                alignItems: "center",
-            }}
-        >
-            <View style={{ height: sizes.headers.height * 0.7 }} />
-            {momentData ? (
-                <Moment.Root.Main
-                    size={sizes.moment.standart}
-                    isFeed={false}
-                    isFocused={true}
-                    data={momentData}
-                    shadow={{ top: false, bottom: true }}
-                >
-                    <Animated.View style={animatedMomentStyle}>
-                        <ProfileDropDownMenuIOS>
-                            <Moment.Container
-                                contentRender={momentData.media}
-                                isFocused={true}
-                                loading={false}
-                                blurRadius={30}
-                                forceMute={false}
-                                showSlider={true}
-                                disableCache={true}
-                                disableWatch={false}
-                            >
-                                {/* Top user info (no scale animations) */}
-                                <Moment.Root.Top>
-                                    <Moment.Root.TopLeft>
-                                        <UserShow.Root data={momentData.user}>
-                                            <UserShow.ProfilePicture
-                                                disableAction={true}
-                                                displayOnMoment={true}
-                                                pictureDimensions={{ width: 30, height: 30 }}
-                                            />
-                                            <UserShow.Username
-                                                pressable={false}
-                                                fontFamily={fonts.family["Bold-Italic"]}
-                                            />
-                                        </UserShow.Root>
-                                    </Moment.Root.TopLeft>
-                                </Moment.Root.Top>
-                                <Moment.Root.Center>
-                                    <View
-                                        style={{
-                                            marginBottom: sizes.margins["2sm"],
-                                            width: "100%",
-                                            zIndex: 1,
-                                        }}
+        <>
+            <Stack.Screen
+                options={{
+                    headerShown: true,
+                    headerTransparent: true,
+                    headerTitle: "Moment",
+                    headerTitleAlign: "center",
+                    headerLargeTitle: false,
+                    headerLargeTitleShadowVisible: false,
+                    headerShadowVisible: false,
+                    headerStyle: { backgroundColor: "transparent" },
+                    headerTintColor: colors.gray.white,
+                    headerTitleStyle: { fontFamily: fonts.family["Black-Italic"] },
+                    headerBackTitle: t("Back"),
+                }}
+            />
+            <SafeAreaView
+                style={{
+                    flex: 1,
+                    backgroundColor: "#000",
+                    justifyContent: "flex-start",
+                    alignItems: "center",
+                }}
+            >
+                <View style={{ height: sizes.headers.height * 0.7 }} />
+                {momentData ? (
+                    <Moment.Root.Main
+                        size={sizes.moment.standart}
+                        isFeed={false}
+                        isFocused={true}
+                        data={momentData}
+                        shadow={{ top: false, bottom: true }}
+                    >
+                        {/* O AppleZoomTarget monta apenas UM filho nativo; por isso ele
+                        envolve somente o card do vídeo — os comentários ficam fora. */}
+                        <Link.AppleZoomTarget>
+                            <Animated.View collapsable={false} style={animatedMomentStyle}>
+                                <ProfileDropDownMenuIOS>
+                                    <Moment.Container
+                                        contentRender={momentData.media}
+                                        isFocused={true}
+                                        loading={false}
+                                        blurRadius={30}
+                                        forceMute={false}
+                                        showSlider={true}
+                                        disableCache={false}
+                                        disableWatch={false}
                                     >
-                                        <View
-                                            style={{
-                                                marginLeft: 6,
-                                                marginBottom: isIPad11 ? sizes.margins["2sm"] : 10,
-                                            }}
-                                        >
-                                            <Moment.Description />
-                                        </View>
-                                        <View
-                                            style={{ flexDirection: "row", alignItems: "center" }}
-                                        >
-                                            <View style={{ flex: 1, height: 46 }}>
-                                                <Moment.LikeButtonIOS isLiked={false} />
+                                        {/* Top user info (no scale animations) */}
+                                        <Moment.Root.Top>
+                                            <Moment.Root.TopLeft>
+                                                <UserShow.Root data={momentData.user}>
+                                                    <UserShow.ProfilePicture
+                                                        disableAction={true}
+                                                        displayOnMoment={true}
+                                                        pictureDimensions={{
+                                                            width: 30,
+                                                            height: 30,
+                                                        }}
+                                                    />
+                                                    <UserShow.Username
+                                                        pressable={false}
+                                                        fontFamily={fonts.family["Bold-Italic"]}
+                                                    />
+                                                </UserShow.Root>
+                                            </Moment.Root.TopLeft>
+                                            <Moment.Root.TopRight>
+                                                <Moment.AudioControl size={36} />
+                                            </Moment.Root.TopRight>
+                                        </Moment.Root.Top>
+                                        <Moment.Root.Center>
+                                            <View
+                                                style={{
+                                                    marginBottom: sizes.margins["2sm"],
+                                                    width: "100%",
+                                                    zIndex: 1,
+                                                }}
+                                            >
+                                                <View style={{ height: 46 }}>
+                                                    <Moment.LikeButtonIOS isLiked={false} />
+                                                </View>
                                             </View>
-                                            <View>
-                                                <Moment.AudioControl />
-                                            </View>
-                                        </View>
-                                    </View>
-                                </Moment.Root.Center>
+                                        </Moment.Root.Center>
 
-                                {/* Subtle bottom gradient like feed */}
-                                <LinearGradient
-                                    pointerEvents="none"
-                                    colors={["rgba(0, 0, 0, 0.00)", "rgba(0, 0, 0, 0.4)"]}
-                                    start={{ x: 0.5, y: 0 }}
-                                    end={{ x: 0.5, y: 1 }}
-                                    style={{
-                                        position: "absolute",
-                                        left: 0,
-                                        right: 0,
-                                        bottom: 0,
-                                        width: sizes.moment.standart.width,
-                                        height: sizes.moment.standart.height * 0.1,
-                                        zIndex: 0,
-                                    }}
-                                />
-                            </Moment.Container>
-                        </ProfileDropDownMenuIOS>
-                    </Animated.View>
-                    {momentData?.topComment ? (
-                        <RenderCommentFeed moment={momentData} focused={true} />
-                    ) : (
-                        <View
-                            style={{
-                                alignSelf: "center",
-                                marginTop: sizes.margins["2sm"],
-                            }}
-                        >
-                            <ZeroComments isAccount={false} moment={momentData} />
-                        </View>
-                    )}
-                </Moment.Root.Main>
-            ) : null}
-            {/* Dismiss overlay when input is active and keyboard visible */}
-            {commentEnabled && isKeyboardVisible && (
-                <Pressable
-                    onPress={() => {
-                        setCommentEnabled(false)
-                        Keyboard.dismiss()
-                    }}
-                    style={{
-                        position: "absolute",
-                        top: 0,
-                        left: 0,
-                        right: 0,
-                        bottom: 0,
-                        zIndex: 9998,
-                    }}
-                />
-            )}
-            {/* Input flutuante: mostrar quando commentEnabled estiver ativo */}
-            {commentEnabled && (
-                <RNAnimated.View
-                    style={{
-                        position: "absolute",
-                        left: 0,
-                        right: 0,
-                        bottom: keyboardHeightAnim,
-                        zIndex: 9999,
-                    }}
-                >
-                    <Input
-                        momentId={String(momentData?.id ?? momentId)}
-                        autoFocus={true}
-                        onSent={() => setCommentEnabled(false)}
+                                        {/* Subtle bottom gradient like feed */}
+                                        <LinearGradient
+                                            pointerEvents="none"
+                                            colors={["rgba(0, 0, 0, 0.00)", "rgba(0, 0, 0, 0.4)"]}
+                                            start={{ x: 0.5, y: 0 }}
+                                            end={{ x: 0.5, y: 1 }}
+                                            style={{
+                                                position: "absolute",
+                                                left: 0,
+                                                right: 0,
+                                                bottom: 0,
+                                                width: sizes.moment.standart.width,
+                                                height: sizes.moment.standart.height * 0.1,
+                                                zIndex: 0,
+                                            }}
+                                        />
+                                    </Moment.Container>
+                                </ProfileDropDownMenuIOS>
+                            </Animated.View>
+                        </Link.AppleZoomTarget>
+                        {momentData?.topComment ? (
+                            <RenderCommentFeed moment={momentData} focused={true} />
+                        ) : (
+                            <View
+                                style={{
+                                    alignSelf: "center",
+                                    marginTop: sizes.margins["2sm"],
+                                }}
+                            >
+                                <ZeroComments isAccount={false} moment={momentData} />
+                            </View>
+                        )}
+                    </Moment.Root.Main>
+                ) : null}
+                {/* Dismiss overlay when input is active and keyboard visible */}
+                {commentEnabled && isKeyboardVisible && (
+                    <Pressable
+                        onPress={() => {
+                            setCommentEnabled(false)
+                            Keyboard.dismiss()
+                        }}
+                        style={{
+                            position: "absolute",
+                            top: 0,
+                            left: 0,
+                            right: 0,
+                            bottom: 0,
+                            zIndex: 9998,
+                        }}
                     />
-                </RNAnimated.View>
-            )}
-        </SafeAreaView>
+                )}
+                {/* Input flutuante: mostrar quando commentEnabled estiver ativo */}
+                {commentEnabled && (
+                    <RNAnimated.View
+                        style={{
+                            position: "absolute",
+                            left: 0,
+                            right: 0,
+                            bottom: keyboardHeightAnim,
+                            zIndex: 9999,
+                        }}
+                    >
+                        <Input
+                            momentId={String(momentData?.id ?? momentId)}
+                            autoFocus={true}
+                            onSent={() => setCommentEnabled(false)}
+                        />
+                    </RNAnimated.View>
+                )}
+            </SafeAreaView>
+        </>
     )
 }

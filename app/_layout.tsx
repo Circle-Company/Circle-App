@@ -1,5 +1,5 @@
 import { SafeAreaProvider, initialWindowMetrics } from "react-native-safe-area-context"
-import { Slot, SplashScreen, useRouter, useSegments } from "expo-router"
+import { Stack, SplashScreen, useRouter, useSegments } from "expo-router"
 import { GestureHandlerRootView } from "react-native-gesture-handler"
 import { KeyboardProvider } from "react-native-keyboard-controller"
 import React, { useEffect, useState } from "react"
@@ -8,6 +8,8 @@ import { useFonts } from "expo-font"
 
 import { Provider as AccountProvider } from "@/contexts/account"
 import AuthContext, { Provider as AuthProvider } from "@/contexts/auth"
+import LanguageContext from "@/contexts/language"
+import { colors } from "@/constants/colors"
 import { Provider as BottomSheetProvider } from "@/contexts/bottomSheet"
 import { Provider as FeedProvider } from "@/contexts/Feed"
 import { Provider as GeolocationProvider } from "@/contexts/geolocation"
@@ -30,11 +32,23 @@ SplashScreen.preventAutoHideAsync()
 function RootLayoutNav() {
     const { checkIsSigned, sessionData } = React.useContext(AuthContext)
     const { redirectTo, setRedirectTo } = React.useContext(RedirectContext)
+    const { t } = React.useContext(LanguageContext)
     const segments = useSegments()
     const router = useRouter()
     const [isInitializing, setIsInitializing] = useState(true)
     const scheme = useColorScheme()
     const hasRedirectedRef = React.useRef(false)
+
+    const settingsHeader = {
+        headerShown: true,
+        headerBackTitle: t("Back"),
+        headerTintColor: colors.gray.white,
+        headerStyle: { backgroundColor: colors.gray.black },
+        headerTitleStyle: {
+            fontFamily: Fonts.family["Black-Italic"],
+            color: colors.gray.white,
+        },
+    } as const
     // hasNavigated state removed; rendering <Slot /> directly
 
     // Inicializa o estado de redirect baseado na sessão
@@ -79,7 +93,66 @@ function RootLayoutNav() {
     }, [isInitializing, redirectTo, router])
 
     // Render app content; splash will be hidden right before navigation
-    return <Slot />
+    return (
+        <Stack
+            screenOptions={{
+                headerShown: false,
+                animation: "slide_from_right",
+                animationMatchesGesture: true,
+                gestureEnabled: true,
+                contentStyle: { backgroundColor: "#000" },
+            }}
+        >
+            <Stack.Screen
+                name="inbox/index"
+                options={{ ...settingsHeader, headerTitle: t("Inbox") }}
+            />
+            <Stack.Screen
+                name="settings/index"
+                options={{ ...settingsHeader, headerTitle: t("Settings") }}
+            />
+            <Stack.Screen
+                name="settings/profile-picture"
+                options={{ ...settingsHeader, headerTitle: t("Add Profile Picture") }}
+            />
+            <Stack.Screen
+                name="settings/description"
+                options={{ ...settingsHeader, headerTitle: t("Add Description") }}
+            />
+            <Stack.Screen
+                name="settings/name"
+                options={{ ...settingsHeader, headerTitle: t("Name") }}
+            />
+            <Stack.Screen
+                name="settings/password"
+                options={{ ...settingsHeader, headerTitle: t("Password") }}
+            />
+            <Stack.Screen
+                name="settings/personal-data"
+                options={{ ...settingsHeader, headerTitle: t("Personal Data") }}
+            />
+            <Stack.Screen
+                name="settings/content"
+                options={{ ...settingsHeader, headerTitle: t("Content") }}
+            />
+            <Stack.Screen
+                name="settings/blocked-users"
+                options={{ ...settingsHeader, headerTitle: t("Blocked Users") }}
+            />
+            <Stack.Screen
+                name="settings/exclude-account"
+                options={{ ...settingsHeader, headerTitle: t("Delete Account") }}
+            />
+            <Stack.Screen
+                name="settings/language"
+                options={{ ...settingsHeader, headerTitle: t("Language") }}
+            />
+            <Stack.Screen
+                name="settings/log-out"
+                options={{ ...settingsHeader, headerTitle: t("Log Out") }}
+            />
+        </Stack>
+    )
 }
 
 export default function RootLayout() {

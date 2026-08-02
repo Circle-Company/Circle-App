@@ -1,139 +1,141 @@
 import PersistedContext from "@/contexts/Persisted"
-import { Button, ButtonVariant, Host, Text } from "@expo/ui/swift-ui"
+import { GlassView, isLiquidGlassAvailable } from "expo-glass-effect"
+import { SymbolView } from "expo-symbols"
 import React from "react"
+import { Pressable, StyleSheet, View } from "react-native"
 import MomentContext from "../context"
-import { iOSMajorVersion } from "@/lib/platform/detection"
 import { colors } from "@/constants/colors"
 import { Vibrate } from "@/lib/hooks/useHapticFeedback"
-import { storage, safeSet, safeDelete } from "@/store"
+import { Text } from "@/components/Themed"
 
-const LIKE_NS = "@circle:like:pressed:"
-
-;(function clearLikePressedNamespaceOnce() {
-    try {
-        const anyStorage = storage as any
-        const keys: string[] =
-            typeof anyStorage.getAllKeys === "function" ? anyStorage.getAllKeys() : []
-        for (const k of keys) {
-            if (typeof k === "string" && k.startsWith(LIKE_NS)) {
-                safeDelete(k)
-            }
-        }
-    } catch {
-        // noop
-    }
-})()
-
-export function likeIOS({ isLiked }: { isLiked: boolean }) {
+export function likeIOS({ isLiked, size }: { isLiked: boolean; size?: number }) {
     const { session } = React.useContext(PersistedContext)
     const { data, actions, options } = React.useContext(MomentContext)
-    const [likedPressed, setLikedPressed] = React.useState(isLiked ? isLiked : actions.like)
-    const likeKey = React.useMemo(() => `${LIKE_NS}${data.id}`, [data.id])
+    const momentId = React.useMemo(() => (data.id ? String(data.id) : ""), [data.id])
 
-    React.useEffect(() => {
-        try {
-            const persisted = (storage as any)?.getString?.(likeKey)
-            if (persisted === "1" || persisted === "0") {
-                // respect persisted transient likePressed; don't override
-                return
-            }
-        } catch {}
-        if (actions.like) setLikedPressed(true)
-        else setLikedPressed(false)
-    }, [actions.like, likeKey])
+    // Fonte única do estado: a lista persistida na conta. Como é uma store
+    // Zustand, curtir no feed já reflete no perfil e no detalhe do momento,
+    // e o estado sobrevive ao fechamento do app.
+    const likedMoments = Array.isArray(session.account.likedMoments)
+        ? session.account.likedMoments
+        : []
+    const liked = momentId ? likedMoments.includes(momentId) : false
 
-    // When moment regains focus in feed, recover from MMKV if present, otherwise from context
+    // Um toque do usuário sempre vence a semeadura vinda do servidor — sem
+    // isso, um payload antigo com `isLiked: true` desfaria o unlike.
+    const userActedRef = React.useRef(false)
     React.useEffect(() => {
-        if (options.isFocused) {
-            try {
-                const persisted = (storage as any)?.getString?.(likeKey)
-                if (persisted === "1") setLikedPressed(true)
-                else if (persisted === "0") setLikedPressed(false)
-                else setLikedPressed(actions.like)
-            } catch {
-                setLikedPressed(actions.like)
-            }
-        }
-    }, [options.isFocused, actions.like, likeKey])
+        userActedRef.current = false
+    }, [momentId])
+
+    // Semeia a partir da verdade do servidor quando ela chega (pode chegar
+    // depois da montagem, já que o DataStore é preenchido num efeito).
+    const serverLiked = Boolean(isLiked || data.isLiked || actions.like)
+    React.useEffect(() => {
+        if (!momentId || userActedRef.current || !serverLiked) return
+        session.account.addLikedMoment(momentId)
+    }, [momentId, serverLiked])
+
+    // As guardas de LIKE/UNLIKE em `registerInteraction` dependem de
+    // `actions.like`. Ao abrir o perfil, esse estado nasce `false` mesmo para
+    // um momento já curtido — sem alinhar aqui, o UNLIKE seria descartado
+    // antes de chegar na API e o like ficaria órfão no servidor.
+    React.useEffect(() => {
+        if (liked && !actions.like) actions.setLike(true)
+    }, [liked, actions.like])
 
     async function onLikeAction() {
-        try {
-            setLikedPressed(true)
-            safeSet(likeKey, "1")
-            Vibrate("effectHeavyClick")
-            console.log(session.account.jwtToken)
-            actions
-                .registerInteraction("LIKE", {
-                    momentId: data.id,
-                    authorizationToken: session.account.jwtToken,
-                })
-                .then(() => {})
-        } catch (error) {
-            setLikedPressed(false)
+        userActedRef.current = true
+        session.account.addLikedMoment(momentId)
+        Vibrate("effectHeavyClick")
+        const ok = await actions.registerInteraction("LIKE", {
+            momentId: data.id,
+            authorizationToken: session.account.jwtToken,
+        })
+        if (!ok) {
+            // `registerInteraction` engole os erros da API, então o retorno é
+            // o único sinal de falha — reverte o otimismo.
+            session.account.removeLikedMoment(momentId)
             Vibrate("notificationError")
         }
     }
+
     async function onUnlikeAction() {
-        try {
-            setLikedPressed(false)
-            safeSet(likeKey, "0")
+        userActedRef.current = true
+        session.account.removeLikedMoment(momentId)
+        Vibrate("effectHeavyClick")
+        const ok = await actions.registerInteraction("UNLIKE", {
+            momentId: data.id,
+            authorizationToken: session.account.jwtToken,
+        })
+        if (!ok) {
+            session.account.addLikedMoment(momentId)
             Vibrate("notificationError")
-            actions.registerInteraction("UNLIKE", {
-                momentId: data.id,
-                authorizationToken: session.account.jwtToken,
-            })
-        } catch (error) {
-            setLikedPressed(true)
-            console.error("Erro ao processar unlike:", error)
         }
     }
 
     async function handlePress() {
-        if (likedPressed) await onUnlikeAction()
+        if (!momentId) return
+        if (liked) await onUnlikeAction()
         else await onLikeAction()
     }
 
-    let variantProminent: ButtonVariant =
-        iOSMajorVersion! >= 26 ? "glassProminent" : "borderedProminent"
-    let variant: ButtonVariant = iOSMajorVersion! >= 26 ? "glass" : "bordered"
-
     if (!options.enableLike) return null
+
+    const heartColor = liked ? colors.gray.white : colors.gray.grey_01
+
+    // Com `size` → botão redondo (círculo size×size). Sem `size` → o padrão
+    // (pílula 60×46). Usado para deixar o like redondo no grid do perfil.
+    const buttonStyle = size
+        ? {
+              width: size,
+              height: size,
+              borderRadius: size / 2,
+              alignItems: "center" as const,
+              justifyContent: "center" as const,
+              overflow: "hidden" as const,
+          }
+        : styles.button
+    const iconSize = size ? Math.round(size * 0.48) : 22
+
     return (
-        <Host matchContents>
-            <Button
-                key={likedPressed ? "liked" : "unliked"}
-                onPress={handlePress}
-                variant={likedPressed ? variantProminent : variant}
-                modifiers={[
-                    {
-                        $type: "frame",
-                        height: 46,
-                    },
-                    ...(iOSMajorVersion! < 26
-                        ? [
-                              {
-                                  $type: "cornerRadius",
-                                  radius: 23,
-                              },
-                          ]
-                        : []),
-                    {
-                        $type: "background",
-                        material: "systemUltraThinMaterialDark",
-                        shape: "circle",
-                    },
-                ]}
-                controlSize="large"
-                systemImage={"heart.fill"}
-                disabled={!options.enableLike}
-                color={
-                    likedPressed
-                        ? colors.red.red_05
-                        : iOSMajorVersion! >= 26
-                          ? colors.gray.grey_01 + 80
-                          : colors.gray.grey_01
-                }
-            />
-        </Host>
+        <Pressable
+            onPress={handlePress}
+            disabled={!options.enableLike}
+            hitSlop={8}
+            accessibilityRole="button"
+            accessibilityState={{ selected: liked }}
+            style={({ pressed }) => ({ opacity: pressed ? 0.8 : 1 })}
+        >
+            {isLiquidGlassAvailable() ? (
+                <GlassView
+                    glassEffectStyle="regular"
+                    isInteractive
+                    colorScheme="dark"
+                    tintColor={liked ? colors.red.red_05 : undefined}
+                    style={buttonStyle}
+                >
+                    <SymbolView name="heart.fill" size={iconSize} tintColor={heartColor} />
+                </GlassView>
+            ) : (
+                <View style={[buttonStyle, styles.fallback]}>
+                    <SymbolView name="heart.fill" size={iconSize} tintColor={heartColor} />
+                </View>
+            )}
+        </Pressable>
     )
 }
+
+const styles = StyleSheet.create({
+    button: {
+        width: 60,
+        height: 46,
+        borderRadius: 23,
+        alignItems: "center",
+        justifyContent: "center",
+        overflow: "hidden",
+    },
+    fallback: {
+        backgroundColor: colors.gray.grey_08 + "cc",
+    },
+})
