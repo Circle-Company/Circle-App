@@ -41,7 +41,7 @@
 		</dict>
 	</array>
 	<key>CFBundleVersion</key>
-	<string>15</string>
+	<string>16</string>
 	<key>EXDefaultScreenOrientationMask</key>
 	<string>UIInterfaceOrientationMaskPortrait</string>
 	<key>LSMinimumSystemVersion</key>
@@ -67,6 +67,8 @@
 	<string>$(PRODUCT_NAME) uses your location while you are using the app to show nearby moments and people.</string>
 	<key>NSMicrophoneUsageDescription</key>
 	<string>$(PRODUCT_NAME) uses the microphone to capture audio for videos you share as moments.</string>
+	<key>NSMotionUsageDescription</key>
+	<string>$(PRODUCT_NAME) uses motion data to stabilize video recording and to improve the feed experience.</string>
 	<key>NSPhotoLibraryAddUsageDescription</key>
 	<string>$(PRODUCT_NAME) saves moments to your library when you choose to download content.</string>
 	<key>NSPhotoLibraryUsageDescription</key>

@@ -37,6 +37,9 @@ module.exports = function (_config) {
                 icon: "./assets/app-icons/ios-icon@x1.png",
                 userInterfaceStyle: "dark",
                 infoPlist: {
+                    // Exigido pela App Store: alguma dependência referencia a API de motion (CoreMotion)
+                    NSMotionUsageDescription:
+                        "$(PRODUCT_NAME) uses motion data to stabilize video recording and to improve the feed experience.",
                     UIApplicationSupportsIndirectInputEvents: true,
                     VKCImageAnalysisDisabled: true,
                     UISupportsLiveText: false,
