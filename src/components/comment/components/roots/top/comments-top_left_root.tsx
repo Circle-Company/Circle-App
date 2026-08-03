@@ -3,12 +3,11 @@ import { View } from "react-native"
 import { CommentsTopLeftRootProps } from "../../../comments-types"
 
 export default function top_left_root({ children }: CommentsTopLeftRootProps) {
-    // Sem `flex: 1`: com ele este bloco esticava até o botão da direita e
-    // empurrava o título para a borda esquerda. Encolhendo no conteúdo, o
-    // `justifyContent: "center"` do TopRoot centraliza título + botão juntos.
-    // (`alignitems`, com i minúsculo, era ignorado silenciosamente pelo RN.)
+    // `flex: 1` faz este bloco ocupar o espaço restante, mantendo o título
+    // colado à esquerda enquanto o botão fica na borda direita do TopRoot.
     const container: any = {
-        alignItems: "center",
+        flex: 1,
+        alignItems: "flex-start",
         justifyContent: "center",
     }
     return <View style={container}>{children}</View>

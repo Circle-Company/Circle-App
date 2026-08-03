@@ -66,7 +66,7 @@ function FetchedCommentsList() {
     const titleContainer: ViewStyle = {
         alignSelf: "center",
         alignItems: "center",
-        width: sizes.screens.width,
+        width: "100%",
         paddingHorizontal: sizes.paddings["1sm"],
         marginBottom: sizes.margins["2sm"],
         height: sizes.headers.height * 0.8,
@@ -145,8 +145,8 @@ function FetchedCommentsList() {
                 <Reanimated.View
                     style={{
                         width: "100%",
-                        alignSelf: "center",
-                        alignItems: "center",
+                        alignSelf: "stretch",
+                        alignItems: "stretch",
                         paddingHorizontal: sizes.paddings["1md"],
                         paddingBottom: sizes.paddings["1sm"],
                     }}
@@ -162,7 +162,7 @@ function FetchedCommentsList() {
                     else return <Text style={endText}>{t("No more comments.")}</Text>
                 } else return <Loading.ActivityIndicator size={25} />
             }}
-            style={{ alignSelf: "center", flex: 1 }}
+            style={{ alignSelf: "stretch", width: "100%", flex: 1 }}
             contentContainerStyle={{
                 paddingBottom: sizes.inputs.height + sizes.margins["2md"],
             }}

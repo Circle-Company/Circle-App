@@ -193,6 +193,8 @@ export default function RenderCommentFeed({ moment, focused }: renderCommentFeed
                 </Animated.View>
                 {isIOS && isIOSSheetOpen && (
                     <SwiftBottomSheet
+                        snapPoints={[0.65]}
+                        fillContent
                         isOpened={isIOSSheetOpen}
                         onIsOpenedChange={(opened) => {
                             if (!opened) setIOSSheetOpen(false)

@@ -7,12 +7,11 @@ import { CommentsTopRootProps } from "../../../comments-types"
 export default function TopRoot({ children }: CommentsTopRootProps) {
     const { comment, preview } = useCommentsContext()
 
-    // Padding horizontal simétrico: o antigo (0.7 à esquerda, 1.4 à direita)
-    // existia para o layout esticado e deslocaria o grupo centralizado.
+    // Layout esticado: título à esquerda, botão à direita.
     const container: any = {
         flexDirection: "row",
         alignItems: "center",
-        justifyContent: "center",
+        justifyContent: "space-between",
         gap: sizes.margins["2sm"],
         paddingTop: sizes.paddings["1sm"] * 0.8,
         paddingHorizontal: sizes.paddings["1md"] * 0.7,
