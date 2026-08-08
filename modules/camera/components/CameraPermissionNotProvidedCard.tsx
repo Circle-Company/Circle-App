@@ -111,7 +111,7 @@ export function CameraPermissionNotProvidedCard() {
                     colorScheme="dark"
                     glassEffectStyle="clear"
                     isInteractive={true}
-                    tintColor={colors.gray.grey_09 + "90"}
+                    tintColor={colors.gray.black + 40}
                 >
                     <Text style={iconStyle}>📷</Text>
                     <Text style={title}>{t("Camera permission not provided")} 😭</Text>

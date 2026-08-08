@@ -2,14 +2,31 @@ import { act, renderHook } from "@testing-library/react-hooks"
 import { beforeEach, describe, expect, it, vi } from "vitest"
 
 import { MomentProps } from "@/contexts/Feed/types"
-import PersistedContext from "@/contexts/Persisted"
-import React from "react"
 import { useFeed } from "@/contexts/Feed/useFeed"
+
+// `src/test-setup.ts` troca `@/contexts/Persisted` por um objeto simples, que
+// não é um contexto React — `useContext` devolveria undefined e `useFeed`
+// quebraria ao desestruturar `session`. Este mock local devolve um contexto de
+// verdade, cujo valor padrão já serve de sessão (dispensa Provider/wrapper).
+vi.mock("@/contexts/Persisted", async () => {
+    const react = await vi.importActual<typeof import("react")>("react")
+    return {
+        default: react.createContext({
+            session: {
+                user: { id: "user-1" },
+                account: { jwtToken: "token-123" },
+                preferences: {},
+                statistics: {},
+            },
+        }),
+    }
+})
 
 const fetchMock = vi.fn()
 const removeMock = vi.fn()
 const getCachedMock = vi.fn()
 const preloadSingleMock = vi.fn()
+const resolveVideoMock = vi.fn()
 const preloadMock = vi.fn()
 
 const markVideoAsViewedMock = vi.fn()
@@ -22,6 +39,7 @@ vi.mock("@/contexts/Feed/classes/orchestrator", () => ({
         remove: removeMock,
         getCached: getCachedMock,
         preloadSingle: preloadSingleMock,
+        resolveVideo: resolveVideoMock,
         preload: preloadMock,
         markVideoAsViewed: markVideoAsViewedMock,
         cleanupViewedVideos: cleanupViewedVideosMock,
@@ -37,33 +55,9 @@ vi.mock("@/contexts/Feed/helpers/calculeCacheMaxSize", () => ({
     useCalculeCacheMaxSize: vi.fn(() => 50),
 }))
 
-const sessionContextValue = {
-    session: {
-        user: { id: "user-1" },
-        account: { jwtToken: "token-123" },
-        preferences: {} as unknown,
-        statistics: {} as unknown,
-    },
-    device: {
-        permissions: {} as unknown,
-        metadata: {
-            deviceId: "device-1",
-            screenWidth: 1080,
-            screenHeight: 1920,
-            isTablet: false,
-            pixelDensity: 2,
-            fontScale: 1,
-            totalMemory: 4 * 1024 * 1024 * 1024,
-            availableMemory: 2 * 1024 * 1024 * 1024,
-        },
-    },
-}
-
-const wrapper = ({ children }: { children: React.ReactNode }) => (
-    <PersistedContext.Provider value={sessionContextValue as any}>
-        {children}
-    </PersistedContext.Provider>
-)
+// Sem wrapper de PersistedContext: o valor padrão do contexto mockado acima já
+// serve de sessão. O JSX do wrapper antigo também impedia a coleta do arquivo
+// (é um `.ts`), motivo pelo qual estes testes nunca chegaram a rodar.
 
 const createMoment = (overrides: Partial<MomentProps> = {}): MomentProps => ({
     id: "moment-1",
@@ -111,12 +105,12 @@ describe("useFeed cache integration", () => {
         preloadUpcomingVideosMock.mockResolvedValue(undefined)
     })
 
-    it("retorna URL do cache quando disponível e marca como visualizado", async () => {
+    it("retorna URL do cache quando disponível", async () => {
         const moment = createMoment({ id: "moment-1" })
         fetchMock.mockResolvedValue({ newFeed: [moment], addedChunk: [moment.id] })
-        getCachedMock.mockResolvedValue("app-cache://moment-1")
+        resolveVideoMock.mockResolvedValue("app-cache://moment-1")
 
-        const { result } = renderHook(() => useFeed(), { wrapper })
+        const { result } = renderHook(() => useFeed())
 
         await act(async () => {
             await result.current.fetch()
@@ -128,30 +122,31 @@ describe("useFeed cache integration", () => {
         })
 
         expect(cachedUrl).toBe("app-cache://moment-1")
-        expect(getCachedMock).toHaveBeenCalledWith(moment.id)
-        // Preload não deve ser chamado quando já está em cache
-        expect(preloadSingleMock).not.toHaveBeenCalled()
+        expect(resolveVideoMock).toHaveBeenCalledWith(moment.id, moment.media)
     })
 
-    it("realiza preload quando vídeo não está no cache e retorna URL original", async () => {
-        const moment = createMoment({ id: "moment-2" })
-        fetchMock.mockResolvedValue({ newFeed: [moment], addedChunk: [moment.id] })
-        getCachedMock.mockResolvedValueOnce(null)
-        preloadSingleMock.mockResolvedValue("app-cache://moment-2")
+    it("resolve pela URL informada quando o momento não está no feed", async () => {
+        // Caso das telas fora do feed (perfil, conta, tela cheia): o momento
+        // não existe em `feedData`, e antes disso a resolução devolvia null e
+        // o vídeo era rebaixado para download novo.
+        fetchMock.mockResolvedValue({ newFeed: [], addedChunk: [] })
+        resolveVideoMock.mockResolvedValue("app-cache://moment-externo")
 
-        const { result } = renderHook(() => useFeed(), { wrapper })
-
-        await act(async () => {
-            await result.current.fetch()
-        })
+        const { result } = renderHook(() => useFeed())
 
         let url: string | null = null
         await act(async () => {
-            url = await result.current.loadVideoFromCache(moment.id)
+            url = await result.current.loadVideoFromCache(
+                "moment-externo",
+                "https://video-externo.mp4",
+            )
         })
 
-        expect(url).toBe(moment.media)
-        expect(preloadSingleMock).toHaveBeenCalledWith(moment.id, moment.media)
+        expect(url).toBe("app-cache://moment-externo")
+        expect(resolveVideoMock).toHaveBeenCalledWith(
+            "moment-externo",
+            "https://video-externo.mp4",
+        )
     })
 
     it("faz preload dos próximos vídeos quando não estão em cache", async () => {
@@ -183,7 +178,7 @@ describe("useFeed cache integration", () => {
         })
         getCachedMock.mockResolvedValue(null)
 
-        const { result } = renderHook(() => useFeed(), { wrapper })
+        const { result } = renderHook(() => useFeed())
 
         await act(async () => {
             await result.current.fetch()
@@ -208,7 +203,7 @@ describe("useFeed cache integration", () => {
         })
         getCachedMock.mockResolvedValue(null)
 
-        const { result } = renderHook(() => useFeed(), { wrapper })
+        const { result } = renderHook(() => useFeed())
 
         await act(async () => {
             await result.current.fetch()

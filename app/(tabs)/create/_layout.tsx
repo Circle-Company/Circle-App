@@ -14,19 +14,6 @@ export default function CameraLayout() {
     return (
         <CameraProvider>
             <GestureHandlerRootView style={styles.root}>
-                {Platform.OS === "ios" &&
-                (typeof Platform.Version === "string"
-                    ? parseFloat(Platform.Version as any)
-                    : (Platform.Version as number)) < 18 ? (
-                    <BlurView intensity={24} tint="dark" style={StyleSheet.absoluteFill} />
-                ) : (
-                    <View
-                        style={[
-                            StyleSheet.absoluteFill,
-                            { backgroundColor: String(ColorTheme().background) },
-                        ]}
-                    />
-                )}
                 <Stack
                     screenOptions={{
                         headerShadowVisible: false,
@@ -35,7 +22,10 @@ export default function CameraLayout() {
                         fullScreenGestureEnabled: true,
                         headerBackTitle: t("Back"),
                         headerTintColor: "white",
-                        headerTitleStyle: { fontFamily: fonts.family["Black-Italic"] },
+                        headerTitleStyle: {
+                            fontFamily: fonts.family["Black-Italic"],
+                            fontSize: fonts.size.title2 * 0.9,
+                        },
                         headerStyle: {
                             backgroundColor: "black",
                         },

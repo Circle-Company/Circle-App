@@ -8,21 +8,26 @@ import {
     RefreshControl,
 } from "react-native"
 import React, { useState, useEffect, useMemo } from "react"
+import Animated, { FadeIn, FadeOut } from "react-native-reanimated"
 import ProfileContext from "@/contexts/profile"
 import PersistedContext from "@/contexts/Persisted"
 import { RenderProfileSkeleton } from "@/features/profile/profile.skeleton"
 import { ProfileHeader } from "@/features/profile"
+import { ProfileReportModal } from "@/features/profile/profile.report.modal"
+import { SwiftBottomSheet } from "@/components/ios/ios.bottom.sheet"
 import sizes from "@/constants/sizes"
 import { Moment } from "@/components/moment"
 import useRewriteUrl from "@/lib/hooks/useRewriteUrl"
 import { colors } from "@/constants/colors"
 import { iOSMajorVersion } from "@/lib/platform/detection"
-import { router, useLocalSearchParams } from "expo-router"
+import { Link, Stack, useLocalSearchParams } from "expo-router"
 import { NoMoments } from "@/features/profile/profile.no.moments"
 import fonts from "@/constants/fonts"
 import { NetworkContext } from "@/contexts/network"
 import OfflineCard from "@/components/general/offline"
 import { ProfileDropDownMenuIOS } from "@/features/profile/profile.moments.dropdown.menu"
+import { ProfileOptionsDropDownMenuIOS } from "@/features/profile/profile.dropdown.menu"
+import LanguageContext from "@/contexts/language"
 
 export default function ProfileScreen() {
     const {
@@ -36,10 +41,14 @@ export default function ProfileScreen() {
         totalMoments,
         setTotalMoments,
         setMoments,
+        showReportModal,
+        setShowReportModal,
     } = React.useContext(ProfileContext)
     const { session } = React.useContext(PersistedContext)
     const { cleanProfile } = React.useContext(ProfileContext)
+    const { t } = React.useContext(LanguageContext)
     const { userId } = useLocalSearchParams<{ userId: string }>()
+    const usernameTitle = profile?.username ? `@${profile.username}` : t("Profile")
     const { networkStats } = React.useContext(NetworkContext)
     const { rewrite } = useRewriteUrl()
     const [currentPage, setCurrentPage] = useState(1)
@@ -207,6 +216,27 @@ export default function ProfileScreen() {
     }, [moments, totalMoments, setMoments, setTotalMoments])
 
     return (
+        <>
+        <Stack.Screen
+            options={{
+                headerShown: true,
+                headerTransparent: true,
+                headerTitleAlign: "center",
+                headerLargeTitle: false,
+                headerLargeTitleShadowVisible: false,
+                headerShadowVisible: false,
+                headerStyle: { backgroundColor: "transparent" },
+                headerTintColor: colors.gray.white,
+                headerTitleStyle: {
+                    fontFamily: fonts.family["Black-Italic"],
+                    fontSize: fonts.size.title2 * 0.9,
+                    color: colors.gray.white,
+                },
+                headerTitle: usernameTitle,
+                headerBackTitle: t("Back"),
+                headerRight: () => <ProfileOptionsDropDownMenuIOS profile={profile} />,
+            }}
+        />
         <FlatList
             data={normalizedMoments}
             numColumns={NUM_COLUMNS}
@@ -231,48 +261,38 @@ export default function ProfileScreen() {
                 />
             }
             ListHeaderComponent={
-                loading ? (
-                    <>
-                        <View
-                            style={{
-                                paddingTop:
-                                    iOSMajorVersion! >= 26
-                                        ? sizes.headers.height * 1.6
-                                        : sizes.headers.height * 1.2,
-                            }}
-                        />
-                        <RenderProfileSkeleton />
-                    </>
-                ) : user ? (
-                    <>
-                        <View
-                            style={{
-                                paddingTop:
-                                    iOSMajorVersion! >= 26
-                                        ? sizes.headers.height * 1.6
-                                        : sizes.headers.height * 1.2,
-                            }}
-                        />
-                        <ProfileHeader
-                            user={user as any}
-                            isAccount={false}
-                            totalMoments={user.metrics.totalMomentsCreated}
-                            lastUpdateDate={lastCreatedAt ?? new Date()}
-                        />
-                    </>
-                ) : (
-                    <>
-                        <View
-                            style={{
-                                paddingTop:
-                                    iOSMajorVersion! >= 26
-                                        ? sizes.headers.height * 1.6
-                                        : sizes.headers.height * 1.2,
-                            }}
-                        />
-                        <RenderProfileSkeleton />
-                    </>
-                )
+                <>
+                    <View
+                        style={{
+                            paddingTop:
+                                iOSMajorVersion! >= 26
+                                    ? sizes.headers.height * 1.6
+                                    : sizes.headers.height * 1.2,
+                        }}
+                    />
+                    {loading || !user ? (
+                        <Animated.View
+                            key="skeleton"
+                            entering={FadeIn.duration(200)}
+                            exiting={FadeOut.duration(220)}
+                        >
+                            <RenderProfileSkeleton />
+                        </Animated.View>
+                    ) : (
+                        <Animated.View
+                            key="header"
+                            entering={FadeIn.duration(320).delay(80)}
+                            exiting={FadeOut.duration(180)}
+                        >
+                            <ProfileHeader
+                                user={user as any}
+                                isAccount={false}
+                                totalMoments={user.metrics.totalMomentsCreated}
+                                lastUpdateDate={lastCreatedAt ?? new Date()}
+                            />
+                        </Animated.View>
+                    )}
+                </>
             }
             renderItem={({ item }) => {
                 if (!isOnline) return null
@@ -291,50 +311,73 @@ export default function ProfileScreen() {
                                 overflow: "hidden",
                             }}
                         >
-                            <Pressable
-                                onPress={() => {
-                                    router.navigate({
-                                        pathname: "/profile/moment/[momentId]",
-                                        params: {
-                                            momentId: String(item.id),
-                                        },
-                                    })
+                            <Link
+                                href={{
+                                    pathname: "/profile/moment/[momentId]",
+                                    params: { momentId: String(item.id) },
                                 }}
+                                push
+                                asChild
                             >
-                                <Moment.Root.Main
-                                    size={{
-                                        ...sizes.moment.small,
-                                        width: ITEM_SIZE,
-                                        height: ITEM_SIZE * sizes.moment.aspectRatio,
-                                        borderRadius: sizes.moment.small.borderRadius * 0.7,
-                                    }}
-                                    isFeed={false}
-                                    isFocused={true}
-                                    data={item}
-                                    shadow={{ top: false, bottom: true }}
-                                >
-                                    <ProfileDropDownMenuIOS>
-                                        <Moment.Container
-                                            contentRender={item.media}
-                                            isFocused={true}
-                                            loading={false}
-                                            blurRadius={0}
-                                            forceMute={true}
-                                            showSlider={false}
-                                            disableCache={true}
-                                            disableWatch={true}
-                                        >
-                                            <Moment.Root.Center />
-                                            <Moment.Root.Bottom>
-                                                <View style={{ marginLeft: 5, marginBottom: 2 }}>
-                                                    <Moment.Description displayOnMoment={true} />
-                                                    <Moment.Date />
-                                                </View>
-                                            </Moment.Root.Bottom>
-                                        </Moment.Container>
-                                    </ProfileDropDownMenuIOS>
-                                </Moment.Root.Main>
-                            </Pressable>
+                                <Pressable>
+                                    {/* Mesma transição de zoom da tela de conta.
+                                        O AppleZoom monta apenas UM filho nativo,
+                                        daí a View única envolvendo o momento. */}
+                                    <Link.AppleZoom>
+                                        <View>
+                                            <Moment.Root.Main
+                                                size={{
+                                                    ...sizes.moment.small,
+                                                    width: ITEM_SIZE,
+                                                    height: ITEM_SIZE * sizes.moment.aspectRatio,
+                                                    borderRadius:
+                                                        sizes.moment.small.borderRadius * 0.7,
+                                                }}
+                                                isFeed={false}
+                                                isFocused={true}
+                                                data={item}
+                                                shadow={{ top: false, bottom: true }}
+                                            >
+                                                <ProfileDropDownMenuIOS>
+                                                    <Moment.Container
+                                                        contentRender={item.media}
+                                                        isFocused={true}
+                                                        loading={false}
+                                                        blurRadius={0}
+                                                        forceMute={true}
+                                                        showSlider={false}
+                                                        disableCache={false}
+                                                        disableWatch={true}
+                                                    >
+                                                        <Moment.Root.Center />
+                                                        <Moment.Root.Bottom>
+                                                            <View
+                                                                style={{
+                                                                    marginLeft: 5,
+                                                                    marginBottom: 2,
+                                                                }}
+                                                            >
+                                                                <View
+                                                                    style={{
+                                                                        alignSelf: "flex-start",
+                                                                        marginBottom: 4,
+                                                                    }}
+                                                                >
+                                                                    <Moment.LikeButtonIOS
+                                                                        isLiked={false}
+                                                                        size={44}
+                                                                    />
+                                                                </View>
+                                                                <Moment.Date />
+                                                            </View>
+                                                        </Moment.Root.Bottom>
+                                                    </Moment.Container>
+                                                </ProfileDropDownMenuIOS>
+                                            </Moment.Root.Main>
+                                        </View>
+                                    </Link.AppleZoom>
+                                </Pressable>
+                            </Link>
                         </View>
                     )
             }}
@@ -395,5 +438,15 @@ export default function ProfileScreen() {
                 }
             }}
         />
+        <SwiftBottomSheet
+            snapPoints={[1]}
+            isOpened={showReportModal}
+            onIsOpenedChange={(opened) => {
+                if (!opened) setShowReportModal(false)
+            }}
+        >
+            <ProfileReportModal />
+        </SwiftBottomSheet>
+        </>
     )
 }

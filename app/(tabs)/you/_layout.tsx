@@ -1,6 +1,7 @@
 import { Stack, useRouter } from "expo-router"
 import React from "react"
 import { Pressable } from "react-native"
+import { SymbolView } from "expo-symbols"
 import { colors } from "@/constants/colors"
 import Fonts from "@/constants/fonts"
 import LanguageContext from "@/contexts/language"
@@ -47,6 +48,22 @@ export default function YouLayout() {
                         color: colors.gray.white,
                     },
                     headerTitle: session?.user?.username ? `@${session.user.username}` : "",
+                    headerRight: () => (
+                        <Pressable
+                            onPress={() => router.push("/settings")}
+                            hitSlop={12}
+                            style={({ pressed }) => ({ opacity: pressed ? 0.6 : 1 })}
+                            accessibilityRole="button"
+                            accessibilityLabel={t("Settings")}
+                        >
+                            <SymbolView
+                                name="gear"
+                                tintColor={colors.gray.white}
+                                size={24}
+                                fallback={<Cog width={24} height={24} fill={colors.gray.white} />}
+                            />
+                        </Pressable>
+                    ),
                 }}
             />
             <Stack.Screen

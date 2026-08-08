@@ -1,6 +1,6 @@
 import React, { useEffect, useRef } from "react"
 import { BackHandler } from "react-native"
-import { useLocalSearchParams, useRouter } from "expo-router"
+import { Link, useLocalSearchParams, useRouter } from "expo-router"
 import { useNavigation } from "expo-router"
 import { SafeAreaView } from "react-native-safe-area-context"
 import PersistedContext from "@/contexts/Persisted"
@@ -199,59 +199,63 @@ export default function MomentFullScreen() {
                     data={momentData}
                     shadow={{ top: false, bottom: true }}
                 >
-                    <Moment.Container
-                        contentRender={momentData.midia}
-                        isFocused={true}
-                        loading={false}
-                        blurRadius={0}
-                        forceMute={false}
-                        showSlider={true}
-                        disableCache={false}
-                        disableWatch={false}
-                    >
-                        {/* Top user info (no scale animations) */}
-                        <Moment.Root.Top>
-                            <Moment.Root.TopLeft>
-                                <UserShow.Root data={momentData.user}>
-                                    <UserShow.ProfilePicture
-                                        disableAction={true}
-                                        displayOnMoment={true}
-                                        pictureDimensions={{ width: 30, height: 30 }}
-                                    />
-                                    <UserShow.Username
-                                        pressable={false}
-                                        fontFamily={fonts.family["Bold-Italic"]}
-                                    />
-                                </UserShow.Root>
-                            </Moment.Root.TopLeft>
-                        </Moment.Root.Top>
+                    {/* O AppleZoomTarget monta apenas UM filho nativo; por isso ele
+                        envolve somente o card do vídeo — os comentários ficam fora. */}
+                    <Link.AppleZoomTarget>
+                        <Moment.Container
+                            contentRender={momentData.midia}
+                            isFocused={true}
+                            loading={false}
+                            blurRadius={0}
+                            forceMute={false}
+                            showSlider={true}
+                            disableCache={false}
+                            disableWatch={false}
+                        >
+                            {/* Top user info (no scale animations) */}
+                            <Moment.Root.Top>
+                                <Moment.Root.TopLeft>
+                                    <UserShow.Root data={momentData.user}>
+                                        <UserShow.ProfilePicture
+                                            disableAction={true}
+                                            displayOnMoment={true}
+                                            pictureDimensions={{ width: 30, height: 30 }}
+                                        />
+                                        <UserShow.Username
+                                            pressable={false}
+                                            fontFamily={fonts.family["Bold-Italic"]}
+                                        />
+                                    </UserShow.Root>
+                                </Moment.Root.TopLeft>
+                                <Moment.Root.TopRight>
+                                    <Moment.AudioControl size={36} />
+                                </Moment.Root.TopRight>
+                            </Moment.Root.Top>
 
-                        <Moment.Root.Center>
-                            <Moment.Description displayOnMoment={true} />
-                        </Moment.Root.Center>
+                            <Moment.Root.Center />
 
-                        {/* Bottom description opens comments modal */}
-                        <Moment.Root.Bottom>
-                            <Moment.Date />
-                            <Moment.AudioControl />
-                        </Moment.Root.Bottom>
+                            {/* Bottom description opens comments modal */}
+                            <Moment.Root.Bottom>
+                                <Moment.Date />
+                            </Moment.Root.Bottom>
 
-                        {/* Subtle bottom gradient like feed */}
-                        <LinearGradient
-                            colors={["rgba(0, 0, 0, 0.00)", "rgba(0, 0, 0, 0.4)"]}
-                            start={{ x: 0.5, y: 0 }}
-                            end={{ x: 0.5, y: 1 }}
-                            style={{
-                                position: "absolute",
-                                left: 0,
-                                right: 0,
-                                bottom: 0,
-                                width: sizes.moment.standart.width,
-                                height: sizes.moment.standart.height * 0.1,
-                                zIndex: 0,
-                            }}
-                        />
-                    </Moment.Container>
+                            {/* Subtle bottom gradient like feed */}
+                            <LinearGradient
+                                colors={["rgba(0, 0, 0, 0.00)", "rgba(0, 0, 0, 0.4)"]}
+                                start={{ x: 0.5, y: 0 }}
+                                end={{ x: 0.5, y: 1 }}
+                                style={{
+                                    position: "absolute",
+                                    left: 0,
+                                    right: 0,
+                                    bottom: 0,
+                                    width: sizes.moment.standart.width,
+                                    height: sizes.moment.standart.height * 0.1,
+                                    zIndex: 0,
+                                }}
+                            />
+                        </Moment.Container>
+                    </Link.AppleZoomTarget>
                     {momentData?.topComment ? (
                         <RenderCommentFeed moment={momentData} focused={true} />
                     ) : (
@@ -261,7 +265,7 @@ export default function MomentFullScreen() {
                                 marginTop: sizes.margins["2sm"],
                             }}
                         >
-                            <ZeroComments moment={momentData} />
+                            <ZeroComments isAccount={false} moment={momentData} />
                         </View>
                     )}
                 </Moment.Root.Main>

@@ -1,9 +1,10 @@
-import { Stack, useRouter } from "expo-router"
+import { router, Stack } from "expo-router"
 import React from "react"
 
 import ColorTheme, { colors } from "@/constants/colors"
 import Fonts from "@/constants/fonts"
 import LanguageContext from "@/contexts/language"
+import { HeaderBackButton } from "@/components/general/header-buttons"
 
 import fonts from "@/constants/fonts"
 import navigation from "@/lib/navigation"
@@ -11,7 +12,6 @@ import { View } from "react-native"
 
 export default function SettingsLayout() {
     const { t } = React.useContext(LanguageContext)
-    const router = useRouter()
 
     return (
         <Stack
@@ -37,17 +37,31 @@ export default function SettingsLayout() {
                 name="index"
                 options={{
                     headerStyle: {
-                        backgroundColor: "transparent",
+                        backgroundColor: colors.gray.black,
                     },
                     headerTitleAlign: "center",
                     headerLargeTitle: false,
-                    headerTransparent: true,
+                    // Opaco: com `headerTransparent` a lista era desenhada por
+                    // baixo do header e os primeiros itens ficavam encobertos.
+                    headerTransparent: false,
                     headerTitleStyle: {
                         fontFamily: Fonts.family["Black-Italic"],
                         fontSize: Fonts.size.title2 * 0.9,
                         color: colors.gray.white,
                     },
                     headerTitle: t("Settings"),
+                    // `index` é a primeira tela deste Stack aninhado, então o
+                    // React Navigation não desenha back button automático —
+                    // o push veio do stack raiz. Daí o botão explícito.
+                    headerLeft: () => (
+                        <HeaderBackButton
+                            tintColor={colors.gray.white}
+                            displayMode="default"
+                            label={t("Back")}
+                            pressColor={colors.purple.purple_05}
+                            onPress={() => router.back()}
+                        />
+                    ),
                 }}
             />
             <Stack.Screen
@@ -96,9 +110,11 @@ export default function SettingsLayout() {
                 name="blocked-users"
                 options={{
                     headerStyle: {
-                        backgroundColor: "transparent",
+                        backgroundColor: colors.gray.black,
                     },
-                    headerTransparent: true,
+                    // Mesma correção: a FlatList de bloqueados ficava por baixo
+                    // do header. O back button aqui já é o automático do Stack.
+                    headerTransparent: false,
                     headerTitle: t("Blocked Users"),
                 }}
             />

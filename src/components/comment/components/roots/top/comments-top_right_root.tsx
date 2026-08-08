@@ -4,7 +4,8 @@ import { CommentsTopRightRootProps } from "../../../comments-types"
 
 export default function top_right_root({ children }: CommentsTopRightRootProps) {
     const container: any = {
-        alignItems: "center",
+        alignItems: "flex-end",
+        justifyContent: "center",
     }
 
     return <View style={container}>{children}</View>

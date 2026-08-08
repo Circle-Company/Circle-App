@@ -11,19 +11,19 @@ export type MomentMainRootProps = {
     shadow?: MomentVideoProps["shadow"]
 }
 export type MomentTopRootProps = {
-    children: React.ReactNode
+    children?: React.ReactNode
 }
 export type MomentTopLeftRootProps = {
-    children: React.ReactNode
+    children?: React.ReactNode
 }
 export type MomentTopRightRootProps = {
-    children: React.ReactNode
+    children?: React.ReactNode
 }
 export type MomentCenterRootProps = {
     children?: React.ReactNode
 }
 export type MomentBottomRootProps = {
-    children: React.ReactNode
+    children?: React.ReactNode
 }
 
 export type MomentContainerProps = {

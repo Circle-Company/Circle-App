@@ -15,6 +15,7 @@ import { Vibrate } from "@/lib/hooks/useHapticFeedback"
 import { useToast } from "@/contexts/Toast"
 
 import { safeSet, storageKeys, storage } from "../store"
+import { useAccountStore } from "./Persisted/persist.account"
 import {
     useSetPushTokenMutation,
     useReadAllNotificationsMutation,
@@ -35,6 +36,15 @@ Notifications.setNotificationHandler({
         shouldSetBadge: false, // we control the badge ourselves
     }),
 })
+
+// ──────────────────────────────────────────────────────────────────────────────
+// MOCK: notificações não lidas fictícias para testar o indicador vermelho com
+// número no ícone de notificações (ex.: header da câmera). Zerado porque em dev
+// ele ressuscitava 12 "não lidas" a cada abertura do app, mascarando o estado
+// real de leitura. Suba para um número > 0 pontualmente se precisar testar o
+// badge de novo.
+// ──────────────────────────────────────────────────────────────────────────────
+const MOCK_UNREAD_COUNT = 0
 
 // ──────────────────────────────────────────────────────────────────────────────
 // Types & enums
@@ -179,10 +189,14 @@ export const PushNotificationProvider: React.FC<{ children: React.ReactNode }> =
     const [isLoadingMore, setIsLoadingMore] = useState(false)
     const [unreadBoost, setUnreadBoost] = useState(0)
     const [inboxVisited, setInboxVisited] = useState(false)
+    // Leitura por item, persistida em MMKV. O backend só oferece "marcar todas
+    // como lidas", então é este conjunto que sobrevive ao fechar/abrir o app.
+    const readNotifications = useAccountStore((s) => s.readNotifications)
+    const addReadNotifications = useAccountStore((s) => s.addReadNotifications)
 
     // ── Route-based inbox detection ──
     const pathname = usePathname()
-    const isOnInbox = pathname === "/(tabs)/inbox"
+    const isOnInbox = pathname === "/inbox"
     const isOnInboxRef = useRef(isOnInbox)
     useEffect(() => {
         isOnInboxRef.current = isOnInbox
@@ -256,11 +270,23 @@ export const PushNotificationProvider: React.FC<{ children: React.ReactNode }> =
 
     const notifications = useMemo<NotificationPayload[]>(() => items, [items])
 
-    // Badge count = only the NEW notifications since the user last visited inbox
+    // Contagem derivada dos dados reais: o servidor (`readAt`) mais o conjunto
+    // local persistido. Antes era `inboxVisited` (só em memória) + um mock, o
+    // que ressuscitava as mesmas "não lidas" a cada abertura do app.
     const unreadCount = useMemo<number>(() => {
-        if (inboxVisited) return 0
-        return unreadBoost
-    }, [unreadBoost, inboxVisited])
+        const locallyRead = new Set(readNotifications.map((id) => String(id)))
+        const unread = notifications.filter(
+            (n) => !locallyRead.has(String(n.id)) && !n.readAt,
+        ).length
+        return unread + unreadBoost + MOCK_UNREAD_COUNT
+    }, [notifications, readNotifications, unreadBoost])
+
+    // Registra como lidas todas as notificações visíveis enquanto a inbox está
+    // aberta — cobre também as que carregam depois da entrada na tela.
+    useEffect(() => {
+        if (!isOnInbox || notifications.length === 0) return
+        addReadNotifications(notifications.map((n) => String(n.id)))
+    }, [isOnInbox, notifications, addReadNotifications])
 
     const resetUnread = useCallback(() => {
         setUnreadBoost(0)

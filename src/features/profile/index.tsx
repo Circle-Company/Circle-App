@@ -6,9 +6,6 @@ import sizes from "../../constants/sizes"
 import { AccountMomentsHeader } from "@/features/profile/profile.moments.header"
 
 import { iOSMajorVersion, isIPad11 } from "@/lib/platform/detection"
-import { SwiftBottomSheet } from "@/components/ios/ios.bottom.sheet"
-import { ProfileReportModal } from "./profile.report.modal"
-import ProfileContext from "@/contexts/profile"
 
 type RenderProfileProps = {
     user?: ProfileReciveDataProps
@@ -23,7 +20,6 @@ export function ProfileHeader({
     totalMoments,
     lastUpdateDate,
 }: RenderProfileProps) {
-    const { showReportModal, setShowReportModal } = React.useContext(ProfileContext)
     const top_container: ViewStyle = {
         paddingTop: iOSMajorVersion! >= 26 ? 0 : sizes.paddings["2sm"],
         alignItems: "center",
@@ -75,17 +71,6 @@ export function ProfileHeader({
                         />
                     </View>
                 )}
-            {showReportModal && (
-                <SwiftBottomSheet
-                    snapPoints={[1]}
-                    isOpened={showReportModal}
-                    onIsOpenedChange={(opened) => {
-                        if (!opened) setShowReportModal(false)
-                    }}
-                >
-                    <ProfileReportModal />
-                </SwiftBottomSheet>
-            )}
         </Profile.MainRoot>
     )
 }

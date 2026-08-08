@@ -149,18 +149,15 @@ export default function RenderMoment({ data, isFocused, isFeed }: renderMomentPr
                                 />
                             </UserShow.Root>
                         </Moment.Root.TopLeft>
+                        <Moment.Root.TopRight>
+                            <Moment.AudioControl size={32} />
+                        </Moment.Root.TopRight>
                     </Moment.Root.Top>
 
                     <Moment.Root.Center>
                         <View style={{ marginBottom: sizes.margins["2sm"], width: "100%" }}>
-                            <Moment.Description />
-                            <View style={{ flexDirection: "row", alignItems: "center" }}>
-                                <View style={{ flex: 1 }}>
-                                    <Moment.LikeButton isLiked={false} />
-                                </View>
-                                <View>
-                                    <Moment.AudioControl />
-                                </View>
+                            <View style={{ flex: 1 }}>
+                                <Moment.LikeButton isLiked={false} />
                             </View>
                         </View>
                     </Moment.Root.Center>

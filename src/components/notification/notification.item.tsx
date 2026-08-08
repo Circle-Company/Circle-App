@@ -63,6 +63,10 @@ export function NotificationItem({ item }: NotificationItemProps) {
     }
 
     function handlePress() {
+        // Marca esta notificação como lida (persistido), para ela não voltar a
+        // contar como não lida quando o app for fechado e reaberto.
+        session.account.addReadNotifications([String(item.id)])
+
         const targetId = String(item.actor.id)
         const myId = String(session.user.id)
         const targetPath = `/profile/${targetId}`

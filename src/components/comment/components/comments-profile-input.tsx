@@ -1,6 +1,5 @@
-import { Animated, Keyboard, TextInput, View } from "react-native"
+import { Animated, Keyboard, Pressable, TextInput, View } from "react-native"
 import ColorTheme, { colors } from "@/constants/colors"
-import CheckIcon from "@/assets/icons/svgs/check_circle.svg"
 import { CommentsInputProps } from "../comments-types"
 import LanguageContext from "@/contexts/language"
 import PersistedContext from "@/contexts/Persisted"
@@ -11,9 +10,9 @@ import sizes from "@/constants/sizes"
 import { useToast } from "@/contexts/Toast"
 import { TextStyle } from "react-native"
 import { ViewStyle } from "react-native"
-import { Button, Host } from "@expo/ui/swift-ui"
+import { GlassView, isLiquidGlassAvailable } from "expo-glass-effect"
+import { SymbolView } from "expo-symbols"
 import { Vibrate } from "@/lib/hooks/useHapticFeedback"
-import { iOSMajorVersion } from "@/lib/platform/detection"
 
 export default function Input({
     momentId,
@@ -32,6 +31,18 @@ export default function Input({
     React.useEffect(() => {
         animatedScale.setValue(1)
     }, [])
+
+    const handleButtonPress = () => {
+        animatedScale.setValue(0.8)
+        Animated.spring(animatedScale, {
+            toValue: 1,
+            bounciness: 12,
+            speed: 10,
+            useNativeDriver: true,
+        }).start()
+        sendComment()
+    }
+
     async function sendComment() {
         const content = (commentText || "").trim()
         if (!content || isSendingRef.current) return
@@ -49,6 +60,9 @@ export default function Input({
             setCommentText("")
             Keyboard.dismiss()
             onSent?.()
+        } catch {
+            toast.error(t("Fail to send comment"))
+            Vibrate("notificationError")
         } finally {
             isSendingRef.current = false
         }
@@ -65,7 +79,7 @@ export default function Input({
         paddingLeft: sizes.inputs.paddingHorizontal,
         backgroundColor: colors.gray.grey_08,
         overflow: "hidden",
-        paddingRight: sizes.inputs.paddingHorizontal,
+        paddingRight: sizes.inputs.paddingHorizontal * 0.5,
         marginBottom: sizes.margins["1sm"],
     }
     const text: TextStyle = {
@@ -80,6 +94,16 @@ export default function Input({
         justifyContent: "center",
         flex: 1,
     }
+    const sendButton: ViewStyle = {
+        width: 60,
+        height: 44,
+        borderRadius: 22,
+        alignItems: "center",
+        justifyContent: "center",
+        overflow: "hidden",
+    }
+
+    const canSend = (commentText || "").trim().length > 0 && !isSendingRef.current
 
     return (
         <View style={[input_container]}>
@@ -92,28 +116,52 @@ export default function Input({
                     numberOfLines={1}
                     onChangeText={(text) => setCommentText(text)}
                     autoFocus={autoFocus}
+                    value={commentText}
                 />
             </View>
-            <Host matchContents>
-                <Button
-                    onPress={sendComment}
-                    color={colors.purple.purple_05}
-                    disabled={!(commentText || "").trim() || isSendingRef.current}
-                    systemImage="paperplane.fill"
-                    variant={iOSMajorVersion! >= 26 ? "glassProminent" : "borderedProminent"}
-                    controlSize="regular"
-                    modifiers={[
-                        ...(iOSMajorVersion! < 26
-                            ? [
-                                  {
-                                      $type: "cornerRadius",
-                                      radius: 25,
-                                  },
-                              ]
-                            : []),
-                    ]}
-                />
-            </Host>
+            <Animated.View style={{ transform: [{ scale: animatedScale }] }}>
+                <Pressable
+                    onPress={handleButtonPress}
+                    disabled={!canSend}
+                    hitSlop={6}
+                    accessibilityRole="button"
+                    accessibilityLabel={t("Send")}
+                    style={({ pressed }) => ({ opacity: pressed && canSend ? 0.85 : 1 })}
+                >
+                    {isLiquidGlassAvailable() ? (
+                        <GlassView
+                            glassEffectStyle="regular"
+                            isInteractive
+                            colorScheme="dark"
+                            tintColor={canSend ? colors.purple.purple_05 : undefined}
+                            style={sendButton}
+                        >
+                            <SymbolView
+                                name="paperplane.fill"
+                                size={18}
+                                tintColor={canSend ? colors.gray.white : colors.gray.grey_04}
+                            />
+                        </GlassView>
+                    ) : (
+                        <View
+                            style={[
+                                sendButton,
+                                {
+                                    backgroundColor: canSend
+                                        ? colors.purple.purple_05
+                                        : colors.gray.grey_07,
+                                },
+                            ]}
+                        >
+                            <SymbolView
+                                name="paperplane.fill"
+                                size={18}
+                                tintColor={canSend ? colors.gray.white : colors.gray.grey_04}
+                            />
+                        </View>
+                    )}
+                </Pressable>
+            </Animated.View>
         </View>
     )
 }

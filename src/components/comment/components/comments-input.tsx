@@ -1,8 +1,6 @@
 import { Animated, Keyboard, Pressable, Text, TextInput, View, useColorScheme } from "react-native"
 import ColorTheme, { colors } from "../../../constants/colors"
 
-import Arrowbottom from "@/assets/icons/svgs/paper_plane.svg"
-import CheckIcon from "@/assets/icons/svgs/check_circle.svg"
 import { CommentsInputProps } from "../comments-types"
 import FeedContext from "@/contexts/Feed"
 import LanguageContext from "@/contexts/language"
@@ -16,22 +14,29 @@ import { userReciveDataProps } from "@/components/user_show/user_show-types"
 import MomentContext from "@/components/moment/context"
 import { TextStyle } from "react-native"
 import { ViewStyle } from "react-native"
-import { Button, Host } from "@expo/ui/swift-ui"
+import { GlassView, isLiquidGlassAvailable } from "expo-glass-effect"
+import { SymbolView } from "expo-symbols"
 import { Vibrate } from "@/lib/hooks/useHapticFeedback"
-import { iOSMajorVersion } from "@/lib/platform/detection"
 
 export default function Input({
     color = String(ColorTheme().text),
     autoFocus = false,
+    momentId,
+    onSent,
 }: CommentsInputProps) {
     const { t } = React.useContext(LanguageContext)
-    const { actions, data } = React.useContext(MomentContext)
+    const { actions } = React.useContext(MomentContext)
     const { setCommentEnabled, commentEnabled } = React.useContext(FeedContext)
     const { session } = React.useContext(PersistedContext)
     const [commentText, setCommentText] = React.useState<string>("")
     const toast = useToast()
 
     const isSendingRef = React.useRef(false)
+    // Enquanto o toque no botão de enviar está em curso, o blur do TextInput
+    // não pode derrubar o input: `onBlur` faz `setCommentEnabled(false)` e o
+    // componente devolve `null`, o que desmontaria o Pressable antes do
+    // `onPress` disparar — e o comentário nunca era enviado.
+    const isPressingSendRef = React.useRef(false)
     const animatedScale = React.useRef(new Animated.Value(0)).current
 
     React.useEffect(() => {
@@ -45,13 +50,9 @@ export default function Input({
             speed: 10,
             useNativeDriver: true,
         }).start()
-        async function fetch() {
-            await sendComment().then(() => {
-                setCommentText("")
-                Keyboard.dismiss()
-            })
-        }
-        fetch()
+        sendComment().finally(() => {
+            isPressingSendRef.current = false
+        })
     }
 
     const input_container: any = {
@@ -65,7 +66,7 @@ export default function Input({
         paddingLeft: sizes.inputs.paddingHorizontal,
         backgroundColor: colors.gray.grey_08,
         overflow: "hidden",
-        paddingRight: sizes.inputs.paddingHorizontal,
+        paddingRight: sizes.inputs.paddingHorizontal * 0.5,
         marginBottom: sizes.margins["1sm"],
     }
     const text: TextStyle = {
@@ -80,9 +81,13 @@ export default function Input({
         justifyContent: "center",
         flex: 1,
     }
-    const pressable_style: ViewStyle = {
-        width: 40,
-        height: 40,
+    const sendButton: ViewStyle = {
+        width: 60,
+        height: 44,
+        borderRadius: 22,
+        alignItems: "center",
+        justifyContent: "center",
+        overflow: "hidden",
     }
 
     async function sendComment() {
@@ -90,15 +95,23 @@ export default function Input({
         if (!content || isSendingRef.current) return
         isSendingRef.current = true
         try {
-            await actions.registerInteraction("COMMENT", {
-                momentId: data.id,
+            // `registerInteraction` engole os erros da API e resolve normalmente,
+            // então é o retorno — e não o catch — que diz se o comentário foi.
+            const sent = await actions.registerInteraction("COMMENT", {
+                momentId,
                 authorizationToken: session.account.jwtToken,
                 content,
             })
+            if (!sent) {
+                toast.error(t("Fail to send comment"))
+                Vibrate("notificationError")
+                return
+            }
             toast.success(t("Comment Sended with success"))
             Vibrate("notificationSuccess")
             setCommentText("")
             Keyboard.dismiss()
+            onSent?.()
             setCommentEnabled(false)
         } catch {
             toast.error(t("Fail to send comment"))
@@ -109,6 +122,8 @@ export default function Input({
     }
 
     if (commentEnabled === false) return null
+
+    const canSend = (commentText || "").trim().length > 0 && !isSendingRef.current
     return (
         <View style={[input_container]}>
             <View style={textContainer}>
@@ -120,31 +135,64 @@ export default function Input({
                     numberOfLines={1}
                     onChangeText={(text) => setCommentText(text)}
                     autoFocus={autoFocus}
+                    value={commentText}
                     onBlur={() => {
+                        if (isPressingSendRef.current) return
                         setCommentEnabled(false)
                     }}
                 />
             </View>
-            <Host matchContents>
-                <Button
-                    onPress={sendComment}
-                    color={colors.purple.purple_05}
-                    disabled={!(commentText || "").trim() || isSendingRef.current}
-                    systemImage="paperplane.fill"
-                    variant={iOSMajorVersion! >= 26 ? "glassProminent" : "borderedProminent"}
-                    controlSize="regular"
-                    modifiers={[
-                        ...(iOSMajorVersion! < 26
-                            ? [
-                                  {
-                                      $type: "cornerRadius",
-                                      radius: 25,
-                                  },
-                              ]
-                            : []),
-                    ]}
-                />
-            </Host>
+            <Animated.View style={{ transform: [{ scale: animatedScale }] }}>
+                <Pressable
+                    onPressIn={() => {
+                        isPressingSendRef.current = true
+                    }}
+                    // Sempre pareia com o onPressIn (inclusive se o toque for
+                    // arrastado para fora), então a trava nunca fica presa.
+                    onPressOut={() => {
+                        isPressingSendRef.current = false
+                    }}
+                    onPress={handleButtonPress}
+                    disabled={!canSend}
+                    hitSlop={6}
+                    accessibilityRole="button"
+                    accessibilityLabel={t("Send")}
+                    style={({ pressed }) => ({ opacity: pressed && canSend ? 0.85 : 1 })}
+                >
+                    {isLiquidGlassAvailable() ? (
+                        <GlassView
+                            glassEffectStyle="regular"
+                            isInteractive
+                            colorScheme="dark"
+                            tintColor={canSend ? colors.purple.purple_05 : undefined}
+                            style={sendButton}
+                        >
+                            <SymbolView
+                                name="paperplane.fill"
+                                size={18}
+                                tintColor={canSend ? colors.gray.white : colors.gray.grey_04}
+                            />
+                        </GlassView>
+                    ) : (
+                        <View
+                            style={[
+                                sendButton,
+                                {
+                                    backgroundColor: canSend
+                                        ? colors.purple.purple_05
+                                        : colors.gray.grey_07,
+                                },
+                            ]}
+                        >
+                            <SymbolView
+                                name="paperplane.fill"
+                                size={18}
+                                tintColor={canSend ? colors.gray.white : colors.gray.grey_04}
+                            />
+                        </View>
+                    )}
+                </Pressable>
+            </Animated.View>
         </View>
     )
 }

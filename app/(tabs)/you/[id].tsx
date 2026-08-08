@@ -1,7 +1,7 @@
 import React, { useEffect, useCallback } from "react"
 import { View, Keyboard, Platform, Animated as RNAnimated, Pressable } from "react-native"
 import Animated, { useAnimatedStyle, useSharedValue, withTiming } from "react-native-reanimated"
-import { useLocalSearchParams } from "expo-router"
+import { Link, useLocalSearchParams } from "expo-router"
 import { useNavigation, useFocusEffect } from "expo-router"
 import { SafeAreaView } from "react-native-safe-area-context"
 import PersistedContext from "@/contexts/Persisted"
@@ -247,7 +247,9 @@ export default function MomentFullScreen() {
             }}
         >
             <View
-                style={{ height: isIPad11 ? sizes.headers.height * 1.2 : sizes.headers.height * 0.7 }}
+                style={{
+                    height: isIPad11 ? sizes.headers.height * 1.2 : sizes.headers.height * 0.7,
+                }}
             />
             {momentData ? (
                 <>
@@ -258,63 +260,63 @@ export default function MomentFullScreen() {
                         data={momentData}
                         shadow={{ top: false, bottom: true }}
                     >
-                        <Animated.View style={animatedMomentStyle}>
-                            <Moment.Container
-                                contentRender={momentData.midia}
-                                isFocused={true}
-                                loading={isLoadingMoment}
-                                blurRadius={30}
-                                forceMute={false}
-                                showSlider={true}
-                                disableCache={false}
-                                disableWatch={true}
-                            >
-                                {/* Top user info (no scale animations) */}
-                                <Moment.Root.Top>
-                                    <Moment.Root.TopLeft>
-                                        <UserShow.Root data={momentData.user}>
-                                            <UserShow.ProfilePicture
-                                                disableAction={true}
-                                                displayOnMoment={true}
-                                                pictureDimensions={{ width: 30, height: 30 }}
-                                            />
-                                            <UserShow.Username
-                                                pressable={false}
-                                                fontFamily={fonts.family["Bold-Italic"]}
-                                            />
-                                        </UserShow.Root>
-                                    </Moment.Root.TopLeft>
-                                </Moment.Root.Top>
+                        {/* O AppleZoomTarget monta apenas UM filho nativo; por isso ele
+                            envolve somente o card do vídeo — os comentários ficam fora. */}
+                        <Link.AppleZoomTarget>
+                            <Animated.View collapsable={false} style={animatedMomentStyle}>
+                                <Moment.Container
+                                    contentRender={momentData.midia}
+                                    isFocused={true}
+                                    loading={isLoadingMoment}
+                                    blurRadius={30}
+                                    forceMute={false}
+                                    showSlider={true}
+                                    disableCache={false}
+                                    disableWatch={true}
+                                >
+                                    {/* Top user info (no scale animations) */}
+                                    <Moment.Root.Top>
+                                        <Moment.Root.TopLeft>
+                                            <UserShow.Root data={momentData.user}>
+                                                <UserShow.ProfilePicture
+                                                    disableAction={true}
+                                                    displayOnMoment={true}
+                                                    pictureDimensions={{ width: 30, height: 30 }}
+                                                />
+                                                <UserShow.Username
+                                                    pressable={false}
+                                                    fontFamily={fonts.family["Bold-Italic"]}
+                                                />
+                                            </UserShow.Root>
+                                        </Moment.Root.TopLeft>
+                                        <Moment.Root.TopRight>
+                                            <Moment.AudioControl size={36} />
+                                        </Moment.Root.TopRight>
+                                    </Moment.Root.Top>
 
-                                <Moment.Root.Center>
-                                    <Moment.Description />
-                                </Moment.Root.Center>
+                                    <Moment.Root.Center />
 
-                                {/* Bottom description opens comments modal */}
-                                <Moment.Root.Bottom>
-                                    <View style={{ marginBottom: 7, marginLeft: 5 }}>
-                                        <Moment.AudioControl />
-                                    </View>
-                                </Moment.Root.Bottom>
+                                    <Moment.Root.Bottom />
 
-                                {/* Subtle bottom gradient like feed */}
-                                <LinearGradient
-                                    colors={["rgba(0, 0, 0, 0.00)", "rgba(0, 0, 0, 0.4)"]}
-                                    start={{ x: 0.5, y: 0 }}
-                                    end={{ x: 0.5, y: 1 }}
-                                    style={{
-                                        pointerEvents: "none",
-                                        position: "absolute",
-                                        left: 0,
-                                        right: 0,
-                                        bottom: 0,
-                                        width: sizes.moment.standart.width,
-                                        height: sizes.moment.standart.height * 0.1,
-                                        zIndex: 0,
-                                    }}
-                                />
-                            </Moment.Container>
-                        </Animated.View>
+                                    {/* Subtle bottom gradient like feed */}
+                                    <LinearGradient
+                                        colors={["rgba(0, 0, 0, 0.00)", "rgba(0, 0, 0, 0.4)"]}
+                                        start={{ x: 0.5, y: 0 }}
+                                        end={{ x: 0.5, y: 1 }}
+                                        style={{
+                                            pointerEvents: "none",
+                                            position: "absolute",
+                                            left: 0,
+                                            right: 0,
+                                            bottom: 0,
+                                            width: sizes.moment.standart.width,
+                                            height: sizes.moment.standart.height * 0.1,
+                                            zIndex: 0,
+                                        }}
+                                    />
+                                </Moment.Container>
+                            </Animated.View>
+                        </Link.AppleZoomTarget>
                         {momentData?.topComment ? (
                             <RenderCommentFeed moment={momentData} focused={true} />
                         ) : (

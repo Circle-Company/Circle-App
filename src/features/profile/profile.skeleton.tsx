@@ -26,7 +26,7 @@ export function RenderProfileSkeleton() {
     }
     return (
         <View style={container}>
-            <Skeleton.View style={{ width: 130, height: 130, borderRadius: 130 / 2 }} />
+            <Skeleton.View style={{ width: 200, height: 200, borderRadius: 200 / 2 }} />
 
             <Skeleton.View
                 style={{

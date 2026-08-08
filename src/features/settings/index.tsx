@@ -59,13 +59,13 @@ export default function ListSettings() {
                 {
                     name: t("Change profile picture"),
                     icon: <UserIcon fill={colors.gray.grey_03} width={24} height={24} />,
-                    onPress: () => router.push("/(tabs)/settings/profile-picture"),
+                    onPress: () => router.push("/settings/profile-picture"),
                 },
                 {
                     name: t("Change name"),
                     value: name_text,
                     icon: <TextIcon fill={colors.gray.grey_03} width={23} height={23} />,
-                    onPress: () => router.push("/(tabs)/settings/name"),
+                    onPress: () => router.push("/settings/name"),
                 },
             ],
         },
@@ -75,12 +75,12 @@ export default function ListSettings() {
                 {
                     name: t("App language"),
                     icon: <GlobeIcon fill={colors.gray.grey_03} width={22} height={22} />,
-                    onPress: () => router.push("/(tabs)/settings/language"),
+                    onPress: () => router.push("/settings/language"),
                 },
                 {
                     name: t("Blocked users"),
                     icon: <LockIcon fill={colors.gray.grey_03} width={24} height={24} />,
-                    onPress: () => router.push("/(tabs)/settings/blocked-users"),
+                    onPress: () => router.push("/settings/blocked-users"),
                 },
             ],
         },
@@ -139,17 +139,17 @@ export default function ListSettings() {
                             style={{ left: 1 }}
                         />
                     ),
-                    onPress: () => router.push("/(tabs)/settings/log-out"),
+                    onPress: () => router.push("/settings/log-out"),
                 },
                 {
                     name: t("Download your data"),
                     icon: <DownloadIcon fill={colors.gray.grey_03} width={21} height={21} />,
-                    onPress: () => router.push("/(tabs)/settings/personal-data"),
+                    onPress: () => router.push("/settings/personal-data"),
                 },
                 {
                     name: t("Delete my account"),
                     icon: <MinusIcon fill={colors.gray.grey_03} width={22} height={22} />,
-                    onPress: () => router.push("/(tabs)/settings/exclude-account"),
+                    onPress: () => router.push("/settings/exclude-account"),
                 },
             ],
         },
@@ -168,14 +168,11 @@ export default function ListSettings() {
                     permissionStatus === PermissionStatus.DENIED
                 )
                     return (
-                        <View>
-                            <View style={{ height: sizes.headers.height * 1.9 }} />
-                            <View style={{ marginBottom: sizes.margins["1md"] }}>
-                                <NotificationPermissionNotProvidedCard />
-                            </View>
+                        <View style={{ marginBottom: sizes.margins["1md"] }}>
+                            <NotificationPermissionNotProvidedCard />
                         </View>
                     )
-                else return <View style={{ height: sizes.headers.height * 1.85 }}></View>
+                else return null
             }}
             renderItem={({ item, index }) => {
                 return (

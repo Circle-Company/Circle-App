@@ -122,21 +122,30 @@ async function getNotifications({
     if (cursor != null && cursor !== "") search.set("cursor", String(cursor))
     if (read) search.set("read", read)
 
-    const response = await api.get(`/account/notifications`, {
+    // A querystring era montada e descartada: `read`, `limit`, `offset` e
+    // `cursor` nunca chegavam no servidor, então toda busca devolvia a mesma
+    // página padrão — daí as notificações "voltarem" sempre iguais.
+    const query = search.toString()
+    const response = await api.get(`/account/notifications${query ? `?${query}` : ""}`, {
         headers: {
             Authorization: `Bearer ${storage.getString(storageKeys().account.jwt.token) || ""}`,
         },
     })
-    console.log(response.data)
     return response.data
 }
 
 async function readAllNotifications(): Promise<void> {
-    const response = await api.patch(`/account/notifications/read`, {
-        headers: {
-            Authorization: `Bearer ${storage.getString(storageKeys().account.jwt.token) || ""}`,
+    // `api.patch(url, data, config)`: o objeto de headers estava indo como
+    // CORPO da requisição, e nenhuma config era passada.
+    const response = await api.patch(
+        `/account/notifications/read`,
+        {},
+        {
+            headers: {
+                Authorization: `Bearer ${storage.getString(storageKeys().account.jwt.token) || ""}`,
+            },
         },
-    })
+    )
     return response.data
 }
 

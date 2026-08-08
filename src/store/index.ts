@@ -50,6 +50,8 @@ export function storageKeys() {
             },
             moments: baseKey + "account:moments",
             hiddenMoments: baseKey + "account:hiddenmoments",
+            likedMoments: baseKey + "account:likedmoments",
+            readNotifications: baseKey + "account:readnotifications",
             totalMoments: baseKey + "account:totalmoments",
             terms: {
                 agreed: baseKey + "account:terms:agreed",

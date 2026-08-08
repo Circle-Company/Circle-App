@@ -1,8 +1,17 @@
 import React from "react"
-import { VStack, HStack, Text, Button, Switch, List } from "@expo/ui/swift-ui"
+import { VStack, HStack, Text, Button, Image, List } from "@expo/ui/swift-ui"
+import {
+    buttonStyle,
+    controlSize,
+    disabled,
+    font,
+    foregroundStyle,
+    italic,
+    padding,
+    tint,
+} from "@expo/ui/swift-ui/modifiers"
 import { colors } from "@/constants/colors"
 import sizes from "@/constants/sizes"
-import fonts from "@/constants/fonts"
 import { Vibrate } from "@/lib/hooks/useHapticFeedback"
 import { useToast } from "@/contexts/Toast"
 import MomentContext from "../context"
@@ -59,12 +68,19 @@ export function MomentReportModal() {
 
     return (
         <VStack alignment="center">
-            <Text size={fonts.size.title3} weight="bold" padding={{ bottom: 20, top: 30 }}>
+            <Text
+                modifiers={[
+                    font({ size: 20, weight: "bold" }),
+                    italic(),
+                    foregroundStyle(colors.gray.white),
+                    padding({ top: 46, bottom: 0, leading: 15, trailing: 15 }),
+                ]}
+            >
                 {title}
             </Text>
 
             <VStack spacing={sizes.margins["1sm"]}>
-                <List listStyle="inset">
+                <List>
                     {reports.map((report) => {
                         const isSelected = selectedReportId === report.id
                         return (
@@ -72,56 +88,48 @@ export function MomentReportModal() {
                                 key={report.id}
                                 spacing={sizes.margins["1sm"]}
                                 alignment="center"
-                                frame={{ width: sizes.screens.width }}
                             >
                                 <Button
-                                    color={
-                                        isSelected ? colors.yellow.yellow_09 : colors.gray.grey_08
-                                    }
-                                    variant={isSelected ? "bordered" : "default"}
-                                    frame={{ alignment: "leading" }}
+                                    modifiers={[buttonStyle("plain")]}
                                     onPress={() => {
                                         setSelectedReportId(report.id)
                                     }}
                                 >
-                                    <HStack
-                                        frame={{
-                                            width: isSelected
-                                                ? sizes.screens.width * 0.8
-                                                : sizes.screens.width * 0.85,
-                                            alignment: "leading",
-                                        }}
-                                        padding={{ leading: 5, trailing: 15 }}
-                                        alignment="center"
-                                    >
-                                        <Switch
-                                            onValueChange={(value) => {
-                                                setSelectedReportId(
-                                                    value === false ? null : report.id,
-                                                )
-                                            }}
-                                            color={colors.yellow.yellow_05}
-                                            value={isSelected}
-                                            variant="checkbox"
+                                    <HStack alignment="center" spacing={16}>
+                                        <Image
+                                            systemName={
+                                                isSelected ? "checkmark.circle.fill" : "circle"
+                                            }
+                                            size={24}
+                                            color={
+                                                isSelected
+                                                    ? colors.yellow.yellow_05
+                                                    : colors.gray.grey_04
+                                            }
                                         />
-                                        <VStack
-                                            alignment="leading"
-                                            spacing={4}
-                                            padding={{
-                                                top: isSelected ? 8 : 0,
-                                                bottom: isSelected ? 8 : 0,
-                                                leading: 20,
-                                                trailing: 20,
-                                            }}
-                                        >
-                                            <Text size={18} weight="bold" color={colors.gray.white}>
+                                        <VStack alignment="leading" spacing={4}>
+                                            <Text
+                                                modifiers={[
+                                                    font({ size: 20, weight: "bold" }),
+                                                    foregroundStyle(
+                                                        isSelected
+                                                            ? colors.yellow.yellow_01
+                                                            : colors.gray.white,
+                                                    ),
+                                                ]}
+                                            >
                                                 {report.title}
                                             </Text>
                                             {!!report.description && (
                                                 <Text
-                                                    size={13}
-                                                    weight="medium"
-                                                    color={colors.gray.grey_03}
+                                                    modifiers={[
+                                                        font({ size: 14, weight: "regular" }),
+                                                        foregroundStyle(
+                                                            isSelected
+                                                                ? colors.yellow.yellow_01 + 90
+                                                                : colors.gray.grey_04,
+                                                        ),
+                                                    ]}
                                                 >
                                                     {report.description}
                                                 </Text>
@@ -135,13 +143,30 @@ export function MomentReportModal() {
                 </List>
             </VStack>
 
-            <HStack padding={{ top: 20 }}>
+            <HStack spacing={12}>
+                <Button
+                    role="cancel"
+                    modifiers={[
+                        buttonStyle("glass"),
+                        controlSize("large"),
+                        tint(colors.gray.grey_04),
+                        disabled(reportMutation.isPending),
+                    ]}
+                    onPress={() => {
+                        options.setShowReportModal(false)
+                        setSelectedReportId(null)
+                    }}
+                >
+                    <Text>Cancel</Text>
+                </Button>
                 <Button
                     role="destructive"
-                    disabled={!selectedReportId || reportMutation.isPending}
-                    variant="glassProminent"
-                    color={colors.red.red_05}
-                    controlSize="large"
+                    modifiers={[
+                        buttonStyle("glassProminent"),
+                        controlSize("large"),
+                        tint(colors.red.red_05),
+                        disabled(!selectedReportId || reportMutation.isPending),
+                    ]}
                     onPress={async () => {
                         if (!selectedReportId) return
                         try {
@@ -158,9 +183,7 @@ export function MomentReportModal() {
                         }
                     }}
                 >
-                    <Text weight="bold">
-                        {reportMutation.isPending ? "Loading" : "Send Report"}
-                    </Text>
+                    <Text>{reportMutation.isPending ? "Loading" : "Send Report"}</Text>
                 </Button>
             </HStack>
         </VStack>

@@ -8,7 +8,8 @@ import Animated, {
 } from "react-native-reanimated"
 import { colors } from "@/constants/colors"
 import { Vibrate } from "@/lib/hooks/useHapticFeedback"
-import { Host, Switch } from "@expo/ui/swift-ui"
+import { Host, Toggle } from "@expo/ui/swift-ui"
+import { tint } from "@expo/ui/swift-ui/modifiers"
 
 interface SwitchButtonProps {
     onPressEnable: () => void
@@ -95,12 +96,11 @@ export const SwitchButton: React.FC<SwitchButtonProps> = ({
     if (Platform.OS === "ios") {
         return (
             <Host matchContents>
-                <Switch
-                    value={checked}
-                    onValueChange={(next: boolean) => toggle(next)}
-                    color={colors.purple.purple_05}
+                <Toggle
+                    isOn={checked}
+                    onIsOnChange={(next: boolean) => toggle(next)}
                     label=""
-                    variant="switch"
+                    modifiers={[tint(colors.purple.purple_05)]}
                 />
             </Host>
         )

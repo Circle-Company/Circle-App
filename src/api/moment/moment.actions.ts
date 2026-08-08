@@ -6,13 +6,20 @@ const WATCH_DEBOUNCE_MS = 400
 type WatchDebounceEntry = { timer: any; lastWatchTime: number }
 const watchDebounceMap = new Map<string, WatchDebounceEntry>()
 
-async function flushWatch(momentId: string, watchTime: number): Promise<void> {
-    const token = storage.getString(storageKeys().account.jwt.token) || ""
-    const tokenPreview = token.slice ? token.slice(0, 10) : ""
+/**
+ * `watchTime` trafega em MILISSEGUNDOS de ponta a ponta: é assim que o player
+ * calcula (`totalWatchTime * 1000`) e assim que chega aqui. Antes esta função
+ * fazia `Math.round(watchTime / 1000)` na hora de enviar, o que (a) rebaixava
+ * para segundos inteiros — qualquer coisa abaixo de 500ms virava 0 — e (b)
+ * fazia o servidor receber "2" onde foram assistidos 1500ms, o que lido como
+ * ms dá os ~0.002s reportados.
+ */
+async function flushWatch(momentId: string, watchTimeMs: number): Promise<void> {
     const url = `/moments/${momentId}/watch`
+    const watchTime = Math.max(0, Math.round(watchTimeMs))
 
     try {
-        const res = await api.post(url, { watchTime: Math.round(watchTime / 1000) })
+        const res = await api.post(url, { watchTime })
         console.log(
             "WATCH flush -> success",
             JSON.stringify({ url, status: res?.status ?? "unknown" }),

@@ -1,228 +1,248 @@
-import React, { useEffect } from "react"
-import { Animated, Easing, Image, ImageStyle, TextStyle, ViewStyle } from "react-native"
-import SearchIcon from "@/assets/icons/svgs/bolt.svg"
-import { Text, View } from "@/components/Themed"
 import ButtonStandart from "@/components/buttons/button-standart"
-import { Loading } from "@/components/loading"
-import ColorTheme, { colors } from "@/constants/colors"
+import { Text } from "@/components/Themed"
+import { colors } from "@/constants/colors"
 import fonts from "@/constants/fonts"
 import sizes from "@/constants/sizes"
-import FeedContext from "@/contexts/Feed"
 import LanguageContext from "@/contexts/language"
-import { LinearGradient } from "expo-linear-gradient"
+import FeedContext from "@/contexts/Feed"
+import React from "react"
 import { router } from "expo-router"
-import { isIPad, isIPad11 } from "@/lib/platform/detection"
+import { AppState, AppStateStatus, Platform } from "react-native"
+import { Image, ImageStyle, TextStyle, ViewStyle, View, Animated } from "react-native"
+
+import {
+    GlassContainer,
+    GlassView,
+    isLiquidGlassAvailable,
+    isGlassEffectAPIAvailable,
+} from "expo-glass-effect"
+
+// Escala reversa de re-tentativa enquanto o feed continua vazio.
+const RETRY_SCHEDULE_MS = [
+    30 * 1000, // 30s
+    2 * 60 * 1000, // 2min
+    5 * 60 * 1000, // 5min
+    10 * 60 * 1000, // 10min
+    30 * 60 * 1000, // 30min
+    60 * 60 * 1000, // 1h
+    5 * 60 * 60 * 1000, // 5h
+]
+
+// Nível atual da escala, deliberadamente em escopo de MÓDULO:
+// - sobrevive a remontagens do card (trocar de aba e voltar não reinicia a
+//   escala em 30s, o que castigaria o servidor);
+// - morre junto com o contexto JS, ou seja, zera quando o app é fechado e
+//   reaberto — exatamente o reinício pedido.
+let retryStep = 0
 
 export function EmptyList() {
     const { t } = React.useContext(LanguageContext)
-    const { reloadFeed, loading } = React.useContext(FeedContext)
+    const { reloadFeed } = React.useContext(FeedContext)
 
-    const fadeAnim = React.useRef(new Animated.Value(0)).current
-    const scaleAnim = React.useRef(new Animated.Value(0.8)).current
-    const moveAnim = React.useRef(new Animated.Value(30)).current
-    const spinAnim = React.useRef(new Animated.Value(0)).current
+    // `reloadFeed` é recriado a cada render (`() => fetch(true)`), então não
+    // pode entrar nas deps do efeito — reagendaria o timer para sempre e ele
+    // nunca dispararia. A ref mantém sempre a versão mais recente.
+    const reloadFeedRef = React.useRef(reloadFeed)
+    reloadFeedRef.current = reloadFeed
 
-    useEffect(() => {
-        Animated.parallel([
-            Animated.timing(fadeAnim, {
-                toValue: 1,
-                duration: 800,
-                easing: Easing.out(Easing.cubic),
-                useNativeDriver: true,
-            }),
-            Animated.timing(scaleAnim, {
-                toValue: 1,
-                duration: 800,
-                easing: Easing.out(Easing.back(1.5)),
-                useNativeDriver: true,
-            }),
-            Animated.timing(moveAnim, {
-                toValue: 0,
-                duration: 800,
-                easing: Easing.out(Easing.cubic),
-                useNativeDriver: true,
-            }),
-        ]).start()
-    }, [])
+    const animatedOpacity = React.useRef(new Animated.Value(0)).current
+    const shouldUseGlass =
+        Platform.OS === "ios" && isLiquidGlassAvailable() && isGlassEffectAPIAvailable()
 
-    const startSpinAnimation = () => {
-        spinAnim.setValue(0)
-        Animated.timing(spinAnim, {
+    function handleAnimation() {
+        Animated.spring(animatedOpacity, {
             toValue: 1,
-            duration: 800,
-            easing: Easing.linear,
+            bounciness: 0,
+            speed: 30,
             useNativeDriver: true,
-        }).start(() => {
-            if (loading) startSpinAnimation()
-        })
+            delay: 90,
+        }).start()
     }
-    useEffect(() => {
+
+    React.useEffect(() => {
+        handleAnimation()
         reloadFeed()
     }, [])
 
-    useEffect(() => {
-        if (loading) {
-            startSpinAnimation()
+    // Enquanto este card estiver montado o feed está vazio; quando moments
+    // chegam ele desmonta e o cleanup cancela o timer — não é preciso checar
+    // o tamanho da lista aqui.
+    React.useEffect(() => {
+        let timer: ReturnType<typeof setTimeout> | null = null
+        let scheduledAt = Date.now()
+        let remaining = RETRY_SCHEDULE_MS[Math.min(retryStep, RETRY_SCHEDULE_MS.length - 1)]
+
+        const clear = () => {
+            if (timer) {
+                clearTimeout(timer)
+                timer = null
+            }
         }
-    }, [loading])
 
-    // Estilos como constantes
-    const containerStyle: ViewStyle = {
-        alignItems: "center",
-        justifyContent: "center",
-    }
+        const schedule = (delay: number) => {
+            clear()
+            remaining = delay
+            scheduledAt = Date.now()
+            timer = setTimeout(async () => {
+                // Avança na escala antes de buscar: uma falha na requisição não
+                // pode prender a re-tentativa no mesmo intervalo curto.
+                retryStep = Math.min(retryStep + 1, RETRY_SCHEDULE_MS.length - 1)
+                try {
+                    await reloadFeedRef.current?.()
+                } catch {
+                    // silencioso: o próximo passo da escala tenta de novo
+                }
+                schedule(RETRY_SCHEDULE_MS[retryStep])
+            }, delay)
+        }
 
-    const gradientBorderStyle: ViewStyle = {
-        alignItems: "center",
-        justifyContent: "center",
-        borderRadius: sizes.borderRadius["1xl"] * 1.1,
-        padding: 2, // 2px gradient border
-        marginBottom: sizes.margins["1md"],
-        width: sizes.screens.width - sizes.paddings["2sm"] * 2,
-    }
+        // Só conta tempo com o app em primeiro plano: ao ir para o background
+        // congelamos o que falta e retomamos daí quando voltar.
+        const onAppStateChange = (state: AppStateStatus) => {
+            if (state === "active") {
+                schedule(remaining)
+            } else {
+                remaining = Math.max(0, remaining - (Date.now() - scheduledAt))
+                clear()
+            }
+        }
 
-    const cardInnerStyle: ViewStyle = {
-        alignItems: "center",
-        justifyContent: "center",
-        borderRadius: sizes.borderRadius["1xl"] * 1.1 - 2,
+        schedule(remaining)
+        const subscription = AppState.addEventListener("change", onAppStateChange)
+
+        return () => {
+            clear()
+            subscription.remove()
+        }
+    }, [])
+
+    const container: ViewStyle = {
+        width: sizes.screens.width - sizes.paddings["1md"] * 2,
+        backgroundColor: colors.gray.grey_08,
+        paddingTop: sizes.paddings["1lg"] * 1.2,
+        paddingBottom: sizes.paddings["1lg"] * 1.6,
+        borderRadius: sizes.borderRadius["1lg"] * 1.8,
         paddingHorizontal: sizes.paddings["1md"],
-        paddingVertical: sizes.paddings["2md"],
-        backgroundColor: "#FFF",
-        width: "100%",
-    }
-
-    const illustrationContainerStyle: ViewStyle = {
+        alignSelf: "center",
         alignItems: "center",
         justifyContent: "center",
-        marginBottom: sizes.margins["1lg"],
-        marginTop: sizes.margins["1md"],
-        position: "relative",
     }
 
-    const illustrationStyle: ImageStyle = {
-        width: sizes.screens.width * 0.8,
-        height: sizes.screens.width * 0.7,
+    const glassContainer: ViewStyle = {
+        width: sizes.screens.width - sizes.paddings["1md"] * 2,
+        paddingTop: sizes.paddings["1lg"],
+        paddingBottom: sizes.paddings["1lg"] * 1.6,
+        borderRadius: sizes.borderRadius["1lg"] * 2,
+        paddingHorizontal: sizes.paddings["1md"],
+        alignSelf: "center",
+        alignItems: "center",
+        justifyContent: "center",
     }
 
-    const messageTextStyle: TextStyle = {
-        fontSize: fonts.size.title1 * 0.8,
-        fontFamily: fonts.family.Bold,
+    const title: TextStyle = {
+        fontSize: fonts.size.title2,
+        fontFamily: fonts.family.ExtraBold,
+        fontStyle: "italic",
+        marginTop: sizes.margins["1sm"],
+        marginBottom: sizes.margins["2sm"],
         textAlign: "center",
-        marginBottom: sizes.margins["1sm"],
-        color: colors.gray.grey_01,
     }
 
-    const subMessageTextStyle: TextStyle = {
-        fontSize: fonts.size.footnote,
-        fontFamily: fonts.family.Medium,
-        color: colors.gray.grey_04,
-        textAlign: "center",
-        marginBottom: sizes.margins["1md"],
-    }
-
-    const buttonTextStyle: TextStyle = {
-        fontSize: fonts.size.body * 1.2,
-        fontFamily: fonts.family["Black-Italic"],
-        color: colors.gray.white,
-    }
-
-    const reloadTextStyle: TextStyle = {
+    const description: TextStyle = {
         fontSize: fonts.size.body,
         fontFamily: fonts.family.Medium,
-        color: colors.gray.grey_01,
-        marginRight: sizes.margins["2sm"],
+        color: colors.gray.grey_04,
+        paddingHorizontal: sizes.paddings["1md"],
+        textAlign: "center",
     }
 
-    return (
-        <View style={containerStyle}>
-            <LinearGradient
-                colors={[colors.gray.grey_07, colors.gray.black]}
-                start={{ x: 0.5, y: 0 }}
-                end={{ x: 0.5, y: 1 }}
-                style={gradientBorderStyle}
-            >
-                <LinearGradient
-                    colors={[colors.gray.grey_09, colors.gray.black]}
-                    start={{ x: 0.5, y: 0 }}
-                    end={{ x: 0.5, y: 1 }}
-                    style={cardInnerStyle}
-                >
-                    <Animated.View
-                        style={[
-                            illustrationContainerStyle,
-                            {
-                                opacity: fadeAnim,
-                                transform: [{ scale: scaleAnim }, { translateY: moveAnim }],
-                            },
-                        ]}
+    const buttonContainer: ViewStyle = {
+        alignSelf: "center",
+        alignItems: "center",
+        marginTop: sizes.margins["1md"],
+        maxWidth: sizes.buttons.width,
+        height: sizes.buttons.height * 0.5,
+        borderRadius: sizes.borderRadius["1md"],
+        overflow: "hidden",
+        backgroundColor: colors.gray.white,
+    }
+
+    const buttonLabel: any = {
+        fontFamily: fonts.family["Black-Italic"],
+        fontSize: fonts.size.body * 1.2,
+        color: colors.gray.black,
+    }
+
+    // Ilustração provisória: por ora a mesma do card "Capture Your Day".
+    const illustrationStyle: ImageStyle = {
+        width: sizes.screens.width * 0.9,
+        height: sizes.screens.width * 0.9,
+        marginTop: sizes.margins["1sm"],
+        marginBottom: sizes.margins["1md"],
+    }
+
+    async function handleShareMoment() {
+        router.push("/(tabs)/create")
+    }
+
+    if (shouldUseGlass)
+        return (
+            <Animated.View style={{ opacity: animatedOpacity }}>
+                <GlassContainer spacing={10}>
+                    <GlassView
+                        style={glassContainer}
+                        colorScheme="dark"
+                        glassEffectStyle="regular"
+                        isInteractive={true}
+                        tintColor={colors.gray.black + 40}
                     >
                         <Image
                             source={require("@/assets/images/illustrations/NewMoment-Illustration.png")}
                             style={illustrationStyle}
                             resizeMode="contain"
                         />
-                    </Animated.View>
-
-                    <Animated.View
-                        style={{
-                            opacity: fadeAnim,
-                            transform: [{ translateY: moveAnim }, { scale: scaleAnim }],
-                        }}
-                    >
-                        <Text style={messageTextStyle}>{t("Capture Your Day")}</Text>
-                        <Text style={subMessageTextStyle}>
+                        <Text style={title}>{t("Capture Your Day")} ⚡</Text>
+                        <Text style={description}>
                             {t(
                                 "No recommendations available right now. Why not share a special moment from your day instead?",
                             )}
                         </Text>
-                    </Animated.View>
 
-                    <Animated.View
-                        style={{
-                            opacity: fadeAnim,
-                            transform: [{ translateY: moveAnim }, { scale: scaleAnim }],
-                        }}
-                    >
                         <ButtonStandart
-                            animationScale={0.92}
-                            width={sizes.buttons.width * 0.6}
-                            height={
-                                isIPad11 ? sizes.buttons.height * 0.6 : sizes.buttons.height * 0.7
-                            }
+                            style={buttonContainer}
                             margins={false}
-                            backgroundColor={ColorTheme().primary.toString()}
-                            action={() => {
-                                router.push("/(tabs)/create")
-                            }}
+                            action={handleShareMoment}
                         >
-                            <Text style={buttonTextStyle}>{t("Share a Moment")}</Text>
+                            <Text style={buttonLabel}>{t("Share a Moment")}</Text>
                         </ButtonStandart>
-                    </Animated.View>
-                </LinearGradient>
-            </LinearGradient>
+                    </GlassView>
+                </GlassContainer>
+            </Animated.View>
+        )
+    else
+        return (
+            <Animated.View style={{ opacity: animatedOpacity }}>
+                <View style={container}>
+                    <Image
+                        source={require("@/assets/images/illustrations/NewMoment-Illustration.png")}
+                        style={illustrationStyle}
+                        resizeMode="contain"
+                    />
+                    <Text style={title}>{t("Capture Your Day")} ⚡</Text>
+                    <Text style={description}>
+                        {t(
+                            "No recommendations available right now. Why not share a special moment from your day instead?",
+                        )}
+                    </Text>
 
-            <ButtonStandart
-                width={loading ? sizes.screens.width * 0.2 : undefined}
-                animationScale={0.92}
-                margins={false}
-                backgroundColor={colors.gray.grey_08}
-                action={reloadFeed}
-            >
-                {loading ? (
-                    <Loading.Container width={sizes.screens.width * 0.5} height={40}>
-                        <Loading.ActivityIndicator size={20} />
-                    </Loading.Container>
-                ) : (
-                    <>
-                        <Text style={reloadTextStyle}>{t("Reload Feed")}</Text>
-                        <SearchIcon
-                            fill={colors.gray.white}
-                            width={sizes.icons["1sm"].width}
-                            height={sizes.icons["1sm"].height}
-                        />
-                    </>
-                )}
-            </ButtonStandart>
-        </View>
-    )
+                    <ButtonStandart
+                        style={buttonContainer}
+                        margins={false}
+                        action={handleShareMoment}
+                    >
+                        <Text style={buttonLabel}>{t("Share a Moment")}</Text>
+                    </ButtonStandart>
+                </View>
+            </Animated.View>
+        )
 }
