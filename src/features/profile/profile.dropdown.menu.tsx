@@ -14,6 +14,7 @@ import {
 } from "@expo/ui/swift-ui/modifiers"
 import { colors } from "@/constants/colors"
 import { useBlockMutation } from "@/queries/user.block"
+import { useFriendshipStatusQuery, useRemoveFriendMutation } from "@/queries/friendship"
 import { Vibrate } from "@/lib/hooks/useHapticFeedback"
 
 export function ProfileOptionsDropDownMenuIOS({ profile }: { profile: profileProps["profile"] }) {
@@ -21,6 +22,14 @@ export function ProfileOptionsDropDownMenuIOS({ profile }: { profile: profilePro
     const { t } = React.useContext(LanguageContext)
     const { setShowReportModal, getProfile, cleanProfile } = React.useContext(ProfileContext)
     const blockMutation = useBlockMutation({ userId: profile.id })
+    const removeFriendMutation = useRemoveFriendMutation({ userId: profile.id })
+    const { data: friendshipStatus } = useFriendshipStatusQuery(profile.id, {
+        enabled: !!profile.id,
+    })
+
+    // Prefere o status vindo da query (mais fresco que o payload do perfil,
+    // que só é relido no refresh da tela).
+    const areFriends = friendshipStatus?.areFriends ?? profile.interactions?.areFriends ?? false
 
     async function handleBlock() {
         if (profile.interactions?.isBlocking !== false) return
@@ -49,6 +58,29 @@ export function ProfileOptionsDropDownMenuIOS({ profile }: { profile: profilePro
         )
     }
 
+    function handleUnfriend() {
+        Alert.alert(
+            t("Unfriend @{{username}}", { username: profile.username }),
+            t("You will no longer be friends. Neither of you will be notified."),
+            [
+                { text: t("Cancel"), style: "cancel" },
+                {
+                    text: t("Unfriend"),
+                    style: "destructive",
+                    onPress: async () => {
+                        try {
+                            await removeFriendMutation.mutateAsync()
+                            Vibrate("rigid")
+                            await getProfile(profile.id)
+                        } catch (e) {
+                            console.log(e)
+                        }
+                    },
+                },
+            ],
+        )
+    }
+
     function handleReport() {
         setShowReportModal(true)
     }
@@ -57,6 +89,13 @@ export function ProfileOptionsDropDownMenuIOS({ profile }: { profile: profilePro
         <Host matchContents colorScheme="dark">
             <Menu label="" systemImage="ellipsis">
                 <Section>
+                    {areFriends && (
+                        <Button
+                            systemImage="person.badge.minus"
+                            label={t("Unfriend @{{username}}", { username: profile.username })}
+                            onPress={handleUnfriend}
+                        />
+                    )}
                     {!profile.interactions?.isBlocking && (
                         <Button
                             systemImage="hand.raised"

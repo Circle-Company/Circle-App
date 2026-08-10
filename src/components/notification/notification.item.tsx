@@ -86,6 +86,11 @@ export function NotificationItem({ item }: NotificationItemProps) {
             case NotificationType.ProfileViewed:
                 router.push({ pathname: "/profile/[userId]", params: { userId: targetId } })
                 break
+            // O deep link do backend manda para `profile` — quem aceitou já é
+            // amigo, então o perfil dele é o destino útil.
+            case NotificationType.FriendRequestAccepted:
+                router.push({ pathname: "/profile/[userId]", params: { userId: targetId } })
+                break
             default:
                 break
         }

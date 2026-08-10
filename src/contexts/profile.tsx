@@ -4,6 +4,7 @@ import api from "@/api"
 import { Image } from "expo-image"
 
 import { momentsProps } from "@/api/account/account.types"
+import type { FriendshipRelation } from "@/api/friendship/friendship.types"
 export interface profileProps {
     success: boolean
     profile: {
@@ -17,13 +18,19 @@ export interface profileProps {
         }
         metrics: {
             totalMomentsCreated: number
+            /** @deprecated a API de amizade substituiu seguidores por `totalFriends` */
             totalFollowers: number
+            totalFriends: number
         }
         interactions: {
+            /** @deprecated o modelo de follow deu lugar à amizade recíproca */
             isFollowing: boolean
+            /** @deprecated o modelo de follow deu lugar à amizade recíproca */
             isFollowedBy: boolean
             isBlockedBy: boolean
             isBlocking: boolean
+            areFriends: boolean
+            friendshipStatus: FriendshipRelation
         }
     }
     error?: string
@@ -108,6 +115,7 @@ export function Provider({ children }: ProfileProviderProps) {
         const metricsSrc = root?.metrics || root?.profile?.metrics || {}
         const metrics = {
             totalFollowers: Number(metricsSrc?.totalFollowers ?? 0),
+            totalFriends: Number(metricsSrc?.totalFriends ?? 0),
             totalMomentsCreated: Number(metricsSrc?.totalMomentsCreated ?? 0),
         }
 
@@ -139,6 +147,15 @@ export function Provider({ children }: ProfileProviderProps) {
                 interSrc.blocking ??
                 interSrc.you_block ??
                 interSrc.you_are_blocking
+            ),
+            // `friendshipStatus` é a fonte de verdade do botão de amizade;
+            // `areFriends` é só o atalho de `=== "friends"`.
+            friendshipStatus: (interSrc.friendshipStatus ??
+                interSrc.relation ??
+                "none") as FriendshipRelation,
+            areFriends: !!(
+                interSrc.areFriends ??
+                (interSrc.friendshipStatus ?? interSrc.relation) === "friends"
             ),
         }
 

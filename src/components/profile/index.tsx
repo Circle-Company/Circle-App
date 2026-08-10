@@ -5,6 +5,7 @@ import name from "./components/profile-name"
 import description from "./components/profile-description"
 import name_follow from "./components/profile-name-followers"
 import { FollowButton } from "./components/profile-follow"
+import { FriendButton } from "./components/profile-friend"
 import { BlockingCard } from "./components/profile-blocking"
 import { BlockedByCard } from "./components/profile-bloked"
 export const Profile = {
@@ -14,6 +15,7 @@ export const Profile = {
     Name: name,
     NameFollow: name_follow,
     Follow: FollowButton,
+    Friend: FriendButton,
     Description: description,
     BlockingCard,
     BlockedByCard,

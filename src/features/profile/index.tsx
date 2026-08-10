@@ -37,17 +37,18 @@ export function ProfileHeader({
                 {user.interactions?.isBlocking === false &&
                     user.interactions?.isBlockedBy === false && (
                         <Profile.NameFollow scale={isIPad11 ? 0.7 : 0.75} />
-
-                        /**
-                           isAccount === false && (
-                           <View style={{ marginVertical: sizes.margins["1md"] }}>
-                               <Profile.Follow
-                                   isFollowedBy={user.interactions.isFollowedBy}
-                                   isFollowing={user.interactions.isFollowing}
-                               />
-                           </View>
-                       )
-                       */
+                    )}
+                {isAccount === false &&
+                    user.interactions?.isBlocking === false &&
+                    user.interactions?.isBlockedBy === false &&
+                    !!user.id && (
+                        <View style={{ marginTop: sizes.margins["3sm"] }}>
+                            <Profile.Friend
+                                userId={String(user.id)}
+                                username={user.username}
+                                initialRelation={user.interactions?.friendshipStatus}
+                            />
+                        </View>
                     )}
             </View>
             {user.interactions?.isBlocking && isAccount === false && <Profile.BlockingCard />}

@@ -1,4 +1,5 @@
 import React from "react"
+import type { FriendshipRelation } from "@/api/friendship/friendship.types"
 
 export type ProfileReciveDataProps = {
     id: number
@@ -11,13 +12,19 @@ export type ProfileReciveDataProps = {
     }
     metrics: {
         totalMomentsCreated: number
+        /** @deprecated substituído por `totalFriends` na API de amizade */
         totalFollowers: number
+        totalFriends?: number
     }
     interactions: {
+        /** @deprecated o modelo de follow deu lugar à amizade recíproca */
         isFollowing: boolean
+        /** @deprecated o modelo de follow deu lugar à amizade recíproca */
         isFollowedBy: boolean
         isBlockedBy: boolean
         isBlocking: boolean
+        areFriends?: boolean
+        friendshipStatus?: FriendshipRelation
     }
 }
 export type ProfileMainRootProps = {

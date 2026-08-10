@@ -386,5 +386,24 @@
     "Show Moment": "Show Moment",
     "Block @{{username}}": "Block @{{username}}",
     "No folder was selected.": "No folder was selected.",
-    "Error saving": "Error saving"
+    "Error saving": "Error saving",
+
+    "General": "General",
+    "Invites": "Invites",
+    "Want to be your friend": "Want to be your friend",
+    "Decline": "Decline",
+    "Add friend": "Add friend",
+    "Invite sent": "Invite sent",
+    "Friend": "Friend",
+    "Friends": "Friends",
+    "Unfriend": "Unfriend",
+    "Unfriend @{{username}}": "Unfriend @{{username}}",
+    "You will no longer be friends. Neither of you will be notified.": "You will no longer be friends. Neither of you will be notified.",
+    "Cancel invite": "Cancel invite",
+    "Do you want to cancel your friend invite?": "Do you want to cancel your friend invite?",
+    "No pending invites": "No pending invites",
+    "When someone invites you to be their friend, it shows up here.": "When someone invites you to be their friend, it shows up here.",
+    "You have no friends yet": "You have no friends yet",
+    "Invite people you know to be your friend and they will show up here.": "Invite people you know to be your friend and they will show up here.",
+    "Something went wrong": "Something went wrong"
 }

@@ -387,5 +387,24 @@
     "Report": "Denunciar",
     "Hide Moment": "Ocultar Momento",
     "Show Moment": "Mostrar Momento",
-    "Block @{{username}}": "Bloquear @{{username}}"
+    "Block @{{username}}": "Bloquear @{{username}}",
+
+    "General": "Geral",
+    "Invites": "Convites",
+    "Want to be your friend": "Quer ser seu amigo",
+    "Decline": "Recusar",
+    "Add friend": "Adicionar amigo",
+    "Invite sent": "Convite enviado",
+    "Friend": "Amigo",
+    "Friends": "Amigos",
+    "Unfriend": "Desfazer amizade",
+    "Unfriend @{{username}}": "Desfazer amizade com @{{username}}",
+    "You will no longer be friends. Neither of you will be notified.": "Vocês deixarão de ser amigos. Nenhum dos dois será notificado.",
+    "Cancel invite": "Cancelar convite",
+    "Do you want to cancel your friend invite?": "Deseja cancelar seu convite de amizade?",
+    "No pending invites": "Nenhum convite pendente",
+    "When someone invites you to be their friend, it shows up here.": "Quando alguém convidar você para ser amigo, o convite aparece aqui.",
+    "You have no friends yet": "Você ainda não tem amigos",
+    "Invite people you know to be your friend and they will show up here.": "Convide pessoas que você conhece para serem seus amigos e elas aparecerão aqui.",
+    "Something went wrong": "Algo deu errado"
 }
