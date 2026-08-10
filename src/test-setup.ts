@@ -4,6 +4,40 @@ import { vi } from "vitest"
 // Mock básico para React Native
 global.fetch = vi.fn()
 
+// `expo-modules-core` lê `globalThis.expo`, que normalmente é instalado pelo
+// runtime nativo. Sem este shim, qualquer import que chegue nele morre com
+// "Cannot read properties of undefined (reading 'EventEmitter')" antes mesmo
+// de a suíte começar.
+class MockEventEmitter {
+    private listeners = new Map<string, Set<(...args: any[]) => void>>()
+
+    addListener(event: string, listener: (...args: any[]) => void) {
+        if (!this.listeners.has(event)) this.listeners.set(event, new Set())
+        this.listeners.get(event)!.add(listener)
+        return { remove: () => this.listeners.get(event)?.delete(listener) }
+    }
+
+    removeAllListeners(event: string) {
+        this.listeners.delete(event)
+    }
+
+    emit(event: string, ...args: any[]) {
+        this.listeners.get(event)?.forEach((listener) => listener(...args))
+    }
+}
+
+;(globalThis as any).expo = {
+    EventEmitter: MockEventEmitter,
+    NativeModule: class {},
+    SharedObject: class {},
+    SharedRef: class {},
+    modules: {},
+    uuidv4: () => "00000000-0000-4000-8000-000000000000",
+    uuidv5: () => "00000000-0000-5000-8000-000000000000",
+    getViewConfig: () => null,
+    reloadAppAsync: vi.fn(),
+}
+
 // Mock para console para evitar logs desnecessários nos testes
 Object.assign(console, {
     log: vi.fn(),
@@ -24,6 +58,11 @@ vi.mock("react-native", () => ({
     },
     Alert: {
         alert: vi.fn(),
+    },
+    Image: {
+        prefetch: vi.fn(() => Promise.resolve(true)),
+        getSize: vi.fn(),
+        resolveAssetSource: vi.fn(() => ({ uri: "" })),
     },
 }))
 
