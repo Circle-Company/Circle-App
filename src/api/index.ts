@@ -12,7 +12,14 @@ import { routes as radarRoutes } from "./radar/radar"
 import { routes as userRoutes } from "./user/user"
 import { routes as profileRoutes } from "./profile/profile"
 
-type PendingResolver = (token: string) => void
+/**
+ * Request que ficou esperando o refresh terminar. Precisa dos dois lados: em
+ * caso de falha ela tem que ser **rejeitada**, não repetida com token vazio.
+ */
+type PendingEntry = {
+    resume: (token: string) => void
+    fail: (error: unknown) => void
+}
 
 const PATH = `${config.ENDPOINT}`
 
@@ -138,12 +145,95 @@ api.interceptors.request.use((cfg) => {
 // -----------------------------
 let isRefreshing = false
 let refreshPromise: Promise<string> | null = null
-const pendingQueue: PendingResolver[] = []
+const pendingQueue: PendingEntry[] = []
+
+/** Teto para a chamada de refresh. Sem isso, um `/auth/refresh-token` pendurado
+ * deixa `isRefreshing` ligado para sempre e toda request seguinte entra numa
+ * fila que nunca é drenada — o app trava inteiro sem erro nenhum. */
+const REFRESH_TIMEOUT_MS = 15_000
+
+/**
+ * Devolve os headers da request com o Authorization trocado. Os headers do
+ * axios podem ser um `AxiosHeaders` (com `toJSON`) ou um objeto simples,
+ * dependendo de como a request foi criada — daí a normalização.
+ */
+/** Rejeita a promise se ela não resolver dentro do prazo. */
+function withTimeout<T>(promise: Promise<T>, ms: number): Promise<T> {
+    return new Promise<T>((resolve, reject) => {
+        const timer = setTimeout(() => reject(new Error(`Refresh timeout após ${ms}ms`)), ms)
+        promise.then(
+            (value) => {
+                clearTimeout(timer)
+                resolve(value)
+            },
+            (error) => {
+                clearTimeout(timer)
+                reject(error)
+            },
+        )
+    })
+}
+
+function withAuthorization(headers: unknown, token: string) {
+    const plain =
+        headers && typeof (headers as any).toJSON === "function"
+            ? (headers as any).toJSON()
+            : { ...((headers as Record<string, unknown>) || {}) }
+    plain.Authorization = `Bearer ${token}`
+    return plain
+}
 
 // Auth grace period: used to delay refresh handling right after auth completes
 let authGraceUntil = 0
 export function beginAuthGracePeriod(durationMs: number = 1000) {
     authGraceUntil = Date.now() + Math.max(0, durationMs)
+}
+
+/**
+ * Sessão irrecuperável: recebemos 401 e não há como renovar o token.
+ * Diferente de um erro de rede no refresh, aqui não adianta tentar de novo —
+ * o app precisa deslogar e voltar para a tela de autenticação.
+ */
+export class SessionExpiredError extends Error {
+    constructor(public readonly reason: "NO_REFRESH_TOKEN" | "REFRESH_REJECTED") {
+        super(`SESSION_EXPIRED: ${reason}`)
+        this.name = "SessionExpiredError"
+    }
+}
+
+type SessionExpiredHandler = () => void
+const sessionExpiredHandlers = new Set<SessionExpiredHandler>()
+
+/**
+ * Registra um handler para quando a sessão morre. A camada de axios não tem
+ * acesso a hooks nem ao router, então o AuthProvider se inscreve aqui e chama
+ * `signOut()` — é isso que tira o app do limbo "logado sem token".
+ */
+export function onSessionExpired(handler: SessionExpiredHandler): () => void {
+    sessionExpiredHandlers.add(handler)
+    return () => sessionExpiredHandlers.delete(handler)
+}
+
+// Um 401 costuma chegar em rajada (várias queries em paralelo). Sem esta trava
+// cada uma dispararia um signOut.
+let sessionExpiredNotified = false
+
+function notifySessionExpired() {
+    if (sessionExpiredNotified) return
+    sessionExpiredNotified = true
+    console.warn("🚪 Sessão expirada — solicitando signOut")
+    sessionExpiredHandlers.forEach((handler) => {
+        try {
+            handler()
+        } catch (e) {
+            console.warn("Erro em handler de sessão expirada:", e)
+        }
+    })
+}
+
+/** Chamado após um login bem-sucedido para rearmar a notificação. */
+export function resetSessionExpiredLatch() {
+    sessionExpiredNotified = false
 }
 
 /**
@@ -157,9 +247,13 @@ async function doRefreshToken(): Promise<string> {
     const currentRefresh = storage.getString(jwtKeys.refreshToken)
 
     if (!currentRefresh) {
-        // No refresh token available: skip cleanup and signal sentinel error
-        console.warn("🔒 Refresh aborted: missing refreshToken in storage")
-        throw new Error("NO_REFRESH_TOKEN")
+        // Sem refresh token não há como recuperar: o 401 já provou que o access
+        // token não serve. Antes isto lançava um sentinela que o handler tratava
+        // como transitório e ignorava — o app seguia "logado" sem token nenhum,
+        // todo request dava 401, nenhuma tela montava e o usuário ficava preso
+        // numa tela preta. Agora é terminal e leva a signOut.
+        console.warn("🔒 Refresh impossível: refreshToken ausente no storage")
+        throw new SessionExpiredError("NO_REFRESH_TOKEN")
     }
 
     // Chama a rota de refresh enviando Authorization com o refresh token "cru" (sem Bearer)
@@ -174,9 +268,23 @@ async function doRefreshToken(): Promise<string> {
             ts: refreshStartTs,
         }),
     )
-    const res = await api.get("/auth/refresh-token", {
-        headers: { Authorization: `Bearer ${currentRefresh}` },
-    })
+    let res
+    try {
+        res = await api.get("/auth/refresh-token", {
+            headers: { Authorization: `Bearer ${currentRefresh}` },
+        })
+    } catch (err) {
+        // 401/403 na própria rota de refresh = o refresh token não vale mais.
+        // Qualquer outra coisa (rede, 5xx) é transitória e deve preservar os
+        // tokens para a próxima tentativa.
+        const status = (err as AxiosError)?.response?.status
+        if (status === 401 || status === 403) {
+            console.warn("🔒 Refresh token rejeitado pelo backend", JSON.stringify({ status }))
+            throw new SessionExpiredError("REFRESH_REJECTED")
+        }
+        throw err
+    }
+
     const refreshDurationMs = Date.now() - refreshStartTs
     console.log(
         "✅ Refresh success",
@@ -188,7 +296,8 @@ async function doRefreshToken(): Promise<string> {
     const expiresIn: number | undefined = res.data?.expiresIn
 
     if (!newToken) {
-        throw new Error("Invalid refresh response: token not found")
+        // Resposta 200 sem token é resposta inválida — não há o que reter.
+        throw new SessionExpiredError("REFRESH_REJECTED")
     }
 
     // Persistir no MMKV
@@ -282,6 +391,16 @@ async function handleAuthError(error: AxiosError) {
         throw error
     }
 
+    // Sem nenhuma credencial no storage não há sessão a recuperar: 401 aqui
+    // significa que o app está montado numa rota autenticada sem estar logado.
+    // Avisa na hora em vez de tentar um refresh que fatalmente falharia.
+    const jwtKeys = storageKeys().account.jwt
+    if (!storage.getString(jwtKeys.token) && !storage.getString(jwtKeys.refreshToken)) {
+        console.warn("🔒 401 sem token nem refreshToken — sessão inexistente")
+        notifySessionExpired()
+        throw error
+    }
+
     console.log("🔄 Tentando refresh token para requisição:", originalRequest.url)
 
     originalRequest._retry = true
@@ -293,33 +412,33 @@ async function handleAuthError(error: AxiosError) {
             JSON.stringify({ url: originalRequest.url, queueSize: pendingQueue.length }),
         )
         return new Promise((resolve, reject) => {
-            pendingQueue.push((newToken) => {
-                try {
-                    console.log(
-                        "▶️ Resuming enqueued request",
-                        JSON.stringify({
-                            url: originalRequest.url,
-                            gotTokenPreview: (newToken || "").slice(0, 10),
-                        }),
-                    )
-                    const plainHeaders =
-                        originalRequest.headers &&
-                        typeof (originalRequest.headers as any).toJSON === "function"
-                            ? (originalRequest.headers as any).toJSON()
-                            : { ...(originalRequest.headers || {}) }
-                    plainHeaders.Authorization = `Bearer ${newToken}`
-                    originalRequest.headers = plainHeaders
-                    resolve(api(originalRequest))
-                } catch (e) {
-                    reject(e)
-                }
+            pendingQueue.push({
+                resume: (newToken) => {
+                    try {
+                        console.log(
+                            "▶️ Resuming enqueued request",
+                            JSON.stringify({
+                                url: originalRequest.url,
+                                gotTokenPreview: (newToken || "").slice(0, 10),
+                            }),
+                        )
+                        originalRequest.headers = withAuthorization(
+                            originalRequest.headers,
+                            newToken,
+                        )
+                        resolve(api(originalRequest))
+                    } catch (e) {
+                        reject(e)
+                    }
+                },
+                fail: reject,
             })
         })
     }
 
-    // Inicia o refresh (single-flight)
+    // Inicia o refresh (single-flight), com teto de tempo
     isRefreshing = true
-    refreshPromise = doRefreshToken()
+    refreshPromise = withTimeout(doRefreshToken(), REFRESH_TIMEOUT_MS)
 
     try {
         const newToken = await refreshPromise
@@ -333,21 +452,16 @@ async function handleAuthError(error: AxiosError) {
 
         // Desenfileira e repete todas requests pendentes
         while (pendingQueue.length) {
-            const resume = pendingQueue.shift()
+            const entry = pendingQueue.shift()
             try {
-                resume?.(newToken)
+                entry?.resume(newToken)
             } catch {
                 // ignora erros isolados no resume
             }
         }
 
         // Repetir a request original com o novo token
-        const plainHeaders =
-            originalRequest.headers && typeof (originalRequest.headers as any).toJSON === "function"
-                ? (originalRequest.headers as any).toJSON()
-                : { ...(originalRequest.headers || {}) }
-        plainHeaders.Authorization = `Bearer ${newToken}`
-        originalRequest.headers = plainHeaders
+        originalRequest.headers = withAuthorization(originalRequest.headers, newToken)
         console.log(
             "🔄 Retrying original request with new token",
             JSON.stringify({
@@ -359,18 +473,23 @@ async function handleAuthError(error: AxiosError) {
     } catch (refreshErr) {
         console.error("❌ Falha no refresh token:", refreshErr)
 
-        // Falha no refresh: limpa fila (tenta rejeitar como vazio)
+        // Rejeita as requests em espera. Antes elas eram reenviadas com
+        // `Bearer ` vazio, o que só gerava outra rodada de 401 e escondia a
+        // causa real atrás de um erro genérico.
         while (pendingQueue.length) {
-            const resume = pendingQueue.shift()
+            const entry = pendingQueue.shift()
             try {
-                resume?.("")
+                entry?.fail(refreshErr)
             } catch {
                 // ignora
             }
         }
 
-        // Limpeza de tokens somente quando o erro não for o sentinela de ausência de refresh token
-        if (String((refreshErr as any)?.message) !== "NO_REFRESH_TOKEN") {
+        // Erro de rede/5xx no refresh é transitório: mantém os tokens para a
+        // próxima tentativa. Sessão expirada é terminal: limpa e desloga.
+        const isTerminal = refreshErr instanceof SessionExpiredError
+
+        if (isTerminal) {
             try {
                 const jwtKeys = storageKeys().account.jwt
                 safeDelete(jwtKeys.token)
@@ -379,12 +498,13 @@ async function handleAuthError(error: AxiosError) {
                 if (api?.defaults?.headers?.common?.Authorization) {
                     delete api.defaults.headers.common.Authorization
                 }
-                console.log("🧹 Tokens limpos após falha no refresh")
+                console.log("🧹 Tokens limpos após sessão expirada")
             } catch {
                 // ignore
             }
+            notifySessionExpired()
         } else {
-            console.log("🔕 Skipping token cleanup due to NO_REFRESH_TOKEN")
+            console.log("🔁 Falha transitória no refresh — tokens preservados")
         }
 
         throw refreshErr
