@@ -104,6 +104,7 @@ export function HandsFreeHint({ trigger, label }: Props): React.ReactElement | n
     if (useGlass) {
         return (
             <AnimatedGlassView
+                colorScheme="dark"
                 pointerEvents="none"
                 style={[styles.pill, containerStyle]}
                 glassEffectStyle="regular"

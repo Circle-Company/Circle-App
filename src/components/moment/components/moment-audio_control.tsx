@@ -66,6 +66,7 @@ export default function MomentAudioControl({ size = 40 }: { size?: number }) {
             >
                 {isLiquidGlassAvailable() ? (
                     <GlassView
+                        colorScheme="dark"
                         glassEffectStyle="regular"
                         isInteractive
                         colorScheme="dark"

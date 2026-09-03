@@ -10,8 +10,8 @@ type NotificationTextProps = {
     style?: TextStyle
 }
 
-function getTypeTitle(type: NotificationType) {
-    switch (type) {
+function getTypeTitle(item: NotificationPayload) {
+    switch (item.type) {
         case NotificationType.HexEntry:
             return "Is close to you right now, see their profile before their gone"
         case NotificationType.UserFollowed:
@@ -22,13 +22,21 @@ function getTypeTitle(type: NotificationType) {
             return "Commented on your moment"
         case NotificationType.MomentLiked:
             return "Novo like"
+        case NotificationType.FriendRequestReceived:
+            return "Want to be your friend"
+        case NotificationType.FriendRequestAccepted:
+            // No auto-aceite recíproco não houve "aceite" de ninguém: os dois
+            // já tinham convidado o outro, então a amizade nasce pronta.
+            return item.autoAccepted
+                ? "You are friends now 🎉"
+                : "Accepted your invite to be their friend 🎉"
         default:
             return "Notificação"
     }
 }
 
 export function NotificationText({ item, style }: NotificationTextProps) {
-    const text = getTypeTitle(item.type)
+    const text = getTypeTitle(item)
 
     return (
         <Text

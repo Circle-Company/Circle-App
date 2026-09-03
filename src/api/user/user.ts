@@ -43,8 +43,22 @@ async function getByPk({ userId, findedUserPk }: UserDataByPkProps) {
     )
 }
 
+/**
+ * Perfil público de um usuário. Usado para resolver username/foto a partir de
+ * um id solto — a caixa de convites de amizade devolve só `userId`.
+ */
+async function getById({ userId }: { userId: string }) {
+    const response = await api.get(`/users/${userId}`, {
+        headers: {
+            Authorization: `Bearer ${storage.getString(storageKeys().account.jwt.token) || ""}`,
+        },
+    })
+    return response.data
+}
+
 export const routes = {
     follow,
     unfollow,
     getByPk,
+    getById,
 }

@@ -94,12 +94,15 @@ export default function ProfileScreen() {
                 totalMomentsCreated:
                     typeof totalMoments === "number" ? totalMoments : (moments?.length ?? 0),
                 totalFollowers: profile.metrics?.totalFollowers ?? 0,
+                totalFriends: profile.metrics?.totalFriends ?? 0,
             },
             interactions: {
                 isFollowedBy: profile.interactions?.isFollowedBy ?? false,
                 isBlockedBy: profile.interactions?.isBlockedBy ?? false,
                 isBlocking: profile.interactions?.isBlocking ?? false,
                 isFollowing: profile.interactions?.isFollowing ?? false,
+                areFriends: profile.interactions?.areFriends ?? false,
+                friendshipStatus: profile.interactions?.friendshipStatus ?? "none",
             },
         }
         return u

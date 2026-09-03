@@ -75,33 +75,48 @@ export default function profile_picture({
         else setProfilePicture("")
     }, [user])
 
+    const content = (
+        <>
+            <Image
+                priority={"normal"}
+                cachePolicy={"memory"}
+                recyclingKey={profilePicture}
+                source={{ uri: String(profilePicture) || "" }}
+                style={{
+                    width: Number(pictureDimensions.width),
+                    height: Number(pictureDimensions.height),
+                    borderRadius: Number(pictureDimensions.width) / 2,
+                    position: "absolute",
+                    top: Number(outlineSize) / 2,
+                    left: Number(outlineSize) / 2,
+                }}
+            />
+            {!profilePicture && (
+                <View style={iconContainer}>
+                    <Icon
+                        width={pictureDimensions.width * 0.5}
+                        height={pictureDimensions.height * 0.5}
+                        fill={isDarkMode ? colors.gray.grey_05 + 90 : colors.gray.grey_04 + 50}
+                    />
+                </View>
+            )}
+        </>
+    )
+
+    // Com `disableAction` a ação vira no-op, mas um Pressable continua
+    // CAPTURANDO o toque — e em React Native o touchable mais interno vence.
+    // Era isso que engolia o clique no avatar das notificações do inbox: o item
+    // inteiro leva ao perfil, menos justamente a foto, que é o alvo maior.
+    // Sem ação, renderiza uma View e deixa o toque chegar a quem envolve.
     return (
         <Animated.View entering={FadeIn.duration(200)}>
-            <Pressable onPress={async () => await onProfilePictureAction()} style={container}>
-                <Image
-                    priority={"normal"}
-                    cachePolicy={"memory"}
-                    recyclingKey={profilePicture}
-                    source={{ uri: String(profilePicture) || "" }}
-                    style={{
-                        width: Number(pictureDimensions.width),
-                        height: Number(pictureDimensions.height),
-                        borderRadius: Number(pictureDimensions.width) / 2,
-                        position: "absolute",
-                        top: Number(outlineSize) / 2,
-                        left: Number(outlineSize) / 2,
-                    }}
-                />
-                {!profilePicture && (
-                    <View style={iconContainer}>
-                        <Icon
-                            width={pictureDimensions.width * 0.5}
-                            height={pictureDimensions.height * 0.5}
-                            fill={isDarkMode ? colors.gray.grey_05 + 90 : colors.gray.grey_04 + 50}
-                        />
-                    </View>
-                )}
-            </Pressable>
+            {disableAction ? (
+                <View style={container}>{content}</View>
+            ) : (
+                <Pressable onPress={async () => await onProfilePictureAction()} style={container}>
+                    {content}
+                </Pressable>
+            )}
         </Animated.View>
     )
 }

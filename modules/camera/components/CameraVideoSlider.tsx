@@ -116,7 +116,7 @@ export default function CameraVideoSlider({
 
     if (iOSMajorVersion! >= 26) {
         return (
-            <Host style={{ width }}>
+            <Host colorScheme="dark" style={{ width }}>
                 <ProgressView value={Math.min(1, Math.max(0, sliderTime / maxTime))} />
             </Host>
         )

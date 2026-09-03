@@ -14,7 +14,7 @@ export function DropDownMenuIOS({
     const { t } = React.useContext(LanguageContext)
 
     return (
-        <Host>
+        <Host colorScheme="dark">
             <ContextMenu activationMethod="longPress" frame={{ alignment: "center" }}>
                 <ContextMenu.Items>
                     <Button

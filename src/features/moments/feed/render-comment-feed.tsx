@@ -89,6 +89,9 @@ export default function RenderCommentFeed({ moment, focused }: renderCommentFeed
         fontSize: 12,
         color: ColorTheme().textDisabled,
         fontFamily: fonts.family.Medium,
+        // Encolhe em vez de empurrar o botão da direita: com o moment mais
+        // estreito, "Shared X ago" não cabe inteiro e precisa truncar.
+        flexShrink: 1,
     }
     const viewMoreTextStyle: TextStyle = {
         top: -4,
@@ -130,7 +133,11 @@ export default function RenderCommentFeed({ moment, focused }: renderCommentFeed
                     <Comments.TopRoot>
                         <Comments.TopLeftRoot>
                             <Comments.HeaderLeft>
-                                <Text style={commentCountStyle}>
+                                <Text
+                                    style={commentCountStyle}
+                                    numberOfLines={1}
+                                    ellipsizeMode="tail"
+                                >
                                     {t("Shared")}{" "}
                                     {textLib.date
                                         .toRelativeTime(new Date(moment.publishedAt))

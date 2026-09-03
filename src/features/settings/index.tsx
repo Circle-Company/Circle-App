@@ -18,6 +18,7 @@ import { usePushNotifications } from "@/contexts/push.notification"
 import { colors } from "@/constants/colors"
 
 import UserIcon from "@/assets/icons/svgs/user_circle-outline.svg"
+import PersonIcon from "@/assets/icons/svgs/person.svg"
 import LockIcon from "@/assets/icons/svgs/lock-outline.svg"
 import DownloadIcon from "@/assets/icons/svgs/arrow.down.to.line.compact.svg"
 import TextIcon from "@/assets/icons/svgs/textformat.svg"
@@ -76,6 +77,11 @@ export default function ListSettings() {
                     name: t("App language"),
                     icon: <GlobeIcon fill={colors.gray.grey_03} width={22} height={22} />,
                     onPress: () => router.push("/settings/language"),
+                },
+                {
+                    name: t("Friends"),
+                    icon: <PersonIcon fill={colors.gray.grey_03} width={22} height={22} />,
+                    onPress: () => router.push("/settings/friends"),
                 },
                 {
                     name: t("Blocked users"),

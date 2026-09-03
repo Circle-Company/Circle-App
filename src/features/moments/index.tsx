@@ -9,18 +9,19 @@ import { EmptyList } from "@/features/moments/empty.list"
 import PersistedContext from "@/contexts/Persisted"
 import { View } from "react-native"
 import { useSafeAreaInsets } from "react-native-safe-area-context"
-import { isIPad11 } from "@/lib/platform/detection"
+import {
+    INITIAL_PADDING,
+    ITEM_WIDTH,
+    SNAP_INTERVAL,
+    SPACING,
+} from "@/features/moments/feed-metrics"
 
-const ITEM_WIDTH = sizes.moment.standart.width
-const SPACING = isIPad11 ? 15 : -20
-const SNAP_INTERVAL = ITEM_WIDTH + SPACING
-const INITIAL_PADDING = (sizes.screens.width - ITEM_WIDTH) / 2
 // Altura da nav bar + uma folga curta abaixo do header (mesma convenção do
 // módulo da câmera: 46 + 8). O espaço total reservado no topo = safe area do
 // device + esta constante, adaptando a qualquer iPhone (SE, notch, Dynamic
 // Island) em vez do multiplicador fixo `headers.height * 1.4`. Em Dynamic
 // Island (insets.top ~59) dá ~113 ≈ o 112 que funcionava, e escala nos demais.
-const NAV_BAR_HEIGHT = isIPad11 ? 44 : 54
+const NAV_BAR_HEIGHT = 54
 
 type ViewToken = {
     item: any

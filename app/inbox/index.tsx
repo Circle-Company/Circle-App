@@ -20,6 +20,13 @@ import fonts from "@/constants/fonts"
 import LanguageContext from "@/contexts/language"
 import { Pressable } from "react-native"
 import { router } from "expo-router"
+import { NotificationType } from "@/contexts/push.notification"
+import {
+    NotificationSegmented,
+    type InboxTab,
+} from "@/components/notification/notification.segmented"
+import { InvitesList } from "@/features/inbox/invites.list"
+import { useFriendRequestsQuery } from "@/queries/friendship"
 
 /**
  * Given how far a notification is from now (in ms), picks the best
@@ -52,6 +59,12 @@ export default function InboxScreen() {
     const { t } = React.useContext(LanguageContext)
     const [isLoadingMore, setIsLoadingMore] = useState(false)
     const { getDateStringRelative } = useDateHelpers()
+    const [tab, setTab] = useState<InboxTab>("general")
+
+    // Uma chamada só resolve a lista de convites e o contador do seletor —
+    // `pendingIncomingCount` já vem preenchido na resposta.
+    const { data: friendRequests } = useFriendRequestsQuery("incoming")
+    const pendingInvitesCount = friendRequests?.pendingIncomingCount ?? 0
 
     const container: ViewStyle = useMemo(
         () => ({
@@ -61,13 +74,20 @@ export default function InboxScreen() {
         [],
     )
 
+    // Convites recebidos vivem na aba "Invites", com ação própria de aceite —
+    // fora daqui eles apareceriam duas vezes.
+    const generalNotifications = useMemo(
+        () => notifications.filter((n) => n.type !== NotificationType.FriendRequestReceived),
+        [notifications],
+    )
+
     const sections = useMemo(() => {
-        if (!notifications.length) return []
+        if (!generalNotifications.length) return []
 
         const now = Date.now()
 
         // Ordena por data decrescente (mais recente primeiro)
-        const sorted = [...notifications]
+        const sorted = [...generalNotifications]
             .filter((n) => n.createdAt && !Number.isNaN(new Date(n.createdAt).getTime()))
             .sort((a, b) => new Date(b.createdAt!).getTime() - new Date(a.createdAt!).getTime())
 
@@ -99,7 +119,7 @@ export default function InboxScreen() {
         result.push({ title: currentLabel, data: currentSection })
 
         return result
-    }, [notifications, getDateStringRelative])
+    }, [generalNotifications, getDateStringRelative])
 
     const headerStyle: ViewStyle = {
         paddingTop: sizes.paddings["2sm"],
@@ -185,19 +205,17 @@ export default function InboxScreen() {
         }).start()
     }, [notificationsRefreshing, emptyOpacity])
 
-    if (error) {
-        return (
-            <View style={container}>
+    function renderGeneral() {
+        if (error) {
+            return (
                 <Text style={{ color: colors.gray.white, padding: 16 }}>
                     Erro ao carregar notificações
                 </Text>
-            </View>
-        )
-    }
+            )
+        }
 
-    if (showSkeleton) {
-        return (
-            <View style={container}>
+        if (showSkeleton) {
+            return (
                 <Animated.View style={{ opacity: skeletonOpacity }}>
                     <View
                         style={{
@@ -213,12 +231,10 @@ export default function InboxScreen() {
                         <NotificationSkeleton opacity={0.2} />
                     </View>
                 </Animated.View>
-            </View>
-        )
-    }
+            )
+        }
 
-    return (
-        <View style={container}>
+        return (
             <SectionList
                 sections={sections}
                 keyExtractor={(item) => item.id}
@@ -307,6 +323,24 @@ export default function InboxScreen() {
                 bounces={true}
                 showsVerticalScrollIndicator={false}
             />
+        )
+    }
+
+    return (
+        <View style={container}>
+            <View
+                style={{
+                    paddingTop: sizes.paddings["1sm"],
+                    paddingBottom: sizes.paddings["1sm"] * 0.5,
+                }}
+            >
+                <NotificationSegmented
+                    value={tab}
+                    onChange={setTab}
+                    invitesCount={pendingInvitesCount}
+                />
+            </View>
+            {tab === "general" ? renderGeneral() : <InvitesList />}
         </View>
     )
 }

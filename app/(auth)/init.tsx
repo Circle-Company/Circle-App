@@ -15,7 +15,6 @@ import { useTranslation } from "react-i18next"
 import { SafeAreaInsetsContext, useSafeAreaInsets } from "react-native-safe-area-context"
 import AuthContext from "@/contexts/auth"
 import React from "react"
-import { isIPad11 } from "@/lib/platform/detection"
 export default function SplashScreen() {
     const router = useRouter()
     const { t } = useTranslation()
@@ -189,12 +188,7 @@ export default function SplashScreen() {
                         <Text style={slogan}>{t(config.APPLICATION_DESCRIPTION)}</Text>
                     </View>
 
-                    <View
-                        style={[
-                            buttons,
-                            { marginTop: isIPad11 ? sizes.margins["1xxl"] : sizes.margins["1lg"] },
-                        ]}
-                    >
+                    <View style={[buttons, { marginTop: sizes.margins["1lg"] }]}>
                         <View style={primaryActionContainer}>
                             <Button
                                 action={SignWithApple}

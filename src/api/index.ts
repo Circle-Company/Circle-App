@@ -6,6 +6,7 @@ import { useAccountStore } from "@/contexts/Persisted/persist.account"
 
 import { routes as accountRoutes } from "./account/account"
 import { routes as authRoutes } from "./auth/auth"
+import { routes as friendshipRoutes } from "./friendship/friendship"
 import { routes as momentRoutes } from "./moment/moment"
 import { routes as preferencesRoutes } from "./preferences/preferences"
 import { routes as radarRoutes } from "./radar/radar"
@@ -439,4 +440,5 @@ export const apiRoutes = {
     auth: authRoutes,
     profile: profileRoutes,
     radar: radarRoutes,
+    friendship: friendshipRoutes,
 }

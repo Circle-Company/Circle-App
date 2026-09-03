@@ -29,7 +29,7 @@ export function FlashIndicator({ animatedStyle }: Props): React.ReactElement {
     if (iOSMajorVersion != null && iOSMajorVersion >= 26) {
         return (
             <Reanimated.View pointerEvents="none" style={[styles.position, animatedStyle]}>
-                <Host matchContents>
+                <Host colorScheme="dark" matchContents>
                     <HStack
                         modifiers={[
                             padding({ horizontal: 12, vertical: 6 }),

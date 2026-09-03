@@ -5,6 +5,8 @@ import GeoIcon from "@/assets/icons/svgs/bolt.svg"
 import EyeIcon from "@/assets/icons/svgs/eye.svg"
 import DialogIcon from "@/assets/icons/svgs/text_bubble.svg"
 import HeartIcon from "@/assets/icons/svgs/heart.svg"
+import PersonIcon from "@/assets/icons/svgs/person.svg"
+import CheckIcon from "@/assets/icons/svgs/check.svg"
 import { NotificationType } from "@/contexts/push.notification"
 import { colors } from "@/constants/colors"
 import sizes from "@/constants/sizes"
@@ -33,6 +35,14 @@ export function NotificationBadge({ type }: { type: NotificationType }) {
         case NotificationType.MomentLiked:
             Icon = HeartIcon
             color = colors.red.red_05
+            break
+        case NotificationType.FriendRequestReceived:
+            Icon = PersonIcon
+            color = colors.blue.blue_04
+            break
+        case NotificationType.FriendRequestAccepted:
+            Icon = CheckIcon
+            color = colors.green.green_04
             break
         default:
             Icon = AtIcon

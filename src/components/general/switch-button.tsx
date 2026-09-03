@@ -95,7 +95,7 @@ export const SwitchButton: React.FC<SwitchButtonProps> = ({
     // iOS: usar SwiftUI Switch controlado
     if (Platform.OS === "ios") {
         return (
-            <Host matchContents>
+            <Host colorScheme="dark" matchContents>
                 <Toggle
                     isOn={checked}
                     onIsOnChange={(next: boolean) => toggle(next)}

@@ -19,6 +19,7 @@ module.exports = function (_config) {
             androidNavigationBar: { barStyle: "light-content" },
             android: {
                 newArchEnabled: false,
+                userInterfaceStyle: "dark",
                 icon: "./assets/app-icons/android_icon_default_light.png",
                 adaptiveIcon: {
                     foregroundImage: "./assets/icon-android-foreground.png",
@@ -53,6 +54,17 @@ module.exports = function (_config) {
                 "expo-video",
                 "expo-audio",
                 "expo-localization",
+                "expo-background-task",
+                [
+                    "expo-location",
+                    {
+                        locationWhenInUsePermission:
+                            "$(PRODUCT_NAME) uses your location while you are using the app to show nearby moments and people.",
+                        isIosBackgroundLocationEnabled: false,
+                        isAndroidBackgroundLocationEnabled: false,
+                        isAndroidForegroundServiceEnabled: false,
+                    },
+                ],
                 [
                     "expo-web-browser",
                     {

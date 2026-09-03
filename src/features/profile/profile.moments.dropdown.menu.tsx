@@ -21,7 +21,7 @@ export function ProfileDropDownMenuIOS({ children }: { children?: React.ReactNod
     }
 
     return (
-        <Host>
+        <Host colorScheme="dark">
             <ContextMenu activationMethod="longPress" frame={{ alignment: "center" }}>
                 <ContextMenu.Items>
                     <Button

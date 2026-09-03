@@ -1,25 +1,79 @@
 import React from "react"
+import * as BackgroundTask from "expo-background-task"
 import * as Location from "expo-location"
 import * as TaskManager from "expo-task-manager"
+import { AppState, Linking } from "react-native"
+
 import PersistedContext from "./Persisted"
-import { useUpdateAccCoordsMutation, updateAccountCoordinates } from "@/queries"
-import { Linking, AppState } from "react-native"
+import { updateAccountCoordinates, useUpdateAccCoordsMutation } from "@/queries"
+import { safeSet, storage, storageKeys } from "@/store"
 
-const BACKGROUND_LOCATION_TASK = "BACKGROUND_LOCATION_TASK"
+/**
+ * Sincronização de localização sem a permissão "Always".
+ *
+ * O app pede apenas `When In Use`. Em background usamos um BGProcessingTask que
+ * lê a ÚLTIMA POSIÇÃO CONHECIDA em cache do sistema (`getLastKnownPositionAsync`)
+ * — isso não liga o GPS e por isso não exige `Always` nem mostra o indicador
+ * azul. É best-effort: o SO decide quando rodar a task.
+ */
+const LOCATION_SYNC_TASK = "LOCATION_SYNC_TASK"
 
-TaskManager.defineTask(BACKGROUND_LOCATION_TASK, async ({ data, error }) => {
-    if (error) {
-        console.error("Background location task error:", error)
-        return
+/** Intervalo do timer de foreground (app aberto). */
+const FOREGROUND_UPDATE_INTERVAL = 5 * 60 * 1000
+/** Piso do agendamento em background, em MINUTOS (API do expo-background-task). */
+const BACKGROUND_MINIMUM_INTERVAL = 15
+/** Idade máxima aceitável para a posição em cache lida em background. */
+const LAST_KNOWN_MAX_AGE = 30 * 60 * 1000
+/** Não reenvia coordenadas ao servidor mais de uma vez a cada 4 min. */
+const SYNC_THROTTLE = 4 * 60 * 1000
+
+function isLoggedIn(): boolean {
+    try {
+        return Boolean(storage.getString(storageKeys().account.jwt.token))
+    } catch {
+        return false
     }
-    const { locations } = (data || {}) as { locations?: Location.LocationObject[] }
-    if (locations && locations.length > 0) {
-        const { latitude, longitude } = locations[0].coords
-        try {
-            await updateAccountCoordinates({ lat: String(latitude), lng: String(longitude) })
-        } catch (e) {
-            console.error("📍 Failed to persist background location:", e)
-        }
+}
+
+function shouldSync(): boolean {
+    try {
+        const last = storage.getNumber(storageKeys().account.coordinates.lastSyncAt)
+        if (!last) return true
+        return Date.now() - last >= SYNC_THROTTLE
+    } catch {
+        return true
+    }
+}
+
+function markSynced() {
+    safeSet(storageKeys().account.coordinates.lastSyncAt, Date.now())
+}
+
+/**
+ * Task headless: roda fora do React, sem acesso a hooks. Usa a função pura
+ * `updateAccountCoordinates` — o interceptor do axios lê o JWT direto do MMKV.
+ */
+TaskManager.defineTask(LOCATION_SYNC_TASK, async () => {
+    try {
+        if (!isLoggedIn()) return BackgroundTask.BackgroundTaskResult.Success
+
+        const { status } = await Location.getForegroundPermissionsAsync()
+        if (status !== "granted") return BackgroundTask.BackgroundTaskResult.Success
+
+        // Cache do SO — não ativa o serviço de localização.
+        const position = await Location.getLastKnownPositionAsync({
+            maxAge: LAST_KNOWN_MAX_AGE,
+        })
+        if (!position) return BackgroundTask.BackgroundTaskResult.Success
+
+        const { latitude, longitude } = position.coords
+        await updateAccountCoordinates({ lat: String(latitude), lng: String(longitude) })
+        markSynced()
+        console.log("📍 Localização sincronizada em background")
+        return BackgroundTask.BackgroundTaskResult.Success
+    } catch (e) {
+        console.error("📍 Falha ao sincronizar localização em background:", e)
+        return BackgroundTask.BackgroundTaskResult.Failed
     }
 })
 
@@ -29,37 +83,36 @@ interface UpdateCoordinatesPayload {
 }
 
 type GeolocationProviderProps = { children: React.ReactNode }
+
 export type GeolocationContextsData = {
     updateUserLocation: () => Promise<void>
     isUpdating: boolean
     foregroundStatus: Location.PermissionStatus | null
-    backgroundStatus: Location.PermissionStatus | null
     canAskAgainForeground: boolean
-    canAskAgainBackground: boolean
+    requestForegroundPermission: () => Promise<boolean>
     openSettings: () => Promise<void>
     refreshPermissions: () => Promise<void>
 }
 
-// Contexto
 const GeolocationContext = React.createContext<GeolocationContextsData>(
     {} as GeolocationContextsData,
 )
 
 export function Provider({ children }: GeolocationProviderProps) {
     const { session } = React.useContext(PersistedContext)
-    const { mutateAsync: updateCoords, isPending } = useUpdateAccCoordsMutation()
+    const { mutateAsync: updateCoords } = useUpdateAccCoordsMutation()
     const [isUpdating, setIsUpdating] = React.useState(false)
     const intervalRef = React.useRef<NodeJS.Timeout | null>(null)
-    const LOCATION_UPDATE_INTERVAL = 5 * 60 * 1000 // 5 minutos em milissegundos
     const [foregroundStatus, setForegroundStatus] =
         React.useState<Location.PermissionStatus | null>(null)
-    const [backgroundStatus, setBackgroundStatus] =
-        React.useState<Location.PermissionStatus | null>(null)
     const [canAskAgainForeground, setCanAskAgainForeground] = React.useState<boolean>(true)
-    const [canAskAgainBackground, setCanAskAgainBackground] = React.useState<boolean>(true)
 
     const openSettings = React.useCallback(async () => {
         try {
+            if (typeof (Linking as any).openSettings === "function") {
+                await (Linking as any).openSettings()
+                return
+            }
             await Linking.openURL("app-settings:")
         } catch (e) {
             console.warn("Não foi possível abrir as configurações do sistema:", e)
@@ -71,19 +124,14 @@ export function Provider({ children }: GeolocationProviderProps) {
             const fg = await Location.getForegroundPermissionsAsync()
             setForegroundStatus(fg.status)
             setCanAskAgainForeground(fg.canAskAgain)
-
-            const bg = await Location.getBackgroundPermissionsAsync()
-            setBackgroundStatus(bg.status)
-            setCanAskAgainBackground(bg.canAskAgain)
         } catch (e) {
-            console.warn("Falha ao consultar permissões de localização:", e)
+            console.warn("Falha ao consultar permissão de localização:", e)
         }
     }, [])
 
-    // Solicita permissões (foreground + background quando possível)
-    const requestLocationPermission = async (): Promise<boolean> => {
+    /** Pede apenas `When In Use`. Nunca pedimos background/Always. */
+    const requestForegroundPermission = React.useCallback(async (): Promise<boolean> => {
         try {
-            // Verifica serviços de localização
             const servicesEnabled = await Location.hasServicesEnabledAsync()
             if (!servicesEnabled) {
                 console.warn("Serviços de localização desativados pelo usuário")
@@ -92,201 +140,121 @@ export function Provider({ children }: GeolocationProviderProps) {
             const fg = await Location.requestForegroundPermissionsAsync()
             setForegroundStatus(fg.status)
             setCanAskAgainForeground(fg.canAskAgain)
-            if (fg.status !== "granted") {
-                console.warn("Permissão de localização em primeiro plano negada")
-                return false
-            }
-
-            // Solicita background depois do foreground
-            let bg = await Location.getBackgroundPermissionsAsync()
-            if (bg.status !== "granted") {
-                bg = await Location.requestBackgroundPermissionsAsync()
-            }
-            setBackgroundStatus(bg.status)
-            setCanAskAgainBackground(bg.canAskAgain)
-            if (bg.status !== "granted") {
-                console.warn("Permissão de localização em segundo plano não concedida")
-                // iOS Allow Once: orientar usuário a abrir Settings via openSettings()
-            }
-
-            return true
+            return fg.status === "granted"
         } catch (error) {
             console.error("Erro ao solicitar permissão de localização:", error)
             return false
         }
-    }
+    }, [])
 
-    // Inicia atualizações de localização em background via TaskManager
-    const startBackgroundLocationUpdates = async () => {
+    // ---- Background sync (BGProcessingTask) --------------------------------
+
+    const registerBackgroundSync = React.useCallback(async () => {
         try {
-            const taskAvailable = await TaskManager.isAvailableAsync()
-            if (!taskAvailable) {
-                console.warn("TaskManager não está disponível neste ambiente")
+            if (!(await TaskManager.isAvailableAsync())) {
+                console.warn("TaskManager não disponível neste ambiente")
                 return
             }
 
-            const servicesEnabled = await Location.hasServicesEnabledAsync()
-            if (!servicesEnabled) {
-                console.warn(
-                    "Serviços de localização desativados; não iniciando background updates",
-                )
+            const status = await BackgroundTask.getStatusAsync()
+            if (status === BackgroundTask.BackgroundTaskStatus.Restricted) {
+                console.warn("Background task restrita pelo sistema")
                 return
             }
 
-            const fgPerm = await Location.getForegroundPermissionsAsync()
-            if (fgPerm.status !== "granted") {
-                console.warn("Permissão de localização em primeiro plano não concedida")
-                return
-            }
+            if (await TaskManager.isTaskRegisteredAsync(LOCATION_SYNC_TASK)) return
 
-            const bgPerm = await Location.getBackgroundPermissionsAsync()
-            if (bgPerm.status !== "granted") {
-                console.warn("Permissão de localização em segundo plano não concedida")
-                return
-            }
-
-            const bgAvailable = await Location.isBackgroundLocationAvailableAsync()
-            if (!bgAvailable) {
-                console.warn(
-                    "Background location não está disponível neste dispositivo/configuração",
-                )
-                return
-            }
-
-            const started = await Location.hasStartedLocationUpdatesAsync(BACKGROUND_LOCATION_TASK)
-            if (started) return
-
-            await Location.startLocationUpdatesAsync(BACKGROUND_LOCATION_TASK, {
-                // Frequência e precisão
-                accuracy: Location.Accuracy.High,
-                timeInterval: LOCATION_UPDATE_INTERVAL,
-                distanceInterval: 50,
-                // iOS: atualizações diferidas para economia de bateria quando em background
-                deferredUpdatesInterval: LOCATION_UPDATE_INTERVAL,
-                deferredUpdatesDistance: 50,
-                pausesUpdatesAutomatically: true,
-                showsBackgroundLocationIndicator: true,
-                activityType: Location.ActivityType.Fitness,
-                // Android: notificação do serviço em primeiro plano
-                foregroundService: {
-                    notificationTitle: "Location Service",
-                    notificationBody: "Atualizando sua localização em segundo plano",
-                },
+            await BackgroundTask.registerTaskAsync(LOCATION_SYNC_TASK, {
+                minimumInterval: BACKGROUND_MINIMUM_INTERVAL,
             })
-            console.log("✅ Background location updates started")
+            console.log("✅ Sync de localização em background registrado")
         } catch (e) {
-            console.error("Erro ao iniciar background location updates:", e)
+            console.error("Erro ao registrar background task de localização:", e)
         }
-    }
+    }, [])
 
-    const stopBackgroundLocationUpdates = async () => {
+    const unregisterBackgroundSync = React.useCallback(async () => {
         try {
-            const taskAvailable = await TaskManager.isAvailableAsync()
-            if (!taskAvailable) return
-            const started = await Location.hasStartedLocationUpdatesAsync(BACKGROUND_LOCATION_TASK)
-            if (started) {
-                await Location.stopLocationUpdatesAsync(BACKGROUND_LOCATION_TASK)
-                console.log("🛑 Background location updates stopped")
-            }
+            if (!(await TaskManager.isAvailableAsync())) return
+            if (!(await TaskManager.isTaskRegisteredAsync(LOCATION_SYNC_TASK))) return
+            await BackgroundTask.unregisterTaskAsync(LOCATION_SYNC_TASK)
+            console.log("🛑 Sync de localização em background cancelado")
         } catch (e) {
-            console.error("Erro ao parar background location updates:", e)
+            console.error("Erro ao cancelar background task de localização:", e)
         }
-    }
+    }, [])
 
-    // Função para atualizar a localização do usuário (foreground/manual)
+    // ---- Foreground --------------------------------------------------------
+
     const updateUserCoordinates = async (payload: UpdateCoordinatesPayload): Promise<void> => {
-        if (session.user.id) {
-            try {
-                await updateCoords({
-                    lat: String(payload.latitude),
-                    lng: String(payload.longitude),
-                })
-
-                session.account.setCoordinates({
-                    latitude: payload.latitude,
-                    longitude: payload.longitude,
-                })
-            } catch (error) {
-                console.error("Error updating coordinates:", error)
-                throw error
-            }
-        }
-    }
-
-    // Função para obter e atualizar a localização do usuário (one-shot)
-    const UseUpdateUserLocation = async () => {
-        const fg = await Location.getForegroundPermissionsAsync()
-        if (fg.status !== "granted") throw new Error("Location permission is not granted")
-
-        setIsUpdating(true)
-
+        if (!session.user.id) return
         try {
-            const location = await Location.getCurrentPositionAsync({
-                accuracy: Location.Accuracy.High,
-                timeInterval: 15000,
-                distanceInterval: 0,
-                mayShowUserSettingsDialog: true,
+            await updateCoords({
+                lat: String(payload.latitude),
+                lng: String(payload.longitude),
             })
-
-            const { latitude, longitude } = location.coords
-
-            await updateCoords({ lat: String(latitude), lng: String(longitude) })
-            await updateUserCoordinates({ latitude, longitude })
-            setIsUpdating(false)
+            session.account.setCoordinates({
+                latitude: payload.latitude,
+                longitude: payload.longitude,
+            })
+            markSynced()
         } catch (error) {
-            setIsUpdating(false)
-            console.error("Error getting location:", error)
+            console.error("Error updating coordinates:", error)
             throw error
         }
     }
 
-    const updateUserLocation = async (): Promise<void> => {
-        if (!session.user.id) {
-            throw new Error("User ID is not available")
-        }
-        await UseUpdateUserLocation()
-    }
+    const updateUserLocation = React.useCallback(
+        async (force = false): Promise<void> => {
+            if (!session.user.id) throw new Error("User ID is not available")
 
-    // Inicia o intervalo para atualização a cada 5 minutos (foreground)
-    const startLocationUpdateInterval = () => {
-        if (intervalRef.current) {
-            clearInterval(intervalRef.current)
-        }
+            const fg = await Location.getForegroundPermissionsAsync()
+            if (fg.status !== "granted") throw new Error("Location permission is not granted")
 
+            if (!force && !shouldSync()) return
+
+            setIsUpdating(true)
+            try {
+                // Balanced basta para "pessoas por perto" e gasta bem menos bateria
+                // que High.
+                const location = await Location.getCurrentPositionAsync({
+                    accuracy: Location.Accuracy.Balanced,
+                    mayShowUserSettingsDialog: true,
+                })
+                const { latitude, longitude } = location.coords
+                await updateUserCoordinates({ latitude, longitude })
+            } catch (error) {
+                console.error("Error getting location:", error)
+                throw error
+            } finally {
+                setIsUpdating(false)
+            }
+        },
+        [session.user.id],
+    )
+
+    const startLocationUpdateInterval = React.useCallback(() => {
+        if (intervalRef.current) clearInterval(intervalRef.current)
         intervalRef.current = setInterval(() => {
-            console.log(
-                `⏰ Executando atualização periódica de localização (intervalo de ${
-                    LOCATION_UPDATE_INTERVAL / 60000
-                } minutos)`,
-            )
             updateUserLocation().catch((error) => {
                 console.error("Error updating location in interval:", error)
             })
-        }, LOCATION_UPDATE_INTERVAL)
-        console.log(
-            `⏱️ Intervalo de atualização de localização iniciado: a cada ${
-                LOCATION_UPDATE_INTERVAL / 60000
-            } minutos`,
-        )
-    }
+        }, FOREGROUND_UPDATE_INTERVAL)
+    }, [updateUserLocation])
 
-    // Limpa o intervalo quando o componente é desmontado
-    React.useEffect(() => {
-        return () => {
-            if (intervalRef.current) {
-                clearInterval(intervalRef.current)
-            }
-            // Para segurança, interrompe task de background ao desmontar o provider
-            stopBackgroundLocationUpdates().catch(() => {})
-        }
-    }, [])
+    // ---- Ciclo de vida -----------------------------------------------------
 
-    // Inicializa estado de permissões (iOS-friendly Allow Once)
     React.useEffect(() => {
         refreshPermissions()
     }, [refreshPermissions])
 
-    // Atualiza localização ao entrar no app (voltar para foreground)
+    React.useEffect(() => {
+        return () => {
+            if (intervalRef.current) clearInterval(intervalRef.current)
+        }
+    }, [])
+
+    // Atualiza ao voltar para o foreground.
     const appState = React.useRef(AppState.currentState)
     React.useEffect(() => {
         const subscription = AppState.addEventListener("change", (nextState) => {
@@ -298,74 +266,51 @@ export function Provider({ children }: GeolocationProviderProps) {
             ) {
                 if (session.user.id && !isUpdating) {
                     updateUserLocation().catch((err) => {
-                        console.warn(
-                            "Falha ao atualizar localização ao voltar para foreground:",
-                            err,
-                        )
+                        console.warn("Falha ao atualizar localização ao voltar ao app:", err)
                     })
                 }
             }
         })
-        return () => {
-            subscription.remove()
-        }
+        return () => subscription.remove()
     }, [session.user.id, isUpdating, updateUserLocation])
 
-    // Verifica se o usuário está logado e inicia o processo (FG + BG)
+    // Liga/desliga o serviço conforme a sessão.
     React.useEffect(() => {
-        const checkUserAndStartUpdating = async () => {
-            // Verifica se temos dados do usuário na memória
-            if (session.user.id) {
-                console.log(
-                    `🔄 Iniciando serviço de localização para usuário ID: ${session.user.id}`,
-                )
-                try {
-                    // Apenas consulta o status; não solicita permissão automaticamente
-                    await refreshPermissions()
-                    const fg = await Location.getForegroundPermissionsAsync()
-                    const bg = await Location.getBackgroundPermissionsAsync()
-                    if (fg.status !== "granted") {
-                        // Sem permissão: não iniciar fluxos
-                        return
-                    }
-
-                    // Atualiza a localização imediatamente
-                    await updateUserLocation()
-
-                    // Inicia o intervalo para atualizações em foreground
-                    startLocationUpdateInterval()
-
-                    // Inicia atualizações em background somente se já concedida
-                    if (bg.status === "granted") {
-                        await startBackgroundLocationUpdates()
-                    }
-                } catch (error) {
-                    console.error("Error in initial location update:", error)
-                }
-            } else {
-                console.log(
-                    "⚠️ Usuário não encontrado na memória, serviço de localização não iniciado",
-                )
-                // Sem usuário logado: parar BG updates
-                stopBackgroundLocationUpdates().catch(() => {})
+        const run = async () => {
+            if (!session.user.id) {
+                await unregisterBackgroundSync()
                 if (intervalRef.current) {
                     clearInterval(intervalRef.current)
                     intervalRef.current = null
                 }
+                return
+            }
+
+            try {
+                await refreshPermissions()
+                const fg = await Location.getForegroundPermissionsAsync()
+                if (fg.status !== "granted") {
+                    await unregisterBackgroundSync()
+                    return
+                }
+
+                await updateUserLocation(true)
+                startLocationUpdateInterval()
+                await registerBackgroundSync()
+            } catch (error) {
+                console.error("Error in initial location update:", error)
             }
         }
 
-        checkUserAndStartUpdating()
-        // Dependência na ID do usuário para reiniciar quando mudar
-    }, [session.user.id])
+        run()
+    }, [session.user.id, foregroundStatus])
 
     const contextValue: GeolocationContextsData = {
-        updateUserLocation,
+        updateUserLocation: () => updateUserLocation(true),
         isUpdating,
         foregroundStatus,
-        backgroundStatus,
         canAskAgainForeground,
-        canAskAgainBackground,
+        requestForegroundPermission,
         openSettings,
         refreshPermissions,
     }

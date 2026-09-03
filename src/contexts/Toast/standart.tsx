@@ -99,6 +99,7 @@ export function Toast({ title, tint }: CustomToastProps) {
     return (
         <GlassContainer spacing={10}>
             <GlassView
+                colorScheme="dark"
                 style={baseContainer}
                 glassEffectStyle="regular"
                 isInteractive={false}

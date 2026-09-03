@@ -107,6 +107,16 @@ export default function SettingsLayout() {
                 }}
             />
             <Stack.Screen
+                name="friends"
+                options={{
+                    headerStyle: {
+                        backgroundColor: colors.gray.black,
+                    },
+                    headerTransparent: false,
+                    headerTitle: t("Friends"),
+                }}
+            />
+            <Stack.Screen
                 name="blocked-users"
                 options={{
                     headerStyle: {

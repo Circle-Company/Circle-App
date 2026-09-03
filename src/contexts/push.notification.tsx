@@ -55,6 +55,10 @@ export enum NotificationType {
     ProfileViewed = "PROFILE_VIEW",
     MomentCommented = "MOMENT_COMMENTED",
     MomentLiked = "MOMENT_LIKED",
+    /** Convite de amizade recebido — vai para a aba "Invites" do inbox. */
+    FriendRequestReceived = "FRIEND_REQUEST_RECEIVED",
+    /** Seu convite foi aceito (inclui o auto-aceite recíproco). */
+    FriendRequestAccepted = "FRIEND_REQUEST_ACCEPTED",
 }
 
 export type NotificationPayload = {
@@ -70,6 +74,14 @@ export type NotificationPayload = {
     type: NotificationType
     createdAt?: string
     readAt?: string | null
+    /**
+     * Só em `FRIEND_REQUEST_ACCEPTED`: marca o auto-aceite recíproco (os dois
+     * tinham convidado um ao outro), que rende um texto diferente do aceite
+     * comum. Ausente = aceite comum.
+     */
+    autoAccepted?: boolean
+    /** Deep link do push: `friend_requests` abre a caixa de convites. */
+    screen?: string
 }
 
 export type Notification = AccountNotification

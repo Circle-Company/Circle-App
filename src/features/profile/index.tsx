@@ -5,7 +5,7 @@ import { ProfileReciveDataProps } from "../../components/profile/profile-types"
 import sizes from "../../constants/sizes"
 import { AccountMomentsHeader } from "@/features/profile/profile.moments.header"
 
-import { iOSMajorVersion, isIPad11 } from "@/lib/platform/detection"
+import { iOSMajorVersion } from "@/lib/platform/detection"
 
 type RenderProfileProps = {
     user?: ProfileReciveDataProps
@@ -35,19 +35,18 @@ export function ProfileHeader({
             <View style={top_container}>
                 <Profile.Picture fromProfile={true} hasOutline={false} />
                 {user.interactions?.isBlocking === false &&
-                    user.interactions?.isBlockedBy === false && (
-                        <Profile.NameFollow scale={isIPad11 ? 0.7 : 0.75} />
-
-                        /**
-                           isAccount === false && (
-                           <View style={{ marginVertical: sizes.margins["1md"] }}>
-                               <Profile.Follow
-                                   isFollowedBy={user.interactions.isFollowedBy}
-                                   isFollowing={user.interactions.isFollowing}
-                               />
-                           </View>
-                       )
-                       */
+                    user.interactions?.isBlockedBy === false && <Profile.NameFollow scale={0.75} />}
+                {isAccount === false &&
+                    user.interactions?.isBlocking === false &&
+                    user.interactions?.isBlockedBy === false &&
+                    !!user.id && (
+                        <View style={{ marginTop: sizes.margins["3sm"] }}>
+                            <Profile.Friend
+                                userId={String(user.id)}
+                                username={user.username}
+                                initialRelation={user.interactions?.friendshipStatus}
+                            />
+                        </View>
                     )}
             </View>
             {user.interactions?.isBlocking && isAccount === false && <Profile.BlockingCard />}

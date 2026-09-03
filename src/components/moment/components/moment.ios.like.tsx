@@ -109,6 +109,7 @@ export function likeIOS({ isLiked, size }: { isLiked: boolean; size?: number }) 
         >
             {isLiquidGlassAvailable() ? (
                 <GlassView
+                    colorScheme="dark"
                     glassEffectStyle="regular"
                     isInteractive
                     colorScheme="dark"
