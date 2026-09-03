@@ -9,7 +9,6 @@ import sizes from "@/constants/sizes"
 import PersistedContext from "@/contexts/Persisted"
 import { useProfileContext } from "../../profile-context"
 import { ProfilePictureProps } from "../../profile-types"
-import { isIPad11 } from "@/lib/platform/detection"
 import { ProfilePictureAdd } from "./add"
 import { ProfilePictureEditButton } from "./edit-button"
 
@@ -29,8 +28,8 @@ export default function Picture({ fromProfile = false, hasOutline = true }: Prof
     const [profilePicture, setProfilePicture] = React.useState<string>("")
 
     const pictureDimensions = {
-        width: isIPad11 ? 170 : 200,
-        height: isIPad11 ? 170 : 200,
+        width: 200,
+        height: 200,
         borderRadius: 200 / 2,
     }
     const outlineSize: number = hasOutline ? Number(pictureDimensions.width) / 20 : 0

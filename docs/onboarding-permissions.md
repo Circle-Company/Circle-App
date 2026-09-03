@@ -20,12 +20,12 @@ Sources in this project
   - app/(tabs)/settings/profile-picture.tsx
     - ImagePicker.requestMediaLibraryPermissionsAsync()
     - ImagePicker.requestCameraPermissionsAsync()
-- Location (Foreground & Background)
+- Location (Foreground only — "When In Use")
   - src/contexts/geolocation.tsx
     - Location.requestForegroundPermissionsAsync()
-    - Location.requestBackgroundPermissionsAsync()
     - openSettings fallback
-    - Background updates with TaskManager
+    - Sync periódico em background via expo-background-task + Location.getLastKnownPositionAsync()
+      (não requer a permissão "Always" — ver docs/location-when-in-use.md)
 
 Target permissions to request on onboarding
 - Push Notifications
@@ -38,10 +38,11 @@ Target permissions to request on onboarding
   - Purpose: capture audio in Moments.
 - Photos / Media Library
   - Purpose: select media for profile picture and Moments from the gallery.
-- Location (Foreground)
+- Location (Foreground / "When In Use")
   - Purpose: show nearby users and personalize content; get current location on demand.
-- Location (Background)
-  - Purpose: keep coordinates updated periodically, even when the app is closed (as implemented in GeolocationContext).
+  - Nota: a app NÃO pede mais a permissão "Always". A atualização periódica em
+    background é feita por um BGProcessingTask que lê a última posição em cache
+    do SO. Ver docs/location-when-in-use.md.
 
 UX copy (titles and descriptions)
 Use the following titles and descriptions on the onboarding screen. You can map each to i18n keys if needed.
@@ -61,9 +62,6 @@ Use the following titles and descriptions on the onboarding screen. You can map 
 - Location (Foreground)
   - Title: Location Access
   - Description: Share your approximate location to discover people and content near you.
-- Background Location
-  - Title: Allow Background Location
-  - Description: Keep your location up to date even when you’re not using the app. This helps us show nearby content reliably.
 
 UI spec
 - Screen header: “Permissions” (or “Get set up”) with short lead: “Allow access to features you’ll use most.”
@@ -88,7 +86,7 @@ UI spec
 Request order (recommended)
 1) Camera, Microphone, Photos/Media: These are typically core to content creation.
 2) Notifications: Non-blocking; request after media permissions to avoid stacking iOS prompts.
-3) Location (Foreground) -> Location (Background): Request Foreground first; if granted, then request Background.
+3) Location (Foreground / "When In Use"): um único prompt. Não pedir background/Always.
 
 Platform nuances and fallbacks
 - iOS:
@@ -110,7 +108,6 @@ Data model
       | "microphone"
       | "mediaLibrary"
       | "locationForeground"
-      | "locationBackground"
     title: string
     description: string
     required: boolean
@@ -138,11 +135,13 @@ Technical details and handlers
   - Result: { status, canAskAgain } (map granted/denied; if limited access available on iOS, treat as “limited”)
 - Location (expo-location)
   - Foreground: await Location.requestForegroundPermissionsAsync()
-  - Background: await Location.requestBackgroundPermissionsAsync() (only after foreground granted)
+  - Nunca chamar requestBackgroundPermissionsAsync() — a permissão "Always" foi removida do app.
   - Respect { status, canAskAgain } and “Allow Once” (iOS).
   - Provide openSettings = () => Linking.openURL("app-settings:")
-- Background updates (already configured)
-  - Background location processing exists in src/contexts/geolocation.tsx. Onboarding should not start background updates directly; let the GeolocationContext manage it automatically once permissions are granted (and user is logged in).
+- Sync periódico em background (already configured)
+  - O GeolocationContext registra/desregistra sozinho um BGProcessingTask
+    (expo-background-task) quando há sessão + permissão de foreground. O
+    onboarding não deve mexer nisso. Ver docs/location-when-in-use.md.
 
 Screen state and flows
 - Initial load:
@@ -239,23 +238,6 @@ const items: PermissionItem[] = [
     },
     openSettings: async () => Linking.openURL("app-settings:"),
   },
-  {
-    id: "locationBackground",
-    title: "Allow Background Location",
-    description:
-      "Keep your location up to date even when you’re not using the app for better nearby content.",
-    required: false,
-    status: "unknown",
-    request: async () => {
-      // Only proceed if foreground was granted
-      const fg = await Location.getForegroundPermissionsAsync()
-      if (fg.status !== "granted") return "denied"
-      const bg = await Location.requestBackgroundPermissionsAsync()
-      if (bg.status === "granted") return "granted"
-      return "denied"
-    },
-    openSettings: async () => Linking.openURL("app-settings:"),
-  },
 ]
 
 Implementation steps
@@ -307,8 +289,6 @@ Optional: i18n keys
 - permissions.media.description = Choose photos and videos from your library.
 - permissions.location.fg.title = Location Access
 - permissions.location.fg.description = Share your approximate location to discover nearby content.
-- permissions.location.bg.title = Allow Background Location
-- permissions.location.bg.description = Keep your location up to date even when you’re not using the app.
 - permissions.actions.allow = Allow
 - permissions.actions.notNow = Not now
 - permissions.actions.allowAll = Allow all

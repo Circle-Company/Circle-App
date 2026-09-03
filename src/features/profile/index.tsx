@@ -5,7 +5,7 @@ import { ProfileReciveDataProps } from "../../components/profile/profile-types"
 import sizes from "../../constants/sizes"
 import { AccountMomentsHeader } from "@/features/profile/profile.moments.header"
 
-import { iOSMajorVersion, isIPad11 } from "@/lib/platform/detection"
+import { iOSMajorVersion } from "@/lib/platform/detection"
 
 type RenderProfileProps = {
     user?: ProfileReciveDataProps
@@ -35,9 +35,7 @@ export function ProfileHeader({
             <View style={top_container}>
                 <Profile.Picture fromProfile={true} hasOutline={false} />
                 {user.interactions?.isBlocking === false &&
-                    user.interactions?.isBlockedBy === false && (
-                        <Profile.NameFollow scale={isIPad11 ? 0.7 : 0.75} />
-                    )}
+                    user.interactions?.isBlockedBy === false && <Profile.NameFollow scale={0.75} />}
                 {isAccount === false &&
                     user.interactions?.isBlocking === false &&
                     user.interactions?.isBlockedBy === false &&

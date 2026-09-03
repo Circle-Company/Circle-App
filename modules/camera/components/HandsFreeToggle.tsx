@@ -121,6 +121,7 @@ export function HandsFreeToggle(): React.ReactElement {
     if (useGlass) {
         return (
             <AnimatedGlassView
+                colorScheme="dark"
                 style={[styles.wrap, containerStyle, disabled && styles.disabled]}
                 glassEffectStyle="regular"
                 colorScheme="dark"

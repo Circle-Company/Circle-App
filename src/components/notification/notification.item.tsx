@@ -100,6 +100,7 @@ export function NotificationItem({ item }: NotificationItemProps) {
         return (
             <GlassContainer spacing={10}>
                 <GlassView
+                    colorScheme="dark"
                     style={glassContainer}
                     colorScheme="dark"
                     glassEffectStyle="regular"

@@ -36,7 +36,7 @@ export function ZoomIndicator({ text, animatedStyle }: Props): React.ReactElemen
     if (iOSMajorVersion != null && iOSMajorVersion >= 26) {
         return (
             <Reanimated.View pointerEvents="none" style={[styles.hostPosition, animatedStyle]}>
-                <Host matchContents>
+                <Host colorScheme="dark" matchContents>
                     <HStack
                         modifiers={[
                             padding({ horizontal: 12, vertical: 6 }),

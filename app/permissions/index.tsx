@@ -17,9 +17,9 @@ import fonts from "@/constants/fonts"
 import { NotificationBadge } from "@/components/notification/notification.badge"
 import { NotificationType } from "@/contexts/push.notification"
 
-type StepId = "locationForeground" | "locationBackground" | "pushNotifications"
+type StepId = "locationForeground" | "pushNotifications"
 
-const STEPS: StepId[] = ["locationForeground", "locationBackground", "pushNotifications"]
+const STEPS: StepId[] = ["locationForeground", "pushNotifications"]
 function treatAsGranted(status: PermissionStatus) {
     return status === "granted"
 }
@@ -32,7 +32,7 @@ export default function PermissionsWizardScreen() {
 
     const { items, refresh, requestOne, hasMissingRequired, requiredMissingIds, openSettings } =
         useAppPermissions({
-            required: ["locationForeground", "locationBackground", "pushNotifications"],
+            required: ["locationForeground", "pushNotifications"],
         })
 
     const [stepIndex, setStepIndex] = React.useState(0)
@@ -71,15 +71,6 @@ export default function PermissionsWizardScreen() {
             const it = getItem(id)
             const status = it?.status ?? "unknown"
 
-            // For BG location, only ask if FG granted; if not, we can skip for now
-            if (id === "locationBackground") {
-                const fg = getItem("locationForeground")
-                if (fg?.status !== "granted") {
-                    // can't process BG yet; stop here (user will see this step but button will hint FG first)
-                    break
-                }
-            }
-
             if (treatAsGranted(status)) {
                 idx += 1
             } else {
@@ -113,7 +104,7 @@ export default function PermissionsWizardScreen() {
     }, [pendingTotal, pendingSteps, stepIndex])
 
     const handleAllow = async () => {
-        const order: StepId[] = ["locationForeground", "locationBackground", "pushNotifications"]
+        const order: StepId[] = ["locationForeground", "pushNotifications"]
 
         for (const id of order) {
             const currentStatus = getItem(id)?.status ?? "unknown"
@@ -121,22 +112,15 @@ export default function PermissionsWizardScreen() {
                 continue
             }
 
-            const result = await requestOne(id)
+            await requestOne(id)
             await refresh()
-
-            // If requesting Background and it did not grant, open Settings and finish
-            if (id === "locationBackground" && result !== "granted") {
-                setOnboardingPermissionsCompleted(true)
-                router.replace("/(tabs)/moments")
-                return
-            }
         }
 
-        // Final refresh and immediately navigate if both permissions have been requested
+        // Navega assim que as duas permissões já foram apresentadas ao usuário
         await refresh()
         const fg = getItem("locationForeground")?.status ?? "unknown"
-        const bg = getItem("locationBackground")?.status ?? "unknown"
-        if (fg !== "unknown" && bg !== "unknown") {
+        const push = getItem("pushNotifications")?.status ?? "unknown"
+        if (fg !== "unknown" && push !== "unknown") {
             setOnboardingPermissionsCompleted(true)
             router.replace("/(tabs)/moments")
             return
@@ -166,18 +150,7 @@ export default function PermissionsWizardScreen() {
                 />
                 <Text style={styles.hint}>
                     Your approximate location is used while you’re using the app to show moments and
-                    people near you.
-                </Text>
-            </View>
-
-            <View style={{ alignItems: "center" }}>
-                <PermissionCard
-                    title={"Keep nearby recommendations relevant"}
-                    icon={<Text style={{ fontSize: 60 }}>🌎</Text>}
-                />
-                <Text style={styles.hint}>
-                    Background location is used to update nearby moments and people recommendations,
-                    even when the app isn’t open.
+                    people near you, and is refreshed occasionally to keep them relevant.
                 </Text>
             </View>
 

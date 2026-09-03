@@ -60,6 +60,7 @@ export function RotateButton() {
     if (useGlass) {
         return (
             <AnimatedGlassView
+                colorScheme="dark"
                 style={[styles.circle, containerStyle]}
                 glassEffectStyle="regular"
                 colorScheme="dark"

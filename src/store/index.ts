@@ -38,6 +38,7 @@ export function storageKeys() {
             coordinates: {
                 latitude: baseKey + "account:coordinates:latitude",
                 longitude: baseKey + "account:coordinates:longitude",
+                lastSyncAt: baseKey + "account:coordinates:lastsyncat",
             },
             blocked: baseKey + "account:block",
             accessLevel: baseKey + "account:accesslevel",

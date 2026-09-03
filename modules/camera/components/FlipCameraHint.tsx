@@ -190,7 +190,7 @@ export function FlipCameraHint({ isRecording }: Props): React.ReactElement | nul
     if (iOSMajorVersion != null && iOSMajorVersion >= 26) {
         return (
             <Reanimated.View pointerEvents="none" style={containerStyle}>
-                <Host matchContents>
+                <Host colorScheme="dark" matchContents>
                     <HStack
                         spacing={8}
                         modifiers={[

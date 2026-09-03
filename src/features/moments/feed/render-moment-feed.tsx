@@ -25,6 +25,7 @@ import RenderCommentFeed from "./render-comment-feed"
 import { UserShow } from "@/components/user_show"
 import fonts from "@/constants/fonts"
 import sizes from "@/constants/sizes"
+import { INITIAL_PADDING, SNAP_INTERVAL } from "@/features/moments/feed-metrics"
 import { useKeyboard } from "@/lib/hooks/useKeyboard"
 import ZeroComments from "@/components/comment/components/comments-zero_comments"
 import { LinearGradient } from "expo-linear-gradient"
@@ -146,10 +147,12 @@ export default function RenderMomentFeed({
         () => {
             "worklet"
             if (scrollXShared && itemIndex !== undefined) {
-                // Calcular diretamente do scrollX para máxima fluidez
-                const margin = -3
-                const itemFullWidth = sizes.moment.standart.width + margin + margin
-                const centerOffset = (sizes.screens.width - sizes.moment.standart.width) / 2
+                // Calcular diretamente do scrollX para máxima fluidez.
+                // O passo entre itens é o SNAP_INTERVAL do carrossel: usar
+                // qualquer outro valor faz o erro acumular com o índice, e a
+                // opacidade de foco descasa do item que está de fato centrado.
+                const itemFullWidth = SNAP_INTERVAL
+                const centerOffset = INITIAL_PADDING
                 const focusPointX = sizes.screens.width - 200
                 const itemScrollPosition = itemIndex === 0 ? 0 : itemIndex * itemFullWidth
                 const itemCenterAtFocus =

@@ -105,7 +105,7 @@ export const Checkbox: React.FC<CheckboxProps> = ({
 
         return (
             <View style={[styles.row, { opacity: disabled ? 0.8 : 1 }, style]}>
-                <Host matchContents>
+                <Host colorScheme="dark" matchContents>
                     <Button
                         testID={testID}
                         systemImage={systemImage}

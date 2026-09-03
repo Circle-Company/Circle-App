@@ -130,6 +130,7 @@ export default function Input({
                 >
                     {isLiquidGlassAvailable() ? (
                         <GlassView
+                            colorScheme="dark"
                             glassEffectStyle="regular"
                             isInteractive
                             colorScheme="dark"

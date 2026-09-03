@@ -8,7 +8,6 @@ import LanguageContext from "@/contexts/language"
 import { useProfileContext as UseProfileContext } from "../profile-context"
 import { ProfileNameProps } from "../profile-types"
 import { textLib } from "@/circle.text.library"
-import { isIPad11 } from "@/lib/platform/detection"
 
 export default function Name({
     color = String(ColorTheme().text),

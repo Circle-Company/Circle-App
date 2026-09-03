@@ -13,12 +13,7 @@ import * as Location from "expo-location"
 import * as Notifications from "expo-notifications"
 
 export type PermissionId =
-    | "camera"
-    | "microphone"
-    | "mediaLibrary"
-    | "locationForeground"
-    | "locationBackground"
-    | "pushNotifications"
+    "camera" | "microphone" | "mediaLibrary" | "locationForeground" | "pushNotifications"
 
 export type PermissionStatus = "unknown" | "granted" | "denied" | "limited"
 
@@ -142,15 +137,6 @@ export function useAppPermissions(options: UseAppPermissionsOptions = {}): UseAp
                 openSettings,
             },
             {
-                id: "locationBackground",
-                title: "Allow Background Location",
-                description:
-                    "Keep your location up to date even when you’re not using the app for better nearby content.",
-                required: required.has("locationBackground"),
-                status: "unknown",
-                openSettings,
-            },
-            {
                 id: "pushNotifications",
                 title: "Allow Push Notifications",
                 description: "Receive notifications for new content and updates.",
@@ -247,18 +233,6 @@ export function useAppPermissions(options: UseAppPermissionsOptions = {}): UseAp
                 }
             },
 
-            locationBackground: async () => {
-                try {
-                    // Ensure FG granted first
-                    const fg = await Location.getForegroundPermissionsAsync()
-                    if (fg.status !== "granted") return "denied"
-                    const res = await Location.requestBackgroundPermissionsAsync()
-                    return mapExpoPermissionStatus(res.status)
-                } catch {
-                    return "unknown"
-                }
-            },
-
             pushNotifications: async () => {
                 try {
                     const res = await Notifications.requestPermissionsAsync()
@@ -326,19 +300,6 @@ export function useAppPermissions(options: UseAppPermissionsOptions = {}): UseAp
             })
         } catch {}
 
-        // location background (only check if FG granted for clearer UX)
-        try {
-            const fg = await Location.getForegroundPermissionsAsync()
-            if (fg.status === "granted") {
-                const bg = await Location.getBackgroundPermissionsAsync()
-                updateOne("locationBackground", {
-                    status: mapExpoPermissionStatus(bg.status),
-                    canAskAgain: Boolean((bg as any).canAskAgain),
-                })
-            } else {
-                updateOne("locationBackground", { status: "unknown" })
-            }
-        } catch {}
         // push notifications
         try {
             const pn = await Notifications.getPermissionsAsync()
@@ -365,14 +326,7 @@ export function useAppPermissions(options: UseAppPermissionsOptions = {}): UseAp
 
     // Recommended request order
     const ORDER: PermissionId[] = React.useMemo(
-        () => [
-            "camera",
-            "microphone",
-            "mediaLibrary",
-            "pushNotifications",
-            "locationForeground",
-            "locationBackground",
-        ],
+        () => ["camera", "microphone", "mediaLibrary", "pushNotifications", "locationForeground"],
         [],
     )
 
@@ -381,11 +335,6 @@ export function useAppPermissions(options: UseAppPermissionsOptions = {}): UseAp
             const item = items.find((i) => i.id === id)
             if (!item) continue
             if (item.status !== "granted") {
-                // For BG location, ensure FG is granted before asking
-                if (id === "locationBackground") {
-                    const fg = items.find((i) => i.id === "locationForeground")
-                    if (fg?.status !== "granted") continue
-                }
                 const s = await item.request()
                 updateOne(id, { status: s })
             }

@@ -4,6 +4,7 @@ import { colors } from "@/constants/colors"
 import fonts from "@/constants/fonts"
 import sizes from "@/constants/sizes"
 import LanguageContext from "@/contexts/language"
+import { useCardIllustrationSize } from "@/features/moments/card-illustration"
 import FeedContext from "@/contexts/Feed"
 import React from "react"
 import { router } from "expo-router"
@@ -37,6 +38,7 @@ let retryStep = 0
 
 export function EmptyList() {
     const { t } = React.useContext(LanguageContext)
+    const illustrationSize = useCardIllustrationSize()
     const { reloadFeed } = React.useContext(FeedContext)
 
     // `reloadFeed` é recriado a cada render (`() => fetch(true)`), então não
@@ -175,8 +177,8 @@ export function EmptyList() {
 
     // Ilustração provisória: por ora a mesma do card "Capture Your Day".
     const illustrationStyle: ImageStyle = {
-        width: sizes.screens.width * 0.9,
-        height: sizes.screens.width * 0.9,
+        width: illustrationSize,
+        height: illustrationSize,
         marginTop: sizes.margins["1sm"],
         marginBottom: sizes.margins["1md"],
     }
@@ -190,6 +192,7 @@ export function EmptyList() {
             <Animated.View style={{ opacity: animatedOpacity }}>
                 <GlassContainer spacing={10}>
                     <GlassView
+                        colorScheme="dark"
                         style={glassContainer}
                         colorScheme="dark"
                         glassEffectStyle="regular"

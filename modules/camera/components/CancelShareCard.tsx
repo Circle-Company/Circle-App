@@ -180,6 +180,7 @@ export function CancelShareCard({
             <View style={styles.backdrop} pointerEvents="box-none">
                 <GlassContainer spacing={10}>
                     <GlassView
+                        colorScheme="dark"
                         style={styles.glassContainer}
                         colorScheme="dark"
                         glassEffectStyle="regular"
