@@ -68,7 +68,6 @@ export default function PermissionCard({ title, icon }: PermissionCardProps) {
         return (
             <GlassContainer>
                 <GlassView
-                    colorScheme="dark"
                     style={glassContainer}
                     colorScheme="dark"
                     glassEffectStyle="clear"
