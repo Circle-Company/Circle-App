@@ -406,5 +406,19 @@
     "When someone invites you to be their friend, it shows up here.": "Quando alguém convidar você para ser amigo, o convite aparece aqui.",
     "You have no friends yet": "Você ainda não tem amigos",
     "Invite people you know to be your friend and they will show up here.": "Convide pessoas que você conhece para serem seus amigos e elas aparecerão aqui.",
-    "Something went wrong": "Algo deu errado"
+    "Something went wrong": "Algo deu errado",
+
+    "Popular nearby": "Populares por perto",
+    "Invite": "Convidar",
+    "more than {{friends}} friends": "mais de {{friends}} amigos",
+    "Nobody new around here": "Ninguém novo por aqui",
+    "When new people show up near you, they will appear here with an invite button.": "Quando aparecer gente nova perto de você, ela surge aqui com um botão de convite.",
+    "Could not load": "Não foi possível carregar",
+    "Something went wrong while looking for people near you.": "Algo deu errado ao procurar pessoas perto de você.",
+    "Not available": "Indisponível",
+    "This feature is not available for your account.": "Este recurso não está disponível para a sua conta.",
+    "Location is required": "A localização é necessária",
+    "We use your location to find popular people near you.": "Usamos sua localização para encontrar pessoas populares perto de você.",
+    "Enable location": "Ativar localização",
+    "Open Settings": "Abrir Ajustes"
 }

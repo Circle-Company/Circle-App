@@ -11,7 +11,7 @@ export default function TabsLayout() {
     const { unreadCount, inboxVisited } = usePushNotifications()
     const hideTabBar =
         /^\/(you|moment)\/[^/]+/.test(pathname ?? "") ||
-        /^\/(radar|inbox|settings)(\/|$)/.test(pathname ?? "")
+        /^\/(radar|popular|inbox|settings)(\/|$)/.test(pathname ?? "")
 
     // O botão de notificações vive no header da câmera. Ao sair dessa aba o
     // header some, então espelhamos o badge no ícone da câmera na tab bar —

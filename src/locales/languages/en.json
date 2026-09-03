@@ -405,5 +405,19 @@
     "When someone invites you to be their friend, it shows up here.": "When someone invites you to be their friend, it shows up here.",
     "You have no friends yet": "You have no friends yet",
     "Invite people you know to be your friend and they will show up here.": "Invite people you know to be your friend and they will show up here.",
-    "Something went wrong": "Something went wrong"
+    "Something went wrong": "Something went wrong",
+
+    "Popular nearby": "Popular nearby",
+    "Invite": "Invite",
+    "more than {{friends}} friends": "more than {{friends}} friends",
+    "Nobody new around here": "Nobody new around here",
+    "When new people show up near you, they will appear here with an invite button.": "When new people show up near you, they will appear here with an invite button.",
+    "Could not load": "Could not load",
+    "Something went wrong while looking for people near you.": "Something went wrong while looking for people near you.",
+    "Not available": "Not available",
+    "This feature is not available for your account.": "This feature is not available for your account.",
+    "Location is required": "Location is required",
+    "We use your location to find popular people near you.": "We use your location to find popular people near you.",
+    "Enable location": "Enable location",
+    "Open Settings": "Open Settings"
 }

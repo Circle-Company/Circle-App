@@ -57,6 +57,7 @@ import { POLL_TIMEOUT_CODE, shareMoment, type SharePhase } from "../hooks/shareM
 import PersistedContext from "@/contexts/Persisted"
 import { notify } from "@/contexts/Toast/notify"
 import { InboxHeaderButton } from "@/components/general/inbox-header-button"
+import { PopularHeaderButton } from "@/components/general/popular-header-button"
 import config from "@/config"
 
 export function CameraPage(): React.ReactElement {
@@ -392,6 +393,9 @@ export function CameraPage(): React.ReactElement {
                     headerTransparent: true,
                     headerStyle: { backgroundColor: "transparent" },
                     headerShadowVisible: false,
+                    // Botão de "populares na sua região", espelho do sino.
+                    // Oculto durante a gravação, junto com o headerRight.
+                    headerLeft: isRecording ? undefined : () => <PopularHeaderButton />,
                     // Botão de notificações (movido da tela de moments). Oculto
                     // durante a gravação, quando o título vira o progresso.
                     headerRight: isRecording ? undefined : () => <InboxHeaderButton />,
