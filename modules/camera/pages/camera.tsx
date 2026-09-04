@@ -58,6 +58,7 @@ import PersistedContext from "@/contexts/Persisted"
 import { notify } from "@/contexts/Toast/notify"
 import { InboxHeaderButton } from "@/components/general/inbox-header-button"
 import { PopularHeaderButton } from "@/components/general/popular-header-button"
+import { trackUserAction } from "@/lib/trackEvent"
 import config from "@/config"
 
 export function CameraPage(): React.ReactElement {
@@ -190,6 +191,7 @@ export function CameraPage(): React.ReactElement {
     const [holdHintTrigger, setHoldHintTrigger] = React.useState(0)
 
     const handleRecordingStop = React.useCallback(() => {
+        trackUserAction("moment_recording_stopped")
         setIsRecording(false)
         zoom.value = withTiming(device?.minZoom ?? 1, { duration: ZOOM_RESET_ANIM_MS })
     }, [setIsRecording, zoom, device])
@@ -227,6 +229,7 @@ export function CameraPage(): React.ReactElement {
             setShareStatus("sharing")
             setSharePhase(null)
             uploadProgress.value = 0
+            trackUserAction("moment_publish_started", { duration_seconds: item.duration })
             try {
                 await shareMoment({
                     description: null,
@@ -243,6 +246,7 @@ export function CameraPage(): React.ReactElement {
                         uploadProgress.value = withTiming(frac, { duration: 200 })
                     },
                 })
+                trackUserAction("moment_published", { duration_seconds: item.duration })
                 setShareStatus("success")
                 setSharePhase(null)
                 setCameraPosition("back")
@@ -264,6 +268,7 @@ export function CameraPage(): React.ReactElement {
                     err?.name === "CanceledError" ||
                     err?.code === "ERR_CANCELED"
                 if (aborted) {
+                    trackUserAction("moment_publish_canceled", { reason: "user_aborted" })
                     setShareStatus(null)
                     return
                 }
@@ -271,6 +276,12 @@ export function CameraPage(): React.ReactElement {
                 // e vai publicar em background. Dismiss silencioso + toast
                 // otimista.
                 if (err?.code === POLL_TIMEOUT_CODE) {
+                    trackUserAction("moment_published", {
+                        duration_seconds: item.duration,
+                        // O servidor continua processando e publica em
+                        // background; do ponto de vista do usuário, saiu.
+                        completed_in_background: true,
+                    })
                     setShareStatus(null)
                     setSharePreviewPath(null)
                     setCameraPosition("back")
@@ -286,6 +297,9 @@ export function CameraPage(): React.ReactElement {
                 setShareStatus(null)
                 const status = err?.response?.status
                 const message = err?.response?.data?.message ?? err?.message ?? "Unknown"
+                trackUserAction("moment_publish_failed", {
+                    ...(status ? { http_status: status } : {}),
+                })
                 notify({
                     params: {
                         title: t("Failed to share"),
@@ -334,6 +348,10 @@ export function CameraPage(): React.ReactElement {
             // capture button instead of pulling the user's eyes to the top
             // of the screen.
             if (duration < MIN_PUBLISHABLE_SEC) {
+                trackUserAction("moment_publish_canceled", {
+                    reason: "too_short",
+                    duration_seconds: duration,
+                })
                 Vibrate("notificationWarning")
                 setHoldHintTrigger((n) => n + 1)
                 return
@@ -515,7 +533,10 @@ export function CameraPage(): React.ReactElement {
                         enabled={isCameraInitialized && isActive && !isSharingActive}
                         handsFree={isHandsFree}
                         setIsPressingButton={setIsPressingButtonCb}
-                        onRecordingStart={() => setIsRecording(true)}
+                        onRecordingStart={() => {
+                            trackUserAction("moment_recording_started")
+                            setIsRecording(true)
+                        }}
                         onRecordingStop={handleRecordingStop}
                         onFlipCamera={handleFlipCamera}
                         onMediaCaptured={onMediaCaptured}

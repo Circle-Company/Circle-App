@@ -1,5 +1,6 @@
 import { useQuery, UseQueryResult, useMutation, useQueryClient } from "@tanstack/react-query"
 import { apiRoutes } from "@/api"
+import { trackUserAction } from "@/lib/trackEvent"
 import { accountBlocksProps } from "@/api/account/account.types"
 
 export type AccountBlock = {
@@ -379,6 +380,7 @@ export function useUpdateAccDescMutation() {
     return useMutation({
         mutationFn: updateAccountDescription,
         onSuccess: async () => {
+            trackUserAction("account_description_updated")
             // Refresh account detail after successful update
             await queryClient.invalidateQueries({ queryKey: accountKeys.detail() })
             await queryClient.refetchQueries({ queryKey: accountKeys.detail() })
@@ -391,6 +393,7 @@ export function useUpdateAccNameMutation() {
     return useMutation({
         mutationFn: updateAccountName,
         onSuccess: async () => {
+            trackUserAction("account_name_updated")
             // Refresh account detail after successful update
             await queryClient.invalidateQueries({ queryKey: accountKeys.detail() })
             await queryClient.refetchQueries({ queryKey: accountKeys.detail() })
@@ -419,6 +422,7 @@ export function useReadAllNotificationsMutation() {
     return useMutation({
         mutationFn: readAllNotifications,
         onSuccess: async () => {
+            trackUserAction("notifications_marked_read")
             await queryClient.invalidateQueries({ queryKey: accountKeys.notifications() })
         },
     })

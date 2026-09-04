@@ -1,5 +1,6 @@
 import { useMutation, useQuery, useQueryClient, UseQueryResult } from "@tanstack/react-query"
 import { apiRoutes } from "@/api"
+import { trackUserAction } from "@/lib/trackEvent"
 import type {
     AcceptFriendRequestResponse,
     FriendRequestsDirection,
@@ -116,6 +117,12 @@ export function useSendFriendRequestMutation({ userId }: { userId: string }) {
     return useMutation<SendFriendRequestResponse, any, void>({
         mutationFn: () => apiRoutes.friendship.sendFriendRequest({ userId }),
         onSuccess: async (data) => {
+            trackUserAction("friend_request_sent", {
+                target_user_id: userId,
+                // `auto_accepted` marca o caso em que o alvo já tinha convidado
+                // você e a relação salta direto para amigos.
+                auto_accepted: !!data?.areFriends,
+            })
             // Estado otimista derivado da resposta, antes do refetch.
             const relation: FriendshipRelation = data?.areFriends ? "friends" : "pending_outgoing"
             queryClient.setQueryData<FriendshipStatusResponse>(friendshipKeys.status(userId), {
@@ -139,6 +146,7 @@ export function useCancelFriendRequestMutation({ userId }: { userId: string }) {
     return useMutation({
         mutationFn: () => apiRoutes.friendship.cancelFriendRequest({ userId }),
         onSuccess: async () => {
+            trackUserAction("friend_request_canceled", { target_user_id: userId })
             queryClient.setQueryData<FriendshipStatusResponse>(friendshipKeys.status(userId), {
                 success: true,
                 relation: "none",
@@ -160,6 +168,7 @@ export function useAcceptFriendRequestMutation({ userId }: { userId: string }) {
     return useMutation<AcceptFriendRequestResponse, any, void>({
         mutationFn: () => apiRoutes.friendship.acceptFriendRequest({ userId }),
         onSuccess: async () => {
+            trackUserAction("friend_request_accepted", { target_user_id: userId })
             queryClient.setQueryData<FriendshipStatusResponse>(friendshipKeys.status(userId), {
                 success: true,
                 relation: "friends",
@@ -181,6 +190,7 @@ export function useDeclineFriendRequestMutation({ userId }: { userId: string }) 
     return useMutation({
         mutationFn: () => apiRoutes.friendship.declineFriendRequest({ userId }),
         onSuccess: async () => {
+            trackUserAction("friend_request_declined", { target_user_id: userId })
             // Para quem recusou a relação volta a `none` (a recusa é silenciosa).
             queryClient.setQueryData<FriendshipStatusResponse>(friendshipKeys.status(userId), {
                 success: true,
@@ -203,6 +213,7 @@ export function useRemoveFriendMutation({ userId }: { userId: string }) {
     return useMutation({
         mutationFn: () => apiRoutes.friendship.removeFriend({ userId }),
         onSuccess: async () => {
+            trackUserAction("friend_removed", { target_user_id: userId })
             queryClient.setQueryData<FriendshipStatusResponse>(friendshipKeys.status(userId), {
                 success: true,
                 relation: "none",
