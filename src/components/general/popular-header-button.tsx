@@ -4,7 +4,7 @@ import { SymbolView } from "expo-symbols"
 import { useRouter } from "expo-router"
 
 import { colors } from "@/constants/colors"
-import DotRadiowaves from "@/assets/icons/svgs/dot_radiowaves_left_and_right.svg"
+import PersonIcon from "@/assets/icons/svgs/person.svg"
 
 /**
  * Botão de "populares na sua região" usado como headerLeft da câmera — o
@@ -23,11 +23,13 @@ export function PopularHeaderButton() {
             accessibilityLabel="Popular nearby"
         >
             <SymbolView
-                name="dot.radiowaves.left.and.right"
+                name="person.2.fill"
                 tintColor={colors.gray.white}
                 size={size}
+                // Não há asset de duas pessoas; o person.svg é o mais próximo
+                // e já é o ícone de gente usado no resto do app.
                 fallback={
-                    <DotRadiowaves width={size + 2} height={size + 2} fill={colors.gray.white} />
+                    <PersonIcon width={size + 2} height={size + 2} fill={colors.gray.white} />
                 }
             />
         </Pressable>
