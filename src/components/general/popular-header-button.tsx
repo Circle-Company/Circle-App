@@ -23,7 +23,7 @@ export function PopularHeaderButton() {
             accessibilityLabel="Popular nearby"
         >
             <SymbolView
-                name="person.badge.plus"
+                name="person.fill.badge.plus"
                 tintColor={colors.gray.white}
                 size={size}
                 // Não há asset de "adicionar usuário" no projeto; o fallback é
