@@ -31,6 +31,9 @@ export type AnalyticsEvent =
     | "login"
     | "logout"
     | "sign_up_completed"
+    // Etapa de foto de perfil do cadastro
+    | "profile_picture_onboarding_completed"
+    | "profile_picture_onboarding_skipped"
     // Navegação
     | "screen_viewed"
     // Feed

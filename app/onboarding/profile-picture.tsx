@@ -12,6 +12,7 @@ import sizes from "@/constants/sizes"
 import LanguageContext from "@/contexts/language"
 import { usePreferencesStore } from "@/contexts/Persisted/persist.preferences"
 import { useProfilePictureUpload } from "@/lib/hooks/useProfilePictureUpload"
+import { trackUserAction } from "@/lib/trackEvent"
 
 /**
  * Etapa de foto de perfil do cadastro. Aparece na primeira entrada na parte
@@ -28,7 +29,8 @@ export default function OnboardingProfilePictureScreen() {
 
     const { selectedAsset, loading, error, showPicker, upload } = useProfilePictureUpload()
 
-    /** Fecha a etapa: baixa a marca e entra no app. */
+    /** Fecha a etapa: baixa a marca e entra no app. Não rastreia — quem chama é
+     * que sabe se foi envio ou pulo. */
     function finish() {
         setPending(false)
         router.replace("/(tabs)/create")
@@ -36,7 +38,18 @@ export default function OnboardingProfilePictureScreen() {
 
     async function handleUpload() {
         const ok = await upload()
-        if (ok) finish()
+        if (!ok) return
+        trackUserAction("profile_picture_onboarding_completed")
+        finish()
+    }
+
+    function handleSkip() {
+        trackUserAction("profile_picture_onboarding_skipped", {
+            // Escolheu uma foto e mesmo assim pulou: é um pulo diferente de
+            // quem nem abriu o seletor, e separa desistência de desinteresse.
+            had_selected_photo: !!selectedAsset,
+        })
+        finish()
     }
 
     const description: TextStyle = {
@@ -107,7 +120,7 @@ export default function OnboardingProfilePictureScreen() {
                 )}
 
                 <Pressable
-                    onPress={finish}
+                    onPress={handleSkip}
                     disabled={loading}
                     hitSlop={12}
                     style={({ pressed }) => [styles.skip, { opacity: pressed ? 0.6 : 1 }]}

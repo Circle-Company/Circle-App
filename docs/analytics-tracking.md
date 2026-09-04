@@ -5,7 +5,7 @@ fonte de verdade do que existe hoje; o catálogo em código
 (`AnalyticsEvent`, em [`src/lib/trackEvent.ts`](../src/lib/trackEvent.ts)) é o que
 o compilador garante. Os dois devem andar juntos — ao mexer num, mexa no outro.
 
-**São 34 eventos.**
+**São 36 eventos.**
 
 ---
 
@@ -56,7 +56,7 @@ Registradas no init e reanexadas após o `reset()` do logout:
 
 ---
 
-## 2. Sessão
+## 2. Sessão e cadastro
 
 | evento | quando dispara | propriedades | onde |
 |---|---|---|---|
@@ -65,6 +65,17 @@ Registradas no init e reanexadas após o `reset()` do logout:
 | `login` | Sessão criada com sucesso, tanto no Apple Sign-In quanto no login por usuário/senha | — | `src/contexts/auth.tsx` |
 | `logout` | Logout confirmado. Dispara **antes** do `reset()` | — | `src/contexts/auth.tsx` |
 | `sign_up_completed` | Cadastro concluído, **depois** de o usuário existir no backend | `sign_up_method` (`"apple"`) | `src/contexts/auth.tsx` |
+| `profile_picture_onboarding_completed` | Foto enviada na etapa que segue o cadastro | — | `app/onboarding/profile-picture.tsx` |
+| `profile_picture_onboarding_skipped` | "Pular por agora" na mesma etapa | `had_selected_photo` (booleano) | `app/onboarding/profile-picture.tsx` |
+
+A etapa de foto aparece uma vez, na primeira entrada na parte logada depois do
+cadastro, e só para quem acabou de criar a conta (a marca
+`profilePictureOnboardingPending` nunca esteve ligada em conta antiga). Como a
+tela sempre termina em um dos dois eventos, a soma deles é o denominador
+prático para a taxa de pulo — o que escapa é só quem mata o app na tela.
+
+`had_selected_photo: true` marca quem escolheu uma foto e ainda assim pulou.
+Separa desistência no meio do caminho de quem nem abriu o seletor.
 
 ---
 
@@ -245,7 +256,7 @@ Estão no painel do Mixpanel, fora do código:
       Management. **Irreversível depois que existir dado** no projeto.
 - [ ] Projeto de **dev separado** do de produção. Hoje o app aponta para
       produção, então evento de teste vira dado real.
-- [ ] **Lexicon** preenchido com a descrição de cada um dos 34 eventos.
+- [ ] **Lexicon** preenchido com a descrição de cada um dos 36 eventos.
 - [ ] **Data Standards** exigindo `snake_case` e **Event Approval** ligados.
 - [ ] Estimativa de custo. `screen_viewed` e `moment_viewed` serão de longe os
       mais volumosos, e o Mixpanel cobra por evento.
