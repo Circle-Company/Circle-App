@@ -1,7 +1,6 @@
 import { Platform } from "react-native"
 import { Mixpanel } from "mixpanel-react-native"
 import config from "@/config"
-import { storage, storageKeys } from "@/store"
 
 const trackAutomaticEvents = false
 const useNative = false
@@ -20,58 +19,6 @@ export type TrackedUser = {
 }
 
 // ──────────────────────────────────────────────────────────────────────────────
-// Consentimento
-//
-// O app tem usuários em regiões que exigem consentimento (UE/Reino Unido/Suíça
-// e Califórnia), então analytics é tratado como tracking não essencial: o SDK
-// **não inicializa** enquanto não houver consentimento explícito. Sem decisão
-// registrada, o padrão é não rastrear.
-// ──────────────────────────────────────────────────────────────────────────────
-
-/** `true` só com consentimento explícito. Ausência de decisão conta como não. */
-export function hasAnalyticsConsent(): boolean {
-    try {
-        return storage.getBoolean(storageKeys().privacy.analyticsConsent) === true
-    } catch {
-        return false
-    }
-}
-
-/** `false` enquanto o usuário nunca respondeu — use para decidir se pergunta. */
-export function isAnalyticsConsentDecided(): boolean {
-    try {
-        return typeof storage.getBoolean(storageKeys().privacy.analyticsConsent) === "boolean"
-    } catch {
-        return false
-    }
-}
-
-/**
- * Registra a decisão do usuário. Ao revogar, derruba a instância e chama
- * `reset()` para que nada mais saia e o device id seja descartado.
- */
-export function setAnalyticsConsent(granted: boolean): void {
-    try {
-        const keys = storageKeys().privacy
-        storage.set(keys.analyticsConsent, granted)
-        storage.set(keys.analyticsConsentDecidedAt, new Date().toISOString())
-    } catch {
-        // noop
-    }
-
-    if (!granted) {
-        try {
-            mixpanelInstance?.reset()
-            mixpanelInstance?.flush()
-        } catch {
-            // noop
-        }
-        mixpanelInstance = null
-        superPropertiesRegistered = false
-    }
-}
-
-// ──────────────────────────────────────────────────────────────────────────────
 // SDK
 // ──────────────────────────────────────────────────────────────────────────────
 
@@ -79,10 +26,13 @@ function isValidKey(key: any): key is string {
     return typeof key === "string" && key.trim().length > 0 && key !== "undefined" && key !== "null"
 }
 
+/**
+ * Não há gate de consentimento aqui: o uso de analytics é coberto pelo aceite
+ * dos termos de uso, que é pré-condição para a conta existir (o cadastro envia
+ * `terms-accepted: true`). Decisão de produto/jurídico — ver o histórico deste
+ * arquivo antes de reintroduzir um gate.
+ */
 function getMixpanel(): Mixpanel | null {
-    // O gate vem antes de tudo e é reavaliado a cada chamada: o consentimento
-    // pode ser concedido (ou revogado) a qualquer momento pelas configurações.
-    if (!hasAnalyticsConsent()) return null
     if (mixpanelInstance) return mixpanelInstance
 
     try {

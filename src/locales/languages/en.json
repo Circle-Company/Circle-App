@@ -419,8 +419,5 @@
     "Location is required": "Location is required",
     "We use your location to find popular people near you.": "We use your location to find popular people near you.",
     "Enable location": "Enable location",
-    "Open Settings": "Open Settings",
-
-    "Usage analytics": "Usage analytics",
-    "Allow Circle to collect anonymous usage data to understand how the app is used and improve it. Turning this off stops all collection.": "Allow Circle to collect anonymous usage data to understand how the app is used and improve it. Turning this off stops all collection."
+    "Open Settings": "Open Settings"
 }

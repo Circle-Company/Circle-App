@@ -136,10 +136,6 @@ function RootLayoutNav() {
                 options={{ ...settingsHeader, headerTitle: t("Content") }}
             />
             <Stack.Screen
-                name="settings/analytics"
-                options={{ ...settingsHeader, headerTitle: t("Usage analytics") }}
-            />
-            <Stack.Screen
                 name="settings/blocked-users"
                 options={{ ...settingsHeader, headerTitle: t("Blocked Users") }}
             />

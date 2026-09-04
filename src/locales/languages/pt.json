@@ -420,8 +420,5 @@
     "Location is required": "A localização é necessária",
     "We use your location to find popular people near you.": "Usamos sua localização para encontrar pessoas populares perto de você.",
     "Enable location": "Ativar localização",
-    "Open Settings": "Abrir Ajustes",
-
-    "Usage analytics": "Dados de uso",
-    "Allow Circle to collect anonymous usage data to understand how the app is used and improve it. Turning this off stops all collection.": "Permite que o Circle colete dados anônimos de uso para entender como o app é usado e melhorá-lo. Desligar interrompe toda a coleta."
+    "Open Settings": "Abrir Ajustes"
 }
