@@ -23,13 +23,11 @@ export function PopularHeaderButton() {
             accessibilityLabel="Popular nearby"
         >
             <SymbolView
-                name="person.2.badge.plus.fill"
+                name="person.badge.plus"
                 tintColor={colors.gray.white}
                 size={size}
-                // person.2.badge.plus.fill é SF Symbols 5 (iOS 17+). No iOS 16,
-                // dentro do deployment target de 16.4, cai no fallback — não há
-                // asset de "adicionar usuários" no projeto, então usamos o
-                // person.svg, o ícone de gente já usado no resto do app.
+                // Não há asset de "adicionar usuário" no projeto; o fallback é
+                // o person.svg, ícone de gente já usado no resto do app.
                 fallback={
                     <PersonIcon width={size + 2} height={size + 2} fill={colors.gray.white} />
                 }
