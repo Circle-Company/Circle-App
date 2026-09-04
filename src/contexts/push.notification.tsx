@@ -15,6 +15,7 @@ import { Vibrate } from "@/lib/hooks/useHapticFeedback"
 import { useToast } from "@/contexts/Toast"
 
 import { safeSet, storageKeys, storage } from "../store"
+import { trackLikeNotificationReceived } from "@/lib/trackEvent"
 import { useAccountStore } from "./Persisted/persist.account"
 import {
     useSetPushTokenMutation,
@@ -112,6 +113,14 @@ const PushNotificationContext = createContext<PushNotificationContextValue | und
 // Helpers
 // ──────────────────────────────────────────────────────────────────────────────
 const keys = storageKeys()
+
+/** Identidade para o Mixpanel: o `identify()` usa o id do backend, não o username. */
+function getTrackedUser() {
+    return {
+        id: storage.getString(keys.user.id) || "",
+        username: storage.getString(keys.user.username) || "",
+    }
+}
 export const EXPO_PUSH_TOKEN_KEY = keys.baseKey + "notifications:expopushtoken"
 
 const getExpoDeviceId = (): string =>
@@ -373,6 +382,15 @@ export const PushNotificationProvider: React.FC<{ children: React.ReactNode }> =
             // Mark that new unread content exists
             setInboxVisited(false)
 
+            // Value Moment: a curtida voltando para quem publicou. Fica na
+            // chegada, e não na leitura do inbox — o valor é entregue quando a
+            // reação chega, não quando a lista é aberta.
+            const receivedType = (event.request.content.data as Record<string, any> | undefined)
+                ?.type
+            if (receivedType === NotificationType.MomentLiked) {
+                trackLikeNotificationReceived(getTrackedUser(), { is_foreground: true })
+            }
+
             // Haptic feedback
             Vibrate("notificationSuccess")
 
@@ -417,7 +435,16 @@ export const PushNotificationProvider: React.FC<{ children: React.ReactNode }> =
 
         // Fires when the user TAPS on a notification (app was bg or closed)
         const responseSubscription = Notifications.addNotificationResponseReceivedListener(
-            (_response) => {
+            (response) => {
+                // Mesmo Value Moment, pela via do toque: com o app em background
+                // o listener de chegada acima não roda.
+                const tappedType = (
+                    response.notification.request.content.data as Record<string, any> | undefined
+                )?.type
+                if (tappedType === NotificationType.MomentLiked) {
+                    trackLikeNotificationReceived(getTrackedUser(), { is_foreground: false })
+                }
+
                 // Refetch the list so the inbox is up-to-date when the user opens it
                 refreshNotificationsRef.current()
             },

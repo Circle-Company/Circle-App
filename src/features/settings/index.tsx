@@ -29,6 +29,7 @@ import ExitIcon from "@/assets/icons/svgs/rectangle.portrait.and.arrow.right.svg
 import MagazineIcon from "@/assets/icons/svgs/magazine.svg"
 import DocIcon from "@/assets/icons/svgs/doc.svg"
 import HelpIcon from "@/assets/icons/svgs/exclamationmark.bubble.svg"
+import TrendIcon from "@/assets/icons/svgs/trend.svg"
 
 export default function ListSettings() {
     const { session } = React.useContext(PersistedContext)
@@ -113,6 +114,11 @@ export default function ListSettings() {
                     onPress: () => {
                         Browser.openBrowserAsync(config.COMMUNITY_GUIDELINES_URL)
                     },
+                },
+                {
+                    name: t("Usage analytics"),
+                    icon: <TrendIcon fill={colors.gray.grey_03} width={22} height={22} />,
+                    onPress: () => router.push("/settings/analytics"),
                 },
             ],
         },

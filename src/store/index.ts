@@ -106,6 +106,14 @@ export function storageKeys() {
         camera: {
             position: baseKey + "camera:position",
         },
+        privacy: {
+            /**
+             * Consentimento para analytics (Mixpanel). Ausente = ainda não
+             * decidido; o SDK não inicializa nesse estado. Ver src/lib/trackEvent.ts.
+             */
+            analyticsConsent: baseKey + "privacy:analytics:consent",
+            analyticsConsentDecidedAt: baseKey + "privacy:analytics:consentDecidedAt",
+        },
     }
 }
 
