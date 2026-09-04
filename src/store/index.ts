@@ -81,6 +81,13 @@ export function storageKeys() {
             appTimezone: baseKey + "preferences:timezone:offset",
             timezoneCode: baseKey + "preferences:timezone:code",
             onboardingPermissionsCompleted: baseKey + "preferences:onboarding:permissionsCompleted",
+            /**
+             * Só é ligada no cadastro. Marca que o usuário acabou de criar a
+             * conta e ainda não passou pela tela de foto de perfil. Conta
+             * antiga nunca teve isso ligado, então nunca vê a tela.
+             */
+            profilePictureOnboardingPending:
+                baseKey + "preferences:onboarding:profilePicturePending",
         },
         user: {
             id: baseKey + "user:id",

@@ -50,6 +50,20 @@ export type AuthContextsData = {
 
 const AuthContext = React.createContext<AuthContextsData>({} as AuthContextsData)
 
+/**
+ * Liga a marca de "acabou de se cadastrar e ainda não passou pela tela de foto".
+ * Chamada só nos dois fluxos de criação de conta, depois de a sessão já estar
+ * injetada — antes disso o Persisted ainda pode resetar as preferências.
+ * Conta antiga nunca teve isso ligado, e por isso nunca vê a tela.
+ */
+function markProfilePicturePending() {
+    try {
+        usePreferencesStore.getState().setProfilePictureOnboardingPending(true)
+    } catch (e) {
+        console.warn("Não foi possível marcar o onboarding de foto de perfil:", e)
+    }
+}
+
 export function Provider({ children }: AuthProviderProps) {
     const { setRedirectTo } = React.useContext(RedirectContext)
     const [signInputUsername, setSignInputUsername] = React.useState("")
@@ -224,6 +238,7 @@ export function Provider({ children }: AuthProviderProps) {
 
             await injectRef.current?.({ session: sessionPayload })
             storage.set("@circle:sessionId", sessionPayload.user?.id ?? "")
+            markProfilePicturePending()
             // Depois de o usuário existir no backend, nunca antes: o
             // `identify()` precisa do id definitivo.
             trackSignUpCompleted(
@@ -432,6 +447,7 @@ export function Provider({ children }: AuthProviderProps) {
             await injectRef.current?.({ session: sessionPayload })
             // Persist sessionId for compatibility with legacy checks
             storage.set("@circle:sessionId", sessionPayload.user?.id ?? "")
+            markProfilePicturePending()
             setRedirectTo("APP")
             beginAuthGracePeriod(1000)
             // Navigation handled by RootLayoutNav via redirectTo

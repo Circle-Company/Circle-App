@@ -419,5 +419,10 @@
     "Location is required": "Location is required",
     "We use your location to find popular people near you.": "We use your location to find popular people near you.",
     "Enable location": "Enable location",
-    "Open Settings": "Open Settings"
+    "Open Settings": "Open Settings",
+
+    "Add a profile picture": "Add a profile picture",
+    "A photo helps people recognize you. You can change it later in settings.": "A photo helps people recognize you. You can change it later in settings.",
+    "Choose a photo": "Choose a photo",
+    "Skip for now": "Skip for now"
 }

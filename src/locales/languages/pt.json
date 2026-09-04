@@ -420,5 +420,10 @@
     "Location is required": "A localização é necessária",
     "We use your location to find popular people near you.": "Usamos sua localização para encontrar pessoas populares perto de você.",
     "Enable location": "Ativar localização",
-    "Open Settings": "Abrir Ajustes"
+    "Open Settings": "Abrir Ajustes",
+
+    "Add a profile picture": "Adicione uma foto de perfil",
+    "A photo helps people recognize you. You can change it later in settings.": "Uma foto ajuda as pessoas a reconhecerem você. Dá para trocar depois nas configurações.",
+    "Choose a photo": "Escolher foto",
+    "Skip for now": "Pular por agora"
 }
