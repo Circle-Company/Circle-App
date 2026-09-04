@@ -138,6 +138,7 @@ describe("Testes de Integração Completos - Criação de Conta", () => {
                 disableTranslation: false,
                 muteAudio: false,
             },
+            pushNotifications: {
                 disableAddToMemory: false,
                 disableFollowUser: false,
                 disableViewUser: false,

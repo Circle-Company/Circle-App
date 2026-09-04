@@ -12,9 +12,6 @@ type NotificationTextProps = {
 
 export function NotificationTextToast({ item, style }: NotificationTextProps) {
     return (
-        <Text>
-            
-        </Text>
         <Text
             style={[
                 {
