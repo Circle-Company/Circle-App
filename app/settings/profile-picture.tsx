@@ -1,6 +1,6 @@
 import { useNavigation } from "expo-router"
 import React from "react"
-import { Image, View, StyleSheet } from "react-native"
+import { Image, Platform, StyleSheet, View } from "react-native"
 import ButtonStandart from "@/components/buttons/button-standart"
 import { Loading } from "@/components/loading"
 import { Text } from "@/components/Themed"
