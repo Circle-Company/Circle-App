@@ -66,7 +66,9 @@ React Query mutation hooks, one file per action (`moment.like.ts`, `user.follow.
 - **Camera**: `modules/camera/` (vision-camera based) with its own context, mounted in the root tree.
 - **Push**: Firebase Messaging + `expo-notifications` (`src/contexts/push.notification.tsx`).
 - **i18n**: `i18next` + `react-i18next`, locales in `src/locales/`.
-- **Analytics**: Mixpanel (`src/lib/trackEvent.ts`, key from `MIXPANEL_KEY`).
+- **Analytics**: Mixpanel (`src/lib/trackEvent.ts`, key from `MIXPANEL_KEY`). Event names are a
+  typed union (`AnalyticsEvent`) — add new ones there, never build a name at runtime. Full
+  inventory of what is tracked: `docs/analytics-tracking.md`.
 - **SVGs**: imported as components via `react-native-svg-transformer` (Metro is configured to treat `.svg` as source, not asset).
 
 ## Testing
