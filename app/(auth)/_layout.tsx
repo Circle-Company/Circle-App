@@ -32,27 +32,7 @@ export default function AuthLayout() {
                 }}
             />
             <Stack.Screen
-                name="sign-in"
-                options={{
-                    headerShown: false,
-                    presentation: "modal",
-                    animation: "slide_from_bottom",
-                    gestureEnabled: true,
-                    fullScreenGestureEnabled: true,
-                }}
-            />
-            <Stack.Screen
                 name="sign-up-username"
-                options={{
-                    headerShown: false,
-                    presentation: "modal",
-                    animation: "slide_from_bottom",
-                    gestureEnabled: true,
-                    fullScreenGestureEnabled: true,
-                }}
-            />
-            <Stack.Screen
-                name="sign-up-password"
                 options={{
                     headerShown: false,
                     presentation: "modal",

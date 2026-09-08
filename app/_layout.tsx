@@ -124,10 +124,6 @@ function RootLayoutNav() {
                 options={{ ...settingsHeader, headerTitle: t("Name") }}
             />
             <Stack.Screen
-                name="settings/password"
-                options={{ ...settingsHeader, headerTitle: t("Password") }}
-            />
-            <Stack.Screen
                 name="settings/personal-data"
                 options={{ ...settingsHeader, headerTitle: t("Personal Data") }}
             />

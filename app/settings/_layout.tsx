@@ -86,13 +86,6 @@ export default function SettingsLayout() {
                 }}
             />
             <Stack.Screen
-                name="password"
-                options={{
-                    headerTransparent: false,
-                    headerTitle: t("Password"),
-                }}
-            />
-            <Stack.Screen
                 name="personal-data"
                 options={{
                     headerTransparent: false,

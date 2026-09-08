@@ -1,13 +1,3 @@
-export type SignInProps = {
-    username: string
-    password: string
-}
-
-export type SignUpProps = {
-    username: string
-    password: string
-}
-
 export interface signWithAppleProps {
     authorizationCode: string
     identityToken: string

@@ -16,7 +16,7 @@ import { useRouter } from "expo-router"
 
 export default function UsernameScreen() {
     const isDarkMode = useColorScheme() === "dark"
-    const { signInputUsername, setErrorMessage, setSignInputPassword, setSignInputUsername } =
+    const { signInputUsername, setErrorMessage, setSignInputUsername } =
         React.useContext(AuthContext)
     const router = useRouter()
 
@@ -98,7 +98,6 @@ export default function UsernameScreen() {
 
     React.useEffect(() => {
         setSignInputUsername("")
-        setSignInputPassword("")
         setErrorMessage("")
     }, [])
 

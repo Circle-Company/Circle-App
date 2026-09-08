@@ -89,9 +89,7 @@ export const ROUTES = {
     // Auth routes
     AUTH: {
         INIT: "/(auth)/init",
-        SIGN_IN: "/(auth)/sign-in",
         SIGN_UP_USERNAME: "/(auth)/sign-up-username",
-        SIGN_UP_PASSWORD: "/(auth)/sign-up-password",
         SIGN_UP_AGREE: "/(auth)/sign-up-agree",
         PRIVACY_POLICY: "/(auth)/privacy-policy",
         TERMS_OF_SERVICE: "/(auth)/terms-of-service",
@@ -123,7 +121,6 @@ export const ROUTES = {
         DESCRIPTION: "/settings/description",
         FOLLOWINGS: "/settings/followings",
         NAME: "/settings/name",
-        PASSWORD: "/settings/password",
         PRIVACY_POLICY: "/settings/privacy-policy",
         TERMS_OF_SERVICE: "/settings/terms-of-service",
         COMMUNITY_GUIDELINES: "/settings/community-guidelines",
@@ -145,9 +142,7 @@ export const ROUTES = {
 export const LEGACY_ROUTE_MAP: Record<string, string> = {
     // Auth
     Init: ROUTES.AUTH.INIT,
-    "Auth-SignIn": ROUTES.AUTH.SIGN_IN,
     "Auth-SignUp-Username": ROUTES.AUTH.SIGN_UP_USERNAME,
-    "Auth-SignUp-Password": ROUTES.AUTH.SIGN_UP_PASSWORD,
     "Auth-SignUp-Agree": ROUTES.AUTH.SIGN_UP_AGREE,
     "Auth-Privacy-Policy": ROUTES.AUTH.PRIVACY_POLICY,
     "Auth-Terms-Of-Service": ROUTES.AUTH.TERMS_OF_SERVICE,
@@ -170,7 +165,6 @@ export const LEGACY_ROUTE_MAP: Record<string, string> = {
     "Settings-Description": ROUTES.SETTINGS.DESCRIPTION,
     "Settings-Followings": ROUTES.SETTINGS.FOLLOWINGS,
     "Settings-Name": ROUTES.SETTINGS.NAME,
-    "Settings-Password": ROUTES.SETTINGS.PASSWORD,
     "Settings-Privacy-Policy": ROUTES.SETTINGS.PRIVACY_POLICY,
     "Settings-Terms-Of-Service": ROUTES.SETTINGS.TERMS_OF_SERVICE,
     "Settings-Community-Guidelines": ROUTES.SETTINGS.COMMUNITY_GUIDELINES,
