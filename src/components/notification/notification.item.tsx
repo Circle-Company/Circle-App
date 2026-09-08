@@ -7,6 +7,10 @@ import fonts from "@/constants/fonts"
 import { NotificationType, type NotificationPayload } from "@/contexts/push.notification"
 import { NotificationBadge } from "./notification.badge"
 import { NotificationText } from "./notification.text"
+import {
+    NotificationMomentThumbnail,
+    getMomentThumbnailUrl,
+} from "./notification.moment.thumbnail"
 import { useRouter, usePathname } from "expo-router"
 import {
     GlassContainer,
@@ -31,6 +35,7 @@ export function NotificationItem({ item }: NotificationItemProps) {
     const { setUserId, setProfilePreview } = React.useContext(ProfileContext)
     const shouldUseGlass =
         Platform.OS === "ios" && isLiquidGlassAvailable() && isGlassEffectAPIAvailable()
+    const momentThumbnailUrl = getMomentThumbnailUrl(item)
     const actor = {
         id: String(item.actor?.id || ""),
         username: String(item.actor?.username || ""),
@@ -147,6 +152,9 @@ export function NotificationItem({ item }: NotificationItemProps) {
                                 </View>
                                 <NotificationText item={item} />
                             </View>
+                            {momentThumbnailUrl ? (
+                                <NotificationMomentThumbnail url={momentThumbnailUrl} />
+                            ) : null}
                         </Pressable>
                     </UserShow.Root>
                 </GlassView>
@@ -189,6 +197,9 @@ export function NotificationItem({ item }: NotificationItemProps) {
                         </View>
                         <NotificationText item={item} />
                     </View>
+                    {momentThumbnailUrl ? (
+                        <NotificationMomentThumbnail url={momentThumbnailUrl} />
+                    ) : null}
                 </UserShow.Root>
             </Pressable>
         )

@@ -60,6 +60,8 @@ export enum NotificationType {
     FriendRequestReceived = "FRIEND_REQUEST_RECEIVED",
     /** Seu convite foi aceito (inclui o auto-aceite recíproco). */
     FriendRequestAccepted = "FRIEND_REQUEST_ACCEPTED",
+    /** Alguém que você segue publicou um moment novo — traz a thumbnail. */
+    MomentPublished = "MOMENT_PUBLISHED",
 }
 
 export type NotificationPayload = {
@@ -83,6 +85,10 @@ export type NotificationPayload = {
     autoAccepted?: boolean
     /** Deep link do push: `friend_requests` abre a caixa de convites. */
     screen?: string
+    /** Só em `MOMENT_PUBLISHED`: o moment publicado e sua thumbnail. */
+    momentId?: string
+    momentThumbnailUrl?: string | null
+    momentTitle?: string | null
 }
 
 export type Notification = AccountNotification
@@ -423,6 +429,9 @@ export const PushNotificationProvider: React.FC<{ children: React.ReactNode }> =
                     type: rawData?.type ?? NotificationType.HexEntry,
                     createdAt: rawData?.createdAt ?? new Date().toISOString(),
                     readAt: null,
+                    momentId: rawData?.momentId ?? undefined,
+                    momentThumbnailUrl: rawData?.momentThumbnailUrl ?? null,
+                    momentTitle: rawData?.momentTitle ?? null,
                 }
 
                 toastRef.current.show({
