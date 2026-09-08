@@ -42,6 +42,7 @@ const ListMoments = () => {
         preloadNextVideo,
         fetch,
         setCommentEnabled,
+        viewersMomentId,
         cacheManager,
     } = React.useContext(FeedContext)
     const [centerIndex, setCenterIndex] = useState<number | null>(0)
@@ -148,7 +149,9 @@ const ListMoments = () => {
                     flex: 1,
                     paddingTop: topInset,
                 }}
-                scrollEnabled={enableScrollFeed}
+                // Com o painel de visualizadores aberto, deslizar para o lado
+                // deixaria o painel órfão sobre outro moment.
+                scrollEnabled={enableScrollFeed && !viewersMomentId}
                 // O input de comentário é filho desta lista. Com o padrão
                 // ("never"), o primeiro toque com o teclado aberto só fecha o
                 // teclado e é engolido — o botão de enviar nunca recebia o

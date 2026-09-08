@@ -425,5 +425,19 @@
     "Add a profile picture": "Adicione uma foto de perfil",
     "A photo helps people recognize you. You can change it later in settings.": "Uma foto ajuda as pessoas a reconhecerem você. Dá para trocar depois nas configurações.",
     "Choose a photo": "Escolher foto",
-    "Skip for now": "Pular por agora"
+    "Skip for now": "Pular por agora",
+    "Close": "Fechar",
+    "Viewers": "Visualizadores",
+    "views": "visualizações",
+    "Completed": "Completas",
+    "Avg. time": "Tempo médio",
+    "No more viewers": "Sem mais visualizadores",
+    "Unavailable user": "Usuário indisponível",
+    "No one has watched it yet": "Ninguém viu ainda",
+    "When someone watches this moment, they will show up here.": "Quando alguém assistir a este moment, aparece aqui.",
+    "This list is private": "Esta lista é privada",
+    "Only the author of a moment can see who watched it.": "Só o autor do moment pode ver quem assistiu.",
+    "Moment not found": "Moment não encontrado",
+    "It may have been deleted.": "Ele pode ter sido excluído.",
+    "Pull down to try again.": "Puxe para baixo para tentar de novo."
 }

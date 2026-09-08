@@ -5,11 +5,13 @@ import {
     Animated as RNAnimated,
     Dimensions,
     Platform,
+    Pressable,
     StyleSheet,
 } from "react-native"
 import { BlurView } from "expo-blur"
 import Animated, {
     useAnimatedStyle,
+    useDerivedValue,
     useSharedValue,
     withTiming,
     interpolate,
@@ -30,6 +32,15 @@ import { useKeyboard } from "@/lib/hooks/useKeyboard"
 import ZeroComments from "@/components/comment/components/comments-zero_comments"
 import { LinearGradient } from "expo-linear-gradient"
 import { ProfileDropDownMenuIOS } from "@/features/profile/profile.moments.dropdown.menu"
+import RenderViewersFeed from "@/features/moments/feed/render-viewers-feed"
+import {
+    useViewersPanel,
+    viewersMomentTransform,
+    VIEWERS_MOVE_UP,
+    VIEWERS_SCALE_SHRINK,
+    VIEWERS_SCROLL_MOVE_UP,
+    VIEWERS_SCROLL_SCALE_SHRINK,
+} from "@/features/moments/viewers/useViewersPanel"
 
 type renderMomentProps = {
     data: MomentProps
@@ -39,6 +50,14 @@ type renderMomentProps = {
     focusProgress?: any // Opcional: pode ser AnimatedInterpolation do React Native ou SharedValue do Reanimated
     scrollXShared?: SharedValue<number> // SharedValue do scrollX para interpolação
     itemIndex?: number // Índice do item para calcular focusProgress
+}
+
+// `transformOrigin` fica no estilo estático: é constante, e o worklet só devolve
+// o transform. Sem a origem à esquerda o bloco escaparia do canto do card.
+const userShowLayout = {
+    flexDirection: "row" as const,
+    alignItems: "center" as const,
+    transformOrigin: "left center",
 }
 
 const BASE_OPACITY_OFF = 0.42
@@ -58,6 +77,12 @@ export default function RenderMomentFeed({
     const isDarkMode = useColorScheme() === "dark"
     const { progress: keyboardProgress } = useKeyboard()
     const { commentEnabled } = React.useContext(FeedContext)
+    const {
+        shouldRender: viewersOpen,
+        openProgress: viewersProgress,
+        scrollY: viewersScrollY,
+        close: closeViewers,
+    } = useViewersPanel(data.id)
     const commentShared = useSharedValue(commentEnabled ? 1 : 0)
     const keyboardHeightAnim = React.useRef(new RNAnimated.Value(0)).current
     const [showFloatingInput, setShowFloatingInput] = React.useState(false)
@@ -184,18 +209,52 @@ export default function RenderMomentFeed({
         }
     }, [scrollXShared, itemIndex, isFocused, focusProgressValue])
 
+    // Um único cálculo de "quanto o card encolheu/subiu", derivado uma vez e
+    // lido por três estilos: o transform do card, a contra-escala do UserShow
+    // e o fade do Bottom.
+    const momentShrink = useDerivedValue(() => {
+        "worklet"
+        const focus = focusProgressValue.value
+        // Progresso ÚNICO: subida do teclado em modo comentário, só no focado.
+        const commentRise = commentShared.value * keyboardProgress.value * focus
+        // O painel de visualizadores dirige EXATAMENTE o mesmo movimento, por
+        // outro progresso — e o scroll da lista o estende além do estado
+        // aberto. Os dois modos nunca estão ativos ao mesmo tempo, então o
+        // maior dos dois `rise` é o que vale.
+        const viewers = viewersMomentTransform(viewersProgress.value, viewersScrollY.value, focus)
+        const rise = Math.max(commentRise, viewers.rise)
+        const MOVE_UP = VIEWERS_MOVE_UP // px de subida com o teclado cheio
+        const SCALE_SHRINK = VIEWERS_SCALE_SHRINK // encolhe até 0.62 com o teclado cheio
+        return {
+            rise,
+            scale: 1 - SCALE_SHRINK * rise - VIEWERS_SCROLL_SCALE_SHRINK * viewers.scrollRise,
+            translateY: -(MOVE_UP * rise + VIEWERS_SCROLL_MOVE_UP * viewers.scrollRise),
+        }
+    }, [])
+
     // Transform (escala + translateY) — no wrapper externo, para que o overlay
     // de blur também acompanhe o movimento/escala do momento.
     const momentTransformStyle = useAnimatedStyle(() => {
         "worklet"
-        const focus = focusProgressValue.value
-        // Progresso ÚNICO: subida do teclado em modo comentário, só no focado.
-        const rise = commentShared.value * keyboardProgress.value * focus
-        const MOVE_UP = 110 // px de subida com o teclado cheio
-        const SCALE_SHRINK = 0.38 // encolhe até 0.62 com o teclado cheio
+        const { scale, translateY } = momentShrink.value
         return {
-            transform: [{ translateY: -MOVE_UP * rise }, { scale: 1 - SCALE_SHRINK * rise }],
+            transform: [{ translateY }, { scaleX: scale }, { scaleY: scale }],
         }
+    }, [])
+
+    // O bloco do usuário não acompanha o encolhimento: a contra-escala desfaz
+    // exatamente o que o card aplicou, então ele fica do tamanho original.
+    // Origem à esquerda para continuar colado no canto do card.
+    const userShowCounterScaleStyle = useAnimatedStyle(() => {
+        "worklet"
+        const inverse = 1 / momentShrink.value.scale
+        return { transform: [{ scaleX: inverse }, { scaleY: inverse }] }
+    }, [])
+
+    // Tudo dentro do Bottom (like, viewers) some junto com o encolhimento.
+    const momentBottomFadeStyle = useAnimatedStyle(() => {
+        "worklet"
+        return { opacity: 1 - momentShrink.value.rise }
     }, [])
 
     // Opacidade (dimming do desfocado) — na camada INTERNA (só o conteúdo do vídeo).
@@ -208,7 +267,10 @@ export default function RenderMomentFeed({
         const focus = focusProgressValue.value
         // Diferente do `rise`, este progresso NÃO é multiplicado pelo foco:
         // é justamente nos itens não focados que ele precisa agir.
-        const commentProgress = commentShared.value * keyboardProgress.value
+        const commentProgress = Math.max(
+            commentShared.value * keyboardProgress.value,
+            viewersProgress.value,
+        )
         const base = dimmedOpacity + (1 - dimmedOpacity) * focus
         // `(1 - focus)` isola o efeito nos não focados: no focado o fator é 1.
         return { opacity: base * (1 - commentProgress * (1 - focus)) }
@@ -220,7 +282,10 @@ export default function RenderMomentFeed({
     // lugar do momento que acabou de desaparecer.
     const momentBlurStyle = useAnimatedStyle(() => {
         "worklet"
-        const commentProgress = commentShared.value * keyboardProgress.value
+        const commentProgress = Math.max(
+            commentShared.value * keyboardProgress.value,
+            viewersProgress.value,
+        )
         return { opacity: (1 - focusProgressValue.value) * (1 - commentProgress) }
     }, [])
 
@@ -242,14 +307,18 @@ export default function RenderMomentFeed({
                         >
                             <Moment.Root.Top>
                                 <Moment.Root.TopLeft>
-                                    <UserShow.Root data={data.user}>
-                                        <UserShow.ProfilePicture
-                                            pictureDimensions={{ width: 30, height: 30 }}
-                                        />
-                                        <UserShow.Username
-                                            fontFamily={fonts.family["Bold-Italic"]}
-                                        />
-                                    </UserShow.Root>
+                                    <Animated.View
+                                        style={[userShowLayout, userShowCounterScaleStyle]}
+                                    >
+                                        <UserShow.Root data={data.user}>
+                                            <UserShow.ProfilePicture
+                                                pictureDimensions={{ width: 30, height: 30 }}
+                                            />
+                                            <UserShow.Username
+                                                fontFamily={fonts.family["Bold-Italic"]}
+                                            />
+                                        </UserShow.Root>
+                                    </Animated.View>
                                 </Moment.Root.TopLeft>
                                 <Moment.Root.TopRight>
                                     <Moment.AudioControl size={32} />
@@ -258,17 +327,30 @@ export default function RenderMomentFeed({
 
                             <Moment.Root.Center></Moment.Root.Center>
                             <Moment.Root.Bottom>
-                                <View
-                                    style={{
-                                        marginBottom: sizes.margins["2sm"],
-                                        width: "100%",
-                                        zIndex: 1,
-                                    }}
+                                <Animated.View
+                                    pointerEvents={viewersOpen ? "none" : "auto"}
+                                    style={[
+                                        {
+                                            marginBottom: sizes.margins["2sm"],
+                                            width: "100%",
+                                            zIndex: 1,
+                                        },
+                                        momentBottomFadeStyle,
+                                    ]}
                                 >
-                                    <View style={{ height: 46 }}>
+                                    <View
+                                        style={{
+                                            height: 46,
+                                            flexDirection: "row",
+                                            alignItems: "center",
+                                            gap: sizes.margins["2sm"],
+                                        }}
+                                    >
                                         <Moment.LikeButtonIOS isLiked={false} />
+                                        {/* Só renderiza algo quando o moment é da própria conta. */}
+                                        <Moment.ViewersButtonIOS />
                                     </View>
-                                </View>
+                                </Animated.View>
                             </Moment.Root.Bottom>
                             <LinearGradient
                                 colors={["rgba(0, 0, 0, 0.00)", "rgba(0, 0, 0, 0.4)"]}
@@ -287,6 +369,17 @@ export default function RenderMomentFeed({
                         </Moment.Container>
                     </ProfileDropDownMenuIOS>
                 </Animated.View>
+
+                {/* Com o painel aberto, tocar no moment é o que fecha — por isso
+                    a camada cobre o card inteiro e só existe nesse estado. */}
+                {viewersOpen ? (
+                    <Pressable
+                        onPress={closeViewers}
+                        accessibilityRole="button"
+                        accessibilityLabel="Close viewers"
+                        style={StyleSheet.absoluteFill}
+                    />
+                ) : null}
 
                 {/* Blur nos momentos desfocados — fora do dim para não enfraquecer */}
                 <Animated.View
@@ -308,16 +401,26 @@ export default function RenderMomentFeed({
                 </Animated.View>
             </Animated.View>
 
-            {/* Comentários SEM escala, apenas opacidade (desaparecem quando input ativo) */}
-            <Animated.View style={{ marginTop: 3 }}>
-                {data.topComment || data.metrics.totalComments > 1 ? (
-                    <RenderCommentFeed moment={data} focused={isFocused} />
-                ) : (
-                    <View style={{ alignSelf: "center", marginTop: sizes.margins["2sm"] }}>
-                        <ZeroComments isAccount={false} moment={data} />
-                    </View>
-                )}
-            </Animated.View>
+            {/* Visualizadores ocupam o lugar dos comentários enquanto abertos */}
+            {viewersOpen ? (
+                <RenderViewersFeed
+                    momentId={data.id}
+                    focused={isFocused}
+                    openProgress={viewersProgress}
+                    scrollY={viewersScrollY}
+                />
+            ) : (
+                /* Comentários SEM escala, apenas opacidade (desaparecem quando input ativo) */
+                <Animated.View style={{ marginTop: 3 }}>
+                    {data.topComment || data.metrics.totalComments > 1 ? (
+                        <RenderCommentFeed moment={data} focused={isFocused} />
+                    ) : (
+                        <View style={{ alignSelf: "center", marginTop: sizes.margins["2sm"] }}>
+                            <ZeroComments isAccount={false} moment={data} />
+                        </View>
+                    )}
+                </Animated.View>
+            )}
 
             {/* Âncora da base do item: referência para alinhar o input ao teclado */}
             <View ref={bottomAnchorRef} collapsable={false} pointerEvents="none" />

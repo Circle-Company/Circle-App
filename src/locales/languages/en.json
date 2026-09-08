@@ -424,5 +424,19 @@
     "Add a profile picture": "Add a profile picture",
     "A photo helps people recognize you. You can change it later in settings.": "A photo helps people recognize you. You can change it later in settings.",
     "Choose a photo": "Choose a photo",
-    "Skip for now": "Skip for now"
+    "Skip for now": "Skip for now",
+    "Close": "Close",
+    "Viewers": "Viewers",
+    "views": "views",
+    "Completed": "Completed",
+    "Avg. time": "Avg. time",
+    "No more viewers": "No more viewers",
+    "Unavailable user": "Unavailable user",
+    "No one has watched it yet": "No one has watched it yet",
+    "When someone watches this moment, they will show up here.": "When someone watches this moment, they will show up here.",
+    "This list is private": "This list is private",
+    "Only the author of a moment can see who watched it.": "Only the author of a moment can see who watched it.",
+    "Moment not found": "Moment not found",
+    "It may have been deleted.": "It may have been deleted.",
+    "Pull down to try again.": "Pull down to try again."
 }
