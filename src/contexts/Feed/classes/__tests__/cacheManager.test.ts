@@ -3,24 +3,16 @@ import { beforeEach, describe, expect, it, vi } from "vitest"
 // Importar após os mocks
 import { CacheManager } from "../cacheManager"
 
-// Mock do React Native FS antes de importar qualquer coisa
-vi.mock("react-native-fs", () => ({
-    default: {
-        CachesDirectoryPath: "/mock/cache/path",
-        exists: vi.fn().mockResolvedValue(true),
-        mkdir: vi.fn().mockResolvedValue(undefined),
-        unlink: vi.fn().mockResolvedValue(undefined),
-        downloadFile: vi.fn().mockReturnValue({
-            promise: Promise.resolve(),
-        }),
-    },
-    CachesDirectoryPath: "/mock/cache/path",
-    exists: vi.fn().mockResolvedValue(true),
-    mkdir: vi.fn().mockResolvedValue(undefined),
-    unlink: vi.fn().mockResolvedValue(undefined),
-    downloadFile: vi.fn().mockReturnValue({
-        promise: Promise.resolve(),
-    }),
+// O CacheManager usa `expo-file-system/legacy` (o mock antigo era de
+// `react-native-fs`, que o código não usa mais — por isso o módulo real era
+// carregado e explodia em `expo-modules-core` sem o runtime nativo).
+vi.mock("expo-file-system/legacy", () => ({
+    cacheDirectory: "file:///mock/cache/",
+    getInfoAsync: vi.fn().mockResolvedValue({ exists: true, size: 1024 }),
+    makeDirectoryAsync: vi.fn().mockResolvedValue(undefined),
+    readDirectoryAsync: vi.fn().mockResolvedValue([]),
+    deleteAsync: vi.fn().mockResolvedValue(undefined),
+    downloadAsync: vi.fn().mockResolvedValue({ uri: "file:///mock/cache/videos/1.mp4" }),
 }))
 
 describe("CacheManager", () => {

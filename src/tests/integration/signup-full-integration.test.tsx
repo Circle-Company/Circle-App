@@ -1,5 +1,13 @@
 import { beforeEach, describe, expect, it, vi } from "vitest"
 
+// Os módulos abaixo são importados (e não `require`d dentro do `beforeEach`):
+// `vi.mock` intercepta apenas o grafo de imports ESM. Um `require()` em runtime
+// escapa da fábrica de mock e carrega o pacote real — no caso do
+// `react-native-device-info`, código Flow que o esbuild não parseia.
+import DeviceInfo from "react-native-device-info"
+import api from "../../api"
+import { storage } from "../../store"
+
 // Mock das dependências globais primeiro
 vi.mock("react-native-device-info", () => ({
     default: {
@@ -136,11 +144,8 @@ describe("Testes de Integração Completos - Criação de Conta", () => {
                 disableAutoplay: false,
                 disableHaptics: false,
                 disableTranslation: false,
+                disableContentWarning: false,
                 muteAudio: false,
-            },
-                disableAddToMemory: false,
-                disableFollowUser: false,
-                disableViewUser: false,
             },
         },
         history: {
@@ -152,9 +157,9 @@ describe("Testes de Integração Completos - Criação de Conta", () => {
         vi.clearAllMocks()
 
         // Configurar mocks
-        mockDeviceInfo = vi.mocked(require("react-native-device-info"))
-        mockApi = require("../../api").default
-        mockStorage = require("../../store").storage
+        mockDeviceInfo = vi.mocked(DeviceInfo)
+        mockApi = vi.mocked(api)
+        mockStorage = vi.mocked(storage)
 
         // Configurar comportamento padrão
         mockDeviceInfo.getUniqueId.mockResolvedValue("test-device-unique-id")

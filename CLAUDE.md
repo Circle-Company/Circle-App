@@ -73,6 +73,13 @@ React Query mutation hooks, one file per action (`moment.like.ts`, `user.follow.
 
 Vitest with `happy-dom` environment (not jest, despite some eslint jest config). Config in `vitest.config.ts`: globals on, `singleFork` pool, setup in `src/test-setup.ts`, `__mocks__/` for native module mocks. Tests match `src/**/*.{test,spec}.{ts,tsx,...}`; `android/` and `ios/` are excluded. `__DEV__` is defined globally.
 
+**No component rendering.** `@testing-library/react-native` does **not** work under Vitest here: it is a CJS package, so Node's native loader resolves its `require("react-native")` and parses React Native's Flow-typed source before Vite can transform it — `SyntaxError: Unexpected token 'typeof'`. Neither `server.deps.inline` nor a Babel transform plugin reaches it. Cover logic (contexts, classes, helpers, hooks) instead; rendering a component tree requires migrating those specs to Jest + `jest-expo`.
+
+Two Vitest-specific gotchas, both already handled in `src/test-setup.ts` / `vitest.config.ts`:
+- `@env` needs a **resolve alias** (`__mocks__/env.ts`), not just `vi.mock` — Vite must resolve the module at transform time, before mocks apply. Alias order matters: `@` matches by prefix and would swallow `@env`.
+- Use ESM `import` for anything you `vi.mock`. A runtime `require()` bypasses the mock factory and loads the real package (which for RN-adjacent packages means untranspiled Flow).
+- `globalThis.expo` is shimmed so `expo-modules-core` doesn't throw on import.
+
 ## Config & environment
 
 - `app.config.js` — dynamic Expo config. App `version`/`PLATFORM` constants live at the top of this file; bump `VERSION` there for releases. Defines plugins (notifications, fonts, splash, build-properties), bundle IDs (`circlellc.circleapp` / `com.circlecompany.circleapp`), and the `jsEngine: "jsc"`.
