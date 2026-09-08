@@ -31,9 +31,15 @@ export default defineConfig({
         },
     },
     resolve: {
-        alias: {
-            "@": path.resolve(__dirname, "./src"),
-        },
+        // Forma de array porque a ordem importa: aliases string casam por
+        // prefixo, então `@` sozinho engoliria `@env` e o resolveria como
+        // `src/env`. O mais específico precisa vir primeiro.
+        alias: [
+            { find: /^@env$/, replacement: path.resolve(__dirname, "./__mocks__/env.ts") },
+            { find: /^@\//, replacement: path.resolve(__dirname, "./src") + "/" },
+            // `#/*` também aponta para `src/*` (ver tsconfig e babel.config).
+            { find: /^#\//, replacement: path.resolve(__dirname, "./src") + "/" },
+        ],
     },
     define: {
         __DEV__: true,
