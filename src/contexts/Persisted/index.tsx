@@ -186,11 +186,33 @@ export function Provider({ children }: PersistedProviderProps) {
             // Normaliza o payload de autenticação (quando for o formato bruto)
             const raw = payload && (payload as any).session ? (payload as any).session : null
 
+            // Os tokens já apareceram sob nomes diferentes conforme a rota
+            // (signin, signup, apple) e podem vir no nível de cima em vez de
+            // dentro de `session`. Ler só `raw.token` fazia o login "passar"
+            // sem gravar nada e o app entrava logado sem credencial.
+            const pickToken = (...candidates: unknown[]) =>
+                candidates.find((c): c is string => typeof c === "string" && c.length > 0) ?? ""
+
+            const accessToken = pickToken(
+                raw?.token,
+                raw?.accessToken,
+                raw?.access_token,
+                payload?.token,
+                payload?.accessToken,
+            )
+
+            const refreshToken = pickToken(
+                raw?.refreshToken,
+                raw?.refresh_token,
+                payload?.refreshToken,
+                payload?.refresh_token,
+            )
+
             const normalized = raw
                 ? {
                       user: raw.user ?? {},
-                      token: raw.token ?? "",
-                      refreshToken: raw.refreshToken,
+                      token: accessToken,
+                      refreshToken: refreshToken || undefined,
                       status: raw.status ?? {},
                       preferences: {
                           app: {

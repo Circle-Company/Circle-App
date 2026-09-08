@@ -2,7 +2,7 @@ import React, { useState } from "react"
 import { AppState } from "react-native"
 import DeviceInfo from "react-native-device-info"
 
-import { apiRoutes, beginAuthGracePeriod } from "@/api"
+import { apiRoutes, beginAuthGracePeriod, onSessionExpired, resetSessionExpiredLatch } from "@/api"
 import { storage, storageKeys } from "@/store"
 import { useUserStore } from "@/contexts/Persisted/persist.user"
 import { useAccountStore } from "@/contexts/Persisted/persist.account"
@@ -89,6 +89,37 @@ export function Provider({ children }: AuthProviderProps) {
             injectRef.current = injectAuthSession
         }, [injectAuthSession])
         return null
+    }
+
+    /**
+     * Persiste a sessão e **confirma** que o token chegou ao MMKV.
+     *
+     * Sem essa confirmação, um payload de login em formato inesperado passava
+     * batido: `injectAuthSession` não achava `token`/`refreshToken`, gravava
+     * nada, e o app navegava para a área autenticada mesmo assim. Dali em
+     * diante todo request saía sem header, voltava 401, o refresh não tinha o
+     * que renovar, e a tela ficava preta indefinidamente.
+     */
+    const persistSession = async (sessionPayload: any) => {
+        await injectRef.current?.({ session: sessionPayload })
+
+        const keys = storageKeys().account.jwt
+        if (!storage.getString(keys.token)) {
+            // Loga as chaves (não os valores) para identificar o formato real
+            // devolvido pelo backend sem vazar credencial no console.
+            console.error(
+                "❌ Login não persistiu o token",
+                JSON.stringify({ sessionKeys: Object.keys(sessionPayload ?? {}) }),
+            )
+            throw new Error("Sessão inválida: o servidor não retornou o token de acesso")
+        }
+
+        if (!storage.getString(keys.refreshToken)) {
+            console.warn("⚠️ Login sem refreshToken — a sessão não poderá ser renovada")
+        }
+
+        // Nova sessão válida: rearma a notificação de expiração.
+        resetSessionExpiredLatch()
     }
 
     const detectTimezoneHeader = (): string => {
@@ -209,7 +240,7 @@ export function Provider({ children }: AuthProviderProps) {
 
             const sessionPayload = response.data.session
 
-            await injectRef.current?.({ session: sessionPayload })
+            await persistSession(sessionPayload)
             storage.set("@circle:sessionId", sessionPayload.user?.id ?? "")
             return true
         } catch (error: any) {
@@ -289,7 +320,7 @@ export function Provider({ children }: AuthProviderProps) {
             }
 
             const sessionPayload = response.data.session
-            await injectRef.current?.({ session: sessionPayload })
+            await persistSession(sessionPayload)
             storage.set("@circle:sessionId", sessionPayload.user?.id ?? "")
             trackLogin(String(sessionPayload.user?.username || usernameForSignIn || ""))
             setRedirectTo("APP")
@@ -341,7 +372,7 @@ export function Provider({ children }: AuthProviderProps) {
 
             const sessionPayload = response.data.session
 
-            await injectRef.current?.({ session: sessionPayload })
+            await persistSession(sessionPayload)
             // Persist sessionId for compatibility with legacy checks
             storage.set("@circle:sessionId", sessionPayload.user?.id ?? "")
             trackLogin(String(sessionPayload.user?.username || signInputUsername.trim() || ""))
@@ -401,7 +432,7 @@ export function Provider({ children }: AuthProviderProps) {
 
             const sessionPayload = response.data.session
 
-            await injectRef.current?.({ session: sessionPayload })
+            await persistSession(sessionPayload)
             // Persist sessionId for compatibility with legacy checks
             storage.set("@circle:sessionId", sessionPayload.user?.id ?? "")
             setRedirectTo("APP")
@@ -461,6 +492,20 @@ export function Provider({ children }: AuthProviderProps) {
             setRedirectTo("AUTH")
         }
     }
+
+    // A camada de axios não alcança hooks nem router: quando ela detecta que a
+    // sessão morreu (401 sem refresh possível), avisa por aqui. Sem esta ponte
+    // o app continuava montado numa rota autenticada sem token — todo request
+    // falhava e nenhuma tela renderizava.
+    const signOutRef = React.useRef(signOut)
+    signOutRef.current = signOut
+
+    React.useEffect(() => {
+        return onSessionExpired(() => {
+            console.warn("🚪 Sessão expirada — deslogando")
+            signOutRef.current()
+        })
+    }, [])
 
     const checkIsSigned = (): boolean => {
         try {
