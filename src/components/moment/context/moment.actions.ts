@@ -22,7 +22,12 @@ export interface MomentActionsState extends actionsProps {
     get: () => actionsProps
 }
 
-export function useActions(momentId?: string): MomentActionsState {
+/**
+ * @param momentId Id do momento sobre o qual as interações são registradas.
+ * @param ownerId  Id do **dono** do momento. Só o `EXCLUDE` o usa, e é o que permite negar
+ *                 a exclusão de um momento de outra pessoa — ver a guarda no `switch`.
+ */
+export function useActions(momentId?: string, ownerId?: string): MomentActionsState {
     const { session } = React.useContext(PersistedContext)
 
     // Estados para interações
@@ -93,25 +98,35 @@ export function useActions(momentId?: string): MomentActionsState {
                     }
                     case "EXCLUDE": {
                         /*
-                         * ⚠️ Esta guarda compara o id do MOMENT com o id do USUÁRIO — dois
-                         * Snowflakes de coisas diferentes, que nunca vão ser iguais. Ou seja,
-                         * o `exclude` abaixo é inalcançável.
+                         * Só o dono apaga o próprio momento.
                          *
-                         * Só não causa dano porque nada chama `registerInteraction("EXCLUDE")`:
-                         * quem apaga um momento hoje é `apiRoutes.moment.author.exclude`,
-                         * chamado direto em `app/(tabs)/you/index.tsx`.
+                         * A guarda anterior comparava `momentId` com `session.account.userId`
+                         * — o id do MOMENTO com o id do USUÁRIO, dois Snowflakes de coisas
+                         * diferentes que nunca são iguais. O efeito era o `exclude` ficar
+                         * inalcançável: parecia uma checagem de permissão e era, na prática,
+                         * um `return` disfarçado.
                          *
-                         * A guarda correta seria comparar o **dono do momento** com o usuário
-                         * logado, mas `useActions(momentId)` não recebe o dono — só o id do
-                         * momento. Corrigir de verdade exige passar essa informação para cá, o
-                         * que é decisão de quem for reativar o fluxo. O `===` aqui não muda
-                         * nada: com `==` a condição já era sempre falsa.
+                         * O dono agora chega por parâmetro (`ownerId`), vindo de
+                         * `data.user.id` no `MomentProvider`. Sem ele a exclusão é **negada**:
+                         * numa ação destrutiva o default seguro é recusar, não presumir posse.
+                         *
+                         * `String()` dos dois lados porque o id às vezes chega como número do
+                         * backend, e aí `===` puro reprovaria o próprio dono.
                          */
-                        if (String(momentId) === String(session.account.userId)) {
-                            await apiRoutes.moment.author.exclude({
-                                ...baseParams,
-                            })
+                        const isOwner =
+                            !!ownerId && String(ownerId) === String(session.account.userId)
+
+                        if (!isOwner) {
+                            console.warn(
+                                "EXCLUDE negado: o momento não pertence ao usuário logado",
+                                JSON.stringify({ momentId, hasOwnerId: !!ownerId }),
+                            )
+                            return false
                         }
+
+                        await apiRoutes.moment.author.exclude({
+                            ...baseParams,
+                        })
                         break
                     }
                     default: {
@@ -132,7 +147,7 @@ export function useActions(momentId?: string): MomentActionsState {
                 return false
             }
         },
-        [momentId, session.account.userId],
+        [momentId, ownerId, session.account.userId],
     )
 
     function get(): actionsProps {
