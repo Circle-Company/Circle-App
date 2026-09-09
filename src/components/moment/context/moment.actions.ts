@@ -36,6 +36,17 @@ export function useActions(momentId?: string, ownerId?: string): MomentActionsSt
     const [comment, setComment] = React.useState<boolean>(false)
     const [initialLikedState, setInitialLikedState] = React.useState<boolean>(false)
 
+    /*
+     * Interações de like em voo, por momento.
+     *
+     * Um toque duplo antes de a primeira resposta voltar disparava **dois** POST do mesmo
+     * like: `like` só vira `true` dentro do `.then()`, então a segunda chamada ainda
+     * encontrava a guarda `!like` aberta. O segundo POST é recusado — o like já existe —
+     * e, como o botão trata a recusa como falha, ele revertia o coração de um like que na
+     * verdade tinha sido registrado.
+     */
+    const inFlightRef = React.useRef<Set<string>>(new Set())
+
     // Função para enviar interação para o servidor
     const registerInteraction = React.useCallback(
         async <T extends InteractionType>(interactionType: T, data?: InteractionPayload<T>) => {
@@ -51,17 +62,34 @@ export function useActions(momentId?: string, ownerId?: string): MomentActionsSt
 
                 switch (interactionType) {
                     case "LIKE": {
-                        if (!like && initialLikedState === false)
-                            await apiRoutes.moment.actions.like(baseParams).then(() => {
+                        if (!like && initialLikedState === false) {
+                            const key = `LIKE:${momentId}`
+                            // Já há um POST desta curtida em voo: o estado final pretendido
+                            // é o mesmo, então isto é sucesso — devolver `false` faria o
+                            // botão desfazer o like que está sendo enviado.
+                            if (inFlightRef.current.has(key)) return true
+                            inFlightRef.current.add(key)
+                            try {
+                                await apiRoutes.moment.actions.like(baseParams)
                                 setLike(true)
-                            })
+                            } finally {
+                                inFlightRef.current.delete(key)
+                            }
+                        }
                         break
                     }
                     case "UNLIKE": {
-                        if (like)
-                            await apiRoutes.moment.actions.unlike(baseParams).then(() => {
+                        if (like) {
+                            const key = `UNLIKE:${momentId}`
+                            if (inFlightRef.current.has(key)) return true
+                            inFlightRef.current.add(key)
+                            try {
+                                await apiRoutes.moment.actions.unlike(baseParams)
                                 setLike(false)
-                            })
+                            } finally {
+                                inFlightRef.current.delete(key)
+                            }
+                        }
                         break
                     }
                     case "WATCH": {
@@ -136,9 +164,30 @@ export function useActions(momentId?: string, ownerId?: string): MomentActionsSt
                 }
                 return true
             } catch (error: any) {
-                const errorMessage =
-                    error.response?.data?.message || error.message || "Erro desconhecido"
-                console.error(`Erro ao enviar interação ${interactionType}:`, errorMessage)
+                /*
+                 * O corpo da resposta entra no log, e não só `data.message`.
+                 *
+                 * Um 400 do backend traz o motivo em campos que variam conforme a camada que
+                 * recusou (`message`, `error`, `code`, `details`, erro de validação em
+                 * lista). Lendo só `message`, tudo isso caía no texto genérico do axios —
+                 * "Request failed with status code 400" —, que não diz o que foi recusado e
+                 * torna a falha indiagnosticável a partir do log do device.
+                 */
+                let body = ""
+                try {
+                    body = JSON.stringify(error?.response?.data) ?? ""
+                } catch {
+                    body = "[unserializable]"
+                }
+                console.error(
+                    `Erro ao enviar interação ${interactionType}:`,
+                    JSON.stringify({
+                        status: error?.response?.status,
+                        momentId,
+                        message: error?.response?.data?.message || error?.message,
+                        body: body.slice(0, 500),
+                    }),
+                )
 
                 // Reverter estado em caso de erro para like/unlike
                 if (interactionType === "LIKE" || interactionType === "UNLIKE") {

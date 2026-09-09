@@ -40,7 +40,8 @@ export default function TabsLayout() {
     useProfilePictureOnboarding()
     const { unreadCount, inboxVisited } = usePushNotifications()
     const hideTabBar =
-        /^\/(you|moment)\/[^/]+/.test(pathname ?? "") ||
+        // `chat/[cid]` entra aqui: a conversa troca a tab bar pelo campo de escrita.
+        /^\/(you|moment|chat)\/[^/]+/.test(pathname ?? "") ||
         /^\/(radar|popular|inbox|settings)(\/|$)/.test(pathname ?? "")
 
     // O botão de notificações vive no header da câmera. Ao sair dessa aba o
@@ -85,6 +86,16 @@ export default function TabsLayout() {
                         {unreadCount > 99 ? "99+" : unreadCount.toString()}
                     </NativeTabs.Trigger.Badge>
                 )}
+            </NativeTabs.Trigger>
+
+            <NativeTabs.Trigger name="chat">
+                <NativeTabs.Trigger.Icon
+                    sf={{
+                        default: "message",
+                        selected: "message.fill",
+                    }}
+                />
+                <NativeTabs.Trigger.Label hidden />
             </NativeTabs.Trigger>
 
             <NativeTabs.Trigger name="you">
