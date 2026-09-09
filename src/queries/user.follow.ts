@@ -5,7 +5,6 @@ import { trackUserAction } from "@/lib/trackEvent"
 type useFollowMutationProps = {
     userId: string
     followedUserId: string
-    authorizationToken: string
 }
 
 export function useFollowMutation({ followedUserId, userId }: useFollowMutationProps) {

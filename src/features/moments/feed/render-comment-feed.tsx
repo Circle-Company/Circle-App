@@ -1,5 +1,5 @@
-import { Animated, Text, TextStyle, ViewStyle, useColorScheme } from "react-native"
-import ColorTheme, { colors } from "@/constants/colors"
+import { Animated, Text, TextStyle, ViewStyle, View } from "react-native"
+import ColorTheme from "@/constants/colors"
 
 import AddIcon from "@/assets/icons/svgs/plus_circle-outline.svg"
 import BottomSheetContext from "@/contexts/bottomSheet"
@@ -18,8 +18,6 @@ import sizes from "@/constants/sizes"
 import { textLib } from "@/circle.text.library"
 import { isIOS } from "@/lib/platform/detection"
 import { SwiftBottomSheet } from "@/components/ios/ios.bottom.sheet"
-import Input from "@/components/comment/components/comments-input"
-import { View } from "react-native"
 
 type renderCommentFeedProps = {
     moment: MomentProps

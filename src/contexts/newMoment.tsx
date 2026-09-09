@@ -1,11 +1,5 @@
-import UploadIcon from "@/assets/icons/svgs/arrow_up.svg"
-import { useNavigation } from "expo-router"
+import { router } from "expo-router"
 import React from "react"
-import { useToast } from "./Toast"
-import { colors } from "../constants/colors"
-import api from "@/api"
-import PersistedContext from "./Persisted"
-import LanguageContext from "./language"
 
 type NewMomentProviderProps = {
     children: React.ReactNode
@@ -22,85 +16,67 @@ export type Video = {
     type?: string
 }
 
+/**
+ * O `contextValue` era tipado como `any`, e isso escondia duas divergências entre o
+ * contrato e o que o provider entrega:
+ *
+ * - `requestPermission` estava declarado, **nunca implementado e nunca consumido**. Um
+ *   membro fantasma é pior que um ausente: quem confiasse nele receberia `undefined` e
+ *   quebraria ao chamar. Removido.
+ * - `selectedVideo` é entregue mas não estava no tipo, então ninguém o via daqui.
+ *
+ * `selectedVideo` é opcional porque o estado nasce vazio — só existe depois da gravação.
+ */
 export type NewMomentContextsData = {
     uploadMoment: () => Promise<void>
-    description: string
-    setSelectedVideo: React.Dispatch<React.SetStateAction<Video>>
-    setDescription: React.Dispatch<React.SetStateAction<string>>
-    requestPermission: () => Promise<boolean>
+    selectedVideo: Video | undefined
+    setSelectedVideo: React.Dispatch<React.SetStateAction<Video | undefined>>
     endSession: () => void
 }
 
 const NewMomentContext = React.createContext<NewMomentContextsData>({} as NewMomentContextsData)
 
 export function Provider({ children }: NewMomentProviderProps) {
-    const { session } = React.useContext(PersistedContext)
-    const { t } = React.useContext(LanguageContext)
     const [selectedVideo, setSelectedVideo] = React.useState<Video>()
-    const [description, setDescription] = React.useState<string>("")
-    const [createdMoment, setCreatedMoment] = React.useState<any>({})
-    const navigation = useNavigation()
-    const toast = useToast()
 
-    async function uploadMoment() {
-        try {
-            const videoBase64 = await RNFS.readFile(selectedVideo.uri, "base64")
-            await api
-                .post(
-                    "/moment/create",
-                    {
-                        user_id: session.user.id,
-                        moment: {
-                            description: description ? description : null,
-                            midia: {
-                                content_type: "VIDEO",
-                                base64: videoBase64,
-                            },
-                            metadata: {
-                                duration: selectedVideo.duration,
-                                file_size: selectedVideo.fileSize,
-                                file_type: selectedVideo.type,
-                            },
-                        },
-                    },
-                    { headers: { Authorization: session.account.jwtToken } },
-                )
-                .then(function (response) {
-                    setCreatedMoment(response.data)
-                    toast.success(t("Momento Criado"), {
-                        icon: (
-                            <UploadIcon
-                                fill={colors.green.green_05.toString()}
-                                width={15}
-                                height={15}
-                            />
-                        ),
-                    })
-                    setDescription("")
-                    setSelectedVideo(undefined)
-                })
-                .catch(function (error) {
-                    console.log(error)
-                })
-        } catch (error) {
-            console.log("Erro ao fazer upload do vídeo:", error)
-        }
+    /**
+     * ⚠️ **Não implementada, e nunca chamada.**
+     *
+     * O corpo original lia o vídeo com `RNFS.readFile` e fazia `POST /moment/create`. Só que
+     * `RNFS` é um identificador indefinido — `react-native-fs` não está no `package.json` —
+     * então a primeira linha lançava `ReferenceError` em qualquer execução. E nenhuma tela
+     * consome `uploadMoment`: quem publica um momento hoje é `modules/camera`
+     * (`hooks/shareMoment.ts`), por outro endpoint.
+     *
+     * Não portei para `expo-file-system` (que **está** instalado) de propósito: seria
+     * inventar comportamento a partir de código que nunca rodou, e a API mudou no SDK 56. A
+     * decisão — portar ou apagar o fluxo — é de produto, não de tipo. O que mudou aqui é só
+     * a honestidade da falha: em vez de um `ReferenceError` obscuro, uma mensagem que diz o
+     * que falta e para onde ir. O `POST` morto saiu junto; está no histórico do git.
+     */
+    async function uploadMoment(): Promise<void> {
+        throw new Error(
+            "uploadMoment não está implementado: dependia de react-native-fs, que não está " +
+                "instalado. Para publicar um momento, use o fluxo da câmera (modules/camera).",
+        )
     }
 
     function endSession() {
-        navigation.navigate("BottomTab", { screen: "Home" })
-        setDescription("")
+        // "BottomTab"/"Home" eram nomes de uma navegação que este app não usa mais; a rota
+        // real do expo-router é a aba de momentos.
+        router.replace("/(tabs)/moments")
         setSelectedVideo(undefined)
     }
 
-    const contextValue: any = {
-        description,
-        selectedVideo,
-        uploadMoment,
-        setSelectedVideo,
-        setDescription,
-        endSession,
-    }
+    const contextValue = React.useMemo(
+        () => ({
+            selectedVideo,
+            uploadMoment,
+            setSelectedVideo,
+            endSession,
+        }),
+        [selectedVideo],
+    )
 
     return <NewMomentContext.Provider value={contextValue}>{children}</NewMomentContext.Provider>
 }

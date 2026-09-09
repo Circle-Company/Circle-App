@@ -3,12 +3,10 @@ import { colors } from "@/constants/colors"
 import fonts from "@/constants/fonts"
 import sizes from "@/constants/sizes"
 import LanguageContext from "@/contexts/language"
-import { useRouter } from "expo-router"
 import React from "react"
 import { TextStyle, ViewStyle, View, Text } from "react-native"
 
 export default function ContentScreen() {
-    const router = useRouter()
     const { t } = React.useContext(LanguageContext)
 
     const title: TextStyle = {

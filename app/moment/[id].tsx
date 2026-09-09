@@ -1,19 +1,21 @@
 import React, { useEffect, useRef } from "react"
-import { BackHandler } from "react-native"
-import { Link, useLocalSearchParams, useRouter } from "expo-router"
-import { useNavigation } from "expo-router"
+import { BackHandler, StyleSheet, View } from "react-native"
+import { Link, useLocalSearchParams, useNavigation, useRouter } from "expo-router"
 import { SafeAreaView } from "react-native-safe-area-context"
+
+import sizes from "@/constants/sizes"
+import FeedContext from "@/contexts/Feed"
 import PersistedContext from "@/contexts/Persisted"
 import { Moment } from "@/components/moment"
-import sizes from "@/constants/sizes"
-import config from "@/config"
-import { UserShow } from "@/components/user_show"
-import { LinearGradient } from "expo-linear-gradient"
-import fonts from "@/constants/fonts"
-import api from "@/api"
-import { View, Keyboard, Platform, Animated as RNAnimated, Modal, Pressable } from "react-native"
-import RenderCommentFeed from "@/features/moments/feed/render-comment-feed"
-import ZeroComments from "@/components/comment/components/comments-zero_comments"
+import {
+    MomentAuthorHeader,
+    MomentBottomGradient,
+    MomentComments,
+    MomentUnavailable,
+    useMomentDetail,
+} from "@/features/moments/detail"
+
+const CARD = sizes.moment.standart
 
 export default function MomentFullScreen() {
     const router = useRouter()
@@ -21,138 +23,21 @@ export default function MomentFullScreen() {
     const hasNavigatedRef = useRef(false)
     const { id, from } = useLocalSearchParams<{ id: string; from?: string }>()
     const { session } = React.useContext(PersistedContext)
+    const feed = React.useContext(FeedContext)
 
-    const [remoteMoment, setRemoteMoment] = React.useState<any | null>(null)
+    // Snowflake: trafega como string de ponta a ponta, nunca `Number()`.
+    const momentId = String(id ?? "")
 
-    // Fetch moment by id (GET /moments/:id) with Authorization
-    useEffect(() => {
-        let cancelled = false
-        async function fetchMoment() {
-            try {
-                const token = session?.account?.jwtToken
-                const auth = token?.startsWith("Bearer ") ? token : token ? `Bearer ${token}` : ""
-                const res = await api.get(
-                    `/moments/${id}`,
-                    auth ? { headers: { Authorization: auth } } : undefined,
-                )
-                if (!cancelled) {
-                    setRemoteMoment((res as any)?.data?.moment ?? (res as any)?.data ?? null)
-                }
-            } catch (e) {
-                console.log("Moment fetch error:", e)
-            }
-        }
-        if (id) fetchMoment()
-        return () => {
-            cancelled = true
-        }
-    }, [id, session?.account?.jwtToken])
-
-    const keyboardHeightAnim = React.useRef(new RNAnimated.Value(0)).current
-
-    React.useEffect(() => {
-        const showListener = Keyboard.addListener(
-            Platform.OS === "ios" ? "keyboardWillShow" : "keyboardDidShow",
-            (e) => {
-                const offset = Platform.OS === "ios" ? 0 : 20
-                RNAnimated.timing(keyboardHeightAnim, {
-                    toValue: e.endCoordinates.height - offset,
-                    duration: Platform.OS === "ios" ? 250 : 200,
-                    useNativeDriver: false,
-                }).start()
-            },
-        )
-        const hideListener = Keyboard.addListener(
-            Platform.OS === "ios" ? "keyboardWillHide" : "keyboardDidHide",
-            () => {
-                RNAnimated.timing(keyboardHeightAnim, {
-                    toValue: 0,
-                    duration: Platform.OS === "ios" ? 250 : 200,
-                    useNativeDriver: false,
-                }).start()
-            },
-        )
-
-        return () => {
-            showListener.remove()
-            hideListener.remove()
-        }
-    }, [])
-
-    const momentData = React.useMemo(() => {
-        const rewrite = (url: string) => {
-            if (!url) return url
-            const original = String(url).trim()
-            const newBase = `http://${config.ENDPOINT}`
-            if (original.startsWith("/")) return `${newBase}${original}`
-            const protoMatch = original.match(/^https?:\/\//i)
-            if (protoMatch) {
-                const afterProto = original.slice(protoMatch[0].length)
-                const hostPort = afterProto.split("/")[0]
-                const path = afterProto.slice(hostPort.length) || "/"
-                const oldHosts = ["10.15.0.235:3000", "10.168.15.17:3000", "172.31.80.1:3000"]
-                if (oldHosts.includes(hostPort) || hostPort === config.ENDPOINT) {
-                    return `${newBase}${path}`
-                }
-                return original
-            }
-            return original
-        }
-
-        const fallbackList = ((session?.account as any)?.moments as any[]) || []
-        const raw = remoteMoment ?? fallbackList.find((m) => String(m?.id) === String(id))
-        if (!raw) return null
-
-        const videoUrl = rewrite(
-            (raw?.midia?.fullhd_resolution as string) ||
-                (raw?.midia?.nhd_resolution as string) ||
-                raw?.video?.url,
-        )
-        const thumbUrl = rewrite(
-            (raw?.midia?.nhd_thumbnail as string) ||
-                raw?.thumbnail?.url ||
-                (raw?.thumbnail as string),
-        )
-
-        return {
-            id: String(raw.id),
-            user: {
-                id: String(raw?.user?.id || session?.user?.id || ""),
-                username: String(raw?.user?.username || session?.user?.username || ""),
-                verified: Boolean(raw?.user?.verified ?? session?.user?.isVerified ?? false),
-                profilePicture: String(
-                    raw?.user?.profilePicture || session?.user?.profilePicture || "",
-                ),
-                youFollow: Boolean(raw?.user?.youFollow ?? false),
-                followYou: Boolean(raw?.user?.followYou ?? false),
-            },
-            description: raw.description || "",
-            media: videoUrl,
-            thumbnail: thumbUrl,
-            midia: {
-                content_type: "VIDEO",
-                fullhd_resolution: videoUrl,
-                nhd_resolution: videoUrl,
-                nhd_thumbnail: thumbUrl,
-            },
-            metrics: raw.metrics || {
-                totalViews: 0,
-                totalLikes: 0,
-                totalComments: 0,
-            },
-            tags: raw.tags || [],
-            language: raw.language || "pt",
-            publishedAt: raw.publishedAt,
-            isLiked: Boolean(raw.isLiked ?? false),
-        } as any
-    }, [id, remoteMoment, session?.account?.moments, session?.user])
+    // Quem chega aqui veio do feed ou da grade da própria conta — as duas listas que já
+    // têm o momento em memória e servem de semente síncrona.
+    const { momentData, isUnavailable, errorMessage } = useMomentDetail({
+        momentId,
+        sources: [feed?.moments, session.account.moments],
+    })
 
     useEffect(() => {
-        if (momentData?.user?.username) {
-            // set stack title to owner's username
-            // @ts-ignore
-            navigation.setOptions({ title: String(momentData.user.username) })
-        }
+        const username = momentData?.user?.username
+        if (username) navigation.setOptions({ title: username } as any)
     }, [momentData?.user?.username, navigation])
 
     useEffect(() => {
@@ -182,18 +67,11 @@ export default function MomentFullScreen() {
     }, [from, router, navigation])
 
     return (
-        <SafeAreaView
-            style={{
-                flex: 1,
-                backgroundColor: "#000",
-                justifyContent: "flex-start",
-                alignItems: "center",
-            }}
-        >
+        <SafeAreaView style={styles.screen}>
             <View style={{ height: sizes.headers.height * 0.7 }} />
-            {momentData ? (
+            {momentData && !isUnavailable ? (
                 <Moment.Root.Main
-                    size={sizes.moment.standart}
+                    size={CARD}
                     isFeed={false}
                     isFocused={true}
                     data={momentData}
@@ -203,7 +81,7 @@ export default function MomentFullScreen() {
                         envolve somente o card do vídeo — os comentários ficam fora. */}
                     <Link.AppleZoomTarget>
                         <Moment.Container
-                            contentRender={momentData.midia}
+                            contentRender={momentData.media}
                             isFocused={true}
                             loading={false}
                             blurRadius={0}
@@ -212,64 +90,31 @@ export default function MomentFullScreen() {
                             disableCache={false}
                             disableWatch={false}
                         >
-                            {/* Top user info (no scale animations) */}
-                            <Moment.Root.Top>
-                                <Moment.Root.TopLeft>
-                                    <UserShow.Root data={momentData.user}>
-                                        <UserShow.ProfilePicture
-                                            disableAction={true}
-                                            displayOnMoment={true}
-                                            pictureDimensions={{ width: 30, height: 30 }}
-                                        />
-                                        <UserShow.Username
-                                            pressable={false}
-                                            fontFamily={fonts.family["Bold-Italic"]}
-                                        />
-                                    </UserShow.Root>
-                                </Moment.Root.TopLeft>
-                                <Moment.Root.TopRight>
-                                    <Moment.AudioControl size={36} />
-                                </Moment.Root.TopRight>
-                            </Moment.Root.Top>
+                            <MomentAuthorHeader user={momentData.user} />
 
                             <Moment.Root.Center />
 
-                            {/* Bottom description opens comments modal */}
                             <Moment.Root.Bottom>
                                 <Moment.Date />
                             </Moment.Root.Bottom>
 
-                            {/* Subtle bottom gradient like feed */}
-                            <LinearGradient
-                                colors={["rgba(0, 0, 0, 0.00)", "rgba(0, 0, 0, 0.4)"]}
-                                start={{ x: 0.5, y: 0 }}
-                                end={{ x: 0.5, y: 1 }}
-                                style={{
-                                    position: "absolute",
-                                    left: 0,
-                                    right: 0,
-                                    bottom: 0,
-                                    width: sizes.moment.standart.width,
-                                    height: sizes.moment.standart.height * 0.1,
-                                    zIndex: 0,
-                                }}
-                            />
+                            <MomentBottomGradient />
                         </Moment.Container>
                     </Link.AppleZoomTarget>
-                    {momentData?.topComment ? (
-                        <RenderCommentFeed moment={momentData} focused={true} />
-                    ) : (
-                        <View
-                            style={{
-                                alignSelf: "center",
-                                marginTop: sizes.margins["2sm"],
-                            }}
-                        >
-                            <ZeroComments isAccount={false} moment={momentData} />
-                        </View>
-                    )}
+                    <MomentComments moment={momentData} />
                 </Moment.Root.Main>
-            ) : null}
+            ) : (
+                <MomentUnavailable message={errorMessage} />
+            )}
         </SafeAreaView>
     )
 }
+
+const styles = StyleSheet.create({
+    screen: {
+        flex: 1,
+        backgroundColor: "#000",
+        justifyContent: "flex-start",
+        alignItems: "center",
+    },
+})

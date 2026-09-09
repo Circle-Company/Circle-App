@@ -20,10 +20,8 @@ export default function AgreeScreen() {
     const { t } = useTranslation()
     const router = useRouter()
     const {
-        signUp,
         appleSignUp,
         setErrorMessage,
-        signInputPassword,
         errorMessage,
         loading,
         setAgeConfirmation,

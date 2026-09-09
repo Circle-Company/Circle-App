@@ -55,7 +55,7 @@ export function Provider({ children }: LanguageProviderProps) {
                     appLanguage: languageCode,
                 }
             }
-        } catch (err) {
+        } catch {
             // swallow persistence errors so UI language still changes
             // optionally log the error to your telemetry
             // console.warn("Failed to persist language to session:", err)
@@ -63,11 +63,13 @@ export function Provider({ children }: LanguageProviderProps) {
 
         // 4) call server mutation only when session is available (avoid requests while logged out)
         try {
-            const hasSession = Boolean(session?.user?.id) && Boolean(session?.account?.jwtToken)
+            // Ter viewer carregado é o sinal de sessão. O token não decide isso — quem o injeta
+            // é o interceptor (§3.2), e lê-lo aqui só acoplaria a tela ao formato da credencial.
+            const hasSession = Boolean(session?.account?.userId)
             if (hasSession && typeof setAppLanguageMutation?.mutate === "function") {
                 setAppLanguageMutation.mutate({ appLanguage: languageCode })
             }
-        } catch (err) {
+        } catch {
             // swallow mutation errors so UI doesn't break
             // console.warn("Language mutation failed:", err)
         }
@@ -91,11 +93,7 @@ export function Provider({ children }: LanguageProviderProps) {
 
         // if we have session language explicitly, sync to server (optional)
         // only when session is available (avoid requests while logged out)
-        if (
-            session?.preferences?.language?.appLanguage &&
-            session?.user?.id &&
-            session?.account?.jwtToken
-        ) {
+        if (session?.preferences?.language?.appLanguage && session?.account?.userId) {
             try {
                 if (typeof setAppLanguageMutation?.mutate === "function") {
                     setAppLanguageMutation.mutate({ appLanguage: currentLanguageCode })
@@ -127,13 +125,20 @@ export function Provider({ children }: LanguageProviderProps) {
 
     const { t } = useTranslation()
 
-    const contextValue = {
-        languagesList,
-        t: t,
-        atualAppLanguage,
-        languageResources,
-        changeAppLanguage,
-    }
+    // `t` troca de identidade quando o i18n recarrega recursos, e `changeAppLanguage` nasce
+    // nova a cada render — as duas entram nas dependências. Este contexto é consumido em
+    // praticamente toda tela, então o objeto instável fazia o app inteiro re-renderizar a
+    // cada render deste provider.
+    const contextValue = React.useMemo(
+        () => ({
+            languagesList,
+            t,
+            atualAppLanguage,
+            languageResources,
+            changeAppLanguage,
+        }),
+        [t, atualAppLanguage, changeAppLanguage],
+    )
     return <LanguageContext.Provider value={contextValue}>{children}</LanguageContext.Provider>
 }
 

@@ -1,6 +1,6 @@
-import { colors } from "@/constants/colors"
 import LanguageContext from "@/contexts/language"
 import { ContextMenu, Host, Button } from "@expo/ui/swift-ui"
+import { frame } from "@expo/ui/swift-ui/modifiers"
 import React from "react"
 import { Alert } from "react-native"
 
@@ -15,7 +15,9 @@ export function DropDownMenuIOS({
 
     return (
         <Host colorScheme="dark">
-            <ContextMenu activationMethod="longPress" frame={{ alignment: "center" }}>
+            {/* No SDK 56 as props de layout do expo-ui viraram `modifiers`, e `activationMethod`
+                deixou de existir: o long press já é o gatilho padrão do `ContextMenu`. */}
+            <ContextMenu modifiers={[frame({ alignment: "center" })]}>
                 <ContextMenu.Items>
                     <Button
                         systemImage="trash"

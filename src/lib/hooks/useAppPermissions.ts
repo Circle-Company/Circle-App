@@ -2,7 +2,7 @@ import React from "react"
 import { Linking } from "react-native"
 
 // Camera & Microphone (react-native-vision-camera)
-import { Camera } from "react-native-vision-camera"
+import { VisionCamera } from "react-native-vision-camera"
 
 // Photos / Media Library (expo-image-picker)
 import * as ImagePicker from "expo-image-picker"
@@ -152,7 +152,8 @@ export function useAppPermissions(options: UseAppPermissionsOptions = {}): UseAp
 
     const updateOne = React.useCallback(
         (id: PermissionId, partial: Partial<PermissionItem>) => {
-            let didChange = false
+            // `didChange` foi removido: era escrito e nunca lido. `statusChanged` fica,
+            // porque é ele que decide se o callback `onStatusChange` dispara.
             let statusChanged = false
             setItems((prev) => {
                 let localChange = false
@@ -176,7 +177,6 @@ export function useAppPermissions(options: UseAppPermissionsOptions = {}): UseAp
                     }
                     return it
                 })
-                didChange = localChange
                 statusChanged = localStatusChanged
                 return localChange ? next : prev
             })
@@ -192,8 +192,10 @@ export function useAppPermissions(options: UseAppPermissionsOptions = {}): UseAp
         const requesters: Record<PermissionId, () => Promise<PermissionStatus>> = {
             camera: async () => {
                 try {
-                    const status = await Camera.requestCameraPermission()
-                    return mapVisionCameraStatus(status)
+                    // Na vision-camera v5 o request devolve BOOLEAN, não o status. O estado
+                    // atual sai da propriedade, lida depois que o prompt fecha.
+                    await VisionCamera.requestCameraPermission()
+                    return mapVisionCameraStatus(VisionCamera.cameraPermissionStatus)
                 } catch {
                     return "unknown"
                 }
@@ -201,8 +203,8 @@ export function useAppPermissions(options: UseAppPermissionsOptions = {}): UseAp
 
             microphone: async () => {
                 try {
-                    const status = await Camera.requestMicrophonePermission()
-                    return mapVisionCameraStatus(status)
+                    await VisionCamera.requestMicrophonePermission()
+                    return mapVisionCameraStatus(VisionCamera.microphonePermissionStatus)
                 } catch {
                     return "unknown"
                 }
@@ -271,13 +273,13 @@ export function useAppPermissions(options: UseAppPermissionsOptions = {}): UseAp
     const refresh = React.useCallback(async () => {
         // camera
         try {
-            const s = mapVisionCameraStatus(await Camera.getCameraPermissionStatus())
+            const s = mapVisionCameraStatus(VisionCamera.cameraPermissionStatus)
             updateOne("camera", { status: s })
         } catch {}
 
         // microphone
         try {
-            const s = mapVisionCameraStatus(await Camera.getMicrophonePermissionStatus())
+            const s = mapVisionCameraStatus(VisionCamera.microphonePermissionStatus)
             updateOne("microphone", { status: s })
         } catch {}
 

@@ -60,7 +60,7 @@ export default function RenderViewer({ viewer: item }: ViewersRenderViewerProps)
     function handlePress() {
         if (!item.username) return
         const targetId = String(item.userId)
-        const isSelf = targetId === String(session.user.id)
+        const isSelf = targetId === String(session.account.userId)
         const targetPath = isSelf ? `/you/${targetId}` : `/profile/${targetId}`
         if (pathname === targetPath) return
 

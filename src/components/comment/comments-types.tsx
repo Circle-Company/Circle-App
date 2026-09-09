@@ -14,7 +14,7 @@ export type CommentObject = {
     createdAt: string
 }
 
-export type CommentsReciveDataProps = Array<CommentObject>
+export type CommentsReciveDataProps = CommentObject[]
 
 export type CommentsMainRootProps = {
     data: CommentsReciveDataProps

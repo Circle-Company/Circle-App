@@ -1,5 +1,5 @@
-import React, { useCallback, useRef, useState } from "react"
-import { Animated } from "react-native"
+import React, { useRef, useState } from "react"
+import { Animated, View } from "react-native"
 import { Loading } from "@/components/loading"
 import { colors } from "@/constants/colors"
 import sizes from "@/constants/sizes"
@@ -8,7 +8,6 @@ import FeedContext from "@/contexts/Feed"
 import RenderMomentFeed from "@/features/moments/feed/render-moment-feed"
 import { EmptyList } from "@/features/moments/empty.list"
 import PersistedContext from "@/contexts/Persisted"
-import { View } from "react-native"
 import { useSafeAreaInsets } from "react-native-safe-area-context"
 import {
     INITIAL_PADDING,
@@ -37,7 +36,6 @@ const ListMoments = () => {
         scrollEnabled: enableScrollFeed,
         feedData,
         reloadFeed,
-        loading: loadingFeed,
         loadVideoFromCache,
         preloadNextVideo,
         fetch,
@@ -233,7 +231,7 @@ const ListMoments = () => {
                             key={item.id}
                         >
                             <RenderMomentFeed
-                                isMe={item.user.id === session.user.id}
+                                isMe={item.user.id === session.account.userId}
                                 isFeed={true}
                                 data={item}
                                 isFocused={focusedItem}

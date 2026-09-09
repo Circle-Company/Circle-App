@@ -1,19 +1,16 @@
 import React from "react"
-import { Animated, ViewStyle } from "react-native"
+import { Animated, ViewStyle, TextStyle } from "react-native"
 import sizes from "@/constants/sizes"
 import { colors } from "@/constants/colors"
 import { Text } from "@/components/Themed"
 import LanguageContext from "@/contexts/language"
-import ButtonStandart from "@/components/buttons/button-standart"
 import { useProfileContext } from "@/components/profile/profile-context"
-import { TextStyle } from "react-native"
 import fonts from "@/constants/fonts"
 
 export function BlockedByCard() {
     const { t } = React.useContext(LanguageContext)
     const { user } = useProfileContext()
 
-    const animatedScale = React.useRef(new Animated.Value(1)).current
     const animatedOpacity = React.useRef(new Animated.Value(0)).current
 
     function handleAnimation() {

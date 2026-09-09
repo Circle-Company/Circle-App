@@ -2,7 +2,7 @@ import React from "react"
 import { View, Text, StyleSheet } from "react-native"
 import { colors } from "@/constants/colors"
 import LanguageContext from "@/contexts/language"
-import { useLocaleDateRelative, useLocaleDateRelative2 } from "@/lib/hooks/useLocaleDate"
+import { useLocaleDateRelative2 } from "@/lib/hooks/useLocaleDate"
 import fonts from "@/constants/fonts"
 type AccountMomentsHeaderProps = {
     totalMoments: number

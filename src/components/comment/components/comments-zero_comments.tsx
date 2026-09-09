@@ -8,7 +8,6 @@ import { Text } from "../../Themed"
 import { Vibrate } from "../../../lib/hooks/useHapticFeedback"
 import fonts from "../../../constants/fonts"
 import sizes from "../../../constants/sizes"
-import { textLib } from "@/circle.text.library"
 import { Moment as MomentProps } from "@/contexts/Feed/types"
 import { isIOS } from "@/lib/platform/detection"
 import FetchedCommentsList from "./fetched-comments-list"
@@ -24,10 +23,13 @@ export default function ZeroComments({
     isAccount: boolean
 }) {
     const { t } = React.useContext(LanguageContext)
-    const [isIOSSheetOpen, setIOSSheetOpen] = React.useState(false)
+    const [, setIOSSheetOpen] = React.useState(false)
     const { setCommentEnabled, setKeyboardVisible, setScrollEnabled } =
         React.useContext(FeedContext)
     const { expand } = React.useContext(BottomSheetContext)
+    // Chamado incondicionalmente: estava dentro de um bloco condicional do JSX, o que muda a
+    // ordem dos hooks entre renders. O hook já devolve "" para data inválida ou ausente.
+    const publishedAtLabel = useLocaleDateRelative2(moment.publishedAt ?? "").toLowerCase()
 
     const container: any = {
         maxWidth: sizes.screens.width,
@@ -88,7 +90,7 @@ export default function ZeroComments({
                             color: ColorTheme().textDisabled,
                         }}
                     >
-                        {t("Shared ")} {useLocaleDateRelative2(moment.publishedAt).toLowerCase()}
+                        {t("Shared ")} {publishedAtLabel}
                     </Text>
                 )}
                 <Text

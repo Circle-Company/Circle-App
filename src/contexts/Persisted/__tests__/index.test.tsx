@@ -66,29 +66,27 @@ describe("Persisted Context", () => {
     })
 
     describe("Basic Functionality", () => {
-        it("should provide context values", () => {
-            const context = {
-                session: {
-                    user: { id: "test", name: "Test User" },
-                    account: { jwtToken: "test-token" },
-                    preferences: { language: "pt" },
-                    statistics: { followers: 100 },
-                    history: { searches: ["test"] },
-                },
-                device: {
-                    permissions: { postNotifications: true },
-                    metadata: { deviceType: "iPhone" },
-                },
+        // Documenta a forma do contexto depois da fusão (§11.2). É deliberadamente um
+        // teste de formato, não de comportamento: sem renderização de componente
+        // (`CLAUDE.md`) não dá para montar o provider aqui. O comportamento da store está
+        // coberto em `persistedAccount.spec.ts`.
+        it("expõe account, preferences e metrics — e nenhum token", () => {
+            const session = {
+                account: { userId: "user-1", username: "fulano", isVerified: true },
+                preferences: { language: { appLanguage: "pt" } },
+                metrics: { totalFollowers: 100 },
             }
 
-            expect(context.session.user.id).toBe("test")
-            expect(context.session.user.name).toBe("Test User")
-            expect(context.session.account.jwtToken).toBe("test-token")
-            expect(context.session.preferences.language).toBe("pt")
-            expect(context.session.statistics.followers).toBe(100)
-            expect(context.session.history.searches).toContain("test")
-            expect(context.device.permissions.postNotifications).toBe(true)
-            expect(context.device.metadata.deviceType).toBe("iPhone")
+            expect(session.account.userId).toBe("user-1")
+            expect(session.account.username).toBe("fulano")
+            expect(session.preferences.language.appLanguage).toBe("pt")
+            expect(session.metrics.totalFollowers).toBe(100)
+
+            // `user` e `account` eram duas portas para a mesma entidade; agora há uma.
+            expect(session).not.toHaveProperty("user")
+            // Credencial não mora em contexto de perfil — quem injeta o header é o
+            // interceptor, a partir da sessão viva (§3.2).
+            expect(session.account).not.toHaveProperty("jwtToken")
         })
     })
 })

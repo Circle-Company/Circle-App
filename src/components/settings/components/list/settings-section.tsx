@@ -1,5 +1,5 @@
-import ColorTheme, { colors } from "../../../../constants/colors"
-import { FlatList, View, useColorScheme } from "react-native"
+import { colors } from "../../../../constants/colors"
+import { FlatList, View } from "react-native"
 import { SettignsSectionProps, SettingsiItemObjectProps } from "../../settings-types"
 import { Text, TextStyle, ViewStyle } from "../../../Themed"
 
@@ -7,13 +7,10 @@ import SettingsItem from "./settings-item"
 import fonts from "../../../../constants/fonts"
 import sizes from "../../../../constants/sizes"
 import { isIOS } from "@/lib/platform/detection"
-import { Host, List, Label } from "@expo/ui/swift-ui"
 
 import * as Browser from "expo-web-browser"
 
 export default function SettingsSection({ name, content }: SettignsSectionProps) {
-    const isDarkMode = useColorScheme() === "dark"
-
     const container: ViewStyle = {
         width: sizes.screens.width,
         marginBottom: sizes.paddings["2sm"],

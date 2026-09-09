@@ -1,24 +1,14 @@
 import React from "react"
 import { Alert } from "react-native"
 import LanguageContext from "@/contexts/language"
-import PersistedContext from "@/contexts/Persisted"
 import ProfileContext, { profileProps } from "@/contexts/profile"
 import { Button, Host, Menu, Section } from "@expo/ui/swift-ui"
-import {
-    clipShape,
-    frame,
-    glassEffect,
-    imageScale,
-    padding,
-    tint,
-} from "@expo/ui/swift-ui/modifiers"
-import { colors } from "@/constants/colors"
+
 import { useBlockMutation } from "@/queries/user.block"
 import { useFriendshipStatusQuery, useRemoveFriendMutation } from "@/queries/friendship"
 import { Vibrate } from "@/lib/hooks/useHapticFeedback"
 
 export function ProfileOptionsDropDownMenuIOS({ profile }: { profile: profileProps["profile"] }) {
-    const { session } = React.useContext(PersistedContext)
     const { t } = React.useContext(LanguageContext)
     const { setShowReportModal, getProfile, cleanProfile } = React.useContext(ProfileContext)
     const blockMutation = useBlockMutation({ userId: profile.id })

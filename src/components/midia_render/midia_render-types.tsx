@@ -1,6 +1,13 @@
-import { MomentMidiaProps, sizeProps } from "../moment/context/types"
+import { sizeProps } from "../moment/context/types"
 
-export type MidiaReciveDataProps = MomentMidiaProps
+/**
+ * A URL da mídia a renderizar.
+ *
+ * Era `MomentMidiaProps`, um objeto (`{ content_type, fullhd_resolution, nhd_thumbnail, ... }`)
+ * que não existe mais no contrato do momento — o tipo nem era exportado, daí o erro. Todos os
+ * chamadores de `Moment.Container` passam `data.media`, que é a URL em string.
+ */
+export type MidiaReciveDataProps = string
 
 export type MidiaRenderMainRootProps = {
     data: any

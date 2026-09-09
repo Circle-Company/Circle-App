@@ -117,18 +117,17 @@ describe("Testes de Integração Completos - Criação de Conta", () => {
                 tiny_resolution: "https://example.com/tiny.jpg",
             },
         },
-        account: {
-            coordinates: {
-                latitude: -23.5505,
-                longitude: -46.6333,
-            },
-            unreadNotificationsCount: 0,
+        // O contrato real do backend (docs/session-management.md §13.1): o par de tokens
+        // vem no **nível da sessão**, não dentro de um objeto `account`, e nao existe
+        // `refreshExpiresIn` — o refresh token nao expira.
+        token: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.test-token",
+        refreshToken: "refresh-token-de-teste",
+        expiresIn: 36000,
+        status: {
+            accessLevel: "USER",
+            verified: true,
             blocked: false,
-            muted: false,
-            last_active_at: "2024-01-01T00:00:00Z",
-            last_login_at: "2024-01-01T00:00:00Z",
-            jwtToken: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.test-token",
-            jwtExpiration: "2024-12-31T23:59:59Z",
+            deleted: false,
         },
         statistics: {
             total_followers_num: 0,
@@ -258,16 +257,17 @@ describe("Testes de Integração Completos - Criação de Conta", () => {
 
             // Verificar resposta
             expect(response.data.session).toBeDefined()
+            // ATENÇÃO: aqui `session` é o **payload do backend**, não o contexto do app —
+            // o formato da resposta não mudou com a fusão das stores.
             expect(response.data.session.user.id).toBe("123")
-            expect(response.data.session.account.jwtToken).toBeTruthy()
+            expect(response.data.session.token).toBeTruthy()
 
             // Verificar que dados seriam persistidos
             const sessionData = response.data.session
             expect(sessionData.user.id).toBe("123")
             expect(sessionData.user.username).toBe("testuser")
-            expect(sessionData.account.jwtToken).toBe(
-                "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.test-token",
-            )
+            expect(sessionData.token).toBe("eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.test-token")
+            expect(sessionData.refreshToken).toBe("refresh-token-de-teste")
         })
 
         it("deve lidar com falhas na coleta de metadados", async () => {
@@ -340,7 +340,8 @@ describe("Testes de Integração Completos - Criação de Conta", () => {
                 const isValidPassword = password.length >= 4
 
                 const isValid = isValidInput && isValidPassword
-                expect(isValid).toBe(valid, `Falhou para: ${reason}`)
+                // `toBe` recebe um argumento só; a mensagem vai no segundo parâmetro de `expect`.
+                expect(isValid, `Falhou para: ${reason}`).toBe(valid)
             })
         })
 

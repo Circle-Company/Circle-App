@@ -6,8 +6,7 @@ import sizes from "@/constants/sizes"
 import LanguageContext from "@/contexts/language"
 import GeolocationContext from "@/contexts/geolocation"
 import React from "react"
-import { Platform } from "react-native"
-import { TextStyle, ViewStyle, View, Animated } from "react-native"
+import { Platform, TextStyle, ViewStyle, View, Animated } from "react-native"
 
 import {
     GlassContainer,
@@ -110,7 +109,6 @@ export function LocationNotProvidedCard() {
                 <GlassContainer spacing={10}>
                     <GlassView
                         style={glassContainer}
-                        colorScheme="dark"
                         glassEffectStyle="clear"
                         isInteractive={true}
                         tintColor={colors.gray.black + 40}

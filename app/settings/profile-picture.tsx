@@ -36,7 +36,7 @@ export default function ProfilePictureScreen() {
             <View style={styles.avatarWrapper}>
                 <Image
                     source={{
-                        uri: selectedAsset?.uri || session.user.profilePicture,
+                        uri: selectedAsset?.uri || session.account.profilePicture,
                     }}
                     style={styles.avatar}
                 />

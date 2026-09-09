@@ -5,9 +5,7 @@ import fonts from "@/constants/fonts"
 import sizes from "@/constants/sizes"
 import LanguageContext from "@/contexts/language"
 import React from "react"
-import { Platform } from "react-native"
-import { Linking } from "react-native"
-import { TextStyle, ViewStyle, View, Animated } from "react-native"
+import { Platform, Linking, TextStyle, ViewStyle, View, Animated } from "react-native"
 
 import {
     GlassContainer,
@@ -108,7 +106,6 @@ export function CameraPermissionNotProvidedCard() {
             <GlassContainer spacing={10}>
                 <GlassView
                     style={glassContainer}
-                    colorScheme="dark"
                     glassEffectStyle="clear"
                     isInteractive={true}
                     tintColor={colors.gray.black + 40}

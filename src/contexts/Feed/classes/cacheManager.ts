@@ -390,7 +390,7 @@ export class CacheManager {
      * Pré-carrega múltiplas thumbnails em lote
      */
     public async preloadThumbnailsBatch(
-        items: Array<{ id: string; url: string }>,
+        items: { id: string; url: string }[],
         priority: DownloadPriority = "low",
     ): Promise<void> {
         const promises = items.map((item) =>
@@ -403,7 +403,7 @@ export class CacheManager {
      * Pré-carrega múltiplos vídeos em lote
      */
     public async preloadVideosBatch(
-        items: Array<{ id: string; url: string }>,
+        items: { id: string; url: string }[],
         priority: DownloadPriority = "medium",
     ): Promise<void> {
         for (const item of items) {

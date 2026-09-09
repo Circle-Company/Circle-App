@@ -1,13 +1,8 @@
 import api from "@/api"
-import { storage, storageKeys } from "@/store"
 import { accountProps, momentsProps, accountBlocksProps } from "./account.types"
 
 async function getAccount(): Promise<accountProps> {
-    const response = await api.get("/account", {
-        headers: {
-            Authorization: `Bearer ${storage.getString(storageKeys().account.jwt.token) || ""}`,
-        },
-    })
+    const response = await api.get("/account")
     return response.data
 }
 
@@ -18,66 +13,27 @@ async function getAccountBlocks({
     limit: number
     offset: number
 }): Promise<accountBlocksProps> {
-    const response = await api.get(`/account/blocks?limit=${limit}&offset=${offset}`, {
-        headers: {
-            Authorization: `Bearer ${storage.getString(storageKeys().account.jwt.token) || ""}`,
-        },
-    })
+    const response = await api.get(`/account/blocks?limit=${limit}&offset=${offset}`)
     return response.data
 }
 
 async function getMoments({ page, limit }: { page: number; limit: number }): Promise<momentsProps> {
-    const response = await api.get(`/account/moments?page=${page}&limit=${limit}`, {
-        headers: {
-            Authorization: `Bearer ${storage.getString(storageKeys().account.jwt.token) || ""}`,
-        },
-    })
-    return response.data
-}
-
-async function updateDescription({ description }: { description: string }): Promise<void> {
-    const response = await api.put(
-        `/account/description`,
-        {
-            description,
-        },
-        {
-            headers: {
-                Authorization: `Bearer ${storage.getString(storageKeys().account.jwt.token) || ""}`,
-            },
-        },
-    )
+    const response = await api.get(`/account/moments?page=${page}&limit=${limit}`)
     return response.data
 }
 
 async function updateCoordinates({ lat, lng }: { lat: string; lng: string }): Promise<void> {
-    const response = await api.put(
-        `/account/coordinates`,
-        {
-            latitude: lat,
-            longitude: lng,
-        },
-        {
-            headers: {
-                Authorization: `Bearer ${storage.getString(storageKeys().account.jwt.token) || ""}`,
-            },
-        },
-    )
+    const response = await api.put(`/account/coordinates`, {
+        latitude: lat,
+        longitude: lng,
+    })
     return response.data
 }
 
 async function updateName({ name }: { name: string }): Promise<void> {
-    const response = await api.put(
-        `/account/name`,
-        {
-            name,
-        },
-        {
-            headers: {
-                Authorization: `Bearer ${storage.getString(storageKeys().account.jwt.token) || ""}`,
-            },
-        },
-    )
+    const response = await api.put(`/account/name`, {
+        name,
+    })
     return response.data
 }
 
@@ -88,18 +44,10 @@ async function updatePushToken({
     expoToken: string
     deviceId: string
 }): Promise<void> {
-    const response = await api.put(
-        `/account/push-token`,
-        {
-            expoToken,
-            deviceId,
-        },
-        {
-            headers: {
-                Authorization: `Bearer ${storage.getString(storageKeys().account.jwt.token) || ""}`,
-            },
-        },
-    )
+    const response = await api.put(`/account/push-token`, {
+        expoToken,
+        deviceId,
+    })
     return response.data
 }
 
@@ -126,26 +74,14 @@ async function getNotifications({
     // `cursor` nunca chegavam no servidor, então toda busca devolvia a mesma
     // página padrão — daí as notificações "voltarem" sempre iguais.
     const query = search.toString()
-    const response = await api.get(`/account/notifications${query ? `?${query}` : ""}`, {
-        headers: {
-            Authorization: `Bearer ${storage.getString(storageKeys().account.jwt.token) || ""}`,
-        },
-    })
+    const response = await api.get(`/account/notifications${query ? `?${query}` : ""}`)
     return response.data
 }
 
 async function readAllNotifications(): Promise<void> {
     // `api.patch(url, data, config)`: o objeto de headers estava indo como
     // CORPO da requisição, e nenhuma config era passada.
-    const response = await api.patch(
-        `/account/notifications/read`,
-        {},
-        {
-            headers: {
-                Authorization: `Bearer ${storage.getString(storageKeys().account.jwt.token) || ""}`,
-            },
-        },
-    )
+    const response = await api.patch(`/account/notifications/read`, {})
     return response.data
 }
 
@@ -153,7 +89,6 @@ export const routes = {
     getAccount,
     getAccountBlocks,
     getMoments,
-    updateDescription,
     updateName,
     updateCoordinates,
     updatePushToken,

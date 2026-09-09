@@ -1,10 +1,9 @@
 import React from "react"
-import { Animated, View, ViewStyle, TextStyle, Linking } from "react-native"
+import { Animated, View, ViewStyle, TextStyle, Linking, Platform, Pressable } from "react-native"
 import { Text } from "@/components/Themed"
 import { colors } from "@/constants/colors"
 import fonts from "@/constants/fonts"
 import sizes from "@/constants/sizes"
-import { Platform } from "react-native"
 import ArrowIcon from "@/assets/icons/svgs/chevron_right.svg"
 
 import {
@@ -16,7 +15,6 @@ import {
 import { t } from "i18next"
 import { NotificationBadge } from "./notification.badge"
 import { NotificationType } from "@/contexts/push.notification"
-import { Pressable } from "react-native"
 
 export function NotificationPermissionNotProvidedCard() {
     const animatedOpacity = React.useRef(new Animated.Value(0)).current
@@ -80,7 +78,6 @@ export function NotificationPermissionNotProvidedCard() {
             <GlassContainer>
                 <GlassView
                     style={glassContainer}
-                    colorScheme="dark"
                     glassEffectStyle="clear"
                     isInteractive={true}
                     tintColor={colors.gray.grey_09 + "99"}

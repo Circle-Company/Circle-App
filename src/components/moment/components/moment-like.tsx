@@ -1,4 +1,4 @@
-import { Animated, Pressable, TextStyle, View, ViewStyle, Platform } from "react-native"
+import { Animated, Pressable, View, ViewStyle, Platform } from "react-native"
 import ColorTheme, { colors } from "../../../constants/colors"
 
 import LikeIcon from "@/assets/icons/svgs/heart_2.svg"
@@ -6,15 +6,11 @@ import LinearGradient from "react-native-linear-gradient"
 import BlurredBackground from "../../general/blurred-background"
 import MomentContext from "../context"
 import { MomentLikeProps } from "../moment-types"
-import PersistedContext from "../../../contexts/Persisted"
 /* eslint-disable no-var */
 import React from "react"
-import { Text } from "../../Themed"
 import { Vibrate } from "../../../lib/hooks/useHapticFeedback"
-import fonts from "../../../constants/fonts"
 import sizes from "../../../constants/sizes"
 import { isIOS } from "@/lib/platform/detection"
-import { textLib } from "@/circle.text.library"
 
 export default function Like({
     isLiked,
@@ -22,7 +18,6 @@ export default function Like({
     paddingHorizontal = sizes.paddings["2sm"],
     margin = sizes.margins["1sm"],
 }: MomentLikeProps) {
-    const { session } = React.useContext(PersistedContext)
     const { data, actions, options } = React.useContext(MomentContext)
     const [likedPressed, setLikedPressed] = React.useState(isLiked ? isLiked : actions.like)
     var animatedScale = React.useRef(new Animated.Value(1)).current
@@ -68,23 +63,11 @@ export default function Like({
         }
     }, [actions.like])
 
-    // Quantidade total de likes que vem do backend
-    const totalLikes = data?.metrics?.totalLikes ?? 0
+    // O contador de likes deixou de ser renderizado (os estilos `like_text` e
+    // `like_text_pressed` também estavam mortos, o que confirma a remoção do texto do
+    // botão). Com ele foi embora a cadeia inteira que o calculava: `totalLikes`,
+    // `likeDifference` e `adjustedLikes`.
 
-    // Determina se um like foi adicionado ou removido em relação ao estado inicial
-    const likeDifference = actions.like
-        ? actions.initialLikedState
-            ? 0
-            : 1 // Se está curtido, não soma se já estava curtido, senão soma 1
-        : actions.initialLikedState
-          ? -1
-          : 0 // Se não está curtido, subtrai 1 se estava curtido, senão não muda
-
-    // Número de likes que será exibido, considerando a interação do usuário
-    const adjustedLikes = totalLikes + likeDifference
-
-    // Converte para formato legível
-    const displayLikes = textLib.conversor.convertNumToShort(adjustedLikes)
     const buttonWidth = 65 //adjustedLikes > 0 ? 84 : 76
     const borderWidth = 1
     const borderRadiusValue = Number([sizes.buttons.width / 4]) / 2
@@ -115,18 +98,6 @@ export default function Like({
         flex: 1,
         borderRadius: borderRadiusValue - borderWidth,
         overflow: "hidden",
-    }
-    const like_text_pressed: TextStyle = {
-        fontSize: fonts.size.body,
-        fontFamily: fonts.family.Black,
-        color: colors.gray.white,
-        marginLeft: sizes.margins["1sm"],
-    }
-    const like_text: TextStyle = {
-        fontSize: fonts.size.body,
-        fontFamily: fonts.family.Bold,
-        color: colors.gray.white,
-        marginLeft: sizes.margins["1sm"],
     }
     const blur_container: ViewStyle = {
         ...blur_container_base,
@@ -165,7 +136,6 @@ export default function Like({
             HandleButtonAnimation()
             actions.registerInteraction("LIKE", {
                 momentId: data.id,
-                authorizationToken: session.account.jwtToken,
             })
         } catch (error) {
             console.error("Erro ao processar like:", error)
@@ -177,7 +147,6 @@ export default function Like({
             HandleButtonAnimation()
             actions.registerInteraction("UNLIKE", {
                 momentId: data.id,
-                authorizationToken: session.account.jwtToken,
             })
         } catch (error) {
             console.error("Erro ao processar unlike:", error)

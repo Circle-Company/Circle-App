@@ -6,8 +6,6 @@ import {
     Pressable,
     Text,
     RefreshControl,
-    Platform,
-    Alert,
 } from "react-native"
 import React, { useState, useEffect, useMemo, useRef } from "react"
 
@@ -19,8 +17,7 @@ import { Moment } from "@/components/moment"
 import config from "@/config"
 import { colors } from "@/constants/colors"
 import { iOSMajorVersion } from "@/lib/platform/detection"
-import { Link, router } from "expo-router"
-import { useNavigation } from "expo-router"
+import { Link, useNavigation } from "expo-router"
 import { NoMoments } from "@/features/profile/profile.no.moments"
 import fonts from "@/constants/fonts"
 import { NetworkContext } from "@/contexts/network"
@@ -47,13 +44,11 @@ export default function AccountScreen() {
     const loadingMoreRef = useRef(false)
     const lastRequestedPageRef = useRef<number | null>(null)
     const refreshInProgressRef = useRef(false)
-
-    const pageSize = 6
     const userSnapshotRef = useRef<string>("")
 
     const queryClient = useQueryClient()
     const { data: accountData, isLoading: rqIsLoadingAccount } = useAccountQuery({
-        enabled: !!session?.account?.jwtToken,
+        enabled: !!session?.account?.userId,
         staleTime: 1000 * 60 * 5,
         refetchOnMount: false,
     })
@@ -62,7 +57,7 @@ export default function AccountScreen() {
         isLoading: rqIsLoadingMoments,
         isFetching: isFetchingMoments,
     } = useAccountMomentsQuery(currentPage, 6, {
-        enabled: !!session?.account?.jwtToken,
+        enabled: !!session?.account?.userId,
         staleTime: 1000 * 60 * 2,
         refetchOnMount: false,
     })
@@ -82,13 +77,12 @@ export default function AccountScreen() {
             id: Number(acc.id),
             username: acc.username,
             name: acc.name ?? null,
-            description: acc.description ?? null,
             profilePicture: acc.profilePicture ?? null,
             status: { verified: !!acc.status?.verified },
             metrics: {
                 totalMomentsCreated:
-                    typeof session.account.totalMoments === "number"
-                        ? session.account.totalMoments
+                    typeof session.metrics.totalMoments === "number"
+                        ? session.metrics.totalMoments
                         : (accMoments?.length ?? 0),
                 totalFollowers: acc.metrics?.totalFollowers ?? 0,
             },
@@ -99,18 +93,18 @@ export default function AccountScreen() {
                 isBlocking: false,
             },
         }
-    }, [accountData, session.account.totalMoments, accMoments])
+    }, [accountData, session.metrics.totalMoments, accMoments])
 
     // Update header title with username (null-safe)
     useEffect(() => {
         const title =
-            (user && (user.username || user.name)) || (session?.user?.username ?? "") || ""
+            (user && (user.username || user.name)) || (session?.account?.username ?? "") || ""
         // Avoid setting undefined titles
         try {
             // @ts-ignore - navigation types depend on navigator setup
             navigation.setOptions?.({ title })
         } catch {}
-    }, [navigation, user?.username, user?.name, session?.user?.username])
+    }, [navigation, user?.username, user?.name, session?.account?.username])
 
     useEffect(() => {
         if (!momentsPage) return
@@ -187,11 +181,10 @@ export default function AccountScreen() {
         try {
             await apiRoutes.moment.author.exclude({
                 momentId: id,
-                authorizationToken: session.account.jwtToken,
             })
 
-            const currentTotal = Number(session.account.totalMoments ?? 0)
-            session.account.setTotalMoments(Math.max(0, currentTotal - 1))
+            const currentTotal = Number(session.metrics.totalMoments ?? 0)
+            session.metrics.setTotalMoments(Math.max(0, currentTotal - 1))
 
             setHasMoreMoments(true)
             setCurrentPage(1)
@@ -203,13 +196,6 @@ export default function AccountScreen() {
         } catch (error) {
             console.error("Error deleting moment:", error)
         }
-    }
-
-    function confirmDelete(id: string) {
-        Alert.alert("Delete Moment", "You will permanently remove it.", [
-            { text: "Cancel", style: "cancel" },
-            { text: "Delete", style: "destructive", onPress: () => handleDeleteMoment(id) },
-        ])
     }
 
     const normalizedMoments = (accMoments ?? []).map((moment: any) => {
@@ -235,8 +221,8 @@ export default function AccountScreen() {
         return {
             ...moment,
             user: {
-                ...session.user,
-                profilePicture: rewrite(session?.user?.profilePicture) || "",
+                ...session.account,
+                profilePicture: rewrite(session?.account?.profilePicture) || "",
                 youFollow: false,
                 followYou: false,
             },
@@ -248,18 +234,26 @@ export default function AccountScreen() {
     // Sync Persisted session when query data changes
     useEffect(() => {
         if (accountData) {
-            session.user.set({
-                id: accountData.id,
+            // Identidade e status são gravados separados de propósito: são fatos de origens
+            // diferentes (o perfil que o usuário edita, e o que o backend decide sobre a
+            // conta), e misturá-los num `set` só foi o que permitiu o `verified` viver em
+            // duplicata nas duas stores antigas.
+            session.account.setIdentity({
+                userId: accountData.id,
                 username: accountData.username,
-                name: accountData.name,
-                description: accountData.description,
-                richDescription: accountData.description,
-                isVerified: !!accountData.status?.verified,
-                isActive: session.user.isActive,
-                profilePicture: accountData.profilePicture,
+                name: accountData.name ?? "",
+                profilePicture: accountData.profilePicture ?? "",
+            })
+            session.account.setStatus({
+                accessLevel: session.account.accessLevel,
+                verified: !!accountData.status?.verified,
+                blocked: session.account.blocked,
+                deleted: session.account.deleted,
+                active: session.account.isActive,
             })
 
             session.metrics.set({
+                totalMoments: accountData.metrics?.totalMoments ?? 0,
                 totalFollowers: accountData.metrics?.totalFollowers ?? 0,
                 totalFollowing: accountData.metrics?.totalFollowing ?? 0,
                 totalLikesReceived: accountData.metrics?.totalLikesReceived ?? 0,
@@ -269,10 +263,10 @@ export default function AccountScreen() {
                 interactionsGrowthRate30d: accountData.metrics?.interactionsGrowthRate30d ?? 0,
             })
             if (
-                typeof session.account.totalMoments !== "number" ||
-                session.account.totalMoments === 0
+                typeof session.metrics.totalMoments !== "number" ||
+                session.metrics.totalMoments === 0
             ) {
-                session.account.setTotalMoments(accMoments?.length ?? 0)
+                session.metrics.setTotalMoments(accMoments?.length ?? 0)
             }
         }
     }, [accountData, accMoments])
@@ -281,27 +275,25 @@ export default function AccountScreen() {
         if (Array.isArray(accMoments)) {
             session.account.setMoments(accMoments as any)
             if (
-                typeof session.account.totalMoments !== "number" ||
-                session.account.totalMoments === 0
+                typeof session.metrics.totalMoments !== "number" ||
+                session.metrics.totalMoments === 0
             ) {
-                session.account.setTotalMoments(accMoments.length)
+                session.metrics.setTotalMoments(accMoments.length)
             }
         }
     }, [accMoments])
 
-    // Snapshot session.user fields; if any field changes compared to the last snapshot, refetch account
+    // Snapshot session.account fields; if any field changes compared to the last snapshot, refetch account
     useEffect(() => {
         if (!accountData) return
 
         const fingerprint = JSON.stringify({
-            id: session?.user?.id ?? "",
-            username: session?.user?.username ?? "",
-            name: session?.user?.name ?? "",
-            description: session?.user?.description ?? "",
-            richDescription: session?.user?.richDescription ?? "",
-            isVerified: !!session?.user?.isVerified,
-            isActive: !!session?.user?.isActive,
-            profilePicture: session?.user?.profilePicture ?? "",
+            id: session?.account?.userId ?? "",
+            username: session?.account?.username ?? "",
+            name: session?.account?.name ?? "",
+            isVerified: !!session?.account?.isVerified,
+            isActive: !!session?.account?.isActive,
+            profilePicture: session?.account?.profilePicture ?? "",
         })
 
         // Only refetch when there's a previous snapshot and it differs
@@ -313,14 +305,12 @@ export default function AccountScreen() {
         userSnapshotRef.current = fingerprint
     }, [
         accountData,
-        session?.user?.id,
-        session?.user?.username,
-        session?.user?.name,
-        session?.user?.description,
-        session?.user?.richDescription,
-        session?.user?.isVerified,
-        session?.user?.isActive,
-        session?.user?.profilePicture,
+        session?.account?.userId,
+        session?.account?.username,
+        session?.account?.name,
+        session?.account?.isVerified,
+        session?.account?.isActive,
+        session?.account?.profilePicture,
     ])
 
     const lastCreatedAt = useMemo(() => {

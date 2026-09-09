@@ -180,7 +180,7 @@ export function ProfileReportModal() {
                             Vibrate("notificationSuccess")
                             toast.success("Report sent successfully!")
                             setSelectedReportId(null)
-                        } catch (e) {
+                        } catch {
                             setShowReportModal(false)
                             Vibrate("notificationError")
                             toast.error("Error sending report")

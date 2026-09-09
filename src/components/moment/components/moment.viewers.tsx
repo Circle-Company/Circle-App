@@ -18,13 +18,14 @@ import MomentContext from "../context"
  * O estado mora no FeedContext porque quem anima o card é a tela que o
  * renderiza, não este botão.
  */
-export function viewersIOS({ size }: { size?: number }) {
+export function ViewersIOS({ size }: { size?: number }) {
     const { session } = React.useContext(PersistedContext)
     const { viewersMomentId, setViewersMomentId } = React.useContext(FeedContext)
     const { data } = React.useContext(MomentContext)
 
     const momentId = data?.id ? String(data.id) : ""
-    const isOwner = !!momentId && String(data?.user?.id || "") === String(session.user.id || "")
+    const isOwner =
+        !!momentId && String(data?.user?.id || "") === String(session.account.userId || "")
 
     const isOpen = viewersMomentId === momentId
 

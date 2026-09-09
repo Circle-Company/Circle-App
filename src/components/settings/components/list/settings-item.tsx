@@ -1,7 +1,7 @@
 import * as LocalAuthentication from "expo-local-authentication"
 
 import ColorTheme, { colors } from "@/constants/colors"
-import { Pressable, TextStyle, View, ViewStyle, useColorScheme } from "react-native"
+import { Pressable, TextStyle, View, ViewStyle } from "react-native"
 
 import ChevronRight from "@/assets/icons/svgs/chevron_right.svg"
 import LanguageContext from "@/contexts/language"
@@ -44,7 +44,6 @@ export default function SettingsItem({
 }: SettingsiItemObjectProps) {
     // migrated: removed legacy navigation variable
     const { t } = React.useContext(LanguageContext)
-    const isDarkMode = useColorScheme() === "dark"
     const { session } = React.useContext(PersistedContext)
     const resolvedType = type ?? "TEXT"
     const showChevron = (resolvedType === "IMAGE" || resolvedType === "TEXT") && !rightComponent
@@ -151,7 +150,7 @@ export default function SettingsItem({
                         <UserShow.Root
                             data={
                                 {
-                                    ...session.user,
+                                    ...session.account,
                                     youFollow: false,
                                     verified: false,
                                 } as unknown as userReciveDataProps

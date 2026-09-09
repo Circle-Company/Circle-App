@@ -78,9 +78,12 @@ export default function FollowButton({
         }
     }
 
-    if (user.id == session.user.id) return null
+    // `String()` dos dois lados: o contrato manda o id como string, mas alguns payloads
+    // ainda entregam número. Com `===` puro, id numérico faria a checagem "sou eu" falhar
+    // e o botão de seguir apareceria no próprio perfil — que é o que o `==` escondia.
+    if (String(user.id) === String(session.account.userId)) return null
     if (isFollowing && hideOnFollowing) return null
-    if (isFollowing && hideOnFollowing == false) {
+    if (isFollowing && hideOnFollowing === false) {
         if (followPressed) {
             return (
                 <Animated.View style={{ transform: [{ scale: animatedScale }] }}>

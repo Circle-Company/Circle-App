@@ -5,7 +5,6 @@ export type ProfileReciveDataProps = {
     id: number
     username: string
     name: string | null
-    description: string | null
     profilePicture: string | null
     status: {
         verified: boolean

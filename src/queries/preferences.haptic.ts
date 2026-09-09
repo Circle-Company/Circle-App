@@ -11,7 +11,7 @@ export function useDisableHapticsMutation() {
     const mutation = useMutation({
         mutationFn: async () => {
             await apiRoutes.preferences.content.setHaptics({
-                userId: session.user.id,
+                userId: session.account.userId,
                 disableHaptics: true,
             })
         },
@@ -34,7 +34,7 @@ export function useEnableEnableMutation() {
     const mutation = useMutation({
         mutationFn: async () => {
             await apiRoutes.preferences.content.setHaptics({
-                userId: session.user.id,
+                userId: session.account.userId,
                 disableHaptics: false,
             })
         },

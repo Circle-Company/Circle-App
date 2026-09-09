@@ -19,7 +19,7 @@ import { useFriendsQuery, useRemoveFriendMutation, type Friend } from "@/queries
 export default function FriendsScreen() {
     const { t } = React.useContext(LanguageContext)
     const { session } = React.useContext(PersistedContext)
-    const accountId = String(session?.user?.id || "")
+    const accountId = String(session?.account?.userId || "")
 
     // 200 é o teto da API por página. Acima disso a tela precisaria paginar;
     // `total` continua sendo a contagem real, então o contador não mente.

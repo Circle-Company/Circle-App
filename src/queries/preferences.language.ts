@@ -21,7 +21,7 @@ export function useSetAppLanguageMutation({ appLanguage }: { appLanguage: Langua
             inFlightRef.current = true
             try {
                 await apiRoutes.preferences.language.setLanguage({
-                    userId: session.user.id,
+                    userId: session.account.userId,
                     appLanguage,
                 })
             } finally {

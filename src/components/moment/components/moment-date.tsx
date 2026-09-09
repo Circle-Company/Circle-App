@@ -5,12 +5,15 @@ import sizes from "@/constants/sizes"
 import ColorTheme from "@/constants/colors"
 import MomentContext from "@/components/moment/context"
 import { MomentDateProps } from "@/components/moment/moment-types"
-import { useLocaleDateRelative, useLocaleDateRelative2 } from "@/lib/hooks/useLocaleDate"
+import { useLocaleDateRelative2 } from "@/lib/hooks/useLocaleDate"
 export default function Date({
     color = String(ColorTheme().text),
     backgroundColor,
 }: MomentDateProps) {
     const { data } = React.useContext(MomentContext)
+    // Chamado incondicionalmente: antes ficava dentro de um ternário no JSX, o que muda a
+    // ordem dos hooks entre renders. O hook já devolve "" para data inválida ou ausente.
+    const publishedAtLabel = useLocaleDateRelative2(data.publishedAt ?? "")
 
     const container: any = {
         borderRadius: (sizes.sizes["2md"] * 0.9) / 2,
@@ -27,7 +30,7 @@ export default function Date({
     return (
         <View style={container}>
             <Text style={description_style} selectable={false}>
-                {data.publishedAt ? useLocaleDateRelative2(data.publishedAt) : ""}
+                {publishedAtLabel}
             </Text>
         </View>
     )

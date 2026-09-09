@@ -23,11 +23,11 @@ export function MomentProvider({
     const { session } = React.useContext(PersistedContext)
 
     const DataStore = useData()
-    const ActionsStore = useActions(data.id)
+    const ActionsStore = useActions(data.id, data.user?.id)
     const OptionsStore = useOptions()
     const VideoStore = useVideo()
 
-    const isMe = data.user?.id ? session.user.id === data.user.id : true
+    const isMe = data.user?.id ? session.account.userId === data.user.id : true
 
     useEffect(() => {
         DataStore.set(data)

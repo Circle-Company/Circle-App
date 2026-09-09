@@ -51,9 +51,6 @@ export type MomentLikeProps = {
 }
 export type MomentUsernameProps = {}
 
-export type MomentDescriptionProps = {
-    displayOnMoment?: boolean
-}
 export type MomentDateProps = {
     color?: string
     backgroundColor?: string

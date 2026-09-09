@@ -4,10 +4,8 @@ import ColorTheme from "../../../constants/colors"
 import fonts from "../../../constants/fonts"
 import sizes from "../../../constants/sizes"
 import { Text } from "../../Themed"
-import LanguageContext from "@/contexts/language"
 import { useProfileContext as UseProfileContext } from "../profile-context"
 import { ProfileNameProps } from "../profile-types"
-import { textLib } from "@/circle.text.library"
 
 export default function Name({
     color = String(ColorTheme().text),
@@ -17,9 +15,7 @@ export default function Name({
     scale = 1,
 }: ProfileNameProps) {
     const { user } = UseProfileContext()
-    const { t } = React.useContext(LanguageContext)
 
-    const followsNum = user?.metrics?.totalFollowers ?? 0
     const animatedOpacity = React.useRef(new Animated.Value(0.2)).current
 
     function handleAnimation() {

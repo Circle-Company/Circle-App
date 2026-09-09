@@ -26,7 +26,8 @@ export default function RenderViewers({ moment, focused }: renderViewersProps) {
     const isOpen = viewersMomentId === momentId
     // `GET /moments/:id/viewers` responde 403 para quem não é o autor, então
     // nem o botão nem a query existem fora da própria conta.
-    const isOwner = !!momentId && String(moment?.user?.id || "") === String(session.user.id || "")
+    const isOwner =
+        !!momentId && String(moment?.user?.id || "") === String(session.account.userId || "")
 
     const { data, error, isLoading } = useMomentViewersQuery(momentId, {
         enabled: isOwner && isOpen && focused,

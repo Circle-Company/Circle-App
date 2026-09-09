@@ -122,7 +122,6 @@ isSharing, setIsSharing                      // true durante todo o card do Canc
 isHandsFree, setIsHandsFree                  // modo tap-to-toggle
 
 // ─── Metadata (opcional) ──────────────────────────────────────
-description, setDescription                  // legenda do moment (não usado hoje)
 authToken, setAuthToken                      // não usado; JWT vem do PersistedContext
 
 // ─── Legacy upload API (vestigial) ────────────────────────────
@@ -303,7 +302,7 @@ O módulo importa de fora:
 
 | Import | Uso |
 |---|---|
-| `@/contexts/Persisted` (`session`) | `session.user.id` + `session.account.jwtToken` no `shareMoment` |
+| `@/contexts/Persisted` (`session`) | `session.account.userId` no `shareMoment`; o token e injetado pelo interceptor |
 | `@/contexts/language` (`LanguageContext.t`) | Traduções de strings visíveis |
 | `@/contexts/Toast/notify` (`notify()`) | In-app toasts (falhas de publicação, cancelled) |
 
@@ -378,7 +377,6 @@ removidos. Se você realmente precisa de "estado global de share", use
 Os campos abaixo estão no `CameraContextType` mas **não são chamados**:
 
 ```ts
-description, setDescription
 authToken, setAuthToken
 isUploading, uploadError, lastUploadResponse, clearUploadError
 upload()
@@ -388,7 +386,8 @@ isPressingButton, setIsPressingButton
 ```
 
 Motivos:
-- `description`, `setDescription`, `video`, `setVideo` — usados pela `share.tsx` deletada
+- `video`, `setVideo` — usados pela `share.tsx` deletada
+- `description` — removido: moment não tem mais descrição, nem no app nem no backend
 - `authToken` — nunca foi usado; JWT vem sempre de `PersistedContext`
 - `isUploading` etc. — refletiam o `upload()` do context (também sem uso)
 - `rotateAnimation` — vestigial de rotate button antigo

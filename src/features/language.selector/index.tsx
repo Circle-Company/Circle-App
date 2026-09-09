@@ -76,7 +76,7 @@ export default function ListLanguagesSelector() {
                         <View style={container_left}>
                             <Text style={text_style}>{item.nativeName}</Text>
                         </View>
-                        {session.preferences.language.appLanguage == item.code && (
+                        {session.preferences.language.appLanguage === item.code && (
                             <View style={container_right}>
                                 <CheckIcon fill={icon_fill} width={23} height={23} />
                             </View>

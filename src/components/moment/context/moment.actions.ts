@@ -22,7 +22,12 @@ export interface MomentActionsState extends actionsProps {
     get: () => actionsProps
 }
 
-export function useActions(momentId?: string): MomentActionsState {
+/**
+ * @param momentId Id do momento sobre o qual as interações são registradas.
+ * @param ownerId  Id do **dono** do momento. Só o `EXCLUDE` o usa, e é o que permite negar
+ *                 a exclusão de um momento de outra pessoa — ver a guarda no `switch`.
+ */
+export function useActions(momentId?: string, ownerId?: string): MomentActionsState {
     const { session } = React.useContext(PersistedContext)
 
     // Estados para interações
@@ -34,7 +39,7 @@ export function useActions(momentId?: string): MomentActionsState {
     // Função para enviar interação para o servidor
     const registerInteraction = React.useCallback(
         async <T extends InteractionType>(interactionType: T, data?: InteractionPayload<T>) => {
-            if (!momentId || !session.account.jwtToken) {
+            if (!momentId || !session.account.userId) {
                 console.warn("MomentId ou token não disponível para enviar interação")
                 return false
             }
@@ -42,12 +47,11 @@ export function useActions(momentId?: string): MomentActionsState {
             try {
                 const baseParams = {
                     momentId,
-                    authorizationToken: session.account.jwtToken,
                 }
 
                 switch (interactionType) {
                     case "LIKE": {
-                        if (!like && initialLikedState == false)
+                        if (!like && initialLikedState === false)
                             await apiRoutes.moment.actions.like(baseParams).then(() => {
                                 setLike(true)
                             })
@@ -93,11 +97,36 @@ export function useActions(momentId?: string): MomentActionsState {
                         break
                     }
                     case "EXCLUDE": {
-                        if (momentId == session.user.id) {
-                            await apiRoutes.moment.author.exclude({
-                                ...baseParams,
-                            })
+                        /*
+                         * Só o dono apaga o próprio momento.
+                         *
+                         * A guarda anterior comparava `momentId` com `session.account.userId`
+                         * — o id do MOMENTO com o id do USUÁRIO, dois Snowflakes de coisas
+                         * diferentes que nunca são iguais. O efeito era o `exclude` ficar
+                         * inalcançável: parecia uma checagem de permissão e era, na prática,
+                         * um `return` disfarçado.
+                         *
+                         * O dono agora chega por parâmetro (`ownerId`), vindo de
+                         * `data.user.id` no `MomentProvider`. Sem ele a exclusão é **negada**:
+                         * numa ação destrutiva o default seguro é recusar, não presumir posse.
+                         *
+                         * `String()` dos dois lados porque o id às vezes chega como número do
+                         * backend, e aí `===` puro reprovaria o próprio dono.
+                         */
+                        const isOwner =
+                            !!ownerId && String(ownerId) === String(session.account.userId)
+
+                        if (!isOwner) {
+                            console.warn(
+                                "EXCLUDE negado: o momento não pertence ao usuário logado",
+                                JSON.stringify({ momentId, hasOwnerId: !!ownerId }),
+                            )
+                            return false
                         }
+
+                        await apiRoutes.moment.author.exclude({
+                            ...baseParams,
+                        })
                         break
                     }
                     default: {
@@ -118,7 +147,7 @@ export function useActions(momentId?: string): MomentActionsState {
                 return false
             }
         },
-        [momentId, session.account.jwtToken],
+        [momentId, ownerId, session.account.userId],
     )
 
     function get(): actionsProps {

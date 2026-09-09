@@ -27,8 +27,8 @@ export default function PersonalData() {
     const [jsonData, setJsonData] = React.useState<any | null>(null)
 
     const handleExport = async () => {
-        const token = session?.account?.jwtToken
-        if (!token) {
+        // Gate de sessão, não credencial: o `Authorization` é do interceptor (§3.2).
+        if (!session?.account?.userId) {
             Alert.alert(t("Error"), t("Token not available for authentication."))
             return
         }
@@ -36,9 +36,7 @@ export default function PersonalData() {
         setResult(null)
         try {
             console.log("⬆️ Requesting account data export: GET /account/data")
-            const res = await api.get("/account/data", {
-                headers: { Authorization: `Bearer ${token}` },
-            })
+            const res = await api.get("/account/data")
             const payloadStr =
                 typeof res?.data === "string" ? res.data : JSON.stringify(res.data, null, 2)
             console.log("✅ Account data export success (length):", payloadStr.length)
@@ -65,7 +63,7 @@ export default function PersonalData() {
             return
         }
         try {
-            const username = session?.user?.username ?? "user"
+            const username = session?.account?.username ?? "user"
             const usernameSafe = String(username).replace(/[^a-zA-Z0-9._-]/g, "_")
             const timestamp = new Date().toISOString().replace(/[:.]/g, "-")
             const filename = `circleapp-@${usernameSafe}-${timestamp}.json`
@@ -104,34 +102,6 @@ export default function PersonalData() {
         } catch (e: any) {
             console.log("❌ Falha ao copiar JSON:", e?.message ?? String(e))
             Alert.alert(t("Error copying JSON"), e?.message ?? t("Try again"))
-        }
-    }
-
-    const handleSaveToFiles = async () => {
-        if (!jsonData) {
-            Alert.alert(t("Nothing to save"), t("Please request the export first."))
-            return
-        }
-        try {
-            const pickedDir = await Directory.pickDirectoryAsync()
-            if (!pickedDir) {
-                Alert.alert(t("Canceled"), t("No folder was selected."))
-                return
-            }
-            const username = session?.user?.username ?? "user"
-            const usernameSafe = String(username).replace(/[^a-zA-Z0-9._-]/g, "_")
-            const timestamp = new Date().toISOString().replace(/[:.]/g, "-")
-            const filename = `circleapp-@${usernameSafe}-${timestamp}.json`
-
-            const file = pickedDir.createFile(filename, "application/json")
-            const payload =
-                typeof jsonData === "string" ? jsonData : JSON.stringify(jsonData, null, 2)
-            file.write(payload)
-            console.log("⬇️ JSON salvo via Files app:", file.uri)
-            Alert.alert(t("File saved"), `${t("File saved at")}:\n${file.uri}`)
-        } catch (e: any) {
-            console.log("❌ Falha ao salvar via Files app:", e?.message ?? String(e))
-            Alert.alert(t("Error saving"), e?.message ?? t("Try again"))
         }
     }
 

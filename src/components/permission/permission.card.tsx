@@ -1,10 +1,9 @@
 import React from "react"
-import { Animated, View, ViewStyle, TextStyle } from "react-native"
+import { Animated, View, ViewStyle, TextStyle, Platform } from "react-native"
 import { Text } from "@/components/Themed"
 import { colors } from "@/constants/colors"
 import fonts from "@/constants/fonts"
 import sizes from "@/constants/sizes"
-import { Platform } from "react-native"
 
 import {
     GlassContainer,
@@ -69,7 +68,6 @@ export default function PermissionCard({ title, icon }: PermissionCardProps) {
             <GlassContainer>
                 <GlassView
                     style={glassContainer}
-                    colorScheme="dark"
                     glassEffectStyle="clear"
                     isInteractive={false}
                     tintColor={colors.gray.grey_09 + "99"}

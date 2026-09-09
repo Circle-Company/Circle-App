@@ -1,6 +1,6 @@
 import { Text } from "@/components/Themed"
 import sizes from "@/constants/sizes"
-import { ViewStyle } from "react-native"
+import { ViewStyle, TextStyle } from "react-native"
 import LanguageContext from "@/contexts/language"
 import React from "react"
 import { Vibrate } from "@/lib/hooks/useHapticFeedback"
@@ -8,8 +8,7 @@ import { colors } from "@/constants/colors"
 import fonts from "@/constants/fonts"
 import { router } from "expo-router"
 import ButtonStandart from "@/components/buttons/button-standart"
-import { TextStyle } from "react-native"
-import Reanimated, { FadeIn, SlideInUp, Easing } from "react-native-reanimated"
+import Reanimated, { FadeIn, Easing } from "react-native-reanimated"
 
 export function NoMoments() {
     const { t } = React.useContext(LanguageContext)

@@ -1,4 +1,4 @@
-import { describe, it, expect, vi, beforeEach } from "vitest"
+import { describe, it, expect, vi, beforeEach, afterEach } from "vitest"
 import { DebounceGate } from "../debounceGate"
 
 // Mock da constante DEBOUNCE_TIME
@@ -78,7 +78,6 @@ describe("DebounceGate", () => {
         it("deve marcar o tempo atual", () => {
             debounceGate = new DebounceGate(1000)
 
-            const initialTime = Date.now()
             debounceGate.mark()
 
             // Verificar que foi marcado (indiretamente através do comportamento)

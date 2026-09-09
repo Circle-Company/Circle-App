@@ -12,7 +12,6 @@ export interface profileProps {
         username: string
         name: string | null
         profilePicture: string | null
-        description: string | null
         status: {
             verified: boolean
         }
@@ -74,9 +73,9 @@ export function Provider({ children }: ProfileProviderProps) {
     )
     const [totalMoments, setTotalMoments] = React.useState<number>(0)
 
-    const [currentPage, setCurrentPage] = React.useState(1)
-    const [pageSize, setPageSize] = React.useState(20)
-    const [userId, setUserId] = React.useState<string>(session?.user?.id || "")
+    const [, setCurrentPage] = React.useState(1)
+    const [, setPageSize] = React.useState(20)
+    const [userId, setUserId] = React.useState<string>(session?.account?.userId || "")
     // Guarda o último userId solicitado para evitar condições de corrida
     const lastRequestedUserIdRef = React.useRef<string>("")
 
@@ -99,7 +98,6 @@ export function Provider({ children }: ProfileProviderProps) {
 
         // Extrai nome/descrição
         const rawName = root.name ?? root.fullName ?? root.displayName ?? ""
-        const rawDescription = root.description ?? root.bio ?? root.about ?? ""
 
         // Extrai foto de perfil de múltiplas chaves
         const rawProfilePicture =
@@ -163,7 +161,6 @@ export function Provider({ children }: ProfileProviderProps) {
             id: String(rawId ?? ""),
             username: String(rawUsername ?? ""),
             name: String(rawName ?? "") || "",
-            description: String(rawDescription ?? "") || "",
             profilePicture: rawProfilePicture ? String(rawProfilePicture) : "",
             status: { verified: statusVerified },
             metrics,
@@ -171,82 +168,88 @@ export function Provider({ children }: ProfileProviderProps) {
         }
     }
 
-    async function getProfile(requestUserId?: string): Promise<profileProps["profile"]> {
-        const targetId = String(requestUserId || userId || "")
-        if (!targetId) {
-            // Quando não houver ID, retorna o último estado conhecido
-            return profile
-        }
-        const token = session?.account?.jwtToken
-        if (!token) {
-            console.warn("⚠️ ProfileContext: missing jwtToken, skipping getProfile")
-            return profile
-        }
-        // Marca o último userId solicitado antes de iniciar a request
-        lastRequestedUserIdRef.current = targetId
-        setIsLoadingProfile(true)
-        try {
-            const res = await api.get(`/users/${targetId}`, {
-                headers: { Authorization: `Bearer ${session.account.jwtToken}` },
-            })
-            // Garante que a resposta ainda corresponde ao último userId solicitado
-            if (lastRequestedUserIdRef.current !== targetId) {
-                // Resposta atrasada/obsoleta; ignorar
+    // Em `useCallback` porque entram no valor do contexto: como `function` solta, nasceriam
+    // novas a cada render e derrubariam a memoizacao do `contextValue`.
+    const getProfile = React.useCallback(
+        async (requestUserId?: string): Promise<profileProps["profile"]> => {
+            const targetId = String(requestUserId || userId || "")
+            if (!targetId) {
+                // Quando não houver ID, retorna o último estado conhecido
                 return profile
             }
-            const acc = transformUserToProfilePayload(res?.data ?? {})
-            setProfile(acc)
-            return acc
-        } catch (error) {
-            console.error("Erro ao carregar perfil:", error)
-            return profile
-        } finally {
-            // Apenas limpa o loading se ainda estivermos olhando para o mesmo userId
-            if (lastRequestedUserIdRef.current === targetId) {
-                setIsLoadingProfile(false)
+            // O gate é a identidade do viewer, não o token: quem injeta o `Authorization` é o
+            // interceptor, a partir da sessão viva (§3.2). Passá-lo aqui não tinha efeito —
+            // o interceptor sobrescreve — e ler o token só para decidir "há sessão?" acoplava
+            // esta tela ao formato da credencial.
+            if (!session?.account?.userId) {
+                console.warn("⚠️ ProfileContext: sem viewer carregado, pulando getProfile")
+                return profile
             }
-        }
-    }
-
-    async function getMoments({
-        page,
-        limit,
-        userId: reqUserId,
-    }: pagination): Promise<momentsProps["moments"]> {
-        const targetId = String(reqUserId || userId || "")
-        if (!targetId) {
-            return moments
-        }
-        setPageSize(limit)
-        setCurrentPage(page)
-        const token = session?.account?.jwtToken
-        if (!token) {
-            console.warn("⚠️ ProfileContext: missing jwtToken, skipping getMoments")
-            return moments
-        }
-        setIsLoadingMoments(true)
-        try {
-            const res = await api.get(`/users/${targetId}/moments?page=${page}&limit=${limit}`, {
-                headers: { Authorization: `Bearer ${session.account.jwtToken}` },
-            })
-            const list = (res?.data?.moments ?? res?.data ?? []) as momentsProps["moments"]
-            if (page === 1) {
-                setMoments(list)
-                setTotalMoments(list.length)
-            } else {
-                setMoments((prev) => [...prev, ...list])
-                setTotalMoments((prev) => prev + list.length)
+            // Marca o último userId solicitado antes de iniciar a request
+            lastRequestedUserIdRef.current = targetId
+            setIsLoadingProfile(true)
+            try {
+                const res = await api.get(`/users/${targetId}`)
+                // Garante que a resposta ainda corresponde ao último userId solicitado
+                if (lastRequestedUserIdRef.current !== targetId) {
+                    // Resposta atrasada/obsoleta; ignorar
+                    return profile
+                }
+                const acc = transformUserToProfilePayload(res?.data ?? {})
+                setProfile(acc)
+                return acc
+            } catch (error) {
+                console.error("Erro ao carregar perfil:", error)
+                return profile
+            } finally {
+                // Apenas limpa o loading se ainda estivermos olhando para o mesmo userId
+                if (lastRequestedUserIdRef.current === targetId) {
+                    setIsLoadingProfile(false)
+                }
             }
-            return list
-        } catch (error) {
-            console.error("Erro ao carregar momentos do perfil:", error)
-            return moments
-        } finally {
-            setIsLoadingMoments(false)
-        }
-    }
+        },
+        [userId, profile, session?.account?.userId],
+    )
 
-    function setProfilePreview(payload: { id?: string; username?: string }) {
+    const getMoments = React.useCallback(
+        async ({
+            page,
+            limit,
+            userId: reqUserId,
+        }: pagination): Promise<momentsProps["moments"]> => {
+            const targetId = String(reqUserId || userId || "")
+            if (!targetId) {
+                return moments
+            }
+            setPageSize(limit)
+            setCurrentPage(page)
+            if (!session?.account?.userId) {
+                console.warn("⚠️ ProfileContext: sem viewer carregado, pulando getMoments")
+                return moments
+            }
+            setIsLoadingMoments(true)
+            try {
+                const res = await api.get(`/users/${targetId}/moments?page=${page}&limit=${limit}`)
+                const list = (res?.data?.moments ?? res?.data ?? []) as momentsProps["moments"]
+                if (page === 1) {
+                    setMoments(list)
+                    setTotalMoments(list.length)
+                } else {
+                    setMoments((prev) => [...prev, ...list])
+                    setTotalMoments((prev) => prev + list.length)
+                }
+                return list
+            } catch (error) {
+                console.error("Erro ao carregar momentos do perfil:", error)
+                return moments
+            } finally {
+                setIsLoadingMoments(false)
+            }
+        },
+        [userId, moments, session?.account?.userId],
+    )
+
+    const setProfilePreview = React.useCallback((payload: { id?: string; username?: string }) => {
         setProfile(
             (prev) =>
                 ({
@@ -257,9 +260,9 @@ export function Provider({ children }: ProfileProviderProps) {
                 }) as any,
         )
         if (payload.id) setUserId(String(payload.id))
-    }
+    }, [])
 
-    function cleanProfile() {
+    const cleanProfile = React.useCallback(() => {
         // Reset profile-related state when leaving the profile stack
         lastRequestedUserIdRef.current = ""
         setIsLoadingProfile(false)
@@ -281,27 +284,41 @@ export function Provider({ children }: ProfileProviderProps) {
         setCurrentPage(1)
         setPageSize(20)
         // Restore default userId to the session user (prevents leaking viewed userId)
-        setUserId(session?.user?.id || "")
-    }
+        setUserId(session?.account?.userId || "")
+    }, [session?.account?.userId])
 
-    const contextValue: ProfileContextsData = {
-        setShowReportModal,
-        showReportModal,
-        isLoadingProfile,
-        isLoadingMoments,
-        setIsLoadingProfile,
-        setIsLoadingMoments,
-        profile,
-        moments,
-        getProfile,
-        getMoments,
-        setUserId,
-        setProfilePreview,
-        totalMoments,
-        setTotalMoments,
-        setMoments,
-        cleanProfile,
-    }
+    const contextValue = React.useMemo<ProfileContextsData>(
+        () => ({
+            setShowReportModal,
+            showReportModal,
+            isLoadingProfile,
+            isLoadingMoments,
+            setIsLoadingProfile,
+            setIsLoadingMoments,
+            profile,
+            moments,
+            getProfile,
+            getMoments,
+            setUserId,
+            setProfilePreview,
+            totalMoments,
+            setTotalMoments,
+            setMoments,
+            cleanProfile,
+        }),
+        [
+            showReportModal,
+            isLoadingProfile,
+            isLoadingMoments,
+            profile,
+            moments,
+            getProfile,
+            getMoments,
+            setProfilePreview,
+            totalMoments,
+            cleanProfile,
+        ],
+    )
 
     return <ProfileContext.Provider value={contextValue}>{children}</ProfileContext.Provider>
 }

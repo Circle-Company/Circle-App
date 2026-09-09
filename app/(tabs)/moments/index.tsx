@@ -1,9 +1,8 @@
 import React from "react"
 import ListMoments from "@/features/moments"
-import { useRouter } from "expo-router"
-import { useFocusEffect } from "expo-router"
+import { useRouter, useFocusEffect } from "expo-router"
 import useAppPermissions from "@/lib/hooks/useAppPermissions"
-import { usePreferencesStore } from "@/contexts/Persisted/persist.preferences"
+import { usePreferencesStore } from "@/contexts/Persisted/preferences"
 import TutorialDialog from "@/features/moments/feed/render-tutorial-dialog"
 import { LocationNotProvidedCard } from "@/features/moments/location-not-provided.card"
 import { NoMomentsCard } from "@/features/moments/no-moments.card"
@@ -36,7 +35,7 @@ export default function HomeScreen() {
     const insets = useSafeAreaInsets()
     const { session } = React.useContext(PersistedContext)
 
-    const hasToken = !!session?.account?.jwtToken
+    const hasToken = !!session?.account?.userId
 
     // O feed só é liberado depois do primeiro momento publicado. `limit: 1`
     // porque só interessa `pagination.total`, não a lista.
@@ -69,10 +68,13 @@ export default function HomeScreen() {
 
     useFocusEffect(
         React.useCallback(() => {
+            // `isActive` era um guard pela metade: marcado como `false` na limpeza e nunca
+            // lido, então o `setChecked` do `finally` rodava mesmo com a tela já fora de
+            // foco. Agora ele é consultado — que é o que a variável sempre quis dizer.
             let isActive = true
             ;(async () => {
                 try {
-                    setChecked(false)
+                    if (isActive) setChecked(false)
                     // Revalida ao voltar do fluxo de criação: é o que destrava
                     // o feed logo após o primeiro momento ser publicado.
                     await Promise.all([
@@ -83,7 +85,7 @@ export default function HomeScreen() {
                     ])
                 } catch {
                 } finally {
-                    setChecked(true)
+                    if (isActive) setChecked(true)
                 }
             })()
             return () => {

@@ -1,6 +1,5 @@
 import type { BaseAction, commentAction, watchTimeAction, reportAction } from "./moment.types"
 import api from "@/api"
-import { storage, storageKeys } from "@/store"
 
 const WATCH_DEBOUNCE_MS = 400
 type WatchDebounceEntry = { timer: any; lastWatchTime: number }
@@ -43,18 +42,10 @@ export async function like(props: BaseAction): Promise<void> {
 }
 
 export async function report(props: reportAction): Promise<void> {
-    await api.post(
-        `/moments/${props.momentId}/report`,
-        {
-            reason: props.reason,
-            description: props.description,
-        },
-        {
-            headers: {
-                Authorization: `Bearer ${storage.getString(storageKeys().account.jwt.token) || ""}`,
-            },
-        },
-    )
+    await api.post(`/moments/${props.momentId}/report`, {
+        reason: props.reason,
+        description: props.description,
+    })
 }
 
 export async function unlike(props: BaseAction): Promise<void> {

@@ -1,4 +1,5 @@
-import { CommentObject, CommentsReciveDataProps } from "../../comment/comments-types"
+import { Moment } from "@/contexts/Feed/types"
+import { CommentsReciveDataProps } from "../../comment/comments-types"
 import { MomentOptionsState } from "./moment.options"
 import { MomentVideoState } from "./moment.video"
 import { MomentActionsState } from "./moment.actions"
@@ -29,17 +30,16 @@ export type actionsProps = {
 }
 
 export type InteractionPayloadMap = {
-    LIKE: { momentId: string; authorizationToken: string }
-    UNLIKE: { momentId: string; authorizationToken: string }
-    WATCH: { momentId: string; authorizationToken: string; watchTime: number }
+    LIKE: { momentId: string }
+    UNLIKE: { momentId: string }
+    WATCH: { momentId: string; watchTime: number }
     COMMENT: {
         momentId: string
-        authorizationToken: string
         content: string
         mentions?: string[]
         parentId?: string
     }
-    EXCLUDE: { momentId: string; authorizationToken: string }
+    EXCLUDE: { momentId: string }
 }
 
 export type InteractionPayload<T extends "LIKE" | "UNLIKE" | "WATCH" | "COMMENT" | "EXCLUDE"> =
@@ -78,25 +78,24 @@ export interface MomentVideoProps {
     }
 }
 
-export interface dataProps {
-    id: string
-    user: {
-        id: string
-        username: string
-        profilePicture: string
+/**
+ * O que o `MomentProvider` precisa para renderizar.
+ *
+ * É o `Moment` do feed. Os dois estavam escritos campo a campo em arquivos diferentes,
+ * com exatamente a mesma forma — e o `MomentProvider` repassa o que recebe para o
+ * `useData`, que já é tipado como `Moment`. Duas declarações da mesma coisa só criam a
+ * chance de divergirem sem ninguém perceber; derivar de uma delas fecha isso.
+ *
+ * O único acréscimo são os campos de relação que o `UserShow.Root` consome
+ * (`userReciveDataProps`): assim a tela monta **um** objeto que serve ao mesmo tempo o
+ * contexto do momento e o cabeçalho do autor, sem cast no meio.
+ */
+export interface dataProps extends Omit<Moment, "user"> {
+    user: Moment["user"] & {
+        verified?: boolean
+        youFollow?: boolean
+        followYou?: boolean
     }
-    media: string
-    thumbnail: string
-    duration: number
-    size: string
-    hasAudio: boolean
-    description: string
-    ageRestriction: boolean
-    contentWarning: boolean
-    metrics: MomentMetricsProps
-    publishedAt: string
-    topComment?: CommentObject
-    isLiked?: boolean
 }
 
 export interface dataReturnsProps extends dataProps {

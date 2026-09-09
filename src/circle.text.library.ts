@@ -1,5 +1,5 @@
 import { CircleTextProps, TextLibrary, Timezone, TimezoneCode } from "circle-text-library"
-import { storage, storageKeys } from "@/store"
+import { preferencesStorage } from "@/contexts/Persisted/preferences/preferences.persistence"
 import { userRules } from "@/config/userRules"
 
 // Função para converter regras do user.rules.ts para o formato ValidationConfig
@@ -361,8 +361,14 @@ function createDateConfig(): CircleTextProps["dateFormatterConfig"] {
         capitalize: true,
         useApproximateTime: true,
         recentTimeThreshold: 60,
-        recentTimeLabel:
-            storage.getString(storageKeys().preferences.appLanguage) == "en" ? "now" : "agora",
+        /*
+         * Lia `storage.getString(storageKeys().preferences.appLanguage)`, uma chave que
+         * **nenhum código escreve**: o idioma mora dentro do blob `@circle:preferences`
+         * (`language.appLanguage`), e `preferences:language:app` só sobrou na tabela de
+         * chaves. A leitura devolvia `undefined`, então o rótulo caía sempre no `"agora"` —
+         * o "now" em inglês nunca aparecia, independentemente do idioma escolhido.
+         */
+        recentTimeLabel: preferencesStorage.read().language.appLanguage === "en" ? "now" : "agora",
     }
 }
 
@@ -375,10 +381,12 @@ export const textLib = new TextLibrary({
     dateFormatterConfig: createDateConfig(),
 })
 
+// Mesmo caso do `recentTimeLabel` acima: lia `storageKeys().preferences.timezoneCode`, chave
+// legada que ninguém escreve. O valor vive em `@circle:preferences` (`timezoneCode`).
 const localTZValue = new Timezone()
 localTZValue.setLocalTimezone(
     TimezoneCode[
-        storage.getString(storageKeys().preferences.timezoneCode) as keyof typeof TimezoneCode
+        preferencesStorage.read().timezoneCode as keyof typeof TimezoneCode
     ] as TimezoneCode,
 )
 

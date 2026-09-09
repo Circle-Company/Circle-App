@@ -116,23 +116,17 @@ export function useProfilePictureUpload() {
             })
             const imageBase64 = manipulated.base64 || ""
 
-            const token = session.account.jwtToken
-            const auth = token?.startsWith("Bearer ") ? token : token ? `Bearer ${token}` : ""
-
             const formData = new FormData()
             formData.append("imageData", `data:image/jpeg;base64,${imageBase64}`)
 
-            await api.post(
-                "/account/profile-picture",
-                formData,
-                auth
-                    ? { headers: { Authorization: auth, "Content-Type": "multipart/form-data" } }
-                    : { headers: { "Content-Type": "multipart/form-data" } },
-            )
+            // Só o `Content-Type`: o `Authorization` é do interceptor (§3.2).
+            await api.post("/account/profile-picture", formData, {
+                headers: { "Content-Type": "multipart/form-data" },
+            })
 
             // Atualiza os dados locais para a foto nova aparecer sem reabrir o app.
             try {
-                await (session.user as any).get?.(session.user.id)
+                await (session.account as any).get?.(session.account.userId)
             } catch {}
 
             setSelectedAsset(null)

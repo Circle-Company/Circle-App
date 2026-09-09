@@ -5,11 +5,10 @@ import sizes from "@/constants/sizes"
 import { Text } from "@/components/Themed"
 import { UserShow } from "@/components/user_show"
 import { CommentsRenderCommentProps } from "../comments-types"
-import { useLocaleDateRelative, useLocaleDateRelative2 } from "@/lib/hooks/useLocaleDate"
-import { iOSMajorVersion } from "@/lib/platform/detection"
+import { useLocaleDateRelative2 } from "@/lib/hooks/useLocaleDate"
 import { textLib } from "@/circle.text.library"
 
-export default function RenderComment({ comment, preview, index }: CommentsRenderCommentProps) {
+export default function RenderComment({ comment, preview }: CommentsRenderCommentProps) {
     const container: ViewStyle = {
         flexDirection: "row",
         marginTop: preview ? sizes.margins["1sm"] * 0.8 : 0,

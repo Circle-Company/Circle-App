@@ -1,4 +1,5 @@
 import Animated, {
+    type SharedValue,
     Easing,
     interpolate,
     runOnJS,
@@ -9,7 +10,7 @@ import Animated, {
     withTiming,
 } from "react-native-reanimated"
 import ColorTheme, { colors } from "../../constants/colors"
-import { PanResponder, View, useColorScheme, ActivityIndicator } from "react-native"
+import { PanResponder, View, ActivityIndicator } from "react-native"
 
 import { Loading } from "../../components/loading"
 import React from "react"
@@ -33,7 +34,7 @@ type AnimatedScrollViewProps = {
     elasticEffect?: boolean // NOVO: controla o efeito elástico/bounce
     onScrollChange?: (hasScrolled: boolean) => void // Callback quando scroll muda
     scrollThreshold?: number // Threshold para considerar que houve scroll
-    scrollY?: Animated.SharedValue<number> // NOVO: permite passar o shared value do scroll
+    scrollY?: SharedValue<number> // NOVO: permite passar o shared value do scroll
 }
 
 export function AnimatedVerticalScrollView({
@@ -51,8 +52,11 @@ export function AnimatedVerticalScrollView({
     scrollThreshold = 10,
     scrollY,
 }: AnimatedScrollViewProps) {
-    const isDarkMode = useColorScheme() === "dark"
-    const scrollPosition = scrollY ?? useSharedValue(0)
+    // O `useSharedValue` precisa ser chamado SEMPRE: com `scrollY ?? useSharedValue(0)` o
+    // curto-circuito pulava o hook quando o pai passava o shared value, mudando a ordem dos
+    // hooks entre montagens com e sem a prop.
+    const fallbackScrollPosition = useSharedValue(0)
+    const scrollPosition = scrollY ?? fallbackScrollPosition
     const pullDownPosition = useSharedValue(0)
     const isReadyToRefresh = useSharedValue(false)
     const [refreshing, setRefreshing] = React.useState(false)

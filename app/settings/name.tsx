@@ -1,5 +1,5 @@
 import React from "react"
-import { ViewStyle, TextStyle } from "react-native"
+import { ViewStyle, TextStyle, ActivityIndicator } from "react-native"
 import { Text, View } from "@/components/Themed"
 import { useNavigation } from "expo-router"
 import ButtonStandart from "@/components/buttons/button-standart"
@@ -11,11 +11,9 @@ import { textLib } from "@/circle.text.library"
 import { userRules } from "@/config/userRules"
 import fonts from "@/constants/fonts"
 import sizes from "@/constants/sizes"
-import api from "@/api"
 import { useUpdateAccNameMutation } from "@/queries"
 import { useToast } from "@/contexts/Toast"
 import { Vibrate } from "@/lib/hooks/useHapticFeedback"
-import { ActivityIndicator } from "react-native"
 
 export default function Name() {
     const { t } = React.useContext(LanguageContext)
@@ -25,10 +23,10 @@ export default function Name() {
     const toast = useToast()
     const navigation = useNavigation()
     const maxLength = userRules().name.maxLength
-    const [name, setname] = React.useState(session.user.name ? session.user.name : "")
+    const [name, setname] = React.useState(session.account.name ? session.account.name : "")
     const nameCanBeEdited = React.useMemo(() => {
-        return name !== session.user.name && name.length <= maxLength && name.length > 0
-    }, [name, session.user.name])
+        return name !== session.account.name && name.length <= maxLength && name.length > 0
+    }, [name, session.account.name])
 
     const container: ViewStyle = {
         alignItems: "center",
@@ -64,7 +62,7 @@ export default function Name() {
 
     const counter: TextStyle = {
         fontSize: fonts.size.caption1,
-        color: maxLength == name.length ? ColorTheme().error : ColorTheme().textDisabled,
+        color: maxLength === name.length ? ColorTheme().error : ColorTheme().textDisabled,
     }
 
     const legend_style: TextStyle = {
@@ -78,7 +76,7 @@ export default function Name() {
     const button_text: TextStyle = {
         fontSize: fonts.size.body,
         fontFamily: fonts.family["Black-Italic"],
-        color: name !== session.user.name ? colors.gray.black : colors.gray.grey_04 + "90",
+        color: name !== session.account.name ? colors.gray.black : colors.gray.grey_04 + "90",
     }
 
     const handleInputChange = (text: string) => {
@@ -88,7 +86,7 @@ export default function Name() {
 
     async function handlePress({ clean }: { clean: boolean }) {
         if ((!clean && !nameCanBeEdited) || isPending) return
-        if (name === session.user.name) return
+        if (name === session.account.name) return
         await updateName({
             name: clean ? null : textLib.rich.formatToEnriched(name),
         })
@@ -144,7 +142,7 @@ export default function Name() {
                 action={() => handlePress({ clean: name.length > 0 ? false : true })}
                 style={{ minWidth: sizes.buttons.width * 0.3 }}
                 backgroundColor={
-                    name !== session.user.name
+                    name !== session.account.name
                         ? colors.gray.white
                         : ColorTheme().backgroundDisabled.toString()
                 }

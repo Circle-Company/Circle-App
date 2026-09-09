@@ -2,7 +2,7 @@ import axios, { AxiosError, AxiosInstance, AxiosRequestConfig } from "axios"
 
 import config from "@/config"
 import { storage, storageKeys, safeDelete } from "@/store"
-import { useAccountStore } from "@/contexts/Persisted/persist.account"
+import { currentAuth, ensureSession, peekSession, waitForRevalidation } from "@/session/runtime"
 
 import { routes as accountRoutes } from "./account/account"
 import { routes as authRoutes } from "./auth/auth"
@@ -13,14 +13,8 @@ import { routes as radarRoutes } from "./radar/radar"
 import { routes as userRoutes } from "./user/user"
 import { routes as profileRoutes } from "./profile/profile"
 
-/**
- * Request que ficou esperando o refresh terminar. Precisa dos dois lados: em
- * caso de falha ela tem que ser **rejeitada**, não repetida com token vazio.
- */
-type PendingEntry = {
-    resume: (token: string) => void
-    fail: (error: unknown) => void
-}
+/** Teto de tentativas de auth por request. Ver §5.4: contador, não booleano. */
+const MAX_AUTH_ATTEMPTS = 2
 
 const PATH = `${config.ENDPOINT}`
 
@@ -28,153 +22,105 @@ const api: AxiosInstance = axios.create({
     baseURL: PATH,
 })
 
+/**
+ * Log de diagnóstico. Duas regras, ambas não negociáveis (ver `docs/session-management.md`
+ * §8): só sai em desenvolvimento, e **nenhum payload pode conter fragmento de token** —
+ * nem prefixo nem sufixo. Presença é booleano; o valor nunca aparece.
+ */
+const devLog = (message: string, data?: Record<string, unknown>) => {
+    if (!__DEV__) return
+    if (data) console.log(message, JSON.stringify(data))
+    else console.log(message)
+}
+
+/**
+ * Escreve o header Authorization, respeitando as duas formas que o axios usa (`AxiosHeaders`
+ * com `set`, ou objeto simples).
+ *
+ * **Sobrescreve um header já presente**, e isso é o ponto. Dezenas de chamadas no app ainda
+ * passam `session.account.userId` à mão, lido do Zustand — que pode estar defasado em
+ * relação à sessão viva logo após uma rotação. Como antes o interceptor só preenchia quando
+ * o header faltava, o token stale **vencia** o fresco: a mesma corrida que o §3.2 fecha,
+ * reaberta pela porta dos fundos. Agora quem manda é sempre a sessão.
+ *
+ * A exceção é quem legitimamente carrega outra credencial: o refresh (que manda o **refresh
+ * token**) e o signout (que manda um access token capturado antes da limpeza). Esses marcam
+ * `ownAuth` e passam intactos.
+ */
+function applyAuthHeader(cfg: { headers?: unknown }, token: string): void {
+    const headers = (cfg.headers ?? (cfg.headers = {})) as any
+    if (typeof headers.set === "function") headers.set("Authorization", `Bearer ${token}`)
+    else headers.Authorization = `Bearer ${token}`
+}
+
 // -----------------------------
 // Request Interceptor
 // -----------------------------
-api.interceptors.request.use((cfg) => {
-    const token = storage.getString(storageKeys().account.jwt.token)
+api.interceptors.request.use(async (cfg) => {
+    // ── A barreira de revalidação (§5.5) ──────────────────────────────────────────────
+    // Na volta do background, as requests esperam aqui em vez de sair com um token morto e
+    // voltar 401. A rajada de 401 deixa de existir em vez de ser tratada depois.
+    //
+    // A rota de refresh é isenta, e isso não é detalhe: é a própria revalidação que abre a
+    // barreira, então fazê-la esperar seria ela esperar por si mesma — deadlock com o app
+    // inteiro travado sem erro nenhum.
+    if (!(cfg.url || "").includes("/auth/refresh-token")) {
+        await waitForRevalidation()
+    }
+
+    // O token vem da SESSÃO VIVA, não do MMKV. É o que fecha a corrida de token stale:
+    // antes, uma request podia sair com o token lido do storage antes de o refresh
+    // terminar de gravar o novo. Lido DEPOIS da barreira, de propósito: se houve rotação
+    // durante a espera, esta request já sai com o par novo.
+    const { token, generation } = currentAuth()
 
     // Timestamp para medir duração (usado no response interceptor)
     ;(cfg as any).metadata = { start: Date.now() }
+    // A geração usada por esta request. No 401, é ela que distingue "o token morreu" de
+    // "esta request saiu antes da rotação e só precisa ser repetida" (§5.4).
+    ;(cfg as any).tokenGeneration = generation
     // Garante baseURL em requests reexecutadas (ex.: após refresh)
     cfg.baseURL = cfg.baseURL || PATH
 
-    // Atenção: o app usa o token "cru" no header Authorization (sem "Bearer ")
-    // Vários endpoints já passam authorizationToken manualmente.
-    // Mantemos o comportamento global como "cru" para não quebrar endpoints existentes.
-    if (token) {
-        cfg.headers = cfg.headers ?? {}
-        const headersAny = cfg.headers as any
-        const hasSet = typeof headersAny.set === "function"
-        const hasAuthUpper = !!headersAny.Authorization
-        const hasAuthLower = !!headersAny.authorization
-        if (!hasAuthUpper && !hasAuthLower) {
-            if (hasSet) {
-                headersAny.set("Authorization", `Bearer ${token}`)
-            } else {
-                headersAny.Authorization = `Bearer ${token}`
-            }
-        }
-        const preview = token.slice ? token.slice(-10) : ""
-        console.log(
-            "🧩 Injected Authorization header from storage",
-            JSON.stringify({ url: cfg.url || "", preview }),
-        )
-    }
+    // `ownAuth` marca as requests que carregam outra credencial de propósito.
+    if (token && !(cfg as any).ownAuth) applyAuthHeader(cfg, token)
 
-    // Logs ricos para diagnóstico de WATCH e AUTH
     const url = cfg.url || ""
     const method = (cfg.method || "GET").toUpperCase()
-    if (url.includes("/moments/") && url.includes("/watch")) {
-        const header = (cfg.headers?.Authorization as string) || token || ""
-        const preview = header.slice ? header.slice(0, 10) : ""
-        let bodyInfo = ""
-        try {
-            bodyInfo = JSON.stringify(cfg.data ?? {})
-        } catch {
-            bodyInfo = "[unserializable]"
+    const authHeaderPresent = !!(
+        (cfg.headers as any)?.Authorization || (cfg.headers as any)?.authorization
+    )
+
+    if (url.includes("/moments/")) {
+        // Mutação em /moments/* sem Authorization é sintoma de sessão em estado
+        // inconsistente — vale um aviso mesmo fora de desenvolvimento.
+        if (["POST", "PUT", "PATCH", "DELETE"].includes(method) && !authHeaderPresent) {
+            console.warn(
+                "⚠️ Missing Authorization for mutating /moments request",
+                JSON.stringify({ method, url }),
+            )
         }
-        console.log(
-            "▶️ WATCH request",
-            JSON.stringify({
-                method,
-                url,
-                authHeaderPresent: !!header,
-                authPreview: preview,
-                body: bodyInfo,
-            }),
-        )
-    } else if (url.includes("/moments/")) {
-        const methodUpper = (method || "GET").toUpperCase()
-        // Enforce Authorization header for mutating requests to /moments/*
-        if (["POST", "PUT", "PATCH", "DELETE"].includes(methodUpper)) {
-            if (!cfg.headers) cfg.headers = {}
-            const headersAny = cfg.headers as any
-            const hasSet = typeof headersAny.set === "function"
-            const hasAuthUpper = !!headersAny.Authorization
-            const hasAuthLower = !!headersAny.authorization
-            if (!hasAuthUpper && !hasAuthLower && token) {
-                if (hasSet) {
-                    headersAny.set("Authorization", `Bearer ${token}`)
-                } else {
-                    headersAny.Authorization = `Bearer ${token}`
-                }
-                const enforcedPreview = token.slice ? token.slice(-10) : ""
-                console.log(
-                    "🛡️ Enforced Authorization for mutating /moments request",
-                    JSON.stringify({ method: methodUpper, url, authPreview: enforcedPreview }),
-                )
-            }
-            if (!(cfg.headers as any).Authorization) {
-                console.warn(
-                    "⚠️ Missing Authorization for mutating /moments request",
-                    JSON.stringify({ method: methodUpper, url }),
-                )
-            }
-        }
-        const finalHeader = (cfg.headers?.Authorization as string) || ""
-        const preview = finalHeader.slice ? finalHeader.slice(-10) : ""
-        console.log(
-            "▶️ MOMENTS request",
-            JSON.stringify({
-                method,
-                url,
-                authHeaderPresent: !!finalHeader,
-                authPreview: preview,
-            }),
-        )
-    }
-    if (url.includes("/auth/")) {
-        const header = (cfg.headers?.Authorization as string) || token || ""
-        const preview = header.slice ? header.slice(0, 10) : ""
-        console.log(
-            "▶️ AUTH request",
-            JSON.stringify({
-                method,
-                url,
-                authHeaderPresent: !!header,
-                authPreview: preview,
-            }),
-        )
+        devLog("▶️ MOMENTS request", { method, url, authHeaderPresent })
+    } else if (url.includes("/auth/")) {
+        devLog("▶️ AUTH request", { method, url, authHeaderPresent })
     }
 
     return cfg
 })
 
 // -----------------------------
-// Refresh Flow (single-flight)
+// Refresh Flow
 // -----------------------------
-let isRefreshing = false
-let refreshPromise: Promise<string> | null = null
-const pendingQueue: PendingEntry[] = []
-
-/** Teto para a chamada de refresh. Sem isso, um `/auth/refresh-token` pendurado
- * deixa `isRefreshing` ligado para sempre e toda request seguinte entra numa
- * fila que nunca é drenada — o app trava inteiro sem erro nenhum. */
-const REFRESH_TIMEOUT_MS = 15_000
+// O estado do refresh (`isRefreshing`, `refreshPromise`, `pendingQueue`) saiu daqui: ele
+// vive dentro da `Session`, que é a dona dos tokens. A fila de requests pendentes era uma
+// reimplementação manual de compartilhamento de promise — `session.refresh()` já devolve a
+// mesma promise para todos os chamadores concorrentes, então a fila deixou de existir.
 
 /**
  * Devolve os headers da request com o Authorization trocado. Os headers do
  * axios podem ser um `AxiosHeaders` (com `toJSON`) ou um objeto simples,
  * dependendo de como a request foi criada — daí a normalização.
  */
-/** Rejeita a promise se ela não resolver dentro do prazo. */
-function withTimeout<T>(promise: Promise<T>, ms: number): Promise<T> {
-    return new Promise<T>((resolve, reject) => {
-        const timer = setTimeout(() => reject(new Error(`Refresh timeout após ${ms}ms`)), ms)
-        promise.then(
-            (value) => {
-                clearTimeout(timer)
-                resolve(value)
-            },
-            (error) => {
-                clearTimeout(timer)
-                reject(error)
-            },
-        )
-    })
-}
-
 function withAuthorization(headers: unknown, token: string) {
     const plain =
         headers && typeof (headers as any).toJSON === "function"
@@ -184,11 +130,10 @@ function withAuthorization(headers: unknown, token: string) {
     return plain
 }
 
-// Auth grace period: used to delay refresh handling right after auth completes
-let authGraceUntil = 0
-export function beginAuthGracePeriod(durationMs: number = 1000) {
-    authGraceUntil = Date.now() + Math.max(0, durationMs)
-}
+// O `beginAuthGracePeriod` foi removido. Ele existia para suprimir a rajada de 401 logo
+// após o login, causada pela janela entre "login respondeu" e "token chegou no MMKV". Com o
+// interceptor lendo a sessão viva em vez do storage, a janela não existe mais — e adiar um
+// 401 por um segundo escondia o sintoma sem tratar a causa.
 
 /**
  * Sessão irrecuperável: recebemos 401 e não há como renovar o token.
@@ -238,100 +183,62 @@ export function resetSessionExpiredLatch() {
 }
 
 /**
- * Dispara o refresh token flow usando o refreshToken salvo no MMKV.
- * - GET /auth/refresh-token (Authorization: Bearer <refreshToken>)
- * - Retorna o novo JWT (e possivelmente um novo refreshToken)
- * - Persiste no MMKV e reflete no Zustand sem hooks
+ * Delega o refresh para a `Session` (`src/session/`), que é a dona dos tokens.
+ *
+ * O single-flight **não mora mais aqui**: quem o garante é a própria sessão, e é ela quem
+ * decide se uma falha foi terminal, transitória ou desconhecida (§5.6). Este wrapper faz
+ * só a ponte da Fase 2 — reflete o par novo no Zustand, que ainda é lido pelo resto do app.
+ *
+ * Com refresh token de uso único e detecção de reuso (§13.1), duas rotações concorrentes
+ * revogam a conta do usuário. Por isso o compartilhamento da promise é uma garantia da
+ * `Session`, não uma fila reimplementada em cada camada.
  */
 async function doRefreshToken(): Promise<string> {
-    const jwtKeys = storageKeys().account.jwt
-    const currentRefresh = storage.getString(jwtKeys.refreshToken)
+    const session = ensureSession(async (refreshToken) => {
+        devLog("🔄 Refresh start", { url: "/auth/refresh-token" })
+        const started = Date.now()
 
-    if (!currentRefresh) {
-        // Sem refresh token não há como recuperar: o 401 já provou que o access
-        // token não serve. Antes isto lançava um sentinela que o handler tratava
-        // como transitório e ignorava — o app seguia "logado" sem token nenhum,
-        // todo request dava 401, nenhuma tela montava e o usuário ficava preso
-        // numa tela preta. Agora é terminal e leva a signOut.
-        console.warn("🔒 Refresh impossível: refreshToken ausente no storage")
+        // Atenção: aqui o header carrega o REFRESH token, não o access. O interceptor de
+        // request só injeta quando não há Authorization — por isso este explícito vence.
+        const res = await api.get("/auth/refresh-token", {
+            headers: { Authorization: `Bearer ${refreshToken}` },
+            // Sem isto o interceptor sobrescreveria com o ACCESS token, e o refresh
+            // falharia com 401 sem que ninguém entendesse por quê.
+            ownAuth: true,
+        } as any)
+
+        devLog("✅ Refresh success", {
+            durationMs: Date.now() - started,
+            status: res?.status,
+            rotated: !!res.data?.refreshToken,
+        })
+        return res.data
+    })
+
+    if (!session) {
+        // Sem credenciais em storage não há sessão a recuperar. Antes isto lançava um
+        // sentinela que o handler tratava como transitório e ignorava — o app seguia
+        // "logado" sem token nenhum, todo request dava 401 e a tela ficava preta.
+        devLog("🔒 Refresh impossível: sem credenciais no storage")
         throw new SessionExpiredError("NO_REFRESH_TOKEN")
     }
 
-    // Chama a rota de refresh enviando Authorization com o refresh token "cru" (sem Bearer)
-    // Usamos a própria instância `api`, e o response interceptor ignora essa rota.
-    const refreshStartTs = Date.now()
-    const refreshHeaderPreview = (currentRefresh || "").slice(0, 10)
-    console.log(
-        "🔄 Refresh start",
-        JSON.stringify({
-            url: "/auth/refresh-token",
-            headerPreview: refreshHeaderPreview,
-            ts: refreshStartTs,
-        }),
-    )
-    let res
+    let credentials
     try {
-        res = await api.get("/auth/refresh-token", {
-            headers: { Authorization: `Bearer ${currentRefresh}` },
-        })
-    } catch (err) {
-        // 401/403 na própria rota de refresh = o refresh token não vale mais.
-        // Qualquer outra coisa (rede, 5xx) é transitória e deve preservar os
-        // tokens para a próxima tentativa.
-        const status = (err as AxiosError)?.response?.status
-        if (status === 401 || status === 403) {
-            console.warn("🔒 Refresh token rejeitado pelo backend", JSON.stringify({ status }))
-            throw new SessionExpiredError("REFRESH_REJECTED")
-        }
-        throw err
+        credentials = await session.refresh()
+    } catch (error) {
+        // A sessão se marca como destruída **apenas** no veredito terminal (§5.6). Falha
+        // transitória ou desconhecida a deixa viva, e o erro sobe como está — preservando
+        // os tokens para a próxima tentativa.
+        if (session.isDestroyed) throw new SessionExpiredError("REFRESH_REJECTED")
+        throw error
     }
 
-    const refreshDurationMs = Date.now() - refreshStartTs
-    console.log(
-        "✅ Refresh success",
-        JSON.stringify({ durationMs: refreshDurationMs, status: res?.status }),
-    )
-    // Backend retorna { success, token, refreshToken, expiresIn, refreshExpiresIn, user }
-    const newToken: string | undefined = res.data?.token
-    const newRefresh: string | undefined = res.data?.refreshToken
-    const expiresIn: number | undefined = res.data?.expiresIn
-
-    if (!newToken) {
-        // Resposta 200 sem token é resposta inválida — não há o que reter.
-        throw new SessionExpiredError("REFRESH_REJECTED")
-    }
-
-    // Persistir no MMKV
-    storage.set(jwtKeys.token, newToken)
-    if (newRefresh) storage.set(jwtKeys.refreshToken, newRefresh)
-
-    if (typeof expiresIn === "number" && expiresIn > 0) {
-        const expiresAt = new Date(Date.now() + expiresIn * 1000).toISOString()
-        storage.set(jwtKeys.expiration, expiresAt)
-    }
-
-    // Atualizar defaults
-    api.defaults.headers.common = api.defaults.headers.common || {}
-    api.defaults.headers.common.Authorization = `Bearer ${newToken}`
-
-    // Refletir no Zustand (sem hooks)
-    try {
-        const account = useAccountStore.getState()
-        account.set({
-            ...account,
-            jwtToken: newToken,
-            refreshToken: newRefresh ?? account.refreshToken,
-            // Mantém a expiração atual se não enviada
-            jwtExpiration:
-                typeof expiresIn === "number" && expiresIn > 0
-                    ? new Date(Date.now() + expiresIn * 1000).toISOString()
-                    : (account as any).jwtExpiration,
-        } as any)
-    } catch {
-        // manter silencioso para não quebrar em ambiente sem Zustand inicializado
-    }
-
-    return newToken
+    // Antes daqui havia um espelho dos tokens no Zustand. Ele sumiu junto com a fusão das
+    // stores (§11.2): o viewer guarda o usuário, não credencial. Os tokens têm **um** dono,
+    // a `Session`, que já os persistiu — e era exatamente a existência de vários donos que
+    // permitia duas escritas concorrentes ressuscitarem um token invalidado (item 1 do §0).
+    return credentials.accessToken
 }
 
 /**
@@ -341,7 +248,10 @@ async function doRefreshToken(): Promise<string> {
  */
 async function handleAuthError(error: AxiosError) {
     const response = error.response
-    const originalRequest: AxiosRequestConfig & { _retry?: boolean } = (error.config || {}) as any
+    const originalRequest: AxiosRequestConfig & {
+        authAttempts?: number
+        tokenGeneration?: number
+    } = (error.config || {}) as any
 
     if (!response) {
         throw error
@@ -350,45 +260,46 @@ async function handleAuthError(error: AxiosError) {
     const responseCode = (response.data as any)?.code
     const isRefreshRoute = (originalRequest.url || "").includes("/auth/refresh-token")
 
-    console.log("🔍 Erro auth detectado")
-    console.log("  Status:", response.status)
-    console.log("  Code:", responseCode)
-    console.log("  URL:", originalRequest.url)
-    let safeData = ""
-    try {
-        safeData = JSON.stringify(response.data)
-    } catch {
-        safeData = "[unserializable]"
-    }
-    console.log("  Response data:", safeData)
-    console.log("  Is retry:", originalRequest._retry)
-    console.log("  Is refresh route:", isRefreshRoute)
+    // O corpo da resposta NÃO é logado: é texto livre vindo do servidor, e o §8 exige que
+    // nenhum payload de log seja sequer capaz de carregar um token. Só o `code`.
+    devLog("🔍 Erro auth detectado", {
+        status: response.status,
+        code: responseCode,
+        url: originalRequest.url,
+        authAttempts: originalRequest.authAttempts ?? 0,
+        isRefreshRoute,
+    })
 
     if (response.status !== 401) {
-        console.log("❌ Erro não-401, repassando erro")
         throw error
     }
 
-    // Auth grace: delay handling 401/refresh just after auth completes
-    const now = Date.now()
-    if (now < authGraceUntil && response.status === 401) {
-        const ms = authGraceUntil - now
-        console.log("⏳ Auth grace period active, delaying retry by", ms, "ms")
-        return new Promise((resolve) => {
-            setTimeout(() => {
-                try {
-                    resolve(api(originalRequest))
-                } catch (e) {
-                    resolve(Promise.reject(e))
-                }
-            }, ms)
+    // ── O 401 que não precisa de refresh (§5.4) ───────────────────────────────────────
+    // Se já rotacionamos desde que esta request saiu, ela morreu com um token velho: não
+    // há nada a renovar, só a repetir. Sem isto, um 401 atrasado de uma request pré-refresh
+    // dispararia uma rotação inteiramente desnecessária — e, com refresh token de uso único,
+    // uma rotação a mais é uma rotação que pode se perder.
+    const live = peekSession()
+    const requestGeneration = (originalRequest as any).tokenGeneration ?? 0
+    if (live && !isRefreshRoute && requestGeneration < live.generation) {
+        devLog("♻️ 401 de geração antiga: repetindo sem refrescar", {
+            url: originalRequest.url,
+            requestGeneration,
+            currentGeneration: live.generation,
         })
+        originalRequest.headers = withAuthorization(originalRequest.headers, live.accessToken)
+        return api(originalRequest)
     }
 
-    const isRefreshable = response.status === 401 && !originalRequest._retry && !isRefreshRoute
+    // O booleano `_retry` de antes gastava a única chance da request numa falha
+    // transitória — e era por isso que, depois de um refresh frustrado por rede, todas as
+    // telas ficavam em erro (§0.1a). Agora é contador, e só o 401 comprovadamente corrente
+    // consome tentativa.
+    const attempts = ((originalRequest as any).authAttempts ?? 0) as number
+    const isRefreshable = response.status === 401 && attempts < MAX_AUTH_ATTEMPTS && !isRefreshRoute
 
     if (!isRefreshable) {
-        console.log("❌ Erro 401 não é refrescável, repassando erro")
+        devLog("❌ 401 não refrescável, repassando erro", { url: originalRequest.url, attempts })
         throw error
     }
 
@@ -402,92 +313,27 @@ async function handleAuthError(error: AxiosError) {
         throw error
     }
 
-    console.log("🔄 Tentando refresh token para requisição:", originalRequest.url)
+    devLog("🔄 Tentando refresh token", { url: originalRequest.url })
 
-    originalRequest._retry = true
-
-    // Se já existe um refresh em andamento, enfileira a repetição da request
-    if (isRefreshing && refreshPromise) {
-        console.log(
-            "⏳ Refresh in progress - enqueue request",
-            JSON.stringify({ url: originalRequest.url, queueSize: pendingQueue.length }),
-        )
-        return new Promise((resolve, reject) => {
-            pendingQueue.push({
-                resume: (newToken) => {
-                    try {
-                        console.log(
-                            "▶️ Resuming enqueued request",
-                            JSON.stringify({
-                                url: originalRequest.url,
-                                gotTokenPreview: (newToken || "").slice(0, 10),
-                            }),
-                        )
-                        originalRequest.headers = withAuthorization(
-                            originalRequest.headers,
-                            newToken,
-                        )
-                        resolve(api(originalRequest))
-                    } catch (e) {
-                        reject(e)
-                    }
-                },
-                fail: reject,
-            })
-        })
-    }
-
-    // Inicia o refresh (single-flight), com teto de tempo
-    isRefreshing = true
-    refreshPromise = withTimeout(doRefreshToken(), REFRESH_TIMEOUT_MS)
-
+    // Sem fila: todas as requests que caíram em 401 ao mesmo tempo aguardam a MESMA
+    // promise de `session.refresh()`, e cada uma se repete com o token que sair de lá.
     try {
-        const newToken = await refreshPromise
-        console.log(
-            "✅ Refresh done - resuming queued requests",
-            JSON.stringify({
-                queued: pendingQueue.length,
-                tokenPreview: (newToken || "").slice(0, 10),
-            }),
-        )
+        const newToken = await doRefreshToken()
 
-        // Desenfileira e repete todas requests pendentes
-        while (pendingQueue.length) {
-            const entry = pendingQueue.shift()
-            try {
-                entry?.resume(newToken)
-            } catch {
-                // ignora erros isolados no resume
-            }
-        }
+        // Só consome tentativa quando o refresh de fato aconteceu: uma falha transitória
+        // não pode gastar a chance da request.
+        ;(originalRequest as any).authAttempts = attempts + 1
 
-        // Repetir a request original com o novo token
         originalRequest.headers = withAuthorization(originalRequest.headers, newToken)
-        console.log(
-            "🔄 Retrying original request with new token",
-            JSON.stringify({
-                url: originalRequest.url,
-                tokenPreview: (newToken || "").slice(0, 10),
-            }),
-        )
+        devLog("🔄 Repetindo request original com o token novo", { url: originalRequest.url })
         return api(originalRequest)
     } catch (refreshErr) {
         console.error("❌ Falha no refresh token:", refreshErr)
 
-        // Rejeita as requests em espera. Antes elas eram reenviadas com
-        // `Bearer ` vazio, o que só gerava outra rodada de 401 e escondia a
-        // causa real atrás de um erro genérico.
-        while (pendingQueue.length) {
-            const entry = pendingQueue.shift()
-            try {
-                entry?.fail(refreshErr)
-            } catch {
-                // ignora
-            }
-        }
-
         // Erro de rede/5xx no refresh é transitório: mantém os tokens para a
         // próxima tentativa. Sessão expirada é terminal: limpa e desloga.
+        // A classificação real vive em `src/session/verdict.ts`; aqui só resta reagir ao
+        // que a sessão já decidiu — ela mata a si mesma no caso terminal.
         const isTerminal = refreshErr instanceof SessionExpiredError
 
         if (isTerminal) {
@@ -499,19 +345,16 @@ async function handleAuthError(error: AxiosError) {
                 if (api?.defaults?.headers?.common?.Authorization) {
                     delete api.defaults.headers.common.Authorization
                 }
-                console.log("🧹 Tokens limpos após sessão expirada")
+                devLog("🧹 Tokens limpos após sessão expirada")
             } catch {
                 // ignore
             }
             notifySessionExpired()
         } else {
-            console.log("🔁 Falha transitória no refresh — tokens preservados")
+            devLog("🔁 Falha transitória no refresh — tokens preservados")
         }
 
         throw refreshErr
-    } finally {
-        isRefreshing = false
-        refreshPromise = null
     }
 }
 
@@ -527,18 +370,10 @@ api.interceptors.response.use(
             const start = (res.config as any)?.metadata?.start
             const durationMs = typeof start === "number" ? Date.now() - start : undefined
 
-            if (url.includes("/moments/") && url.includes("/watch")) {
-                console.log(
-                    "◀️ WATCH response",
-                    JSON.stringify({ method, url, status, durationMs }),
-                )
-            } else if (url.includes("/moments/")) {
-                console.log(
-                    "◀️ MOMENTS response",
-                    JSON.stringify({ method, url, status, durationMs }),
-                )
+            if (url.includes("/moments/")) {
+                devLog("◀️ MOMENTS response", { method, url, status, durationMs })
             } else if (url.includes("/auth/")) {
-                console.log("◀️ AUTH response", JSON.stringify({ method, url, status, durationMs }))
+                devLog("◀️ AUTH response", { method, url, status, durationMs })
             }
         } catch {}
         return res

@@ -10,7 +10,7 @@ import ColorTheme, { colors } from "@/constants/colors"
 import fonts from "@/constants/fonts"
 import sizes from "@/constants/sizes"
 import LanguageContext from "@/contexts/language"
-import { usePreferencesStore } from "@/contexts/Persisted/persist.preferences"
+import { usePreferencesStore } from "@/contexts/Persisted/preferences"
 import { useProfilePictureUpload } from "@/lib/hooks/useProfilePictureUpload"
 import { trackUserAction } from "@/lib/trackEvent"
 

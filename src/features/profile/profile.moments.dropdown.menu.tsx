@@ -2,6 +2,7 @@ import MomentContext from "@/components/moment/context"
 import LanguageContext from "@/contexts/language"
 import PersistedContext from "@/contexts/Persisted"
 import { ContextMenu, Host, Button } from "@expo/ui/swift-ui"
+import { frame } from "@expo/ui/swift-ui/modifiers"
 import React from "react"
 
 export function ProfileDropDownMenuIOS({ children }: { children?: React.ReactNode }) {
@@ -22,7 +23,9 @@ export function ProfileDropDownMenuIOS({ children }: { children?: React.ReactNod
 
     return (
         <Host colorScheme="dark">
-            <ContextMenu activationMethod="longPress" frame={{ alignment: "center" }}>
+            {/* No SDK 56 as props de layout do expo-ui viraram `modifiers`, e `activationMethod`
+                deixou de existir: o long press já é o gatilho padrão do `ContextMenu`. */}
+            <ContextMenu modifiers={[frame({ alignment: "center" })]}>
                 <ContextMenu.Items>
                     <Button
                         systemImage={options.isHidden ? "eye" : "eye.slash"}

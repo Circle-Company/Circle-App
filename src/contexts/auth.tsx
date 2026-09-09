@@ -2,14 +2,16 @@ import React, { useState } from "react"
 import { AppState } from "react-native"
 import DeviceInfo from "react-native-device-info"
 
-import { apiRoutes, beginAuthGracePeriod, onSessionExpired, resetSessionExpiredLatch } from "@/api"
+import { apiRoutes, onSessionExpired, resetSessionExpiredLatch } from "@/api"
 import { storage, storageKeys } from "@/store"
-import { useUserStore } from "@/contexts/Persisted/persist.user"
-import { useAccountStore } from "@/contexts/Persisted/persist.account"
-import { useMetricsStore } from "@/contexts/Persisted/persist.metrics"
-import { usePreferencesStore } from "@/contexts/Persisted/persist.preferences"
+import { useMetricsStore } from "@/contexts/Persisted/metrics"
+import { useAccountStore } from "@/contexts/Persisted/account"
+import { usePreferencesStore } from "@/contexts/Persisted/preferences"
 import PersistedContext, { Provider as PersistedProvider } from "@/contexts/Persisted"
 import { RedirectContext } from "@/contexts/redirect"
+import { recordLogin, resetSessionRuntime } from "@/session/runtime"
+import { installForegroundRevalidation } from "@/session/foreground"
+import { clearResidualDataIfDifferentPerson } from "@/session/identityGuard"
 import { SessionDataType } from "@/contexts/Persisted/types"
 import { signWithAppleProps } from "@/api/auth/auth.types"
 import {
@@ -27,11 +29,8 @@ export type AuthContextsData = {
     isAuthenticating: boolean
     errorMessage: string
     signInputUsername: string
-    signInputPassword: string
     sessionData: SessionDataType | null
     ageConfirmation: boolean
-    signIn: () => Promise<void>
-    signUp: () => Promise<void>
     appleSignUp: () => Promise<boolean>
     checkAppleAccountExists: (userOverride?: string) => Promise<{
         success: boolean
@@ -42,7 +41,6 @@ export type AuthContextsData = {
     signOut(): void
     checkIsSigned: () => boolean
     setErrorMessage: React.Dispatch<React.SetStateAction<string>>
-    setSignInputPassword: React.Dispatch<React.SetStateAction<string>>
     setSignInputUsername: React.Dispatch<React.SetStateAction<string>>
     setAppleSignData: React.Dispatch<React.SetStateAction<signWithAppleProps>>
     setAgeConfirmation: React.Dispatch<React.SetStateAction<boolean>>
@@ -67,7 +65,6 @@ function markProfilePicturePending() {
 export function Provider({ children }: AuthProviderProps) {
     const { setRedirectTo } = React.useContext(RedirectContext)
     const [signInputUsername, setSignInputUsername] = React.useState("")
-    const [signInputPassword, setSignInputPassword] = React.useState("")
     const [appleSignData, setAppleSignData] = React.useState({} as signWithAppleProps)
     const [ageConfirmation, setAgeConfirmation] = React.useState(true)
     const [sessionData, setSessionData] = useState<SessionDataType | null>(null)
@@ -108,6 +105,11 @@ export function Provider({ children }: AuthProviderProps) {
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [])
 
+    // A barreira de revalidação (§5.5). Montada uma vez, no provider que já é a raiz da
+    // sessão: na volta do background as requests esperam a decisão em vez de saírem com um
+    // token morto e voltarem 401 em rajada — que é o §0.1 inteiro.
+    React.useEffect(() => installForegroundRevalidation(), [])
+
     const injectRef = React.useRef<null | ((session: any) => Promise<void>)>(null)
 
     const PersistedConsumerBinder = () => {
@@ -127,7 +129,19 @@ export function Provider({ children }: AuthProviderProps) {
      * diante todo request saía sem header, voltava 401, o refresh não tinha o
      * que renovar, e a tela ficava preta indefinidamente.
      */
-    const persistSession = async (sessionPayload: any) => {
+    const persistSession = async (sessionPayload: any, appleUserId?: string) => {
+        // ANTES de gravar a sessão nova (§2.6): se quem está entrando não é quem o device
+        // lembra, o dado por-usuário residual — likes, notificações lidas, métricas — é de
+        // outra pessoa e não pode ser herdado. A limpeza rodava só no logout, e quem troca
+        // de conta sem deslogar nunca passava por ela.
+        const identity = clearResidualDataIfDifferentPerson({
+            appleUserId,
+            userId: sessionPayload?.user?.id ? String(sessionPayload.user.id) : undefined,
+        })
+        if (identity.isDifferentPerson) {
+            console.warn("🧹 Conta diferente neste aparelho — dado residual limpo", identity.reason)
+        }
+
         await injectRef.current?.({ session: sessionPayload })
 
         const keys = storageKeys().account.jwt
@@ -144,6 +158,11 @@ export function Provider({ children }: AuthProviderProps) {
         if (!storage.getString(keys.refreshToken)) {
             console.warn("⚠️ Login sem refreshToken — a sessão não poderá ser renovada")
         }
+
+        // Grava o blob da sessão com a âncora do Apple. É o que dá ao device memória de
+        // **quem** entrou — sem isso o guard acima nunca teria com o que comparar no
+        // próximo login, e o §5.8 nunca poderia oferecer "entrar como @fulano".
+        recordLogin(appleUserId)
 
         // Nova sessão válida: rearma a notificação de expiração.
         resetSessionExpiredLatch()
@@ -221,7 +240,9 @@ export function Provider({ children }: AuthProviderProps) {
             setErrorMessage(
                 "Credenciais do Apple inválidas ou ausentes. Tente novamente realizar o login com a Apple.",
             )
-            return
+            // `return` sem valor fazia o tipo virar `boolean | undefined`, e quem chama
+            // trata o retorno como "deu certo?".
+            return false
         }
 
         // Sanitização de fullName (opcional nos providers da Apple)
@@ -267,7 +288,7 @@ export function Provider({ children }: AuthProviderProps) {
 
             const sessionPayload = response.data.session
 
-            await persistSession(sessionPayload)
+            await persistSession(sessionPayload, String(appleSignData?.user || ""))
             storage.set("@circle:sessionId", sessionPayload.user?.id ?? "")
             markProfilePicturePending()
             // Depois de o usuário existir no backend, nunca antes: o
@@ -357,14 +378,13 @@ export function Provider({ children }: AuthProviderProps) {
             }
 
             const sessionPayload = response.data.session
-            await persistSession(sessionPayload)
+            await persistSession(sessionPayload, String(merged?.user || ""))
             storage.set("@circle:sessionId", sessionPayload.user?.id ?? "")
             trackLogin({
                 id: String(sessionPayload.user?.id || ""),
                 username: String(sessionPayload.user?.username || usernameForSignIn || ""),
             })
             setRedirectTo("APP")
-            beginAuthGracePeriod(1000)
         } catch (error: any) {
             let errorMsg = "Erro interno do servidor"
             if (error?.response?.data?.message) {
@@ -379,133 +399,39 @@ export function Provider({ children }: AuthProviderProps) {
         }
     }
 
-    const signIn = async () => {
-        if (!signInputUsername.trim() || !signInputPassword.trim()) {
-            setErrorMessage("Usuário e senha são obrigatórios")
-            return
-        }
-
-        setErrorMessage("")
-        setLoading(true)
-
-        try {
-            const response = await apiRoutes.auth.signIn(
-                {
-                    username: signInputUsername.trim(),
-                    password: signInputPassword,
-                },
-                {
-                    "terms-accepted": "true",
-                    "forwarded-for": await DeviceInfo.getIpAddress(),
-                    "machine-id": await DeviceInfo.getUniqueId(),
-                    timezone: detectTimezoneHeader(),
-                    latitude: "0",
-                    longitude: "0",
-                    device: "mobile",
-                    "Content-Type": "application/json",
-                },
-            )
-
-            if (!response.data || !response.data.session) {
-                throw new Error("Resposta inválida do servidor")
-            }
-
-            const sessionPayload = response.data.session
-
-            await persistSession(sessionPayload)
-            // Persist sessionId for compatibility with legacy checks
-            storage.set("@circle:sessionId", sessionPayload.user?.id ?? "")
-            trackLogin({
-                id: String(sessionPayload.user?.id || ""),
-                username: String(sessionPayload.user?.username || signInputUsername.trim() || ""),
-            })
-            setRedirectTo("APP")
-            beginAuthGracePeriod(1000)
-            // Navigation handled by RootLayoutNav via redirectTo
-        } catch (error: any) {
-            console.error("❌ Erro no login:", error)
-
-            let errorMsg = "Erro interno do servidor"
-            if (error.response?.data?.message) {
-                errorMsg = error.response.data.message.split(". ")[0]
-            } else if (error.message) {
-                errorMsg = error.message
-            }
-
-            setErrorMessage(errorMsg)
-        } finally {
-            setLoading(false)
-        }
-    }
-
-    const signUp = async () => {
-        if (!signInputUsername.trim() || !signInputPassword.trim()) {
-            setErrorMessage("Usuário e senha são obrigatórios")
-            return
-        }
-
-        if (signInputPassword.length < 4) {
-            setErrorMessage("A senha deve ter pelo menos 4 caracteres")
-            return
-        }
-
-        setErrorMessage("")
-        setLoading(true)
-
-        try {
-            const response = await apiRoutes.auth.signUp(
-                {
-                    username: signInputUsername.trim(),
-                    password: signInputPassword,
-                },
-                {
-                    "terms-accepted": "true",
-                    "forwarded-for": await DeviceInfo.getIpAddress(),
-                    "machine-id": await DeviceInfo.getUniqueId(),
-                    timezone: detectTimezoneHeader(),
-                    latitude: "0",
-                    longitude: "0",
-                    device: "mobile",
-                    "Content-Type": "application/json",
-                },
-            )
-            if (!response.data || !response.data.session) {
-                throw new Error("Resposta inválida do servidor")
-            }
-
-            const sessionPayload = response.data.session
-
-            await persistSession(sessionPayload)
-            // Persist sessionId for compatibility with legacy checks
-            storage.set("@circle:sessionId", sessionPayload.user?.id ?? "")
-            markProfilePicturePending()
-            setRedirectTo("APP")
-            beginAuthGracePeriod(1000)
-            // Navigation handled by RootLayoutNav via redirectTo
-        } catch (error: any) {
-            console.error("❌ Erro na criação da conta:", error)
-
-            let errorMsg = "Erro interno do servidor"
-            if (error.response?.data?.message) {
-                errorMsg = error.response.data.message.split(". ")[0]
-            } else if (error.message) {
-                errorMsg = error.message
-            }
-
-            setErrorMessage(errorMsg)
-        } finally {
-            setLoading(false)
-        }
-    }
-
     const signOut = () => {
+        // Capturado ANTES de qualquer limpeza: a chamada de despedida precisa do access
+        // token no header, e estamos prestes a apagar o storage de onde ele sai.
+        const accessToken = storage.getString(storageKeys().account.jwt.token)
+
+        // Best-effort, sem `await`: o logout do usuário não pode esperar a rede. A revogação
+        // no servidor é desejável — ela impede que a sessão se renove — mas o que efetiva o
+        // logout do ponto de vista do usuário é a limpeza local, que acontece de qualquer
+        // jeito logo abaixo.
+        if (accessToken) {
+            apiRoutes.auth.signOut(accessToken).catch(() => {
+                // rede caiu, servidor fora: não muda nada aqui
+            })
+        }
+
         try {
-            // Limpa stores persistidas
+            // Mata a sessão viva antes de tudo: sem isto, um refresh em voo poderia gravar
+            // um par novo DEPOIS da limpeza, deixando o app com token de uma sessão que o
+            // usuário acabou de encerrar.
+            resetSessionRuntime()
+
+            // Limpa as stores persistidas. Atenção ao `.getState()`: chamar `useAccountStore()`
+            // aqui é invocar um hook fora de componente — o Zustand usa
+            // `useSyncExternalStore` por baixo, então a chamada quebra em runtime e, dentro
+            // deste try/catch, falhava em silêncio. O resultado era o logout limpar o MMKV
+            // mas deixar os dados do usuário anterior vivos em memória.
+            //
+            // São três, e não quatro: `user` e `account` viraram um viewer só (§11.2), cujo
+            // `clear()` zera memória e storage numa operação.
             try {
-                useUserStore().remove()
-                useAccountStore().remove()
-                usePreferencesStore().remove()
-                useMetricsStore().remove()
+                useAccountStore.getState().clear()
+                useMetricsStore.getState().clear()
+                // `preferences` fica: é do aparelho, não da conta (§2.2).
             } catch (e) {
                 console.warn("Erro ao limpar stores:", e)
             }
@@ -528,7 +454,6 @@ export function Provider({ children }: AuthProviderProps) {
             // Reseta estados locais
             setSessionData(null)
             setSignInputUsername("")
-            setSignInputPassword("")
             setErrorMessage("")
 
             // Redireciona para AUTH
@@ -589,9 +514,7 @@ export function Provider({ children }: AuthProviderProps) {
                 errorMessage,
                 ageConfirmation,
                 sessionData,
-                signInputPassword,
                 signInputUsername,
-                setSignInputPassword,
                 setSignInputUsername,
                 setAppleSignData,
                 setAgeConfirmation,
@@ -599,10 +522,8 @@ export function Provider({ children }: AuthProviderProps) {
                 checkIsSigned,
                 checkAppleAccountExists,
                 appleSignIn,
-                signIn,
                 appleSignUp,
                 signOut,
-                signUp,
             }}
         >
             <PersistedProvider>

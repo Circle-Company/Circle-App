@@ -1,98 +1,64 @@
-import React, { useEffect, useCallback } from "react"
-import { Link, Stack, useLocalSearchParams } from "expo-router"
-import { colors } from "@/constants/colors"
+import React, { useCallback } from "react"
+import { Animated as RNAnimated, Keyboard, Platform, Pressable, View } from "react-native"
+import { Link, Stack, useFocusEffect, useLocalSearchParams, useNavigation } from "expo-router"
 import { SafeAreaView } from "react-native-safe-area-context"
-import { useNavigation, useFocusEffect } from "expo-router"
-import { View, Keyboard, Platform, Animated as RNAnimated, Pressable } from "react-native"
 import Animated, { useAnimatedStyle, useSharedValue, withTiming } from "react-native-reanimated"
-import { LinearGradient } from "expo-linear-gradient"
-import PersistedContext from "@/contexts/Persisted"
-import { UserShow } from "@/components/user_show"
+import { useQueryClient } from "@tanstack/react-query"
+
+import { colors } from "@/constants/colors"
+import fonts from "@/constants/fonts"
+import sizes from "@/constants/sizes"
+import FeedContext from "@/contexts/Feed"
+import LanguageContext from "@/contexts/language"
 import ProfileContext from "@/contexts/profile"
 import { Moment } from "@/components/moment"
-import FeedContext from "@/contexts/Feed"
-import sizes from "@/constants/sizes"
-import fonts from "@/constants/fonts"
-
-import api from "@/api"
 import Input from "@/components/comment/components/comments-profile-input"
-import RenderCommentFeed from "@/features/moments/feed/render-comment-feed"
-import ZeroComments from "@/components/comment/components/comments-zero_comments"
-import useRewriteUrl from "@/lib/hooks/useRewriteUrl"
-import { useToast } from "@/contexts/Toast"
-import LanguageContext from "@/contexts/language"
 import { ProfileDropDownMenuIOS } from "@/features/profile/profile.moments.dropdown.menu"
+import {
+    MomentAuthorHeader,
+    MomentBottomGradient,
+    MomentComments,
+    MomentUnavailable,
+    useMomentDetail,
+} from "@/features/moments/detail"
+import { momentKeys } from "@/queries/moment.get"
+
+const CARD = sizes.moment.standart
 
 export default function MomentFullScreen() {
-    const { momentId } = useLocalSearchParams<{ momentId: string }>()
+    const { momentId: rawMomentId } = useLocalSearchParams<{ momentId: string }>()
     const { t } = React.useContext(LanguageContext)
-    const { session } = React.useContext(PersistedContext)
     const { profile, moments } = React.useContext(ProfileContext)
     const { commentEnabled, setCommentEnabled } = React.useContext(FeedContext)
 
-    const toast = useToast()
-    const [remoteMoment, setRemoteMoment] = React.useState<any | null>(null)
+    const navigation = useNavigation()
+    const queryClient = useQueryClient()
 
-    // Fetch a single moment by id (GET /moments/:id) with Authorization
-    useEffect(() => {
-        let cancelled = false
-        async function fetchMoment() {
-            try {
-                const token = session?.account?.jwtToken
-                const auth = token?.startsWith("Bearer ") ? token : token ? `Bearer ${token}` : ""
-                const res = await api.get(
-                    `/moments/${momentId}`,
-                    auth ? { headers: { Authorization: auth } } : undefined,
-                )
-                if (!cancelled) {
-                    const payload = (res as any)?.data?.moment ?? (res as any)?.data ?? null
-                    setRemoteMoment(payload)
-                }
-            } catch (e) {
-                toast.error(t("Fail to share your moment"))
-                console.log("Moment fetch error:", e)
-            }
-        }
-        if (momentId) fetchMoment()
-        return () => {
-            cancelled = true
-        }
-    }, [momentId, session?.account?.jwtToken])
+    // Snowflake: trafega como string de ponta a ponta, nunca `Number()`.
+    const momentId = String(rawMomentId ?? "")
 
-    // Comments UI and keyboard handling
+    // Esta tela só é alcançada de dentro de um perfil: a grade dele é a semente, e o próprio
+    // perfil é o autor quando o item da lista não o traz (§2.1 do contrato).
+    const { momentData, isUnavailable, errorMessage } = useMomentDetail({
+        momentId,
+        sources: [moments],
+        userFallback: profile,
+    })
 
-    // Refetch moment when screen gains focus to ensure freshest data
+    /**
+     * Refetch ao ganhar foco: as métricas mudam enquanto o usuário está em outra tela (um
+     * like dele mesmo, um comentário novo). Vai pelo `queryClient` em vez de um fetch
+     * próprio — assim compartilha deduplicação, cancelamento e a classificação de erro do
+     * `useMomentDetail`, em vez de reimplementar os três.
+     */
     useFocusEffect(
         useCallback(() => {
-            let cancelled = false
-            async function refetch() {
-                try {
-                    const token = session?.account?.jwtToken
-                    const auth = token?.startsWith("Bearer ")
-                        ? token
-                        : token
-                          ? `Bearer ${token}`
-                          : ""
-                    const res = await api.get(
-                        `/moments/${momentId}`,
-                        auth ? { headers: { Authorization: auth } } : undefined,
-                    )
-                    if (!cancelled) {
-                        const payload = (res as any)?.data?.moment ?? (res as any)?.data ?? null
-                        setRemoteMoment(payload)
-                    }
-                } catch (e) {
-                    console.log("Moment refetch error:", e)
-                }
+            if (momentId) {
+                queryClient.invalidateQueries({ queryKey: momentKeys.detail(momentId) })
             }
-            if (momentId) refetch()
-            return () => {
-                cancelled = true
-            }
-        }, [momentId, session?.account?.jwtToken]),
+        }, [momentId, queryClient]),
     )
-    const [isKeyboardVisible, setIsKeyboardVisible] = React.useState(false)
-    const navigation = useNavigation()
+
     useFocusEffect(
         useCallback(() => {
             const parent = navigation.getParent?.()
@@ -110,10 +76,11 @@ export default function MomentFullScreen() {
             }
         }, [navigation]),
     )
+
+    const [isKeyboardVisible, setIsKeyboardVisible] = React.useState(false)
     const keyboardHeightAnim = React.useRef(new RNAnimated.Value(0)).current
     const keyboardProgress = useSharedValue(0)
     const commentShared = useSharedValue(commentEnabled ? 1 : 0)
-    const { rewrite } = useRewriteUrl()
 
     React.useEffect(() => {
         const showListener = Keyboard.addListener(
@@ -156,54 +123,6 @@ export default function MomentFullScreen() {
         commentShared.value = withTiming(commentEnabled ? 1 : 0, { duration: 250 })
     }, [commentEnabled, commentShared])
 
-    const momentData = React.useMemo(() => {
-        const fallbackList = (moments as any[]) || []
-        const raw =
-            remoteMoment ?? fallbackList.find((m: any) => String(m?.id) === String(momentId))
-        if (!raw) return null
-
-        const videoUrl = rewrite(
-            (raw?.midia?.fullhd_resolution as string) ||
-                (raw?.midia?.nhd_resolution as string) ||
-                raw?.video?.url,
-        )
-        const thumbUrl = rewrite(
-            (raw?.midia?.nhd_thumbnail as string) ||
-                raw?.thumbnail?.url ||
-                (raw?.thumbnail as string),
-        )
-
-        return {
-            id: String(raw.id),
-            user: {
-                id: String(raw?.user?.id ?? profile?.id ?? ""),
-                username: String(raw?.user?.username ?? profile?.username ?? ""),
-                profilePicture: rewrite(
-                    String(raw?.user?.profilePicture ?? profile?.profilePicture ?? ""),
-                ),
-                // removed: verified, youFollow, followYou per required shape
-                // using raw.user when available; falling back to profile
-                // end user
-            },
-            description: String(raw?.description ?? ""),
-            media: videoUrl,
-            thumbnail: thumbUrl,
-            duration: Number(raw?.video?.duration ?? raw?.midia?.duration ?? 0),
-            size: String(raw?.video?.size ?? raw?.video?.fileSize ?? raw?.midia?.size ?? ""),
-            hasAudio: Boolean(raw?.hasAudio ?? raw?.video?.hasAudio ?? true),
-            ageRestriction: Boolean(raw?.ageRestriction ?? false),
-            contentWarning: Boolean(raw?.contentWarning ?? false),
-            metrics: raw.metrics || {
-                totalViews: 0,
-                totalLikes: 0,
-                totalComments: 0,
-            },
-            publishedAt: String(raw.publishedAt),
-            topComment: raw.topComment || null,
-            isLiked: Boolean(raw.isLiked ?? false),
-        } as any
-    }, [momentId, remoteMoment, moments])
-
     const animatedMomentStyle = useAnimatedStyle(() => {
         "worklet"
         const commentScale = 1 - 0.06 * commentShared.value
@@ -239,19 +158,29 @@ export default function MomentFullScreen() {
                 }}
             >
                 <View style={{ height: sizes.headers.height * 0.7 }} />
-                {momentData ? (
+                {momentData && !isUnavailable ? (
                     <Moment.Root.Main
-                        size={sizes.moment.standart}
+                        size={CARD}
                         isFeed={false}
                         isFocused={true}
                         data={momentData}
                         shadow={{ top: false, bottom: true }}
                     >
-                        {/* O AppleZoomTarget monta apenas UM filho nativo; por isso ele
-                        envolve somente o card do vídeo — os comentários ficam fora. */}
-                        <Link.AppleZoomTarget>
-                            <Animated.View collapsable={false} style={animatedMomentStyle}>
-                                <ProfileDropDownMenuIOS>
+                        {/*
+                            O `AppleZoomTarget` monta apenas UM filho nativo e mede o
+                            retângulo dele quando a transição começa — por isso ele envolve
+                            somente o card do vídeo, e nada mais.
+
+                            A escala do teclado (`Animated.View`) e o menu de contexto
+                            (`ProfileDropDownMenuIOS`) ficam FORA: dentro, o que o iOS mede é
+                            o card já deformado pela transformada e reparentado pelo host
+                            SwiftUI do menu, e a animação aterrissa fora do lugar. É a mesma
+                            ordem que a grade do perfil usa do lado de origem, onde o menu
+                            envolve o `Link`, não o `AppleZoom`.
+                        */}
+                        <Animated.View collapsable={false} style={animatedMomentStyle}>
+                            <ProfileDropDownMenuIOS>
+                                <Link.AppleZoomTarget>
                                     <Moment.Container
                                         contentRender={momentData.media}
                                         isFocused={true}
@@ -262,28 +191,8 @@ export default function MomentFullScreen() {
                                         disableCache={false}
                                         disableWatch={false}
                                     >
-                                        {/* Top user info (no scale animations) */}
-                                        <Moment.Root.Top>
-                                            <Moment.Root.TopLeft>
-                                                <UserShow.Root data={momentData.user}>
-                                                    <UserShow.ProfilePicture
-                                                        disableAction={true}
-                                                        displayOnMoment={true}
-                                                        pictureDimensions={{
-                                                            width: 30,
-                                                            height: 30,
-                                                        }}
-                                                    />
-                                                    <UserShow.Username
-                                                        pressable={false}
-                                                        fontFamily={fonts.family["Bold-Italic"]}
-                                                    />
-                                                </UserShow.Root>
-                                            </Moment.Root.TopLeft>
-                                            <Moment.Root.TopRight>
-                                                <Moment.AudioControl size={36} />
-                                            </Moment.Root.TopRight>
-                                        </Moment.Root.Top>
+                                        <MomentAuthorHeader user={momentData.user} />
+
                                         <Moment.Root.Center>
                                             <View
                                                 style={{
@@ -293,45 +202,23 @@ export default function MomentFullScreen() {
                                                 }}
                                             >
                                                 <View style={{ height: 46 }}>
-                                                    <Moment.LikeButtonIOS isLiked={false} />
+                                                    <Moment.LikeButtonIOS
+                                                        isLiked={Boolean(momentData.isLiked)}
+                                                    />
                                                 </View>
                                             </View>
                                         </Moment.Root.Center>
 
-                                        {/* Subtle bottom gradient like feed */}
-                                        <LinearGradient
-                                            pointerEvents="none"
-                                            colors={["rgba(0, 0, 0, 0.00)", "rgba(0, 0, 0, 0.4)"]}
-                                            start={{ x: 0.5, y: 0 }}
-                                            end={{ x: 0.5, y: 1 }}
-                                            style={{
-                                                position: "absolute",
-                                                left: 0,
-                                                right: 0,
-                                                bottom: 0,
-                                                width: sizes.moment.standart.width,
-                                                height: sizes.moment.standart.height * 0.1,
-                                                zIndex: 0,
-                                            }}
-                                        />
+                                        <MomentBottomGradient />
                                     </Moment.Container>
-                                </ProfileDropDownMenuIOS>
-                            </Animated.View>
-                        </Link.AppleZoomTarget>
-                        {momentData?.topComment ? (
-                            <RenderCommentFeed moment={momentData} focused={true} />
-                        ) : (
-                            <View
-                                style={{
-                                    alignSelf: "center",
-                                    marginTop: sizes.margins["2sm"],
-                                }}
-                            >
-                                <ZeroComments isAccount={false} moment={momentData} />
-                            </View>
-                        )}
+                                </Link.AppleZoomTarget>
+                            </ProfileDropDownMenuIOS>
+                        </Animated.View>
+                        <MomentComments moment={momentData} />
                     </Moment.Root.Main>
-                ) : null}
+                ) : (
+                    <MomentUnavailable message={errorMessage} />
+                )}
                 {/* Dismiss overlay when input is active and keyboard visible */}
                 {commentEnabled && isKeyboardVisible && (
                     <Pressable
@@ -361,7 +248,7 @@ export default function MomentFullScreen() {
                         }}
                     >
                         <Input
-                            momentId={String(momentData?.id ?? momentId)}
+                            momentId={momentId}
                             autoFocus={true}
                             onSent={() => setCommentEnabled(false)}
                         />

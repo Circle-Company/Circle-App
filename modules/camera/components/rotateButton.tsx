@@ -62,7 +62,6 @@ export function RotateButton() {
             <AnimatedGlassView
                 style={[styles.circle, containerStyle]}
                 glassEffectStyle="regular"
-                colorScheme="dark"
                 isInteractive
             >
                 <Pressable

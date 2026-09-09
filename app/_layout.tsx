@@ -1,26 +1,26 @@
 import { SafeAreaProvider, initialWindowMetrics } from "react-native-safe-area-context"
-import { Stack, SplashScreen, useRouter, useSegments } from "expo-router"
+import { Stack, SplashScreen, useRouter } from "expo-router"
 import { GestureHandlerRootView } from "react-native-gesture-handler"
 import { KeyboardProvider } from "react-native-keyboard-controller"
 import React, { useEffect, useState } from "react"
-import { useColorScheme } from "react-native"
 import { useFonts } from "expo-font"
 
-import { Provider as AccountProvider } from "@/contexts/account"
-import AuthContext, { Provider as AuthProvider } from "@/contexts/auth"
-import LanguageContext from "@/contexts/language"
+import { Provider as AuthProvider } from "@/contexts/auth"
+import LanguageContext, { Provider as LanguageProvider } from "@/contexts/language"
 import { colors } from "@/constants/colors"
 import { Provider as BottomSheetProvider } from "@/contexts/bottomSheet"
 import { Provider as FeedProvider } from "@/contexts/Feed"
 import { Provider as GeolocationProvider } from "@/contexts/geolocation"
 import { Provider as NetworkProvider } from "@/contexts/network"
 import { Provider as NewMomentProvider } from "@/contexts/newMoment"
-import { Provider as LanguageProvider } from "@/contexts/language"
 import { Provider as ProfileProvider } from "@/contexts/profile"
 import { PushNotificationProvider } from "@/contexts/push.notification"
 import { CameraProvider } from "../modules/camera/context"
 import { QueryProvider } from "@/lib/react-query"
 import { Provider as RedirectProvider, RedirectContext } from "@/contexts/redirect"
+import { decideEntryScreen } from "@/session/apple"
+import { readSession } from "@/session/storage"
+import { setPendingEntryScreen } from "@/session/runtime"
 import { Provider as ToastProvider } from "@/contexts/Toast"
 import Fonts from "@/constants/fonts"
 import sizes from "@/constants/sizes"
@@ -31,13 +31,10 @@ import { TutorialProvider } from "@/contexts/tutorial"
 SplashScreen.preventAutoHideAsync()
 
 function RootLayoutNav() {
-    const { checkIsSigned, sessionData } = React.useContext(AuthContext)
     const { redirectTo, setRedirectTo } = React.useContext(RedirectContext)
     const { t } = React.useContext(LanguageContext)
-    const segments = useSegments()
     const router = useRouter()
     const [isInitializing, setIsInitializing] = useState(true)
-    const scheme = useColorScheme()
     const hasRedirectedRef = React.useRef(false)
 
     // Uma linha cobre toda a navegação do app: dispara `screen_viewed` a cada
@@ -56,17 +53,26 @@ function RootLayoutNav() {
     } as const
     // hasNavigated state removed; rendering <Slot /> directly
 
-    // Inicializa o estado de redirect baseado na sessão
+    // Inicializa o estado de redirect a partir da sessão persistida (§5.1).
+    //
+    // A decisão deixou de ser "tem token no MMKV?" e passou a ser a união do §2.3, que
+    // distingue três coisas que o booleano juntava: nunca logou, deslogado mas o device
+    // lembra de quem, e sessão viva. O estado do meio é o que permite o re-auth de um toque
+    // em vez da tela de login em branco (§5.8).
     useEffect(() => {
         const initializeAuth = async () => {
             try {
-                const isAuthenticated = checkIsSigned()
-                if (isAuthenticated) {
-                    setRedirectTo("APP")
-                } else {
-                    setRedirectTo("SPLASH")
-                }
+                const screen = await decideEntryScreen(readSession())
+                setRedirectTo(screen.kind === "app" ? "APP" : "SPLASH")
+
+                // A decisão fica disponível para a tela de entrada oferecer
+                // "entrar como @fulano" (§5.8). A tela em si ainda não existe — enquanto
+                // não existir, `one-tap` se comporta como login completo, que é o
+                // degradado correto: pior UX, nunca comportamento errado.
+                setPendingEntryScreen(screen)
             } catch (error) {
+                // Nada aqui pode impedir o app de subir: sem decisão, vai para a tela de
+                // entrada, que sempre funciona.
                 console.error("❌ Erro ao inicializar auth:", error)
                 setRedirectTo("SPLASH")
             } finally {
@@ -121,16 +127,8 @@ function RootLayoutNav() {
                 options={{ ...settingsHeader, headerTitle: t("Add Profile Picture") }}
             />
             <Stack.Screen
-                name="settings/description"
-                options={{ ...settingsHeader, headerTitle: t("Add Description") }}
-            />
-            <Stack.Screen
                 name="settings/name"
                 options={{ ...settingsHeader, headerTitle: t("Name") }}
-            />
-            <Stack.Screen
-                name="settings/password"
-                options={{ ...settingsHeader, headerTitle: t("Password") }}
             />
             <Stack.Screen
                 name="settings/personal-data"
@@ -196,19 +194,17 @@ export default function RootLayout() {
                                             <NetworkProvider>
                                                 <GeolocationProvider>
                                                     <CameraProvider>
-                                                        <AccountProvider>
-                                                            <ProfileProvider>
-                                                                <FeedProvider>
-                                                                    <BottomSheetProvider>
-                                                                        <NewMomentProvider>
-                                                                            <PushNotificationProvider>
-                                                                                <RootLayoutNav />
-                                                                            </PushNotificationProvider>
-                                                                        </NewMomentProvider>
-                                                                    </BottomSheetProvider>
-                                                                </FeedProvider>
-                                                            </ProfileProvider>
-                                                        </AccountProvider>
+                                                        <ProfileProvider>
+                                                            <FeedProvider>
+                                                                <BottomSheetProvider>
+                                                                    <NewMomentProvider>
+                                                                        <PushNotificationProvider>
+                                                                            <RootLayoutNav />
+                                                                        </PushNotificationProvider>
+                                                                    </NewMomentProvider>
+                                                                </BottomSheetProvider>
+                                                            </FeedProvider>
+                                                        </ProfileProvider>
                                                     </CameraProvider>
                                                 </GeolocationProvider>
                                             </NetworkProvider>

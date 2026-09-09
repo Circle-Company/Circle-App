@@ -4,7 +4,7 @@ import type { MomentViewer, MomentViewsStats } from "@/api/moment/moment.types"
 
 export type ViewerObject = MomentViewer
 export type ViewersStatsObject = MomentViewsStats
-export type ViewersReciveDataProps = Array<ViewerObject>
+export type ViewersReciveDataProps = ViewerObject[]
 
 export type ViewersMainRootProps = {
     data: ViewersReciveDataProps

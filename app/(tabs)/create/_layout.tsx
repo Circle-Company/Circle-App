@@ -1,11 +1,9 @@
 import { Stack } from "expo-router"
 import React from "react"
-import ColorTheme from "@/constants/colors"
 import fonts from "@/constants/fonts"
 import LanguageContext from "@/contexts/language"
 import { GestureHandlerRootView } from "react-native-gesture-handler"
-import { StyleSheet, Platform, View } from "react-native"
-import { BlurView } from "expo-blur"
+import { StyleSheet } from "react-native"
 import { CameraProvider } from "../../../modules/camera/context"
 
 export default function CameraLayout() {

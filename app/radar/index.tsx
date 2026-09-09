@@ -1,12 +1,5 @@
 import React, { useEffect, useMemo, useState } from "react"
-import {
-    ActivityIndicator,
-    Dimensions,
-    Pressable,
-    StyleSheet,
-    Text,
-    View,
-} from "react-native"
+import { ActivityIndicator, Dimensions, Pressable, StyleSheet, Text, View } from "react-native"
 import Svg, { Circle } from "react-native-svg"
 import { Image } from "expo-image"
 import * as Location from "expo-location"
@@ -32,7 +25,7 @@ const SELF_AVATAR_SIZE = 52
 const RING_BASE_RADIUS = RADAR_RADIUS - AVATAR_SIZE / 2 - 4
 const RING_RATIOS = [0.5, 0.85, 1.6, 2.4] as const
 const LAYER_BY_TIER = [1, 2, 3, 4] as const
-const COMPASS_LABELS: Array<{ label: string; bearing: number }> = [
+const COMPASS_LABELS: { label: string; bearing: number }[] = [
     { label: "N", bearing: 0 },
     { label: "E", bearing: 90 },
     { label: "S", bearing: 180 },
@@ -120,7 +113,7 @@ function polarToXY(bearingDeg: number, radius: number) {
     }
 }
 
-function assignLayers<T extends RadarPerson>(items: T[]): Array<T & { layer: number }> {
+function assignLayers<T extends RadarPerson>(items: T[]): (T & { layer: number })[] {
     if (items.length === 0) return []
     const sorted = [...items].sort((a, b) => a.distanceMeters - b.distanceMeters)
     const layerByUserId = new Map<string, number>()
@@ -160,7 +153,7 @@ export default function RadarScreen() {
                 longitude: location.coords.longitude,
             })
             setPermissionError(null)
-        } catch (e) {
+        } catch {
             setPermissionError(t("Could not read your location"))
         }
     }
@@ -252,9 +245,7 @@ export default function RadarScreen() {
                                 pressed && { opacity: 0.75 },
                             ]}
                         >
-                            <Text style={styles.permissionButtonText}>
-                                {t("Enable location")}
-                            </Text>
+                            <Text style={styles.permissionButtonText}>{t("Enable location")}</Text>
                         </Pressable>
                     </View>
                 ) : (
@@ -273,17 +264,14 @@ export default function RadarScreen() {
                                         cx={RADAR_RADIUS}
                                         cy={RADAR_RADIUS}
                                         r={RING_BASE_RADIUS * ratio}
-                                        stroke={
-                                            colors.purple.purple_07 +
-                                            (ratio > 1 ? "44" : "88")
-                                        }
+                                        stroke={colors.purple.purple_07 + (ratio > 1 ? "44" : "88")}
                                         strokeWidth={1}
                                         fill="none"
                                     />
                                 ))}
                             </Svg>
                             <SelfMarker
-                                profilePictureUrl={session?.user?.profilePicture}
+                                profilePictureUrl={session?.account?.profilePicture}
                                 label={t("You")}
                             />
                             {COMPASS_LABELS.map(({ label, bearing }) => {
@@ -296,10 +284,7 @@ export default function RadarScreen() {
                                     <View
                                         key={label}
                                         pointerEvents="none"
-                                        style={[
-                                            styles.compassLabel,
-                                            { left: x - 12, top: y - 12 },
-                                        ]}
+                                        style={[styles.compassLabel, { left: x - 12, top: y - 12 }]}
                                     >
                                         <Text
                                             style={[
@@ -318,9 +303,7 @@ export default function RadarScreen() {
                                     p.bearingDegrees - heading,
                                     RING_BASE_RADIUS * ringRatio,
                                 )
-                                return (
-                                    <RadarMarker key={p.userId} person={p} x={x} y={y} />
-                                )
+                                return <RadarMarker key={p.userId} person={p} x={x} y={y} />
                             })}
                             {isLoading && (
                                 <View
@@ -399,15 +382,7 @@ function SelfMarker({
     )
 }
 
-function RadarMarker({
-    person,
-    x,
-    y,
-}: {
-    person: RadarPersonWithAvatar
-    x: number
-    y: number
-}) {
+function RadarMarker({ person, x, y }: { person: RadarPersonWithAvatar; x: number; y: number }) {
     const isExact = person.precision === "exact"
     const initial = person.userId.charAt(0).toUpperCase()
     return (
@@ -425,9 +400,7 @@ function RadarMarker({
                     height: AVATAR_SIZE,
                     borderRadius: AVATAR_SIZE / 2,
                     borderWidth: 2,
-                    borderColor: isExact
-                        ? colors.purple.purple_04
-                        : colors.purple.purple_02 + "cc",
+                    borderColor: isExact ? colors.purple.purple_04 : colors.purple.purple_02 + "cc",
                     backgroundColor: colors.gray.grey_08,
                     alignItems: "center",
                     justifyContent: "center",
@@ -447,11 +420,7 @@ function RadarMarker({
                 )}
             </View>
             <View style={styles.usernameBadge}>
-                <Text
-                    style={styles.usernameText}
-                    numberOfLines={1}
-                    ellipsizeMode="tail"
-                >
+                <Text style={styles.usernameText} numberOfLines={1} ellipsizeMode="tail">
                     @{person.userId}
                 </Text>
             </View>

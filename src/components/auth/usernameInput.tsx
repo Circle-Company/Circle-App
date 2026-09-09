@@ -10,23 +10,13 @@ import { usernameRegex } from "@/lib/hooks/useUsernameRegex"
 import api from "@/api" // Serviço para verificar disponibilidade do username
 import React, { useContext, useEffect, useRef, useState } from "react"
 import { useTranslation } from "react-i18next"
-import {
-    Animated,
-    Easing,
-    Pressable,
-    TextInput,
-    TextStyle,
-    useColorScheme,
-    View,
-    ViewStyle,
-} from "react-native"
+import { Animated, Easing, Pressable, TextInput, TextStyle, View, ViewStyle } from "react-native"
 
 type UsernameInputProps = {
     type: "signIn" | "signUp"
 }
 
 export default function UsernameInput({ type }: UsernameInputProps) {
-    const isDarkMode = useColorScheme() === "dark"
     const { setSignInputUsername } = useContext(AuthContext)
     const { t } = useTranslation()
     const [username, setUsername] = useState("")

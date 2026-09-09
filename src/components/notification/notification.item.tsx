@@ -1,5 +1,4 @@
-import { View, ViewStyle } from "react-native"
-import { Text } from "@/components/Themed"
+import { View, ViewStyle, Platform, Pressable } from "react-native"
 import { UserShow } from "@/components/user_show"
 import sizes from "@/constants/sizes"
 import { colors } from "@/constants/colors"
@@ -7,10 +6,7 @@ import fonts from "@/constants/fonts"
 import { NotificationType, type NotificationPayload } from "@/contexts/push.notification"
 import { NotificationBadge } from "./notification.badge"
 import { NotificationText } from "./notification.text"
-import {
-    NotificationMomentThumbnail,
-    getMomentThumbnailUrl,
-} from "./notification.moment.thumbnail"
+import { NotificationMomentThumbnail, getMomentThumbnailUrl } from "./notification.moment.thumbnail"
 import { useRouter, usePathname } from "expo-router"
 import {
     GlassContainer,
@@ -18,8 +14,6 @@ import {
     isGlassEffectAPIAvailable,
     isLiquidGlassAvailable,
 } from "expo-glass-effect"
-import { Platform } from "react-native"
-import { Pressable } from "react-native"
 import PersistedContext from "@/contexts/Persisted"
 import React from "react"
 import ProfileContext from "@/contexts/profile"
@@ -73,7 +67,6 @@ export function NotificationItem({ item }: NotificationItemProps) {
         session.account.addReadNotifications([String(item.id)])
 
         const targetId = String(item.actor.id)
-        const myId = String(session.user.id)
         const targetPath = `/profile/${targetId}`
         // Evitar navegação duplicada
         if (pathname === targetPath) return
@@ -106,7 +99,6 @@ export function NotificationItem({ item }: NotificationItemProps) {
             <GlassContainer spacing={10}>
                 <GlassView
                     style={glassContainer}
-                    colorScheme="dark"
                     glassEffectStyle="regular"
                     isInteractive={true}
                     tintColor={colors.gray.grey_09 + "90"}

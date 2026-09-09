@@ -89,9 +89,7 @@ export const ROUTES = {
     // Auth routes
     AUTH: {
         INIT: "/(auth)/init",
-        SIGN_IN: "/(auth)/sign-in",
         SIGN_UP_USERNAME: "/(auth)/sign-up-username",
-        SIGN_UP_PASSWORD: "/(auth)/sign-up-password",
         SIGN_UP_AGREE: "/(auth)/sign-up-agree",
         PRIVACY_POLICY: "/(auth)/privacy-policy",
         TERMS_OF_SERVICE: "/(auth)/terms-of-service",
@@ -116,14 +114,21 @@ export const ROUTES = {
         USER: (userId: string) => `/profile/${userId}`,
     },
 
+    // Moment routes
+    //
+    // Faltava, e `navigateLegacy` já usava `ROUTES.MOMENT.DETAIL` — o grupo nunca existiu,
+    // então aquele ramo não compilava e, em runtime, teria lançado ao navegar para um
+    // momento pelo nome legado. A rota em si existe desde sempre (`app/moment/[id].tsx`).
+    MOMENT: {
+        DETAIL: (momentId: string) => `/moment/${momentId}`,
+    },
+
     // Settings routes
     SETTINGS: {
         INDEX: "/settings",
         PROFILE_PICTURE: "/settings/profile-picture",
-        DESCRIPTION: "/settings/description",
         FOLLOWINGS: "/settings/followings",
         NAME: "/settings/name",
-        PASSWORD: "/settings/password",
         PRIVACY_POLICY: "/settings/privacy-policy",
         TERMS_OF_SERVICE: "/settings/terms-of-service",
         COMMUNITY_GUIDELINES: "/settings/community-guidelines",
@@ -145,9 +150,7 @@ export const ROUTES = {
 export const LEGACY_ROUTE_MAP: Record<string, string> = {
     // Auth
     Init: ROUTES.AUTH.INIT,
-    "Auth-SignIn": ROUTES.AUTH.SIGN_IN,
     "Auth-SignUp-Username": ROUTES.AUTH.SIGN_UP_USERNAME,
-    "Auth-SignUp-Password": ROUTES.AUTH.SIGN_UP_PASSWORD,
     "Auth-SignUp-Agree": ROUTES.AUTH.SIGN_UP_AGREE,
     "Auth-Privacy-Policy": ROUTES.AUTH.PRIVACY_POLICY,
     "Auth-Terms-Of-Service": ROUTES.AUTH.TERMS_OF_SERVICE,
@@ -167,10 +170,8 @@ export const LEGACY_ROUTE_MAP: Record<string, string> = {
     // Settings
     Settings: ROUTES.SETTINGS.INDEX,
     "Settings-ProfilePicture": ROUTES.SETTINGS.PROFILE_PICTURE,
-    "Settings-Description": ROUTES.SETTINGS.DESCRIPTION,
     "Settings-Followings": ROUTES.SETTINGS.FOLLOWINGS,
     "Settings-Name": ROUTES.SETTINGS.NAME,
-    "Settings-Password": ROUTES.SETTINGS.PASSWORD,
     "Settings-Privacy-Policy": ROUTES.SETTINGS.PRIVACY_POLICY,
     "Settings-Terms-Of-Service": ROUTES.SETTINGS.TERMS_OF_SERVICE,
     "Settings-Community-Guidelines": ROUTES.SETTINGS.COMMUNITY_GUIDELINES,

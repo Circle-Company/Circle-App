@@ -73,7 +73,7 @@ vi.mock("react-native-mmkv", () => ({
         getString: vi.fn(),
         getNumber: vi.fn(),
         getBoolean: vi.fn(),
-        delete: vi.fn(),
+        remove: vi.fn(),
         clearAll: vi.fn(),
     })),
 }))
@@ -95,7 +95,7 @@ vi.mock("expo-constants", () => ({
 
 // Mock para TimerUtil usado no useTimer
 vi.mock("@/helpers/debounce", () => ({
-    debounce: vi.fn((fn: Function, delay: number) => fn),
+    debounce: vi.fn((fn: Function, _delay: number) => fn),
 }))
 
 // Mock para axios se necessário
@@ -125,77 +125,45 @@ vi.mock("@/store", () => ({
         getString: vi.fn(() => ""),
         getBoolean: vi.fn(() => false),
         set: vi.fn(),
-        delete: vi.fn(),
+        remove: vi.fn(),
     },
+    // Espelha `storageKeys()` de verdade, chave por chave. A versão anterior deste mock era
+    // um fóssil: declarava `history.search`, `account.muted`, `deviceMetadata`,
+    // `user.profile_picture.small` e `preferences.likeMoment` — nomes que **nunca**
+    // existiram na tabela real. Um mock que inventa chaves esconde justamente o tipo de bug
+    // que este arquivo deveria ajudar a pegar: código lendo uma chave que ninguém grava.
     storageKeys: vi.fn(() => ({
-        user: {
-            id: "user.id",
-            name: "user.name",
-            username: "user.username",
-            description: "user.description",
-            verified: "user.verified",
-            profile_picture: {
-                small: "user.profile_picture.small",
-                tiny: "user.profile_picture.tiny",
-            },
-        },
+        baseKey: "@circle:",
+        clockOffset: "@circle:clockoffset",
         account: {
             coordinates: {
-                latitude: "account.coordinates.latitude",
-                longitude: "account.coordinates.longitude",
+                lastSyncAt: "@circle:account:coordinates:lastsyncat",
             },
-            unreadNotificationsCount: "account.unreadNotificationsCount",
-            blocked: "account.blocked",
-            muted: "account.muted",
-            last_active_at: "account.last_active_at",
-            last_login_at: "account.last_login_at",
+            blocked: "@circle:account:block",
+            accessLevel: "@circle:account:accesslevel",
+            verified: "@circle:account:verified",
+            deleted: "@circle:account:deleted",
             jwt: {
-                token: "account.jwt.token",
-                expiration: "account.jwt.expiration",
+                expiration: "@circle:account:jwt:expiration",
+                token: "@circle:account:jwt:token",
+                refreshToken: "@circle:account:jwt:refreshtoken",
             },
         },
-        deviceMetadata: {
-            totalMemory: "totalMemory",
-            availableMemory: "availableMemory",
-            freeDiskStorage: "freeDiskStorage",
-            batteryLevel: "batteryLevel",
-            isLowPowerModeEnabled: "isLowPowerModeEnabled",
-            isTablet: "isTablet",
-            screenWidth: "screenWidth",
-            screenHeight: "screenHeight",
-            pixelDensity: "pixelDensity",
-            fontScale: "fontScale",
-            deviceType: "deviceType",
-        },
-        statistics: {
-            totalFollowers: "statistics.totalFollowers",
-            totalFollowing: "statistics.totalFollowing",
-            totalLikes: "statistics.totalLikes",
-            totalViews: "statistics.totalViews",
-            followerGrowthRate30d: "statistics.followerGrowthRate30d",
-            engagementGrowthRate30d: "statistics.engagementGrowthRate30d",
-            interactionsGrowthRate30d: "statistics.interactionsGrowthRate30d",
-        },
-        preferences: {
-            primaryLanguage: "preferences.primaryLanguage",
-            appLanguage: "preferences.appLanguage",
-            autoplay: "preferences.autoplay",
-            haptics: "preferences.haptics",
-            translation: "preferences.translation",
-            translationLanguage: "preferences.translationLanguage",
-            muteAudio: "preferences.muteAudio",
-            likeMoment: "preferences.likeMoment",
-            newMemory: "preferences.newMemory",
-            addToMemory: "preferences.addToMemory",
-            followUser: "preferences.followUser",
-            viewUser: "preferences.viewUser",
-        },
-        history: {
-            search: "history.search",
+        user: {
+            id: "@circle:user:id",
+            name: "@circle:user:name",
+            username: "@circle:user:username",
+            profilePicture: "@circle:user:profilepicture",
         },
         permissions: {
-            postNotifications: "permissions.postNotifications",
-            firebaseMessaging: "permissions.firebaseMessaging",
+            postNotifications: "@circle:permissions:postnotifications",
+        },
+        tutorial: {
+            feed: {
+                step1Seen: "@circle:tutorial:feed:step1Seen",
+                step2Seen: "@circle:tutorial:feed:step2Seen",
+            },
+            dismissed: "@circle:tutorial:dismissed",
         },
     })),
 }))

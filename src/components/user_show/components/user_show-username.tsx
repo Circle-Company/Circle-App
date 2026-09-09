@@ -31,7 +31,8 @@ export default function UserShowUsername({
     const pathname = usePathname()
     const { setUserId, setProfilePreview } = React.useContext(ProfileContext)
 
-    const isMe = user.id == session.user.id ? true : false
+    // `String()` dos dois lados: ver a mesma comparação em `user_show-follow_button`.
+    const isMe = String(user.id) === String(session.account.userId)
 
     const container: any = {
         margin: margin * scale,
@@ -58,7 +59,7 @@ export default function UserShowUsername({
         if (!pressable) return
         executeBeforeClick ? executeBeforeClick() : null
         const targetId = String(user.id)
-        const myId = String(session.user.id)
+        const myId = String(session.account.userId)
         const isSelf = targetId === myId
         const targetPath = isSelf ? `/you/${targetId}` : `/profile/${targetId}`
         // Evitar navegação duplicada

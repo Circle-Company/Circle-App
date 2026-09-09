@@ -1,12 +1,5 @@
 import React from "react"
-import {
-    ActivityIndicator,
-    FlatList,
-    RefreshControl,
-    TextStyle,
-    View,
-    ViewStyle,
-} from "react-native"
+import { FlatList, RefreshControl, TextStyle, View, ViewStyle } from "react-native"
 
 import { Text } from "@/components/Themed"
 import { NotificationSkeleton } from "@/components/notification/notification.skeleton"

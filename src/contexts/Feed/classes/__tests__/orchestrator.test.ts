@@ -2,12 +2,14 @@ import { beforeEach, describe, expect, it, vi } from "vitest"
 
 // Importar após os mocks
 import { FeedOrchestrator } from "../orchestrator"
+import type { Moment } from "@/contexts/Feed/types"
 
 // Mock todas as dependências primeiro
 vi.mock("../fetcher", () => ({
     Fetcher: vi.fn().mockImplementation(() => ({
-        fetchChunk: vi.fn().mockResolvedValue([]),
-        fetchOlderChunks: vi.fn().mockResolvedValue([]),
+        fetchChunk: vi.fn().mockResolvedValue({ ok: true, moments: [] }),
+        fetchOlderChunks: vi.fn().mockResolvedValue({ ok: true, moments: [] }),
+        abort: vi.fn(),
     })),
 }))
 
@@ -15,6 +17,7 @@ vi.mock("../debounceGate", () => ({
     DebounceGate: vi.fn().mockImplementation(() => ({
         canProceed: vi.fn().mockReturnValue(true),
         mark: vi.fn(),
+        reset: vi.fn(),
     })),
 }))
 
@@ -40,30 +43,15 @@ vi.mock("../../helpers/mapper", () => ({
     mapper: vi.fn().mockReturnValue([]),
 }))
 
-// Mock data para os testes
-const mockMoments = [
+// Mock data para os testes.
+//
+// O fixture ainda descrevia o `Moment` legado (`content_type`, `midia`,
+// `comments_count`, `created_at`) misturado com o atual, e por isso não era
+// atribuível a `Moment[]` em nenhuma das chamadas abaixo.
+const mockMoments: Moment[] = [
     {
         id: "1",
-        user: {
-            id: "1",
-            username: "user1",
-            verified: false,
-            profile_picture: { small_resolution: "", tiny_resolution: "" },
-            isFollowing: false,
-        },
-        description: "Test moment 1",
-        content_type: "VIDEO",
-        midia: {
-            content_type: "VIDEO" as const,
-            nhd_thumbnail: "",
-            fullhd_resolution: "",
-            nhd_resolution: "",
-        },
-        comments_count: 0,
-        likes_count: 0,
-        isLiked: false,
-        deleted: false,
-        created_at: "2024-01-01T00:00:00Z",
+        user: { id: "1", username: "user1", profilePicture: "" },
         media: "https://example.com/video-1.mp4",
         thumbnail: "https://example.com/thumb-1.jpg",
         duration: 10,
@@ -71,34 +59,9 @@ const mockMoments = [
         hasAudio: false,
         ageRestriction: false,
         contentWarning: false,
-        metrics: {
-            totalViews: 0,
-            totalLikes: 0,
-            totalComments: 0,
-        },
+        metrics: { totalViews: 0, totalLikes: 0, totalComments: 0 },
+        isLiked: false,
         publishedAt: "2024-01-01T00:00:00Z",
-    },
-]
-
-const mockInteractions = [
-    {
-        id: 1,
-        tags: [],
-        duration: 5000,
-        type: "VIDEO" as const,
-        language: "pt" as const,
-        interaction: {
-            like: false,
-            share: false,
-            click: false,
-            comment: false,
-            likeComment: false,
-            showLessOften: false,
-            report: false,
-            initialLikedState: false,
-            partialView: false,
-            completeView: false,
-        },
     },
 ]
 
@@ -107,7 +70,7 @@ describe("FeedOrchestrator", () => {
 
     beforeEach(() => {
         vi.clearAllMocks()
-        orchestrator = new FeedOrchestrator("test-token", 50)
+        orchestrator = new FeedOrchestrator(50)
     })
 
     describe("constructor", () => {

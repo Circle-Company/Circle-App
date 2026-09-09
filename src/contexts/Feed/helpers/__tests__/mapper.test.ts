@@ -1,128 +1,42 @@
 import { describe, expect, it } from "vitest"
 
-import { MomentProps } from "../../types"
+import { Moment as MomentProps } from "../../types"
 import { mapper } from "../mapper"
 
-// Mock data para os testes
+/**
+ * Fábrica em vez de literais gigantes: os fixtures antigos ainda descreviam o
+ * `Moment` legado (`content_type`, `midia`, `comments_count`, `created_at`) e
+ * não compilavam mais contra o tipo atual.
+ *
+ * O discriminador dos testes era `description` — que não existe mais em moment
+ * nenhum. Quem distingue "veio de moments" de "veio do fallback" agora é
+ * `username`, que já diferia entre as duas listas.
+ */
+const makeMoment = (id: string, username: string): MomentProps => ({
+    id,
+    user: { id, username, profilePicture: "" },
+    media: "",
+    thumbnail: "",
+    duration: 0,
+    size: "",
+    hasAudio: false,
+    ageRestriction: false,
+    contentWarning: false,
+    metrics: { totalViews: 0, totalLikes: 0, totalComments: 0 },
+    isLiked: false,
+    publishedAt: "2024-01-01T00:00:00Z",
+})
+
 const mockMoments: MomentProps[] = [
-    {
-        id: "1",
-        user: {
-            id: "1",
-            username: "user1",
-            verified: false,
-            profile_picture: { small_resolution: "", tiny_resolution: "" },
-            isFollowing: false,
-        },
-        description: "Test moment 1",
-        content_type: "VIDEO",
-        midia: {
-            content_type: "VIDEO",
-            nhd_thumbnail: "",
-            fullhd_resolution: "",
-            nhd_resolution: "",
-        },
-        comments_count: 0,
-        likes_count: 0,
-        isLiked: false,
-        deleted: false,
-        created_at: "2024-01-01T00:00:00Z",
-    },
-    {
-        id: "2",
-        user: {
-            id: "2",
-            username: "user2",
-            verified: true,
-            profile_picture: { small_resolution: "", tiny_resolution: "" },
-            isFollowing: true,
-        },
-        description: "Test moment 2",
-        content_type: "IMAGE",
-        midia: {
-            content_type: "IMAGE",
-            nhd_thumbnail: "",
-            fullhd_resolution: "",
-            nhd_resolution: "",
-        },
-        comments_count: 5,
-        likes_count: 10,
-        isLiked: true,
-        deleted: false,
-        created_at: "2024-01-02T00:00:00Z",
-    },
-    {
-        id: "3",
-        user: {
-            id: "3",
-            username: "user3",
-            verified: false,
-            profile_picture: { small_resolution: "", tiny_resolution: "" },
-            isFollowing: false,
-        },
-        description: "Test moment 3",
-        content_type: "VIDEO",
-        midia: {
-            content_type: "VIDEO",
-            nhd_thumbnail: "",
-            fullhd_resolution: "",
-            nhd_resolution: "",
-        },
-        comments_count: 2,
-        likes_count: 5,
-        isLiked: false,
-        deleted: false,
-        created_at: "2024-01-03T00:00:00Z",
-    },
+    makeMoment("1", "user1"),
+    makeMoment("2", "user2"),
+    makeMoment("3", "user3"),
 ]
 
 const fallbackMoments: MomentProps[] = [
-    {
-        id: "4",
-        user: {
-            id: "4",
-            username: "user4",
-            verified: true,
-            profile_picture: { small_resolution: "", tiny_resolution: "" },
-            isFollowing: true,
-        },
-        description: "Fallback moment 4",
-        content_type: "IMAGE",
-        midia: {
-            content_type: "IMAGE",
-            nhd_thumbnail: "",
-            fullhd_resolution: "",
-            nhd_resolution: "",
-        },
-        comments_count: 1,
-        likes_count: 3,
-        isLiked: false,
-        deleted: false,
-        created_at: "2024-01-04T00:00:00Z",
-    },
-    {
-        id: "1", // Mesmo ID do primeiro mock, para testar fallback
-        user: {
-            id: "1",
-            username: "user1_fallback",
-            verified: true,
-            profile_picture: { small_resolution: "", tiny_resolution: "" },
-            isFollowing: true,
-        },
-        description: "Fallback moment 1",
-        content_type: "IMAGE",
-        midia: {
-            content_type: "IMAGE",
-            nhd_thumbnail: "",
-            fullhd_resolution: "",
-            nhd_resolution: "",
-        },
-        comments_count: 10,
-        likes_count: 20,
-        isLiked: true,
-        deleted: false,
-        created_at: "2024-01-01T12:00:00Z",
-    },
+    makeMoment("4", "user4_fallback"),
+    // Mesmo ID do primeiro mock, para testar a precedência.
+    makeMoment("1", "user1_fallback"),
 ]
 
 describe("mapper", () => {
@@ -175,8 +89,8 @@ describe("mapper", () => {
 
             expect(result).toHaveLength(1)
             expect(result[0]).toEqual(mockMoments[0]) // Deve vir de moments, não fallback
-            expect(result[0].description).toBe("Test moment 1")
-            expect(result[0].description).not.toBe("Fallback moment 1")
+            expect(result[0].user.username).toBe("user1")
+            expect(result[0].user.username).not.toBe("user1_fallback")
         })
 
         it("deve filtrar IDs que não existem em nenhum lugar", () => {
@@ -289,7 +203,7 @@ describe("mapper", () => {
                 {
                     ...mockMoments[0],
                     id: "1",
-                    description: "Updated moment 1", // Versão atualizada
+                    user: { id: "1", username: "user1_updated", profilePicture: "" }, // Versão atualizada
                 },
             ]
 
@@ -298,7 +212,7 @@ describe("mapper", () => {
 
             expect(result).toHaveLength(3)
             // ID 1 deve vir dos novos momentos (atualizado)
-            expect(result[0].description).toBe("Updated moment 1")
+            expect(result[0].user.username).toBe("user1_updated")
             // ID 2 deve vir do fallback (feed atual)
             expect(result[1]).toBe(feedAtual[1])
             // ID 3 deve vir dos novos momentos
@@ -310,12 +224,12 @@ describe("mapper", () => {
             const feedNovo = [
                 {
                     ...mockMoments[0],
-                    description: "Updated moment 1",
+                    user: { id: "1", username: "user1_updated", profilePicture: "" },
                 },
                 {
                     ...mockMoments[1],
                     id: "4",
-                    description: "New moment 4",
+                    user: { id: "4", username: "user4_novo", profilePicture: "" },
                 },
             ]
 
@@ -323,8 +237,8 @@ describe("mapper", () => {
             const result = mapper(novosIds, feedNovo, feedAntigo)
 
             expect(result).toHaveLength(2)
-            expect(result[0].description).toBe("Updated moment 1") // Atualizado
-            expect(result[1].description).toBe("New moment 4") // Novo
+            expect(result[0].user.username).toBe("user1_updated") // Atualizado
+            expect(result[1].user.username).toBe("user4_novo") // Novo
         })
 
         it("deve simular cenário de cache miss parcial", () => {

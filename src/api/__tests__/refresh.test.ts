@@ -14,7 +14,7 @@ vi.mock("@/store", () => ({
     storage: {
         getString: (k: string) => memory.get(k),
         set: (k: string, v: string) => void memory.set(k, String(v)),
-        delete: (k: string) => void memory.delete(k),
+        remove: (k: string) => void memory.delete(k),
         getBoolean: () => false,
         getNumber: () => 0,
     },
@@ -35,11 +35,8 @@ vi.mock("@/store", () => ({
     }),
 }))
 
-vi.mock("@/contexts/Persisted/persist.account", () => ({
-    useAccountStore: {
-        getState: () => ({ set: vi.fn(), jwtToken: "", refreshToken: "", jwtExpiration: "" }),
-    },
-}))
+// O mock de `persist.account` saiu junto com a store: os tokens não são mais espelhados em
+// Zustand nenhum. A `Session` é o único dono deles (§11.2).
 
 // ──────────────────────────────────────────────────────────────────────────────
 // Axios: captura os interceptors registrados no import do módulo, para poder
@@ -64,9 +61,14 @@ vi.mock("axios", () => {
 })
 
 /** Erro 401 no formato que o axios entrega ao interceptor. */
-function unauthorized(url = "/account") {
+/**
+ * O `tokenGeneration` é o que o interceptor de request carimba em toda request. Um 401 com
+ * geração ANTERIOR à corrente significa "esta request saiu antes da rotação" e é apenas
+ * repetida; só a geração corrente justifica um refresh novo (§5.4).
+ */
+function unauthorized(url = "/account", tokenGeneration = 0) {
     return {
-        config: { url, headers: {} },
+        config: { url, headers: {}, tokenGeneration },
         response: {
             status: 401,
             data: { success: false, code: "AUTHENTICATION_REQUIRED" },
@@ -117,8 +119,11 @@ describe("fluxo de 401 → refresh", () => {
 
         const result: any = await captured.onResponseError!(unauthorized())
 
+        // `ownAuth` impede o interceptor de sobrescrever este header com o ACCESS token —
+        // sem ele o refresh sairia autenticado com a credencial errada.
         expect(instanceGet).toHaveBeenCalledWith("/auth/refresh-token", {
             headers: { Authorization: "Bearer refresh-bom" },
+            ownAuth: true,
         })
         expect(memory.get("jwt:token")).toBe("token-novo")
         expect(memory.get("jwt:refresh")).toBe("refresh-novo")
@@ -172,7 +177,10 @@ describe("fluxo de 401 → refresh", () => {
             captured.onResponseError!(unauthorized("/c")),
         ]
 
-        release({ status: 200, data: { token: "token-novo", expiresIn: 3600 } })
+        release({
+            status: 200,
+            data: { token: "token-novo", refreshToken: "refresh-novo", expiresIn: 3600 },
+        })
         const results: any[] = await Promise.all(inFlight)
 
         // Single-flight: uma chamada só, e as três requests são reenviadas.
@@ -224,5 +232,81 @@ describe("fluxo de 401 → refresh", () => {
 
         await expect(captured.onResponseError!(serverError)).rejects.toBeDefined()
         expect(instanceGet).not.toHaveBeenCalled()
+    })
+
+    // O refresh token é de uso único: o que enviamos já foi consumido no servidor. Uma
+    // resposta sem o par completo não deixa nada com que renovar da próxima vez, e guardar
+    // o token antigo só faria a próxima tentativa disparar a detecção de reuso — que revoga
+    // todas as sessões do usuário. Melhor deslogar limpo.
+    it("resposta 200 sem refreshToken é terminal, não é aproveitada pela metade", async () => {
+        memory.set("jwt:token", "token-velho")
+        memory.set("jwt:refresh", "refresh-bom")
+        instanceGet.mockResolvedValue({ status: 200, data: { token: "só-o-access" } })
+
+        await expect(captured.onResponseError!(unauthorized("/account"))).rejects.toThrow(
+            /REFRESH_REJECTED/,
+        )
+
+        expect(memory.get("jwt:token")).toBeUndefined()
+        expect(memory.get("jwt:refresh")).toBeUndefined()
+    })
+
+    it("grava o par novo inteiro, nunca só metade", async () => {
+        memory.set("jwt:token", "token-velho")
+        memory.set("jwt:refresh", "refresh-velho")
+        instanceGet.mockResolvedValue({
+            status: 200,
+            data: { token: "token-novo", refreshToken: "refresh-novo", expiresIn: 3600 },
+        })
+
+        await captured.onResponseError!(unauthorized("/account"))
+
+        expect(memory.get("jwt:token")).toBe("token-novo")
+        expect(memory.get("jwt:refresh")).toBe("refresh-novo")
+    })
+
+    // A regra que sozinha resolve a maior parte da rajada de retomada do background: as
+    // requests que saíram ANTES do refresh terminar são repetidas, não viram gatilho de
+    // uma segunda rotação — que, com token de uso único, é uma rotação que pode se perder.
+    it("401 de geração antiga é repetido sem disparar refresh", async () => {
+        memory.set("jwt:token", "token-velho")
+        memory.set("jwt:refresh", "refresh-1")
+        instanceGet.mockResolvedValue({
+            status: 200,
+            data: { token: "token-2", refreshToken: "refresh-2", expiresIn: 3600 },
+        })
+        await captured.onResponseError!(unauthorized("/a", 0))
+        expect(instanceGet).toHaveBeenCalledTimes(1)
+
+        // Uma request que saiu antes da rotação chega atrasada com 401 da geração 0.
+        const atrasada: any = await captured.onResponseError!(unauthorized("/atrasada", 0))
+
+        expect(instanceGet).toHaveBeenCalledTimes(1) // nenhuma rotação a mais
+        expect(atrasada.config.headers.Authorization).toBe("Bearer token-2")
+    })
+
+    // Com detecção de reuso no backend, um segundo refresh usando o token já consumido
+    // revogaria a conta inteira.
+    it("um refresh subsequente usa o token rotacionado, nunca o consumido", async () => {
+        memory.set("jwt:token", "token-velho")
+        memory.set("jwt:refresh", "refresh-1")
+        instanceGet.mockResolvedValue({
+            status: 200,
+            data: { token: "token-2", refreshToken: "refresh-2", expiresIn: 3600 },
+        })
+        await captured.onResponseError!(unauthorized("/a"))
+
+        instanceGet.mockResolvedValue({
+            status: 200,
+            data: { token: "token-3", refreshToken: "refresh-3", expiresIn: 3600 },
+        })
+        // Geração 1: uma request que já saiu COM o token rotacionado e mesmo assim tomou
+        // 401 — aí sim há motivo para renovar de novo.
+        await captured.onResponseError!(unauthorized("/b", 1))
+
+        const enviados = instanceGet.mock.calls.map(
+            (call: any[]) => call[1]?.headers?.Authorization,
+        )
+        expect(enviados).toEqual(["Bearer refresh-1", "Bearer refresh-2"])
     })
 })

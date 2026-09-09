@@ -8,9 +8,6 @@ async function getRadar({ latitude, longitude }: RadarQuery): Promise<RadarRespo
             latitude: String(latitude),
             longitude: String(longitude),
         },
-        headers: {
-            Authorization: `Bearer ${storage.getString(storageKeys().account.jwt.token) || ""}`,
-        },
     })
     return res.data
 }

@@ -10,7 +10,6 @@ import { Text } from "@/components/Themed"
 import fonts from "@/constants/fonts"
 import sizes from "@/constants/sizes"
 import BottomSheetContext from "@/contexts/bottomSheet"
-import PersistedContext from "@/contexts/Persisted"
 import LanguageContext from "@/contexts/language"
 import { Vibrate } from "@/lib/hooks/useHapticFeedback"
 import api from "@/api"
@@ -77,7 +76,6 @@ const ReportOptions: ReportOption[] = [
 export function RenderReportModal({ moment }: { moment: dataProps }) {
     const { t } = React.useContext(LanguageContext)
     const { collapse } = React.useContext(BottomSheetContext)
-    const { session } = React.useContext(PersistedContext)
     const toast = useToast()
     const isDarkMode = useColorScheme() === "dark"
     const width =
@@ -137,19 +135,12 @@ export function RenderReportModal({ moment }: { moment: dataProps }) {
 
         try {
             await api
-                .post(
-                    `/moments/${momentId}/report`,
-                    {
-                        report_type: option.id,
-                    },
-                    {
-                        headers: {
-                            Authorization: session.account.jwtToken,
-                        },
-                    },
-                )
+                .post(`/moments/${momentId}/report`, {
+                    report_type: option.id,
+                })
                 .then(() => {
                     toast.success(t("Report Sended"), {
+                        //@ts-ignore
                         icon: (
                             <CheckIcon
                                 fill={colors.green.green_05.toString()}

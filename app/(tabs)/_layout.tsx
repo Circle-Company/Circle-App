@@ -1,13 +1,12 @@
 import { NativeTabs } from "expo-router/unstable-native-tabs"
-import { usePathname } from "expo-router"
+import { usePathname, useRouter } from "expo-router"
 import React from "react"
 import { Platform, DynamicColorIOS } from "react-native"
 import { colors } from "@/constants/colors"
 import { iOSMajorVersion } from "@/lib/platform/detection"
 import { usePushNotifications } from "@/contexts/push.notification"
 import PersistedContext from "@/contexts/Persisted"
-import { usePreferencesStore } from "@/contexts/Persisted/persist.preferences"
-import { useRouter } from "expo-router"
+import { usePreferencesStore } from "@/contexts/Persisted/preferences"
 
 /**
  * Etapa de foto de perfil do cadastro. Fica aqui, no layout das tabs, porque a
@@ -22,7 +21,7 @@ function useProfilePictureOnboarding() {
     const { session } = React.useContext(PersistedContext)
     const pending = usePreferencesStore((s) => s.profilePictureOnboardingPending)
     const setPending = usePreferencesStore((s) => s.setProfilePictureOnboardingPending)
-    const profilePicture = session?.user?.profilePicture
+    const profilePicture = session?.account?.profilePicture
 
     React.useEffect(() => {
         if (!pending) return

@@ -6,7 +6,6 @@ import { AccountMoment } from "@/queries/account"
 import { colors } from "@/constants/colors"
 import React from "react"
 import PersistedContext from "@/contexts/Persisted"
-import { DropDownMenuIOS } from "@/features/account/account.moments.dropdown.menu"
 import { iOSMajorVersion } from "@/lib/platform/detection"
 import { ProfileMomentEmpty } from "@/features/profile/profile.moments.empty"
 import { ProfileDropDownMenuIOS } from "./profile.moments.dropdown.menu"
@@ -21,7 +20,7 @@ type AccountMomentsProps = {
     totalMoments?: number
 }
 
-export function ProfileMoments({ moments, totalMoments }: AccountMomentsProps) {
+export function ProfileMoments({ moments }: AccountMomentsProps) {
     const { session } = React.useContext(PersistedContext)
 
     const [visibleMomentIds, setVisibleMomentIds] = React.useState<Set<string>>(new Set())
@@ -30,11 +29,7 @@ export function ProfileMoments({ moments, totalMoments }: AccountMomentsProps) {
 
     // moved empty state rendering to main return to preserve hook order
 
-    // Convert moments to dataProps
-    const userId = session?.user?.id || ""
-    const username = session?.user?.username || ""
-    const profilePicture = session?.user?.profilePicture ?? null
-    const isVerified = session?.user?.isVerified || false
+    const username = session?.account?.username || ""
 
     // Callback para rastrear itens visíveis
     const onViewableItemsChanged = React.useCallback(
@@ -49,8 +44,6 @@ export function ProfileMoments({ moments, totalMoments }: AccountMomentsProps) {
         [],
     )
 
-    function deleteMoment() {}
-
     const viewabilityConfig = React.useRef({
         minimumViewTime: 0,
         viewAreaCoveragePercentThreshold: 50, // 50% do item visível
@@ -58,7 +51,7 @@ export function ProfileMoments({ moments, totalMoments }: AccountMomentsProps) {
     }).current
 
     const renderItem = React.useCallback(
-        ({ item, index }: { item: dataProps; index: number }) => {
+        ({ item }: { item: dataProps }) => {
             const isVisible = visibleMomentIds.has(item.id)
 
             return (

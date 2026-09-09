@@ -123,7 +123,6 @@ export function HandsFreeToggle(): React.ReactElement {
             <AnimatedGlassView
                 style={[styles.wrap, containerStyle, disabled && styles.disabled]}
                 glassEffectStyle="regular"
-                colorScheme="dark"
                 isInteractive
             >
                 {Content}

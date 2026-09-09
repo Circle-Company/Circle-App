@@ -5,7 +5,7 @@ import UserShowContext from "../user_show-context"
 import { View } from "react-native"
 import api from "../../../api"
 
-export default function root({ children, data, executeBeforeClick }: UserRootProps) {
+export default function UserShowRoot({ children, data, executeBeforeClick }: UserRootProps) {
     const { session } = React.useContext(PersistedContext)
     const container: any = {
         flexDirection: "row",
@@ -16,16 +16,10 @@ export default function root({ children, data, executeBeforeClick }: UserRootPro
     const follow = async (followed_user_id: string) => {
         try {
             const response = await api
-                .post(
-                    "/user/follow",
-                    {
-                        user_id: session.user.id,
-                        followed_user_id,
-                    },
-                    {
-                        headers: { Authorization: session.account.jwtToken },
-                    },
-                )
+                .post("/user/follow", {
+                    user_id: session.account.userId,
+                    followed_user_id,
+                })
                 .then(function (response) {
                     return response.data
                 })
@@ -41,16 +35,10 @@ export default function root({ children, data, executeBeforeClick }: UserRootPro
     const unfollow = async (followed_user_id: string) => {
         try {
             const response = await api
-                .post(
-                    "/user/unfollow",
-                    {
-                        user_id: session.user.id,
-                        followed_user_id,
-                    },
-                    {
-                        headers: { Authorization: session.account.jwtToken },
-                    },
-                )
+                .post("/user/unfollow", {
+                    user_id: session.account.userId,
+                    followed_user_id,
+                })
                 .then(function (response) {
                     return response.data
                 })

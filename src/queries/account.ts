@@ -14,12 +14,13 @@ export type AccountData = {
     id: string
     username: string
     name: string
-    description: string
     profilePicture: string
     status: {
         verified: boolean
     }
     metrics: {
+        /** Opcional: nem toda resposta do backend traz a contagem de momentos. */
+        totalMoments?: number
         totalFollowers: number
         totalFollowing: number
         totalLikesReceived: number
@@ -31,7 +32,6 @@ export type AccountData = {
 }
 export type AccountMoment = {
     id: string
-    description: string | null
     video: { url: string }
     thumbnail: {
         url: string
@@ -191,7 +191,7 @@ export async function fetchAccountNotifications(
  * ```tsx
  * const { session } = useContext(PersistedContext)
  * const { data, isLoading, refetch } = useAccountBlocksQuery({
- *   enabled: !!session.account.jwtToken,
+ *   enabled: !!session.account.userId,
  *   staleTime: 1000 * 60 * 10, // 10 minutes
  * })
  *
@@ -231,7 +231,7 @@ export function useAccountBlocksQuery(
  * ```tsx
  * const { session } = useContext(PersistedContext)
  * const { data, isLoading, refetch } = useAccountQuery({
- *   enabled: !!session.account.jwtToken,
+ *   enabled: !!session.account.userId,
  *   staleTime: 1000 * 60 * 10, // 10 minutes
  * })
  *
@@ -269,7 +269,7 @@ export function useAccountQuery(options?: {
  * ```tsx
  * const { session } = useContext(PersistedContext)
  * const [page, setPage] = useState(1)
- * const { data, isLoading } = useAccountMomentsQuery(session.account.jwtToken, page, 20)
+ * const { data, isLoading } = useAccountMomentsQuery(session.account.userId, page, 20)
  *
  * const loadMore = () => {
  *   if (data && data.pagination.page < data.pagination.totalPages) {
@@ -322,12 +322,8 @@ export function useAccountNotificationsQuery(
 }
 
 /**
- * Mutation: update account description
+ * Mutation: update account name
  */
-type UpdateAccountDescriptionInput = {
-    description: string | null
-}
-
 type UpdateAccountNameInput = {
     name: string | null
 }
@@ -340,13 +336,6 @@ export type UpdateAccountPushTokenInput = {
 export type UpdateAccountCoordinatesInput = {
     lat: string
     lng: string
-}
-
-async function updateAccountDescription(input: UpdateAccountDescriptionInput): Promise<void> {
-    // Backend route expected to update the description for the authenticated account
-    await apiRoutes.account.updateDescription({
-        description: input.description,
-    } as any)
 }
 
 async function updateAccountName(input: UpdateAccountNameInput): Promise<void> {
@@ -372,21 +361,8 @@ export async function updateAccountCoordinates(
     } as any)
 }
 
-/**
- * Hook to update the authenticated user's description and invalidate cached account detail.
- */
-export function useUpdateAccDescMutation() {
-    const queryClient = useQueryClient()
-    return useMutation({
-        mutationFn: updateAccountDescription,
-        onSuccess: async () => {
-            trackUserAction("account_description_updated")
-            // Refresh account detail after successful update
-            await queryClient.invalidateQueries({ queryKey: accountKeys.detail() })
-            await queryClient.refetchQueries({ queryKey: accountKeys.detail() })
-        },
-    })
-}
+// A mutation de descrição saiu junto com a feature: `app/settings/description.tsx` foi
+// removida em `be3900ea` e nada mais consome `updateAccountDescription`.
 
 export function useUpdateAccNameMutation() {
     const queryClient = useQueryClient()

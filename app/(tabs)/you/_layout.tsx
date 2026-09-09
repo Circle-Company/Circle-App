@@ -6,7 +6,6 @@ import { colors } from "@/constants/colors"
 import Fonts from "@/constants/fonts"
 import LanguageContext from "@/contexts/language"
 import PersistedContext from "@/contexts/Persisted"
-import { iOSMajorVersion } from "@/lib/platform/detection"
 import Cog from "@/assets/icons/svgs/cog.svg"
 import fonts from "@/constants/fonts"
 
@@ -47,7 +46,7 @@ export default function YouLayout() {
                         fontSize: Fonts.size.title2 * 0.9,
                         color: colors.gray.white,
                     },
-                    headerTitle: session?.user?.username ? `@${session.user.username}` : "",
+                    headerTitle: session?.account?.username ? `@${session.account.username}` : "",
                     headerRight: () => (
                         <Pressable
                             onPress={() => router.push("/settings")}

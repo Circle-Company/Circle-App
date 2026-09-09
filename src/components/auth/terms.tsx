@@ -1,8 +1,7 @@
-import { useRouter } from "expo-router"
 import React from "react"
 import { useTranslation } from "react-i18next"
-import { TextStyle, TouchableOpacity, useColorScheme, ViewProps } from "react-native"
-import { colors, default as ColorScheme, default as ColorTheme } from "@/constants/colors"
+import { TextStyle, TouchableOpacity, ViewProps } from "react-native"
+import { colors, default as ColorTheme } from "@/constants/colors"
 import fonts from "@/constants/fonts"
 import sizes from "@/constants/sizes"
 import { Text } from "../Themed"
@@ -14,7 +13,6 @@ type Props = ViewProps & {
 }
 
 export default function AuthTermsText({ signText }: Props) {
-    const router = useRouter()
     const { t } = useTranslation()
 
     const container: TextStyle = {

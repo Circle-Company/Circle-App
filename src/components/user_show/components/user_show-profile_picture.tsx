@@ -1,6 +1,6 @@
 import Animated, { FadeIn } from "react-native-reanimated"
-import ColorTheme, { colors } from "../../../constants/colors"
-import { BackHandler, Pressable, View, useColorScheme } from "react-native"
+import { colors } from "../../../constants/colors"
+import { Pressable, View, useColorScheme } from "react-native"
 
 import Icon from "@/assets/icons/svgs/@2.svg"
 import { Image } from "expo-image"
@@ -12,8 +12,7 @@ import ProfileContext from "../../../contexts/profile"
 import { router, usePathname } from "expo-router"
 import { useUserShowContext } from "../user_show-context"
 
-export default function profile_picture({
-    displayOnMoment = true,
+export default function UserShowProfilePicture({
     pictureDimensions,
     disableAction = false,
 }: UserProfilePictureProps) {
@@ -45,7 +44,7 @@ export default function profile_picture({
     async function onProfilePictureAction() {
         if (!disableAction) {
             const targetId = String(user.id)
-            const myId = String(session.user.id)
+            const myId = String(session.account.userId)
             const isSelf = targetId === myId
             const targetPath = isSelf ? `/you/${targetId}` : `/profile/${targetId}`
             if (pathname === targetPath) {

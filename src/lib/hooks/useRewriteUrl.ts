@@ -17,7 +17,9 @@ function parseEndpoint(endpoint: string) {
         return { origin, host }
     } catch {
         // Fallback to raw string
-        const ep = String(endpoint || "").trim().replace(/\/+$/, "")
+        const ep = String(endpoint || "")
+            .trim()
+            .replace(/\/+$/, "")
         return {
             origin: ep || "",
             host: ep.replace(/^https?:\/\//i, "").replace(/\/+.*$/, ""),
@@ -139,7 +141,7 @@ export function useRewriteUrl(options?: UseRewriteUrlOptions) {
     )
 
     const rewriteAll = React.useCallback(
-        (urls: Array<string | null | undefined>): string[] => urls.map((u) => rewrite(u || "")),
+        (urls: (string | null | undefined)[]): string[] => urls.map((u) => rewrite(u || "")),
         [rewrite],
     )
 
