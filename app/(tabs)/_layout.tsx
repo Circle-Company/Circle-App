@@ -1,17 +1,47 @@
 import { NativeTabs } from "expo-router/unstable-native-tabs"
-import { usePathname } from "expo-router"
+import { usePathname, useRouter } from "expo-router"
 import React from "react"
 import { Platform, DynamicColorIOS } from "react-native"
 import { colors } from "@/constants/colors"
 import { iOSMajorVersion } from "@/lib/platform/detection"
 import { usePushNotifications } from "@/contexts/push.notification"
+import PersistedContext from "@/contexts/Persisted"
+import { usePreferencesStore } from "@/contexts/Persisted/preferences"
+
+/**
+ * Etapa de foto de perfil do cadastro. Fica aqui, no layout das tabs, porque a
+ * entrada na parte logada é `/(tabs)/create` — pendurar em uma tela específica
+ * deixaria de fora quem entrasse por outra.
+ *
+ * Só dispara para quem acabou de criar a conta: `profilePictureOnboardingPending`
+ * é ligada nos fluxos de cadastro e nunca esteve ligada em conta antiga.
+ */
+function useProfilePictureOnboarding() {
+    const router = useRouter()
+    const { session } = React.useContext(PersistedContext)
+    const pending = usePreferencesStore((s) => s.profilePictureOnboardingPending)
+    const setPending = usePreferencesStore((s) => s.setProfilePictureOnboardingPending)
+    const profilePicture = session?.account?.profilePicture
+
+    React.useEffect(() => {
+        if (!pending) return
+        // Já tem foto (ex.: enviou e voltou): baixa a marca em vez de mostrar
+        // a etapa de novo.
+        if (profilePicture) {
+            setPending(false)
+            return
+        }
+        router.replace("/onboarding/profile-picture")
+    }, [pending, profilePicture, router, setPending])
+}
 
 export default function TabsLayout() {
     const pathname = usePathname()
+    useProfilePictureOnboarding()
     const { unreadCount, inboxVisited } = usePushNotifications()
     const hideTabBar =
         /^\/(you|moment)\/[^/]+/.test(pathname ?? "") ||
-        /^\/(radar|inbox|settings)(\/|$)/.test(pathname ?? "")
+        /^\/(radar|popular|inbox|settings)(\/|$)/.test(pathname ?? "")
 
     // O botão de notificações vive no header da câmera. Ao sair dessa aba o
     // header some, então espelhamos o badge no ícone da câmera na tab bar —

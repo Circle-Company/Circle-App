@@ -65,12 +65,7 @@ export default function MomentAudioControl({ size = 40 }: { size?: number }) {
                 style={({ pressed }) => ({ opacity: pressed ? 0.85 : 1 })}
             >
                 {isLiquidGlassAvailable() ? (
-                    <GlassView
-                        colorScheme="dark"
-                        glassEffectStyle="regular"
-                        isInteractive
-                        style={buttonStyle}
-                    >
+                    <GlassView glassEffectStyle="regular" isInteractive style={buttonStyle}>
                         {icon}
                     </GlassView>
                 ) : (

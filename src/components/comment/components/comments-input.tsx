@@ -154,7 +154,6 @@ export default function Input({
                 >
                     {isLiquidGlassAvailable() ? (
                         <GlassView
-                            colorScheme="dark"
                             glassEffectStyle="regular"
                             isInteractive
                             tintColor={canSend ? colors.purple.purple_05 : undefined}

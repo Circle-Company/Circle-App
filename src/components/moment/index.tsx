@@ -9,6 +9,7 @@ import top_left_root from "./components/roots/top/moment-top_left_root"
 import top_right_root from "./components/roots/top/moment-top_right_root"
 import top_root from "./components/roots/top/moment-top_root"
 import { LikeIOS as iosLikeButton } from "./components/moment.ios.like"
+import { ViewersIOS as iosViewersButton } from "./components/moment.viewers"
 export const Moment = {
     Root: {
         Main: main_root,
@@ -21,6 +22,7 @@ export const Moment = {
     AudioControl: audio_control,
     LikeButton: like,
     LikeButtonIOS: iosLikeButton,
+    ViewersButtonIOS: iosViewersButton,
     Container: container,
     Date: moment_date,
 }

@@ -71,7 +71,6 @@ export function FlashButton() {
     if (useGlass) {
         return (
             <GlassView
-                colorScheme="dark"
                 style={[styles.circle, disabled && styles.disabled]}
                 glassEffectStyle="regular"
                 isInteractive

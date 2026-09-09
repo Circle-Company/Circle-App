@@ -3,6 +3,7 @@ import React from "react"
 import { useToast } from "@/contexts/Toast"
 import PersistedContext from "@/contexts/Persisted"
 import { apiRoutes } from "@/api"
+import { trackUserAction } from "@/lib/trackEvent"
 
 export function useDisableHapticsMutation() {
     const { session } = React.useContext(PersistedContext)
@@ -15,6 +16,7 @@ export function useDisableHapticsMutation() {
             })
         },
         onSuccess: () => {
+            trackUserAction("haptics_disabled")
             session.preferences.setDisableHaptics(true)
             toast.success("Haptics disabled successfully")
         },
@@ -37,6 +39,7 @@ export function useEnableEnableMutation() {
             })
         },
         onSuccess: () => {
+            trackUserAction("haptics_enabled")
             session.preferences.setDisableHaptics(false)
             toast.success("Haptics enabled successfully")
         },

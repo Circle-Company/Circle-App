@@ -8,6 +8,8 @@ export type PersistedPreferences = PreferencesDataType & {
     /** Fica no blob junto do resto: é preferência de aparelho, e o onboarding de permissões
      * não deve reaparecer só porque o usuário trocou de conta. */
     onboardingPermissionsCompleted: boolean
+    /** Ligada só no cadastro: marca quem ainda não passou pela tela de foto de perfil. */
+    profilePictureOnboardingPending: boolean
 }
 
 export interface PreferencesState {
@@ -16,6 +18,8 @@ export interface PreferencesState {
     language: PreferencesLanguage
     content: PreferencesContent
     onboardingPermissionsCompleted: boolean
+    /** Ligada só no cadastro: marca quem ainda não passou pela tela de foto de perfil. */
+    profilePictureOnboardingPending: boolean
 
     setAppLanguage: (value: string) => void
     setTranslationLanguage: (value: string) => void
@@ -29,6 +33,7 @@ export interface PreferencesState {
     setMuteAudio: (value: boolean) => void
 
     setOnboardingPermissionsCompleted: (value: boolean) => void
+    setProfilePictureOnboardingPending: (value: boolean) => void
 
     set: (value: PreferencesDataType) => void
     /** Lê do storage. Explícito: o store não faz I/O no import. */

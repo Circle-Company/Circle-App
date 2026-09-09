@@ -117,7 +117,6 @@ export function NoMomentsCard() {
             <Animated.View style={{ opacity: animatedOpacity }}>
                 <GlassContainer spacing={10}>
                     <GlassView
-                        colorScheme="dark"
                         style={glassContainer}
                         glassEffectStyle="clear"
                         isInteractive={true}

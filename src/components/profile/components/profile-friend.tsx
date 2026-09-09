@@ -260,7 +260,6 @@ function Pill({ label, tone, onPress, solid, loading, useGlass }: PillProps) {
     return (
         <GlassContainer spacing={8}>
             <GlassView
-                colorScheme="dark"
                 style={pillBase}
                 glassEffectStyle="regular"
                 isInteractive={true}

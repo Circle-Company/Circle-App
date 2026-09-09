@@ -154,7 +154,6 @@ export function TutorialDialog() {
             >
                 <GlassContainer spacing={10}>
                     <GlassView
-                        colorScheme="dark"
                         style={styles.glassContainer}
                         glassEffectStyle="regular"
                         isInteractive={true}

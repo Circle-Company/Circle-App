@@ -94,7 +94,6 @@ export function MicPermissionNotProvidedCard() {
         return (
             <GlassContainer spacing={10}>
                 <GlassView
-                    colorScheme="dark"
                     style={glassContainer}
                     glassEffectStyle="regular"
                     isInteractive={true}

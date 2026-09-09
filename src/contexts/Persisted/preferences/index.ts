@@ -3,7 +3,12 @@ import type { TimezoneCode } from "circle-text-library"
 
 import { asNumber, asString } from "../coerce"
 import type { PreferencesContent, PreferencesDataType, PreferencesLanguage } from "../types"
-import { defaultContent, defaultLanguage, defaultState, preferencesStorage } from "./preferences.persistence"
+import {
+    defaultContent,
+    defaultLanguage,
+    defaultState,
+    preferencesStorage,
+} from "./preferences.persistence"
 import type { PreferencesState } from "./preferences.types"
 
 /**
@@ -38,14 +43,21 @@ import type { PreferencesState } from "./preferences.types"
  */
 export const usePreferencesStore = create<PreferencesState>((set, get) => {
     const persist = () => {
-        const { appTimezone, timezoneCode, language, content, onboardingPermissionsCompleted } =
-            get()
+        const {
+            appTimezone,
+            timezoneCode,
+            language,
+            content,
+            onboardingPermissionsCompleted,
+            profilePictureOnboardingPending,
+        } = get()
         preferencesStorage.write({
             appTimezone,
             timezoneCode,
             language,
             content,
             onboardingPermissionsCompleted,
+            profilePictureOnboardingPending,
         })
     }
 
@@ -88,6 +100,13 @@ export const usePreferencesStore = create<PreferencesState>((set, get) => {
             persist()
         },
 
+        // Mesma natureza do de cima: é marca do aparelho, ligada só no cadastro, e por isso
+        // também fica fora do `set()` do payload de sessão.
+        setProfilePictureOnboardingPending: (value) => {
+            set({ profilePictureOnboardingPending: value === true })
+            persist()
+        },
+
         set: (value: PreferencesDataType) => {
             set({
                 appTimezone: asNumber(value?.appTimezone),
@@ -109,7 +128,6 @@ export const usePreferencesStore = create<PreferencesState>((set, get) => {
         },
     }
 })
-
 
 export { PREFERENCES_KEY, PREFERENCES_SCHEMA_VERSION } from "./preferences.persistence"
 export type { PersistedPreferences, PreferencesState } from "./preferences.types"

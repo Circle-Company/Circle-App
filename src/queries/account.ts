@@ -1,5 +1,6 @@
 import { useQuery, UseQueryResult, useMutation, useQueryClient } from "@tanstack/react-query"
 import { apiRoutes } from "@/api"
+import { trackUserAction } from "@/lib/trackEvent"
 import { accountBlocksProps } from "@/api/account/account.types"
 
 export type AccountBlock = {
@@ -360,11 +361,15 @@ export async function updateAccountCoordinates(
     } as any)
 }
 
+// A mutation de descrição saiu junto com a feature: `app/settings/description.tsx` foi
+// removida em `be3900ea` e nada mais consome `updateAccountDescription`.
+
 export function useUpdateAccNameMutation() {
     const queryClient = useQueryClient()
     return useMutation({
         mutationFn: updateAccountName,
         onSuccess: async () => {
+            trackUserAction("account_name_updated")
             // Refresh account detail after successful update
             await queryClient.invalidateQueries({ queryKey: accountKeys.detail() })
             await queryClient.refetchQueries({ queryKey: accountKeys.detail() })
@@ -393,6 +398,7 @@ export function useReadAllNotificationsMutation() {
     return useMutation({
         mutationFn: readAllNotifications,
         onSuccess: async () => {
+            trackUserAction("notifications_marked_read")
             await queryClient.invalidateQueries({ queryKey: accountKeys.notifications() })
         },
     })

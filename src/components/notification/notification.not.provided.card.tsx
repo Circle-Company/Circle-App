@@ -77,7 +77,6 @@ export function NotificationPermissionNotProvidedCard() {
         return (
             <GlassContainer>
                 <GlassView
-                    colorScheme="dark"
                     style={glassContainer}
                     glassEffectStyle="clear"
                     isInteractive={true}

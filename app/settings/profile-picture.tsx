@@ -1,8 +1,6 @@
 import { useNavigation } from "expo-router"
 import React from "react"
-import { Image, View, Platform, StyleSheet, Keyboard, ActionSheetIOS, Alert } from "react-native"
-import * as ImagePicker from "expo-image-picker"
-import * as ImageManipulator from "expo-image-manipulator"
+import { Image, Platform, StyleSheet, View } from "react-native"
 import ButtonStandart from "@/components/buttons/button-standart"
 import { Loading } from "@/components/loading"
 import { Text } from "@/components/Themed"
@@ -10,138 +8,27 @@ import ColorTheme, { colors } from "@/constants/colors"
 import fonts from "@/constants/fonts"
 import sizes from "@/constants/sizes"
 import PersistedContext from "@/contexts/Persisted"
-import api from "@/api"
 import LanguageContext from "@/contexts/language"
+import { useProfilePictureUpload } from "@/lib/hooks/useProfilePictureUpload"
 
 export default function ProfilePictureScreen() {
     const { t } = React.useContext(LanguageContext)
     const { session } = React.useContext(PersistedContext)
-    const [selectedAsset, setSelectedAsset] = React.useState<ImagePicker.ImagePickerAsset | null>(
-        null,
-    )
-
-    const [loading, setLoading] = React.useState(false)
-
-    const [error, setError] = React.useState<string | null>(null)
     const navigation = useNavigation()
 
-    async function pickFromLibrary() {
-        try {
-            const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync()
-            if (status !== "granted") {
-                setError(t("Permission to access the gallery is required"))
-                return
-            }
-            const result = await ImagePicker.launchImageLibraryAsync({
-                mediaTypes: ImagePicker.MediaTypeOptions.Images,
-                allowsEditing: true,
-                aspect: [1, 1],
-                quality: 0.9,
-                base64: true,
-            })
-            if (!result.canceled && result.assets?.length) {
-                setSelectedAsset(result.assets[0])
-                setError(null)
-            }
-        } catch (e: any) {
-            setError(e?.message ?? t("Failed to open the gallery"))
-        }
-    }
-
-    async function pickFromCamera() {
-        try {
-            const { status } = await ImagePicker.requestCameraPermissionsAsync()
-            if (status !== "granted") {
-                setError(t("Permission to use the camera is required"))
-                return
-            }
-            const result = await ImagePicker.launchCameraAsync({
-                allowsEditing: true,
-                aspect: [1, 1],
-                quality: 0.9,
-                base64: true,
-            })
-            if (!result.canceled && result.assets?.length) {
-                setSelectedAsset(result.assets[0])
-                setError(null)
-            }
-        } catch (e: any) {
-            setError(e?.message ?? t("Failed to open the camera"))
-        }
-    }
+    // Escolha e envio moram no hook, compartilhados com a etapa de onboarding
+    // do cadastro (app/onboarding/profile-picture.tsx).
+    const {
+        selectedAsset,
+        loading,
+        error,
+        showPicker: handlePressViewMore,
+        upload,
+    } = useProfilePictureUpload()
 
     async function updateProfilePicture() {
-        if (!selectedAsset) return
-        try {
-            Keyboard.dismiss()
-        } catch {}
-
-        setLoading(true)
-        setError(null)
-
-        try {
-            console.log("ProfilePicture: converting to JPEG", { uri: selectedAsset.uri })
-            const manipulated = await ImageManipulator.manipulateAsync(selectedAsset.uri, [], {
-                compress: 0.9,
-                format: ImageManipulator.SaveFormat.JPEG,
-                base64: true,
-            })
-            const imageBase64 = manipulated.base64 || ""
-            console.log("ProfilePicture: converted to base64", { length: imageBase64.length })
-
-            const mimeType = "image/jpeg"
-            const formData = new FormData()
-            formData.append("imageData", `data:${mimeType};base64,${imageBase64}`)
-
-            console.log("ProfilePicture: uploading to /account/profile-picture", {
-                length: imageBase64.length,
-            })
-            // Só o `Content-Type`: o `Authorization` é do interceptor (§3.2).
-            await api.post("/account/profile-picture", formData, {
-                headers: { "Content-Type": "multipart/form-data" },
-            })
-
-            console.log("ProfilePicture: upload success")
-            // Atualiza dados locais (ou refetch)
-            try {
-                await (session.account as any).get?.(session.account.userId)
-            } catch {}
-
-            setSelectedAsset(null)
-            navigation.goBack()
-        } catch (e: any) {
-            console.error("ProfilePicture: upload error", e)
-            setError(e?.message ?? t("Not possible send your picture"))
-        } finally {
-            setLoading(false)
-        }
-    }
-    function handlePressViewMore() {
-        if (Platform.OS === "ios") {
-            ActionSheetIOS.showActionSheetWithOptions(
-                {
-                    title: t("Change Picture"),
-                    userInterfaceStyle: "dark",
-                    options: [t("Open Camera"), t("Choose from Library"), t("Cancel")],
-                    cancelButtonIndex: 2,
-                },
-                (buttonIndex) => {
-                    if (buttonIndex === 0) pickFromCamera()
-                    else if (buttonIndex === 1) pickFromLibrary()
-                },
-            )
-        } else {
-            Alert.alert(
-                t("Change Picture"),
-                "",
-                [
-                    { text: t("Open Camera"), onPress: pickFromCamera },
-                    { text: t("Choose from Library"), onPress: pickFromLibrary },
-                    { text: t("Cancel"), style: "cancel" },
-                ],
-                { cancelable: true },
-            )
-        }
+        const ok = await upload()
+        if (ok) navigation.goBack()
     }
 
     return (

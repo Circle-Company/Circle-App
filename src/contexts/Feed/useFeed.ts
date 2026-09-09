@@ -17,6 +17,10 @@ export const useFeed = () => {
         null,
     )
     const [commentEnabled, setCommentEnabled] = useState(false)
+    // Id do moment com o painel de visualizadores aberto (`null` = fechado).
+    // Vive aqui, e não numa tela, porque quem abre é um botão dentro do card e
+    // quem anima é a tela que renderiza o card — as duas pontas leem daqui.
+    const [viewersMomentId, setViewersMomentId] = useState<string | null>(null)
     const [focusedMoment, setFocusedMoment] = useState<dataProps>({} as dataProps)
     const [currentChunk, setCurrentChunk] = useState<string[]>([])
     const [period, setPeriod] = useState(0)
@@ -176,6 +180,8 @@ export const useFeed = () => {
         currentChunk,
         commentEnabled,
         setCommentEnabled,
+        viewersMomentId,
+        setViewersMomentId,
         setFocusedChunkItemFunc,
         setFocusedMoment,
         setScrollEnabled,

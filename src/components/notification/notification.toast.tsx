@@ -125,7 +125,6 @@ export function NotificationToast({ item, onDismiss }: NotificationToastProps) {
         return (
             <GlassContainer spacing={10}>
                 <GlassView
-                    colorScheme="dark"
                     style={glassContainer}
                     glassEffectStyle="regular"
                     isInteractive={true}

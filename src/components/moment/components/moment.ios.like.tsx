@@ -106,7 +106,6 @@ export function LikeIOS({ isLiked, size }: { isLiked: boolean; size?: number }) 
         >
             {isLiquidGlassAvailable() ? (
                 <GlassView
-                    colorScheme="dark"
                     glassEffectStyle="regular"
                     isInteractive
                     tintColor={liked ? colors.red.red_05 : undefined}

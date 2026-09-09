@@ -201,7 +201,6 @@ export function EmptyList() {
             <Animated.View style={{ opacity: animatedOpacity }}>
                 <GlassContainer spacing={10}>
                     <GlassView
-                        colorScheme="dark"
                         style={glassContainer}
                         glassEffectStyle="regular"
                         isInteractive={true}

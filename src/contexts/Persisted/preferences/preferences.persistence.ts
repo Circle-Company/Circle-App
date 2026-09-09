@@ -40,6 +40,7 @@ export const defaultState = () => ({
     language: defaultLanguage(),
     content: defaultContent(),
     onboardingPermissionsCompleted: false,
+    profilePictureOnboardingPending: false,
 })
 
 export type PreferencesSnapshot = ReturnType<typeof defaultState>
@@ -76,6 +77,7 @@ export const preferencesStorage = createBlobStorage<PreferencesSnapshot>({
                 muteAudio: asBoolean(content.muteAudio),
             },
             onboardingPermissionsCompleted: asBoolean(data.onboardingPermissionsCompleted),
+            profilePictureOnboardingPending: asBoolean(data.profilePictureOnboardingPending),
         }
     },
 })

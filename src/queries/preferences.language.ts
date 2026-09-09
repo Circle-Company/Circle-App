@@ -3,6 +3,7 @@ import React from "react"
 import PersistedContext from "@/contexts/Persisted"
 import { LanguagesCodesType } from "@/locales/LanguageTypes"
 import { apiRoutes } from "@/api"
+import { trackUserAction } from "@/lib/trackEvent"
 
 export function useSetAppLanguageMutation({ appLanguage }: { appLanguage: LanguagesCodesType }) {
     const { session } = React.useContext(PersistedContext)
@@ -28,6 +29,7 @@ export function useSetAppLanguageMutation({ appLanguage }: { appLanguage: Langua
             }
         },
         onSuccess: () => {
+            trackUserAction("app_language_changed", { app_language: appLanguage })
             lastAppliedRef.current = appLanguage
             // Só atualiza o estado se houver mudança real para evitar re-render em loop
             if (session.preferences.language.appLanguage !== appLanguage) {
