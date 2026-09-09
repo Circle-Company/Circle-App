@@ -187,7 +187,7 @@ export function Provider({ children }: GeolocationProviderProps) {
     // ---- Foreground --------------------------------------------------------
 
     const updateUserCoordinates = async (payload: UpdateCoordinatesPayload): Promise<void> => {
-        if (!session.account.userId) return
+        if (!session.account.userId || !isLoggedIn()) return
         try {
             await updateCoords({
                 lat: String(payload.latitude),
@@ -206,7 +206,13 @@ export function Provider({ children }: GeolocationProviderProps) {
 
     const updateUserLocation = React.useCallback(
         async (force = false): Promise<void> => {
-            if (!session.account.userId) throw new Error("User ID is not available")
+            // A checagem é pelo token, e não só pelo `userId`: a store de `account` hidrata o
+            // perfil do blob em disco no cold start, então o id sobrevive a uma sessão que já
+            // morreu (refresh terminal apaga as credenciais, não o perfil). Era esse
+            // descompasso que disparava a rajada de 401 em `/account/coordinates` antes de a
+            // tela de login sequer aparecer. Sem sessão não é erro — é só não haver o que
+            // sincronizar; por isso volta em silêncio em vez de lançar.
+            if (!session.account.userId || !isLoggedIn()) return
 
             const fg = await Location.getForegroundPermissionsAsync()
             if (fg.status !== "granted") throw new Error("Location permission is not granted")
@@ -264,7 +270,7 @@ export function Provider({ children }: GeolocationProviderProps) {
                 (prevState === "inactive" || prevState === "background") &&
                 nextState === "active"
             ) {
-                if (session.account.userId && !isUpdating) {
+                if (session.account.userId && isLoggedIn() && !isUpdating) {
                     updateUserLocation().catch((err) => {
                         console.warn("Falha ao atualizar localização ao voltar ao app:", err)
                     })
@@ -277,7 +283,7 @@ export function Provider({ children }: GeolocationProviderProps) {
     // Liga/desliga o serviço conforme a sessão.
     React.useEffect(() => {
         const run = async () => {
-            if (!session.account.userId) {
+            if (!session.account.userId || !isLoggedIn()) {
                 await unregisterBackgroundSync()
                 if (intervalRef.current) {
                     clearInterval(intervalRef.current)

@@ -27,7 +27,15 @@ export function MomentProvider({
     const OptionsStore = useOptions()
     const VideoStore = useVideo()
 
-    const isMe = data.user?.id ? session.account.userId === data.user.id : true
+    /*
+     * `String()` dos dois lados, pelo mesmo motivo da guarda do EXCLUDE (`moment.actions.ts`):
+     * o id do autor às vezes chega como número do backend, enquanto `session.account.userId`
+     * é sempre string (a store faz `String(u.id)` ao gravar a identidade). Com `===` puro,
+     * `5 === "5"` é falso e o dono nunca se reconhece no próprio momento — então `enableLike`,
+     * `enableComment` e `enableReport` ficavam ligados sobre o próprio conteúdo. O like daí
+     * sai para a API e volta recusado, porque ninguém curte o próprio momento.
+     */
+    const isMe = data.user?.id ? String(session.account.userId) === String(data.user.id) : true
 
     useEffect(() => {
         DataStore.set(data)
