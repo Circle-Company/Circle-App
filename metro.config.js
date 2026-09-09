@@ -1,4 +1,5 @@
 const { getDefaultConfig } = require("expo/metro-config")
+const withStorybook = require("@storybook/react-native/metro/withStorybook")
 
 const config = getDefaultConfig(__dirname)
 
@@ -21,4 +22,14 @@ config.resolver = {
     unstable_enablePackageExports: true,
 }
 
-module.exports = config
+/**
+ * O Storybook só entra no bundle quando `STORYBOOK_ENABLED=true` (script
+ * `npm run storybook`). Com a flag desligada o `onDisabledRemoveStorybook`
+ * remove o pacote da árvore de módulos, então o app de produção não carrega
+ * nada disso.
+ */
+module.exports = withStorybook(config, {
+    enabled: process.env.STORYBOOK_ENABLED === "true",
+    configPath: require("node:path").resolve(__dirname, ".rnstorybook"),
+    onDisabledRemoveStorybook: true,
+})

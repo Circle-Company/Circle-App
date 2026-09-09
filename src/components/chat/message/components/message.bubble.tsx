@@ -1,0 +1,37 @@
+import React from "react"
+import { View, type ViewStyle } from "react-native"
+
+import ColorTheme from "@/constants/colors"
+import MessageContext from "../context/provider"
+import { MessageChildrenProps } from "../message.types"
+
+/**
+ * A bolha em si: fundo, raio dos cantos e limite de largura.
+ *
+ * O canto "colado" (`borderRadiusTight`) é o de baixo do lado de quem enviou,
+ * e só na última mensagem de uma sequência do mesmo autor — é o que dá o
+ * rabinho visual sem desenhar um triângulo.
+ */
+export default function BubbleRoot({ children }: MessageChildrenProps) {
+    const { options, size } = React.useContext(MessageContext)
+    const colors = ColorTheme()
+
+    const tight = options.isLastOfGroup ? size.borderRadiusTight : size.borderRadius
+
+    const container: ViewStyle = {
+        maxWidth: `${size.maxWidthRatio * 100}%`,
+        padding: size.padding,
+        rowGap: size.gap / 2,
+        // Enviada: roxo bem claro (`primaryAccent` = purple_00). O `primary` cheio
+        // pesava demais numa lista inteira de bolhas, e o texto sobre ele exigia
+        // cor invertida; sobre o claro o texto normal já contrasta.
+        backgroundColor: options.isMine ? colors.primaryAccent : colors.background,
+        borderRadius: size.borderRadius,
+        borderBottomRightRadius: options.isMine ? tight : size.borderRadius,
+        borderBottomLeftRadius: options.isMine ? size.borderRadius : tight,
+        borderWidth: options.isSelected ? 1 : 0,
+        borderColor: colors.primary,
+    }
+
+    return <View style={container}>{children}</View>
+}

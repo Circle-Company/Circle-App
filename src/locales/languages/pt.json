@@ -441,5 +441,11 @@
     "Only the author of a moment can see who watched it.": "Só o autor do moment pode ver quem assistiu.",
     "Moment not found": "Moment não encontrado",
     "It may have been deleted.": "Ele pode ter sido excluído.",
-    "Pull down to try again.": "Puxe para baixo para tentar de novo."
+    "Pull down to try again.": "Puxe para baixo para tentar de novo.",
+    "Reply": "Responder",
+    "Forward": "Encaminhar",
+    "Pin": "Fixar",
+    "Unpin": "Desafixar",
+    "Delete Message": "Apagar Mensagem",
+    "This message was deleted": "Esta mensagem foi apagada"
 }

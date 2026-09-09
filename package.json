@@ -15,7 +15,13 @@
     "test:run": "vitest run",
     "test:watch": "vitest watch",
     "test:coverage": "vitest run --coverage",
-    "postinstall": "patch-package"
+    "postinstall": "patch-package",
+    "storybook": "cross-env STORYBOOK_ENABLED=true expo start --clear",
+    "storybook:ios": "cross-env STORYBOOK_ENABLED=true expo run:ios",
+    "storybook:android": "cross-env STORYBOOK_ENABLED=true expo run:android",
+    "storybook:generate": "sb-rn-get-stories --config-path .rnstorybook",
+    "storybook:web": "storybook dev -p 6006",
+    "storybook:build": "storybook build -o storybook-static"
   },
   "dependencies": {
     "@callstack/liquid-glass": "^0.7.0",
@@ -111,11 +117,16 @@
     "@babel/plugin-proposal-optional-chaining": "^7.21.0",
     "@react-native-community/cli": "^20.0.2",
     "@react-native/js-polyfills": "^0.81.0",
+    "@storybook/addon-ondevice-actions": "^10.6.0",
+    "@storybook/addon-ondevice-controls": "^10.6.0",
+    "@storybook/react-native": "^10.6.0",
+    "@storybook/react-native-web-vite": "^10.6.0",
     "@testing-library/react-hooks": "^8.0.1",
     "@types/react": "~19.2.14",
     "@types/react-native": "^0.72.8",
     "@vitest/ui": "^3.2.4",
     "babel-plugin-module-resolver": "^5.0.2",
+    "cross-env": "^10.1.0",
     "eslint": "^9.25.0",
     "eslint-config-expo": "~56.0.4",
     "eslint-import-resolver-alias": "^1.1.2",
@@ -124,8 +135,10 @@
     "happy-dom": "^18.0.1",
     "patch-package": "^8.0.1",
     "react-native-dotenv": "^3.4.11",
+    "storybook": "^10.6.0",
     "tslib": "^2.8.1",
     "typescript": "~6.0.3",
+    "vite": "^7.3.6",
     "vitest": "^3.2.4"
   },
   "private": true

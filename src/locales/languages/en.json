@@ -440,5 +440,11 @@
     "Only the author of a moment can see who watched it.": "Only the author of a moment can see who watched it.",
     "Moment not found": "Moment not found",
     "It may have been deleted.": "It may have been deleted.",
-    "Pull down to try again.": "Pull down to try again."
+    "Pull down to try again.": "Pull down to try again.",
+    "Reply": "Reply",
+    "Forward": "Forward",
+    "Pin": "Pin",
+    "Unpin": "Unpin",
+    "Delete Message": "Delete Message",
+    "This message was deleted": "This message was deleted"
 }

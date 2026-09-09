@@ -1,0 +1,116 @@
+<!--
+    Fontes do app no Storybook web.
+
+    No app quem carrega o Inter é o `useFonts` do expo-font, que não existe no
+    navegador: sem estas declarações o react-native-web cai na fonte do sistema
+    e a story mente sobre peso, altura de linha e largura do texto — justamente
+    o que se está tentando avaliar.
+
+    O nome de cada família é o mesmo de `constants/fonts` (`Inter-Regular`,
+    `Inter-SemiBold`, ...), porque é esse nome que chega no `fontFamily` dos
+    componentes. Os arquivos vêm de `assets/fonts/inter`, servidos em `/fonts`
+    pelo `staticDirs` do main.ts. Aqui usa-se o .woff2 (o app usa o .otf):
+    mesma fonte, formato próprio para web.
+-->
+<style>
+    @font-face {
+        font-family: 'Inter-Black';
+        src: url('/fonts/Inter-Black.woff2') format('woff2');
+        font-display: block;
+    }
+    @font-face {
+        font-family: 'Inter-BlackItalic';
+        src: url('/fonts/Inter-BlackItalic.woff2') format('woff2');
+        font-display: block;
+    }
+    @font-face {
+        font-family: 'Inter-Bold';
+        src: url('/fonts/Inter-Bold.woff2') format('woff2');
+        font-display: block;
+    }
+    @font-face {
+        font-family: 'Inter-BoldItalic';
+        src: url('/fonts/Inter-BoldItalic.woff2') format('woff2');
+        font-display: block;
+    }
+    @font-face {
+        font-family: 'Inter-ExtraBold';
+        src: url('/fonts/Inter-ExtraBold.woff2') format('woff2');
+        font-display: block;
+    }
+    @font-face {
+        font-family: 'Inter-ExtraBoldItalic';
+        src: url('/fonts/Inter-ExtraBoldItalic.woff2') format('woff2');
+        font-display: block;
+    }
+    @font-face {
+        font-family: 'Inter-ExtraLight';
+        src: url('/fonts/Inter-ExtraLight.woff2') format('woff2');
+        font-display: block;
+    }
+    @font-face {
+        font-family: 'Inter-ExtraLightItalic';
+        src: url('/fonts/Inter-ExtraLightItalic.woff2') format('woff2');
+        font-display: block;
+    }
+    @font-face {
+        font-family: 'Inter-Italic';
+        src: url('/fonts/Inter-Italic.woff2') format('woff2');
+        font-display: block;
+    }
+    @font-face {
+        font-family: 'Inter-Light';
+        src: url('/fonts/Inter-Light.woff2') format('woff2');
+        font-display: block;
+    }
+    @font-face {
+        font-family: 'Inter-LightItalic';
+        src: url('/fonts/Inter-LightItalic.woff2') format('woff2');
+        font-display: block;
+    }
+    @font-face {
+        font-family: 'Inter-Medium';
+        src: url('/fonts/Inter-Medium.woff2') format('woff2');
+        font-display: block;
+    }
+    @font-face {
+        font-family: 'Inter-MediumItalic';
+        src: url('/fonts/Inter-MediumItalic.woff2') format('woff2');
+        font-display: block;
+    }
+    @font-face {
+        font-family: 'Inter-Regular';
+        src: url('/fonts/Inter-Regular.woff2') format('woff2');
+        font-display: block;
+    }
+    @font-face {
+        font-family: 'Inter-SemiBold';
+        src: url('/fonts/Inter-SemiBold.woff2') format('woff2');
+        font-display: block;
+    }
+    @font-face {
+        font-family: 'Inter-SemiBoldItalic';
+        src: url('/fonts/Inter-SemiBoldItalic.woff2') format('woff2');
+        font-display: block;
+    }
+    @font-face {
+        font-family: 'Inter-Thin';
+        src: url('/fonts/Inter-Thin.woff2') format('woff2');
+        font-display: block;
+    }
+    @font-face {
+        font-family: 'Inter-ThinItalic';
+        src: url('/fonts/Inter-ThinItalic.woff2') format('woff2');
+        font-display: block;
+    }
+    @font-face {
+        font-family: 'InterVariable-Italic';
+        src: url('/fonts/InterVariable-Italic.woff2') format('woff2');
+        font-display: block;
+    }
+    @font-face {
+        font-family: 'InterVariable';
+        src: url('/fonts/InterVariable.woff2') format('woff2');
+        font-display: block;
+    }
+</style>
