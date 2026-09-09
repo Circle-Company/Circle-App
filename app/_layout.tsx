@@ -25,6 +25,7 @@ import { Provider as ToastProvider } from "@/contexts/Toast"
 import Fonts from "@/constants/fonts"
 import sizes from "@/constants/sizes"
 import { clearLikePressedNamespace } from "@/store"
+import { useScreenTracking } from "@/lib/hooks/useScreenTracking"
 import { TutorialProvider } from "@/contexts/tutorial"
 // Keep the splash screen visible while we fetch resources
 SplashScreen.preventAutoHideAsync()
@@ -38,6 +39,10 @@ function RootLayoutNav() {
     const [isInitializing, setIsInitializing] = useState(true)
     const scheme = useColorScheme()
     const hasRedirectedRef = React.useRef(false)
+
+    // Uma linha cobre toda a navegação do app: dispara `screen_viewed` a cada
+    // mudança de rota, sem precisar instrumentar tela por tela.
+    useScreenTracking()
 
     const settingsHeader = {
         headerShown: true,

@@ -1,6 +1,18 @@
 import React, { useEffect, useCallback } from "react"
-import { View, Keyboard, Platform, Animated as RNAnimated, Pressable } from "react-native"
-import Animated, { useAnimatedStyle, useSharedValue, withTiming } from "react-native-reanimated"
+import {
+    View,
+    Keyboard,
+    Platform,
+    Animated as RNAnimated,
+    Pressable,
+    StyleSheet,
+} from "react-native"
+import Animated, {
+    useAnimatedStyle,
+    useDerivedValue,
+    useSharedValue,
+    withTiming,
+} from "react-native-reanimated"
 import { Link, useLocalSearchParams } from "expo-router"
 import { useNavigation, useFocusEffect } from "expo-router"
 import { SafeAreaView } from "react-native-safe-area-context"
@@ -17,11 +29,27 @@ import Input from "@/components/comment/components/comments-profile-input"
 import ZeroComments from "@/components/comment/components/comments-zero_comments"
 import FeedContext from "@/contexts/Feed"
 import useUniqueAppend from "@/lib/hooks/useUniqueAppend"
+import RenderViewersFeed from "@/features/moments/feed/render-viewers-feed"
+import { useViewersPanel, viewersMomentTransform } from "@/features/moments/viewers/useViewersPanel"
+
+// `transformOrigin` fica no estilo estático: é constante, e o worklet só devolve
+// o transform. Sem a origem à esquerda o bloco escaparia do canto do card.
+const userShowLayout = {
+    flexDirection: "row" as const,
+    alignItems: "center" as const,
+    transformOrigin: "left center",
+}
 
 export default function MomentFullScreen() {
     const { id } = useLocalSearchParams<{ id: string; from?: string }>()
     const { session } = React.useContext(PersistedContext)
     const { commentEnabled, setCommentEnabled } = React.useContext(FeedContext)
+    const {
+        shouldRender: viewersOpen,
+        openProgress: viewersProgress,
+        scrollY: viewersScrollY,
+        close: closeViewers,
+    } = useViewersPanel(String(id))
 
     const {
         items: uniqueMoments,
@@ -227,13 +255,43 @@ export default function MomentFullScreen() {
         } as any
     }, [id, uniqueMoments, session?.user])
 
-    const animatedMomentStyle = useAnimatedStyle(() => {
+    // Um único cálculo de "quanto o card encolheu/subiu", lido pelo transform
+    // do card, pela contra-escala do UserShow e pelo fade do Bottom.
+    const momentShrink = useDerivedValue(() => {
         "worklet"
         const commentScale = 1 - 0.06 * commentShared.value
         const keyboardScale = 1 - 0.3 * keyboardProgress.value * commentShared.value
-        const finalScale = commentScale * keyboardScale
-        const translateY = -100 * keyboardProgress.value * commentShared.value
-        return { transform: [{ translateY }, { scale: finalScale }] }
+        // Mesma gramática do comentário: o painel de visualizadores encolhe e
+        // sobe o card, e o scroll da lista continua interpolando até o limite.
+        const viewers = viewersMomentTransform(viewersProgress.value, viewersScrollY.value)
+        return {
+            rise: Math.max(keyboardProgress.value * commentShared.value, viewers.rise),
+            scale: commentScale * keyboardScale * viewers.scale,
+            translateY: -100 * keyboardProgress.value * commentShared.value + viewers.translateY,
+        }
+    }, [])
+
+    const animatedMomentStyle = useAnimatedStyle(() => {
+        "worklet"
+        const { scale, translateY } = momentShrink.value
+        return {
+            transform: [{ translateY }, { scaleX: scale }, { scaleY: scale }],
+        }
+    }, [])
+
+    // O bloco do usuário não acompanha o encolhimento: a contra-escala desfaz
+    // exatamente o que o card aplicou, mantendo-o no tamanho original e colado
+    // no canto esquerdo.
+    const userShowCounterScaleStyle = useAnimatedStyle(() => {
+        "worklet"
+        const inverse = 1 / momentShrink.value.scale
+        return { transform: [{ scaleX: inverse }, { scaleY: inverse }] }
+    }, [])
+
+    // Tudo dentro do Bottom some junto com o encolhimento.
+    const momentBottomFadeStyle = useAnimatedStyle(() => {
+        "worklet"
+        return { opacity: 1 - momentShrink.value.rise }
     }, [])
 
     return (
@@ -276,17 +334,24 @@ export default function MomentFullScreen() {
                                     {/* Top user info (no scale animations) */}
                                     <Moment.Root.Top>
                                         <Moment.Root.TopLeft>
-                                            <UserShow.Root data={momentData.user}>
-                                                <UserShow.ProfilePicture
-                                                    disableAction={true}
-                                                    displayOnMoment={true}
-                                                    pictureDimensions={{ width: 30, height: 30 }}
-                                                />
-                                                <UserShow.Username
-                                                    pressable={false}
-                                                    fontFamily={fonts.family["Bold-Italic"]}
-                                                />
-                                            </UserShow.Root>
+                                            <Animated.View
+                                                style={[userShowLayout, userShowCounterScaleStyle]}
+                                            >
+                                                <UserShow.Root data={momentData.user}>
+                                                    <UserShow.ProfilePicture
+                                                        disableAction={true}
+                                                        displayOnMoment={true}
+                                                        pictureDimensions={{
+                                                            width: 30,
+                                                            height: 30,
+                                                        }}
+                                                    />
+                                                    <UserShow.Username
+                                                        pressable={false}
+                                                        fontFamily={fonts.family["Bold-Italic"]}
+                                                    />
+                                                </UserShow.Root>
+                                            </Animated.View>
                                         </Moment.Root.TopLeft>
                                         <Moment.Root.TopRight>
                                             <Moment.AudioControl size={36} />
@@ -295,7 +360,25 @@ export default function MomentFullScreen() {
 
                                     <Moment.Root.Center />
 
-                                    <Moment.Root.Bottom />
+                                    <Moment.Root.Bottom>
+                                        {/* Mesma linha do like nos outros
+                                            moments; aqui só o botão do dono. */}
+                                        <Animated.View
+                                            pointerEvents={viewersOpen ? "none" : "auto"}
+                                            style={[
+                                                {
+                                                    height: 46,
+                                                    flexDirection: "row",
+                                                    alignItems: "center",
+                                                    gap: sizes.margins["2sm"],
+                                                    marginBottom: sizes.margins["2sm"],
+                                                },
+                                                momentBottomFadeStyle,
+                                            ]}
+                                        >
+                                            <Moment.ViewersButtonIOS />
+                                        </Animated.View>
+                                    </Moment.Root.Bottom>
 
                                     {/* Subtle bottom gradient like feed */}
                                     <LinearGradient
@@ -314,9 +397,27 @@ export default function MomentFullScreen() {
                                         }}
                                     />
                                 </Moment.Container>
+
+                                {/* Com o painel aberto, tocar no moment é o que
+                                    fecha — a camada só existe nesse estado. */}
+                                {viewersOpen ? (
+                                    <Pressable
+                                        onPress={closeViewers}
+                                        accessibilityRole="button"
+                                        accessibilityLabel="Close viewers"
+                                        style={StyleSheet.absoluteFill}
+                                    />
+                                ) : null}
                             </Animated.View>
                         </Link.AppleZoomTarget>
-                        {momentData?.topComment ? (
+                        {viewersOpen ? (
+                            <RenderViewersFeed
+                                momentId={String(id)}
+                                focused={true}
+                                openProgress={viewersProgress}
+                                scrollY={viewersScrollY}
+                            />
+                        ) : momentData?.topComment ? (
                             <RenderCommentFeed moment={momentData} focused={true} />
                         ) : (
                             <View

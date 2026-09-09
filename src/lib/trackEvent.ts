@@ -1,108 +1,236 @@
+import { Platform } from "react-native"
 import { Mixpanel } from "mixpanel-react-native"
 import config from "@/config"
+import { storage, storageKeys } from "@/store"
 
 const trackAutomaticEvents = false
 const useNative = false
 
 let mixpanelInstance: Mixpanel | null = null
-let initialized = false
+let superPropertiesRegistered = false
+
+/**
+ * Identidade de quem dispara o evento. `id` é a chave primária do usuário no
+ * backend e é o que vai para o `identify()` — nunca o username, que é texto
+ * escolhido pela pessoa e não serve como `$user_id` estável.
+ */
+export type TrackedUser = {
+    id?: string | null
+    username?: string | null
+}
+
+/**
+ * Catálogo de eventos. Todo `track` do app passa por aqui — nomes são literais
+ * desta união, nunca montados em runtime, que é o que evita a base virar um
+ * cemitério de nomes quase iguais. `snake_case` em tudo.
+ */
+export type AnalyticsEvent =
+    // Sessão
+    | "app_open"
+    | "app_close"
+    | "login"
+    | "logout"
+    | "sign_up_completed"
+    // Etapa de foto de perfil do cadastro
+    | "profile_picture_onboarding_completed"
+    | "profile_picture_onboarding_skipped"
+    // Navegação
+    | "screen_viewed"
+    // Feed
+    | "moment_viewed"
+    // Ações sobre moments
+    | "moment_liked"
+    | "moment_unliked"
+    | "moment_comment_sent"
+    | "moment_reported"
+    | "moment_recording_started"
+    | "moment_recording_stopped"
+    | "moment_publish_started"
+    | "moment_published"
+    | "moment_publish_failed"
+    | "moment_publish_canceled"
+    // Social
+    | "user_followed"
+    | "user_unfollowed"
+    | "user_blocked"
+    | "user_unblocked"
+    | "user_reported"
+    | "friend_request_sent"
+    | "friend_request_canceled"
+    | "friend_request_accepted"
+    | "friend_request_declined"
+    | "friend_removed"
+    // Value Moment
+    | "like_notification_received"
+    // Conta e preferências
+    | "account_description_updated"
+    | "account_name_updated"
+    | "notifications_marked_read"
+    | "app_language_changed"
+    | "haptics_enabled"
+    | "haptics_disabled"
+
+// ──────────────────────────────────────────────────────────────────────────────
+// SDK
+// ──────────────────────────────────────────────────────────────────────────────
 
 function isValidKey(key: any): key is string {
     return typeof key === "string" && key.trim().length > 0 && key !== "undefined" && key !== "null"
 }
 
+/**
+ * Não há gate de consentimento aqui: o uso de analytics é coberto pelo aceite
+ * dos termos de uso, que é pré-condição para a conta existir (o cadastro envia
+ * `terms-accepted: true`). Decisão de produto/jurídico — ver o histórico deste
+ * arquivo antes de reintroduzir um gate.
+ */
 function getMixpanel(): Mixpanel | null {
+    if (mixpanelInstance) return mixpanelInstance
+
     try {
-        if (initialized) return mixpanelInstance
         const key = (config as any)?.MIXPANEL_KEY
         if (!isValidKey(key)) {
             console.warn("Mixpanel: invalid or missing MIXPANEL_KEY; tracking disabled")
-            initialized = true
             return null
         }
-        try {
-            const masked = typeof key === "string" ? key.slice(0, 4) + "****" : ""
-            console.log("Mixpanel: initializing", masked)
-        } catch {}
-        mixpanelInstance = new Mixpanel(key as string, trackAutomaticEvents, useNative)
-        mixpanelInstance.init()
-        console.log("Mixpanel: initialized")
-        initialized = true
-        return mixpanelInstance
+        const instance = new Mixpanel(key as string, trackAutomaticEvents, useNative)
+        instance.init()
+        mixpanelInstance = instance
+        registerSuperProperties(instance)
+        return instance
     } catch {
-        initialized = true
         mixpanelInstance = null
         return null
     }
 }
 
-function identifyUser(mp: Mixpanel, username: string) {
+/**
+ * Propriedades anexadas a todo evento. Ficam aqui e não em cada `track()` para
+ * não haver risco de uma chamada esquecer de mandá-las.
+ */
+function registerSuperProperties(mp: Mixpanel) {
+    if (superPropertiesRegistered) return
     try {
-        const id = (username || "").trim()
+        mp.registerSuperProperties({
+            platform: Platform.OS,
+            app_version: String((config as any)?.APP_VERSION ?? ""),
+        })
+        superPropertiesRegistered = true
+    } catch {
+        // noop
+    }
+}
+
+/**
+ * `identify()` com a chave primária do usuário. Sem `id` não identificamos:
+ * criar perfil para anônimo polui a base e não dá para desfazer.
+ */
+function identifyUser(mp: Mixpanel, user: TrackedUser) {
+    try {
+        const id = String(user?.id || "").trim()
         if (!id) return
         mp.identify(id)
-        try {
-            mp.getPeople().set({ username: id, $name: id })
-        } catch {}
-    } catch {}
-}
-
-export function trackAppOpen(username: string = ""): void {
-    const mp = getMixpanel()
-    if (!mp) {
-        console.warn("Mixpanel: not initialized; skipping app_open", { username })
-        return
-    }
-    try {
-        console.log("Mixpanel track: app_open", { username })
-        identifyUser(mp, username)
-        mp.track("app_open", { username })
+        const username = String(user?.username || "").trim()
+        if (username) {
+            try {
+                mp.getPeople().set({ username })
+            } catch {
+                // noop
+            }
+        }
     } catch {
-        // no-op
+        // noop
     }
 }
 
-export function trackLogin(username: string = ""): void {
-    const mp = getMixpanel()
-    if (!mp) {
-        console.warn("Mixpanel: not initialized; skipping login", { username })
-        return
-    }
+/**
+ * Identidade do usuário logado lida direto do MMKV. É o que permite que as
+ * chamadas espalhadas pelo app sejam de uma linha só, sem ter que carregar o
+ * usuário como parâmetro até o ponto da ação.
+ */
+function currentUser(): TrackedUser {
     try {
-        console.log("Mixpanel track: login", { username })
-        identifyUser(mp, username)
-        mp.track("login", { username })
+        const keys = storageKeys()
+        return {
+            id: storage.getString(keys.user.id) || "",
+            username: storage.getString(keys.user.username) || "",
+        }
     } catch {
-        // no-op
+        return {}
     }
 }
 
-export function trackLogout(username: string = ""): void {
+/**
+ * Ponto de entrada geral. Use nas ações do app; os eventos de sessão abaixo
+ * existem à parte só porque precisam da identidade explícita (login/logout
+ * acontecem quando o storage ainda não reflete o estado final).
+ *
+ * Propriedades: omita o que não tem valor em vez de mandar `null`/`""`, e mande
+ * número como número — string numérica não agrega no Mixpanel.
+ */
+export function trackUserAction(event: AnalyticsEvent, properties: Record<string, any> = {}): void {
+    track(event, currentUser(), properties)
+}
+
+function track(event: AnalyticsEvent, user: TrackedUser, properties: Record<string, any> = {}) {
     const mp = getMixpanel()
-    if (!mp) {
-        console.warn("Mixpanel: not initialized; skipping logout", { username })
-        return
-    }
+    if (!mp) return
     try {
-        console.log("Mixpanel track: logout", { username })
-        mp.track("logout", { username })
+        identifyUser(mp, user)
+        mp.track(event, properties)
+    } catch {
+        // noop
+    }
+}
+
+// ──────────────────────────────────────────────────────────────────────────────
+// Eventos
+// ──────────────────────────────────────────────────────────────────────────────
+
+export function trackAppOpen(user: TrackedUser = {}): void {
+    track("app_open", user)
+}
+
+export function trackAppClose(user: TrackedUser = {}): void {
+    track("app_close", user)
+}
+
+export function trackLogin(user: TrackedUser = {}): void {
+    track("login", user)
+}
+
+/**
+ * Value Moment: a curtida chegando de volta para quem publicou. É o sinal de
+ * que o app entregou valor — o moment saiu e alguém reagiu.
+ */
+export function trackLikeNotificationReceived(
+    user: TrackedUser = {},
+    properties: { is_foreground?: boolean } = {},
+): void {
+    track("like_notification_received", user, properties)
+}
+
+/** Disparado só depois de o usuário existir no backend, nunca antes. */
+export function trackSignUpCompleted(
+    user: TrackedUser = {},
+    properties: { sign_up_method?: string } = {},
+): void {
+    track("sign_up_completed", user, properties)
+}
+
+/**
+ * `reset()` é obrigatório no logout: sem ele o próximo usuário do aparelho é
+ * fundido na sessão do anterior.
+ */
+export function trackLogout(user: TrackedUser = {}): void {
+    const mp = getMixpanel()
+    if (!mp) return
+    try {
+        mp.track("logout")
         mp.reset()
-        console.log("Mixpanel: reset after logout")
+        superPropertiesRegistered = false
+        registerSuperProperties(mp)
     } catch {
-        // no-op
-    }
-}
-
-export function trackAppClose(username: string = ""): void {
-    const mp = getMixpanel()
-    if (!mp) {
-        console.warn("Mixpanel: not initialized; skipping app_close", { username })
-        return
-    }
-    try {
-        console.log("Mixpanel track: app_close", { username })
-        mp.track("app_close", { username })
-    } catch {
-        // no-op
+        // noop
     }
 }

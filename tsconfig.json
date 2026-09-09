@@ -3,6 +3,9 @@
     "compilerOptions": {
         "strict": true,
         "baseUrl": "src",
+        // Sem isto o TS 6 aborta com TS5101 antes de checar qualquer arquivo,
+        // e `tsc --noEmit` passa a não verificar nada.
+        "ignoreDeprecations": "6.0",
         "jsx": "react-jsx",
         "types": ["react", "react-native"],
         "paths": {

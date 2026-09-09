@@ -11,6 +11,7 @@ export interface PreferencesState {
     language: PreferencesLanguage
     content: PreferencesContent
     onboardingPermissionsCompleted: boolean
+    profilePictureOnboardingPending: boolean
     setAppLanguage: (value: string) => void
     setPrimaryLanguage: (value: string) => void
     setDisableAutoPlay: (value: boolean) => void
@@ -21,6 +22,7 @@ export interface PreferencesState {
     setTimezoneCode: (value: TimezoneCode) => void
     setMuteAudio: (value: boolean) => void
     setOnboardingPermissionsCompleted: (value: boolean) => void
+    setProfilePictureOnboardingPending: (value: boolean) => void
     set: (value: PreferencesDataType) => void
     load: () => void
     remove: () => void
@@ -41,6 +43,8 @@ export const usePreferencesStore = create<PreferencesState>((set) => ({
         muteAudio: storage.getBoolean(key.muteAudio) || false,
     },
     onboardingPermissionsCompleted: storage.getBoolean(key.onboardingPermissionsCompleted) || false,
+    profilePictureOnboardingPending:
+        storage.getBoolean(key.profilePictureOnboardingPending) || false,
     setAppLanguage: (value: string) => {
         safeSet(key.appLanguage, value)
         set((state) => ({
@@ -119,6 +123,12 @@ export const usePreferencesStore = create<PreferencesState>((set) => ({
             onboardingPermissionsCompleted: value,
         }))
     },
+    setProfilePictureOnboardingPending: (value: boolean) => {
+        safeSet(key.profilePictureOnboardingPending, value)
+        set(() => ({
+            profilePictureOnboardingPending: value,
+        }))
+    },
 
     setTimezoneCode: (value: TimezoneCode) => {
         safeSet(key.timezoneCode, value)
@@ -163,6 +173,8 @@ export const usePreferencesStore = create<PreferencesState>((set) => ({
             },
             onboardingPermissionsCompleted:
                 storage.getBoolean(key.onboardingPermissionsCompleted) || false,
+            profilePictureOnboardingPending:
+                storage.getBoolean(key.profilePictureOnboardingPending) || false,
         })
     },
     remove: () => {
@@ -177,6 +189,7 @@ export const usePreferencesStore = create<PreferencesState>((set) => ({
         safeDelete(key.appTimezone)
         safeDelete(key.timezoneCode)
         safeDelete(key.onboardingPermissionsCompleted)
+        safeDelete(key.profilePictureOnboardingPending)
 
         set({
             appTimezone: 0,
@@ -193,6 +206,7 @@ export const usePreferencesStore = create<PreferencesState>((set) => ({
                 muteAudio: false,
             },
             onboardingPermissionsCompleted: false,
+            profilePictureOnboardingPending: false,
         })
     },
 }))

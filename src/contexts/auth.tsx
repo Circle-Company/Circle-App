@@ -12,7 +12,13 @@ import PersistedContext, { Provider as PersistedProvider } from "@/contexts/Pers
 import { RedirectContext } from "@/contexts/redirect"
 import { SessionDataType } from "@/contexts/Persisted/types"
 import { signWithAppleProps } from "@/api/auth/auth.types"
-import { trackAppOpen, trackAppClose, trackLogin, trackLogout } from "@/lib/trackEvent"
+import {
+    trackAppClose,
+    trackAppOpen,
+    trackLogin,
+    trackLogout,
+    trackSignUpCompleted,
+} from "@/lib/trackEvent"
 
 type AuthProviderProps = { children: React.ReactNode }
 
@@ -44,6 +50,20 @@ export type AuthContextsData = {
 
 const AuthContext = React.createContext<AuthContextsData>({} as AuthContextsData)
 
+/**
+ * Liga a marca de "acabou de se cadastrar e ainda não passou pela tela de foto".
+ * Chamada só nos dois fluxos de criação de conta, depois de a sessão já estar
+ * injetada — antes disso o Persisted ainda pode resetar as preferências.
+ * Conta antiga nunca teve isso ligado, e por isso nunca vê a tela.
+ */
+function markProfilePicturePending() {
+    try {
+        usePreferencesStore.getState().setProfilePictureOnboardingPending(true)
+    } catch (e) {
+        console.warn("Não foi possível marcar o onboarding de foto de perfil:", e)
+    }
+}
+
 export function Provider({ children }: AuthProviderProps) {
     const { setRedirectTo } = React.useContext(RedirectContext)
     const [signInputUsername, setSignInputUsername] = React.useState("")
@@ -56,17 +76,24 @@ export function Provider({ children }: AuthProviderProps) {
     const [errorMessage, setErrorMessage] = useState("")
 
     React.useEffect(() => {
-        const getUsername = () =>
-            (storage.getString(storageKeys().user.username) || signInputUsername || "").toString()
+        // O `identify()` do Mixpanel usa o id do backend, não o username.
+        const getTrackedUser = () => ({
+            id: storage.getString(storageKeys().user.id) || "",
+            username: (
+                storage.getString(storageKeys().user.username) ||
+                signInputUsername ||
+                ""
+            ).toString(),
+        })
 
         // track app opened on mount
-        trackAppOpen(getUsername())
+        trackAppOpen(getTrackedUser())
 
         const handler = (nextState: string) => {
             if (nextState === "active") {
-                trackAppOpen(getUsername())
+                trackAppOpen(getTrackedUser())
             } else if (nextState === "inactive" || nextState === "background") {
-                trackAppClose(getUsername())
+                trackAppClose(getTrackedUser())
             }
         }
 
@@ -76,7 +103,7 @@ export function Provider({ children }: AuthProviderProps) {
                 sub?.remove()
             } catch {}
             // provider unmount: consider app closing
-            trackAppClose(getUsername())
+            trackAppClose(getTrackedUser())
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [])
@@ -242,6 +269,16 @@ export function Provider({ children }: AuthProviderProps) {
 
             await persistSession(sessionPayload)
             storage.set("@circle:sessionId", sessionPayload.user?.id ?? "")
+            markProfilePicturePending()
+            // Depois de o usuário existir no backend, nunca antes: o
+            // `identify()` precisa do id definitivo.
+            trackSignUpCompleted(
+                {
+                    id: String(sessionPayload.user?.id || ""),
+                    username: String(sessionPayload.user?.username || ""),
+                },
+                { sign_up_method: "apple" },
+            )
             return true
         } catch (error: any) {
             console.error("❌ Erro no login com Apple:", error)
@@ -322,7 +359,10 @@ export function Provider({ children }: AuthProviderProps) {
             const sessionPayload = response.data.session
             await persistSession(sessionPayload)
             storage.set("@circle:sessionId", sessionPayload.user?.id ?? "")
-            trackLogin(String(sessionPayload.user?.username || usernameForSignIn || ""))
+            trackLogin({
+                id: String(sessionPayload.user?.id || ""),
+                username: String(sessionPayload.user?.username || usernameForSignIn || ""),
+            })
             setRedirectTo("APP")
             beginAuthGracePeriod(1000)
         } catch (error: any) {
@@ -375,7 +415,10 @@ export function Provider({ children }: AuthProviderProps) {
             await persistSession(sessionPayload)
             // Persist sessionId for compatibility with legacy checks
             storage.set("@circle:sessionId", sessionPayload.user?.id ?? "")
-            trackLogin(String(sessionPayload.user?.username || signInputUsername.trim() || ""))
+            trackLogin({
+                id: String(sessionPayload.user?.id || ""),
+                username: String(sessionPayload.user?.username || signInputUsername.trim() || ""),
+            })
             setRedirectTo("APP")
             beginAuthGracePeriod(1000)
             // Navigation handled by RootLayoutNav via redirectTo
@@ -435,6 +478,7 @@ export function Provider({ children }: AuthProviderProps) {
             await persistSession(sessionPayload)
             // Persist sessionId for compatibility with legacy checks
             storage.set("@circle:sessionId", sessionPayload.user?.id ?? "")
+            markProfilePicturePending()
             setRedirectTo("APP")
             beginAuthGracePeriod(1000)
             // Navigation handled by RootLayoutNav via redirectTo
@@ -468,8 +512,10 @@ export function Provider({ children }: AuthProviderProps) {
 
             // Limpa dados do usuário e tokens, preservando chaves de tutorial
             try {
-                const username = storage.getString(storageKeys().user.username) || ""
-                trackLogout(username)
+                trackLogout({
+                    id: storage.getString(storageKeys().user.id) || "",
+                    username: storage.getString(storageKeys().user.username) || "",
+                })
             } catch {}
             // storage.clearAll() removido para preservar chaves de tutorial (MMKV)
             try {

@@ -1,5 +1,6 @@
 import { useMutation } from "@tanstack/react-query"
 import { apiRoutes } from "@/api"
+import { trackUserAction } from "@/lib/trackEvent"
 
 type useLikeMutationProps = {
     userId: string
@@ -15,6 +16,9 @@ export function useLikeMutation({ momentId, userId, authorizationToken }: useLik
                 authorizationToken,
                 momentId,
             })
+        },
+        onSuccess: () => {
+            trackUserAction("moment_liked", { moment_id: momentId })
         },
         onError: (err: any) => {
             console.log(err)
@@ -32,6 +36,9 @@ export function useUnlikeMutation({ momentId, userId, authorizationToken }: useL
                 authorizationToken,
                 momentId,
             })
+        },
+        onSuccess: () => {
+            trackUserAction("moment_unliked", { moment_id: momentId })
         },
         onError: (err: any) => {
             console.log(err)

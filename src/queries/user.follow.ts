@@ -1,5 +1,6 @@
 import { useMutation } from "@tanstack/react-query"
 import { apiRoutes } from "@/api"
+import { trackUserAction } from "@/lib/trackEvent"
 
 type useFollowMutationProps = {
     userId: string
@@ -14,6 +15,9 @@ export function useFollowMutation({ followedUserId, userId }: useFollowMutationP
                 userId,
                 followedUserId,
             })
+        },
+        onSuccess: () => {
+            trackUserAction("user_followed", { target_user_id: followedUserId })
         },
         onError: (err: any) => {
             console.log(err)
@@ -30,6 +34,9 @@ export function useUnfollowMutation({ followedUserId, userId }: useFollowMutatio
                 userId,
                 followedUserId,
             })
+        },
+        onSuccess: () => {
+            trackUserAction("user_unfollowed", { target_user_id: followedUserId })
         },
         onError: (err: any) => {
             console.log(err)

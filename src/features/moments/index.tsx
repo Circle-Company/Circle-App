@@ -3,6 +3,7 @@ import { Animated } from "react-native"
 import { Loading } from "@/components/loading"
 import { colors } from "@/constants/colors"
 import sizes from "@/constants/sizes"
+import { trackUserAction } from "@/lib/trackEvent"
 import FeedContext from "@/contexts/Feed"
 import RenderMomentFeed from "@/features/moments/feed/render-moment-feed"
 import { EmptyList } from "@/features/moments/empty.list"
@@ -41,6 +42,7 @@ const ListMoments = () => {
         preloadNextVideo,
         fetch,
         setCommentEnabled,
+        viewersMomentId,
         cacheManager,
     } = React.useContext(FeedContext)
     const [centerIndex, setCenterIndex] = useState<number | null>(0)
@@ -55,6 +57,11 @@ const ListMoments = () => {
     // acertava num device específico).
     const topInset = insets.top + NAV_BAR_HEIGHT
 
+    // Moments já contados como vistos nesta sessão de feed. Sem isso, voltar o
+    // carrossel para um moment anterior reemitiria `moment_viewed` e inflaria a
+    // métrica — aqui o evento significa "assistiu", não "passou de novo".
+    const viewedMomentsRef = useRef<Set<string>>(new Set())
+
     // Criar referência para onViewableItemsChanged
     const onViewableItemsChanged = useRef(({ viewableItems }: { viewableItems: ViewToken[] }) => {
         if (viewableItems.length > 0) {
@@ -68,6 +75,16 @@ const ListMoments = () => {
 
                 // Fazer preload do próximo vídeo
                 preloadNextVideo?.(currentIndex)
+
+                // `viewabilityConfig.minimumViewTime` é 3s, então chegar aqui já
+                // significa permanência, não scroll de passagem.
+                if (momentId && !viewedMomentsRef.current.has(momentId)) {
+                    viewedMomentsRef.current.add(momentId)
+                    trackUserAction("moment_viewed", {
+                        moment_id: momentId,
+                        feed_position: currentIndex,
+                    })
+                }
 
                 console.log(`Momento focado: ${momentId}, índice: ${currentIndex}`)
             }
@@ -132,7 +149,9 @@ const ListMoments = () => {
                     flex: 1,
                     paddingTop: topInset,
                 }}
-                scrollEnabled={enableScrollFeed}
+                // Com o painel de visualizadores aberto, deslizar para o lado
+                // deixaria o painel órfão sobre outro moment.
+                scrollEnabled={enableScrollFeed && !viewersMomentId}
                 // O input de comentário é filho desta lista. Com o padrão
                 // ("never"), o primeiro toque com o teclado aberto só fecha o
                 // teclado e é engolido — o botão de enviar nunca recebia o

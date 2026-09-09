@@ -20,6 +20,8 @@ function getTypeTitle(item: NotificationPayload) {
             return "Visited your profile"
         case NotificationType.MomentCommented:
             return "Commented on your moment"
+        case NotificationType.MomentPublished:
+            return "Posted a new moment"
         case NotificationType.MomentLiked:
             return "Novo like"
         case NotificationType.FriendRequestReceived:

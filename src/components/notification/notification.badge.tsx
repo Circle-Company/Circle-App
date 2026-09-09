@@ -7,6 +7,7 @@ import DialogIcon from "@/assets/icons/svgs/text_bubble.svg"
 import HeartIcon from "@/assets/icons/svgs/heart.svg"
 import PersonIcon from "@/assets/icons/svgs/person.svg"
 import CheckIcon from "@/assets/icons/svgs/check.svg"
+import MomentIcon from "@/assets/icons/svgs/moments.svg"
 import { NotificationType } from "@/contexts/push.notification"
 import { colors } from "@/constants/colors"
 import sizes from "@/constants/sizes"
@@ -43,6 +44,10 @@ export function NotificationBadge({ type }: { type: NotificationType }) {
         case NotificationType.FriendRequestAccepted:
             Icon = CheckIcon
             color = colors.green.green_04
+            break
+        case NotificationType.MomentPublished:
+            Icon = MomentIcon
+            color = colors.purple.purple_05
             break
         default:
             Icon = AtIcon
