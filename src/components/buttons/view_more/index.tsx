@@ -30,9 +30,9 @@ export default function ViewMorebutton({
         <ChevronRight fill={String(ColorTheme().primary)} width={11 * scale} height={11 * scale} />
     ),
 }: ViewMorePuttonProps) {
-    var animatedScale = React.useRef(new Animated.Value(1)).current
-
-    var animatedScale = React.useRef(new Animated.Value(1)).current
+    // Estava declarado duas vezes com `var` (legal em JS, dois `useRef` criados, o primeiro
+    // sombreado pelo segundo). Um `const` só.
+    const animatedScale = React.useRef(new Animated.Value(1)).current
     React.useEffect(() => {
         animatedScale.setValue(1)
     }, [])

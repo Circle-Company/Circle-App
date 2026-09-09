@@ -55,7 +55,6 @@ interface VideoPlayerProps {
 export default function MediaRenderVideo({
     uri,
     thumbnailUri,
-    hasVideoCache = false,
     autoPlay = true,
     onVideoLoad,
     onVideoEnd,
@@ -64,7 +63,6 @@ export default function MediaRenderVideo({
     isFocused = true,
     width,
     height,
-    isLoadingCache = false,
     momentId,
     forceMute = false,
     prefetchAdjacentThumbnails = [],
@@ -150,12 +148,12 @@ export default function MediaRenderVideo({
         if (disableWatch) return
         // Guardas defensivos para evitar acesso ao player nativo quando não está anexado
         const effectiveMomentId = data?.id || momentId
-        if (!player || !effectiveMomentId || !session?.account?.jwtToken) {
+        if (!player || !effectiveMomentId || !session?.account?.userId) {
             console.log("WATCH skip: missing deps", {
                 hasPlayer: !!player,
                 hasMoment: !!data?.id,
                 hasMomentFallback: !!momentId,
-                hasToken: !!session?.account?.jwtToken,
+                hasToken: !!session?.account?.userId,
             })
             return
         }
@@ -195,7 +193,6 @@ export default function MediaRenderVideo({
 
             actions.registerInteraction("WATCH", {
                 momentId: effectiveMomentId,
-                authorizationToken: session.account.jwtToken,
                 watchTime: Math.round(totalWatchTime * 1000), // Converter para milissegundos
             })
 
@@ -209,7 +206,7 @@ export default function MediaRenderVideo({
         // e em seguida desmontar, por exemplo) media `currentTime - 0` e somava
         // a posição inteira de novo por cima do total.
         watchSessionStartRef.current = currentTime
-    }, [player, data?.id, session?.account?.jwtToken, actions])
+    }, [player, data?.id, session?.account?.userId, actions])
 
     // Controle de play/pause baseado em foco e autoPlay
     useEffect(() => {
@@ -220,7 +217,7 @@ export default function MediaRenderVideo({
                 setShowThumbnail(false)
                 // Marca início da sessão de visualização
                 watchSessionStartRef.current = player.currentTime || 0
-            } catch (e) {
+            } catch {
                 // evita erro quando o objeto nativo ainda não está anexado
             }
         } else if (isVideoReadyRef.current && attachedRef.current) {
@@ -228,7 +225,7 @@ export default function MediaRenderVideo({
                 player.pause()
                 // Registra tempo assistido quando pausar/perder foco
                 registerWatchTime()
-            } catch (e) {
+            } catch {
                 // evita erro quando o objeto nativo ainda não está anexado
             }
         }
@@ -299,10 +296,10 @@ export default function MediaRenderVideo({
             if (attachedRef.current) {
                 try {
                     player.pause()
-                } catch (e) {}
+                } catch {}
                 try {
                     player.currentTime = 0
-                } catch (e) {}
+                } catch {}
             }
         }
     }, [isFocused, player])
@@ -328,7 +325,7 @@ export default function MediaRenderVideo({
                     const mutedNow = latestIsMutedRef.current
                     player.muted = mutedNow
                     player.volume = mutedNow ? 0 : 1
-                } catch (e) {}
+                } catch {}
                 attachedRef.current = true
                 console.log("Video attached", { momentId, uri })
 
@@ -344,7 +341,7 @@ export default function MediaRenderVideo({
                             // Marca início da sessão quando começar a tocar
                             watchSessionStartRef.current = player.currentTime || 0
                             lastPositionRef.current = player.currentTime || 0
-                        } catch (e) {
+                        } catch {
                             // se falhar, será retomado pelo efeito de foco quando estiver pronto
                         }
                     }
@@ -434,7 +431,7 @@ export default function MediaRenderVideo({
             try {
                 player.muted = isMuted
                 player.volume = isMuted ? 0 : 1
-            } catch (e) {}
+            } catch {}
         }
     }, [isMuted, player])
 
@@ -460,7 +457,7 @@ export default function MediaRenderVideo({
                     } else if (typeof anyPlayer.replace === "function") {
                         anyPlayer.replace(uri)
                     }
-                } catch (e) {}
+                } catch {}
             }
             // autoplay will be handled on statusChange when readyToPlay
         }
@@ -510,7 +507,7 @@ export default function MediaRenderVideo({
             if (player) {
                 try {
                     player.pause()
-                } catch (e) {}
+                } catch {}
             }
             if (progressIntervalRef.current) {
                 clearInterval(progressIntervalRef.current)
@@ -528,7 +525,13 @@ export default function MediaRenderVideo({
             width: videoWidth,
         },
         absoluteFill: {
-            ...StyleSheet.absoluteFillObject,
+            // `StyleSheet.absoluteFillObject` saiu da tipagem do RN; as quatro bordas explícitas
+            // são exatamente o que ele significava.
+            position: "absolute",
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
         },
         thumbnail: {
             bottom: 0,
@@ -606,7 +609,6 @@ export default function MediaRenderVideo({
                         style={styles.video}
                         contentFit="cover"
                         nativeControls={false}
-                        allowsFullscreen={false}
                         allowsPictureInPicture={false}
                         accessible={false}
                     />

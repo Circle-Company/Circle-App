@@ -39,7 +39,6 @@ interface Props {
  *   - Short-clip hint       → "Aperte e segure para gravar"
  */
 export function HandsFreeHint({ trigger, label }: Props): React.ReactElement | null {
-
     const [mounted, setMounted] = React.useState(false)
     const opacity = useSharedValue(0)
     const translateY = useSharedValue(6)
@@ -108,7 +107,6 @@ export function HandsFreeHint({ trigger, label }: Props): React.ReactElement | n
                 pointerEvents="none"
                 style={[styles.pill, containerStyle]}
                 glassEffectStyle="regular"
-                colorScheme="dark"
                 // Same recipe as ZoomIndicator: without a tint the glass
                 // fails to sample the AVCaptureVideoPreviewLayer behind it
                 // and often ends up invisible. `isInteractive` bumps the

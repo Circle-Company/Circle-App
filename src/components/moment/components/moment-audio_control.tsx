@@ -69,7 +69,6 @@ export default function MomentAudioControl({ size = 40 }: { size?: number }) {
                         colorScheme="dark"
                         glassEffectStyle="regular"
                         isInteractive
-                        colorScheme="dark"
                         style={buttonStyle}
                     >
                         {icon}

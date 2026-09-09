@@ -1,102 +1,50 @@
-import React, { useEffect, useCallback } from "react"
-import { View, Keyboard, Platform, Animated as RNAnimated, Pressable } from "react-native"
-import Animated, { useAnimatedStyle, useSharedValue, withTiming } from "react-native-reanimated"
-import { Link, useLocalSearchParams } from "expo-router"
-import { useNavigation, useFocusEffect } from "expo-router"
+import React, { useCallback } from "react"
+import { Animated as RNAnimated, Keyboard, Platform, Pressable, View } from "react-native"
+import { Link, useFocusEffect, useLocalSearchParams, useNavigation } from "expo-router"
 import { SafeAreaView } from "react-native-safe-area-context"
+import Animated, { useAnimatedStyle, useSharedValue, withTiming } from "react-native-reanimated"
+
+import sizes from "@/constants/sizes"
+import FeedContext from "@/contexts/Feed"
 import PersistedContext from "@/contexts/Persisted"
 import { Moment } from "@/components/moment"
-import sizes from "@/constants/sizes"
-import config from "@/config"
-import { UserShow } from "@/components/user_show"
-import { LinearGradient } from "expo-linear-gradient"
-import fonts from "@/constants/fonts"
-import api from "@/api"
-import RenderCommentFeed from "@/features/moments/feed/render-comment-feed"
 import Input from "@/components/comment/components/comments-profile-input"
-import ZeroComments from "@/components/comment/components/comments-zero_comments"
-import FeedContext from "@/contexts/Feed"
-import useUniqueAppend from "@/lib/hooks/useUniqueAppend"
+import {
+    MomentAuthorHeader,
+    MomentBottomGradient,
+    MomentComments,
+    MomentUnavailable,
+    useMomentDetail,
+} from "@/features/moments/detail"
+
+const CARD = sizes.moment.standart
 
 export default function MomentFullScreen() {
     const { id } = useLocalSearchParams<{ id: string; from?: string }>()
     const { session } = React.useContext(PersistedContext)
     const { commentEnabled, setCommentEnabled } = React.useContext(FeedContext)
 
-    const {
-        items: uniqueMoments,
-        appendOneUnique,
+    const navigation = useNavigation()
 
-        appendUnique,
-        resetUnique,
-    } = useUniqueAppend<any>({
-        keySelector: (m) => m?.id,
+    // Snowflake: trafega como string de ponta a ponta, nunca `Number()`.
+    const momentId = String(id ?? "")
+
+    /**
+     * Os momentos persistidos da conta são a semente **síncrona**, e é isso que faz a
+     * transição de zoom funcionar: o `Link.AppleZoomTarget` precisa ter um filho montado,
+     * com a geometria final, no instante em que a animação começa.
+     *
+     * A versão anterior desta tela buscava o momento num `useEffect` e renderizava `null`
+     * até a resposta chegar — no primeiro frame não havia alvo nenhum, então a animação
+     * partia de lugar nenhum e o card só aparecia depois dela, já com o player recomeçando
+     * do zero. Como o autor é sempre o dono da sessão, ele vem de `session.account`.
+     */
+    const { momentData, isUnavailable, errorMessage } = useMomentDetail({
+        momentId,
+        sources: [session.account.moments],
+        userFallback: session.account,
     })
 
-    const [isLoadingMoment, setIsLoadingMoment] = React.useState(false)
-    const fetchInProgressRef = React.useRef(false)
-
-    // Fetch moment by id (GET /moments/:id) with Authorization
-    useEffect(() => {
-        let cancelled = false
-        async function fetchMoment() {
-            if (fetchInProgressRef.current) return
-            fetchInProgressRef.current = true
-            try {
-                setIsLoadingMoment(true)
-                const token = session?.account?.jwtToken
-                const auth = token?.startsWith("Bearer ") ? token : token ? `Bearer ${token}` : ""
-                const res = await api.get(
-                    `/moments/${id}`,
-                    auth ? { headers: { Authorization: auth } } : undefined,
-                )
-                if (!cancelled) {
-                    const payload = (res as any)?.data?.moment ?? (res as any)?.data ?? null
-                    if (!payload) return
-
-                    // Support single payload or chunk (array)
-                    const incoming: any[] = Array.isArray(payload) ? payload : [payload]
-
-                    // Current chunk ids already rendered
-                    const currentIds = new Set(uniqueMoments.map((m: any) => String(m?.id)))
-                    const currentChunkIds = Array.from(currentIds)
-
-                    // New chunk ids from incoming payload
-                    const newChunkIds = incoming
-                        .map((m) => String(m?.id))
-                        .filter((v): v is string => !!v)
-
-                    // Only append items that are not yet present
-                    const uniqueIncoming = incoming.filter((m) => !currentIds.has(String(m?.id)))
-
-                    if (uniqueIncoming.length === 1) appendOneUnique(uniqueIncoming[0])
-                    else if (uniqueIncoming.length > 1) appendUnique(uniqueIncoming)
-
-                    // Debug if needed:
-                    // console.debug({ currentChunkIds, newChunkIds, uniqueNewChunkIds: uniqueIncoming.map(m => String(m?.id)) })
-                }
-            } catch (e) {
-                console.log("Moment fetch error:", e)
-            } finally {
-                if (!cancelled) setIsLoadingMoment(false)
-                fetchInProgressRef.current = false
-            }
-        }
-        if (id) fetchMoment()
-        return () => {
-            cancelled = true
-        }
-    }, [id, session?.account?.jwtToken, uniqueMoments, appendOneUnique, appendUnique])
-
-    React.useEffect(() => {
-        const list = ((session?.account as any)?.moments as any[]) || []
-        if (Array.isArray(list) && list.length) resetUnique(list as any[])
-    }, [session?.account?.moments, resetUnique])
-
-    // Comments UI and keyboard handling
-
-    const [isKeyboardVisible, setIsKeyboardVisible] = React.useState(false)
-    const navigation = useNavigation()
     useFocusEffect(
         useCallback(() => {
             const parent = navigation.getParent?.()
@@ -114,6 +62,8 @@ export default function MomentFullScreen() {
             }
         }, [navigation]),
     )
+
+    const [isKeyboardVisible, setIsKeyboardVisible] = React.useState(false)
     const keyboardHeightAnim = React.useRef(new RNAnimated.Value(0)).current
     const keyboardProgress = useSharedValue(0)
     const commentShared = useSharedValue(commentEnabled ? 1 : 0)
@@ -159,74 +109,6 @@ export default function MomentFullScreen() {
         commentShared.value = withTiming(commentEnabled ? 1 : 0, { duration: 250 })
     }, [commentEnabled, commentShared])
 
-    const momentData = React.useMemo(() => {
-        const rewrite = (url: string) => {
-            if (!url) return url
-            const original = String(url).trim()
-            const newBase = `${config.ENDPOINT}`
-            if (original.startsWith("/")) return `${newBase}${original}`
-            const protoMatch = original.match(/^https?:\/\//i)
-            if (protoMatch) {
-                const afterProto = original.slice(protoMatch[0].length)
-                const hostPort = afterProto.split("/")[0]
-                const path = afterProto.slice(hostPort.length) || "/"
-                const oldHosts = ["10.15.0.235:3000", "10.168.15.17:3000", "172.31.80.1:3000"]
-                if (oldHosts.includes(hostPort) || hostPort === config.ENDPOINT) {
-                    return `${newBase}${path}`
-                }
-                return original
-            }
-            return original
-        }
-
-        const raw = uniqueMoments.find((m: any) => String(m?.id) === String(id))
-        if (!raw) return null
-
-        const videoUrl = rewrite(
-            (raw?.midia?.fullhd_resolution as string) ||
-                (raw?.midia?.nhd_resolution as string) ||
-                raw?.video?.url,
-        )
-        const thumbUrl = rewrite(
-            (raw?.midia?.nhd_thumbnail as string) ||
-                raw?.thumbnail?.url ||
-                (raw?.thumbnail as string),
-        )
-
-        return {
-            id: String(raw.id),
-            user: {
-                id: String(raw?.user?.id || session?.user?.id || ""),
-                username: String(raw?.user?.username || session?.user?.username || ""),
-                verified: Boolean(raw?.user?.verified ?? session?.user?.isVerified ?? false),
-                profilePicture: String(
-                    raw?.user?.profilePicture || session?.user?.profilePicture || "",
-                ),
-                youFollow: Boolean(raw?.user?.youFollow ?? false),
-                followYou: Boolean(raw?.user?.followYou ?? false),
-            },
-            description: raw.description || "",
-            media: videoUrl,
-            thumbnail: thumbUrl,
-            midia: {
-                content_type: "VIDEO",
-                fullhd_resolution: videoUrl,
-                nhd_resolution: videoUrl,
-                nhd_thumbnail: thumbUrl,
-            },
-            metrics: raw.metrics || {
-                totalViews: 0,
-                totalLikes: 0,
-                totalComments: 0,
-            },
-            tags: raw.tags || [],
-            language: raw.language || "pt",
-            publishedAt: raw.publishedAt,
-            topComment: raw.topComment || null,
-            isLiked: Boolean(raw.isLiked ?? false),
-        } as any
-    }, [id, uniqueMoments, session?.user])
-
     const animatedMomentStyle = useAnimatedStyle(() => {
         "worklet"
         const commentScale = 1 - 0.06 * commentShared.value
@@ -245,92 +127,48 @@ export default function MomentFullScreen() {
                 alignItems: "center",
             }}
         >
-            <View
-                style={{
-                    height: sizes.headers.height * 0.7,
-                }}
-            />
-            {momentData ? (
-                <>
-                    <Moment.Root.Main
-                        size={sizes.moment.standart}
-                        isFeed={false}
-                        isFocused={true}
-                        data={momentData}
-                        shadow={{ top: false, bottom: true }}
-                    >
-                        {/* O AppleZoomTarget monta apenas UM filho nativo; por isso ele
-                            envolve somente o card do vídeo — os comentários ficam fora. */}
+            <View style={{ height: sizes.headers.height * 0.7 }} />
+            {momentData && !isUnavailable ? (
+                <Moment.Root.Main
+                    size={CARD}
+                    isFeed={false}
+                    isFocused={true}
+                    data={momentData}
+                    shadow={{ top: false, bottom: true }}
+                >
+                    {/*
+                        A escala do teclado/comentário fica FORA do alvo de zoom.
+                        O `Link.AppleZoomTarget` mede o retângulo do seu único filho nativo:
+                        com um `Animated.View` transformado no meio, o que ele mede é o card
+                        já deformado, e a animação aterrissa fora do lugar.
+                    */}
+                    <Animated.View collapsable={false} style={animatedMomentStyle}>
                         <Link.AppleZoomTarget>
-                            <Animated.View collapsable={false} style={animatedMomentStyle}>
-                                <Moment.Container
-                                    contentRender={momentData.midia}
-                                    isFocused={true}
-                                    loading={isLoadingMoment}
-                                    blurRadius={30}
-                                    forceMute={false}
-                                    showSlider={true}
-                                    disableCache={false}
-                                    disableWatch={true}
-                                >
-                                    {/* Top user info (no scale animations) */}
-                                    <Moment.Root.Top>
-                                        <Moment.Root.TopLeft>
-                                            <UserShow.Root data={momentData.user}>
-                                                <UserShow.ProfilePicture
-                                                    disableAction={true}
-                                                    displayOnMoment={true}
-                                                    pictureDimensions={{ width: 30, height: 30 }}
-                                                />
-                                                <UserShow.Username
-                                                    pressable={false}
-                                                    fontFamily={fonts.family["Bold-Italic"]}
-                                                />
-                                            </UserShow.Root>
-                                        </Moment.Root.TopLeft>
-                                        <Moment.Root.TopRight>
-                                            <Moment.AudioControl size={36} />
-                                        </Moment.Root.TopRight>
-                                    </Moment.Root.Top>
-
-                                    <Moment.Root.Center />
-
-                                    <Moment.Root.Bottom />
-
-                                    {/* Subtle bottom gradient like feed */}
-                                    <LinearGradient
-                                        colors={["rgba(0, 0, 0, 0.00)", "rgba(0, 0, 0, 0.4)"]}
-                                        start={{ x: 0.5, y: 0 }}
-                                        end={{ x: 0.5, y: 1 }}
-                                        style={{
-                                            pointerEvents: "none",
-                                            position: "absolute",
-                                            left: 0,
-                                            right: 0,
-                                            bottom: 0,
-                                            width: sizes.moment.standart.width,
-                                            height: sizes.moment.standart.height * 0.1,
-                                            zIndex: 0,
-                                        }}
-                                    />
-                                </Moment.Container>
-                            </Animated.View>
-                        </Link.AppleZoomTarget>
-                        {momentData?.topComment ? (
-                            <RenderCommentFeed moment={momentData} focused={true} />
-                        ) : (
-                            <View
-                                style={{
-                                    alignSelf: "center",
-                                    marginTop: sizes.margins["2sm"],
-                                }}
+                            <Moment.Container
+                                contentRender={momentData.media}
+                                isFocused={true}
+                                loading={false}
+                                blurRadius={30}
+                                forceMute={false}
+                                showSlider={true}
+                                disableCache={false}
+                                disableWatch={true}
                             >
-                                <ZeroComments isAccount={true} moment={momentData} />
-                            </View>
-                        )}
-                    </Moment.Root.Main>
-                </>
-            ) : null}
+                                <MomentAuthorHeader user={momentData.user} />
+
+                                <Moment.Root.Center />
+
+                                <Moment.Root.Bottom />
+
+                                <MomentBottomGradient />
+                            </Moment.Container>
+                        </Link.AppleZoomTarget>
+                    </Animated.View>
+                    <MomentComments moment={momentData} isAccount={true} />
+                </Moment.Root.Main>
+            ) : (
+                <MomentUnavailable message={errorMessage} />
+            )}
             {/* Dismiss overlay when input is active and keyboard visible */}
             {commentEnabled && isKeyboardVisible && (
                 <Pressable
@@ -360,11 +198,9 @@ export default function MomentFullScreen() {
                     }}
                 >
                     <Input
-                        momentId={momentData.id}
-                        onSent={() => {
-                            setCommentEnabled(false)
-                        }}
+                        momentId={momentId}
                         autoFocus={true}
+                        onSent={() => setCommentEnabled(false)}
                     />
                 </RNAnimated.View>
             )}

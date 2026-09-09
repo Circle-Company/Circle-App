@@ -6,8 +6,6 @@ export type SessionUser = {
     id: string
     username: string
     name: string | null
-    description: string | null
-    richDescription: string | null
     isVerified: boolean
     isActive: boolean
     profilePicture: string
@@ -71,6 +69,9 @@ export type PreferencesDataType = {
 export type UserDataType = SessionUser
 
 export type MetricsDataType = {
+    /** Momentos publicados pelo usuário. Vive aqui, e não na conta, porque é contagem
+     * derivada — o mesmo tipo de dado que seguidores e likes, vindo do mesmo payload. */
+    totalMoments: number
     totalFollowers: number
     totalFollowing: number
     totalLikesReceived: number
@@ -156,8 +157,11 @@ export type AuthSessionPayload = {
             notifications?: {}
         }
         token: string
+        /** Validade do ACCESS token, em segundos. Hoje 36000 (10h) — use sempre o valor
+         * que veio na resposta, nunca um valor fixo no cliente. */
         expiresIn: number
         refreshToken?: string
-        refreshExpiresIn?: number
+        // `refreshExpiresIn` não existe mais: o refresh token não expira (é revogado pelo
+        // banco). Não reintroduzir.
     }
 }

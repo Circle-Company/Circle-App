@@ -1,4 +1,5 @@
 import Animated, {
+    type SharedValue,
     Easing,
     interpolate,
     runOnJS,
@@ -74,7 +75,7 @@ const AnimatedListItem = React.memo(
         item: any
         index: number
         renderItem: ({ item, index }: { item: any; index: number }) => React.ReactElement
-        elasticDistortion: Animated.SharedValue<number>
+        elasticDistortion: SharedValue<number>
     }) => {
         const itemStyle = useAnimatedStyle(() => {
             "worklet"
@@ -424,8 +425,8 @@ export function AnimatedVerticalFlatlist<T>({
             backgroundColor: backgroundColor
                 ? backgroundColor
                 : isDarkMode
-                ? colors.gray.black
-                : colors.gray.white,
+                  ? colors.gray.black
+                  : colors.gray.white,
         } as ViewStyle,
     }
 

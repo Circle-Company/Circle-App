@@ -1,6 +1,6 @@
 import Close from "@/assets/icons/svgs/close.svg"
 import { useRouter } from "expo-router"
-import ColorTheme, { colors } from "../../constants/colors"
+import ColorTheme from "../../constants/colors"
 import { Pressable } from "react-native"
 
 type ButtonCloseProps = {
@@ -20,7 +20,7 @@ export default function ButtonClose({
 }: ButtonCloseProps) {
     const router = useRouter()
     const container: any = {
-        backgroundColor: transparent == true ? "#12121D30" : backgroundColor,
+        backgroundColor: transparent === true ? "#12121D30" : backgroundColor,
         width: 35,
         height: 35,
         borderRadius: 50,

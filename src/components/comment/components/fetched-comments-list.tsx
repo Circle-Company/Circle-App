@@ -112,7 +112,7 @@ function FetchedCommentsList() {
         fetchData()
     }, [networkStats])
 
-    if (networkStats == "OFFLINE" && data.comments.length == 0) return <OfflineCard />
+    if (networkStats === "OFFLINE" && data.comments.length === 0) return <OfflineCard />
     if (loading)
         return (
             <Loading.Container width={sizes.screens.width}>
@@ -157,7 +157,7 @@ function FetchedCommentsList() {
             )}
             ListFooterComponent={() => {
                 if (endReached) {
-                    if (data.comments.length == 0)
+                    if (data.comments.length === 0)
                         return <Text style={endText}>{t("No one has commented yet.")}</Text>
                     else return <Text style={endText}>{t("No more comments.")}</Text>
                 } else return <Loading.ActivityIndicator size={25} />

@@ -1,14 +1,10 @@
 import { router, Stack } from "expo-router"
 import React from "react"
 
-import ColorTheme, { colors } from "@/constants/colors"
+import { colors } from "@/constants/colors"
 import Fonts from "@/constants/fonts"
 import LanguageContext from "@/contexts/language"
 import { HeaderBackButton } from "@/components/general/header-buttons"
-
-import fonts from "@/constants/fonts"
-import navigation from "@/lib/navigation"
-import { View } from "react-native"
 
 export default function SettingsLayout() {
     const { t } = React.useContext(LanguageContext)

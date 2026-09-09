@@ -83,10 +83,6 @@ export type CameraContextType = {
     videoBuffer: string | null
     setVideoBuffer: (buffer: string | null) => void
 
-    // Optional metadata
-    description: string | null
-    setDescription: (description: string | null) => void
-
     // Auth token to be used by default on upload (can be overridden per call)
     authToken: string | null
     setAuthToken: (token: string | null) => void
@@ -113,7 +109,6 @@ export const CameraProvider = ({ children }: { children: ReactNode }) => {
     const [video, setVideo] = useState<CameraVideoInfo>(null)
     const [recordingTime, setRecordingTime] = useState(0)
     const [videoBuffer, setVideoBuffer] = useState<string | null>(null)
-    const [description, setDescription] = useState<string | null>(null)
     const [authToken, setAuthToken] = useState<string | null>(null)
 
     // Global camera UI/state
@@ -143,7 +138,6 @@ export const CameraProvider = ({ children }: { children: ReactNode }) => {
         setVideo(null)
         setRecordingTime(0)
         setVideoBuffer(null)
-        setDescription(null)
         setIsUploading(false)
         setUploadError(null)
         setLastUploadResponse(null)
@@ -177,14 +171,12 @@ export const CameraProvider = ({ children }: { children: ReactNode }) => {
             console.log("📤 Enviando para shareMoment...")
 
             const data = await shareMoment({
-                description: description !== undefined ? description : null,
-                userId: session.user.id,
+                userId: session.account.userId,
                 videoMetadata: {
                     mimeType: video?.mimeType || "video/mp4",
                     duration: typeof video?.duration === "number" ? video.duration : undefined,
                 },
                 videoPath: video.path,
-                jwtToken: session.account.jwtToken,
             })
 
             console.log("✅ Upload concluído com sucesso!")
@@ -211,7 +203,7 @@ export const CameraProvider = ({ children }: { children: ReactNode }) => {
         } finally {
             setIsUploading(false)
         }
-    }, [video, description, session.account.jwtToken, session.user.id])
+    }, [video, session.account.userId])
 
     const value = useMemo<CameraContextType>(
         () => ({
@@ -268,10 +260,6 @@ export const CameraProvider = ({ children }: { children: ReactNode }) => {
             videoBuffer,
             setVideoBuffer,
 
-            // metadata
-            description,
-            setDescription,
-
             // auth
             authToken,
             setAuthToken,
@@ -304,7 +292,6 @@ export const CameraProvider = ({ children }: { children: ReactNode }) => {
             video,
             recordingTime,
             videoBuffer,
-            description,
             authToken,
             isUploading,
             uploadError,

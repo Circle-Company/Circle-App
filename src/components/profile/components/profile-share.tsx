@@ -6,14 +6,11 @@ import fonts from "../../../constants/fonts"
 import sizes from "../../../constants/sizes"
 import ButtonStandart from "../../buttons/button-standart"
 import { Text } from "../../Themed"
-import { useProfileContext } from "../profile-context"
 import { ProfileShareProps } from "../profile-types"
-export default function share({
+export default function ProfileShare({
     color = String(ColorTheme().text),
     backgroundColor = String(ColorTheme().backgroundDisabled),
 }: ProfileShareProps) {
-    const { user } = useProfileContext()
-
     const container: any = {
         flexDirection: "row",
         alignitems: "center",

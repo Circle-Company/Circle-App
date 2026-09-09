@@ -50,8 +50,6 @@ export default function RenderMomentFeed({
     data,
     isFocused,
     isFeed,
-    isMe,
-    focusProgress,
     scrollXShared,
     itemIndex,
 }: renderMomentProps) {

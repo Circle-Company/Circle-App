@@ -228,14 +228,12 @@ export function CameraPage(): React.ReactElement {
             uploadProgress.value = 0
             try {
                 await shareMoment({
-                    description: null,
-                    userId: session.user.id,
+                    userId: session.account.userId,
                     videoMetadata: {
                         mimeType: item.mimeType,
                         duration: item.duration,
                     },
                     videoPath: item.path,
-                    jwtToken: session.account.jwtToken,
                     signal: controller.signal,
                     onPhaseChange: (phase) => setSharePhase(phase),
                     onUploadProgress: (frac) => {
@@ -299,7 +297,7 @@ export function CameraPage(): React.ReactElement {
                 }
             }
         },
-        [session.account.jwtToken, session.user.id, setCameraPosition, t, uploadProgress],
+        [session.account.userId, session.account.userId, setCameraPosition, t, uploadProgress],
     )
 
     const {

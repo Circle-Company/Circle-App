@@ -17,9 +17,9 @@ export default function ToastNetworkStats({ type, showStats }: ToastNotification
     const position = React.useRef(new Animated.Value(-100)).current
 
     function Color() {
-        return (type == "OFFLINE" && colors.red.red_05) ||
-            (type == "ONLINE" && colors.green.green_05) ||
-            (type == "RECONNECTING" && isDarkMode)
+        return (type === "OFFLINE" && colors.red.red_05) ||
+            (type === "ONLINE" && colors.green.green_05) ||
+            (type === "RECONNECTING" && isDarkMode)
             ? colors.gray.grey_04
             : colors.gray.grey_07
     }
@@ -43,7 +43,7 @@ export default function ToastNetworkStats({ type, showStats }: ToastNotification
         }, 4000)
     }, [showStats])
 
-    if (showStats == false) return null
+    if (showStats === false) return null
 
     const container: any = {
         ...sizes.toasts.small,
@@ -67,14 +67,14 @@ export default function ToastNetworkStats({ type, showStats }: ToastNotification
         fontSize: fonts.size.body,
         fontFamily: fonts.family.Medium,
         color:
-            (type == "OFFLINE" && colors.red.red_05) ||
-            (type == "ONLINE" && colors.green.green_05) ||
-            (type == "RECONNECTING" && isDarkMode)
+            (type === "OFFLINE" && colors.red.red_05) ||
+            (type === "ONLINE" && colors.green.green_05) ||
+            (type === "RECONNECTING" && isDarkMode)
                 ? colors.gray.grey_04
                 : colors.gray.grey_07,
     }
     const leftContainer: any = {
-        top: type == "OFFLINE" ? -1 : 0,
+        top: type === "OFFLINE" ? -1 : 0,
         alignItems: "center",
         justifyContent: "center",
         paddingRight: sizes.paddings["1md"],
@@ -88,18 +88,18 @@ export default function ToastNetworkStats({ type, showStats }: ToastNotification
     const iconSize = 17
 
     function Icon() {
-        if (type == "OFFLINE")
+        if (type === "OFFLINE")
             return <WifiOff fill={Color().toString()} width={iconSize} height={iconSize} />
-        if (type == "ONLINE")
+        if (type === "ONLINE")
             return <Wifi fill={Color().toString()} width={iconSize} height={iconSize} />
-        if (type == "RECONNECTING")
+        if (type === "RECONNECTING")
             return <Loading.ActivityIndicator color={Color().toString()} size={iconSize - 2} />
     }
 
     function Title() {
-        if (type == "OFFLINE") return "You are offline"
-        if (type == "ONLINE") return "You are connected"
-        if (type == "RECONNECTING") return "Restoring connection..."
+        if (type === "OFFLINE") return "You are offline"
+        if (type === "ONLINE") return "You are connected"
+        if (type === "RECONNECTING") return "Restoring connection..."
     }
     return (
         <Animated.View style={[container, { top: position }]}>

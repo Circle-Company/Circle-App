@@ -262,7 +262,6 @@ function Pill({ label, tone, onPress, solid, loading, useGlass }: PillProps) {
             <GlassView
                 colorScheme="dark"
                 style={pillBase}
-                colorScheme="dark"
                 glassEffectStyle="regular"
                 isInteractive={true}
                 tintColor={colors.gray.grey_09 + "90"}

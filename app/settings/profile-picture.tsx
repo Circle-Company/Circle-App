@@ -89,29 +89,22 @@ export default function ProfilePictureScreen() {
             const imageBase64 = manipulated.base64 || ""
             console.log("ProfilePicture: converted to base64", { length: imageBase64.length })
 
-            const token = session.account.jwtToken
-            const auth = token?.startsWith("Bearer ") ? token : token ? `Bearer ${token}` : ""
-
             const mimeType = "image/jpeg"
             const formData = new FormData()
             formData.append("imageData", `data:${mimeType};base64,${imageBase64}`)
 
             console.log("ProfilePicture: uploading to /account/profile-picture", {
-                hasAuth: !!auth,
                 length: imageBase64.length,
             })
-            await api.post(
-                "/account/profile-picture",
-                formData,
-                auth
-                    ? { headers: { Authorization: auth, "Content-Type": "multipart/form-data" } }
-                    : { headers: { "Content-Type": "multipart/form-data" } },
-            )
+            // Só o `Content-Type`: o `Authorization` é do interceptor (§3.2).
+            await api.post("/account/profile-picture", formData, {
+                headers: { "Content-Type": "multipart/form-data" },
+            })
 
             console.log("ProfilePicture: upload success")
             // Atualiza dados locais (ou refetch)
             try {
-                await (session.user as any).get?.(session.user.id)
+                await (session.account as any).get?.(session.account.userId)
             } catch {}
 
             setSelectedAsset(null)
@@ -156,7 +149,7 @@ export default function ProfilePictureScreen() {
             <View style={styles.avatarWrapper}>
                 <Image
                     source={{
-                        uri: selectedAsset?.uri || session.user.profilePicture,
+                        uri: selectedAsset?.uri || session.account.profilePicture,
                     }}
                     style={styles.avatar}
                 />

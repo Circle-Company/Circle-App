@@ -3,13 +3,12 @@ import bottom_root from "./components/roots/bottom/moment-bottom_root"
 import center_root from "./components/roots/center/moment-center_root"
 import container from "./components/moment-container"
 import moment_date from "./components/moment-date"
-import description from "./components/moment-description"
 import like from "./components/moment-like"
 import main_root from "./components/roots/moment-main_root"
 import top_left_root from "./components/roots/top/moment-top_left_root"
 import top_right_root from "./components/roots/top/moment-top_right_root"
 import top_root from "./components/roots/top/moment-top_root"
-import { likeIOS as iosLikeButton } from "./components/moment.ios.like"
+import { LikeIOS as iosLikeButton } from "./components/moment.ios.like"
 export const Moment = {
     Root: {
         Main: main_root,
@@ -23,6 +22,5 @@ export const Moment = {
     LikeButton: like,
     LikeButtonIOS: iosLikeButton,
     Container: container,
-    Description: description,
     Date: moment_date,
 }

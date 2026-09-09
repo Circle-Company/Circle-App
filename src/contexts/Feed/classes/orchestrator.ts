@@ -18,8 +18,8 @@ export class FeedOrchestrator {
     public chunkManager: ChunkManager
     public cacheManager: CacheManager
 
-    constructor(jwtToken: string, maxCacheSize: number = 50) {
-        this.fetcher = new Fetcher(jwtToken)
+    constructor(maxCacheSize: number = 50) {
+        this.fetcher = new Fetcher()
         this.debounceGate = new DebounceGate()
         this.chunkManager = new ChunkManager()
         this.cacheManager = new CacheManager(maxCacheSize)
@@ -35,7 +35,25 @@ export class FeedOrchestrator {
         }
         this.debounceGate.mark()
 
-        const moments = await this.fetcher.fetchChunk()
+        const outcome = await this.fetcher.fetchChunk()
+
+        // Falha não é feed vazio.
+        //
+        // O `Fetcher` devolvia `[]` nos dois casos, e o `RESET` logo abaixo trocava a
+        // lista inteira por vazio: um blip de rede durante o pull-to-refresh apagava o
+        // feed da tela. Preservar `currentFeed` é o comportamento correto — os moments
+        // que já estão lá continuam válidos, e o cache de vídeo continua servindo.
+        //
+        // O `reset()` do gate é o par disso: a janela de debounce foi consumida por uma
+        // busca que não trouxe nada, então o próximo puxão do usuário não pode esbarrar
+        // nela.
+        if (!outcome.ok) {
+            this.debounceGate.reset()
+            console.warn("feed fetch falhou:", outcome.reason, outcome.status ?? "")
+            return { newFeed: currentFeed, addedChunk: [] }
+        }
+
+        const moments = outcome.moments
         const newChunkIds = moments.map((m) => m.id)
         const dedupNewChunkIds = Array.from(new Set(newChunkIds))
         const currentPostIds = currentFeed.map((m) => m.id)
@@ -157,8 +175,8 @@ export class FeedOrchestrator {
         if (neighbors.all.length === 0) return []
 
         const thumbnailUrls: string[] = []
-        const thumbnailItems: Array<{ id: string; url: string }> = []
-        const videoItems: Array<{ id: string; url: string }> = []
+        const thumbnailItems: { id: string; url: string }[] = []
+        const videoItems: { id: string; url: string }[] = []
 
         for (const neighborId of neighbors.all) {
             const moment = moments.find((m) => String(m.id) === neighborId)

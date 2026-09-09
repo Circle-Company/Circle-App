@@ -1,15 +1,12 @@
-import { Animated, Keyboard, Pressable, TextInput, View } from "react-native"
+import { Animated, Keyboard, Pressable, TextInput, View, TextStyle, ViewStyle } from "react-native"
 import ColorTheme, { colors } from "@/constants/colors"
 import { CommentsInputProps } from "../comments-types"
 import LanguageContext from "@/contexts/language"
-import PersistedContext from "@/contexts/Persisted"
 import React from "react"
 import { apiRoutes } from "@/api"
 import fonts from "@/constants/fonts"
 import sizes from "@/constants/sizes"
 import { useToast } from "@/contexts/Toast"
-import { TextStyle } from "react-native"
-import { ViewStyle } from "react-native"
 import { GlassView, isLiquidGlassAvailable } from "expo-glass-effect"
 import { SymbolView } from "expo-symbols"
 import { Vibrate } from "@/lib/hooks/useHapticFeedback"
@@ -21,7 +18,6 @@ export default function Input({
     onSent,
 }: CommentsInputProps) {
     const { t } = React.useContext(LanguageContext)
-    const { session } = React.useContext(PersistedContext)
     const [commentText, setCommentText] = React.useState<string>("")
     const toast = useToast()
 
@@ -50,7 +46,6 @@ export default function Input({
         try {
             await apiRoutes.moment.actions.comment({
                 momentId,
-                authorizationToken: session.account.jwtToken,
                 content: commentText,
                 mentions: [],
                 parentId: "",
@@ -133,7 +128,6 @@ export default function Input({
                             colorScheme="dark"
                             glassEffectStyle="regular"
                             isInteractive
-                            colorScheme="dark"
                             tintColor={canSend ? colors.purple.purple_05 : undefined}
                             style={sendButton}
                         >

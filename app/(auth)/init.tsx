@@ -1,7 +1,6 @@
 import { colors } from "@/constants/colors"
 import { default as Fonts, default as fonts } from "@/constants/fonts"
-import { ViewStyle } from "react-native"
-import { View, Image } from "react-native"
+import { ViewStyle, View, Image } from "react-native"
 import Button from "@/components/buttons/button-standart"
 import AppleLogo from "@/assets/icons/svgs/apple-logo.svg"
 import { LanguageSelector } from "@/components/language/selector"
@@ -19,7 +18,7 @@ export default function SplashScreen() {
     const router = useRouter()
     const { t } = useTranslation()
     const insets = useSafeAreaInsets()
-    const { setAppleSignData, setErrorMessage, checkAppleAccountExists, appleSignIn, appleSignUp } =
+    const { setAppleSignData, setErrorMessage, checkAppleAccountExists, appleSignIn } =
         React.useContext(AuthContext)
 
     const container: any = {

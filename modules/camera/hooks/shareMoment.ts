@@ -9,13 +9,11 @@ export type SharePhase = "requesting" | "uploading" | "confirming" | "polling"
 
 export interface ShareMomentProps {
     userId: number | string
-    jwtToken: string
     videoPath: string
     videoMetadata: {
         mimeType: string
         duration?: number
     }
-    description?: string | null
     visibility?: "public" | "followers_only"
 
     /** Notifica cada transição entre requesting/uploading/confirming/polling. */
@@ -143,23 +141,16 @@ async function runFlow(
     // === Passo 3: confirmar ===
     props.onPhaseChange?.("confirming")
     throwIfAborted()
-    await confirmUpload(momentId, props.jwtToken, props.signal)
+    await confirmUpload(momentId, props.signal)
 
     // === Passo 4: aguardar processamento ===
     props.onPhaseChange?.("polling")
-    const { mediaUrl, thumbnailUrl } = await pollUntilPublished(
-        momentId,
-        props.jwtToken,
-        props.signal,
-    )
+    const { mediaUrl, thumbnailUrl } = await pollUntilPublished(momentId, props.signal)
 
     return { momentId, mediaUrl, thumbnailUrl }
 }
 
-async function requestUploadUrl(
-    props: ShareMomentProps,
-    size: number,
-): Promise<UploadUrlResponse> {
+async function requestUploadUrl(props: ShareMomentProps, size: number): Promise<UploadUrlResponse> {
     const res = await api.post(
         "/moments/upload-url",
         {
@@ -167,11 +158,9 @@ async function requestUploadUrl(
             size,
             filename: `moment-${Date.now()}.mp4`,
             duration: props.videoMetadata.duration,
-            description: props.description ?? null,
             visibility: props.visibility ?? "public",
         },
         {
-            headers: { Authorization: props.jwtToken },
             signal: props.signal,
         },
     )
@@ -200,9 +189,7 @@ async function uploadToAzure(
         },
         (progress) => {
             if (progress.totalBytesExpectedToSend > 0) {
-                onProgress?.(
-                    progress.totalBytesSent / progress.totalBytesExpectedToSend,
-                )
+                onProgress?.(progress.totalBytesSent / progress.totalBytesExpectedToSend)
             }
         },
     )
@@ -227,16 +214,11 @@ async function uploadToAzure(
     }
 }
 
-async function confirmUpload(
-    momentId: string,
-    jwtToken: string,
-    signal?: AbortSignal,
-): Promise<void> {
+async function confirmUpload(momentId: string, signal?: AbortSignal): Promise<void> {
     const res = await api.post(
         `/moments/${momentId}/confirm`,
         {},
         {
-            headers: { Authorization: jwtToken },
             signal,
         },
     )
@@ -247,7 +229,6 @@ async function confirmUpload(
 
 async function pollUntilPublished(
     momentId: string,
-    jwtToken: string,
     signal?: AbortSignal,
 ): Promise<{ mediaUrl: string; thumbnailUrl?: string }> {
     const deadline = Date.now() + POLL_TIMEOUT_MS
@@ -256,7 +237,6 @@ async function pollUntilPublished(
         if (signal?.aborted) raiseAbort()
 
         const res = await api.get<MomentPollResponse>(`/moments/${momentId}`, {
-            headers: { Authorization: jwtToken },
             signal,
         })
         const moment = res.data?.moment

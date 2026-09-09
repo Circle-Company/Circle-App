@@ -74,7 +74,6 @@ export function FlashButton() {
                 colorScheme="dark"
                 style={[styles.circle, disabled && styles.disabled]}
                 glassEffectStyle="regular"
-                colorScheme="dark"
                 isInteractive
             >
                 <Pressable style={styles.pressable} onPress={toggleTorch} disabled={disabled}>

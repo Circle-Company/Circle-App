@@ -1,5 +1,5 @@
 import React from "react"
-import { Pressable, StyleSheet, Text, View, ViewStyle, Platform } from "react-native"
+import { Pressable, StyleSheet, Text, ViewStyle, Platform } from "react-native"
 import ChevronRight from "@/assets/icons/svgs/chevron_right.svg"
 import fonts from "@/constants/fonts"
 
@@ -38,16 +38,14 @@ export function HeaderBackButton({
                 pressed && Platform.OS === "ios" ? { opacity: pressOpacity } : null,
             ]}
         >
-            <ChevronRight
-                width={13}
-                height={21}
-                fill={tintColor}
-                style={styles.backIcon}
-            />
+            <ChevronRight width={13} height={21} fill={tintColor} style={styles.backIcon} />
             {showLabel && label ? (
                 <Text
                     numberOfLines={1}
-                    style={[styles.backLabel, { color: tintColor, fontFamily: fonts.family.Regular }]}
+                    style={[
+                        styles.backLabel,
+                        { color: tintColor, fontFamily: fonts.family.Regular },
+                    ]}
                 >
                     {label}
                 </Text>
@@ -69,7 +67,6 @@ type HeaderButtonProps = {
 }
 
 export function HeaderButton({
-    tintColor,
     pressColor,
     pressOpacity = 0.6,
     style,

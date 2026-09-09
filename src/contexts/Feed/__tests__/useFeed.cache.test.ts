@@ -1,7 +1,7 @@
 import { act, renderHook } from "@testing-library/react-hooks"
 import { beforeEach, describe, expect, it, vi } from "vitest"
 
-import { MomentProps } from "@/contexts/Feed/types"
+import { Moment as MomentProps } from "@/contexts/Feed/types"
 import { useFeed } from "@/contexts/Feed/useFeed"
 
 // `src/test-setup.ts` troca `@/contexts/Persisted` por um objeto simples, que
@@ -12,11 +12,13 @@ vi.mock("@/contexts/Persisted", async () => {
     const react = await vi.importActual<typeof import("react")>("react")
     return {
         default: react.createContext({
+            // O gate do `useFeed` é `session.account.userId`: sem ele o orquestrador
+            // nasce nulo e todo o cache devolve `null`. O mock antigo ainda descrevia a
+            // sessão pré-refatoração (`user`, `statistics`, `jwtToken` no account).
             session: {
-                user: { id: "user-1" },
-                account: { jwtToken: "token-123" },
+                account: { userId: "user-1" },
                 preferences: {},
-                statistics: {},
+                metrics: {},
             },
         }),
     }
@@ -64,23 +66,8 @@ const createMoment = (overrides: Partial<MomentProps> = {}): MomentProps => ({
     user: {
         id: "user-1",
         username: "tester",
-        verified: false,
         profilePicture: "",
-        isFollowing: false,
     },
-    description: "",
-    content_type: "VIDEO",
-    midia: {
-        content_type: "VIDEO",
-        nhd_thumbnail: "thumb",
-        fullhd_resolution: "https://video-full.mp4",
-        nhd_resolution: "https://video-nhd.mp4",
-    },
-    comments_count: 0,
-    likes_count: 0,
-    isLiked: false,
-    deleted: false,
-    created_at: new Date().toISOString(),
     media: "https://video-stream.mp4",
     thumbnail: "https://thumb.jpg",
     duration: 10,
@@ -143,10 +130,7 @@ describe("useFeed cache integration", () => {
         })
 
         expect(url).toBe("app-cache://moment-externo")
-        expect(resolveVideoMock).toHaveBeenCalledWith(
-            "moment-externo",
-            "https://video-externo.mp4",
-        )
+        expect(resolveVideoMock).toHaveBeenCalledWith("moment-externo", "https://video-externo.mp4")
     })
 
     it("faz preload dos próximos vídeos quando não estão em cache", async () => {
@@ -154,22 +138,10 @@ describe("useFeed cache integration", () => {
         const secondMoment = createMoment({
             id: "moment-4",
             media: "https://video-second.mp4",
-            midia: {
-                content_type: "VIDEO",
-                nhd_thumbnail: "thumb",
-                fullhd_resolution: "https://video-second-full.mp4",
-                nhd_resolution: "https://video-second-nhd.mp4",
-            },
         })
         const thirdMoment = createMoment({
             id: "moment-5",
             media: "https://video-third.mp4",
-            midia: {
-                content_type: "VIDEO",
-                nhd_thumbnail: "thumb",
-                fullhd_resolution: "https://video-third-full.mp4",
-                nhd_resolution: "https://video-third-nhd.mp4",
-            },
         })
 
         fetchMock.mockResolvedValue({

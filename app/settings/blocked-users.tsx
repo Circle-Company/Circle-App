@@ -1,22 +1,18 @@
-import { FlatList, Alert } from "react-native"
-import { View } from "react-native"
+import { FlatList, Alert, View, ViewStyle, TextStyle, RefreshControl } from "react-native"
 import { Text } from "@/components/Themed"
 import { UserShow } from "@/components/user_show"
-import { ViewStyle } from "react-native"
 import sizes from "@/constants/sizes"
 import { colors } from "@/constants/colors"
 import Button from "@/components/buttons/button-standart"
 import React from "react"
 import LanguageContext from "@/contexts/language"
-import { TextStyle } from "react-native"
 import fonts from "@/constants/fonts"
-import { RefreshControl } from "react-native"
 import { useAccountBlocksQuery } from "@/queries"
 import { useUnlockMutation } from "@/queries/user.block"
 
 export default function BlockedUsersScreen() {
     const { t } = React.useContext(LanguageContext)
-    const { data, isPending, isLoading, isRefetching, refetch } = useAccountBlocksQuery()
+    const { data, isRefetching, refetch } = useAccountBlocksQuery()
 
     const container: ViewStyle = {
         paddingHorizontal: sizes.paddings["1md"],

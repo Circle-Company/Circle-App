@@ -182,7 +182,6 @@ export function CancelShareCard({
                     <GlassView
                         colorScheme="dark"
                         style={styles.glassContainer}
-                        colorScheme="dark"
                         glassEffectStyle="regular"
                         isInteractive={true}
                         tintColor={colors.gray.grey_09 + "50"}

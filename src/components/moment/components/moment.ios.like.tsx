@@ -6,9 +6,8 @@ import { Pressable, StyleSheet, View } from "react-native"
 import MomentContext from "../context"
 import { colors } from "@/constants/colors"
 import { Vibrate } from "@/lib/hooks/useHapticFeedback"
-import { Text } from "@/components/Themed"
 
-export function likeIOS({ isLiked, size }: { isLiked: boolean; size?: number }) {
+export function LikeIOS({ isLiked, size }: { isLiked: boolean; size?: number }) {
     const { session } = React.useContext(PersistedContext)
     const { data, actions, options } = React.useContext(MomentContext)
     const momentId = React.useMemo(() => (data.id ? String(data.id) : ""), [data.id])
@@ -50,7 +49,6 @@ export function likeIOS({ isLiked, size }: { isLiked: boolean; size?: number }) 
         Vibrate("effectHeavyClick")
         const ok = await actions.registerInteraction("LIKE", {
             momentId: data.id,
-            authorizationToken: session.account.jwtToken,
         })
         if (!ok) {
             // `registerInteraction` engole os erros da API, então o retorno é
@@ -66,7 +64,6 @@ export function likeIOS({ isLiked, size }: { isLiked: boolean; size?: number }) 
         Vibrate("effectHeavyClick")
         const ok = await actions.registerInteraction("UNLIKE", {
             momentId: data.id,
-            authorizationToken: session.account.jwtToken,
         })
         if (!ok) {
             session.account.addLikedMoment(momentId)
@@ -112,7 +109,6 @@ export function likeIOS({ isLiked, size }: { isLiked: boolean; size?: number }) 
                     colorScheme="dark"
                     glassEffectStyle="regular"
                     isInteractive
-                    colorScheme="dark"
                     tintColor={liked ? colors.red.red_05 : undefined}
                     style={buttonStyle}
                 >

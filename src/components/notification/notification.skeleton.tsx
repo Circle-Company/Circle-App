@@ -1,7 +1,6 @@
 import { ViewStyle } from "react-native"
 import { Skeleton } from "../skeleton"
 import sizes from "@/constants/sizes"
-import { colors } from "@/constants/colors"
 
 export function NotificationSkeleton({ opacity }: { opacity?: number }) {
     const container: ViewStyle = {

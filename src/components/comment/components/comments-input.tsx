@@ -1,19 +1,14 @@
-import { Animated, Keyboard, Pressable, Text, TextInput, View, useColorScheme } from "react-native"
+import { Animated, Keyboard, Pressable, TextInput, View, TextStyle, ViewStyle } from "react-native"
 import ColorTheme, { colors } from "../../../constants/colors"
 
 import { CommentsInputProps } from "../comments-types"
 import FeedContext from "@/contexts/Feed"
 import LanguageContext from "@/contexts/language"
-import PersistedContext from "@/contexts/Persisted"
 import React from "react"
-import api from "@/api"
 import fonts from "@/constants/fonts"
 import sizes from "../../../constants/sizes"
 import { useToast } from "../../../contexts/Toast"
-import { userReciveDataProps } from "@/components/user_show/user_show-types"
 import MomentContext from "@/components/moment/context"
-import { TextStyle } from "react-native"
-import { ViewStyle } from "react-native"
 import { GlassView, isLiquidGlassAvailable } from "expo-glass-effect"
 import { SymbolView } from "expo-symbols"
 import { Vibrate } from "@/lib/hooks/useHapticFeedback"
@@ -27,7 +22,6 @@ export default function Input({
     const { t } = React.useContext(LanguageContext)
     const { actions } = React.useContext(MomentContext)
     const { setCommentEnabled, commentEnabled } = React.useContext(FeedContext)
-    const { session } = React.useContext(PersistedContext)
     const [commentText, setCommentText] = React.useState<string>("")
     const toast = useToast()
 
@@ -99,7 +93,6 @@ export default function Input({
             // então é o retorno — e não o catch — que diz se o comentário foi.
             const sent = await actions.registerInteraction("COMMENT", {
                 momentId,
-                authorizationToken: session.account.jwtToken,
                 content,
             })
             if (!sent) {
@@ -164,7 +157,6 @@ export default function Input({
                             colorScheme="dark"
                             glassEffectStyle="regular"
                             isInteractive
-                            colorScheme="dark"
                             tintColor={canSend ? colors.purple.purple_05 : undefined}
                             style={sendButton}
                         >

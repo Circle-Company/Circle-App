@@ -1,5 +1,4 @@
 import api from "@/api"
-import { storage, storageKeys } from "@/store"
 import {
     AcceptFriendRequestResponse,
     CancelFriendRequestResponse,
@@ -13,12 +12,6 @@ import {
     SendFriendRequestResponse,
 } from "./friendship.types"
 
-function authHeaders() {
-    return {
-        Authorization: `Bearer ${storage.getString(storageKeys().account.jwt.token) || ""}`,
-    }
-}
-
 /**
  * Envia convite de amizade. Idempotente: reenviar não duplica convite nem
  * notificação. Pode devolver `outcome: "auto_accepted"` quando o alvo já
@@ -29,9 +22,7 @@ async function sendFriendRequest({
 }: {
     userId: string
 }): Promise<SendFriendRequestResponse> {
-    const response = await api.post(`/users/${userId}/friend-request`, undefined, {
-        headers: authHeaders(),
-    })
+    const response = await api.post(`/users/${userId}/friend-request`, undefined, {})
     return response.data
 }
 
@@ -41,9 +32,7 @@ async function cancelFriendRequest({
 }: {
     userId: string
 }): Promise<CancelFriendRequestResponse> {
-    const response = await api.delete(`/users/${userId}/friend-request`, {
-        headers: authHeaders(),
-    })
+    const response = await api.delete(`/users/${userId}/friend-request`, {})
     return response.data
 }
 
@@ -53,9 +42,7 @@ async function acceptFriendRequest({
 }: {
     userId: string
 }): Promise<AcceptFriendRequestResponse> {
-    const response = await api.post(`/users/${userId}/friend-request/accept`, undefined, {
-        headers: authHeaders(),
-    })
+    const response = await api.post(`/users/${userId}/friend-request/accept`, undefined, {})
     return response.data
 }
 
@@ -65,17 +52,13 @@ async function declineFriendRequest({
 }: {
     userId: string
 }): Promise<DeclineFriendRequestResponse> {
-    const response = await api.post(`/users/${userId}/friend-request/decline`, undefined, {
-        headers: authHeaders(),
-    })
+    const response = await api.post(`/users/${userId}/friend-request/decline`, undefined, {})
     return response.data
 }
 
 /** Desfaz a amizade. Qualquer um dos dois lados pode chamar. */
 async function removeFriend({ userId }: { userId: string }): Promise<RemoveFriendResponse> {
-    const response = await api.delete(`/users/${userId}/friend`, {
-        headers: authHeaders(),
-    })
+    const response = await api.delete(`/users/${userId}/friend`, {})
     return response.data
 }
 
@@ -85,9 +68,7 @@ async function getFriendshipStatus({
 }: {
     userId: string
 }): Promise<FriendshipStatusResponse> {
-    const response = await api.get(`/users/${userId}/friendship-status`, {
-        headers: authHeaders(),
-    })
+    const response = await api.get(`/users/${userId}/friendship-status`, {})
     return response.data
 }
 
@@ -100,9 +81,7 @@ async function getFriends({
     limit = 50,
     offset = 0,
 }: GetFriendsParams): Promise<FriendsResponse> {
-    const response = await api.get(`/users/${userId}/friends?limit=${limit}&offset=${offset}`, {
-        headers: authHeaders(),
-    })
+    const response = await api.get(`/users/${userId}/friends?limit=${limit}&offset=${offset}`, {})
     return response.data
 }
 
@@ -117,7 +96,6 @@ async function getFriendRequests({
 }: GetFriendRequestsParams = {}): Promise<FriendRequestsResponse> {
     const response = await api.get(
         `/account/friend-requests?direction=${direction}&limit=${limit}&offset=${offset}`,
-        { headers: authHeaders() },
     )
     return response.data
 }

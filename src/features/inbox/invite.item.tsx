@@ -156,7 +156,6 @@ export function InviteItem({ invite, placeholder }: InviteItemProps) {
                 <GlassView
                     colorScheme="dark"
                     style={glassContainer}
-                    colorScheme="dark"
                     glassEffectStyle="regular"
                     isInteractive={true}
                     tintColor={colors.gray.grey_09 + "90"}

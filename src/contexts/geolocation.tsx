@@ -187,7 +187,7 @@ export function Provider({ children }: GeolocationProviderProps) {
     // ---- Foreground --------------------------------------------------------
 
     const updateUserCoordinates = async (payload: UpdateCoordinatesPayload): Promise<void> => {
-        if (!session.user.id) return
+        if (!session.account.userId) return
         try {
             await updateCoords({
                 lat: String(payload.latitude),
@@ -206,7 +206,7 @@ export function Provider({ children }: GeolocationProviderProps) {
 
     const updateUserLocation = React.useCallback(
         async (force = false): Promise<void> => {
-            if (!session.user.id) throw new Error("User ID is not available")
+            if (!session.account.userId) throw new Error("User ID is not available")
 
             const fg = await Location.getForegroundPermissionsAsync()
             if (fg.status !== "granted") throw new Error("Location permission is not granted")
@@ -230,7 +230,7 @@ export function Provider({ children }: GeolocationProviderProps) {
                 setIsUpdating(false)
             }
         },
-        [session.user.id],
+        [session.account.userId],
     )
 
     const startLocationUpdateInterval = React.useCallback(() => {
@@ -264,7 +264,7 @@ export function Provider({ children }: GeolocationProviderProps) {
                 (prevState === "inactive" || prevState === "background") &&
                 nextState === "active"
             ) {
-                if (session.user.id && !isUpdating) {
+                if (session.account.userId && !isUpdating) {
                     updateUserLocation().catch((err) => {
                         console.warn("Falha ao atualizar localização ao voltar ao app:", err)
                     })
@@ -272,12 +272,12 @@ export function Provider({ children }: GeolocationProviderProps) {
             }
         })
         return () => subscription.remove()
-    }, [session.user.id, isUpdating, updateUserLocation])
+    }, [session.account.userId, isUpdating, updateUserLocation])
 
     // Liga/desliga o serviço conforme a sessão.
     React.useEffect(() => {
         const run = async () => {
-            if (!session.user.id) {
+            if (!session.account.userId) {
                 await unregisterBackgroundSync()
                 if (intervalRef.current) {
                     clearInterval(intervalRef.current)
@@ -303,17 +303,31 @@ export function Provider({ children }: GeolocationProviderProps) {
         }
 
         run()
-    }, [session.user.id, foregroundStatus])
+    }, [session.account.userId, foregroundStatus])
 
-    const contextValue: GeolocationContextsData = {
-        updateUserLocation: () => updateUserLocation(true),
-        isUpdating,
-        foregroundStatus,
-        canAskAgainForeground,
-        requestForegroundPermission,
-        openSettings,
-        refreshPermissions,
-    }
+    // A arrow inline em `updateUserLocation` era um segundo motivo de instabilidade: além
+    // de o objeto nascer novo a cada render, aquela função nascia nova junto — então nem
+    // memoizar o objeto bastaria sem envolvê-la.
+    const contextValue = React.useMemo<GeolocationContextsData>(
+        () => ({
+            updateUserLocation: () => updateUserLocation(true),
+            isUpdating,
+            foregroundStatus,
+            canAskAgainForeground,
+            requestForegroundPermission,
+            openSettings,
+            refreshPermissions,
+        }),
+        [
+            updateUserLocation,
+            isUpdating,
+            foregroundStatus,
+            canAskAgainForeground,
+            requestForegroundPermission,
+            openSettings,
+            refreshPermissions,
+        ],
+    )
 
     return (
         <GeolocationContext.Provider value={contextValue}>{children}</GeolocationContext.Provider>

@@ -1,5 +1,4 @@
-import { View, ViewStyle } from "react-native"
-import { Text } from "@/components/Themed"
+import { View, ViewStyle, Platform, Pressable } from "react-native"
 import { UserShow } from "@/components/user_show"
 import sizes from "@/constants/sizes"
 import { colors } from "@/constants/colors"
@@ -14,8 +13,6 @@ import {
     isGlassEffectAPIAvailable,
     isLiquidGlassAvailable,
 } from "expo-glass-effect"
-import { Platform } from "react-native"
-import { Pressable } from "react-native"
 import PersistedContext from "@/contexts/Persisted"
 import React from "react"
 import ProfileContext from "@/contexts/profile"
@@ -68,7 +65,6 @@ export function NotificationItem({ item }: NotificationItemProps) {
         session.account.addReadNotifications([String(item.id)])
 
         const targetId = String(item.actor.id)
-        const myId = String(session.user.id)
         const targetPath = `/profile/${targetId}`
         // Evitar navegação duplicada
         if (pathname === targetPath) return
@@ -102,7 +98,6 @@ export function NotificationItem({ item }: NotificationItemProps) {
                 <GlassView
                     colorScheme="dark"
                     style={glassContainer}
-                    colorScheme="dark"
                     glassEffectStyle="regular"
                     isInteractive={true}
                     tintColor={colors.gray.grey_09 + "90"}

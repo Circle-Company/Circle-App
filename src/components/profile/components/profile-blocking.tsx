@@ -1,12 +1,11 @@
 import React from "react"
-import { Animated, ViewStyle } from "react-native"
+import { Animated, ViewStyle, TextStyle } from "react-native"
 import sizes from "@/constants/sizes"
 import { colors } from "@/constants/colors"
 import { Text } from "@/components/Themed"
 import LanguageContext from "@/contexts/language"
 import ButtonStandart from "@/components/buttons/button-standart"
 import { useProfileContext } from "@/components/profile/profile-context"
-import { TextStyle } from "react-native"
 import fonts from "@/constants/fonts"
 import { useUnlockMutation } from "@/queries/user.block"
 
@@ -27,7 +26,6 @@ export function BlockingCard() {
         }
     }
 
-    const animatedScale = React.useRef(new Animated.Value(1)).current
     const animatedOpacity = React.useRef(new Animated.Value(0)).current
 
     function handleAnimation() {

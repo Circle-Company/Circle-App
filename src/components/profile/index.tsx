@@ -2,7 +2,6 @@ import main_root from "./components/roots/profile-main_root"
 import share from "./components/profile-share"
 import picture from "./components/profile-picture"
 import name from "./components/profile-name"
-import description from "./components/profile-description"
 import name_follow from "./components/profile-name-followers"
 import { FollowButton } from "./components/profile-follow"
 import { FriendButton } from "./components/profile-friend"
@@ -16,7 +15,6 @@ export const Profile = {
     NameFollow: name_follow,
     Follow: FollowButton,
     Friend: FriendButton,
-    Description: description,
     BlockingCard,
     BlockedByCard,
 }

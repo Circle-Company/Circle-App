@@ -8,8 +8,17 @@ import { useCardIllustrationSize } from "@/features/moments/card-illustration"
 import FeedContext from "@/contexts/Feed"
 import React from "react"
 import { router } from "expo-router"
-import { AppState, AppStateStatus, Platform } from "react-native"
-import { Image, ImageStyle, TextStyle, ViewStyle, View, Animated } from "react-native"
+import {
+    AppState,
+    AppStateStatus,
+    Platform,
+    Image,
+    ImageStyle,
+    TextStyle,
+    ViewStyle,
+    View,
+    Animated,
+} from "react-native"
 
 import {
     GlassContainer,
@@ -194,7 +203,6 @@ export function EmptyList() {
                     <GlassView
                         colorScheme="dark"
                         style={glassContainer}
-                        colorScheme="dark"
                         glassEffectStyle="regular"
                         isInteractive={true}
                         tintColor={colors.gray.black + 40}

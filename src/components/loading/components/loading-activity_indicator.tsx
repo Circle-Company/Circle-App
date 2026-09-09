@@ -1,5 +1,8 @@
 import Loading from "@/assets/icons/svgs/circle-spinner.svg"
-import { MotiView } from "@motify/components"
+// `moti`, não `@motify/components`: este último é o nome antigo do pacote (v0.18), estava
+// instalado em paralelo ao `moti@0.30` que o app já usa, e trazia tipos velhos de
+// `transition` — era daí que vinha o erro do `MotiTransitionProp`.
+import { MotiView } from "moti"
 import React from "react"
 import { ActivityIndicator } from "react-native"
 import ColorTheme from "../../../constants/colors"
@@ -10,7 +13,6 @@ export default function activity_indicator({
     size = 30,
     duration = 1000,
     color = ColorTheme().textDisabled.toString() + "50",
-    progress = 0,
 }: LoadingProps) {
     if (isIOS) {
         return (

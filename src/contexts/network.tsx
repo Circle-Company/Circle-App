@@ -1,9 +1,5 @@
-import WifiIcon from "@/assets/icons/svgs/wifi.svg"
-import WifiSlashIcon from "@/assets/icons/svgs/wifi_slash.svg"
 import { addNetworkStateListener, getNetworkStateAsync, NetworkStateType } from "expo-network"
-import { ReactNode, createContext, useContext, useEffect, useState } from "react"
-import { useToast } from "./Toast"
-import { colors } from "../constants/colors"
+import { ReactNode, createContext, useContext, useEffect, useMemo, useState } from "react"
 import LanguageContext from "./language"
 
 type NetworkProviderProps = { children: ReactNode }
@@ -69,7 +65,6 @@ export function Provider({ children }: NetworkProviderProps) {
     const [isInternetReachable, setIsInternetReachable] = useState<boolean | null>(null)
     const [appStarted, setAppStarted] = useState<boolean>(true)
     const { t } = useContext(LanguageContext)
-    const toast = useToast()
 
     useEffect(() => {
         let previousConnected: boolean | null = isConnected
@@ -116,31 +111,35 @@ export function Provider({ children }: NetworkProviderProps) {
             if (prevEffective !== currEffective) {
                 if (currEffective === false) {
                     // Foi para OFFLINE
-                    toast.show({
-                        title: t("You are Offline"),
-                        type: "error",
-                        duration: 1000,
-                        backgroundColor: colors.red.red_05,
-                        icon: (
-                            <WifiSlashIcon
-                                fill={colors.gray.white.toString()}
-                                width={12}
-                                height={12}
-                            />
-                        ),
-                    })
+                    /**
+                        toast.show({
+                            title: t("You are Offline"),
+                            type: "error",
+                            duration: 1000,
+                            backgroundColor: colors.red.red_05,
+                            icon: (
+                                <WifiSlashIcon
+                                    fill={colors.gray.white.toString()}
+                                    width={12}
+                                    height={12}
+                                />
+                            ),
+                        })
+                    */
                     setNetworkStatus("OFFLINE")
                 } else if (currEffective === true) {
                     // Voltou para ONLINE
-                    toast.show({
-                        title: t("Connected to Internet"),
-                        type: "success",
-                        duration: 1000,
-                        backgroundColor: colors.green.green_05,
-                        icon: (
-                            <WifiIcon fill={colors.gray.white.toString()} width={12} height={12} />
-                        ),
-                    })
+                    /**
+                        toast.show({
+                            title: t("Connected to Internet"),
+                            type: "success",
+                            duration: 1000,
+                            backgroundColor: colors.green.green_05,
+                            icon: (
+                                <WifiIcon fill={colors.gray.white.toString()} width={12} height={12} />
+                            ),
+                        })
+                    */
                     setNetworkStatus("ONLINE")
                 }
             } else {
@@ -150,30 +149,34 @@ export function Provider({ children }: NetworkProviderProps) {
                     currentReachable === true &&
                     currentConnected === true
                 ) {
-                    toast.show({
-                        title: t("Reconnecting..."),
-                        duration: 1000,
-                        backgroundColor: colors.yellow.yellow_05,
-                        icon: (
-                            <WifiSlashIcon
-                                fill={colors.gray.white.toString()}
-                                width={12}
-                                height={12}
-                            />
-                        ),
-                    })
+                    /**
+                        toast.show({
+                            title: t("Reconnecting..."),
+                            duration: 1000,
+                            backgroundColor: colors.yellow.yellow_05,
+                            icon: (
+                                <WifiSlashIcon
+                                    fill={colors.gray.white.toString()}
+                                    width={12}
+                                    height={12}
+                                />
+                            ),
+                        })
+                    */
                     setNetworkStatus("RECONNECTING")
                 }
             }
 
             // Handle UNKNOWN type change with neutral toast
             if (previousType !== currentType && currentType === NetworkStateType.UNKNOWN) {
-                toast.show({
-                    title: t("Reconnecting..."),
-                    duration: 1000,
-                    backgroundColor: colors.gray.grey_06,
-                    icon: <WifiIcon fill={colors.gray.white.toString()} width={12} height={12} />,
-                })
+                /**
+                    toast.show({
+                        title: t("Reconnecting..."),
+                        duration: 1000,
+                        backgroundColor: colors.gray.grey_06,
+                        icon: <WifiIcon fill={colors.gray.white.toString()} width={12} height={12} />,
+                    })
+                */
             }
 
             previousConnected = currentConnected
@@ -189,9 +192,9 @@ export function Provider({ children }: NetworkProviderProps) {
         }
     }, [t])
 
-    return (
-        <NetworkContext.Provider value={{ networkStats: networkStatus }}>
-            {children}
-        </NetworkContext.Provider>
-    )
+    // Sem o memo, o objeto inline nasce novo a cada render e propaga re-render para todo
+    // consumidor — inclusive quando o estado da rede não mudou.
+    const value = useMemo(() => ({ networkStats: networkStatus }), [networkStatus])
+
+    return <NetworkContext.Provider value={value}>{children}</NetworkContext.Provider>
 }

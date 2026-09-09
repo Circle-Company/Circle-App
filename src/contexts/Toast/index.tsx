@@ -16,7 +16,6 @@ import { setGlobalNotify } from "./notify"
 import { colors } from "@/constants/colors"
 import { Toast as StandartToast } from "./standart"
 
-const ENTER_DURATION = 220
 const EXIT_DURATION = 180
 const DISMISS_THRESHOLD = 40
 const TOP_OFFSET_IOS = 60

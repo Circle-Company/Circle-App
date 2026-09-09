@@ -1,5 +1,5 @@
 import React from "react"
-import { TextStyle, ViewStyle } from "react-native"
+import { TextStyle } from "react-native"
 
 export type userReciveDataProps = {
     id: string

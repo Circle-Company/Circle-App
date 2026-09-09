@@ -4,8 +4,6 @@ import ButtonStandart from "@/components/buttons/button-standart"
 import LanguageContext from "@/contexts/language"
 import sizes from "@/constants/sizes"
 import ColorTheme, { colors } from "@/constants/colors"
-import ProfileContext from "@/contexts/profile"
-import { useProfileContext } from "../profile-context"
 import fonts from "@/constants/fonts"
 import { TextStyle } from "react-native"
 
@@ -30,7 +28,6 @@ export function FollowButton({
     loading = false,
     disabled = false,
 }: FollowButtonProps) {
-    const { user } = useProfileContext()
     const { t } = React.useContext(LanguageContext)
 
     let displayTitleKey: Title
@@ -49,8 +46,6 @@ export function FollowButton({
 
     const label = t(displayTitleKey)
     const isDisabled = disabled || loading
-
-    function handleFollow() {}
 
     const labelStyle: TextStyle = {
         fontSize: fonts.size.title3 * 0.9,

@@ -27,14 +27,14 @@ export const useFeed = () => {
 
     // Criar instância do orchestrator com configurações
     const feedOrchestrator = useMemo(() => {
-        if (!session.account.jwtToken) return null
+        if (!session.account.userId) return null
 
-        return new FeedOrchestrator(session.account.jwtToken, maxCacheSize)
-    }, [session.account.jwtToken, maxCacheSize])
+        return new FeedOrchestrator(maxCacheSize)
+    }, [session.account.userId, maxCacheSize])
 
     const fetch = useCallback(
         async (isReloading = false) => {
-            if (!session.user || !feedOrchestrator) {
+            if (!session.account.userId || !feedOrchestrator) {
                 console.warn(
                     "Feed: waiting for session or feedManager; skipping fetch during auth/init grace",
                 )
@@ -66,7 +66,7 @@ export const useFeed = () => {
                 setLoading(false)
             }
         },
-        [feedData, session.user, period, resetTimer, feedOrchestrator],
+        [feedData, session.account, period, resetTimer, feedOrchestrator],
     )
 
     function setFocusedChunkItemFunc({ id }: { id: string }) {

@@ -17,8 +17,8 @@ export default function Picture({ fromProfile = false, hasOutline = true }: Prof
     const router = useRouter()
     const { session } = React.useContext(PersistedContext)
 
-    const sessionId = session?.user?.id != null ? String(session.user.id) : ""
-    const sessionUsername = (session?.user?.username ?? "").toLowerCase()
+    const sessionId = session?.account?.userId != null ? String(session.account.userId) : ""
+    const sessionUsername = (session?.account?.username ?? "").toLowerCase()
     const viewedId = user?.id != null ? String(user.id) : ""
     const viewedUsername = (user?.username ?? "").toLowerCase()
     const isOwnAccount =
@@ -39,7 +39,7 @@ export default function Picture({ fromProfile = false, hasOutline = true }: Prof
         justifyContent: "center",
         marginHorizontal: sizes.margins["1sm"],
         marginBottom:
-            user.interactions.isBlockedBy == false || user.interactions.isBlocking == false
+            user.interactions.isBlockedBy === false || user.interactions.isBlocking === false
                 ? sizes.margins["1md"]
                 : 0,
         width: Number(pictureDimensions.width) + outlineSize,

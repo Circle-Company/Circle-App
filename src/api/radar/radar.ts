@@ -1,5 +1,4 @@
 import api from "@/api"
-import { storage, storageKeys } from "@/store"
 import { RadarQuery, RadarResponse } from "./radar.types"
 
 async function getRadar({ latitude, longitude }: RadarQuery): Promise<RadarResponse> {
@@ -7,9 +6,6 @@ async function getRadar({ latitude, longitude }: RadarQuery): Promise<RadarRespo
         params: {
             latitude: String(latitude),
             longitude: String(longitude),
-        },
-        headers: {
-            Authorization: `Bearer ${storage.getString(storageKeys().account.jwt.token) || ""}`,
         },
     })
     return res.data

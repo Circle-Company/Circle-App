@@ -2,8 +2,6 @@ import React from "react"
 import { View, ViewStyle, Pressable, Platform } from "react-native"
 import { Text } from "@/components/Themed"
 import { UserShow } from "@/components/user_show"
-import { NotificationBadge } from "./notification.badge"
-import { NotificationText } from "./notification.text"
 import { NotificationType, type NotificationPayload } from "@/contexts/push.notification"
 import { colors } from "@/constants/colors"
 import fonts from "@/constants/fonts"
@@ -17,7 +15,6 @@ import {
 import { useRouter } from "expo-router"
 import PersistedContext from "@/contexts/Persisted"
 import ProfileContext from "@/contexts/profile"
-import NotificationTextToast from "./notification.text.toast"
 
 type NotificationToastProps = {
     item: NotificationPayload
@@ -67,7 +64,7 @@ export function NotificationToast({ item, onDismiss }: NotificationToastProps) {
     function handlePress() {
         onDismiss?.()
         const targetId = String(item.actor.id)
-        const myId = String(session?.user?.id)
+        const myId = String(session?.account?.userId)
         const isSelf = targetId === myId
         setProfilePreview({ id: targetId, username: String(item.actor.username || "") })
         setUserId(targetId)
@@ -130,7 +127,6 @@ export function NotificationToast({ item, onDismiss }: NotificationToastProps) {
                 <GlassView
                     colorScheme="dark"
                     style={glassContainer}
-                    colorScheme="dark"
                     glassEffectStyle="regular"
                     isInteractive={true}
                     tintColor={colors.gray.grey_09 + "99"}

@@ -29,8 +29,9 @@ export default function ExcludeAccountScreen() {
     }
 
     const handleDelete = async () => {
-        const token = session?.account?.jwtToken
-        if (!token) {
+        // Gate de sessão, não credencial: quem injeta o `Authorization` é o interceptor, a
+        // partir da sessão viva (§3.2). Sem conta carregada não há o que excluir.
+        if (!session?.account?.userId) {
             Alert.alert(t("Error"), t("It was not possible to authenticate your session."))
             return
         }
@@ -39,16 +40,15 @@ export default function ExcludeAccountScreen() {
             setLoading(true)
 
             // Solicitação de exclusão da conta
-            const res = await api.delete("/account", {
-                headers: { Authorization: `Bearer ${token}` },
-            })
+            await api.delete("/account")
 
-            // Limpeza local de sessão e dados persistidos
+            // Limpeza local de sessão e dados persistidos. Eram quatro chamadas porque
+            // `user` e `account` eram stores diferentes; agora são uma só, e `clear()` zera
+            // memória e storage numa operação.
             try {
-                session?.user?.remove?.()
-                session?.account?.remove?.()
-                session?.preferences?.remove?.()
-                session?.metrics?.remove?.()
+                session?.account?.clear?.()
+                // `preferences` NÃO é limpo: é escopo `device` (§2.2) e sobrevive à conta.
+                session?.metrics?.clear?.()
             } catch {}
 
             Alert.alert(

@@ -278,7 +278,9 @@ describe("Feed Provider", () => {
         it("deve ter todas as linhas necessárias", () => {
             const fs = require("fs")
             const indexContent = fs.readFileSync("src/contexts/Feed/index.tsx", "utf-8")
-            const lines = indexContent.split("\n")
+            // `require("fs")` devolve `any`, então sem esta anotação o `line` do filter
+            // abaixo fica implicitamente `any` e o strict reclama.
+            const lines: string[] = indexContent.split("\n")
 
             // Filtrar linhas não vazias
             const nonEmptyLines = lines.filter((line) => line.trim().length > 0)

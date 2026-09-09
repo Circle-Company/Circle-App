@@ -114,11 +114,19 @@ export const ROUTES = {
         USER: (userId: string) => `/profile/${userId}`,
     },
 
+    // Moment routes
+    //
+    // Faltava, e `navigateLegacy` já usava `ROUTES.MOMENT.DETAIL` — o grupo nunca existiu,
+    // então aquele ramo não compilava e, em runtime, teria lançado ao navegar para um
+    // momento pelo nome legado. A rota em si existe desde sempre (`app/moment/[id].tsx`).
+    MOMENT: {
+        DETAIL: (momentId: string) => `/moment/${momentId}`,
+    },
+
     // Settings routes
     SETTINGS: {
         INDEX: "/settings",
         PROFILE_PICTURE: "/settings/profile-picture",
-        DESCRIPTION: "/settings/description",
         FOLLOWINGS: "/settings/followings",
         NAME: "/settings/name",
         PRIVACY_POLICY: "/settings/privacy-policy",
@@ -162,7 +170,6 @@ export const LEGACY_ROUTE_MAP: Record<string, string> = {
     // Settings
     Settings: ROUTES.SETTINGS.INDEX,
     "Settings-ProfilePicture": ROUTES.SETTINGS.PROFILE_PICTURE,
-    "Settings-Description": ROUTES.SETTINGS.DESCRIPTION,
     "Settings-Followings": ROUTES.SETTINGS.FOLLOWINGS,
     "Settings-Name": ROUTES.SETTINGS.NAME,
     "Settings-Privacy-Policy": ROUTES.SETTINGS.PRIVACY_POLICY,

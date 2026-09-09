@@ -1,7 +1,7 @@
 import ColorTheme from "@/constants/colors"
 import React from "react"
 import type { ViewProps } from "react-native"
-import { StyleSheet, View } from "react-native"
+import { StyleSheet } from "react-native"
 import { Gesture, GestureDetector } from "react-native-gesture-handler"
 import Reanimated, {
     cancelAnimation,
@@ -193,7 +193,7 @@ const CaptureButtonComponent: React.FC<Props> = ({
             safeSetPressing(false)
             try {
                 await recorderRef.current?.stopRecording()
-            } catch (e) {
+            } catch {
                 // If stop fails, force-cleanup.
                 onStoppedRecording()
             } finally {
@@ -521,10 +521,7 @@ const CaptureButtonComponent: React.FC<Props> = ({
         if (!enabled) {
             return {
                 opacity: withTiming(0.3),
-                transform: [
-                    { scale: withSpring(0.6) },
-                    { translateY: withTiming(0) },
-                ],
+                transform: [{ scale: withSpring(0.6) }, { translateY: withTiming(0) }],
             }
         }
         const pressed = isPressingButton.value
@@ -578,10 +575,7 @@ const CaptureButtonComponent: React.FC<Props> = ({
         <GestureDetector gesture={composedGesture}>
             <Reanimated.View {...props} style={[buttonStyle, style]}>
                 <Reanimated.View style={styles.flex}>
-                    <Reanimated.View
-                        style={[styles.shadow, shadowStyle]}
-                        pointerEvents="none"
-                    >
+                    <Reanimated.View style={[styles.shadow, shadowStyle]} pointerEvents="none">
                         {/*
                           Purple recording indicator drawn as an SVG rect so
                           the rounded corners stay sharp while shadowStyle
@@ -590,10 +584,7 @@ const CaptureButtonComponent: React.FC<Props> = ({
                           layout size and blurs at the corners during the
                           spring; SVG re-renders each frame via CoreGraphics.
                         */}
-                        <Svg
-                            width={SHADOW_SIZE}
-                            height={SHADOW_SIZE}
-                        >
+                        <Svg width={SHADOW_SIZE} height={SHADOW_SIZE}>
                             <Rect
                                 x={0}
                                 y={0}
@@ -616,10 +607,7 @@ const CaptureButtonComponent: React.FC<Props> = ({
                           bitmap at layout size and blurs when upscaled; SVG
                           paths re-render each frame via CoreGraphics.
                         */}
-                        <Svg
-                            width={CAPTURE_BUTTON_SIZE}
-                            height={CAPTURE_BUTTON_SIZE}
-                        >
+                        <Svg width={CAPTURE_BUTTON_SIZE} height={CAPTURE_BUTTON_SIZE}>
                             <Circle
                                 cx={CAPTURE_BUTTON_SIZE / 2}
                                 cy={CAPTURE_BUTTON_SIZE / 2}

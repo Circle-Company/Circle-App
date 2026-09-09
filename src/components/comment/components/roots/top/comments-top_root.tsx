@@ -17,5 +17,5 @@ export default function TopRoot({ children }: CommentsTopRootProps) {
         paddingHorizontal: sizes.paddings["1md"] * 0.7,
     }
 
-    return <View style={container}>{preview && comment?.length == 0 ? null : children}</View>
+    return <View style={container}>{preview && comment?.length === 0 ? null : children}</View>
 }

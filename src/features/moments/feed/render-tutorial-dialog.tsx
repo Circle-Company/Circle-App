@@ -1,5 +1,5 @@
 import React from "react"
-import { Platform, View, StyleSheet, ViewStyle } from "react-native"
+import { Platform, View, StyleSheet } from "react-native"
 import { Text } from "@/components/Themed"
 import { colors } from "@/constants/colors"
 import sizes from "@/constants/sizes"
@@ -156,7 +156,6 @@ export function TutorialDialog() {
                     <GlassView
                         colorScheme="dark"
                         style={styles.glassContainer}
-                        colorScheme="dark"
                         glassEffectStyle="regular"
                         isInteractive={true}
                         tintColor={colors.gray.grey_09 + "50"}

@@ -1,17 +1,14 @@
 import React from "react"
-import { StyleSheet, View } from "react-native"
-import { useRouter } from "expo-router"
-import { useFocusEffect } from "expo-router"
+import { StyleSheet, View, TextStyle } from "react-native"
+import { useRouter, useFocusEffect } from "expo-router"
 import { LinearGradient } from "expo-linear-gradient"
 import { Text } from "@/components/Themed"
 import { colors } from "@/constants/colors"
 import sizes from "@/constants/sizes"
 
 import useAppPermissions, { PermissionStatus } from "@/lib/hooks/useAppPermissions"
-import { useToast } from "@/contexts/Toast"
-import { usePreferencesStore } from "@/contexts/Persisted/persist.preferences"
+import { usePreferencesStore } from "@/contexts/Persisted/preferences"
 import PermissionCard from "@/components/permission/permission.card"
-import { TextStyle } from "react-native"
 import ButtonStandart from "@/components/buttons/button-standart"
 import fonts from "@/constants/fonts"
 import { NotificationBadge } from "@/components/notification/notification.badge"
@@ -30,10 +27,9 @@ export default function PermissionsWizardScreen() {
         (s) => s.setOnboardingPermissionsCompleted,
     )
 
-    const { items, refresh, requestOne, hasMissingRequired, requiredMissingIds, openSettings } =
-        useAppPermissions({
-            required: ["locationForeground", "pushNotifications"],
-        })
+    const { items, refresh, requestOne, hasMissingRequired } = useAppPermissions({
+        required: ["locationForeground", "pushNotifications"],
+    })
 
     const [stepIndex, setStepIndex] = React.useState(0)
     const totalSteps = STEPS.length

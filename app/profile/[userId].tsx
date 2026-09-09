@@ -10,7 +10,6 @@ import {
 import React, { useState, useEffect, useMemo } from "react"
 import Animated, { FadeIn, FadeOut } from "react-native-reanimated"
 import ProfileContext from "@/contexts/profile"
-import PersistedContext from "@/contexts/Persisted"
 import { RenderProfileSkeleton } from "@/features/profile/profile.skeleton"
 import { ProfileHeader } from "@/features/profile"
 import { ProfileReportModal } from "@/features/profile/profile.report.modal"
@@ -44,7 +43,6 @@ export default function ProfileScreen() {
         showReportModal,
         setShowReportModal,
     } = React.useContext(ProfileContext)
-    const { session } = React.useContext(PersistedContext)
     const { cleanProfile } = React.useContext(ProfileContext)
     const { t } = React.useContext(LanguageContext)
     const { userId } = useLocalSearchParams<{ userId: string }>()
@@ -87,7 +85,6 @@ export default function ProfileScreen() {
             id: profile.id,
             username: profile.username,
             name: profile.name ?? null,
-            description: profile.description ?? null,
             profilePicture: profile.profilePicture ?? null,
             status: { verified: !!profile.status?.verified },
             metrics: {
@@ -220,236 +217,237 @@ export default function ProfileScreen() {
 
     return (
         <>
-        <Stack.Screen
-            options={{
-                headerShown: true,
-                headerTransparent: true,
-                headerTitleAlign: "center",
-                headerLargeTitle: false,
-                headerLargeTitleShadowVisible: false,
-                headerShadowVisible: false,
-                headerStyle: { backgroundColor: "transparent" },
-                headerTintColor: colors.gray.white,
-                headerTitleStyle: {
-                    fontFamily: fonts.family["Black-Italic"],
-                    fontSize: fonts.size.title2 * 0.9,
-                    color: colors.gray.white,
-                },
-                headerTitle: usernameTitle,
-                headerBackTitle: t("Back"),
-                headerRight: () => <ProfileOptionsDropDownMenuIOS profile={profile} />,
-            }}
-        />
-        <FlatList
-            data={normalizedMoments}
-            numColumns={NUM_COLUMNS}
-            showsVerticalScrollIndicator={false}
-            showsHorizontalScrollIndicator={false}
-            alwaysBounceVertical={true}
-            bounces={true}
-            columnWrapperStyle={{ justifyContent: "flex-start", marginBottom: SPACING }}
-            contentContainerStyle={{
-                paddingHorizontal: SPACING,
-                backgroundColor: "#000",
-                flexGrow: 1,
-            }}
-            keyExtractor={(item: any) => item.id}
-            refreshControl={
-                <RefreshControl
-                    refreshing={refreshing}
-                    onRefresh={handleRefresh}
-                    tintColor={colors.gray.grey_04}
-                    colors={[colors.gray.grey_04]}
-                    progressViewOffset={sizes.headers.height * 1.45}
-                />
-            }
-            ListHeaderComponent={
-                <>
-                    <View
-                        style={{
-                            paddingTop:
-                                iOSMajorVersion! >= 26
-                                    ? sizes.headers.height * 1.6
-                                    : sizes.headers.height * 1.2,
-                        }}
+            <Stack.Screen
+                options={{
+                    headerShown: true,
+                    headerTransparent: true,
+                    headerTitleAlign: "center",
+                    headerLargeTitle: false,
+                    headerLargeTitleShadowVisible: false,
+                    headerShadowVisible: false,
+                    headerStyle: { backgroundColor: "transparent" },
+                    headerTintColor: colors.gray.white,
+                    headerTitleStyle: {
+                        fontFamily: fonts.family["Black-Italic"],
+                        fontSize: fonts.size.title2 * 0.9,
+                        color: colors.gray.white,
+                    },
+                    headerTitle: usernameTitle,
+                    headerBackTitle: t("Back"),
+                    headerRight: () => <ProfileOptionsDropDownMenuIOS profile={profile} />,
+                }}
+            />
+            <FlatList
+                data={normalizedMoments}
+                numColumns={NUM_COLUMNS}
+                showsVerticalScrollIndicator={false}
+                showsHorizontalScrollIndicator={false}
+                alwaysBounceVertical={true}
+                bounces={true}
+                columnWrapperStyle={{ justifyContent: "flex-start", marginBottom: SPACING }}
+                contentContainerStyle={{
+                    paddingHorizontal: SPACING,
+                    backgroundColor: "#000",
+                    flexGrow: 1,
+                }}
+                keyExtractor={(item: any) => item.id}
+                refreshControl={
+                    <RefreshControl
+                        refreshing={refreshing}
+                        onRefresh={handleRefresh}
+                        tintColor={colors.gray.grey_04}
+                        colors={[colors.gray.grey_04]}
+                        progressViewOffset={sizes.headers.height * 1.45}
                     />
-                    {loading || !user ? (
-                        <Animated.View
-                            key="skeleton"
-                            entering={FadeIn.duration(200)}
-                            exiting={FadeOut.duration(220)}
-                        >
-                            <RenderProfileSkeleton />
-                        </Animated.View>
-                    ) : (
-                        <Animated.View
-                            key="header"
-                            entering={FadeIn.duration(320).delay(80)}
-                            exiting={FadeOut.duration(180)}
-                        >
-                            <ProfileHeader
-                                user={user as any}
-                                isAccount={false}
-                                totalMoments={user.metrics.totalMomentsCreated}
-                                lastUpdateDate={lastCreatedAt ?? new Date()}
-                            />
-                        </Animated.View>
-                    )}
-                </>
-            }
-            renderItem={({ item }) => {
-                if (!isOnline) return null
-                else if (user?.interactions?.isBlocking) return null
-                else if (user?.interactions?.isBlockedBy) return null
-                else
-                    return (
+                }
+                ListHeaderComponent={
+                    <>
                         <View
                             style={{
-                                width: ITEM_SIZE,
-                                marginRight: SPACING,
-                                borderRadius: sizes.moment.small.borderRadius * 0.7,
-                                borderWidth: iOSMajorVersion! >= 26 ? 0 : 1,
-                                borderColor:
-                                    iOSMajorVersion! >= 26 ? "#00000000" : colors.gray.grey_09,
-                                overflow: "hidden",
+                                paddingTop:
+                                    iOSMajorVersion! >= 26
+                                        ? sizes.headers.height * 1.6
+                                        : sizes.headers.height * 1.2,
                             }}
-                        >
-                            <Link
-                                href={{
-                                    pathname: "/profile/moment/[momentId]",
-                                    params: { momentId: String(item.id) },
-                                }}
-                                push
-                                asChild
+                        />
+                        {loading || !user ? (
+                            <Animated.View
+                                key="skeleton"
+                                entering={FadeIn.duration(200)}
+                                exiting={FadeOut.duration(220)}
                             >
-                                <Pressable>
-                                    {/* Mesma transição de zoom da tela de conta.
+                                <RenderProfileSkeleton />
+                            </Animated.View>
+                        ) : (
+                            <Animated.View
+                                key="header"
+                                entering={FadeIn.duration(320).delay(80)}
+                                exiting={FadeOut.duration(180)}
+                            >
+                                <ProfileHeader
+                                    user={user as any}
+                                    isAccount={false}
+                                    totalMoments={user.metrics.totalMomentsCreated}
+                                    lastUpdateDate={lastCreatedAt ?? new Date()}
+                                />
+                            </Animated.View>
+                        )}
+                    </>
+                }
+                renderItem={({ item }) => {
+                    if (!isOnline) return null
+                    else if (user?.interactions?.isBlocking) return null
+                    else if (user?.interactions?.isBlockedBy) return null
+                    else
+                        return (
+                            <View
+                                style={{
+                                    width: ITEM_SIZE,
+                                    marginRight: SPACING,
+                                    borderRadius: sizes.moment.small.borderRadius * 0.7,
+                                    borderWidth: iOSMajorVersion! >= 26 ? 0 : 1,
+                                    borderColor:
+                                        iOSMajorVersion! >= 26 ? "#00000000" : colors.gray.grey_09,
+                                    overflow: "hidden",
+                                }}
+                            >
+                                <Link
+                                    href={{
+                                        pathname: "/profile/moment/[momentId]",
+                                        params: { momentId: String(item.id) },
+                                    }}
+                                    push
+                                    asChild
+                                >
+                                    <Pressable>
+                                        {/* Mesma transição de zoom da tela de conta.
                                         O AppleZoom monta apenas UM filho nativo,
                                         daí a View única envolvendo o momento. */}
-                                    <Link.AppleZoom>
-                                        <View>
-                                            <Moment.Root.Main
-                                                size={{
-                                                    ...sizes.moment.small,
-                                                    width: ITEM_SIZE,
-                                                    height: ITEM_SIZE * sizes.moment.aspectRatio,
-                                                    borderRadius:
-                                                        sizes.moment.small.borderRadius * 0.7,
-                                                }}
-                                                isFeed={false}
-                                                isFocused={true}
-                                                data={item}
-                                                shadow={{ top: false, bottom: true }}
-                                            >
-                                                <ProfileDropDownMenuIOS>
-                                                    <Moment.Container
-                                                        contentRender={item.media}
-                                                        isFocused={true}
-                                                        loading={false}
-                                                        blurRadius={0}
-                                                        forceMute={true}
-                                                        showSlider={false}
-                                                        disableCache={false}
-                                                        disableWatch={true}
-                                                    >
-                                                        <Moment.Root.Center />
-                                                        <Moment.Root.Bottom>
-                                                            <View
-                                                                style={{
-                                                                    marginLeft: 5,
-                                                                    marginBottom: 2,
-                                                                }}
-                                                            >
+                                        <Link.AppleZoom>
+                                            <View>
+                                                <Moment.Root.Main
+                                                    size={{
+                                                        ...sizes.moment.small,
+                                                        width: ITEM_SIZE,
+                                                        height:
+                                                            ITEM_SIZE * sizes.moment.aspectRatio,
+                                                        borderRadius:
+                                                            sizes.moment.small.borderRadius * 0.7,
+                                                    }}
+                                                    isFeed={false}
+                                                    isFocused={true}
+                                                    data={item}
+                                                    shadow={{ top: false, bottom: true }}
+                                                >
+                                                    <ProfileDropDownMenuIOS>
+                                                        <Moment.Container
+                                                            contentRender={item.media}
+                                                            isFocused={true}
+                                                            loading={false}
+                                                            blurRadius={0}
+                                                            forceMute={true}
+                                                            showSlider={false}
+                                                            disableCache={false}
+                                                            disableWatch={true}
+                                                        >
+                                                            <Moment.Root.Center />
+                                                            <Moment.Root.Bottom>
                                                                 <View
                                                                     style={{
-                                                                        alignSelf: "flex-start",
-                                                                        marginBottom: 4,
+                                                                        marginLeft: 5,
+                                                                        marginBottom: 2,
                                                                     }}
                                                                 >
-                                                                    <Moment.LikeButtonIOS
-                                                                        isLiked={false}
-                                                                        size={44}
-                                                                    />
+                                                                    <View
+                                                                        style={{
+                                                                            alignSelf: "flex-start",
+                                                                            marginBottom: 4,
+                                                                        }}
+                                                                    >
+                                                                        <Moment.LikeButtonIOS
+                                                                            isLiked={false}
+                                                                            size={44}
+                                                                        />
+                                                                    </View>
+                                                                    <Moment.Date />
                                                                 </View>
-                                                                <Moment.Date />
-                                                            </View>
-                                                        </Moment.Root.Bottom>
-                                                    </Moment.Container>
-                                                </ProfileDropDownMenuIOS>
-                                            </Moment.Root.Main>
-                                        </View>
-                                    </Link.AppleZoom>
-                                </Pressable>
-                            </Link>
-                        </View>
-                    )
-            }}
-            onEndReached={async () => {
-                await handleLoadMore()
-            }}
-            onEndReachedThreshold={0.5}
-            ListFooterComponent={() => {
-                if (user?.interactions?.isBlocking) return null
-                if (user?.interactions?.isBlockedBy) return null
-                if (!isOnline) {
-                    return <OfflineCard />
-                }
-                if (isLoadingMoments) {
-                    return (
-                        <View
-                            style={{
-                                paddingVertical: sizes.paddings["1md"],
-                                alignItems: "center",
-                            }}
-                        >
-                            <ActivityIndicator
-                                style={{ transform: [{ scale: 1.4 }] }}
-                                color="#888"
-                            />
-                        </View>
-                    )
-                } else if (!isLoadingMoments && !hasMoreMoments && moments.length === 0) {
-                    return (
-                        <View
-                            style={{
-                                paddingVertical: sizes.paddings["1md"],
-                                alignItems: "center",
-                            }}
-                        >
-                            <NoMoments />
-                        </View>
-                    )
-                } else if (!hasMoreMoments) {
-                    return (
-                        <View
-                            style={{
-                                paddingVertical: sizes.paddings["1md"],
-                                alignItems: "center",
-                            }}
-                        >
-                            <Text
+                                                            </Moment.Root.Bottom>
+                                                        </Moment.Container>
+                                                    </ProfileDropDownMenuIOS>
+                                                </Moment.Root.Main>
+                                            </View>
+                                        </Link.AppleZoom>
+                                    </Pressable>
+                                </Link>
+                            </View>
+                        )
+                }}
+                onEndReached={async () => {
+                    await handleLoadMore()
+                }}
+                onEndReachedThreshold={0.5}
+                ListFooterComponent={() => {
+                    if (user?.interactions?.isBlocking) return null
+                    if (user?.interactions?.isBlockedBy) return null
+                    if (!isOnline) {
+                        return <OfflineCard />
+                    }
+                    if (isLoadingMoments) {
+                        return (
+                            <View
                                 style={{
-                                    color: colors.gray.grey_04,
-                                    fontFamily: fonts.family.Semibold,
-                                    fontStyle: "italic",
+                                    paddingVertical: sizes.paddings["1md"],
+                                    alignItems: "center",
                                 }}
                             >
-                                No more moments
-                            </Text>
-                        </View>
-                    )
-                }
-            }}
-        />
-        <SwiftBottomSheet
-            snapPoints={[1]}
-            isOpened={showReportModal}
-            onIsOpenedChange={(opened) => {
-                if (!opened) setShowReportModal(false)
-            }}
-        >
-            <ProfileReportModal />
-        </SwiftBottomSheet>
+                                <ActivityIndicator
+                                    style={{ transform: [{ scale: 1.4 }] }}
+                                    color="#888"
+                                />
+                            </View>
+                        )
+                    } else if (!isLoadingMoments && !hasMoreMoments && moments.length === 0) {
+                        return (
+                            <View
+                                style={{
+                                    paddingVertical: sizes.paddings["1md"],
+                                    alignItems: "center",
+                                }}
+                            >
+                                <NoMoments />
+                            </View>
+                        )
+                    } else if (!hasMoreMoments) {
+                        return (
+                            <View
+                                style={{
+                                    paddingVertical: sizes.paddings["1md"],
+                                    alignItems: "center",
+                                }}
+                            >
+                                <Text
+                                    style={{
+                                        color: colors.gray.grey_04,
+                                        fontFamily: fonts.family.Semibold,
+                                        fontStyle: "italic",
+                                    }}
+                                >
+                                    No more moments
+                                </Text>
+                            </View>
+                        )
+                    }
+                }}
+            />
+            <SwiftBottomSheet
+                snapPoints={[1]}
+                isOpened={showReportModal}
+                onIsOpenedChange={(opened) => {
+                    if (!opened) setShowReportModal(false)
+                }}
+            >
+                <ProfileReportModal />
+            </SwiftBottomSheet>
         </>
     )
 }

@@ -11,5 +11,5 @@ export type SettingsiItemObjectProps = {
 }
 export type SettignsSectionProps = {
     name: string
-    content: Array<SettingsiItemObjectProps>
+    content: SettingsiItemObjectProps[]
 }

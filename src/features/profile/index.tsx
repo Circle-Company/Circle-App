@@ -24,9 +24,6 @@ export function ProfileHeader({
         paddingTop: iOSMajorVersion! >= 26 ? 0 : sizes.paddings["2sm"],
         alignItems: "center",
     }
-    const name_container: ViewStyle = {
-        paddingTop: sizes.paddings["1sm"],
-    }
 
     if (!user) return null
 
@@ -51,7 +48,6 @@ export function ProfileHeader({
             </View>
             {user.interactions?.isBlocking && isAccount === false && <Profile.BlockingCard />}
             {user.interactions?.isBlockedBy && isAccount === false && <Profile.BlockedByCard />}
-            {/**user?.description && <Profile.Description />**/}
             {typeof totalMoments === "number" &&
                 lastUpdateDate &&
                 user.interactions.isBlockedBy === false &&

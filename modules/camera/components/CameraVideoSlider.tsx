@@ -1,5 +1,5 @@
 import React, { useEffect, useRef } from "react"
-import { Animated, View, Text, ViewStyle } from "react-native"
+import { Animated, View, ViewStyle } from "react-native"
 import { colors } from "@/constants/colors"
 import sizes from "@/constants/sizes"
 
@@ -12,12 +12,6 @@ interface CameraVideoSliderProps {
     width?: number
     currentTime?: number // tempo atual do vídeo, opcional
     inline?: boolean // quando true, não usa posicionamento absoluto interno
-}
-
-function formatCurrentTime(sec: number): string {
-    // Formato: 0X (dois dígitos inteiros de 00 a 30)
-    const seconds = Math.floor(sec)
-    return seconds.toString().padStart(2, "0")
 }
 
 export default function CameraVideoSlider({
@@ -92,20 +86,6 @@ export default function CameraVideoSlider({
         borderRadius: 3,
         left: 0,
         position: "absolute",
-    }
-
-    const timeRow: ViewStyle = {
-        flexDirection: "row",
-        justifyContent: "space-between",
-        alignItems: "center",
-        marginBottom: 2,
-        paddingHorizontal: 2,
-    }
-
-    const timeTextStyle = {
-        color: colors.gray.white,
-        fontSize: 15,
-        fontWeight: "bold",
     }
 
     const progressWidth = progressAnim.interpolate({

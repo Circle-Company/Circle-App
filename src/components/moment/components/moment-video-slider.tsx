@@ -1,4 +1,4 @@
-import { Animated, View, ViewStyle, Platform } from "react-native"
+import { Animated, View, ViewStyle } from "react-native"
 import React, { useEffect, useRef } from "react"
 
 import { colors } from "../../../constants/colors"

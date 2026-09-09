@@ -34,7 +34,7 @@ export function useActions(momentId?: string): MomentActionsState {
     // Função para enviar interação para o servidor
     const registerInteraction = React.useCallback(
         async <T extends InteractionType>(interactionType: T, data?: InteractionPayload<T>) => {
-            if (!momentId || !session.account.jwtToken) {
+            if (!momentId || !session.account.userId) {
                 console.warn("MomentId ou token não disponível para enviar interação")
                 return false
             }
@@ -42,12 +42,11 @@ export function useActions(momentId?: string): MomentActionsState {
             try {
                 const baseParams = {
                     momentId,
-                    authorizationToken: session.account.jwtToken,
                 }
 
                 switch (interactionType) {
                     case "LIKE": {
-                        if (!like && initialLikedState == false)
+                        if (!like && initialLikedState === false)
                             await apiRoutes.moment.actions.like(baseParams).then(() => {
                                 setLike(true)
                             })
@@ -93,7 +92,22 @@ export function useActions(momentId?: string): MomentActionsState {
                         break
                     }
                     case "EXCLUDE": {
-                        if (momentId == session.user.id) {
+                        /*
+                         * ⚠️ Esta guarda compara o id do MOMENT com o id do USUÁRIO — dois
+                         * Snowflakes de coisas diferentes, que nunca vão ser iguais. Ou seja,
+                         * o `exclude` abaixo é inalcançável.
+                         *
+                         * Só não causa dano porque nada chama `registerInteraction("EXCLUDE")`:
+                         * quem apaga um momento hoje é `apiRoutes.moment.author.exclude`,
+                         * chamado direto em `app/(tabs)/you/index.tsx`.
+                         *
+                         * A guarda correta seria comparar o **dono do momento** com o usuário
+                         * logado, mas `useActions(momentId)` não recebe o dono — só o id do
+                         * momento. Corrigir de verdade exige passar essa informação para cá, o
+                         * que é decisão de quem for reativar o fluxo. O `===` aqui não muda
+                         * nada: com `==` a condição já era sempre falsa.
+                         */
+                        if (String(momentId) === String(session.account.userId)) {
                             await apiRoutes.moment.author.exclude({
                                 ...baseParams,
                             })
@@ -118,7 +132,7 @@ export function useActions(momentId?: string): MomentActionsState {
                 return false
             }
         },
-        [momentId, session.account.jwtToken],
+        [momentId, session.account.userId],
     )
 
     function get(): actionsProps {

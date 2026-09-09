@@ -10,12 +10,11 @@ import React, {
 import { usePathname } from "expo-router"
 import * as Notifications from "expo-notifications"
 import * as Device from "expo-device"
-import { Platform } from "react-native"
 import { Vibrate } from "@/lib/hooks/useHapticFeedback"
 import { useToast } from "@/contexts/Toast"
 
 import { safeSet, storageKeys, storage } from "../store"
-import { useAccountStore } from "./Persisted/persist.account"
+import { useAccountStore } from "./Persisted/account"
 import {
     useSetPushTokenMutation,
     useReadAllNotificationsMutation,
@@ -112,7 +111,7 @@ const PushNotificationContext = createContext<PushNotificationContextValue | und
 // Helpers
 // ──────────────────────────────────────────────────────────────────────────────
 const keys = storageKeys()
-export const EXPO_PUSH_TOKEN_KEY = keys.baseKey + "notifications:expopushtoken"
+export const EXPO_PUSH_TOKEN_KEY = `${keys.baseKey}notifications:expopushtoken` as const
 
 const getExpoDeviceId = (): string =>
     Device.osBuildId ??
@@ -252,14 +251,18 @@ export const PushNotificationProvider: React.FC<{ children: React.ReactNode }> =
     })
 
     useEffect(() => {
-        const incoming = notifData?.notifications ?? []
+        // `AccountNotification` (o que a API devolve) e `NotificationPayload` (o que a lista
+        // renderiza) não são a mesma forma — faltam `actor`, `title`, `description` e `type`.
+        // O cast já existia, espalhado: um `as any` num ramo e um spread sem cast no outro,
+        // que era o que não compilava. Fica um só, na fronteira, para a lacuna ter um lugar.
+        const incoming = (notifData?.notifications ?? []) as unknown as NotificationPayload[]
         const isPaging =
             (queryParams.cursor != null && queryParams.cursor !== "") ||
             (typeof queryParams.offset === "number" && queryParams.offset > 0)
 
         if (!isPaging) {
             if (incoming.length === 0 && (notifRefetching || notifLoading)) return
-            setItems(incoming as any)
+            setItems(incoming)
             setUnreadBoost(0)
             return
         }

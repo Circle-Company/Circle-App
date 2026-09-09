@@ -36,7 +36,6 @@ export interface Moment {
     duration: number
     size: string
     hasAudio: boolean
-    description: string
     ageRestriction: boolean
     contentWarning: boolean
     metrics: {

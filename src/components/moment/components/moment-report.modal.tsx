@@ -175,7 +175,7 @@ export function MomentReportModal() {
                             Vibrate("notificationSuccess")
                             toast.success("Report sent successfully!")
                             setSelectedReportId(null)
-                        } catch (e) {
+                        } catch {
                             options.setShowReportModal(false)
                             Vibrate("notificationError")
                             toast.error("Error sending report")

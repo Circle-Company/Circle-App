@@ -9,8 +9,3 @@ export interface signWithAppleProps {
     realUserStatus: number
     user: string
 }
-
-export type refreshTokenProps = {
-    id: string
-    username: string
-}

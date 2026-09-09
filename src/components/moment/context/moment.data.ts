@@ -1,6 +1,4 @@
 import React from "react"
-import type { AxiosError } from "axios"
-import PersistedContext from "../../../contexts/Persisted"
 import api from "../../../api"
 import { CommentsReciveDataProps } from "../../comment/comments-types"
 import { Moment } from "@/contexts/Feed/types"
@@ -14,39 +12,19 @@ export interface MomentDataState {
 export function useData(): MomentDataState {
     const [data, setData] = React.useState<Moment>({} as Moment)
     const [comments, setComments] = React.useState<CommentsReciveDataProps>([])
-    const { session } = React.useContext(PersistedContext)
 
     async function getComments({ page, pageSize }: { page: number; pageSize: number }) {
         const momentId = data.id
         if (!momentId) throw new Error("Moment id is missing")
 
-        const token = session?.account?.jwtToken
-        const params = { page, pageSize }
-
-        const request = (authorization?: string) =>
-            api.get(`/moments/${momentId}/comments`, {
-                params,
-                headers: authorization ? { Authorization: authorization } : undefined,
-            })
-
-        let res: any
-
-        try {
-            // 1) Tenta com token cru (padrão do backend)
-            res = await request(token || undefined)
-        } catch (e) {
-            const err = e as AxiosError
-            const status = (err.response as any)?.status
-            // 2) Se 401, tenta novamente com Bearer
-            if (status === 401 && token) {
-                const bearer = token.startsWith("Bearer ") ? token : `Bearer ${token}`
-                res = await request(bearer)
-            } else {
-                // Outros erros: propaga
-                console.error("getComments error (first attempt):", err)
-                throw err
-            }
-        }
+        // Aqui havia uma tentativa com o token "cru" e, no 401, um retry com `Bearer`. A
+        // dança existia porque o formato do header era ambíguo — e hoje não é: o
+        // interceptor injeta `Bearer <access token>` a partir da sessão viva (§3.2). Manter
+        // o retry só gastaria uma das duas tentativas de auth da request (§5.4) para
+        // reenviar exatamente o mesmo header.
+        const res = await api.get(`/moments/${momentId}/comments`, {
+            params: { page, pageSize },
+        })
 
         const received = Array.isArray(res?.data?.comments) ? res.data.comments : []
         if (page === 1) setComments(received)

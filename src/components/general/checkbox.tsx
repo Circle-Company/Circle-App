@@ -20,6 +20,12 @@ import Animated, {
 import { colors } from "@/constants/colors"
 import { Vibrate } from "@/lib/hooks/useHapticFeedback"
 import { Host, Button } from "@expo/ui/swift-ui"
+import {
+    buttonStyle,
+    controlSize,
+    disabled as disabledModifier,
+    tint as tintModifier,
+} from "@expo/ui/swift-ui/modifiers"
 
 export interface CheckboxProps {
     // Controlled value. If provided, component becomes controlled
@@ -94,48 +100,9 @@ export const Checkbox: React.FC<CheckboxProps> = ({
         [disabled, isControlled, onChange],
     )
 
-    // iOS SwiftUI variant using Button + systemImage
-    if (Platform.OS === "ios") {
-        const systemImage = resolvedChecked ? "checkmark.square.fill" : "square"
-        const tint = disabled
-            ? isDarkMode
-                ? colors.gray.grey_06.toString()
-                : colors.gray.grey_03.toString()
-            : accentColor
-
-        return (
-            <View style={[styles.row, { opacity: disabled ? 0.8 : 1 }, style]}>
-                <Host colorScheme="dark" matchContents>
-                    <Button
-                        testID={testID}
-                        systemImage={systemImage}
-                        color={tint}
-                        disabled={disabled}
-                        variant="plain"
-                        controlSize="regular"
-                        onPress={() => toggle(!resolvedChecked)}
-                    />
-                </Host>
-                {label ? (
-                    <Pressable onPress={() => toggle(!resolvedChecked)} disabled={disabled}>
-                        <Text
-                            style={[
-                                {
-                                    color: isDarkMode ? colors.gray.white : colors.gray.black,
-                                    marginLeft: 6,
-                                },
-                                labelStyle,
-                            ]}
-                        >
-                            {label}
-                        </Text>
-                    </Pressable>
-                ) : null}
-            </View>
-        )
-    }
-
-    // Android / Others: Animated fallback
+    // Os dois `useAnimatedStyle` ficam ACIMA do early return de iOS. Estavam depois dele,
+    // e um hook após um `return` condicional muda a ordem dos hooks entre renders — que a
+    // plataforma não mude em runtime não torna o padrão correto, só esconde a consequência.
     const trackStyle = useAnimatedStyle(() => {
         const bg = interpolateColor(
             progress.value,
@@ -161,6 +128,53 @@ export const Checkbox: React.FC<CheckboxProps> = ({
             opacity,
         }
     })
+
+    // iOS SwiftUI variant using Button + systemImage
+    if (Platform.OS === "ios") {
+        const systemImage = resolvedChecked ? "checkmark.square.fill" : "square"
+        const tint = disabled
+            ? isDarkMode
+                ? colors.gray.grey_06.toString()
+                : colors.gray.grey_03.toString()
+            : accentColor
+
+        return (
+            <View style={[styles.row, { opacity: disabled ? 0.8 : 1 }, style]}>
+                <Host colorScheme="dark" matchContents>
+                    {/* SDK 56: `color`, `disabled`, `variant` e `controlSize` deixaram de ser props
+                        do `Button` e viraram modifiers. */}
+                    <Button
+                        testID={testID}
+                        systemImage={systemImage}
+                        modifiers={[
+                            tintModifier(tint),
+                            disabledModifier(disabled),
+                            buttonStyle("plain"),
+                            controlSize("regular"),
+                        ]}
+                        onPress={() => toggle(!resolvedChecked)}
+                    />
+                </Host>
+                {label ? (
+                    <Pressable onPress={() => toggle(!resolvedChecked)} disabled={disabled}>
+                        <Text
+                            style={[
+                                {
+                                    color: isDarkMode ? colors.gray.white : colors.gray.black,
+                                    marginLeft: 6,
+                                },
+                                labelStyle,
+                            ]}
+                        >
+                            {label}
+                        </Text>
+                    </Pressable>
+                ) : null}
+            </View>
+        )
+    }
+
+    // Android / Others: Animated fallback
 
     const rowDisabled = disabled
         ? isDarkMode

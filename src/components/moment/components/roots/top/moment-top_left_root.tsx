@@ -1,7 +1,6 @@
 import React from "react"
-import { View } from "react-native"
+import { View, ViewStyle } from "react-native"
 import { MomentTopLeftRootProps } from "../../../moment-types"
-import { ViewStyle } from "react-native"
 import sizes from "@/constants/sizes"
 
 export default function top_left_root({ children }: MomentTopLeftRootProps) {

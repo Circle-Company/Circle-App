@@ -101,30 +101,11 @@ export const SkeletonView: React.FC<SkeletonViewProps> = React.memo(
         isAnimating = true,
         ...props
     }) => {
-        // iOS Native (SwiftUI) path when available
-        if (hasNativeIOS && NativeSkeletonView) {
-            return (
-                <RNView
-                    style={[{ overflow: "hidden", borderRadius }, style]}
-                    // @ts-ignore
-                    pointerEvents="auto"
-                    {...props}
-                >
-                    {/* Native skeleton rendered absolutely behind children */}
-                    <NativeSkeletonView
-                        style={StyleSheet.absoluteFill}
-                        durationMs={duration}
-                        baseColor={backgroundColor}
-                        highlightColor={gradientColor}
-                        cornerRadius={borderRadius}
-                        animating={isAnimating}
-                    />
-                    {children}
-                </RNView>
-            )
-        }
-
-        // JS fallback (cross‑platform): animated gradient shimmer
+        // Estes hooks ficam ACIMA do early return do caminho nativo de iOS. Estavam depois
+        // dele: quando o `NativeSkeletonView` existia, nenhum era chamado, e a ordem dos
+        // hooks mudava conforme a plataforma resolvia (ou não) o módulo nativo.
+        //
+        // JS fallback (cross-platform): animated gradient shimmer
         const progress = useSharedValue(0)
 
         React.useEffect(() => {
@@ -148,6 +129,29 @@ export const SkeletonView: React.FC<SkeletonViewProps> = React.memo(
                 opacity: isAnimating ? 1 : 0,
             }
         }, [isAnimating])
+
+        // iOS Native (SwiftUI) path when available
+        if (hasNativeIOS && NativeSkeletonView) {
+            return (
+                <RNView
+                    style={[{ overflow: "hidden", borderRadius }, style]}
+                    // @ts-ignore
+                    pointerEvents="auto"
+                    {...props}
+                >
+                    {/* Native skeleton rendered absolutely behind children */}
+                    <NativeSkeletonView
+                        style={StyleSheet.absoluteFill}
+                        durationMs={duration}
+                        baseColor={backgroundColor}
+                        highlightColor={gradientColor}
+                        cornerRadius={borderRadius}
+                        animating={isAnimating}
+                    />
+                    {children}
+                </RNView>
+            )
+        }
 
         return (
             <View

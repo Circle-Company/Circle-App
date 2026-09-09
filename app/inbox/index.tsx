@@ -13,14 +13,11 @@ import { NotificationSkeleton } from "@/components/notification/notification.ske
 import { NotificationEmptyCard } from "@/components/notification/notification.empty.card"
 import { colors } from "@/constants/colors"
 import sizes from "@/constants/sizes"
-import { usePushNotifications } from "@/contexts/push.notification"
+import { usePushNotifications, NotificationType } from "@/contexts/push.notification"
 import { useDateHelpers, TimeInterval } from "@/lib/hooks/separeArrByDate"
 import type { NotificationPayload } from "@/contexts/push.notification"
 import fonts from "@/constants/fonts"
 import LanguageContext from "@/contexts/language"
-import { Pressable } from "react-native"
-import { router } from "expo-router"
-import { NotificationType } from "@/contexts/push.notification"
 import {
     NotificationSegmented,
     type InboxTab,

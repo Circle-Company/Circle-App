@@ -1,5 +1,5 @@
-import React, { useCallback, useEffect, useState, useMemo } from "react"
-import { useIsFocused } from "expo-router"
+import React, { useCallback, useEffect, useState } from "react"
+import { useScreenPlaybackFocus } from "@/lib/hooks/useScreenPlaybackFocus"
 import ColorTheme from "@/constants/colors"
 import FeedContext from "@/contexts/Feed"
 import MediaRenderVideo from "@/components/midia_render/components/midia_render-video"
@@ -8,7 +8,6 @@ import { MomentReportModal } from "./moment-report.modal"
 import { MomentContainerProps } from "../moment-types"
 import MomentContext from "../context"
 import MomentVideoSlider from "./moment-video-slider"
-import PersistedContext from "@/contexts/Persisted"
 import { View } from "react-native"
 import { Hidden } from "./moment-hidden"
 import { SwiftBottomSheet } from "@/components/ios/ios.bottom.sheet"
@@ -27,17 +26,14 @@ export default function Container({
     // Foco da TELA (não do momento dentro do carrossel): sai da aba do feed,
     // abre um perfil ou troca para a conta → a tela deixa de estar focada e o
     // vídeo tem que parar, inclusive o áudio.
-    const isScreenFocused = useIsFocused()
-    const { data, actions, size, options, video } = React.useContext(MomentContext)
-    const { session } = React.useContext(PersistedContext)
+    //
+    // `useScreenPlaybackFocus` e não `useIsFocused`: durante uma transição nenhum dos dois
+    // lados está focado, e o vídeo congelava justamente enquanto o zoom acontecia.
+    const isScreenFocused = useScreenPlaybackFocus()
+    const { data, size, options, video } = React.useContext(MomentContext)
     const feedContext = React.useContext(FeedContext)
-    const {
-        commentEnabled,
-        getCachedVideoSync,
-        resolveVideo,
-        prefetchAround,
-        prefetchThumbnail,
-    } = feedContext || {}
+    const { commentEnabled, getCachedVideoSync, resolveVideo, prefetchAround, prefetchThumbnail } =
+        feedContext || {}
     // Consulta SÍNCRONA ao cache já no primeiro render. Sem isso o player era
     // criado com a URL remota e só depois trocava para o arquivo local — troca
     // de `uri` que reinicia o player e reexibe a thumbnail, exatamente o
@@ -155,10 +151,6 @@ export default function Container({
         if (video?.setDuration) video.setDuration(0)
     }, [data.id])
 
-    async function handleDoublePress() {
-        if (data.user.id != session.user.id) actions.registerInteraction("LIKE")
-    }
-
     function handleProgressChange(currentTime: number, duration: number) {
         video.setCurrentTime(currentTime)
         video.setDuration(duration)
@@ -208,7 +200,6 @@ export default function Container({
                 setFocusedMoment({
                     id: data.id,
                     user: data.user,
-                    description: data.description,
                     midia: data.midia,
                     comments: data.comments,
                     statistics: data.statistics,
@@ -227,7 +218,10 @@ export default function Container({
             <View style={container}>
                 <View style={content_container}>
                     <MidiaRender.Root data={contentRender} content_sizes={size}>
-                        <Hidden width={contentRender?.width} height={contentRender?.height} />
+                        {/* As dimensões vêm de `size`, não de `contentRender` — este último é
+                            a URL da mídia (string), então `contentRender?.width` era sempre
+                            `undefined` e o `Hidden` renderizava sem tamanho. */}
+                        <Hidden width={size.width} height={size.height} />
                         {renderVideoContent({ isHidden: true })}
                     </MidiaRender.Root>
                 </View>

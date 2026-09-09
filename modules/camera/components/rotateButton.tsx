@@ -63,7 +63,6 @@ export function RotateButton() {
                 colorScheme="dark"
                 style={[styles.circle, containerStyle]}
                 glassEffectStyle="regular"
-                colorScheme="dark"
                 isInteractive
             >
                 <Pressable
