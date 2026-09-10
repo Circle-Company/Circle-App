@@ -446,5 +446,9 @@
     "Pin": "Pin",
     "Unpin": "Unpin",
     "Delete Message": "Delete Message",
-    "This message was deleted": "This message was deleted"
-}
+    "This message was deleted": "This message was deleted",
+    "Chat": "Chat",
+    "No conversations yet": "No conversations yet",
+    "Your conversations will appear here.": "Your conversations will appear here.",
+    "Say hi": "Say hi",
+    "Message": "Message"}

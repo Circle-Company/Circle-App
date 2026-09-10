@@ -10,6 +10,7 @@ import { usePreferencesStore } from "@/contexts/Persisted/preferences"
 import PersistedContext, { Provider as PersistedProvider } from "@/contexts/Persisted"
 import { RedirectContext } from "@/contexts/redirect"
 import { recordLogin, resetSessionRuntime } from "@/session/runtime"
+import { persistLoginSession } from "@/session/login"
 import { installForegroundRevalidation } from "@/session/foreground"
 import { clearResidualDataIfDifferentPerson } from "@/session/identityGuard"
 import { SessionDataType } from "@/contexts/Persisted/types"
@@ -142,10 +143,18 @@ export function Provider({ children }: AuthProviderProps) {
             console.warn("🧹 Conta diferente neste aparelho — dado residual limpo", identity.reason)
         }
 
+        // A gravação do par de tokens. Tem de partir daqui: as chaves `account:jwt:*` são a
+        // FONTE das credenciais enquanto a Fase 3 (§12) não fecha — o interceptor lê o access
+        // token de lá e `recordLogin`, logo abaixo, só grava o blob se elas já existirem. O
+        // `Persisted` era quem escrevia e deixou de escrever quando os tokens passaram a ser
+        // exclusivos de `src/session/`; sem este dono, todo login autenticava no backend e
+        // morria na asserção seguinte.
+        const credentials = persistLoginSession(sessionPayload)
+
         await injectRef.current?.({ session: sessionPayload })
 
         const keys = storageKeys().account.jwt
-        if (!storage.getString(keys.token)) {
+        if (!credentials || !storage.getString(keys.token)) {
             // Loga as chaves (não os valores) para identificar o formato real
             // devolvido pelo backend sem vazar credencial no console.
             console.error(

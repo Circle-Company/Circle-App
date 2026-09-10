@@ -447,5 +447,9 @@
     "Pin": "Fixar",
     "Unpin": "Desafixar",
     "Delete Message": "Apagar Mensagem",
-    "This message was deleted": "Esta mensagem foi apagada"
-}
+    "This message was deleted": "Esta mensagem foi apagada",
+    "Chat": "Chat",
+    "No conversations yet": "Nenhuma conversa ainda",
+    "Your conversations will appear here.": "Suas conversas vão aparecer aqui.",
+    "Say hi": "Manda um oi",
+    "Message": "Mensagem"}
