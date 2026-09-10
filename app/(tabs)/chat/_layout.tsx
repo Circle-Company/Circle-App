@@ -44,8 +44,9 @@ export default function ChatLayout() {
             <Stack.Screen
                 name="[cid]"
                 options={{
-                    // Mesmo header da tela de account: fundo transparente e título em
-                    // `Black-Italic` no `title2 * 0.9`, centralizado.
+                    // Transparente como os demais headers do app. Opaco fazia a barra
+                    // piscar branco no gesto de voltar: com aparência própria, a
+                    // `UINavigationBar` volta ao padrão do sistema durante o pop.
                     headerStyle: { backgroundColor: "transparent" },
                     headerTransparent: true,
                     headerTitleAlign: "center",

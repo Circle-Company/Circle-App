@@ -1,5 +1,6 @@
 import React from "react"
-import { Animated, Text, type TextStyle } from "react-native"
+import { Text, type TextStyle } from "react-native"
+import Animated, { interpolate, useAnimatedStyle, type SharedValue } from "react-native-reanimated"
 
 import ColorTheme from "@/constants/colors"
 import fonts from "@/constants/fonts"
@@ -15,7 +16,13 @@ import { REVEAL_WIDTH } from "./chat.list.reveal"
  * A opacidade acompanha o arrasto — sem isso o texto ficaria parado à direita,
  * visível pela metade sempre que a lista se mexesse um pouco.
  */
-function ChatListTimestamp({ date, translateX }: { date: string; translateX: Animated.Value }) {
+function ChatListTimestamp({
+    date,
+    translateX,
+}: {
+    date: string
+    translateX: SharedValue<number>
+}) {
     const colors = ColorTheme()
 
     const label = React.useMemo(() => {
@@ -36,24 +43,30 @@ function ChatListTimestamp({ date, translateX }: { date: string; translateX: Ani
         color: colors.textDisabled,
     }
 
-    const opacity = translateX.interpolate({
-        inputRange: [-REVEAL_WIDTH, -REVEAL_WIDTH / 2, 0],
-        outputRange: [1, 0.35, 0],
-        extrapolate: "clamp",
-    })
+    // Derivado na thread de UI: a opacidade acompanha o dedo sem passar pelo JS.
+    const animatedStyle = useAnimatedStyle(() => ({
+        opacity: interpolate(
+            translateX.value,
+            [-REVEAL_WIDTH, -REVEAL_WIDTH / 2, 0],
+            [1, 0.35, 0],
+            "clamp",
+        ),
+    }))
 
     return (
         <Animated.View
-            style={{
-                position: "absolute",
-                right: -REVEAL_WIDTH,
-                width: REVEAL_WIDTH,
-                top: 0,
-                bottom: 0,
-                alignItems: "center",
-                justifyContent: "center",
-                opacity,
-            }}
+            style={[
+                {
+                    position: "absolute",
+                    right: -REVEAL_WIDTH,
+                    width: REVEAL_WIDTH,
+                    top: 0,
+                    bottom: 0,
+                    alignItems: "center",
+                    justifyContent: "center",
+                },
+                animatedStyle,
+            ]}
         >
             <Text style={style}>{label}</Text>
         </Animated.View>

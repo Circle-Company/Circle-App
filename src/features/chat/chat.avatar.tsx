@@ -45,6 +45,15 @@ export function ChatAvatar({ size, profilePicture, name, online }: ChatAvatarPro
                         style={{ width: size, height: size }}
                         contentFit="cover"
                         transition={120}
+                        /*
+                         * Obrigatório dentro de lista reciclada.
+                         *
+                         * Sem a chave, a `expo-image` reaproveita a view e mantém a imagem
+                         * anterior enquanto a nova carrega — numa conversa isso é a foto de
+                         * uma pessoa aparecendo na mensagem de outra durante a rolagem. Com
+                         * ela, a view é tratada como conteúdo novo e limpa antes.
+                         */
+                        recyclingKey={profilePicture}
                     />
                 ) : (
                     <Text

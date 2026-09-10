@@ -16,5 +16,5 @@ export {
 } from "./chat.conversation.cell"
 export { ChatSpeechBubble } from "./chat.speech.bubble"
 export { toMessageData, toMessageList, type ToMessageDataOptions } from "./chat.message.adapter"
-export { MOCK_CONVERSATIONS, mockMessages } from "./chat.mock"
+export { MOCK_CONVERSATIONS, isMockGroupChat, mockMessages } from "./chat.mock"
 export type { ChatPreview } from "./chat.types"

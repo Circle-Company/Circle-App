@@ -5,13 +5,14 @@ import ColorTheme from "@/constants/colors"
 import fonts from "@/constants/fonts"
 import MessageContext from "../context/provider"
 import { MessageEditedLabelProps } from "../message.types"
+import { showsEdited } from "../helpers/footerContent"
 
 /** Marca "editada" no rodapé, quando `editedAt` está preenchido. */
-export default function EditedLabel({ color, fontSize }: MessageEditedLabelProps) {
+function EditedLabel({ color, fontSize }: MessageEditedLabelProps) {
     const { data, options, size } = React.useContext(MessageContext)
     const colors = ColorTheme()
 
-    if (!data.editedAt || options.messageType === "deleted") return null
+    if (!showsEdited(data, options)) return null
 
     const text_style: TextStyle = {
         fontSize: fontSize ?? size.fontSize * 0.75,
@@ -23,3 +24,11 @@ export default function EditedLabel({ color, fontSize }: MessageEditedLabelProps
 
     return <Text style={text_style}>editada ·</Text>
 }
+
+/**
+ * Memoizado: dentro de uma conversa a mensagem re-renderiza por motivos que não são deste
+ * componente — o principal é o progresso da nota de voz, que chega várias vezes por segundo
+ * como prop da árvore. Sem `memo`, cada tique redesenhava também texto, hora, status e
+ * rótulos, que não mudaram.
+ */
+export default React.memo(EditedLabel)

@@ -7,6 +7,7 @@ import MessageContext from "../context/provider"
 import MessageSymbol from "./message.symbol"
 import fonts from "@/constants/fonts"
 import { MessageRepliesProps } from "../message.types"
+import { showsReplies } from "../helpers/footerContent"
 
 /**
  * Quantas mensagens responderam a esta.
@@ -18,14 +19,15 @@ import { MessageRepliesProps } from "../message.types"
  * uma janela da conversa, e contar ali daria números diferentes conforme a
  * rolagem — inclusive "0 respostas" numa mensagem respondida ontem.
  */
-export default function MessageReplies({ color, fontSize, onPress }: MessageRepliesProps) {
+function MessageReplies({ color, fontSize, onPress }: MessageRepliesProps) {
     const { data, options, size } = React.useContext(MessageContext)
     const { t } = React.useContext(LanguageContext)
     const colors = ColorTheme()
 
+    // A regra mora no helper porque o rodapé precisa da mesma resposta antes de desenhar a
+    // caixa — ver `helpers/footerContent`.
+    if (!showsReplies(data, options)) return null
     const count = data.replyCount ?? 0
-    // Mensagem apagada não convida a abrir a discussão que ela gerou.
-    if (count <= 0 || options.messageType === "deleted") return null
 
     const tint = color ?? colors.textDisabled
     const glyphSize = (fontSize ?? size.fontSize * 0.75) * 1.1
@@ -55,3 +57,11 @@ export default function MessageReplies({ color, fontSize, onPress }: MessageRepl
         </Pressable>
     )
 }
+
+/**
+ * Memoizado: dentro de uma conversa a mensagem re-renderiza por motivos que não são deste
+ * componente — o principal é o progresso da nota de voz, que chega várias vezes por segundo
+ * como prop da árvore. Sem `memo`, cada tique redesenhava também texto, hora, status e
+ * rótulos, que não mudaram.
+ */
+export default React.memo(MessageReplies)

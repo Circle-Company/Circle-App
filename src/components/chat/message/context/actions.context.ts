@@ -7,6 +7,7 @@ import {
     MessageDeliveryStatus,
     MessageReactionProps,
 } from "../message.types"
+import { useSizeState } from "../hooks/useSizeState"
 
 export interface MessageActionsState {
     reactions: MessageReactionProps[]
@@ -30,11 +31,70 @@ export interface MessageActionsState {
  *                  exclusão de mensagem alheia — mesma guarda de posse do
  *                  `EXCLUDE` no moment.
  */
-export function useActions(messageId?: string, authorId?: string): MessageActionsState {
+export function useActions(
+    messageId: string | undefined,
+    authorId: string | undefined,
+    incoming: { reactions: MessageReactionProps[]; status: MessageDeliveryStatus },
+): MessageActionsState {
     const { session } = React.useContext(PersistedContext)
 
-    const [reactions, setReactions] = React.useState<MessageReactionProps[]>([])
-    const [status, setStatus] = React.useState<MessageDeliveryStatus>("sent")
+    /**
+     * Reações e status vêm do dado; o estado local é só a sobrescrita otimista.
+     *
+     * Antes eram cópias sincronizadas por efeito, e numa lista reciclada isso significa que o
+     * primeiro quadro da linha reciclada mostrava as reações e o tique de entrega da mensagem
+     * **anterior**. Ver a explicação completa em `data.context.ts`.
+     *
+     * A sobrescrita é presa ao `messageId`: sem isso, uma reação otimista vazaria de uma
+     * mensagem para outra quando a view trocasse de dono.
+     */
+    // Reagir acrescenta a fileira de pílulas abaixo da bolha, e o estado de envio faz o
+    // rodapé aparecer ou sumir: os dois mudam a altura — ver `useSizeState`.
+    const [override, setOverride] = useSizeState<{
+        messageId: string
+        reactions?: MessageReactionProps[]
+        status?: MessageDeliveryStatus
+    } | null>(null)
+
+    const active = override && messageId && override.messageId === messageId ? override : null
+    const reactions = active?.reactions ?? incoming.reactions
+    const status = active?.status ?? incoming.status
+
+    const setReactions = React.useCallback<
+        React.Dispatch<React.SetStateAction<MessageReactionProps[]>>
+    >(
+        (value) => {
+            if (!messageId) return
+            setOverride((previous) => {
+                const base = previous && previous.messageId === messageId ? previous : { messageId }
+                const current = base.reactions ?? incoming.reactions
+                return {
+                    ...base,
+                    messageId,
+                    reactions: typeof value === "function" ? value(current) : value,
+                }
+            })
+        },
+        [messageId, incoming.reactions, setOverride],
+    )
+
+    const setStatus = React.useCallback<
+        React.Dispatch<React.SetStateAction<MessageDeliveryStatus>>
+    >(
+        (value) => {
+            if (!messageId) return
+            setOverride((previous) => {
+                const base = previous && previous.messageId === messageId ? previous : { messageId }
+                const current = base.status ?? incoming.status
+                return {
+                    ...base,
+                    messageId,
+                    status: typeof value === "function" ? value(current) : value,
+                }
+            })
+        },
+        [messageId, incoming.status, setOverride],
+    )
 
     const registerAction = React.useCallback(
         async <T extends MessageActionType>(actionType: T, data: MessageActionPayload<T>) => {
@@ -84,11 +144,12 @@ export function useActions(messageId?: string, authorId?: string): MessageAction
         [messageId, authorId, session.account.userId],
     )
 
-    return {
-        reactions,
-        status,
-        setReactions,
-        setStatus,
-        registerAction,
-    }
+    // Memoizado como as outras duas stores: o objeto entra no valor do contexto da mensagem,
+    // e identidade nova a cada render faria bolha, texto, rodapé e player re-renderizarem
+    // sem nada ter mudado. `setReactions` e `setStatus` são setters de `useState`, já
+    // estáveis; `registerAction` é `useCallback`.
+    return React.useMemo(
+        () => ({ reactions, status, setReactions, setStatus, registerAction }),
+        [reactions, status, setReactions, setStatus, registerAction],
+    )
 }

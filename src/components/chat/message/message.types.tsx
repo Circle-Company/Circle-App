@@ -103,6 +103,8 @@ export type MessageOptionsProps = {
     /** Primeira/última de uma sequência do mesmo autor: controla avatar e cantos. */
     isFirstOfGroup: boolean
     isLastOfGroup: boolean
+    /** A mensagem logo acima é uma nota de voz do mesmo autor — pede mais respiro. */
+    followsAudio: boolean
     /**
      * É a mensagem mais recente da conversa.
      *
@@ -175,11 +177,26 @@ export type MessageOptionsInput = {
      * quem tem caso especial (uma prévia, por exemplo) precisa impor.
      */
     messageType?: MessageType
+    /**
+     * Quem é o autor, decidido de fora.
+     *
+     * Normalmente omitido: o provider compara o autor com a sessão, que é a resposta certa
+     * numa conversa de verdade. Serve para quem tem outra fonte de identidade — dados de
+     * exemplo, uma prévia, ou um SDK cujo id de usuário não é o mesmo da sessão do app.
+     */
+    isMine?: boolean
     /** Conversa em grupo — habilita avatar e nome do autor. */
     isGroup?: boolean
     /** Posição na sequência do mesmo autor: controla avatar e cantos da bolha. */
     isFirstOfGroup?: boolean
     isLastOfGroup?: boolean
+    /**
+     * A mensagem logo acima é uma nota de voz do mesmo autor.
+     *
+     * Chega de fora porque só quem enxerga os vizinhos sabe — a lista resolve isso junto da
+     * sequência (`resolveSequence`).
+     */
+    followsAudio?: boolean
     /** É a mensagem mais recente da conversa — ver `MessageOptionsProps.isLatest`. */
     isLatest?: boolean
     /** Selecionada pelo menu de ações (long press). */

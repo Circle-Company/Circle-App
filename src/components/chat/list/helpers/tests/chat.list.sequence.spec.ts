@@ -21,7 +21,11 @@ describe("resolveSequence", () => {
     it("marca uma mensagem isolada como início e fim do bloco", () => {
         const sequence = resolveSequence([message("m1", "a")])
 
-        expect(sequence.get("m1")).toEqual({ isFirstOfGroup: true, isLastOfGroup: true })
+        expect(sequence.get("m1")).toEqual({
+            isFirstOfGroup: true,
+            isLastOfGroup: true,
+            followsAudio: false,
+        })
     })
 
     it("encadeia mensagens seguidas do mesmo autor", () => {
@@ -31,16 +35,36 @@ describe("resolveSequence", () => {
             message("m3", "a"),
         ])
 
-        expect(sequence.get("m1")).toEqual({ isFirstOfGroup: true, isLastOfGroup: false })
-        expect(sequence.get("m2")).toEqual({ isFirstOfGroup: false, isLastOfGroup: false })
-        expect(sequence.get("m3")).toEqual({ isFirstOfGroup: false, isLastOfGroup: true })
+        expect(sequence.get("m1")).toEqual({
+            isFirstOfGroup: true,
+            isLastOfGroup: false,
+            followsAudio: false,
+        })
+        expect(sequence.get("m2")).toEqual({
+            isFirstOfGroup: false,
+            isLastOfGroup: false,
+            followsAudio: false,
+        })
+        expect(sequence.get("m3")).toEqual({
+            isFirstOfGroup: false,
+            isLastOfGroup: true,
+            followsAudio: false,
+        })
     })
 
     it("quebra o bloco quando o autor muda", () => {
         const sequence = resolveSequence([message("m1", "a"), message("m2", "b")])
 
-        expect(sequence.get("m1")).toEqual({ isFirstOfGroup: true, isLastOfGroup: true })
-        expect(sequence.get("m2")).toEqual({ isFirstOfGroup: true, isLastOfGroup: true })
+        expect(sequence.get("m1")).toEqual({
+            isFirstOfGroup: true,
+            isLastOfGroup: true,
+            followsAudio: false,
+        })
+        expect(sequence.get("m2")).toEqual({
+            isFirstOfGroup: true,
+            isLastOfGroup: true,
+            followsAudio: false,
+        })
     })
 
     it("um divisor interrompe a sequência do mesmo autor", () => {
@@ -48,8 +72,16 @@ describe("resolveSequence", () => {
         // dias diferentes: emendá-las num bloco só esconderia isso.
         const sequence = resolveSequence([message("m1", "a"), dateDivider, message("m2", "a")])
 
-        expect(sequence.get("m1")).toEqual({ isFirstOfGroup: true, isLastOfGroup: true })
-        expect(sequence.get("m2")).toEqual({ isFirstOfGroup: true, isLastOfGroup: true })
+        expect(sequence.get("m1")).toEqual({
+            isFirstOfGroup: true,
+            isLastOfGroup: true,
+            followsAudio: false,
+        })
+        expect(sequence.get("m2")).toEqual({
+            isFirstOfGroup: true,
+            isLastOfGroup: true,
+            followsAudio: false,
+        })
     })
 
     it("vale também para o aviso de sistema", () => {
@@ -68,5 +100,44 @@ describe("resolveSequence", () => {
 
     it("devolve mapa vazio para lista vazia", () => {
         expect(resolveSequence([]).size).toBe(0)
+    })
+
+    describe("followsAudio", () => {
+        const audio = (id: string, authorId: string): ChatRow =>
+            ({ ...(message(id, authorId) as any), contentType: "audio", content: null }) as ChatRow
+
+        it("marca a mensagem logo abaixo de uma nota de voz do mesmo autor", () => {
+            const sequence = resolveSequence([audio("m1", "a"), message("m2", "a")])
+
+            expect(sequence.get("m2")?.followsAudio).toBe(true)
+        })
+
+        it("não marca quando a nota de voz é de outro autor", () => {
+            const sequence = resolveSequence([audio("m1", "a"), message("m2", "b")])
+
+            expect(sequence.get("m2")?.followsAudio).toBe(false)
+        })
+
+        // Um divisor entre as duas já quebra o bloco: o respiro viria em dobro.
+        it("não marca através de um divisor", () => {
+            const sequence = resolveSequence([audio("m1", "a"), dateDivider, message("m2", "a")])
+
+            expect(sequence.get("m2")?.followsAudio).toBe(false)
+        })
+
+        // Áudio apagado vira lápide: baixa, sem player e sem avatar. O respiro depois dela
+        // sobraria.
+        it("não marca quando a nota de voz anterior foi apagada", () => {
+            const deleted = { ...(audio("m1", "a") as any), deletedAt: "2026-01-01T00:00:00.000Z" }
+            const sequence = resolveSequence([deleted as ChatRow, message("m2", "a")])
+
+            expect(sequence.get("m2")?.followsAudio).toBe(false)
+        })
+
+        it("a própria nota de voz não é marcada", () => {
+            const sequence = resolveSequence([message("m1", "a"), audio("m2", "a")])
+
+            expect(sequence.get("m2")?.followsAudio).toBe(false)
+        })
     })
 })

@@ -1,13 +1,14 @@
-import { Text, View, ViewStyle, TextStyle } from "react-native"
+import React from "react"
+import { Platform, Text, View, type TextStyle, type ViewStyle } from "react-native"
+
+import { isGlassEffectAPIAvailable, isLiquidGlassAvailable } from "expo-glass-effect"
 
 import ColorTheme from "@/constants/colors"
 import fonts from "@/constants/fonts"
 import sizes from "@/constants/sizes"
 
-export type DateSeparatorProps = {
-    /** Rótulo já formatado pela lista do chat ("Hoje", "Ontem", "12 de março"). */
-    date: string
-}
+import { DateSeparatorIOS } from "./date.separator.ios"
+import type { DateSeparatorProps } from "./date.separator.types"
 
 /**
  * Etiqueta de dia ("HOJE") entre blocos da lista.
@@ -16,7 +17,7 @@ export type DateSeparatorProps = {
  * de dia acontece, então o componente vive fora do `Message` e não toca o
  * contexto dele.
  */
-export function DateSeparator({ date }: DateSeparatorProps) {
+function DateSeparatorBase({ date, floating = false, stickyTopInset = 0 }: DateSeparatorProps) {
     const colors = ColorTheme()
 
     const containerStyle: ViewStyle = {
@@ -25,7 +26,10 @@ export function DateSeparator({ date }: DateSeparatorProps) {
         paddingVertical: 4,
         borderRadius: sizes.borderRadius["1sm"],
         backgroundColor: colors.backgroundDisabled,
-        marginVertical: sizes.margins["2sm"],
+        // Solta no meio da conversa, a etiqueta precisa de bastante ar acima: ela encerra um
+        // dia e abre outro, e um respiro curto a faz parecer parte do bloco anterior.
+        marginTop: floating ? stickyTopInset : sizes.margins["1xl"],
+        marginBottom: floating ? 0 : sizes.margins["2sm"],
     }
     const textStyle: TextStyle = {
         fontSize: fonts.size.caption1,
@@ -40,3 +44,20 @@ export function DateSeparator({ date }: DateSeparatorProps) {
         </View>
     )
 }
+
+/**
+ * O vidro só existe a partir de uma versão do iOS. A checagem fica aqui, num lugar só, e cada
+ * versão do componente cuida do próprio desenho — a de fallback continua simples, que é a que
+ * roda em todo lugar.
+ */
+const useGlass = () =>
+    Platform.OS === "ios" && isLiquidGlassAvailable() && isGlassEffectAPIAvailable()
+
+function DateSeparatorRoot(props: DateSeparatorProps) {
+    return useGlass() ? <DateSeparatorIOS {...props} /> : <DateSeparatorBase {...props} />
+}
+
+/** Memoizado: divisores nunca mudam depois de montados, mas re-renderizam junto da lista. */
+export const DateSeparator = React.memo(DateSeparatorRoot)
+
+export type { DateSeparatorProps }

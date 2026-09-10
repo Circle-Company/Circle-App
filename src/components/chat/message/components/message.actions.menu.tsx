@@ -17,6 +17,23 @@ import LanguageContext from "@/contexts/language"
 import MessageContext from "../context/provider"
 import { MessageActionType, MessageActionsMenuProps } from "../message.types"
 
+/**
+ * ── DIAGNÓSTICO, TEMPORÁRIO ─────────────────────────────────────────────────────────────
+ *
+ * Com `true`, o iOS renderiza a bolha crua: sem medida em dois tempos, sem `Host`, sem
+ * `ContextMenu`. A altura da linha fica definitiva já no primeiro quadro.
+ *
+ * Existe para responder **uma** pergunta: a sobreposição das bolhas ao subir o scroll vem da
+ * medida em dois tempos do menu nativo, ou não?
+ *
+ *   - sumiu   ⇒ é a medida. O menu volta, e o conserto é nela.
+ *   - continua ⇒ o menu está inocente, e o problema é da lista.
+ *
+ * De qualquer forma isto **sai**: é instrumento de teste, não o novo comportamento. O menu
+ * nativo segue inteiro logo abaixo, intocado.
+ */
+const BYPASS_NATIVE_MENU: boolean = false
+
 type ActionItem = {
     action: MessageActionType
     label: string
@@ -27,20 +44,36 @@ type ActionItem = {
 }
 
 /**
- * Menu de ações da mensagem, nativo nos dois sistemas: `ActionSheetIOS` no iOS e
+ * Menu de ações da mensagem, nativo nos dois sistemas: `ContextMenu` (SwiftUI) no iOS e
  * `DropdownMenu` (Jetpack Compose) no Android. O gatilho é o long press sobre a
  * bolha.
  *
- * **O relevo do long press vem do `ContextMenu`**, igual ao card do feed
- * (`ProfileDropDownMenuIOS`). A diferença é que lá o card tem tamanho fixo, e a
- * bolha não tem: ela depende do texto.
+ * **O relevo do long press vem do `ContextMenu` do SwiftUI**, igual ao card do feed
+ * (`ProfileDropDownMenuIOS`).
  *
- * Usar `matchContents` para resolver isso criava um círculo — o host media zero,
- * a bolha calculava a própria largura sobre esse zero, e o host continuava zero.
- * O sintoma era a conversa sem bolha nenhuma, só as reações (que são irmãs do
- * host) aparecendo. Por isso aqui a bolha é **medida em RN primeiro** e só então
- * hospedada, com o tamanho já conhecido — que é a condição em que o menu do feed
- * funciona.
+ * O `Host` do `@expo/ui` **não mede filho RN**: com `matchContents` ele reporta zero, e a
+ * bolha nasce 0×0. O que funciona no feed é o `Host` receber tamanho explícito — lá o card já
+ * tem tamanho fixo por preset. A bolha não tem: depende do texto.
+ *
+ * Daí a medida em dois tempos. O primeiro quadro renderiza a bolha **solta**, no fluxo normal,
+ * só para ela se medir; a partir do segundo ela vai hospedada, dentro de uma caixa com o
+ * tamanho já conhecido — então entre um quadro e outro a altura da linha não muda.
+ *
+ * **Mede-se uma vez, e fora do host.** Medir também lá dentro realimenta a própria medida e
+ * vira um laço que derruba o layout da lista inteira — ver o comentário no `ContextMenu.Trigger`.
+ *
+ * Já tentei deixar a bolha em fluxo e pôr o host como camada absoluta por cima, para o layout
+ * nunca depender dele. Também não serve: o host precisa ficar **no fluxo**, ocupando o espaço
+ * que desenha.
+ *
+ * A medida é **presa à mensagem** (ver `signature`) e vive no estado desta instância. Isso é o
+ * que a torna segura numa lista que recicla views: sem a amarra, a linha reciclada apareceria
+ * com o tamanho da anterior.
+ *
+ * Já tentei guardá-la num cache global por mensagem, para medir uma vez só na vida. Não
+ * funciona: a altura da bolha não depende só do conteúdo — depende da posição no bloco (o nome
+ * do autor aparece ou não), de ser conversa de grupo e da largura disponível. A mesma mensagem
+ * tem alturas legítimas diferentes, e uma primeira medida ruim ficava gravada para sempre.
  *
  * Montar a lista é responsabilidade daqui, e não de quem usa o `Message`: o que
  * pode ser feito com a mensagem já está decidido nas `options` (posse, tipo de
@@ -110,25 +143,46 @@ export default function ActionsMenu({ children, onAction }: MessageActionsMenuPr
     )
 
     /**
-     * Tamanho da bolha, medido em RN antes de hospedar.
+     * Tamanho da bolha, medido em RN.
      *
-     * `null` enquanto não mediu: nesse primeiro quadro a bolha renderiza sem menu, o que é
-     * o necessário para ela poder se medir. Depois disso o host recebe a medida pronta e o
-     * long press passa a valer.
+     * `null` enquanto não mediu: nesse primeiro quadro a bolha aparece sem menu, que é o
+     * necessário para ela poder se medir. Depois disso a camada de cima assume, com a medida
+     * pronta, e o long press passa a valer.
+     *
+     * A medida é **presa à mensagem** (`signature`) e vive no estado desta instância: sem a
+     * amarra, a linha reciclada apareceria com o tamanho da anterior.
      */
-    const [box, setBox] = React.useState<{ width: number; height: number } | null>(null)
 
-    const handleLayout = React.useCallback((event: LayoutChangeEvent) => {
-        const { width, height } = event.nativeEvent.layout
-        if (width <= 0 || height <= 0) return
-        setBox((previous) =>
-            previous &&
-            Math.abs(previous.width - width) < 1 &&
-            Math.abs(previous.height - height) < 1
-                ? previous
-                : { width, height },
-        )
-    }, [])
+    /**
+     * Assinatura do que altera o tamanho da bolha. Muda ⇒ vale medir de novo.
+     *
+     * Reações e rodapé ficam **fora** do gatilho, então não entram aqui: incluí-los provocaria
+     * remedição por algo que não mexe no que está hospedado.
+     */
+    const signature = `${data.id}:${data.content ?? ""}:${data.editedAt ?? ""}:${data.deletedAt ?? ""}`
+    const [box, setBox] = React.useState<{
+        signature: string
+        width: number
+        height: number
+    } | null>(null)
+
+    const measured = box && box.signature === signature ? box : null
+
+    const handleLayout = React.useCallback(
+        (event: LayoutChangeEvent) => {
+            const { width, height } = event.nativeEvent.layout
+            if (width <= 0 || height <= 0) return
+            setBox((previous) =>
+                previous &&
+                previous.signature === signature &&
+                Math.abs(previous.width - width) < 1 &&
+                Math.abs(previous.height - height) < 1
+                    ? previous
+                    : { signature, width, height },
+            )
+        },
+        [signature],
+    )
 
     /**
      * O gatilho do menu é uma camada a mais entre a linha e a bolha, e por padrão
@@ -162,8 +216,12 @@ export default function ActionsMenu({ children, onAction }: MessageActionsMenuPr
         )
     }
 
-    // Primeiro quadro: sem menu, só para a bolha poder se medir.
-    if (!box) {
+    // ── DIAGNÓSTICO, TEMPORÁRIO ──────────────────────────────────────────────────────────
+    // Ver `BYPASS_NATIVE_MENU` no topo do arquivo. Para desfazer, é só o `false`.
+    if (BYPASS_NATIVE_MENU) return <View style={align}>{children}</View>
+
+    // Primeiro quadro: a bolha solta, só para poder se medir.
+    if (!measured) {
         return (
             <View style={align} onLayout={handleLayout}>
                 {children}
@@ -172,12 +230,18 @@ export default function ActionsMenu({ children, onAction }: MessageActionsMenuPr
     }
 
     return (
-        <View style={[align, { width: box.width, height: box.height }]}>
-            {/* Tamanho explícito nos dois lados — no `Host` e no `frame` — é o que evita
-                o `matchContents`. O card do feed não precisa disto porque já nasce com
-                tamanho fixo; a bolha chega aqui medida. */}
-            <SwiftUIHost colorScheme="dark" style={{ width: box.width, height: box.height }}>
-                <ContextMenu modifiers={[frame({ width: box.width, height: box.height })]}>
+        // A caixa em fluxo tem o tamanho medido, e é ela que a lista enxerga: entre o quadro
+        // de medida e este a altura não muda.
+        <View style={[align, { width: measured.width, height: measured.height }]}>
+            {/* Tamanho explícito no `Host` e no `frame`: é a condição em que o menu do feed
+                funciona, e a única que o `Host` respeita — `matchContents` reporta zero. */}
+            <SwiftUIHost
+                colorScheme="dark"
+                style={{ width: measured.width, height: measured.height }}
+            >
+                <ContextMenu
+                    modifiers={[frame({ width: measured.width, height: measured.height })]}
+                >
                     <ContextMenu.Items>
                         {items.map((item) => (
                             <Button
@@ -190,11 +254,24 @@ export default function ActionsMenu({ children, onAction }: MessageActionsMenuPr
                         ))}
                     </ContextMenu.Items>
 
-                    <ContextMenu.Trigger>
-                        {/* `onLayout` continua ligado: mensagem editada ou reação nova muda a
-                            altura, e o host precisa acompanhar. */}
-                        <View onLayout={handleLayout}>{children}</View>
-                    </ContextMenu.Trigger>
+                    {/*
+                        Sem `onLayout` aqui dentro — e isso é o ponto mais delicado do
+                        arquivo.
+
+                        Dentro do host a bolha se mede contra o tamanho que o host recebeu,
+                        que veio da medida anterior. Medir de novo ali realimenta o mesmo
+                        valor que a produziu: cada medida escreve o estado, o host muda de
+                        tamanho, a bolha mede outra vez. É um laço, e ele não fica contido na
+                        mensagem — cada volta faz a lista recalcular layout. A FlashList
+                        aguenta 40 renders sem commit; passando disso ela avisa no console e
+                        commita com os tamanhos que tiver, e as células vão parar umas por
+                        cima das outras.
+
+                        Remedir quando o conteúdo muda continua funcionando, e por outro
+                        caminho: a `signature` muda, `measured` volta a ser nulo, e o quadro
+                        seguinte é o de medida — no fluxo, fora do host, onde medir é seguro.
+                    */}
+                    <ContextMenu.Trigger>{children}</ContextMenu.Trigger>
                 </ContextMenu>
             </SwiftUIHost>
         </View>

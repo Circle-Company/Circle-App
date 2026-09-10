@@ -7,21 +7,32 @@ import MessageContext from "../context/provider"
 import { MessageReactionsProps } from "../message.types"
 
 /** Pílulas de reação ancoradas abaixo da bolha. */
-export default function Reactions({ onPressReaction }: MessageReactionsProps) {
+function Reactions({ onPressReaction }: MessageReactionsProps) {
     const { actions, options, size } = React.useContext(MessageContext)
     const colors = ColorTheme()
 
     if (!options.enableReactions || !actions.reactions.length) return null
 
-    // `width: "100%"` força a quebra de linha dentro do `Container`, que é um
-    // row com `flexWrap`: assim as pílulas caem sob a bolha em vez de ao lado.
+    /*
+     * As pílulas ocupam a linha inteira e se alinham ao lado da bolha.
+     *
+     * O `width: "100%"` é herança da época em que o `Container` era um `flexWrap` e as
+     * reações precisavam forçar a quebra para não ficarem ao lado da bolha. Hoje elas são um
+     * item da coluna da mensagem, que já empilha — o `100%` continua porque é ele que dá à
+     * linha a largura contra a qual o `justifyContent` alinha.
+     *
+     * **Sem margem negativa.** Ela existia para subir as pílulas até encostarem na base da
+     * bolha, e fazia sentido quando eram vizinhas diretas dela. Na coluna atual as reações vêm
+     * depois do rodapé, então o que a margem negativa puxava para cima era o rodapé — e a
+     * altura da linha passava a depender de qual dos dois existia. Um respiro pequeno e
+     * positivo mantém a ligação visual com a bolha sem sobrepor nada.
+     */
     const container: ViewStyle = {
         width: "100%",
         flexDirection: "row",
         columnGap: size.gap / 2,
         justifyContent: options.isMine ? "flex-end" : "flex-start",
-        // Sobe as pílulas para encostarem na base da bolha.
-        marginTop: -size.gap,
+        marginTop: size.gap / 3,
         // Sem reserva para o avatar: ele é irmão desta coluna, não parte dela.
     }
 
@@ -61,3 +72,11 @@ export default function Reactions({ onPressReaction }: MessageReactionsProps) {
         </View>
     )
 }
+
+/**
+ * Memoizado: dentro de uma conversa a mensagem re-renderiza por motivos que não são deste
+ * componente — o principal é o progresso da nota de voz, que chega várias vezes por segundo
+ * como prop da árvore. Sem `memo`, cada tique redesenhava também texto, hora, status e
+ * rótulos, que não mudaram.
+ */
+export default React.memo(Reactions)

@@ -8,7 +8,7 @@ import MessageSymbol from "./message.symbol"
 import { MessageForwardedLabelProps } from "../message.types"
 
 /** Marca "Encaminhada" no topo da bolha. */
-export default function ForwardedLabel({ color, fontSize }: MessageForwardedLabelProps) {
+function ForwardedLabel({ color, fontSize }: MessageForwardedLabelProps) {
     const { data, options, size } = React.useContext(MessageContext)
     const colors = ColorTheme()
 
@@ -34,3 +34,11 @@ export default function ForwardedLabel({ color, fontSize }: MessageForwardedLabe
         </View>
     )
 }
+
+/**
+ * Memoizado: dentro de uma conversa a mensagem re-renderiza por motivos que não são deste
+ * componente — o principal é o progresso da nota de voz, que chega várias vezes por segundo
+ * como prop da árvore. Sem `memo`, cada tique redesenhava também texto, hora, status e
+ * rótulos, que não mudaram.
+ */
+export default React.memo(ForwardedLabel)

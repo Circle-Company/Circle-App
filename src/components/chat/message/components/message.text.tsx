@@ -6,6 +6,7 @@ import fonts from "@/constants/fonts"
 import LanguageContext from "@/contexts/language"
 import MessageContext from "../context/provider"
 import { MessageTextProps } from "../message.types"
+import { formatLinkForDisplay, resolveLinkOnly } from "../helpers/resolveLinkOnly"
 
 /**
  * Texto da mensagem (ou legenda da mídia).
@@ -17,12 +18,7 @@ import { MessageTextProps } from "../message.types"
  * As menções chegam como intervalos sobre a string crua, então o corte é feito
  * por índice: nada de regex por cima do texto do usuário.
  */
-export default function MessageText({
-    content: contentProp,
-    color,
-    fontSize,
-    fontFamily,
-}: MessageTextProps) {
+function MessageText({ content: contentProp, color, fontSize, fontFamily }: MessageTextProps) {
     const { data, options, size } = React.useContext(MessageContext)
     const { t } = React.useContext(LanguageContext)
     const colors = ColorTheme()
@@ -50,6 +46,21 @@ export default function MessageText({
         color: options.isMine ? colors.background : colors.primary,
     }
 
+    /**
+     * Mensagem que é **só** um link: o endereço vira o destaque da bolha.
+     *
+     * Sublinhado além da cor, e não só a cor: um link precisa se anunciar como alvo mesmo
+     * para quem não distingue bem a matiz. Na bolha enviada o fundo já é claro, então o
+     * sublinhado carrega o peso sozinho.
+     */
+    const linkOnly = contentProp || isDeleted ? null : resolveLinkOnly(content)
+    const link_style: TextStyle = {
+        ...text_style,
+        fontFamily: fonts.family.Semibold,
+        color: options.isMine ? colors.background : colors.primary,
+        textDecorationLine: "underline",
+    }
+
     // Sem texto não se renderiza nada — nem um `Text` vazio.
     //
     // Uma nota de voz sem legenda caía aqui e desenhava um nó de altura zero, que
@@ -63,6 +74,12 @@ export default function MessageText({
     // eles apontam para a string original e recortariam no lugar errado.
     const mentions =
         contentProp || isDeleted ? [] : [...(data.mentions ?? [])].sort((a, b) => a.start - b.start)
+
+    if (linkOnly) {
+        // Exibe sem o protocolo. O endereço completo segue em `data.content`, que é o que se
+        // abre ao tocar — o corte é de exibição, não do dado.
+        return <Text style={link_style}>{formatLinkForDisplay(linkOnly)}</Text>
+    }
 
     if (!mentions.length) {
         return <Text style={text_style}>{content}</Text>
@@ -83,3 +100,11 @@ export default function MessageText({
 
     return <Text style={text_style}>{parts}</Text>
 }
+
+/**
+ * Memoizado: dentro de uma conversa a mensagem re-renderiza por motivos que não são deste
+ * componente — o principal é o progresso da nota de voz, que chega várias vezes por segundo
+ * como prop da árvore. Sem `memo`, cada tique redesenhava também texto, hora, status e
+ * rótulos, que não mudaram.
+ */
+export default React.memo(MessageText)

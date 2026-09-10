@@ -6,6 +6,7 @@ import LanguageContext from "@/contexts/language"
 import MessageContext from "../context/provider"
 import fonts from "@/constants/fonts"
 import { MessageStatusProps } from "../message.types"
+import { showsStatus } from "../helpers/footerContent"
 
 /**
  * Estado de entrega, por extenso: "enviando", "enviado", "recebido", "lido".
@@ -17,18 +18,19 @@ import { MessageStatusProps } from "../message.types"
  * Só aparece nas mensagens que EU enviei: o estado de leitura de uma mensagem
  * recebida não existe do lado de cá.
  */
-export default function MessageStatus({ color, size: sizeProp }: MessageStatusProps) {
+function MessageStatus({ color, size: sizeProp }: MessageStatusProps) {
     const { actions, options, size } = React.useContext(MessageContext)
     const { t } = React.useContext(LanguageContext)
     const colors = ColorTheme()
 
-    if (!options.isMine) return null
-
-    // "Lida" só na mensagem mais recente. Chegou coisa nova depois dela, o estado
-    // dessa vira histórico: repetido conversa acima, vira ruído em vez de
-    // informação. Os outros estados continuam aparecendo — "enviando" e "falhou"
-    // pedem atenção mesmo numa mensagem antiga.
-    if (actions.status === "read" && !options.isLatest) return null
+    /*
+     * Só nas minhas, e "lida" só na mensagem mais recente: chegou coisa nova depois dela, o
+     * estado dessa vira histórico e repeti-lo conversa acima é ruído. "Enviando" e "falhou"
+     * continuam aparecendo mesmo numa mensagem antiga, porque pedem atenção.
+     *
+     * A regra mora no helper porque o rodapé decide com ela se desenha a caixa.
+     */
+    if (!showsStatus(options, actions.status)) return null
 
     const label = {
         pending: t("Sending"),
@@ -50,3 +52,11 @@ export default function MessageStatus({ color, size: sizeProp }: MessageStatusPr
 
     return <Text style={style}>{label}</Text>
 }
+
+/**
+ * Memoizado: dentro de uma conversa a mensagem re-renderiza por motivos que não são deste
+ * componente — o principal é o progresso da nota de voz, que chega várias vezes por segundo
+ * como prop da árvore. Sem `memo`, cada tique redesenhava também texto, hora, status e
+ * rótulos, que não mudaram.
+ */
+export default React.memo(MessageStatus)

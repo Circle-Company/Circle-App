@@ -458,5 +458,6 @@
     "Read": "read",
     "Failed": "failed",
     "1 reply": "1 reply",
-    "{{count}} replies": "{{count}} replies"
+    "{{count}} replies": "{{count}} replies",
+    "Click to open": "Click to open"
 }

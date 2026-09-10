@@ -20,7 +20,7 @@ import { MessageReplyPreviewProps } from "../message.types"
  * fora, ele continuava existindo mesmo sem citação, e o `rowGap` do conteúdo
  * contava esse nó vazio — o que abria um vão só no topo da bolha.
  */
-export default function ReplyPreview({ accentColor, onPress }: MessageReplyPreviewProps) {
+function ReplyPreview({ accentColor, onPress }: MessageReplyPreviewProps) {
     const { data, options, size } = React.useContext(MessageContext)
     const colors = ColorTheme()
 
@@ -67,3 +67,11 @@ export default function ReplyPreview({ accentColor, onPress }: MessageReplyPrevi
         </Pressable>
     )
 }
+
+/**
+ * Memoizado: dentro de uma conversa a mensagem re-renderiza por motivos que não são deste
+ * componente — o principal é o progresso da nota de voz, que chega várias vezes por segundo
+ * como prop da árvore. Sem `memo`, cada tique redesenhava também texto, hora, status e
+ * rótulos, que não mudaram.
+ */
+export default React.memo(ReplyPreview)

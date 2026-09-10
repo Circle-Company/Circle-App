@@ -7,7 +7,7 @@ import MessageContext from "../context/provider"
 import { MessageAuthorNameProps } from "../message.types"
 
 /** Nome do autor no topo da bolha — só aparece em grupo, na primeira da sequência. */
-export default function AuthorName({ color, fontSize }: MessageAuthorNameProps) {
+function AuthorName({ color, fontSize }: MessageAuthorNameProps) {
     const { data, options, size } = React.useContext(MessageContext)
     const colors = ColorTheme()
 
@@ -25,3 +25,11 @@ export default function AuthorName({ color, fontSize }: MessageAuthorNameProps) 
         </Text>
     )
 }
+
+/**
+ * Memoizado: dentro de uma conversa a mensagem re-renderiza por motivos que não são deste
+ * componente — o principal é o progresso da nota de voz, que chega várias vezes por segundo
+ * como prop da árvore. Sem `memo`, cada tique redesenhava também texto, hora, status e
+ * rótulos, que não mudaram.
+ */
+export default React.memo(AuthorName)

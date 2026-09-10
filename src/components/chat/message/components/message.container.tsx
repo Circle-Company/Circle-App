@@ -1,10 +1,11 @@
 import React from "react"
-import { View, type LayoutChangeEvent, type ViewStyle } from "react-native"
+import { View, type ViewStyle } from "react-native"
 
 import MessageContext from "../context/provider"
 import MessageLayoutContext from "../context/layout.context"
 import { MessageContainerProps } from "../message.types"
-import { avatarSide, hasAvatarSlot } from "../helpers/avatarSlot"
+import appSizes from "@/constants/sizes"
+import { avatarSide, drawsAvatar, hasAvatarSlot } from "../helpers/avatarSlot"
 
 /**
  * Linha horizontal da mensagem: avatar do autor | bolha, com as reações logo
@@ -21,21 +22,43 @@ import { avatarSide, hasAvatarSlot } from "../helpers/avatarSlot"
 export default function Container({ children, avatar, backgroundColor }: MessageContainerProps) {
     const { options, size } = React.useContext(MessageContext)
 
-    // Largura da linha, publicada para a bolha calcular o próprio teto em px.
-    const [width, setWidth] = React.useState(0)
-    const onLayout = React.useCallback((event: LayoutChangeEvent) => {
-        setWidth(event.nativeEvent.layout.width)
-    }, [])
-
     const showAvatarSlot = hasAvatarSlot(options)
     const side = avatarSide(options)
+
+    /**
+     * Teto de largura da bolha, **calculado** em vez de medido.
+     *
+     * Antes vinha de um `onLayout` guardado em estado. Numa lista reciclada isso estica a
+     * bolha: a FlashList reaproveita a view, o estado sobrevive à troca, e o primeiro quadro
+     * da linha nova usa a largura da linha antiga. Também custava uma passada de layout por
+     * linha.
+     *
+     * O teto é o **mesmo para toda mensagem**: uma fração da largura útil da conversa. Quando
+     * a linha tem avatar ao lado — nota de voz, ou conversa de grupo — o vão dele é descontado
+     * desse teto, e não da largura antes da fração. É o que faz o conjunto foto + bolha
+     * terminar exatamente na mesma coluna em que uma bolha simples termina, em vez de ficar
+     * mais estreito e desalinhado dela.
+     */
+    const usableWidth = appSizes.window.width - appSizes.paddings["1sm"] * 2
+    const avatarSlotWidth = showAvatarSlot ? size.avatarSize + size.gap : 0
+    const bubbleMaxWidth = usableWidth * size.maxWidthRatio - avatarSlotWidth
 
     const row: ViewStyle = {
         width: "100%",
         flexDirection: "row",
         alignItems: "flex-end",
         columnGap: size.gap,
-        marginTop: options.isFirstOfGroup ? size.gap * 2 : size.gap / 2,
+        /*
+         * Respiro acima da linha.
+         *
+         * Bloco novo respira; dentro do bloco as mensagens ficam coladas. A exceção é seguir
+         * uma nota de voz do mesmo autor: a linha do áudio é mais alta e sempre desenha o
+         * avatar, então a mensagem de baixo — inclusive outra nota de voz — encostava nela com
+         * o respiro de dentro do bloco.
+         */
+        marginTop:
+            (options.isFirstOfGroup ? size.gap * 2 : size.gap / 2) +
+            (options.followsAudio ? size.gap * 1.5 : 0),
         backgroundColor,
     }
 
@@ -54,17 +77,27 @@ export default function Container({ children, avatar, backgroundColor }: Message
         alignItems: options.isMine ? "flex-end" : "flex-start",
     }
 
-    // Só na última da sequência o avatar é desenhado; nas demais o vão continua
-    // reservado, para as bolhas do bloco ficarem na mesma coluna.
+    // O vão fica reservado em todas as mensagens do bloco, para as bolhas ficarem na mesma
+    // coluna; quem decide se o rosto é desenhado nele é o `drawsAvatar`.
     const avatarSlot = showAvatarSlot ? (
-        <View style={{ width: size.avatarSize }}>{options.isLastOfGroup ? avatar : null}</View>
+        <View
+            style={{
+                width: size.avatarSize,
+                // A linha alinha pelo rodapé, então uma folga embaixo levanta o avatar. Na
+                // nota de voz ele fica ao lado de uma bolha alta, e encostado na base parecia
+                // pendurado; um pouco acima ele se alinha ao corpo do player.
+                paddingBottom: options.messageType === "audio" ? size.gap : 0,
+            }}
+        >
+            {drawsAvatar(options) ? avatar : null}
+        </View>
     ) : null
 
     return (
         <View style={row}>
             {side === "left" ? avatarSlot : null}
-            <View style={column} onLayout={onLayout}>
-                <MessageLayoutContext.Provider value={width}>
+            <View style={column}>
+                <MessageLayoutContext.Provider value={bubbleMaxWidth}>
                     {children}
                 </MessageLayoutContext.Provider>
             </View>

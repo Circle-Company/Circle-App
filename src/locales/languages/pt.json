@@ -459,5 +459,6 @@
     "Read": "lida",
     "Failed": "falhou",
     "1 reply": "1 resposta",
-    "{{count}} replies": "{{count}} respostas"
+    "{{count}} replies": "{{count}} respostas",
+    "Click to open": "Clique para abrir"
 }

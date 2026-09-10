@@ -1,3 +1,4 @@
+import React from "react"
 import { Text, View, type TextStyle, type ViewStyle } from "react-native"
 
 import ColorTheme from "@/constants/colors"
@@ -15,7 +16,7 @@ export type SystemMessageProps = {
  * Não é bolha nem tem autor, então vive fora do `Message`: quem o posiciona é a
  * lista do chat, e ele não toca o contexto da mensagem.
  */
-export function SystemMessage({ text }: SystemMessageProps) {
+function SystemMessageBase({ text }: SystemMessageProps) {
     const colors = ColorTheme()
 
     const containerStyle: ViewStyle = {
@@ -39,3 +40,6 @@ export function SystemMessage({ text }: SystemMessageProps) {
         </View>
     )
 }
+
+/** Memoizado: divisores nunca mudam depois de montados, mas re-renderizam junto da lista. */
+export const SystemMessage = React.memo(SystemMessageBase)

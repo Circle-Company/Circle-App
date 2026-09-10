@@ -65,10 +65,31 @@ function AudioWaveform({
      * dispostas num traço maior do que o disponível e saltavam para o lugar certo
      * no quadro seguinte, o que se via como um piscar para a direita.
      */
-    const [measuredWidth, setMeasuredWidth] = React.useState(0)
-    const onLayout = React.useCallback((event: LayoutChangeEvent) => {
-        setMeasuredWidth(event.nativeEvent.layout.width)
-    }, [])
+    const [measured, setMeasured] = React.useState<{ key: string; width: number } | null>(null)
+
+    /**
+     * A medida é presa ao traço que a originou.
+     *
+     * Sem essa amarra ela sobrevive à reciclagem da linha: a FlashList reaproveita a view, o
+     * estado permanece, e o áudio novo desenha as barras com a largura do anterior por um
+     * quadro — o traço estica e depois salta. A chave junta a origem e a quantidade de
+     * barras, que é tudo que altera a geometria.
+     */
+    const measureKey = `${bars.length}`
+    const measuredWidth = measured && measured.key === measureKey ? measured.width : 0
+
+    const onLayout = React.useCallback(
+        (event: LayoutChangeEvent) => {
+            const width = event.nativeEvent.layout.width
+            if (width <= 0) return
+            setMeasured((previous) =>
+                previous && previous.key === measureKey && Math.abs(previous.width - width) < 1
+                    ? previous
+                    : { key: measureKey, width },
+            )
+        },
+        [measureKey],
+    )
 
     /**
      * As barras que cabem de fato, e o vão que preenche a sobra.
@@ -182,6 +203,14 @@ function AudioWaveform({
             bottom: 0,
             overflow: "hidden",
         }
+        /**
+         * Sombra que acompanha a fronteira do progresso.
+         *
+         * Fica **fora** da máscara de preenchimento de propósito: dentro dela seria cortada
+         * junto com as barras e nunca apareceria sobre o trecho que falta, que é justamente
+         * onde ela precisa cair para dar profundidade. Posicionada pelo mesmo valor animado
+         * da máscara, então anda com ela sem cálculo próprio.
+         */
         return { wrapper, row, fillLayer }
     }, [height, isFallback, preferredWidth, trackWidth])
 

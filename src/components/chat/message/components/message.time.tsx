@@ -7,7 +7,7 @@ import MessageContext from "../context/provider"
 import { MessageTimeProps } from "../message.types"
 
 /** Hora da mensagem (HH:mm) no rodapé da bolha. */
-export default function MessageTime({ color, fontSize }: MessageTimeProps) {
+function MessageTime({ color, fontSize }: MessageTimeProps) {
     const { data, options, size } = React.useContext(MessageContext)
     const colors = ColorTheme()
 
@@ -32,3 +32,11 @@ export default function MessageTime({ color, fontSize }: MessageTimeProps) {
 
     return <Text style={text_style}>{label}</Text>
 }
+
+/**
+ * Memoizado: dentro de uma conversa a mensagem re-renderiza por motivos que não são deste
+ * componente — o principal é o progresso da nota de voz, que chega várias vezes por segundo
+ * como prop da árvore. Sem `memo`, cada tique redesenhava também texto, hora, status e
+ * rótulos, que não mudaram.
+ */
+export default React.memo(MessageTime)

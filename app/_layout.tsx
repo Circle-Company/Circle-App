@@ -15,6 +15,7 @@ import { Provider as NetworkProvider } from "@/contexts/network"
 import { Provider as NewMomentProvider } from "@/contexts/newMoment"
 import { Provider as ProfileProvider } from "@/contexts/profile"
 import { PushNotificationProvider } from "@/contexts/push.notification"
+import { Provider as ChatProvider } from "@/contexts/Chat"
 import { CameraProvider } from "../modules/camera/context"
 import { QueryProvider } from "@/lib/react-query"
 import { Provider as RedirectProvider, RedirectContext } from "@/contexts/redirect"
@@ -199,7 +200,9 @@ export default function RootLayout() {
                                                                 <BottomSheetProvider>
                                                                     <NewMomentProvider>
                                                                         <PushNotificationProvider>
-                                                                            <RootLayoutNav />
+                                                                            <ChatProvider>
+                                                                                <RootLayoutNav />
+                                                                            </ChatProvider>
                                                                         </PushNotificationProvider>
                                                                     </NewMomentProvider>
                                                                 </BottomSheetProvider>

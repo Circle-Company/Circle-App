@@ -10,6 +10,7 @@ import edited_label from "./components/message.edited.label"
 import footer from "./components/message.footer"
 import forwarded_label from "./components/message.forwarded.label"
 import message_status from "./components/message.status"
+import link_hint from "./components/message.link.hint"
 import message_text from "./components/message.text"
 import message_time from "./components/message.time"
 import reactions from "./components/message.reactions"
@@ -72,6 +73,7 @@ export function MessageRender({
                                 onTogglePlay={() => onTogglePlay?.(data.id)}
                             />
                             <Message.Text />
+                            <Message.LinkHint />
                         </Message.Content>
                     </Message.Bubble>
                 </Message.ActionsMenu>
@@ -102,6 +104,7 @@ export const Message = {
     AuthorName: author_name,
     ReplyPreview: reply_preview,
     Text: message_text,
+    LinkHint: link_hint,
     Media: {
         Audio: audio,
     },
