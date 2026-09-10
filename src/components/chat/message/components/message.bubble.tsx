@@ -3,6 +3,7 @@ import { View, type ViewStyle } from "react-native"
 
 import ColorTheme from "@/constants/colors"
 import MessageContext from "../context/provider"
+import MessageLayoutContext from "../context/layout.context"
 import { MessageChildrenProps } from "../message.types"
 
 /**
@@ -14,12 +15,16 @@ import { MessageChildrenProps } from "../message.types"
  */
 export default function BubbleRoot({ children }: MessageChildrenProps) {
     const { options, size } = React.useContext(MessageContext)
+    const rowWidth = React.useContext(MessageLayoutContext)
     const colors = ColorTheme()
 
     const tight = options.isLastOfGroup ? size.borderRadiusTight : size.borderRadius
 
     const container: ViewStyle = {
-        maxWidth: `${size.maxWidthRatio * 100}%`,
+        // Teto em px sobre a largura medida da linha. Em porcentagem ele se
+        // resolveria contra o gatilho do menu de ações — a camada que envolve a
+        // bolha —, cuja largura é a do texto, não a da conversa.
+        maxWidth: rowWidth > 0 ? rowWidth * size.maxWidthRatio : `${size.maxWidthRatio * 100}%`,
         padding: size.padding,
         rowGap: size.gap / 2,
         // Enviada: roxo bem claro (`primaryAccent` = purple_00). O `primary` cheio

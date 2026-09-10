@@ -1,6 +1,6 @@
 import React from "react"
 import type { SFSymbols7_0 } from "sf-symbols-typescript"
-import { Alert, Platform, Pressable } from "react-native"
+import { Alert, Platform, Pressable, View, type ViewStyle } from "react-native"
 import { Button, ContextMenu, Host as SwiftUIHost } from "@expo/ui/swift-ui"
 import { frame } from "@expo/ui/swift-ui/modifiers"
 import { DropdownMenu, DropdownMenuItem, Host as ComposeHost } from "@expo/ui/jetpack-compose"
@@ -92,39 +92,61 @@ export default function ActionsMenu({ children, onAction }: MessageActionsMenuPr
         [onAction, t],
     )
 
+    /**
+     * O gatilho do menu é uma camada a mais entre a linha e a bolha, e por padrão
+     * ela estica: a bolha ficava encostada à esquerda dentro de um gatilho largo,
+     * o que na mensagem enviada aparecia como um vão sobrando à direita.
+     *
+     * Este `View` faz a camada abraçar a bolha e alinhá-la ao lado certo, para o
+     * gatilho ser transparente para o layout.
+     */
+    const align: ViewStyle = {
+        alignSelf: options.isMine ? "flex-end" : "flex-start",
+        alignItems: options.isMine ? "flex-end" : "flex-start",
+        maxWidth: "100%",
+    }
+
     // Mensagem sem nenhuma ação disponível (apagada, por exemplo): a bolha passa
     // direto, sem gatilho de menu.
-    if (!items.length) return <>{children}</>
+    if (!items.length) return <View style={align}>{children}</View>
 
     if (Platform.OS === "android") {
         return (
-            <AndroidMenu items={items} onPressItem={handlePress} destructiveColor={colors.error}>
-                {children}
-            </AndroidMenu>
+            <View style={align}>
+                <AndroidMenu
+                    items={items}
+                    onPressItem={handlePress}
+                    destructiveColor={colors.error}
+                >
+                    {children}
+                </AndroidMenu>
+            </View>
         )
     }
 
     return (
-        <SwiftUIHost matchContents>
-            {/* No SDK 56 as props de layout do expo-ui viraram `modifiers`, e
+        <View style={align}>
+            <SwiftUIHost matchContents>
+                {/* No SDK 56 as props de layout do expo-ui viraram `modifiers`, e
                 `activationMethod` deixou de existir: o long press já é o gatilho
                 padrão do `ContextMenu`. */}
-            <ContextMenu modifiers={[frame({ alignment: "center" })]}>
-                <ContextMenu.Items>
-                    {items.map((item) => (
-                        <Button
-                            key={item.action}
-                            systemImage={item.systemImage}
-                            role={item.destructive ? "destructive" : undefined}
-                            label={item.label}
-                            onPress={() => handlePress(item)}
-                        />
-                    ))}
-                </ContextMenu.Items>
+                <ContextMenu modifiers={[frame({ alignment: "center" })]}>
+                    <ContextMenu.Items>
+                        {items.map((item) => (
+                            <Button
+                                key={item.action}
+                                systemImage={item.systemImage}
+                                role={item.destructive ? "destructive" : undefined}
+                                label={item.label}
+                                onPress={() => handlePress(item)}
+                            />
+                        ))}
+                    </ContextMenu.Items>
 
-                <ContextMenu.Trigger>{children}</ContextMenu.Trigger>
-            </ContextMenu>
-        </SwiftUIHost>
+                    <ContextMenu.Trigger>{children}</ContextMenu.Trigger>
+                </ContextMenu>
+            </SwiftUIHost>
+        </View>
     )
 }
 

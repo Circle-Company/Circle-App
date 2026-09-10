@@ -70,6 +70,5 @@ yarn-error.log
 google-services.json
 # testing
 /coverage
-# storybook — arquivo gerado por `sb-rn-get-stories` a cada start
-.rnstorybook/storybook.requires.ts
+# storybook
 storybook-static/

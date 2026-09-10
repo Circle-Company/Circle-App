@@ -1,7 +1,8 @@
 import React from "react"
-import { View, type ViewStyle } from "react-native"
+import { View, type LayoutChangeEvent, type ViewStyle } from "react-native"
 
 import MessageContext from "../context/provider"
+import MessageLayoutContext from "../context/layout.context"
 import { MessageContainerProps } from "../message.types"
 
 /**
@@ -20,6 +21,12 @@ import { MessageContainerProps } from "../message.types"
 export default function Container({ children, avatar, backgroundColor }: MessageContainerProps) {
     const { options, size } = React.useContext(MessageContext)
 
+    // Largura da linha, publicada para a bolha calcular o próprio teto em px.
+    const [width, setWidth] = React.useState(0)
+    const onLayout = React.useCallback((event: LayoutChangeEvent) => {
+        setWidth(event.nativeEvent.layout.width)
+    }, [])
+
     const showAvatarSlot = options.isGroup && !options.isMine
 
     const container: ViewStyle = {
@@ -34,13 +41,13 @@ export default function Container({ children, avatar, backgroundColor }: Message
     }
 
     return (
-        <View style={container}>
+        <View style={container} onLayout={onLayout}>
             {showAvatarSlot ? (
                 <View style={{ width: size.avatarSize }}>
                     {options.isLastOfGroup ? avatar : null}
                 </View>
             ) : null}
-            {children}
+            <MessageLayoutContext.Provider value={width}>{children}</MessageLayoutContext.Provider>
         </View>
     )
 }

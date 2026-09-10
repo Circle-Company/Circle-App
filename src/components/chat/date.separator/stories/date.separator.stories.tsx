@@ -17,17 +17,8 @@ export default meta
 
 type Story = StoryObj<typeof meta>
 
-export const Today: Story = {
+export const ShortLabel: Story = {
     args: { date: "Hoje" },
-}
-
-export const Yesterday: Story = {
-    args: { date: "Ontem" },
-}
-
-/** Data absoluta, o formato usado quando a conversa passa da semana. */
-export const AbsoluteDate: Story = {
-    args: { date: "12 de março de 2026" },
 }
 
 /** Rótulo longo: a etiqueta cresce com o texto, sem quebrar nem cortar. */
