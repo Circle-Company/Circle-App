@@ -44,12 +44,21 @@ export default function ChatLayout() {
             <Stack.Screen
                 name="[cid]"
                 options={{
+                    // Mesmo header da tela de account: fundo transparente e título em
+                    // `Black-Italic` no `title2 * 0.9`, centralizado.
+                    headerStyle: { backgroundColor: "transparent" },
+                    headerTransparent: true,
                     headerTitleAlign: "center",
+                    headerLargeTitle: false,
                     headerTitleStyle: {
-                        fontFamily: Fonts.family.Semibold,
-                        fontSize: Fonts.size.headline,
+                        fontFamily: Fonts.family["Black-Italic"],
+                        fontSize: Fonts.size.title2 * 0.9,
                         color: colors.gray.white,
                     },
+                    // Só o chevron, sem o título da tela anterior ao lado. No iOS o default
+                    // é `"default"`, que escreve "Chat" junto do ícone; nas outras
+                    // plataformas `"minimal"` já é o padrão.
+                    headerBackButtonDisplayMode: "minimal",
                 }}
             />
         </Stack>

@@ -35,7 +35,7 @@ export function useRevealGesture() {
 
                 // Uma vez assumido, o gesto não é devolvido a ninguém.
                 //
-                // Sem isto a `FlatList` reivindicava o toque no meio do arrasto —
+                // Sem isto a lista reivindicava o toque no meio do arrasto —
                 // basta o dedo derivar alguns pixels na vertical —, o gesto era
                 // terminado e a lista voltava sozinha com o dedo ainda na tela. O
                 // deslocamento só desfaz ao soltar ou ao arrastar de volta.

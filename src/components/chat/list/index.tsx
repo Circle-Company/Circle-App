@@ -1,5 +1,6 @@
 import React from "react"
-import { FlatList, View } from "react-native"
+import { View } from "react-native"
+import { FlashList } from "@shopify/flash-list"
 
 import ChatListRow from "./chat.list.row"
 import { ChatListProps, ChatRow, isDivider } from "./chat.list.types"
@@ -22,6 +23,7 @@ export default function ChatList({
     rows,
     isGroup = false,
     size,
+    contentInsetTop = 0,
     renderAvatar,
     onAction,
     onPressReply,
@@ -82,15 +84,15 @@ export default function ChatList({
     )
 
     return (
-        // O gesto fica no envelope, e não na `FlatList`: assim ele observa o
+        // O gesto fica no envelope, e não na lista: assim ele observa o
         // movimento sem disputar o `onScroll` dela, e só assume quando o arrasto
         // é horizontal (ver `useRevealGesture`).
         <View style={{ flex: 1, overflow: "hidden" }} {...panHandlers}>
-            <FlatList
+            <FlashList
                 data={rows}
                 keyExtractor={keyExtractor}
                 renderItem={renderItem}
-                contentContainerStyle={{ paddingVertical: 8 }}
+                contentContainerStyle={{ paddingTop: contentInsetTop + 8, paddingBottom: 8 }}
                 // Conversa antiga fica acima; o fim da lista é o presente.
                 showsVerticalScrollIndicator={false}
             />

@@ -1,5 +1,6 @@
 import React from "react"
-import { FlatList, Text, View } from "react-native"
+import { Text, View } from "react-native"
+import { FlashList } from "@shopify/flash-list"
 import { router } from "expo-router"
 
 import {
@@ -28,7 +29,7 @@ import LanguageContext from "@/contexts/language"
  *         useChannelsContext()
  *     const previews = channels.map(toChatPreview)   // adaptador a escrever
  *
- * e a `FlatList` ganha `onEndReached`, `refreshing` e `onRefresh` a partir desses valores. O
+ * e a lista ganha `onEndReached`, `refreshing` e `onRefresh` a partir desses valores. O
  * `ChannelsContext` já entrega paginação, refresh e erro prontos — por isso a lista é nossa
  * e o `ChannelList` do SDK não é usado: não há forma documentada de substituir a célula dele
  * por uma célula de grid (§8.1 do documento).
@@ -88,7 +89,7 @@ export default function ChatScreen() {
     }
 
     return (
-        <FlatList
+        <FlashList
             data={previews}
             numColumns={CHAT_GRID_COLUMNS}
             keyExtractor={(preview) => preview.cid}

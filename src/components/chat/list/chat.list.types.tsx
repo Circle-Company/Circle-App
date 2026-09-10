@@ -26,6 +26,14 @@ export type ChatListProps = {
     /** Conversa em grupo: habilita nome do autor e avatar. */
     isGroup?: boolean
     size?: MessageSizeProps
+    /**
+     * Altura a reservar no topo da rolagem.
+     *
+     * A conversa costuma viver sob um header transparente, e sem esta folga a primeira
+     * mensagem nasce atrás dele. Chega de fora porque quem conhece a altura do header é a
+     * tela (`useHeaderHeight`), não o chat.
+     */
+    contentInsetTop?: number
     /** Avatar do autor, montado pela tela — o chat não conhece o componente. */
     renderAvatar?: (message: MessageReciveDataProps) => React.ReactNode
     onAction?: (action: string, messageId: string) => void
