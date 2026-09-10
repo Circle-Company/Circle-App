@@ -85,6 +85,19 @@ export type ChatListProps = {
      * digita num ponto da conversa que não é aquele.
      */
     footer?: React.ReactElement | null
+    /**
+     * O que fica **antes** da primeira mensagem — na prática, o indicador de que se está
+     * carregando o passado da conversa.
+     */
+    header?: React.ReactElement | null
+    /**
+     * Chegou no topo: hora de carregar mensagens mais antigas.
+     *
+     * A lista é cronológica (a mais recente embaixo), então o passado fica no **início** —
+     * daí `onStartReached`, e não `onEndReached`, que é o engano fácil aqui: `onEndReached`
+     * dispararia ao chegar na mensagem mais nova, carregando o que já está na tela.
+     */
+    onStartReached?: () => void
     /** Avatar do autor, montado pela tela — o chat não conhece o componente. */
     renderAvatar?: (message: MessageReciveDataProps) => React.ReactNode
     onAction?: (action: string, messageId: string) => void

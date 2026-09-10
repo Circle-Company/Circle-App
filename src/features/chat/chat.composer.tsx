@@ -3,6 +3,7 @@ import { Pressable, View } from "react-native"
 import { Host, TextInput, useNativeState } from "@expo/ui"
 import { SymbolView } from "expo-symbols"
 import { useSafeAreaInsets } from "react-native-safe-area-context"
+import { runOnJS } from "react-native-reanimated"
 
 import { colors } from "@/constants/colors"
 import fonts from "@/constants/fonts"
@@ -28,6 +29,15 @@ type NativeTextState = {
 type ChatComposerProps = {
     placeholder: string
     onSend: (text: string) => void
+    /**
+     * Uma tecla foi digitada — é o gancho do "digitando…" para o outro lado.
+     *
+     * Não recebe o texto de propósito: o que interessa é que houve digitação, e passar o
+     * conteúdo obrigaria a atravessar a fronteira de thread com uma string a cada tecla.
+     */
+    onTyping?: () => void
+    /** O campo perdeu o foco ou a mensagem foi enviada: encerra o "digitando…". */
+    onStopTyping?: () => void
 }
 
 /**
@@ -48,30 +58,48 @@ type ChatComposerProps = {
  * O `@expo/ui` já é usado no app (`profile.dropdown.menu.tsx`, `profile.report.modal.tsx`) e
  * o pod está no build, então isto não acrescenta dependência nativa nova.
  */
-export function ChatComposer({ placeholder, onSend }: ChatComposerProps) {
+export function ChatComposer({ placeholder, onSend, onTyping, onStopTyping }: ChatComposerProps) {
     const insets = useSafeAreaInsets()
     const text = useNativeState("") as NativeTextState
+
+    /*
+     * O aviso de digitação atravessa para a thread de JS.
+     *
+     * `onChangeText` é worklet — roda na thread de UI, que é o ponto do componente —, e
+     * `channel.keystroke()` é uma chamada de rede, que só existe do lado do JS. Sem o
+     * `runOnJS` a chamada quebraria no runtime dos worklets.
+     *
+     * Uma travessia por tecla parece cara, mas o SDK já limita o envio a um a cada dois
+     * segundos: o que passa a fronteira é uma função sem argumentos, e quase toda chamada
+     * morre no throttle do lado de lá.
+     */
+    const notifyTyping = React.useCallback(() => {
+        "worklet"
+        if (onTyping) runOnJS(onTyping)()
+    }, [onTyping])
 
     const handleChangeText = React.useCallback(
         (value: string) => {
             "worklet"
+            notifyTyping()
             // Atribuição direta, e não `set()`: dentro de um worklet a escrita em `value` é
             // síncrona na thread de UI, que é o ponto do componente inteiro. É a forma que a
             // documentação do `@expo/ui` usa aqui.
             // eslint-disable-next-line react-hooks/immutability
             text.value = value
         },
-        [text],
+        [notifyTyping, text],
     )
 
     const handleSend = React.useCallback(() => {
         const value = text.get().trim()
         if (!value) return
         onSend(value)
+        onStopTyping?.()
         // Escrita a partir da thread JS é agendada para a de UI, não imediata. Aqui isso não
         // importa: o campo esvaziar um frame depois do envio é imperceptível.
         text.set("")
-    }, [onSend, text])
+    }, [onSend, onStopTyping, text])
 
     return (
         <View

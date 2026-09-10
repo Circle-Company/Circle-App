@@ -7,6 +7,8 @@ import { iOSMajorVersion } from "@/lib/platform/detection"
 import { usePushNotifications } from "@/contexts/push.notification"
 import PersistedContext from "@/contexts/Persisted"
 import { usePreferencesStore } from "@/contexts/Persisted/preferences"
+import { useChat } from "@/contexts/Chat"
+import { useChatUnread } from "@/features/chat"
 
 /**
  * Etapa de foto de perfil do cadastro. Fica aqui, no layout das tabs, porque a
@@ -39,6 +41,18 @@ export default function TabsLayout() {
     const pathname = usePathname()
     useProfilePictureOnboarding()
     const { unreadCount, inboxVisited } = usePushNotifications()
+
+    /*
+     * A aba de chat só existe onde o chat existe.
+     *
+     * `unavailable` é o ambiente sem o provedor configurado (503): a aba levaria a uma tela
+     * que nunca vai carregar. Nos demais estados ela fica, porque conectar é questão de
+     * tempo ou de uma nova tentativa.
+     */
+    const { status: chatStatus } = useChat()
+    const chatAvailable = chatStatus !== "unavailable"
+    // O não-lido do chat é o do Stream, não o do inbox — mensagem não gera notificação.
+    const chatUnread = useChatUnread()
     const hideTabBar =
         // `chat/[cid]` entra aqui: a conversa troca a tab bar pelo campo de escrita.
         /^\/(you|moment|chat)\/[^/]+/.test(pathname ?? "") ||
@@ -88,15 +102,22 @@ export default function TabsLayout() {
                 )}
             </NativeTabs.Trigger>
 
-            <NativeTabs.Trigger name="chat">
-                <NativeTabs.Trigger.Icon
-                    sf={{
-                        default: "message",
-                        selected: "message.fill",
-                    }}
-                />
-                <NativeTabs.Trigger.Label hidden />
-            </NativeTabs.Trigger>
+            {chatAvailable && (
+                <NativeTabs.Trigger name="chat">
+                    <NativeTabs.Trigger.Icon
+                        sf={{
+                            default: "message",
+                            selected: "message.fill",
+                        }}
+                    />
+                    <NativeTabs.Trigger.Label hidden />
+                    {chatUnread > 0 && (
+                        <NativeTabs.Trigger.Badge selectedBackgroundColor={colors.red.red_05}>
+                            {chatUnread > 99 ? "99+" : chatUnread.toString()}
+                        </NativeTabs.Trigger.Badge>
+                    )}
+                </NativeTabs.Trigger>
+            )}
 
             <NativeTabs.Trigger name="you">
                 <NativeTabs.Trigger.Icon sf={{ default: "at", selected: "at" }} />

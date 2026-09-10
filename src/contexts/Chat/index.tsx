@@ -1,5 +1,9 @@
 import React from "react"
+import type { StreamChat } from "stream-chat"
 
+import PersistedContext from "@/contexts/Persisted"
+
+import { type ChatConnectionStatus, useChatConnection } from "./connection"
 import {
     type ActivityEntry,
     type ActivityMap,
@@ -45,6 +49,22 @@ import {
  * componente.
  */
 export type ChatContextData = {
+    // ── Conexão ────────────────────────────────────────────────────────────────────────
+    /**
+     * Em que pé está a conexão com o Stream.
+     *
+     * `"unavailable"` é o que esconde a aba de chat e o botão "Mensagem" do perfil: o
+     * ambiente não tem o provedor configurado, e nenhuma tela do chat pode funcionar.
+     */
+    status: ChatConnectionStatus
+    /** O client conectado, ou `null`. É dele que os hooks de tela leem canais e mensagens. */
+    client: StreamChat | null
+    /** WebSocket de pé agora. `false` → banner de "sem conexão" nas telas do chat. */
+    online: boolean
+    /** Tenta conectar de novo. Para o botão do estado de erro. */
+    retryConnection: () => void
+
+    // ── Estado efêmero ─────────────────────────────────────────────────────────────────
     presence: PresenceMap
     isOnline: (userId: string) => boolean
 
@@ -70,6 +90,21 @@ export type ChatContextData = {
 const ChatContext = React.createContext<ChatContextData>({} as ChatContextData)
 
 export function Provider({ children }: { children: React.ReactNode }) {
+    /*
+     * Quem está logado, do ponto de vista do chat.
+     *
+     * Vem da sessão persistida e não do `AuthContext` porque é o `userId` que o backend usa
+     * como id no Stream — o mesmo valor que a guarda de identidade em `connection.ts` compara
+     * com o da credencial emitida. Vazio significa "ninguém logado", e o hook desconecta.
+     */
+    const { session } = React.useContext(PersistedContext)
+    const {
+        status,
+        client,
+        online,
+        retry: retryConnection,
+    } = useChatConnection(session?.account?.userId)
+
     const [presence, setPresenceState] = React.useState<PresenceMap>({})
     const [activities, setActivities] = React.useState<ActivityMap>({})
     const [playing, setPlaying] = React.useState<PlayingState>(null)
@@ -150,8 +185,22 @@ export function Provider({ children }: { children: React.ReactNode }) {
         [playing],
     )
 
+    /*
+     * Sessão do chat encerrada (logout, troca de conta, 503): o estado efêmero morre junto.
+     *
+     * Sem isto, "digitando…" e o ponto de online de quem conversava com a conta anterior
+     * sobrevivem à troca — dado de uma pessoa aparecendo na tela de outra.
+     */
+    React.useEffect(() => {
+        if (status === "idle" || status === "unavailable") reset()
+    }, [status, reset])
+
     const value = React.useMemo<ChatContextData>(
         () => ({
+            status,
+            client,
+            online,
+            retryConnection,
             presence,
             isOnline,
             activityIn,
@@ -169,6 +218,10 @@ export function Provider({ children }: { children: React.ReactNode }) {
             reset,
         }),
         [
+            status,
+            client,
+            online,
+            retryConnection,
             presence,
             isOnline,
             activityIn,
@@ -194,6 +247,8 @@ export function useChat(): ChatContextData {
     return React.useContext(ChatContext)
 }
 
+export type { ChatConnectionStatus } from "./connection"
+export { endChatSession } from "./connection"
 export type { ChatActivity, ChatPresence } from "./state"
 export { TYPING_TTL_MS } from "./state"
 export default ChatContext

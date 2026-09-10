@@ -13,6 +13,10 @@ import { recordLogin, resetSessionRuntime } from "@/session/runtime"
 import { persistLoginSession } from "@/session/login"
 import { installForegroundRevalidation } from "@/session/foreground"
 import { clearResidualDataIfDifferentPerson } from "@/session/identityGuard"
+// Direto do módulo, e não de `@/contexts/Chat`: o index do contexto importa o
+// `PersistedContext`, que importa este arquivo — o ciclo quebraria o bundle. `connection.ts`
+// não depende de nenhum contexto.
+import { endChatSession } from "@/contexts/Chat/connection"
 import { SessionDataType } from "@/contexts/Persisted/types"
 import { signWithAppleProps } from "@/api/auth/auth.types"
 import {
@@ -422,6 +426,14 @@ export function Provider({ children }: AuthProviderProps) {
                 // rede caiu, servidor fora: não muda nada aqui
             })
         }
+
+        // O chat vem **antes** da limpeza, e é o mesmo motivo do access token acima: o
+        // `disconnectUser` precisa da sessão viva. Sem esta linha o WebSocket do Stream
+        // sobrevive ao logout — a sessão do app morre e a do chat continua entregando
+        // mensagens de uma conta que já saiu do aparelho.
+        //
+        // Sem `await`, como a despedida do servidor: o logout do usuário não espera rede.
+        endChatSession().catch(() => {})
 
         try {
             // Mata a sessão viva antes de tudo: sem isto, um refresh em voo poderia gravar

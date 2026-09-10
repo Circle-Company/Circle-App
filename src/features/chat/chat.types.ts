@@ -16,6 +16,13 @@
 export type ChatPreview = {
     /** `cid` do canal no Stream (`messaging:xyz`). Chave da lista e da rota. */
     cid: string
+    /**
+     * Id do outro participante numa DM, quando conhecido.
+     *
+     * Opcional porque o mock não tem pessoas de verdade por trás. Nas conversas reais ele
+     * está sempre presente, e é por ele — nunca pelo nome — que se navega para o perfil.
+     */
+    peerId?: string
     /** Nome do outro participante numa DM. */
     name: string
     profilePicture?: string

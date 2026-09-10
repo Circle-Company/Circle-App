@@ -30,6 +30,8 @@ import {
     useRemoveFriendMutation,
     useSendFriendRequestMutation,
 } from "@/queries/friendship"
+import { useChat } from "@/contexts/Chat"
+import { useOpenDirectChat } from "@/features/chat"
 
 type FriendButtonProps = {
     userId: string
@@ -57,6 +59,11 @@ export function FriendButton({ userId, username, initialRelation }: FriendButton
     const { t } = React.useContext(LanguageContext)
 
     const { data: status, isLoading } = useFriendshipStatusQuery(userId)
+
+    // Onde o chat não existe (503), o botão de mensagem também não deve existir.
+    const { status: chatStatus } = useChat()
+    const chatAvailable = chatStatus !== "unavailable"
+    const openChat = useOpenDirectChat()
     const relation: FriendshipRelation = status?.relation ?? initialRelation ?? "none"
 
     const sendMutation = useSendFriendRequestMutation({ userId })
@@ -150,6 +157,24 @@ export function FriendButton({ userId, username, initialRelation }: FriendButton
                         onPress={handleUnfriend}
                         solid={false}
                     />
+                    {/*
+                     * "Mensagem" só existe aqui, no ramo `friends`.
+                     *
+                     * Conversa é entre amigos: o backend recusa a abertura com 403 para
+                     * qualquer outra relação. Mostrar o botão nos demais ramos seria oferecer
+                     * um caminho que termina em erro — daí ele viver dentro do `switch`, e
+                     * não ao lado dele.
+                     */}
+                    {chatAvailable && (
+                        <Pill
+                            {...shared}
+                            loading={shared.loading || openChat.opening}
+                            label={t("Message")}
+                            tone="light"
+                            onPress={() => openChat.open(userId)}
+                            solid={false}
+                        />
+                    )}
                 </View>
             )
 

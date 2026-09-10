@@ -27,6 +27,9 @@ import ExitIcon from "@/assets/icons/svgs/rectangle.portrait.and.arrow.right.svg
 import MagazineIcon from "@/assets/icons/svgs/magazine.svg"
 import DocIcon from "@/assets/icons/svgs/doc.svg"
 import HelpIcon from "@/assets/icons/svgs/exclamationmark.bubble.svg"
+import MessageIcon from "@/assets/icons/svgs/message.svg"
+import { SwitchButton } from "@/components/general/switch-button"
+import { useNotificationPreference } from "@/queries/notification.preferences"
 
 export default function ListSettings() {
     const { session } = React.useContext(PersistedContext)
@@ -40,6 +43,15 @@ export default function ListSettings() {
         : t("add new name")
 
     const { permissionStatus } = usePushNotifications()
+
+    /*
+     * Push de mensagem direta.
+     *
+     * É separado de silenciar uma conversa (que se faz dentro dela): este desliga o push de
+     * **todas**. Nenhum dos dois afeta o recebimento das mensagens nem o contador de
+     * não-lidas — o que muda é só o aviso.
+     */
+    const directMessages = useNotificationPreference("message")
 
     const ListData: SettignsSectionProps[] = [
         {
@@ -70,6 +82,18 @@ export default function ListSettings() {
                     name: t("Friends"),
                     icon: <PersonIcon fill={colors.gray.grey_03} width={22} height={22} />,
                     onPress: () => router.push("/settings/friends"),
+                },
+                {
+                    name: t("Direct messages"),
+                    icon: <MessageIcon fill={colors.gray.grey_03} width={22} height={22} />,
+                    type: "Switch",
+                    rightComponent: (
+                        <SwitchButton
+                            initialState={directMessages.enabled}
+                            onPressEnable={directMessages.toggle}
+                            onPressDisable={directMessages.toggle}
+                        />
+                    ),
                 },
                 {
                     name: t("Blocked users"),

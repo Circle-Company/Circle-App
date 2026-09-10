@@ -155,6 +155,20 @@ export const STORAGE_KEYS = {
         // Escrita por `contexts/push.notification.tsx` a cada checagem de permissão.
         postNotifications: `${BASE_KEY}permissions:postnotifications`,
     },
+    notifications: {
+        /**
+         * As preferências de notificação da conta, como JSON.
+         *
+         * Cache do que o servidor decide, não a verdade: existe para a tela de ajustes abrir
+         * já mostrando o estado certo, em vez de piscar o padrão e corrigir depois. É escrita
+         * com a resposta do `PUT /account/notifications/preferences` e no login.
+         *
+         * Escopo de **conta**, não de aparelho: por estar sob `@circle:`, some no logout
+         * junto do resto — que é o comportamento correto, porque a preferência é de quem
+         * estava logado.
+         */
+        preferences: `${BASE_KEY}notifications:preferences`,
+    },
     tutorial: {
         feed: {
             step1Seen: `${BASE_KEY}tutorial:feed:step1Seen`,

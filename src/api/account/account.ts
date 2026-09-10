@@ -85,6 +85,43 @@ async function readAllNotifications(): Promise<void> {
     return response.data
 }
 
+/**
+ * As preferências de notificação que o app conhece.
+ *
+ * Todas opcionais, e `message` é a chave nova do chat: **ligada por padrão**, inclusive em
+ * conta antiga (a migration do backend preencheu `true`). É separada de `friends` de
+ * propósito — silenciar convite de amizade não silencia conversa.
+ */
+export type NotificationPreferences = {
+    message?: boolean
+    friends?: boolean
+    likes?: boolean
+    comments?: boolean
+    followers?: boolean
+    moments?: boolean
+}
+
+export type NotificationPreferencesResponse = {
+    success: boolean
+    preferences: {
+        notifications: NotificationPreferences
+    }
+}
+
+/**
+ * Atualiza as preferências de notificação.
+ *
+ * **Envie só o que mudou.** O backend preserva as demais chaves; mandar o objeto inteiro
+ * significaria sobrescrever com o que o app acha que sabe, que pode estar velho se a conta
+ * mudou a preferência em outro aparelho.
+ */
+async function updateNotificationPreferences(
+    notifications: NotificationPreferences,
+): Promise<NotificationPreferencesResponse> {
+    const response = await api.put(`/account/notifications/preferences`, { notifications })
+    return response.data
+}
+
 export const routes = {
     getAccount,
     getAccountBlocks,
@@ -94,4 +131,5 @@ export const routes = {
     updatePushToken,
     getNotifications,
     readAllNotifications,
+    updateNotificationPreferences,
 }

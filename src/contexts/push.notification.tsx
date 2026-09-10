@@ -7,7 +7,7 @@ import React, {
     useRef,
     useState,
 } from "react"
-import { usePathname } from "expo-router"
+import { router, usePathname } from "expo-router"
 import * as Notifications from "expo-notifications"
 import * as Device from "expo-device"
 import { Vibrate } from "@/lib/hooks/useHapticFeedback"
@@ -23,18 +23,35 @@ import {
     type AccountNotification,
     type FetchAccountNotificationsParams,
 } from "@/queries/account"
+// Direto do módulo: `@/features/chat` reexporta o client do Stream, e este arquivo é
+// importado no escopo global (o `setNotificationHandler` abaixo roda na carga do módulo).
+import { asChatPush, chatRouteFromPush, isForOpenConversation } from "@/features/chat/chat.push"
 
 // ──────────────────────────────────────────────────────────────────────────────
 // Foreground notification behaviour (per Expo docs)
 // Must be called at module scope, before any listener is registered.
 // ──────────────────────────────────────────────────────────────────────────────
 Notifications.setNotificationHandler({
-    handleNotification: async () => ({
-        shouldShowBanner: false, // we show our own in-app toast
-        shouldShowList: true, // keep in notification center
-        shouldPlaySound: true, // let the OS play the push sound
-        shouldSetBadge: false, // we control the badge ourselves
-    }),
+    handleNotification: async (notification) => {
+        /*
+         * Mensagem cuja conversa já está na tela não vira aviso nenhum.
+         *
+         * Nem banner do sistema, nem som, nem linha no centro de notificações: a pessoa está
+         * olhando para a mensagem, e ela vai aparecer na lista pelo WebSocket de qualquer
+         * forma. Um aviso aqui seria o app avisando sobre algo que já está visível.
+         *
+         * O `shouldShowBanner: false` das demais não é o mesmo caso — ali o banner é
+         * substituído pelo nosso toast; aqui não há substituto porque não deve haver aviso.
+         */
+        const isOpenConversation = isForOpenConversation(notification.request.content.data)
+
+        return {
+            shouldShowBanner: false, // we show our own in-app toast
+            shouldShowList: !isOpenConversation, // keep in notification center
+            shouldPlaySound: !isOpenConversation, // let the OS play the push sound
+            shouldSetBadge: false, // we control the badge ourselves
+        }
+    },
 })
 
 // ──────────────────────────────────────────────────────────────────────────────
@@ -388,6 +405,17 @@ export const PushNotificationProvider: React.FC<{ children: React.ReactNode }> =
     useEffect(() => {
         // Fires when a notification is received while the app is FOREGROUNDED
         const receivedSubscription = Notifications.addNotificationReceivedListener((event) => {
+            /*
+             * Mensagem nova é push-only: não gera linha em `/notifications`.
+             *
+             * Então nada daqui para baixo se aplica a ela — nem marcar o inbox como sujo, nem
+             * recarregar a lista, nem somar ao badge do inbox. O contador do chat é outro
+             * (`useChatUnread`), alimentado pelo Stream. Sem esta saída, cada mensagem
+             * recebida aumentaria o badge de notificações e disparia um refetch do inbox que
+             * voltaria exatamente igual.
+             */
+            if (asChatPush(event.request.content.data)) return
+
             // Mark that new unread content exists
             setInboxVisited(false)
 
@@ -450,9 +478,24 @@ export const PushNotificationProvider: React.FC<{ children: React.ReactNode }> =
             (response) => {
                 // Mesmo Value Moment, pela via do toque: com o app em background
                 // o listener de chegada acima não roda.
-                const tappedType = (
-                    response.notification.request.content.data as Record<string, any> | undefined
-                )?.type
+                const tappedData = response.notification.request.content.data as
+                    Record<string, any> | undefined
+
+                /*
+                 * Toque num push de mensagem: abre a conversa e para por aqui.
+                 *
+                 * `router.push` e não `replace`: o destino é uma conversa, e voltar dela tem
+                 * de levar de volta para onde a pessoa estava. Com o app frio, este listener
+                 * dispara antes de a navegação existir — o `router` do expo-router enfileira
+                 * a navegação até a raiz montar, então não há corrida a tratar aqui.
+                 */
+                const chatRoute = chatRouteFromPush(tappedData)
+                if (chatRoute) {
+                    router.push(chatRoute as any)
+                    return
+                }
+
+                const tappedType = tappedData?.type
                 if (tappedType === NotificationType.MomentLiked) {
                     trackLikeNotificationReceived(getTrackedUser(), { is_foreground: false })
                 }

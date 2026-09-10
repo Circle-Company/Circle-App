@@ -16,16 +16,21 @@ export type ChatConnectParams = {
     /** Mesmo id do usuário no Circle — ver §5 do documento. */
     userId: string
     /**
-     * O token, ou uma função que o busca.
+     * A função que busca o token.
      *
-     * **Prefira a função.** O token expira, e o client a chama de novo sozinho quando isso
-     * acontece; com uma string fixa, a sessão do chat simplesmente morre e só volta com um
-     * reinício do app.
+     * **Função, e não string.** O token expira em uma hora, e o client chama isto de novo
+     * sozinho quando isso acontece; com um valor fixo a sessão do chat simplesmente morre e
+     * só volta com um reinício do app.
      */
-    token: string | TokenProvider
-    name?: string
-    image?: string
+    token: TokenProvider
 }
+
+/*
+ * Não há `name` nem `image` aqui, e a ausência é a decisão: quem escreve o perfil no Stream
+ * é o backend, a cada emissão de token (`POST /chat/token`). Se o app também escrevesse, duas
+ * fontes disputariam o mesmo registro e o nome exibido dependeria de quem gravou por último —
+ * ver §4.1 do guia do chat.
+ */
 
 /**
  * `getInstance` e não `new StreamChat()`: a própria documentação avisa que o construtor é
@@ -45,6 +50,13 @@ export function getChatClient(apiKey: string): StreamChat {
  * `getInstance` acima existe para evitar.
  */
 let connecting: Promise<StreamChat> | null = null
+/**
+ * De quem é a conexão em voo.
+ *
+ * Sem isto, duas contas em sequência compartilham a promise da primeira: a segunda chamada
+ * cai no `return connecting` e recebe o client conectado como quem acabou de sair.
+ */
+let connectingUserId: string | null = null
 let connectedUserId: string | null = null
 
 /**
@@ -68,8 +80,6 @@ export async function connectChatUser({
     apiKey,
     userId,
     token,
-    name,
-    image,
 }: ChatConnectParams): Promise<StreamChat> {
     const instance = getChatClient(apiKey)
     client = instance
@@ -78,23 +88,28 @@ export async function connectChatUser({
     // recarregaria tudo sem necessidade.
     if (connectedUserId === userId && instance.userID === userId) return instance
 
-    if (connecting) return connecting
+    // Compartilha a conexão em voo **só se for da mesma pessoa**. A checagem de usuário vem
+    // antes de tudo de propósito: numa troca de conta rápida, devolver a promise em voo
+    // entregaria ao chamador o client conectado como quem acabou de sair.
+    if (connecting && connectingUserId === userId) return connecting
 
     // Trocou de usuário no mesmo aparelho (§2.6 do guard de identidade): a conexão anterior
     // precisa morrer antes, senão o WebSocket antigo continua entregando eventos da conta
-    // que acabou de sair.
-    if (connectedUserId && connectedUserId !== userId) {
+    // que acabou de sair. Vale também para uma conexão ainda em voo.
+    if (connecting || (connectedUserId && connectedUserId !== userId)) {
         await disconnectChatUser()
     }
 
+    connectingUserId = userId
     connecting = instance
-        .connectUser({ id: userId, name, image }, token)
+        .connectUser({ id: userId }, token)
         .then(() => {
             connectedUserId = userId
             return instance
         })
         .finally(() => {
             connecting = null
+            connectingUserId = null
         })
 
     return connecting
@@ -111,6 +126,7 @@ export async function disconnectChatUser(): Promise<void> {
     const instance = client
     connectedUserId = null
     connecting = null
+    connectingUserId = null
     if (!instance) return
 
     try {

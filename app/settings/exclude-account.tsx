@@ -4,6 +4,7 @@ import { useRouter } from "expo-router"
 import PersistedContext from "@/contexts/Persisted"
 import LanguageContext from "@/contexts/language"
 import api from "@/api"
+import { endChatSession } from "@/contexts/Chat/connection"
 import ButtonStandart from "@/components/buttons/button-standart"
 import { colors } from "@/constants/colors"
 import fonts from "@/constants/fonts"
@@ -41,6 +42,13 @@ export default function ExcludeAccountScreen() {
 
             // Solicitação de exclusão da conta
             await api.delete("/account")
+
+            /*
+             * O chat sai primeiro. O backend já revogou os tokens e apagou as conversas, mas
+             * o WebSocket aberto neste aparelho não sabe disso: sem desconectar, ele continua
+             * tentando reconectar com uma credencial de uma conta que não existe mais.
+             */
+            await endChatSession()
 
             // Limpeza local de sessão e dados persistidos. Eram quatro chamadas porque
             // `user` e `account` eram stores diferentes; agora são uma só, e `clear()` zera

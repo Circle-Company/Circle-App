@@ -6,6 +6,7 @@ import { MetricsState, useMetricsStore } from "./metrics"
 import { AccountState, useAccountStore } from "./account"
 import { readSession } from "@/session/storage"
 import { textLib } from "@/circle.text.library"
+import { writeNotificationPreferences } from "@/queries/notification.preferences"
 
 type PersistedProviderProps = { children: React.ReactNode }
 /**
@@ -123,6 +124,18 @@ export function Provider({ children }: PersistedProviderProps) {
                             muteAudio: false,
                         },
                     })
+                }
+
+                /*
+                 * Preferências de notificação.
+                 *
+                 * Não há rota de leitura para elas: o login é a única vez em que o servidor
+                 * as manda sem que o app tenha acabado de escrevê-las. Sem esta linha a tela
+                 * de ajustes abriria mostrando o padrão (tudo ligado) para quem desligou algo
+                 * em outro aparelho.
+                 */
+                if (session?.preferences?.notifications) {
+                    writeNotificationPreferences(session.preferences.notifications)
                 }
 
                 // Metrics

@@ -32,6 +32,8 @@ export default function ChatList({
     contentInsetAdjustmentBehavior = "never",
     disableContentAnchoring = false,
     footer,
+    header,
+    onStartReached,
     renderAvatar,
     onAction,
     onPressReply,
@@ -226,7 +228,14 @@ export default function ChatList({
                         disabled: disableContentAnchoring,
                         startRenderingFromBottom: true,
                     }}
+                    ListHeaderComponent={header}
                     ListFooterComponent={footer}
+                    onStartReached={onStartReached}
+                    /*
+                     * Meia tela de antecedência: com o padrão, a busca só começa quando o
+                     * topo já está à vista, e a conversa trava enquanto a página chega.
+                     */
+                    onStartReachedThreshold={0.5}
                     showsVerticalScrollIndicator={false}
                 />
             </View>

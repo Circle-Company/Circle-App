@@ -6,6 +6,7 @@ import { currentAuth, ensureSession, peekSession, waitForRevalidation } from "@/
 
 import { routes as accountRoutes } from "./account/account"
 import { routes as authRoutes } from "./auth/auth"
+import { routes as chatRoutes } from "./chat/chat"
 import { routes as friendshipRoutes } from "./friendship/friendship"
 import { routes as momentRoutes } from "./moment/moment"
 import { routes as preferencesRoutes } from "./preferences/preferences"
@@ -396,4 +397,5 @@ export const apiRoutes = {
     profile: profileRoutes,
     radar: radarRoutes,
     friendship: friendshipRoutes,
+    chat: chatRoutes,
 }
