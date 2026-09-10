@@ -1,5 +1,7 @@
 const { getDefaultConfig } = require("expo/metro-config")
-const withStorybook = require("@storybook/react-native/metro/withStorybook")
+// Export nomeado: no Storybook 10 esse caminho devolve `{ withStorybook }`, e não a
+// função direto — `require(...)` sem desestruturar dá "withStorybook is not a function".
+const { withStorybook } = require("@storybook/react-native/metro/withStorybook")
 
 const config = getDefaultConfig(__dirname)
 
