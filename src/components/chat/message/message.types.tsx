@@ -84,6 +84,13 @@ export type MessageReciveDataProps = {
     deletedAt?: string | null
     forwarded?: boolean
     pinned?: boolean
+    /**
+     * Quantas mensagens responderam a esta.
+     *
+     * Vem do backend: a lista carregada na tela é uma janela da conversa, e
+     * contar as respostas ali daria números diferentes conforme a rolagem.
+     */
+    replyCount?: number
 }
 
 export type MessageOptionsProps = {
@@ -235,6 +242,13 @@ export type MessageForwardedLabelProps = {
     fontSize?: number
 }
 
+export type MessageRepliesProps = {
+    color?: string
+    fontSize?: number
+    /** Toque para abrir as respostas. */
+    onPress?: () => void
+}
+
 export type MessageReactionsProps = {
     onPressReaction?: (emoji: string) => void
 }
@@ -299,6 +313,8 @@ export type MessageRenderProps = {
     onPressReaction?: (emoji: string) => void
     /** Toque na citação, para saltar até a mensagem original. */
     onPressReply?: (replyToId: string) => void
+    /** Toque em "X respostas", para abrir as respostas àquela mensagem. */
+    onPressReplies?: (messageId: string) => void
     /** Arrasto no traço da nota de voz — ver `MessageAudioProps.onSeek`. */
     onSeek?: (progress: number) => void
 }

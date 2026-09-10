@@ -70,3 +70,28 @@ export const Deleted: Story = {
         },
     },
 }
+
+/** Mensagem que gerou discussão: a contagem de respostas entra no rodapé. */
+export const WithReplies: Story = {
+    args: {
+        data: {
+            ...baseMessage,
+            id: "6",
+            content: "Alguém consegue revisar o contrato hoje?",
+            replyCount: 4,
+        },
+    },
+}
+
+/** Uma resposta só: o texto vai no singular. */
+export const WithSingleReply: Story = {
+    args: {
+        data: {
+            ...baseMessage,
+            id: "7",
+            author: me,
+            content: "Fechado, mando o resumo depois.",
+            replyCount: 1,
+        },
+    },
+}

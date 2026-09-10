@@ -19,9 +19,12 @@ import { MessageChildrenProps } from "../message.types"
  * horário de cada mensagem à direita.
  */
 export default function Footer({ children }: MessageChildrenProps) {
-    const { options, size } = React.useContext(MessageContext)
+    const { data, options, size } = React.useContext(MessageContext)
 
-    if (!options.isLastOfGroup) return null
+    // Regra do rodapé: aparece no fim do bloco, ou antes dele quando há algo dito
+    // sobre *aquela* mensagem em particular — hoje, as respostas que ela recebeu.
+    const hasOwnInfo = (data.replyCount ?? 0) > 0
+    if (!options.isLastOfGroup && !hasOwnInfo) return null
 
     const container: ViewStyle = {
         // Ocupa a linha inteira para quebrar depois da bolha, no `flexWrap` do

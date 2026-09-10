@@ -13,6 +13,7 @@ import message_status from "./components/message.status"
 import message_text from "./components/message.text"
 import message_time from "./components/message.time"
 import reactions from "./components/message.reactions"
+import replies from "./components/message.replies"
 import reply_preview from "./components/message.reply.preview"
 import root from "./components/message.root"
 import { MessageRenderProps } from "./message.types"
@@ -45,6 +46,7 @@ export function MessageRender({
     onAction,
     onPressReaction,
     onPressReply,
+    onPressReplies,
     onSeek,
 }: MessageRenderProps) {
     return (
@@ -76,6 +78,7 @@ export function MessageRender({
                     envio, não do conteúdo. A hora saiu daqui — quem a mostra
                     agora é o arrasto da lista. */}
                 <Message.Footer>
+                    <Message.Replies onPress={() => onPressReplies?.(data.id)} />
                     <Message.EditedLabel />
                     <Message.Status />
                 </Message.Footer>
@@ -104,6 +107,7 @@ export const Message = {
     EditedLabel: edited_label,
     Time: message_time,
     Status: message_status,
+    Replies: replies,
     Reactions: reactions,
     ActionsMenu: actions_menu,
 }

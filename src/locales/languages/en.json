@@ -456,5 +456,7 @@
     "Sent": "sent",
     "Delivered": "delivered",
     "Read": "read",
-    "Failed": "failed"
+    "Failed": "failed",
+    "1 reply": "1 reply",
+    "{{count}} replies": "{{count}} replies"
 }

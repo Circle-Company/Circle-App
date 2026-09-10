@@ -457,5 +457,7 @@
     "Sent": "enviado",
     "Delivered": "recebido",
     "Read": "lida",
-    "Failed": "falhou"
+    "Failed": "falhou",
+    "1 reply": "1 resposta",
+    "{{count}} replies": "{{count}} respostas"
 }

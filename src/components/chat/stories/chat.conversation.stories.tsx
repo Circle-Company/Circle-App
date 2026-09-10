@@ -76,6 +76,8 @@ export const OneToOne: Story = {
             content: "Oi! Consegui dois ingressos pro show de sexta.",
             status: "read",
             createdAt: at("14:02"),
+            // Respondida logo abaixo (c2), então mostra a contagem no rodapé.
+            replyCount: 1,
         },
         {
             id: "c2",
@@ -205,6 +207,7 @@ export const Group: Story = {
                 content: "Eu passo na confeitaria. @Rafael você leva os refrigerantes?",
                 status: "read",
                 createdAt: at("08:20"),
+                replyCount: 3,
                 mentions: [{ start: 25, end: 32, userId: rafael.id, username: "rafael" }],
             },
             {

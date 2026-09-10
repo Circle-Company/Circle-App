@@ -40,7 +40,16 @@ const fakePersisted = { session: fakeSession } as never
  * despercebida justamente por parecer igual a todas as outras.
  */
 const fakeLanguage = {
-    t: (key: string) => (pt as Record<string, string>)[key] ?? key,
+    t: (key: string, params?: Record<string, unknown>) => {
+        const template = (pt as Record<string, string>)[key] ?? key
+        // Interpolação `{{var}}`, como o i18next faz em runtime. Sem isto a story
+        // mostrava a chave crua ("{{count}} respostas") e escondia justamente o
+        // caso plural que ela existe para verificar.
+        if (!params) return template
+        return template.replace(/\{\{(\w+)\}\}/g, (match, name) =>
+            name in params ? String(params[name]) : match,
+        )
+    },
     languagesList: [],
     languageResources: {},
     atualAppLanguage: { code: "pt", name: "Português" },
