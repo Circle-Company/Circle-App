@@ -48,6 +48,7 @@ export function MessageRender({
     onPressReply,
     onPressReplies,
     onSeek,
+    onTogglePlay,
 }: MessageRenderProps) {
     return (
         <Message.Root data={data} options={{ ...options, messageType }} size={size}>
@@ -68,6 +69,7 @@ export function MessageRender({
                                 progress={progress}
                                 isPlaying={isPlaying}
                                 onSeek={onSeek}
+                                onTogglePlay={() => onTogglePlay?.(data.id)}
                             />
                             <Message.Text />
                         </Message.Content>

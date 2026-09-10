@@ -24,6 +24,7 @@ function MessageAudio({
     progress = 0,
     isPlaying = false,
     onSeek,
+    onTogglePlay,
 }: MessageAudioProps) {
     const { data, options, size } = React.useContext(MessageContext)
     const colors = ColorTheme()
@@ -56,6 +57,8 @@ function MessageAudio({
                 size={size.avatarSize}
                 color={foreground}
                 backgroundColor={isMine ? colors.blur_display_color : colors.backgroundDisabled}
+                isPlaying={isPlaying}
+                onPress={onTogglePlay}
             />
 
             <AudioWaveform

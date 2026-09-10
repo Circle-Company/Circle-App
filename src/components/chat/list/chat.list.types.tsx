@@ -40,6 +40,8 @@ export type ChatListProps = {
     onPressReply?: (replyToId: string) => void
     onPressReaction?: (messageId: string, emoji: string) => void
     onSeek?: (messageId: string, progress: number) => void
+    /** Play/pause de uma nota de voz. */
+    onTogglePlay?: (messageId: string) => void
     /** Id da nota de voz tocando agora, se houver. */
     playingMessageId?: string
     /** Progresso da nota de voz em reprodução (0..1). */

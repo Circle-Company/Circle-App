@@ -24,6 +24,12 @@ export default function MessageStatus({ color, size: sizeProp }: MessageStatusPr
 
     if (!options.isMine) return null
 
+    // "Lida" só na mensagem mais recente. Chegou coisa nova depois dela, o estado
+    // dessa vira histórico: repetido conversa acima, vira ruído em vez de
+    // informação. Os outros estados continuam aparecendo — "enviando" e "falhou"
+    // pedem atenção mesmo numa mensagem antiga.
+    if (actions.status === "read" && !options.isLatest) return null
+
     const label = {
         pending: t("Sending"),
         sent: t("Sent"),

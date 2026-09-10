@@ -29,12 +29,28 @@ export default function ChatList({
     onPressReply,
     onPressReaction,
     onSeek,
+    onTogglePlay,
     playingMessageId,
     playingProgress = 0,
 }: ChatListProps) {
     const { translateX, panHandlers } = useRevealGesture()
 
     const sequence = React.useMemo(() => resolveSequence(rows), [rows])
+
+    /**
+     * Id da mensagem mais recente.
+     *
+     * Percorre de trás para frente e para na primeira que não for divisor: a
+     * conversa pode terminar com uma virada de dia ou um aviso do sistema, e
+     * nenhum dos dois é a "última mensagem".
+     */
+    const latestId = React.useMemo(() => {
+        for (let index = rows.length - 1; index >= 0; index--) {
+            const row = rows[index]
+            if (!isDivider(row)) return row.id
+        }
+        return undefined
+    }, [rows])
 
     const keyExtractor = React.useCallback((row: ChatRow) => row.id, [])
 
@@ -44,6 +60,7 @@ export default function ChatList({
                 row={item}
                 sequence={isDivider(item) ? undefined : sequence.get(item.id)}
                 isGroup={isGroup}
+                isLatest={!isDivider(item) && item.id === latestId}
                 size={size}
                 translateX={translateX}
                 avatar={isDivider(item) ? undefined : renderAvatar?.(item)}
@@ -66,14 +83,19 @@ export default function ChatList({
                         ? (progress: number) => onSeek(item.id, progress)
                         : undefined
                 }
+                onTogglePlay={
+                    onTogglePlay && !isDivider(item) ? () => onTogglePlay(item.id) : undefined
+                }
             />
         ),
         [
             isGroup,
+            latestId,
             onAction,
             onPressReaction,
             onPressReply,
             onSeek,
+            onTogglePlay,
             playingMessageId,
             playingProgress,
             renderAvatar,
@@ -103,3 +125,4 @@ export default function ChatList({
 export { REVEAL_WIDTH } from "./chat.list.reveal"
 export * from "./chat.list.types"
 export { resolveSequence } from "./helpers/chat.list.sequence"
+export { useChatAudioPlayback } from "./hooks/useChatAudioPlayback"

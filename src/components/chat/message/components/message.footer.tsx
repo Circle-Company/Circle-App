@@ -38,12 +38,7 @@ export default function Footer({ children }: MessageChildrenProps) {
         // Respiro nas laterais: sem fundo próprio, o rodapé encostaria na borda da
         // conversa e pareceria colado nela.
         paddingHorizontal: size.padding * 1.5,
-        // Em grupo a linha do autor começa depois do avatar; sem isto o rodapé
-        // ficaria desalinhado da bolha que ele descreve.
-        paddingLeft:
-            options.isGroup && !options.isMine
-                ? size.avatarSize + size.gap + size.padding * 1.5
-                : size.padding * 1.5,
+        // Sem reserva para o avatar: ele é irmão desta coluna, não parte dela.
     }
 
     return <View style={container}>{children}</View>

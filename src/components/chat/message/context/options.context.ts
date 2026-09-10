@@ -14,6 +14,7 @@ const initialOptions: MessageOptionsProps = {
     isGroup: false,
     isFirstOfGroup: true,
     isLastOfGroup: true,
+    isLatest: true,
     isSelected: false,
     enableReply: true,
     enableForward: true,

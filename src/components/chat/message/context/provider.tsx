@@ -35,6 +35,9 @@ export function MessageProvider({
         isGroup = false,
         isFirstOfGroup = true,
         isLastOfGroup = true,
+        // Sem a lista dizendo o contrário, presume-se que não há nada mais novo:
+        // uma mensagem renderizada sozinha é a mais recente que existe.
+        isLatest = true,
         isSelected = false,
     } = options ?? {}
 
@@ -60,6 +63,7 @@ export function MessageProvider({
             isGroup,
             isFirstOfGroup,
             isLastOfGroup,
+            isLatest,
             isSelected,
             // Mensagem apagada vira lápide: nenhuma ação além de ler.
             enableReply: !isDeleted,
@@ -78,6 +82,7 @@ export function MessageProvider({
         isGroup,
         isFirstOfGroup,
         isLastOfGroup,
+        isLatest,
         isSelected,
         isDeleted,
         data.contentType,

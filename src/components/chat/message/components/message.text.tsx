@@ -50,6 +50,13 @@ export default function MessageText({
         color: options.isMine ? colors.background : colors.primary,
     }
 
+    // Sem texto não se renderiza nada — nem um `Text` vazio.
+    //
+    // Uma nota de voz sem legenda caía aqui e desenhava um nó de altura zero, que
+    // mesmo assim contava como filho no `rowGap` do conteúdo: sobrava um vão no
+    // pé da bolha sem nada que o explicasse.
+    if (!content) return null
+
     // Com texto sobrescrito os índices das menções não valem mais: eles apontam
     // para a string original, e aplicá-los aqui recortaria no lugar errado.
     // Com texto sobrescrito (ou na lápide) os índices das menções não valem mais:

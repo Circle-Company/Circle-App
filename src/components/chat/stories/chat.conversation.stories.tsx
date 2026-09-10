@@ -38,13 +38,60 @@ type Story = StoryObj<ConversationArgs>
 /** Horário fixo: story com `new Date()` mudaria de aparência a cada abertura. */
 const at = (time: string) => new Date(`2026-09-09T${time}:00`).toISOString()
 
+/**
+ * Reprodução simulada.
+ *
+ * O player de verdade é o `useChatAudioPlayback`, que fala com o `expo-audio` —
+ * mas aqui os arquivos são caminhos falsos e não há áudio a tocar. Um cronômetro
+ * faz o papel dele para o botão de play e o traço serem demonstráveis: é a mesma
+ * interface (id tocando + progresso), só a fonte do tempo é outra.
+ */
+function useSimulatedPlayback(durationSeconds = 14) {
+    const [playingMessageId, setPlayingMessageId] = React.useState<string | null>(null)
+    const [progress, setProgress] = React.useState(0)
+
+    React.useEffect(() => {
+        if (!playingMessageId) return
+
+        const startedAt = Date.now() - progress * durationSeconds * 1000
+        const timer = setInterval(() => {
+            const next = Math.min(1, (Date.now() - startedAt) / (durationSeconds * 1000))
+            setProgress(next)
+            if (next >= 1) setPlayingMessageId(null)
+        }, 250)
+
+        return () => clearInterval(timer)
+        // `progress` fora das dependências de propósito: ele muda a cada tique e
+        // reiniciaria o cronômetro sem parar. O valor no play já foi capturado.
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [durationSeconds, playingMessageId])
+
+    const toggle = React.useCallback((messageId: string) => {
+        setPlayingMessageId((current) => {
+            if (current === messageId) return null
+            setProgress(0)
+            return messageId
+        })
+    }, [])
+
+    const seek = React.useCallback((_messageId: string, next: number) => setProgress(next), [])
+
+    return { playingMessageId, progress, toggle, seek }
+}
+
 const renderConversation = (rows: ChatRow[], isGroup = false) =>
     function ConversationStory(args: ConversationArgs) {
+        const playback = useSimulatedPlayback()
+
         return (
             <ChatList
                 rows={rows}
                 isGroup={isGroup}
                 size={messageSizes[args.sizePreset] ?? messageSizes.standart}
+                playingMessageId={playback.playingMessageId ?? undefined}
+                playingProgress={playback.progress}
+                onTogglePlay={playback.toggle}
+                onSeek={playback.seek}
                 renderAvatar={(message) => (
                     <View
                         style={{

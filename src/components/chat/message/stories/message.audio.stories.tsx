@@ -1,3 +1,5 @@
+import React from "react"
+import { View } from "react-native"
 import { UPDATE_STORY_ARGS } from "storybook/internal/core-events"
 import { addons } from "storybook/preview-api"
 
@@ -30,6 +32,17 @@ const meta = {
         }),
 }
 
+/**
+ * Avatar de exemplo.
+ *
+ * A nota de voz mostra o rosto de quem falou dos dois lados — é o que diz de
+ * quem é a voz antes de apertar o play —, então as stories de áudio precisam
+ * passá-lo para o caso ficar visível.
+ */
+const StoryAvatar = ({ color }: { color: string }) => (
+    <View style={{ width: 34, height: 34, borderRadius: 17, backgroundColor: color }} />
+)
+
 export default meta
 
 type Story = MessageStory
@@ -37,6 +50,7 @@ type Story = MessageStory
 /** Nota de voz com waveform pronta. Use o controle `progress` para ver o avanço. */
 export const WithWaveform: Story = {
     args: {
+        avatar: <StoryAvatar color="#7C3AED" />,
         data: {
             ...baseMessage,
             id: "9",
@@ -55,6 +69,7 @@ export const WithWaveform: Story = {
 export const Sent: Story = {
     args: {
         ...WithWaveform.args,
+        avatar: <StoryAvatar color="#E8590C" />,
         data: {
             ...WithWaveform.args!.data!,
             id: "10",

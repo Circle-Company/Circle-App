@@ -12,6 +12,8 @@ export type ChatListRowProps = {
     row: ChatRow
     sequence?: ChatSequence
     isGroup: boolean
+    /** É a mensagem mais recente da conversa. */
+    isLatest?: boolean
     size?: MessageSizeProps
     translateX: Animated.Value
     avatar?: React.ReactNode
@@ -21,6 +23,7 @@ export type ChatListRowProps = {
     onPressReply?: (replyToId: string) => void
     onPressReaction?: (emoji: string) => void
     onSeek?: (progress: number) => void
+    onTogglePlay?: () => void
 }
 
 /**
@@ -38,6 +41,7 @@ function ChatListRow({
     row,
     sequence,
     isGroup,
+    isLatest,
     size,
     translateX,
     avatar,
@@ -47,6 +51,7 @@ function ChatListRow({
     onPressReply,
     onPressReaction,
     onSeek,
+    onTogglePlay,
 }: ChatListRowProps) {
     if (isDivider(row)) {
         return row.kind === "date" ? (
@@ -68,11 +73,13 @@ function ChatListRow({
                     isGroup,
                     isFirstOfGroup: sequence?.isFirstOfGroup ?? true,
                     isLastOfGroup: sequence?.isLastOfGroup ?? true,
+                    isLatest,
                 }}
                 onAction={onAction}
                 onPressReply={onPressReply}
                 onPressReaction={onPressReaction}
                 onSeek={onSeek}
+                onTogglePlay={onTogglePlay ? () => onTogglePlay() : undefined}
             />
             <ChatListTimestamp date={row.createdAt} translateX={translateX} />
         </Animated.View>

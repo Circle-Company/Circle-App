@@ -1,6 +1,6 @@
 /** Geometria das barras, em px. O vão é igual à barra: o traço respira. */
-export const BAR_WIDTH = 3
-export const BAR_GAP = 3
+export const BAR_WIDTH = 4
+export const BAR_GAP = 4
 /** Cantos totalmente arredondados: a barra vira uma cápsula. */
 export const BAR_RADIUS = BAR_WIDTH / 2
 /** Altura mínima, para a barra não sumir quando o valor está no piso. */

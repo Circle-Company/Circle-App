@@ -103,6 +103,14 @@ export type MessageOptionsProps = {
     /** Primeira/última de uma sequência do mesmo autor: controla avatar e cantos. */
     isFirstOfGroup: boolean
     isLastOfGroup: boolean
+    /**
+     * É a mensagem mais recente da conversa.
+     *
+     * Quem sabe disso é a lista, não a mensagem. Serve para o "lida" não se
+     * repetir conversa acima: uma vez que chegou mensagem nova, saber que a de
+     * dez atrás foi lida não acrescenta nada.
+     */
+    isLatest: boolean
     /** Selecionada pelo menu de ações (long press). */
     isSelected: boolean
     enableReply: boolean
@@ -172,6 +180,8 @@ export type MessageOptionsInput = {
     /** Posição na sequência do mesmo autor: controla avatar e cantos da bolha. */
     isFirstOfGroup?: boolean
     isLastOfGroup?: boolean
+    /** É a mensagem mais recente da conversa — ver `MessageOptionsProps.isLatest`. */
+    isLatest?: boolean
     /** Selecionada pelo menu de ações (long press). */
     isSelected?: boolean
 }
@@ -268,6 +278,8 @@ export type MessageAudioProps = {
      * brigaria com o que o player reporta.
      */
     onSeek?: (progress: number) => void
+    /** Toque no botão de play: alterna entre tocar e pausar esta nota. */
+    onTogglePlay?: () => void
     /** Quantidade de barras da waveform. Fixa por padrão — ver `WAVEFORM_BAR_COUNT`. */
     barCount?: number
     /** Altura útil do traço, em px. Default: a altura do avatar do preset. */
@@ -317,4 +329,6 @@ export type MessageRenderProps = {
     onPressReplies?: (messageId: string) => void
     /** Arrasto no traço da nota de voz — ver `MessageAudioProps.onSeek`. */
     onSeek?: (progress: number) => void
+    /** Play/pause da nota de voz. */
+    onTogglePlay?: (messageId: string) => void
 }

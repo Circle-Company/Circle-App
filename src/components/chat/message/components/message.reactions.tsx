@@ -22,7 +22,7 @@ export default function Reactions({ onPressReaction }: MessageReactionsProps) {
         justifyContent: options.isMine ? "flex-end" : "flex-start",
         // Sobe as pílulas para encostarem na base da bolha.
         marginTop: -size.gap,
-        paddingLeft: options.isGroup && !options.isMine ? size.avatarSize + size.gap : 0,
+        // Sem reserva para o avatar: ele é irmão desta coluna, não parte dela.
     }
 
     return (
