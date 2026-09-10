@@ -33,22 +33,3 @@ export type ChatPreview = {
     awaitingReply?: boolean
     online?: boolean
 }
-
-/** Posição da mensagem dentro de um bloco de mensagens seguidas do mesmo autor.
- *
- * É o que dá o formato do iMessage: só a última bolha de um bloco tem rabinho, e os cantos
- * internos do bloco são menos arredondados que os externos. */
-export type BubbleGroupPosition = "single" | "first" | "middle" | "last"
-
-export type ChatMessageStatus = "sending" | "sent" | "read" | "failed"
-
-/** Uma mensagem como a bolha precisa dela. */
-export type ChatBubbleMessage = {
-    id: string
-    text: string
-    /** `true` quando é do usuário logado — decide lado e cor. */
-    mine: boolean
-    createdAt?: string
-    status?: ChatMessageStatus
-    groupPosition?: BubbleGroupPosition
-}

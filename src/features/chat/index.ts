@@ -14,13 +14,7 @@ export {
     CHAT_GRID_PADDING,
     ChatConversationCell,
 } from "./chat.conversation.cell"
-export { ChatMessageBubble } from "./chat.message.bubble"
 export { ChatSpeechBubble } from "./chat.speech.bubble"
-export { groupMessages } from "./chat.grouping"
-export { MOCK_CONVERSATIONS, MOCK_MESSAGES } from "./chat.mock"
-export type {
-    BubbleGroupPosition,
-    ChatBubbleMessage,
-    ChatMessageStatus,
-    ChatPreview,
-} from "./chat.types"
+export { toMessageData, toMessageList, type ToMessageDataOptions } from "./chat.message.adapter"
+export { MOCK_CONVERSATIONS, mockMessages } from "./chat.mock"
+export type { ChatPreview } from "./chat.types"
