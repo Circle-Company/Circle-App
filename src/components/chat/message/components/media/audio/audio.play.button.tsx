@@ -1,11 +1,12 @@
 import React from "react"
-import { Text, View, type ViewStyle } from "react-native"
+import { View, type ViewStyle } from "react-native"
+
+import MessageSymbol from "../../message.symbol"
 
 /**
  * Botão de reprodução.
  *
- * TODO: trocar o glifo pelo ícone de play/pause e ligar no player — hoje é só o
- * lugar dele na composição.
+ * TODO: alternar para pause e ligar no player — hoje só o ícone está no lugar.
  */
 function AudioPlayButton({
     size,
@@ -27,7 +28,7 @@ function AudioPlayButton({
 
     return (
         <View style={style}>
-            <Text style={{ color }}>▶</Text>
+            <MessageSymbol ios="play.fill" material="play_arrow" size={size * 0.45} color={color} />
         </View>
     )
 }

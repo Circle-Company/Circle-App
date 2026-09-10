@@ -451,4 +451,10 @@
     "No conversations yet": "No conversations yet",
     "Your conversations will appear here.": "Your conversations will appear here.",
     "Say hi": "Say hi",
-    "Message": "Message"}
+    "Message": "Message",
+    "Sending": "sending",
+    "Sent": "sent",
+    "Delivered": "delivered",
+    "Read": "read",
+    "Failed": "failed"
+}

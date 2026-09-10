@@ -452,4 +452,10 @@
     "No conversations yet": "Nenhuma conversa ainda",
     "Your conversations will appear here.": "Suas conversas vão aparecer aqui.",
     "Say hi": "Manda um oi",
-    "Message": "Mensagem"}
+    "Message": "Mensagem",
+    "Sending": "enviando",
+    "Sent": "enviado",
+    "Delivered": "recebido",
+    "Read": "lida",
+    "Failed": "falhou"
+}

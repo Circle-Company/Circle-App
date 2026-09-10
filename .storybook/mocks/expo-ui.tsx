@@ -11,7 +11,12 @@ import { Modal, Pressable, Text, View } from "react-native"
  * dispositivo, com `npm run storybook:ios`.
  */
 
-type ItemProps = { label?: string; role?: string; onPress?: () => void }
+type ItemProps = { label?: string; role?: string; onPress?: () => void; children?: React.ReactNode }
+
+/** Elemento de slot (`Items`/`Trigger`), reconhecido pelo `slotName` do tipo. */
+type SlotElement = React.ReactElement<{ children?: React.ReactNode }> & {
+    type: { slotName?: string }
+}
 
 const MenuContext = React.createContext<{ open: () => void } | null>(null)
 
@@ -24,7 +29,7 @@ function useItems(children: React.ReactNode): React.ReactElement<ItemProps>[] {
 function Menu({ children }: { children: React.ReactNode }) {
     const [visible, setVisible] = React.useState(false)
 
-    const nodes = React.Children.toArray(children).filter(React.isValidElement) as any[]
+    const nodes = React.Children.toArray(children).filter(React.isValidElement) as SlotElement[]
     const items = nodes.find((node) => node.type?.slotName === "items")
     const trigger = nodes.find((node) => node.type?.slotName === "trigger")
 
@@ -92,8 +97,8 @@ export const DropdownMenu = Object.assign(Menu, {
     Preview: slot("preview"),
 })
 
-export const Button = (props: ItemProps) => null
-export const DropdownMenuItem = Object.assign((props: any) => null, {
+export const Button = (_props: ItemProps) => null
+export const DropdownMenuItem = Object.assign((_props: ItemProps) => null, {
     Text: ({ children }: { children?: React.ReactNode }) => <>{children}</>,
     LeadingIcon: ({ children }: { children?: React.ReactNode }) => <>{children}</>,
     TrailingIcon: ({ children }: { children?: React.ReactNode }) => <>{children}</>,

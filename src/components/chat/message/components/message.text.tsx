@@ -36,7 +36,10 @@ export default function MessageText({
         : (color ?? (options.isMine ? colors.background : colors.text))
 
     const text_style: TextStyle = {
-        fontSize: fontSize ?? size.fontSize,
+        // A lápide é metadado, não conteúdo: vai na escala das outras marcas do
+        // rodapé ("editada", "encaminhada"), e não na do texto que a pessoa
+        // escreveu — no tamanho cheio ela pesava mais que a própria conversa.
+        fontSize: fontSize ?? (isDeleted ? size.fontSize * 0.85 : size.fontSize),
         fontFamily:
             fontFamily ?? (isDeleted ? fonts.family["Regular-Italic"] : fonts.family.Regular),
         color: textColor,

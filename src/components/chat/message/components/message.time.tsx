@@ -15,7 +15,13 @@ export default function MessageTime({ color, fontSize }: MessageTimeProps) {
         if (!data.createdAt) return ""
         const date = new Date(data.createdAt)
         if (Number.isNaN(date.getTime())) return ""
-        return date.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })
+        return date.toLocaleTimeString("pt-BR", {
+            hour: "2-digit",
+            minute: "2-digit",
+            // 24h fixo: sem isto o formato segue a região do aparelho, e a mesma
+            // conversa mostraria "2:05 PM" para uns e "14:05" para outros.
+            hour12: false,
+        })
     }, [data.createdAt])
 
     const text_style: TextStyle = {

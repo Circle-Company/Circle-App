@@ -16,7 +16,9 @@ export default function EditedLabel({ color, fontSize }: MessageEditedLabelProps
     const text_style: TextStyle = {
         fontSize: fontSize ?? size.fontSize * 0.75,
         fontFamily: fonts.family["Regular-Italic"],
-        color: color ?? (options.isMine ? colors.background : colors.textDisabled),
+        // Fora da bolha o rodapé fica sobre o fundo da conversa, então a cor não
+        // depende mais do lado da mensagem.
+        color: color ?? colors.textDisabled,
     }
 
     return <Text style={text_style}>editada ·</Text>

@@ -209,8 +209,10 @@ export type MessageAuthorNameProps = {
 }
 
 export type MessageReplyPreviewProps = {
-    /** Cor da barra vertical à esquerda da citação. */
+    /** Cor de destaque do nome do autor citado. */
     accentColor?: string
+    /** Toque na citação, para saltar até a mensagem original. */
+    onPress?: () => void
 }
 
 export type MessageTimeProps = {

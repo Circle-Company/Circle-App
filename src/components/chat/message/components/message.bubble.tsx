@@ -1,7 +1,7 @@
 import React from "react"
 import { View, type ViewStyle } from "react-native"
 
-import ColorTheme from "@/constants/colors"
+import ColorTheme, { colors as palette } from "@/constants/colors"
 import MessageContext from "../context/provider"
 import MessageLayoutContext from "../context/layout.context"
 import { MessageChildrenProps } from "../message.types"
@@ -30,7 +30,13 @@ export default function BubbleRoot({ children }: MessageChildrenProps) {
         // Enviada: roxo bem claro (`primaryAccent` = purple_00). O `primary` cheio
         // pesava demais numa lista inteira de bolhas, e o texto sobre ele exigia
         // cor invertida; sobre o claro o texto normal já contrasta.
-        backgroundColor: options.isMine ? colors.primaryAccent : colors.background,
+        // Recebida em cinza bem escuro, e não no preto do fundo: no preto a bolha
+        // se dissolvia na conversa e só a mancha do texto marcava onde ela estava.
+        //
+        // Vem da paleta direta porque o tema não tem um token para "superfície um
+        // passo acima do fundo" — é isso que falta aqui, e inventar um significado
+        // novo para `backgroundDisabled` seria pior.
+        backgroundColor: options.isMine ? colors.primaryAccent : palette.gray.grey_08,
         borderRadius: size.borderRadius,
         borderBottomRightRadius: options.isMine ? tight : size.borderRadius,
         borderBottomLeftRadius: options.isMine ? size.borderRadius : tight,

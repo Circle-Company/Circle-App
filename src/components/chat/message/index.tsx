@@ -1,5 +1,4 @@
 import React from "react"
-import { Pressable } from "react-native"
 
 import actions_menu from "./components/message.actions.menu"
 import audio from "./components/media/audio"
@@ -56,15 +55,13 @@ export function MessageRender({
                         <Message.AuthorName />
                         <Message.Content>
                             <Message.ForwardedLabel />
-                            <Pressable
+                            <Message.ReplyPreview
                                 onPress={
                                     data.replyTo
                                         ? () => onPressReply?.(data.replyTo!.id)
                                         : undefined
                                 }
-                            >
-                                <Message.ReplyPreview />
-                            </Pressable>
+                            />
                             <Message.Media.Audio
                                 progress={progress}
                                 isPlaying={isPlaying}
@@ -72,13 +69,17 @@ export function MessageRender({
                             />
                             <Message.Text />
                         </Message.Content>
-                        <Message.Footer>
-                            <Message.EditedLabel />
-                            <Message.Time />
-                            <Message.Status />
-                        </Message.Footer>
                     </Message.Bubble>
                 </Message.ActionsMenu>
+
+                {/* Fora da bolha, dentro da linha: "editada" e tiques falam do
+                    envio, não do conteúdo. A hora saiu daqui — quem a mostra
+                    agora é o arrasto da lista. */}
+                <Message.Footer>
+                    <Message.EditedLabel />
+                    <Message.Status />
+                </Message.Footer>
+
                 <Message.Reactions onPressReaction={onPressReaction} />
             </Message.Container>
         </Message.Root>

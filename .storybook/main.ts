@@ -41,6 +41,12 @@ const main: StorybookConfig = {
                 replacement: path.resolve(configDir, "mocks/expo-ui.tsx"),
             },
             {
+                // O build web do expo-symbols importa `PlatformColor`, ausente no
+                // react-native-web — sem o stub o bundle não monta.
+                find: /^expo-symbols$/,
+                replacement: path.resolve(configDir, "mocks/expo-symbols.tsx"),
+            },
+            {
                 find: /^react-native-mmkv$/,
                 replacement: path.resolve(configDir, "mocks/mmkv.ts"),
             },
