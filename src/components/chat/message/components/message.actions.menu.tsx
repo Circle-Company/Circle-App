@@ -1,6 +1,13 @@
 import React from "react"
 import type { SFSymbols7_0 } from "sf-symbols-typescript"
-import { Alert, Platform, Pressable, View, type ViewStyle } from "react-native"
+import {
+    Alert,
+    Platform,
+    Pressable,
+    View,
+    type LayoutChangeEvent,
+    type ViewStyle,
+} from "react-native"
 import { Button, ContextMenu, Host as SwiftUIHost } from "@expo/ui/swift-ui"
 import { frame } from "@expo/ui/swift-ui/modifiers"
 import { DropdownMenu, DropdownMenuItem, Host as ComposeHost } from "@expo/ui/jetpack-compose"
@@ -20,10 +27,20 @@ type ActionItem = {
 }
 
 /**
- * Menu de ações da mensagem, com renderização **nativa** nos dois sistemas:
- * `ContextMenu` (SwiftUI) no iOS e `DropdownMenu` (Jetpack Compose) no Android.
+ * Menu de ações da mensagem, nativo nos dois sistemas: `ActionSheetIOS` no iOS e
+ * `DropdownMenu` (Jetpack Compose) no Android. O gatilho é o long press sobre a
+ * bolha.
  *
- * O componente envolve a bolha e vira o gatilho do long press.
+ * **O relevo do long press vem do `ContextMenu`**, igual ao card do feed
+ * (`ProfileDropDownMenuIOS`). A diferença é que lá o card tem tamanho fixo, e a
+ * bolha não tem: ela depende do texto.
+ *
+ * Usar `matchContents` para resolver isso criava um círculo — o host media zero,
+ * a bolha calculava a própria largura sobre esse zero, e o host continuava zero.
+ * O sintoma era a conversa sem bolha nenhuma, só as reações (que são irmãs do
+ * host) aparecendo. Por isso aqui a bolha é **medida em RN primeiro** e só então
+ * hospedada, com o tamanho já conhecido — que é a condição em que o menu do feed
+ * funciona.
  *
  * Montar a lista é responsabilidade daqui, e não de quem usa o `Message`: o que
  * pode ser feito com a mensagem já está decidido nas `options` (posse, tipo de
@@ -93,6 +110,27 @@ export default function ActionsMenu({ children, onAction }: MessageActionsMenuPr
     )
 
     /**
+     * Tamanho da bolha, medido em RN antes de hospedar.
+     *
+     * `null` enquanto não mediu: nesse primeiro quadro a bolha renderiza sem menu, o que é
+     * o necessário para ela poder se medir. Depois disso o host recebe a medida pronta e o
+     * long press passa a valer.
+     */
+    const [box, setBox] = React.useState<{ width: number; height: number } | null>(null)
+
+    const handleLayout = React.useCallback((event: LayoutChangeEvent) => {
+        const { width, height } = event.nativeEvent.layout
+        if (width <= 0 || height <= 0) return
+        setBox((previous) =>
+            previous &&
+            Math.abs(previous.width - width) < 1 &&
+            Math.abs(previous.height - height) < 1
+                ? previous
+                : { width, height },
+        )
+    }, [])
+
+    /**
      * O gatilho do menu é uma camada a mais entre a linha e a bolha, e por padrão
      * ela estica: a bolha ficava encostada à esquerda dentro de um gatilho largo,
      * o que na mensagem enviada aparecia como um vão sobrando à direita.
@@ -124,13 +162,22 @@ export default function ActionsMenu({ children, onAction }: MessageActionsMenuPr
         )
     }
 
+    // Primeiro quadro: sem menu, só para a bolha poder se medir.
+    if (!box) {
+        return (
+            <View style={align} onLayout={handleLayout}>
+                {children}
+            </View>
+        )
+    }
+
     return (
-        <View style={align}>
-            <SwiftUIHost matchContents>
-                {/* No SDK 56 as props de layout do expo-ui viraram `modifiers`, e
-                `activationMethod` deixou de existir: o long press já é o gatilho
-                padrão do `ContextMenu`. */}
-                <ContextMenu modifiers={[frame({ alignment: "center" })]}>
+        <View style={[align, { width: box.width, height: box.height }]}>
+            {/* Tamanho explícito nos dois lados — no `Host` e no `frame` — é o que evita
+                o `matchContents`. O card do feed não precisa disto porque já nasce com
+                tamanho fixo; a bolha chega aqui medida. */}
+            <SwiftUIHost colorScheme="dark" style={{ width: box.width, height: box.height }}>
+                <ContextMenu modifiers={[frame({ width: box.width, height: box.height })]}>
                     <ContextMenu.Items>
                         {items.map((item) => (
                             <Button
@@ -143,7 +190,11 @@ export default function ActionsMenu({ children, onAction }: MessageActionsMenuPr
                         ))}
                     </ContextMenu.Items>
 
-                    <ContextMenu.Trigger>{children}</ContextMenu.Trigger>
+                    <ContextMenu.Trigger>
+                        {/* `onLayout` continua ligado: mensagem editada ou reação nova muda a
+                            altura, e o host precisa acompanhar. */}
+                        <View onLayout={handleLayout}>{children}</View>
+                    </ContextMenu.Trigger>
                 </ContextMenu>
             </SwiftUIHost>
         </View>

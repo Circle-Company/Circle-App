@@ -4,6 +4,7 @@ import { View, type ViewStyle } from "react-native"
 import ColorTheme, { colors as palette } from "@/constants/colors"
 import MessageContext from "../context/provider"
 import MessageLayoutContext from "../context/layout.context"
+import appSizes from "@/constants/sizes"
 import { MessageChildrenProps } from "../message.types"
 
 /**
@@ -16,6 +17,8 @@ import { MessageChildrenProps } from "../message.types"
 export default function BubbleRoot({ children }: MessageChildrenProps) {
     const { options, size } = React.useContext(MessageContext)
     const rowWidth = React.useContext(MessageLayoutContext)
+    // Teto de segurança enquanto a linha ainda não se mediu.
+    const windowWidth = appSizes.window.width
     const colors = ColorTheme()
 
     const tight = options.isLastOfGroup ? size.borderRadiusTight : size.borderRadius
@@ -24,7 +27,11 @@ export default function BubbleRoot({ children }: MessageChildrenProps) {
         // Teto em px sobre a largura medida da linha. Em porcentagem ele se
         // resolveria contra o gatilho do menu de ações — a camada que envolve a
         // bolha —, cuja largura é a do texto, não a da conversa.
-        maxWidth: rowWidth > 0 ? rowWidth * size.maxWidthRatio : `${size.maxWidthRatio * 100}%`,
+        // O fallback é medida ABSOLUTA, não percentual. Percentual resolve contra o pai —
+        // que é o `Host` do SwiftUI do menu de ações — e se ele reporta largura zero, `78%`
+        // de `0` é `0`: a bolha nasce sem largura e desaparece, enquanto as reações (irmãs
+        // do host, filhas diretas do `Container`) continuam visíveis. Foi esse o sintoma.
+        maxWidth: rowWidth > 0 ? rowWidth * size.maxWidthRatio : windowWidth * size.maxWidthRatio,
         padding: size.padding,
         rowGap: size.gap / 2,
         // Enviada: roxo bem claro (`primaryAccent` = purple_00). O `primary` cheio
